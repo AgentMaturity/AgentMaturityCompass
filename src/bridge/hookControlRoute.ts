@@ -1,4 +1,4 @@
-import { evaluateProviderHookControl, MAX_CONTROL_HOOK_BODY_BYTES, type ProviderHookControlResult } from "./hookControl.js";
+import { evaluateProviderHookControl, evaluateProviderHookControlAsync, MAX_CONTROL_HOOK_BODY_BYTES, type ProviderHookControlResult } from "./hookControl.js";
 import { isPiSessionStart, registerPiSession, type PiSessionRegistrationResult } from "./piSessionRegistry.js";
 import { recordPiToolResult } from "./piObservations.js";
 import { isDshSessionStart, registerDshSession, type DshSessionRegistrationResult } from "./dshSessionRegistry.js";
@@ -32,10 +32,18 @@ function eventName(rawInput: string): unknown {
  */
 export function handleHookControlRequest(input: Input):
   ProviderHookControlResult | PiSessionRegistrationResult | DshSessionRegistrationResult | ClaudeCodeRegistrationResult | HookObservationResult {
-  return guardHookAudit(input.workspace, (message) => new HookControlError("HOOK_CONTROL_LEDGER_UNAVAILABLE", 503, message), () => route(input));
+  return guardHookAudit(input.workspace, (message) => new HookControlError("HOOK_CONTROL_LEDGER_UNAVAILABLE", 503, message), () => route(input, evaluateProviderHookControl));
 }
 
-function route(input: Input): ProviderHookControlResult | PiSessionRegistrationResult | DshSessionRegistrationResult | ClaudeCodeRegistrationResult | HookObservationResult {
+/** Async signing failures pass the same audit latch as synchronous hook failures. */
+export async function handleHookControlRequestAsync(input: Input) {
+  const error = (message: string) => new HookControlError("HOOK_CONTROL_LEDGER_UNAVAILABLE", 503, message);
+  guardHookAudit(input.workspace, error, () => undefined);
+  try { return await route(input, evaluateProviderHookControlAsync); }
+  catch (cause) { return guardHookAudit(input.workspace, error, () => { throw cause; }); }
+}
+
+function route<T>(input: Input, evaluate: (input: Input) => T): T | PiSessionRegistrationResult | DshSessionRegistrationResult | ClaudeCodeRegistrationResult | HookObservationResult {
   // The size cap comes before any parse.
   if (Buffer.byteLength(input.rawInput, "utf8") > MAX_CONTROL_HOOK_BODY_BYTES) throw new HookControlError("HOOK_CONTROL_INPUT_TOO_LARGE", 413, "hook input is too large");
   if (input.provider === "pi" && isPiSessionStart(input.rawInput)) return registerPiSession(input);
@@ -46,5 +54,5 @@ function route(input: Input): ProviderHookControlResult | PiSessionRegistrationR
   const event = eventName(input.rawInput);
   const claudeSession = input.provider === "claude-code" && typeof event === "string" && Object.hasOwn(CLAUDE_SESSION_EVENTS, event)
     ? CLAUDE_SESSION_EVENTS[event] : undefined;
-  return claudeSession ? claudeSession(input) : evaluateProviderHookControl(input);
+  return claudeSession ? claudeSession(input) : evaluate(input);
 }

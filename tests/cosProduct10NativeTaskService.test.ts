@@ -9,6 +9,7 @@ import { AMCNativeClient, type AMCNativeSession, type AMCNativeTurn } from "../s
 import { createNativeTaskService } from "../src/studio/nativeTaskService.js";
 import { NativeTaskDescriptors, nativeTaskId } from "../src/studio/nativeTaskDescriptors.js";
 import * as projection from "../src/studio/nativeTaskProjection.js";
+import { projectNativeRunUsage } from "../src/agent/nativeRunUsage.js";
 import type { NativeTaskActor, NativeTaskInputPart, NativeTaskService, NativeTaskStartRequest } from "../src/studio/nativeTaskTypes.js";
 import { IMAGE_PNG_BASE64 } from "./fixtures/nativeAcpImageRuntime.js";
 import { wavBytes } from "./fixtures/nativeSignedAudio.js";
@@ -61,7 +62,8 @@ beforeEach(() => {
   root = mkdtempSync(join(tmpdir(), "amc-p10-service-")); home = join(root, "operator-home"); mkdirSync(home, { mode: 0o700 }); // the credentials store refuses a group/other-readable home
   initWorkspace({ workspacePath: root, trustBoundaryMode: "isolated" });
   runtimeCapabilities = structuredClone(capabilities); clients.length = 0; pending.length = 0; serial = 0;
-  current = { history: { status: "authenticated", backend: "sqlite", headEventHash: "a".repeat(64), eventCount: 1,
+  const { requestReports: _reports, issues, ...usage } = projectNativeRunUsage([], "p10-synthetic-session");
+  current = { plans: [], usage: { ...usage, issueCount: issues.length }, history: { status: "authenticated", backend: "sqlite", headEventHash: "a".repeat(64), eventCount: 1,
       message: "Synthetic unit-test projection, not evidence acceptance" }, storeHeadEventHash: "a".repeat(64),
     validation: { status: "not-requested", turn: null, configSha256: null, checks: [] }, validationOutputs: [], events: [],
     nextCursor: 0, firstCursor: 1, droppedEvents: 0, ending: null, endingId: null, closed: false, approvals: [], approvalError: null };

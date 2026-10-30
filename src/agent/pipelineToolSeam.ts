@@ -43,7 +43,8 @@ export const OUTCOME_UNKNOWN_NOTICES = Object.freeze([
  */
 function toLoopOutcome(outcome: PipelineOutcome, aborted: boolean): ToolCallOutcome {
   const state = outcome.action?.state;
-  if (state === undefined ? aborted : state === "cancelled") {
+  // A cancellation control can finish with explicit unknown cleanup after its caller aborts.
+  if (state === undefined ? aborted && outcome.effect !== "unknown" : state === "cancelled") {
     return { outcome: "CANCELLED", content: "", exitCode: null, timedOut: false, denied: false };
   }
   if (outcome.denied === null && (state === "outcome_unknown" || state === "started"
@@ -113,6 +114,7 @@ export function pipelineToolSeam(init: PipelineToolSeamInit): AgentToolSeam {
         .filter((tool) => tool.parameters !== undefined)
         .map((tool): ToolSchema => ({
           name: tool.name,
+          ...(tool.modelAlias === undefined ? {} : { modelAlias: tool.modelAlias }),
           description: tool.description,
           parameters: tool.parameters as Record<string, unknown>
         }));
@@ -159,6 +161,7 @@ export function pipelineToolSeam(init: PipelineToolSeamInit): AgentToolSeam {
           callId: request.callId,
           parentToken: request.parentToken,
           signal: request.signal,
+          ownerStep: { sessionId: request.sessionId, turn: request.turn, step: request.step, callId: request.callId },
           ...(request.beforeEffect === undefined ? {} : { beforeEffect: request.beforeEffect }),
           ...(request.authority === undefined ? {} : { authority: request.authority })
         });

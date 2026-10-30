@@ -36,6 +36,8 @@ export interface ToolExecution {
   /** Correlation token minted by the registry when the call enters. */
   readonly token: string;
   readonly callId: string;
+  /** Trusted native step identity; never taken from model arguments. */
+  readonly ownerStep?: Readonly<{ sessionId: string; turn: number; step: number; callId: string }>;
   /** The originating call, for sub-calls dispatched from inside a tool. */
   readonly rootCallId: string;
   readonly name: string;
@@ -187,6 +189,8 @@ export interface ToolStepContext {
 
 export interface ToolDefinition {
   readonly name: string;
+  /** Operator-declared provider name; registry identity and authorization remain canonical. */
+  readonly modelAlias?: string;
   readonly actionClass: ActionClass;
   readonly description: string;
   /**

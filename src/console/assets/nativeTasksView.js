@@ -36,6 +36,7 @@ export function nativeTasksShell(agentId) {
     </section><aside class="native-task-sidebar">
       <section class="card"><h3>Session</h3><div id="nativeTaskIdentity"><p class="muted">No task has been started.</p></div><div class="native-task-actions"><button id="nativeTaskRefresh" class="secondary" disabled>Refresh status</button><button id="nativeTaskRelease" class="secondary" hidden>Release for later</button><button id="nativeTaskResume" hidden>Resume session</button><button id="nativeTaskVerify" class="secondary" hidden>Close and verify</button><button id="nativeTaskArchive" class="secondary" aria-describedby="nativeTaskArchiveHelp" hidden>Archive closed task</button><button id="nativeTaskNew" class="secondary" disabled>New task</button></div><p id="nativeTaskArchiveHelp" class="muted" hidden>Removes this closed task from your current list. Its signed history stays available under Show archived tasks.</p></section>
       <section class="card"><h3>Approvals</h3><div id="nativeTaskApprovals"><p class="muted">No pending requests.</p></div></section>
+      <section class="card"><h3>Agent todo and plan</h3><div id="nativeTaskPlans"><p class="muted">No standing list loaded.</p></div></section>
       <section class="card"><h3>Public validation</h3><div id="nativeTaskValidation"><p class="muted">No checks requested.</p></div></section>
       <section class="card"><h3>Evidence</h3><div id="nativeTaskVerification"><p class="muted">No verification has been requested.</p></div></section>
       <section class="card"><h3>Recorded usage</h3><div id="nativeTaskUsage"><p class="muted">Usage unavailable until reported by Studio.</p></div></section>
@@ -159,21 +160,23 @@ export function collectNativeTaskTools(previous, events, limit = 128) {
 export function renderTaskToolStatus(tools, available = true) {
   if (!available) return '<p class="muted">Tool status is unconfirmed. Refresh the original task history; no completion is inferred.</p>';
   if (!tools.size) return '<p class="muted">No tool activity in the loaded updates. This does not prove that no tool ran.</p>';
-  const statuses = { pending: "Pending", in_progress: "In progress", completed: "Completed", failed: "Failed", cancelled: "Cancelled", canceled: "Cancelled", unreported: "Status unreported" };
+  const statuses = { pending: "Pending", in_progress: "In progress", completed: "Completed", failed: "Failed", unknown: "Outcome unknown", cancelled: "Cancelled", canceled: "Cancelled", unreported: "Status unreported" };
   const visible = [...tools.values()].slice(-20).reverse();
   return `<p class="muted">Latest recorded status for ${visible.length} retained calls; not a complete tool inventory or a live process check.</p>${visible.map(tool => `<article class="native-task-tool-status" data-native-tool-status="${esc(tool.status)}"><div class="native-task-row"><strong>${esc(tool.title || "Tool call")}${tool.titleTruncated ? "… (title shortened)" : ""}</strong><span class="pill">${esc(statuses[tool.status] || tool.status)}</span></div><small>${tool.toolCallId ? esc(tool.toolCallId) : "Call identity not reported"} · recorded update ${esc(tool.cursor)}</small></article>`).join("")}`;
 }
 
-/** Optional additive P10 projection: NativeTaskView.usage = NativeRunUsage, not maxTokens or estimates. */
+/** Optional additive P10 projection: bounded recorded usage aggregates, not maxTokens or estimates. */
 export function renderTaskUsage(task) {
   const unavailable = '<p class="muted">Usage unavailable. Studio has not supplied a usable recorded usage projection; absent counts are not zero.</p>';
   if (!task) return unavailable;
   if (task.history?.status !== "authenticated") return '<p class="muted">Usage withheld until the original session history is authenticated.</p>';
   if (task.provider === "stub") return '<p class="muted">Local demonstration only. Stub counts are synthetic, not measured provider usage or cost.</p>';
   const usage = task.usage, count = value => Number.isSafeInteger(value) && value >= 0;
+  const issueCount = usage?.issueCount === undefined ? (Array.isArray(usage?.issues) ? usage.issues.length : null) : usage.issueCount;
   const fields = [["inputTokens", "Input"], ["outputTokens", "Output"], ["cacheReadTokens", "Cache read"], ["cacheWriteTokens", "Cache write"], ["reasoningTokens", "Reasoning"]];
   if (!usage || usage.scope !== "recorded-session" || !["recorded", "partial"].includes(usage.status)
-    || !Array.isArray(usage.issues) || usage.issues.length > 0
+    || !count(issueCount) || issueCount !== 0
+    || (usage.issues !== undefined && (!Array.isArray(usage.issues) || usage.issues.length !== issueCount))
     || ![usage.requests, usage.syntheticRequests, usage.reportedRequests, usage.completeRequests, usage.unreportedRequests, usage.pendingRequests].every(count)
     || usage.syntheticRequests > usage.requests || usage.reportedRequests > usage.requests - usage.syntheticRequests
     || usage.completeRequests > usage.reportedRequests || usage.pendingRequests > usage.requests
@@ -206,4 +209,11 @@ export function nativeTaskErrorText(error) {
     NATIVE_TIMEOUT: "The request timed out locally, not necessarily on the server. Refresh status before another action."
   };
   return `${error?.message || "Studio could not complete this request."}${error?.code ? ` (${error.code})` : ""}${hints[error?.code] ? ` ${hints[error.code]}` : [401, 403].includes(error?.status) ? " Sign in or refresh setup before another action." : ""}`;
+}
+
+/** Current signed list state is separate from transcript replay and approval authority. */
+export function renderTaskPlans(task) {
+  if (task?.history?.status !== "authenticated") return '<p class="muted">Standing lists withheld until the original session history is authenticated.</p>';
+  if (!task.plans?.length) return '<p class="muted">No current todo or plan was committed in this turn.</p>';
+  return `<p class="muted">Agent intent only. These lists do not grant approval or prove that an action ran.</p>${task.plans.map(plan => `<article><strong>${esc(plan.kind)} · revision ${esc(plan.revision)}</strong><pre tabindex="0">${esc(plan.text)}</pre><details><summary>Current record identity</summary><code>${esc(plan.recordSha256)}</code></details></article>`).join("")}`;
 }

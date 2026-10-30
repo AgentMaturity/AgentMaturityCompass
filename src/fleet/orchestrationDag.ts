@@ -6,6 +6,7 @@
  */
 
 import { randomUUID } from "node:crypto";
+import { readDelegationLineage, nativeDelegationReceiptId, delegationStartFor, incomingDelegationFor, delegatingAgentFor } from "../receipts/receiptChain.js";
 import { join, resolve } from "node:path";
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { z } from "zod";
@@ -53,6 +54,8 @@ export const dagNodeSchema = z.object({
 export type DagNode = z.infer<typeof dagNodeSchema>;
 
 export interface OrchestrationDag {
+  /** Native DAGs are verified ledger projections; their hashes/signatures are the ledger events. */
+  source?: "ledger";
   dagId: string;
   fleetId: string;
   createdTs: number;
@@ -175,7 +178,46 @@ function saveDag(workspace: string, dag: OrchestrationDag, previous: DagFileStat
   } });
 }
 
+/** Legacy manual DAG files remain readable; native lineage is always projected from the signed session store. */
+function nativeDags(workspace: string): OrchestrationDag[] {
+  const lineage = readDelegationLineage(workspace), dags = new Map<string, OrchestrationDag>();
+  for (const entry of lineage.delegations) {
+    let rootSession = entry.event.session_id;
+    const visited = new Set<string>();
+    for (;;) {
+      if (visited.has(rootSession)) throw new Error("Cyclic delegation lineage");
+      visited.add(rootSession);
+      const incoming = incomingDelegationFor(lineage.delegations, rootSession);
+      if (!incoming) break;
+      rootSession = incoming.event.session_id;
+    }
+    const dagId = `native_${encodeURIComponent(rootSession)}`;
+    let dag = dags.get(dagId);
+    if (!dag) {
+      dag = { source: "ledger", dagId, fleetId: "default", createdTs: entry.event.ts, nodes: [], dagHash: "", dagSignature: "" };
+      dags.set(dagId, dag);
+    }
+    const completed = entry.event.event_type === "agent_delegation_completed";
+    const start = completed ? delegationStartFor(lineage.delegations, entry) : entry;
+    if (!start) throw new Error("Delegation lineage completion has no matching start");
+    const parent = completed ? start : incomingDelegationFor(lineage.delegations, entry.event.session_id);
+    dag.nodes.push(dagNodeSchema.parse({ nodeId: nativeDelegationReceiptId(entry.event.id), dagId,
+      callerAgentId: delegatingAgentFor(lineage, start), calleeAgentId: entry.meta.childRunAs,
+      eventType: entry.event.event_type, taskDescription: entry.meta.packetId, contextHash: entry.event.event_hash,
+      startTs: start.event.ts, endTs: completed ? entry.event.ts : null, outcome: completed ? entry.meta.settledAs : null,
+      parentNodeId: parent ? nativeDelegationReceiptId(parent.event.id) : null,
+      prevHash: entry.event.prev_event_hash, nodeHash: entry.event.event_hash, signature: entry.event.writer_sig }));
+    dag.dagHash = entry.event.event_hash; dag.dagSignature = entry.event.writer_sig;
+  }
+  return [...dags.values()];
+}
+
 export function loadDag(workspace: string, dagId: string): OrchestrationDag {
+  if (dagId.startsWith("native_")) {
+    const projected = nativeDags(workspace).find(dag => dag.dagId === dagId);
+    if (!projected) throw new Error(`DAG not found: ${dagId}`);
+    return projected;
+  }
   const file = dagFilePath(workspace, dagId);
   if (!pathExists(file)) {
     throw new Error(`DAG not found: ${dagId}`);
@@ -185,11 +227,8 @@ export function loadDag(workspace: string, dagId: string): OrchestrationDag {
 
 export function listDags(workspace: string): string[] {
   const dir = dagDir(workspace);
-  if (!pathExists(dir)) return [];
-  return readdirSync(dir)
-    .filter((f) => f.endsWith(".json"))
-    .map((f) => f.replace(".json", ""))
-    .sort();
+  const legacy = pathExists(dir) ? readdirSync(dir).filter(f => f.endsWith(".json")).map(f => f.replace(/\.json$/, "")) : [];
+  return [...new Set([...legacy, ...nativeDags(workspace).map(dag => dag.dagId)])].sort();
 }
 
 // ---------------------------------------------------------------------------

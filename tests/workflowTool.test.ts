@@ -8,6 +8,7 @@ import { openLedger } from "../src/ledger/ledger.js";
 import { initBudgets } from "../src/budgets/budgets.js";
 import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 import { agentToolset } from "../src/agent/agentToolset.js";
+import { OUTCOME_UNKNOWN_NOTICES } from "../src/agent/pipelineToolSeam.js";
 import { initToolsConfig, loadToolsConfig } from "../src/toolhub/toolhubValidators.js";
 import { rootIdentity } from "../src/agent/delegationIdentity.js";
 import { MAX_PLAN_NODES } from "../src/workflow/workflowPlan.js";
@@ -263,15 +264,11 @@ describe("a workflow stops when the turn is cancelled", () => {
     });
 
     expect(spawned, "the later stages never reached a runner").toBe(1);
-    expect(outcome.outcome, "the loop is told the call was cancelled").toBe("CANCELLED");
-
-    // The partial answers do NOT reach the model, and that is the loop's
-    // contract rather than a loss: `pipelineToolSeam` maps any aborted call to
-    // CANCELLED with empty content, and special-casing `workflow` would put a
-    // result into a turn the loop has already decided was cancelled. The work is
-    // not lost from the RECORD — each delegation that ran wrote its own
-    // started/completed pair and its own child session.
-    expect(String(outcome.content)).toBe("");
+    // WP16: an aborted call whose body reports an explicit unknown effect stays TOOL_OUTCOME_UNKNOWN rather than
+    // CANCELLED: the interrupted delegation may have taken effect. The loop is told so, never that nothing happened.
+    // Each delegation that ran still wrote its own started/completed pair and its own child session.
+    expect(outcome.outcome, "the loop is told the interrupted plan's effect is unknown").toBe("TOOL_OUTCOME_UNKNOWN");
+    expect(String(outcome.content)).toContain(OUTCOME_UNKNOWN_NOTICES[0]);
     toolset.close();
   });
 });

@@ -5,23 +5,26 @@ export interface NativeDelegationOptions {
   delegateScope?: string;
   delegateStop?: string[] | false;
   maxDelegationDepth?: string;
+  maxActiveChildren?: string;
   delegateProvider?: string;
   delegateTimeout?: string;
 }
 export class NativeDelegationSelectionError extends Error {
   constructor() {
-    super("--no-delegate cannot be combined with explicit child scope, depth, provider, timeout or stop options. Remove those child options to disable delegation; signed approval and budget controls remain in force.");
+    super("--no-delegate cannot be combined with explicit child scope, depth, capacity, provider, timeout or stop options. Remove those child options to disable delegation; signed approval and budget controls remain in force.");
     this.name = "NativeDelegationSelectionError";
   }
 }
 
 /** An explicit disabled capability cannot be restored by inherited child defaults. */
 export function applyNativeDelegationPreset<T extends NativeDelegationOptions>(options: T, preset: AgentPreset["delegate"]): T & NativeDelegationOptions {
-  if (options.delegate === false && [options.delegateScope, options.delegateStop, options.maxDelegationDepth, options.delegateProvider, options.delegateTimeout]
+  if (options.delegate === false && [options.delegateScope, options.delegateStop, options.maxDelegationDepth, options.maxActiveChildren, options.delegateProvider, options.delegateTimeout]
     .some(value => value !== undefined)) throw new NativeDelegationSelectionError();
   const inherited = options.delegate === false ? undefined : preset;
+  const maxActiveChildren = options.maxActiveChildren ?? (inherited?.maxActiveChildren === undefined ? undefined : String(inherited.maxActiveChildren));
   return { ...options,
     delegate: options.delegate ?? inherited?.enabled,
+    ...(maxActiveChildren === undefined ? {} : { maxActiveChildren }),
     delegateScope: options.delegateScope ?? inherited?.scope?.join(","),
     delegateStop: options.delegateStop ?? inherited?.stopConditions,
     maxDelegationDepth: options.maxDelegationDepth ?? (inherited?.maxDepth === undefined ? undefined : String(inherited.maxDepth)),

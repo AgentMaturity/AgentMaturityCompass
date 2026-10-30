@@ -1,3 +1,6 @@
+import { readNativeSessionEvents } from "../session/readNativeSessionEvents.js";
+import { readEventPayload } from "../session/eventPayload.js";
+import type { EvidenceEvent } from "../types.js";
 import { randomUUID } from "node:crypto";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -49,6 +52,12 @@ export interface WorkRequest {
   readonly model: string | null;
 }
 
+/** Verified submission identity, with no bearer credential stored in evidence. */
+export interface WorkAuthority {
+  readonly leaseId: string;
+  readonly tokenSha256: string;
+}
+
 export interface AcceptedWork {
   /** The session the work will be logged under. Signed into the acceptance. */
   readonly workSessionId: string;
@@ -60,8 +69,8 @@ export interface AcceptedWork {
 }
 
 /** The exact bytes the acceptance digests. Canonical, so the digest is reproducible. */
-function acceptanceBody(workSessionId: string, request: WorkRequest): string {
-  return canonicalize({ v: 1, workSessionId, request });
+function acceptanceBody(workSessionId: string, request: WorkRequest, authority?: WorkAuthority): string {
+  return canonicalize({ v: 1, workSessionId, request, ...(authority === undefined ? {} : { authority }) });
 }
 
 /**
@@ -76,6 +85,7 @@ export function acceptWork(params: {
   readonly ledger: Ledger;
   readonly intakeSessionId: string;
   readonly request: WorkRequest;
+  readonly authority?: WorkAuthority;
 }): AcceptedWork {
   // The intake session must already exist as a row. `appendEvidenceWithReceipt`
   // will happily write an event naming a session that was never started, and
@@ -94,7 +104,7 @@ export function acceptWork(params: {
   }
 
   const workSessionId = randomUUID();
-  const body = acceptanceBody(workSessionId, params.request);
+  const body = acceptanceBody(workSessionId, params.request, params.authority);
   const requestSha256 = sha256Hex(Buffer.from(body, "utf8"));
 
   const written = params.ledger.appendEvidenceWithReceipt({
@@ -132,7 +142,7 @@ export function acceptWork(params: {
  * that failed and closed cleanly lands here too. The outcome of the work is in
  * the work session's own rows; this states only that it stopped in an orderly way.
  */
-export const WORK_STATES = ["not-started", "running", "abandoned", "finished"] as const;
+export const WORK_STATES = ["not-started", "claimed", "refused", "failed", "running", "abandoned", "finished"] as const;
 
 export type WorkState = (typeof WORK_STATES)[number];
 
@@ -141,6 +151,8 @@ export type DescribedWork =
   | {
       readonly ok: true;
       readonly workSessionId: string;
+      readonly eventId: string;
+      readonly authority?: WorkAuthority;
       readonly request: WorkRequest;
       readonly state: WorkState;
     };
@@ -158,17 +170,21 @@ function workSessionState(
   ledger: Ledger,
   sessionId: string,
   now: number,
-  staleAfterMs: number
+  staleAfterMs: number,
+  acceptedEventId: string
 ): WorkState {
-  const row = ledger.db.prepare(
-    `SELECT
-       SUM(event_type = 'session/close') AS closed,
-       COUNT(*) AS total,
-       MAX(ts) AS last_ts
-     FROM evidence_events WHERE session_id = ?`
-  ).get(sessionId) as { closed: number | null; total: number; last_ts: number | null };
+  const events = readNativeSessionEvents(ledger.workspace, sessionId);
+  const row = { total: events.length, closed: events.filter(event => event.event_type === "session/close").length,
+    last_ts: events.length === 0 ? null : events.reduce((latest, event) => Math.max(latest, event.ts), 0) };
 
-  if (row.total === 0) return "not-started";
+  if (row.total === 0) {
+    const claim = ledger.db.prepare("SELECT ts, meta_json FROM evidence_events WHERE event_type = 'audit' AND json_extract(meta_json, '$.acceptedEventId') = ? ORDER BY rowid DESC LIMIT 1").get(acceptedEventId) as { ts: number; meta_json: string } | undefined;
+    if (claim === undefined) return "not-started";
+    const type = (JSON.parse(claim.meta_json) as { type?: unknown }).type;
+    if (type === "wire_work_refused") return "refused";
+    if (type === "wire_work_failed") return "failed";
+    return now - claim.ts <= staleAfterMs ? "claimed" : "abandoned";
+  }
   if ((row.closed ?? 0) > 0) return "finished";
   return now - (row.last_ts ?? 0) <= staleAfterMs ? "running" : "abandoned";
 }
@@ -199,9 +215,9 @@ export function describeAcceptedWork(params: {
   }
 
   const row = params.ledger.db.prepare(
-    "SELECT id, event_type, payload_inline FROM evidence_events WHERE event_hash = ? LIMIT 1"
+    "SELECT * FROM evidence_events WHERE event_hash = ? LIMIT 1"
   ).get(verified.payload.event_hash) as
-    { id: string; event_type: string; payload_inline: string | null } | undefined;
+    EvidenceEvent | undefined;
   if (!row) {
     return { ok: false, reason: "receipt names an event that is not in this ledger" };
   }
@@ -218,9 +234,11 @@ export function describeAcceptedWork(params: {
     return { ok: false, reason: `acceptance is not anchored: ${anchored.errors.join("; ")}` };
   }
 
-  let body: { workSessionId?: unknown; request?: unknown };
+  let body: { workSessionId?: unknown; request?: unknown; authority?: unknown };
   try {
-    body = JSON.parse(row.payload_inline ?? "") as typeof body;
+    const payload = readEventPayload(params.ledger.workspace, row);
+    if (payload.status !== "ok") return { ok: false, reason: "acceptance payload is unavailable" };
+    body = JSON.parse(payload.bytes.toString("utf8")) as typeof body;
   } catch {
     return { ok: false, reason: "acceptance payload is not readable" };
   }
@@ -232,12 +250,15 @@ export function describeAcceptedWork(params: {
   return {
     ok: true,
     workSessionId,
+    eventId: row.id,
+    ...(body.authority === undefined ? {} : { authority: body.authority as WorkAuthority }),
     request: body.request as WorkRequest,
     state: workSessionState(
       params.ledger,
       workSessionId,
       params.now ?? Date.now(),
-      params.staleAfterMs ?? SESSION_STALE_AFTER_MS
+      params.staleAfterMs ?? SESSION_STALE_AFTER_MS,
+      row.id
     )
   };
 }

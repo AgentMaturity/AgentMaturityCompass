@@ -1,6 +1,6 @@
 # Native context and prompt-command extensions
 
-AMC native extensions contribute reviewed text and named prompt commands to AMC's own model loop. They need no external harness. Format v1 is declarative. Format v2 adds only the existing isolated executable context/command capabilities, admitted separately through publisher-signed packages, workspace execution approval and Linux Bubblewrap. Neither format registers arbitrary host tools, changes provider credentials or widens signed tool policy.
+AMC native extensions contribute reviewed text and named prompt commands to AMC's own model loop. They need no external harness. Format v1 is declarative. Format v2 adds isolated executable context, command and governed hook capabilities, admitted separately through publisher-signed packages, workspace execution approval and Linux Bubblewrap. Neither format registers arbitrary host tools, changes provider credentials or widens signed tool policy.
 
 The source implementation awaits the final combined validation pass. The examples are instructions for operators, not records of a successful provider or installed-package trial.
 
@@ -102,10 +102,42 @@ See [Native Agent Workflow](NATIVE_AGENT_WORKFLOW.md) for sessions, [Native MCP]
 For code navigation, start at `src/cli-native-extension-commands.ts`, then follow `src/extensions/nativeExtensionStore.ts` and `src/extensions/nativeExtensionRuntime.ts`. The format is in `src/extensions/nativeExtensionManifest.ts`. Context contributions enter the existing `src/prompt/context/contextHost.ts`; signing and verification reuse `src/org/orgSigner.ts` and `src/crypto/signing/signer.ts`. These are reading pointers for the next Graphify refresh, not a claim that a current generated map already contains them.
 
 
-## D55 native-loop hook design remains deferred
+## Governed native-loop hooks (D55 / PI-024)
 
-WP22 does not add external Claude/Codex hook dialect compatibility or a new callback ABI. The existing context/command capabilities retain their current lifecycle. A native-loop hook needs a concrete consumer and an approved event contract before implementation.
+A v2 executable declaration can add an optional `hooks` object. It maps the six observer event names (`turn-start`, `turn-end`, `step-start`, `step-end`, `tool-start`, `tool-end`) and the deny-only `pre-tool` event to `{ "export": "handlerName" }`. The exact capability set must include `hook.observe` when observers are declared and `hook.deny` when `pre-tool` is declared. Existing declarations without hooks keep their existing capabilities and behavior.
 
-The proposed contract is a closed, versioned capability per supported event. It would receive immutable, bounded turn/session metadata, the enclosing cancellation signal and the exact reviewed manifest digest. Hooks could contribute attributed literal context or deny a proposed action; they could never add tools, mutate signed policy, replace system instructions, approve a request or widen a prepared request's authority. Dispatch order must be deterministic. Every invocation would have explicit time, byte and call limits, and cancellation would stop admission before observing bounded cleanup.
+For example, the executable section of an otherwise admitted v2 manifest can include:
 
-Unload, reload, cancellation and exceptions must share a single disposal owner. Its receipt would identify the manifest, scope, invocation, terminal outcome and whether process closure was observed; disposal would be idempotent and emitted once. Reload would perform fresh WP12 admission before a replacement handler becomes eligible. A prepared handler that loses approval cannot resume. The open decision is which native-loop events a concrete integration needs, and whether an exception denies the action or terminates the turn. Those choices affect session correctness and are deferred to the integrator. Required follow-up tests must cover event order, exceptions, cancellation, unload/reload, revocation, stale prepared handlers, disposal exactly once and unchanged tool authority through the actual loop caller.
+```json
+{
+  "capabilities": ["hook.observe", "hook.deny"],
+  "contexts": [],
+  "commands": {},
+  "hooks": {
+    "turn-start": { "export": "observeTurn" },
+    "pre-tool": { "export": "checkTool" }
+  }
+}
+```
+
+The bundled ESM exports use the existing text-returning executable ABI:
+
+```js
+export function observeTurn(event) {
+  // event is a frozen, flat metadata view in the confined child.
+  return "";
+}
+export function checkTool(event) {
+  return event.toolName === "bash"
+    ? JSON.stringify({ decision: "deny", reason: "Shell use requires a separate review" })
+    : JSON.stringify({ decision: "abstain" });
+}
+```
+
+Hook views contain the event kind and applicable turn/step numbers or tool name, action class and requested mode. They omit prompts, raw tool arguments, tool output, session objects, credentials, host functions and exception text. Views are detached and frozen. Hooks cannot change arguments, grant tools, skip approvals, change modes or supply privileged instructions. Observer output is ignored. A valid `{"decision":"allow"}` pre-tool response has the same effect as abstention: every existing guard still runs. Invalid deny-hook output or an unavailable deny hook fails closed. Every hook denial names the extension ID and exact manifest digest; its bounded reason is secret-redacted before recording.
+
+Hooks share their extension's existing invocation, output, lifetime and timeout budgets. Each admitted call uses the same fresh confined process and onLoad/onUnload lifecycle as executable context and command handlers. No new signing authority, package path, unconfined fallback, background process or automatic retry is introduced. Unsupported platforms retain the Linux Bubblewrap refusal. Loading, signature verification, exact digest pins, approval, package verification, cancellation and revocation checks still apply.
+
+Observers are awaited in declaration/load order. A throwing observer is reported with its extension ID, manifest digest, event kind and coarse error code; private exception text is withheld. A verified observer handler exception does not poison other contributions or break the turn. Authority, confinement, timeout and process-cleanup faults still stop the executable handle. Observer reports remain bounded in `manager.hooks.reports()`. Failures observed while the owning turn is running are projected into its signed session before sealing; late failures remain in the manager report. Closing notifications carry the turn cancellation signal, so cancelled turns do not launch new observer code. Parallel calls retain the runner's existing busy refusal: observers report it, while unavailable deny hooks deny. The native `ToolPipeline` awaits deny-hook evaluation after approval and then runs its synchronous guard chain and fresh authorization checks, including Code Mode sub-calls. Tool observer notifications describe the native loop's model tool-call boundaries; nested Code Mode calls receive the same deny guard. Revoked or changed hook loads cannot reuse a prepared decision.
+
+Programmatic hosts pass `manager.hooks` as `agentToolset({ extensionHooks: manager.hooks, ... })`; the returned seam carries the same observer runtime into `AgentDriver`. The existing native run/chat extension selection wires this automatically. Hooks are local to the selected native composition; foreign harness hook dialects remain governed by their existing adapters and shared policy decisions.

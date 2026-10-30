@@ -41,7 +41,7 @@ for line in sys.stdin:
     method = request["method"]
     if method == "initialize":
         result = {"protocolVersion": 1, "agentCapabilities": {"loadSession": False, "_meta": {"dev.agentmaturity.amc": {"executionApi": 1}}},
-                  "agentInfo": {"name": "untrusted-fixture"}}
+                  "agentInfo": {"name": "untrusted-fixture", "version": "1.2.0"}}
     elif method == "session/new":
         result = {"sessionId": "fixture-session"}
     elif method == "session/prompt":

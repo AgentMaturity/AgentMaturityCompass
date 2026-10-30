@@ -46,14 +46,16 @@ def main() -> None:
             request_id = request.get("id")
             session_id = params.get("sessionId")
             if method == "initialize":
-                extension = {"releaseSession": True, "committedUpdates": "live-completed-blocks",
+                extension = {"currentPlanUpdates": None if mode == "no-plan-cap" else "amc-current-plan-v1",
+                             "releaseSession": True, "committedUpdates": "live-completed-blocks",
                              "orderedImageInput": "amc-image-input@2",
                              "audioInput": {"format": "amc-audio-input@1", "encoderId": "gemini-generate-content",
                                             "encoderVersion": 2, "mimeTypes": ["audio/wav"]},
+                             "clientRequestIds": mode != "no-request-ids", "withdrawSubmission": mode != "no-request-ids",
                              "executionApi": 2 if mode == "execution-api-2" else 1, "lineageFork": "verified-parent-reference"}
                 if mode == "no-execution-api":
                     del extension["executionApi"]
-                reply(request_id, {"protocolVersion": 1, "agentInfo": {"name": "P06-regression-peer"},
+                reply(request_id, {"protocolVersion": 1, "agentInfo": {"name": "P06-regression-peer", "version": "1.2.0"},
                     "agentCapabilities": {"loadSession": True, "_meta": {EXT: extension},
                         "promptCapabilities": {"image": mode != "image-disabled", "audio": mode != "audio-disabled"}}})
             elif method == "session/new":
@@ -61,6 +63,8 @@ def main() -> None:
                 identity = "p06-1" if mode == "duplicate-session" else f"p06-{sequence}"
                 history.setdefault(identity, [])
                 reply(request_id, {"sessionId": identity})
+            elif method == "_amc/session/withdraw":
+                reply(request_id, {"withdrawn": "true" if mode == "bad-withdraw" else True})
             elif method == "_amc/session/release":
                 reply(request_id, {})
             elif method == "_amc/session/fork":
@@ -84,6 +88,8 @@ def main() -> None:
                 if session_id in pending and mode != "ignore-cancel":
                     reply(pending.pop(session_id), {"stopReason": "cancelled"})
             elif method == "session/prompt":
+                if mode in ("live-plan", "no-plan-cap"):
+                    update(session_id, {"sessionUpdate": "plan", "entries": [{"content": "prepare", "priority": "medium", "status": "pending"}]})
                 if mode == "exit":
                     sys.exit(4)
                 if mode == "duplicate-keys":
@@ -125,6 +131,8 @@ def main() -> None:
                     update(session_id, {"sessionUpdate": "tool_call_update", "toolCallId": tool_id, "content": []})
                 update(session_id, {"sessionUpdate": "agent_message_chunk", "content": {"type": "text", "text": "block"}})
                 extension = {"validation": {"status": "not-requested", "turn": 1, "configSha256": None, "checks": []}}
+                if mode == "request-ids":
+                    extension.update(params.get("_meta", {}).get(EXT, {}))
                 if mode in ("execution", "bad-execution"):
                     extension["execution"] = {"sessionId": session_id, "receiptStates": [], "recheckFailures": [], "phases": {
                         "admission": "succeeded", "model-completion": "succeeded", "side-effect-completion": "succeeded",

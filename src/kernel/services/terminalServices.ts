@@ -1,8 +1,7 @@
 /**
- * library-only, not enforced by the native runtime: no production host composes
- * this service. WP16 should reuse this seam and src/terminal/nativeTerminal.ts
- * when wiring interactive terminals. Current shell tool execution lives in
- * src/tools/builtin/bashTool.ts; this service does not expose a native PTY tool.
+ * Composed by the native toolset with its session-owned NativeTerminalTools
+ * runtime (WP16). Interactive authority still requires an explicit host grant;
+ * a native bash approval cannot grant arbitrary terminal input.
  *
  * Interactive terminals as a composed service (P4.2).
  *
@@ -30,11 +29,14 @@ import { openPipeTerminal, type PipeTerminalOptions } from "../../terminal/pipeT
 import { TerminalSession } from "../../terminal/terminalSession.js";
 import { NativeTerminalHost, type NativeTerminalHostOptions } from "../../terminal/nativeTerminal.js";
 import type { NativePtySupport } from "../../terminal/nativePtySandbox.js";
+import type { NativeTerminalTools } from "../../terminal/nativeTerminalTools.js";
 import type { TerminalBackend, TerminalSessionOptions } from "../../terminal/terminalTypes.js";
 
 export const TERMINAL_SEAM = defineSeam("amcTerminal");
 
 export interface TerminalServiceConfig {
+  /** The native composition's session-owned runtime; the facade owns its disposal. */
+  readonly runtime?: NativeTerminalTools;
   /**
    * How a backend is opened. Defaults to pipes.
    *
@@ -72,24 +74,27 @@ export class TerminalSeamService extends AmcSeam {
 
   /** The native path never consults openBackend or falls back to host pipes. */
   openInteractive(options: Parameters<NativeTerminalHost["open"]>[0]): Promise<TerminalSession> {
-    return this.native.open(options);
+    if (this.terminalDisposed) return Promise.reject(new Error("The terminal service is disposed."));
+    return this.config.runtime ? this.config.runtime.openInteractive(options) : this.native.open(options);
   }
 
-  nativeSupport(): NativePtySupport { return this.native.support(); }
+  nativeSupport(): NativePtySupport { return this.config.runtime?.support() ?? this.native.support(); }
 
   close(session: TerminalSession): void {
     if (this.sessions.has(session)) session.dispose();
+    else if (this.config.runtime) this.config.runtime.closeSession(session);
     else this.native.close(session);
   }
 
   get openCount(): number {
-    return this.sessions.size + this.native.openCount;
+    return this.sessions.size + (this.config.runtime?.openCount ?? this.native.openCount);
   }
 
-  private closeAll(): void {
+  private async closeAll(): Promise<void> {
     this.terminalDisposed = true;
     this.native.dispose();
     for (const session of [...this.sessions]) this.close(session);
+    if (this.config.runtime) await this.config.runtime.dispose();
   }
 }
 

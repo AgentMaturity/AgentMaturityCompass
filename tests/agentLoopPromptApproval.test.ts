@@ -189,6 +189,21 @@ describe("a governed agent turn: identity, context, and a human in the loop", ()
     };
   }
 
+  it("composition evidence commits to each reviewed MCP approval class", async () => {
+    const digest = async (reviewedActionClasses?: Readonly<Record<string, "READ_ONLY" | "WRITE_LOW">>) => {
+      const outcome = await runComposedTurn(turnOptions({ tools: undefined,
+        approvalGate: { actionClass: "READ_ONLY", riskTier: "low",
+          ...(reviewedActionClasses === undefined ? {} : { reviewedActionClasses }) } }));
+      const row = events(outcome.sessionId).find(event => event.event_type === "session/open")!;
+      return (JSON.parse(row.meta_json) as { compositionDigest: string }).compositionDigest;
+    };
+    const legacy = await digest();
+    const read = await digest({ mcp_fixture_reviewed: "READ_ONLY" });
+    const write = await digest({ mcp_fixture_reviewed: "WRITE_LOW" });
+    expect(read).not.toBe(legacy);
+    expect(write).not.toBe(read);
+  });
+
   it("VERIFY-1/3: assembles identity in order, carries the workspace's rules, and blocks on a real approval", async () => {
     let raised: string | null = null;
 

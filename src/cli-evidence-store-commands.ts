@@ -20,21 +20,18 @@ export function registerEvidenceStoreCommands(program: Command): void {
     .argument("<receiptId>", "receipt ID to trace")
     .action(async (receiptId: string) => {
       const { verifyDelegationChain, renderDelegationChainMarkdown } = await import("./receipts/receiptChain.js");
-      // In practice, public keys would be loaded from workspace
       const publicKeys: string[] = [];
       try {
         const { getPublicKeyHistory } = await import("./crypto/keys.js");
-        const keys = getPublicKeyHistory(process.cwd(), "monitor");
-        publicKeys.push(...keys);
+        const { getPurposeKeyHistory } = await import("./keys/signingKeys.js");
+        publicKeys.push(...getPurposeKeyHistory(process.cwd(), "receipt"), ...getPublicKeyHistory(process.cwd(), "monitor"));
       } catch { /* no keys */ }
       const result = verifyDelegationChain(receiptId, publicKeys, process.cwd());
       console.log(renderDelegationChainMarkdown(result));
       const { countStoredReceipts } = await import("./receipts/receiptChain.js");
       if (!result.valid && countStoredReceipts(process.cwd()) === 0) {
         // Otherwise "not found in store" reads as a mistyped id, when in fact
-        // this workspace has never recorded a chained receipt: the ledger mints
-        // plain receipts, and delegation chains come only from callers that opt
-        // into mintChainedReceipt.
+        // this workspace has never recorded a native or explicitly minted chain.
         console.log(
           chalk.yellow(
             "No chained receipts are recorded in this workspace, so no delegation chain can be traced yet."

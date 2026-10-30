@@ -1,6 +1,6 @@
 # `amc-sdk`
 
-Drive an installed AMC native agent from Python. The client uses the standard library and launches one `amc acp` process with a fixed workspace, provider and credential reference. Select the executable explicitly with `amc_bin` or `AMC_BIN` when multiple AMC installations exist.
+Drive an installed AMC native agent from Python. The client uses the standard library and launches one `amc acp` process with a fixed workspace, provider and credential reference. Pin the executable explicitly with `amc_bin` or `AMC_BIN` when multiple AMC installations exist. This wrapper supports AMC runtimes `>=1.2.0,<1.3.0`; initialization refuses a missing, malformed, prerelease or incompatible `agentInfo.version` before opening any session. The Python package version is independent of the CLI version.
 
 ```python
 from amc_sdk import AmcAgent
@@ -37,6 +37,53 @@ with AmcAgent(workspace=".", provider="stub") as agent:
 ```
 
 `Turn` supports one iterator and retains its updates in `RunResult.updates`. The result is separate from the stream. Updates are completed blocks projected from committed session rows and may arrive while a turn is still running; they are not raw provider token deltas. A cancellation request does not prove cancellation occurred: inspect the final stop reason. Closing the client cancels and settles active work before sealing owned sessions; a forced termination remains an interrupted run requiring recovery.
+
+## Bounded committed history and reconnect
+
+```python
+with AmcAgent(workspace=".", provider="stub") as reader:
+    for page in reader.read_session_pages(session_id, limit=64):
+        for event in page.updates:
+            print(event.seq, event.update)
+        resume_cursor = page.resume_cursor
+    # Later, continue from the same verified prefix without replaying a prompt.
+    next_page = reader.read_session_page(session_id, cursor=resume_cursor, limit=64)
+```
+
+These APIs read the recorded session store through the negotiated native ACP
+extension. They do not load, resume or claim a session writer. Each page checks
+owner/session identity, authenticates the underlying history and contains only
+committed updates. `next_cursor` drains a fixed snapshot; `resume_cursor` follows
+later commits from the last delivered sequence. Keep the cursor opaque. Gaps,
+tampering, forged or foreign cursors raise an error instead of returning a
+silently shortened transcript. Page limits are integers from 1 through 256.
+A page reports runtime verification metadata, not a cold verification receipt.
+
+The live turn iterator retains its existing explicit overflow error by default.
+Opt in with `resync_on_overflow=True` and optionally lower retention through
+`event_buffer={"max_events": 8, "max_bytes": 1048576}`. This requires the negotiated
+page and `amc-committed-turn-v1` capabilities. The prompt reply pins its exact
+signed turn seal; recovery must include that completed seal and match the
+retained committed text prefix. A valid-prefix rollback refuses the result.
+Preflight, prompt execution and recovery share the total request deadline;
+cancellation during preflight prevents dispatch, and cancellation during
+read-only recovery stops reconstruction. Ordinary acknowledged model
+cancellation still reports its cancelled outcome. On overflow the iterator raises `AmcResyncRequiredError` with
+`recoverable=True`; keep awaiting the same `turn.result()`. The final result
+recovers committed text within the byte limit, sets `resynced=True`, and marks
+`recovery["updatesComplete"]=False`: `updates` and tool snapshots retain a bounded
+prefix. Use `recovery["cursor"]` for later page reads. Invalid recovery history or
+an oversized answer refuses the result. Never resubmit a prompt to recover output.
+Each page's `state` holds cumulative validation, usage, cancellation, approval and
+unknown-outcome snapshots; replace the prior snapshot instead of summing pages.
+Plan updates are display data and do not grant tool authority.
+
+Use `session.prompt(text, client_request_id="caller-request-1")` for a durable
+submission identity. A duplicate refuses with the existing submission receipt
+in `AmcRefusedError.data`, without another model turn. `session.withdraw(message_id)`
+withdraws one pending message; it does not cancel an active turn or clear a queue.
+Both operations require explicit runtime capabilities and refuse older runtimes
+before dispatch. Request IDs contain 1 through 128 visible ASCII characters.
 
 ## Explicit handoff and verified resume
 

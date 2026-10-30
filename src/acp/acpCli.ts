@@ -39,14 +39,14 @@ export function registerAcpCommands(program: Command): void {
     .option("--validate <id>", "Run this public check after each completed turn; repeat to select more", (id: string, previous: string[] = []) => [...previous, id])
     .option("--approve-tools <actionClass>", "Require the existing signed approval gate for tool calls")
     .option("--approve-risk <tier>", "Signed approval risk tier; requires --approve-tools")
-    .option("--mcp-config <path>", "Reviewed native MCP config; requires workspace tools and signed approvals")
-    .option("--mcp-config-sha256 <digest>", "Pin exact reviewed MCP configuration bytes")
+    .option("--mcp-config <path>", "Reviewed native MCP config; repeat for more servers; requires workspace tools and signed approvals", (path: string, previous: string[] = []) => [...previous, path])
+    .option("--mcp-config-sha256 <digest>", "Pin exact reviewed MCP configuration bytes; one per --mcp-config in the same order", (digest: string, previous: string[] = []) => [...previous, digest])
     .option("--max-tokens <n>", "Positive output-token bound per model request", "512")
     .option("--thinking <mode>", "DeepSeek only: enabled (default) or disabled")
     .option("--reasoning-effort <effort>", "DeepSeek only: exact low, high (default), or max with enabled thinking")
     .option("--max-steps <n>", "Positive model-step bound per turn (default 8, stub 2)")
-    .option("--context-window <tokens>", "Declared model context window; enables automatic compaction between steps")
-    .option("--compact-threshold <fraction>", "Measured prompt share of --context-window that triggers compaction (0.5-0.95, default 0.8)")
+    .option("--context-window <tokens>", "Override the reviewed model context window for automatic compaction")
+    .option("--compact-threshold <fraction>", "Use ratio trigger instead of the catalog token reserve (0.5-0.95; requires --context-window)")
     .option("--no-auto-summary", "Prune old tool output only; never run a model-written summary step")
     .option("--agent-id <id>", "Agent identity recorded in the ledger", "default")
     .option("--system-prompt <text>", "System prompt for each session", "You are a careful assistant.")
@@ -69,8 +69,8 @@ export function registerAcpCommands(program: Command): void {
       validate?: string[];
       approveTools?: string;
       approveRisk?: string;
-      mcpConfig?: string;
-      mcpConfigSha256?: string;
+      mcpConfig?: string[];
+      mcpConfigSha256?: string[];
       maxTokens: string;
       thinking?: string;
       reasoningEffort?: string;

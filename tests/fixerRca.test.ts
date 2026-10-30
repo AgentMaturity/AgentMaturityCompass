@@ -160,6 +160,27 @@ describe("fixer RCA lane", () => {
     expect(loaded.reportId).toBe(written.report.reportId);
   });
 
+  test("a failure cluster with a passing sibling run yields a contrast proposal ranked above count-only ones (H2X-13)", () => {
+    const ws = workspace();
+    writeMutableManifest(ws);
+    writeEpisodeRecord({ workspace: ws, report: report("trace-run-rca-contrast"), source: "cli", command: "amc" });
+    const plain = writeFixerRcaReport({ workspace: ws, agentId: "default", selector: "trace-run-rca-contrast" }).report;
+    expect(plain.proposals.length).toBeGreaterThanOrEqual(2);
+    expect(plain.proposals.every((proposal) => proposal.evidenceClass !== "contrast")).toBe(true);
+    const target = plain.rootCauses.at(-1)!;
+    const contrasted = writeFixerRcaReport({ workspace: ws, agentId: "default", selector: "trace-run-rca-contrast",
+      contrasts: [
+        { failureClass: target.failureClass, passingRunId: "passing-sibling-run", evidenceRefs: ["ev-passing-1"] },
+        // A run where the failure occurred is not a passing sibling of it.
+        { failureClass: plain.rootCauses[0]!.failureClass, passingRunId: "trace-run-rca-contrast", evidenceRefs: ["ev-self"] }
+      ] }).report;
+    const first = contrasted.proposals[0]!;
+    expect(first.rootCauseId).toBe(target.rootCauseId);
+    expect(first.evidenceClass).toBe("contrast");
+    expect(first.contrastEvidenceRefs).toEqual(["passing-sibling-run", "ev-passing-1"]);
+    expect(contrasted.proposals.slice(1).every((proposal) => proposal.evidenceClass !== "contrast")).toBe(true);
+  });
+
   test("blocks proposed patches when no mutable Enforce resource is available", () => {
     const ws = workspace();
     writeEpisodeRecord({

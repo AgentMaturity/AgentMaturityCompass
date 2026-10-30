@@ -15,6 +15,7 @@ import { initUsersConfig } from "../../src/auth/authApi.js";
 import { issueChildLease, issueSessionLease } from "../../src/leases/delegatedLease.js";
 import type { LeasePayload } from "../../src/leases/leaseSchema.js";
 import { issueLeaseToken } from "../../src/leases/leaseSigner.js";
+import { SessionService } from "../../src/session/sessionService.js";
 import { newWorkspace } from "../catalog/l0/workspaces.js";
 
 /**
@@ -89,13 +90,18 @@ describe("delegated child lease lineage", () => {
     for (const make of [delegateTool, workflowTool]) {
       const seen: SubagentRunContext[] = [];
       const runner = vi.fn(async (ctx: SubagentRunContext) => { seen.push(ctx); return { ok: true, text: "done" }; });
-      const tool = make({ identity: rootIdentity("default"), runner, session: { recordLoopEvent: vi.fn(), recordProjectedEvidence: vi.fn() },
-        parentLeaseToken: "composer-lease" });
-      const args = make === delegateTool ? { runAs: "child", goal: "g", parentLeaseToken: "model-lease" }
-        : { plan: { kind: "agent", id: "a", runAs: "child", goal: "g" }, parentLeaseToken: "model-lease" };
-      await tool.body({ workspace, agentId: "default", name: tool.name, actionClass: "READ_ONLY", arguments: args,
-        token: "fixture", callId: "fixture", rootCallId: "fixture", parentToken: null, requestedMode: "EXECUTE", effectiveMode: "EXECUTE" });
-      expect(seen.map((ctx) => ctx.parentLeaseToken), make.name).toEqual(["composer-lease"]);
+      const session = new SessionService(workspace);
+      try {
+        session.open({ sessionId: `lease-tool-${make.name}`, agentId: "default", harnessVersion: "fixture",
+          compositionDigest: "composition", policyDigest: "policy" });
+        const tool = make({ identity: rootIdentity("default"), runner, session, parentLeaseToken: "composer-lease" });
+        const args = make === delegateTool ? { runAs: "child", goal: "g", parentLeaseToken: "model-lease" }
+          : { plan: { kind: "agent", id: "a", runAs: "child", goal: "g" }, parentLeaseToken: "model-lease" };
+        const outcome = await tool.body({ workspace, agentId: "default", name: tool.name, actionClass: "READ_ONLY", arguments: args,
+          token: "fixture", callId: "fixture", rootCallId: "fixture", parentToken: null, requestedMode: "EXECUTE", effectiveMode: "EXECUTE" });
+        expect(outcome.ok, JSON.stringify(outcome.output)).toBe(true);
+        expect(seen.map((ctx) => ctx.parentLeaseToken), make.name).toEqual(["composer-lease"]);
+      } finally { session.disposeWithoutClosing(); }
     }
   });
 });

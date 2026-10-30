@@ -5,12 +5,12 @@
  * Supports explicit path, workspace-relative, and cwd-relative discovery.
  */
 
-import { existsSync, readFileSync } from "node:fs";
-import { resolve, join, dirname } from "node:path";
+import { existsSync } from "node:fs";
+import { homedir } from "node:os";
+import { basename, resolve, join, dirname } from "node:path";
 import YAML from "yaml";
-import { ZodError } from "zod";
+import { resolveConfigOverlays, type ConfigOverlayOptions, type ConfigProvenance } from "./configOverlays.js";
 import {
-  amcDeclarativeConfigSchema,
   defaultDeclarativeConfig,
   type AMCDeclarativeConfig,
   type AMCAgent,
@@ -57,6 +57,7 @@ export interface LoadConfigResult {
   config: AMCDeclarativeConfig;
   configPath: string;
   warnings: string[];
+  provenance: ConfigProvenance;
 }
 
 /**
@@ -69,58 +70,37 @@ export interface LoadConfigResult {
 export function loadDeclarativeConfig(
   explicitPath?: string,
   workspace?: string,
+  options: ConfigOverlayOptions = {},
 ): LoadConfigResult {
-  const ws = workspace ?? process.cwd();
+  const ws = resolve(workspace ?? process.cwd());
   const warnings: string[] = [];
-
-  // Resolve config file path
-  let configPath: string;
-  if (explicitPath) {
-    configPath = resolve(ws, explicitPath);
-    if (!existsSync(configPath)) {
-      throw new Error(`Config file not found: ${configPath}`);
-    }
-  } else {
-    const discovered = discoverConfigFile(ws);
-    if (!discovered) {
-      throw new Error(
-        `No amcconfig.yaml found in ${ws} or ${join(ws, ".amc")}.\n` +
-        `Create one with: amc config init\n` +
-        `Or specify a path with: --config <path>`
-      );
-    }
-    configPath = discovered;
+  const files: Array<{ layer: "workspace" | "user" | "explicit"; path: string }> = [];
+  // As before overlays existed, an explicit --config file replaces the discovered workspace file.
+  const discovered = explicitPath === undefined ? discoverConfigFile(ws) : null;
+  if (discovered) files.push({ layer: "workspace", path: discovered });
+  if (discovered && dirname(discovered) === join(ws, ".amc") && /^amc\.config\.ya?ml$/.test(basename(discovered))) {
+    // Read exactly as before WP39b; this name is also the workspace runtime policy, so evaluation config should move.
+    console.warn(`Deprecated: reading declarative evaluation config from ${discovered}. Move it to ${join(ws, "amcconfig.yaml")}.`);
   }
-
-  // Parse YAML
-  let raw: unknown;
+  // The user layer is opt-in: home config is an unreviewed input to a governed run unless the operator asks for it.
+  const user = options.userConfig === true ? join(homedir(), ".amc", "amcconfig.yaml")
+    : typeof options.userConfig === "string" ? resolve(ws, options.userConfig) : null;
+  if (user) files.push({ layer: "user", path: user });
+  if (explicitPath !== undefined) files.push({ layer: "explicit", path: resolve(ws, explicitPath) });
+  for (const file of files) {
+    if (!existsSync(file.path)) throw new Error(`Config file not found: ${file.path}`);
+  }
+  const configPath = files[files.length - 1]?.path;
+  if (!configPath) {
+    throw new Error(`No amcconfig.yaml found in ${ws} or ${join(ws, ".amc")}.\nCreate one with: amc config init\nOr specify a path with: --config <path>`);
+  }
+  let resolved: ReturnType<typeof resolveConfigOverlays>;
   try {
-    const content = readFileSync(configPath, "utf8");
-    raw = YAML.parse(content);
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    throw new Error(`Failed to parse ${configPath}: ${msg}`);
+    resolved = resolveConfigOverlays(ws, files, options.overrides);
+  } catch (error) {
+    throw new Error(`Invalid amcconfig.yaml (${configPath}): ${error instanceof Error ? error.message : String(error)}`);
   }
-
-  if (raw === null || raw === undefined) {
-    throw new Error(`Config file is empty: ${configPath}`);
-  }
-
-  // Validate with Zod
-  let config: AMCDeclarativeConfig;
-  try {
-    config = amcDeclarativeConfigSchema.parse(raw);
-  } catch (err) {
-    if (err instanceof ZodError) {
-      const issues = err.issues.map(
-        (i) => `  - ${i.path.join(".")}: ${i.message}`
-      );
-      throw new Error(
-        `Invalid amcconfig.yaml (${configPath}):\n${issues.join("\n")}`
-      );
-    }
-    throw err;
-  }
+  const { config, provenance } = resolved;
 
   // Post-validation warnings
   if (config.agents.length === 0) {
@@ -149,7 +129,7 @@ export function loadDeclarativeConfig(
     }
   }
 
-  return { config, configPath, warnings };
+  return { config, configPath, warnings, provenance };
 }
 
 // ---------------------------------------------------------------------------

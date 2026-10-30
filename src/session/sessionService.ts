@@ -18,6 +18,7 @@ import { assertToolSchemaCommitted } from "./toolSchemaCommitment.js";
 import { buildStepEndMeta, buildTurnEndMeta } from "./turnLifecycleMeta.js";
 import { buildApprovalRow } from "./approvalEventMeta.js";
 import { buildLoopEventRow } from "./loopEventMeta.js";
+import { buildSessionOpenMeta } from "./sessionOpenMeta.js";
 import { assertNativeImageBytes, snapshotNativeImages } from "../attachments/nativeImageInput.js";
 import { assertNativeAudioBytes, snapshotNativeAudio, NATIVE_AUDIO_INPUT_FORMAT } from "../attachments/nativeAudioInput.js";
 import { snapshotRecordedGeminiPart } from "./geminiPartMeta.js";
@@ -167,14 +168,7 @@ export class SessionService extends SessionEventWriter {
 
     return this.appendSessionEvent({
       eventType: "session/open",
-      typeMeta: {
-        runtime: params.runtime ?? "amc",
-        agentId: params.agentId,
-        harnessVersion: params.harnessVersion,
-        compositionDigest: params.compositionDigest,
-        policyDigest: params.policyDigest,
-        ...(params.parent === undefined ? {} : { parentSession: { ...params.parent } })
-      },
+      typeMeta: buildSessionOpenMeta(params),
       surface: { op: "none" },
       turn: null,
       step: null

@@ -29,11 +29,11 @@ const EXTENSIONS: Readonly<Record<NativeImageMediaType, string>> = {
  */
 export function acpSupportsImageInput(route?: AcpPromptRoute): boolean {
   if (route?.capabilities?.features["image-input"] !== "supported") return false;
-  return (route.encoderId === ANTHROPIC_MESSAGES_ENCODER_ID && route.encoderVersion === 4
+  return (route.encoderId === ANTHROPIC_MESSAGES_ENCODER_ID && (route.encoderVersion === 4 || route.encoderVersion === 5)
       && route.capabilities.protocol === "anthropic-messages")
-    || (route.encoderId === OPENAI_RESPONSES_ENCODER_ID && route.encoderVersion === 3
+    || (route.encoderId === OPENAI_RESPONSES_ENCODER_ID && (route.encoderVersion === 3 || route.encoderVersion === 4)
       && route.capabilities.protocol === "openai-responses")
-    || (route.encoderId === OPENAI_CHAT_ENCODER_ID && route.encoderVersion === 4
+    || (route.encoderId === OPENAI_CHAT_ENCODER_ID && (route.encoderVersion === 4 || route.encoderVersion === 5)
       && route.capabilities.protocol === "openai-chat-completions")
     || (route.encoderId === GEMINI_CONTENT_ID && (route.encoderVersion === 1 || route.encoderVersion === 2)
       && route.capabilities.protocol === "gemini-generate-content");

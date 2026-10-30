@@ -4,7 +4,7 @@ import { AMCNativeInputError, AMCNativeProtocolError } from "./nativeAgentErrors
 export type JsonObject = Record<string, unknown>;
 export const object = (value: unknown): value is JsonObject => value !== null && typeof value === "object" && !Array.isArray(value);
 export const STOP_REASONS = new Set(["end_turn", "max_tokens", "max_turn_requests", "refusal", "cancelled"]);
-export const UPDATE_KINDS = new Set(["agent_message_chunk", "user_message_chunk", "tool_call", "tool_call_update"]);
+export const UPDATE_KINDS = new Set(["agent_message_chunk", "user_message_chunk", "tool_call", "tool_call_update", "plan"]);
 export const MAX_FRAME_BYTES = 1024 * 1024;
 export const MAX_TURN_BYTES = 8 * 1024 * 1024;
 /** Hard retention ceilings, independently applied to each turn and each history replay. */
@@ -55,4 +55,12 @@ export function assertSignal(signal: AbortSignal | undefined): void {
     || typeof signal.addEventListener !== "function" || typeof signal.removeEventListener !== "function")) {
     throw new AMCNativeInputError("Cancellation requires an AbortSignal");
   }
+}
+
+/** ACP plans contain display text only; no entry grants execution authority. */
+export function validPlanUpdate(update: JsonObject): boolean {
+  return Array.isArray(update.entries) && update.entries.length <= 100
+    && update.entries.every(entry => object(entry) && typeof entry.content === "string" && Buffer.byteLength(entry.content) <= 8192
+      && ["low", "medium", "high"].includes(entry.priority as string)
+      && ["pending", "in_progress", "completed"].includes(entry.status as string));
 }

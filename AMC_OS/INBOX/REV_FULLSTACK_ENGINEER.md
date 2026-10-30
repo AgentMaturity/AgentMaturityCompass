@@ -489,6 +489,125 @@ platform cases on a suitable host, and commit using
 `/Users/sid/AgentMaturityCompass-worktrees/s442cd919/work/codex-runs/wp19-commit-message.txt`.
 Installed-package/platform qualification remains deferred. Native scheduling stays
 hidden and experimental. No research, dependency files, or other worktrees changed.
+
+# WP20 handoff — 2026-10-30
+
+Role: REV_FULLSTACK_ENGINEER. Review/adoption owner: Claude integrator, session 3c2ecdb1.
+
+Worktree `amc-gap-wp20`, branch `rtd/gap-wp20`, tip/base `ae10d4f197102c2239c24eccf6b79606feef6192`. The finished diff remains uncommitted. No push or merge was performed. Existing handoff history is preserved above.
+
+The implementation reuses the verified session store for bounded snapshot/follow pages across ACP, TypeScript, Python, existing CLI inspection and Studio GET queries. Missing/tampered evidence refuses explicitly. SDK recovery is opt-in and pinned to the successful prompt's exact signed turn seal. Signed inbox identities prevent duplicate execution; withdrawal uses the existing single-message cancel splice. Current authenticated todo/plan intent persists until signed replacement and is HTML-escaped. A bounded collector lets Studio page valid histories beyond the default ACP aggregate replay cap while preserving that default cap, full provenance checks and per-frame bounds.
+
+Final verification: the exact required `verify-wt.sh` command against `ae10d4f19` exited 0, including build, both typechecks, lint, every supplied repository check and freeze. Git staging was refused by the sandbox; amend did not run. The final 18-file cohort passed 277/277 cases, including all 185 new TypeScript cases; 49 source/test hashes stayed unchanged. The checkpoint-only rerun passed 143/143 across ten existing files. The final CLI smoke paged four times, followed without replay and preserved selected store hashes. All applicable recorded guard mutants were killed and restored, including eight final collector mutations.
+
+The broader 104-file diagnostic was 1,273 passed / 170 failed; the isolated checkpoint rerun resolves 81 of those failures. Remaining cases require permitted loopback/confinement or fixture reconciliation. Python's isolated full run was 419 passed / 59 failed / 1 skipped; all 111 added Python cases pass. Remaining Python cases need protected peer/context fixture updates, loopback access or a preinstalled SDK interpreter. Full exact counts, classifications and logs are in the report.
+
+Remaining scope: PXB-30 progress checkpoint writing; structured shutdown results; interactive queued-input controls; WP30 tree/TUI navigation; optional SDK preview; fresh desktop/live qualification. No new transcript store, dependency, CLI command, Studio route or freeze exception was added. Composition factory/tool wiring and other lanes' owned sources/fixtures remain unchanged; AgentSession edits only bridge the public prompt/receipt/withdraw adapters and duplicate refusal. No research files changed.
+
+Review the diff and `/Users/sid/AgentMaturityCompass-worktrees/s442cd919/work/codex-runs/wp20-report.md`, with per-row source evidence in `wp20-row-report.md` and a source-hash receipt in `wp20-source-receipt.json`. The requested message is `wp20-commit-message.txt`. The two-version `wp20-owned-fixture-followup.patch` is review-only; actual Claude-owned fixtures were not edited. Claude should review, reconcile owned fixtures, rerun blocked integrations on a suitable host, then commit/merge through the integrator's process. Codex must not commit, push or merge.
+
+
+# WP20 part B handoff
+
+Role: REV_FULLSTACK_ENGINEER. Date: 30 October 2026.
+
+Scope: DXA-12 native shutdown results and PI-035 TypeScript request preview on branch `rtd/gap-wp20b`, based on `75eaea680`. The change is uncommitted for the Claude integrator to review and commit.
+
+Deliverables: bounded driver, composed-loop and in-process session shutdown results; a pure SDK request preview; lifecycle and preview regressions; SDK documentation, generated API snapshot and a patch changeset.
+
+Final `verify-wt.sh` exited 0; all 50 new cases passed and all 38 mutants were killed. Runtime integration still has 37 blocked/unresolved cases. Exact counts, limitations and command output are recorded in `../codex-runs/wp20b-report.md` relative to the worktree. The conventional commit message is `../codex-runs/wp20b-commit-message.txt`.
+
+PXB-25 interactive wiring remains deferred because this base has no WP30 command registry or long-lived chat session handle. Native/SDK withdrawal already exists. PXB-30 remains deferred because producer/checkpoint and budget-consumer semantics cross this lane's ownership. ACP/Studio host shutdown aggregation remains outside this native slice.
+
+Next owner: Claude reviews the diff, reconciles the reported test results, commits and merges. No push or merge was performed by Codex.
+
+---
+
+# WP16 handoff — candidate for Claude review
+
+WP16 is implemented in an uncommitted candidate. Repository verification passed. Runtime qualification remains incomplete for the blocked host checks below.
+
+Tip: `dff352a3e42eda65d11fd3127f91d036208b2687`, branch `rtd/gap-wp16`, worktree `/Users/sid/AgentMaturityCompass-worktrees/s442cd919/work/amc-gap-wp16`. No commit, push or merge was made. Claude reviews, commits and merges.
+
+## Row status
+
+“Fixed” below means implemented and regression-tested in this candidate, not physical platform or release qualification.
+
+| Row | Status | Evidence and limits |
+| --- | --- | --- |
+| D36 | Fixed | The native toolset composes `terminalServices` with the shared `NativeTerminalTools` runtime through `nativeBackground.ts`. The existing Linux PTY host remains the execution boundary. Explicit host interactive authority and platform prerequisites are required. |
+| D37 | Fixed | The same composition mounts `jobServices` and `JobRegistry`. Jobs retain their starting session/turn/step/call, distinguish logical cancellation from observed cleanup, and keep unknown work reserved until cleanup is proven. Session and delegated cleanup run before sealing or handoff. |
+| DXA-11 | Fixed | CLI SIGTERM records parent cancellation with `requestedBy: "signal:SIGTERM"`, closes admission and awaits bounded shutdown. An uncooperative driver remains unknown and unsealed. |
+| DXA-22 | Fixed | `AgentDriver.dispose()` closes admission synchronously, memoizes bounded shutdown and rejects later followup/steer. Kernel service disposal invokes it even when idle or failed. |
+| DXA-24 | Already present | The current controller is the cancellation target; the first abort cause wins and inbox preservation is explicit. The candidate also snapshots bounded cause metadata before notifying abort listeners. |
+| DXA-25 | Fixed | New hook reasons and requestedBy values are capped at 512 UTF-8 bytes. Historical metadata readers remain compatible. |
+| DXB-16 | Already addressed in base, with documented limit | Exclusive create and publication checks are present. The final check/rename race with an external writer remains documented in `fsTools.ts`. WP34b-owned filesystem source was not edited. |
+| DXB-17 | Already addressed in base, with documented limit | Edits use captured bytes and snapshot-digest publication checks. The same external-writer race remains. |
+| DXB-18 | Already present | The existing `processTree` substrate distinguishes direct-child closure from proven process-range exit. Jobs reuse it through the existing confined bash/runProcess path; `processTree` was not edited. Missing tree proof remains unknown. |
+| DXC-04 | Fixed | `terminal_send` uses the same persistent shell, preserving cwd/state across calls. No second bash dialect was added. |
+| DXC-05 | Fixed | Governed open/list/read/send/signal/resize/close tools use NativeTerminalHost, bounded output and revision-bound byte pages. Input/resize retain synchronous authority checks and revocation. A bash approval cannot grant interactive input. |
+| DXC-06 | Fixed | Governed job_start/list/output/kill tools use the existing ToolPipeline. Waiting is finite and does not kill a running job. Stop requests report observed cleanup separately. |
+| PXB-35 | Fixed | A per-registry UUID isolates stale job IDs from later registry instances; owner checks remain mandatory. |
+| PXB-36 | Already addressed in base | Native search runs the walk/read/regex work in a worker with finite deadline/cancellation, awaited termination and explicit incomplete results. |
+| AXR-21 | Already present | Native and ToolHub adapters use the canonical approval engine. |
+| AXR-23 | Already present | Native and ToolHub calls share the action journal and authorization binding/recheck. |
+| AXR-24 | Already present | Native authorization, managed hooks, gateway and wire paths use the existing lease verifier. |
+
+## Implementation and boundaries
+
+`composeNativeAgent` reaches the existing toolset composition. A shared kernel job/terminal lifetime is mounted there, with every tool dispatched through the existing ToolPipeline and signed allowlist. Background commands re-enter that pipeline as confined bash calls with fresh policy/authorization checks. No default policy was widened. Every new tool result sets `ok` explicitly.
+
+Job output uses OutputCollector head/tail retention and absolute byte cursors with explicit dropped ranges. Active, retained, owner-namespace and waiter limits are finite. Unknown cleanup consumes active capacity. Logical settlement and completion notification remain exactly once; the existing wake budget is three and only trusted human input refills it. There is no autonomous completion-wake pump.
+
+Owned cleanup is awaited by ordinary sessions, failed composition, kernel runs and delegated/continued children. Cleanup failure cannot become a successful child result or a successful handoff. A still-running driver does not receive a false signed close. Read-only stop control (`job_kill`) is deliberate: it only cancels an already owned producer and must remain callable while that producer holds the pipeline write lock. Tool evidence and owner/policy fences still apply. Read/list tools also use READ_ONLY; terminal writes use WRITE_HIGH.
+
+The library-only labels were removed only from the now-consumed job and terminal service modules; the label test verifies their real production consumer. No package/lockfile, shared node_modules, research, MCP source, processTree, reserved filesystem/bash argument code or other worktree was edited. No dependency was installed, no freeze exception was added, and no tracked file was deleted. Two narrow dead-code acceptances preserve the existing exported TERMINAL_SEAM token and TerminalSeamService class for kernel extension compatibility. The plugin uses them internally; no production implementation is being excused as unreachable. Only the two stale unused-file entries for the now-composed job and terminal modules are removed. The exact pre-update delta is preserved in wp16-quality-delta.json.
+
+The PTY wiring uses the existing Linux Bubblewrap/system-Python backend; it needs no new npm/native addon. Actual Linux PTY execution was not qualified in this macOS sandbox. Default CLI/ACP composition provides no interactive host authorizer; programmatic `AgentSessionInit.nativeTerminal` supplies explicit authority. Unsupported platforms and missing grants refuse execution. No unconfined fallback, detach/reattach, new CLI command or Studio route was added. Bash's separate run_in_background argument remains refused; `job_start` is the admitted launch tool.
+
+## Tests and red/green evidence
+
+There are 66 added test cases: 46 in six new WP16 files, 18 added registry cases, one label-consumer case and one SIGTERM case. The existing kernel service disposal test also gained late-admission assertions.
+
+The final focused run passed 95/95 across ten files: `jobRegistry.test.ts` (30), `wp16JobTools.test.ts` (10), `wp16TerminalTools.test.ts` (12), `wp16Shutdown.test.ts` (5), `wp16NativeComposition.test.ts` (11), `unwiredContractsLabelled.test.ts` (14), `wp16KernelShutdown.test.ts` (1), `wp16SubagentLifecycle.test.ts` (7), plus the five existing kernel-runtime/barrel/SBOM cases across two files. See `wp16-final-focused.log`.
+
+The six-file existing core run passed 116/117: CLI loop (11), delegation flags (35), budgets (27), shell composition (17) and tool pool (7) all passed. Toolset wiring passed 19/20; its real Seatbelt shell launch failed. A minimal host probe independently returned `sandbox-exec: sandbox_apply: Operation not permitted`, exit 71. This is retained as an unqualified environment path, not a passing shell test. See `wp16-final-core.log` and `wp16-seatbelt-environment.log`.
+
+A separate delegated lifecycle run passed 64/64 across the new lifecycle file and existing `subagentContinuable`, `subagentStopConditions`, `subagentForeignContract` and `subagentCancellation` files. The earlier 110-file affected-test sweep was stopped after repeated socket-backed fixture refusals/timeouts; it has no aggregate pass result. Its manifest and log are preserved. The final 85-file rerun excludes 19 files containing socket-related code or references and the six core files; its exact manifest is `wp16-final-existing-files.txt`. Excluded fixtures are listed in `wp16-socket-fixture-files.txt`. Socket qualification remains blocked by `listen EPERM 127.0.0.1` in this sandbox; excluded files are not claimed passed.
+
+The 85-file run finished with 81 files passed and four files failed: 1,142 cases passed, five failed, plus one unhandled socket-fixture error. It had loaded the earlier MCP assertion; the corrected full MCP file subsequently passed 27/27 in `wp16-mcp-final.log`, and its final strict test types passed in `wp16-final-mcp-typecheck.log`. The four remaining failed cases are environmental: `toolsetConfinementProperty.test.ts` (11/13 passed; both failures are sandbox-exec sandbox_apply Operation not permitted, exit 71), `execProcessTree.test.ts` (12/13 passed; `spawnSync ps EPERM` during the PGID probe), and `piAi/piAiCli.test.ts` (2/3 passed; the loopback fixture throws `listen EPERM 127.0.0.1`, causing its test timeout and the unhandled error). This run is not claimed as an all-green qualification run. The verifier rebuild overlapped its final portion; no import/startup failures occurred, and production source did not change. The exact log is `wp16-final-existing.log`.
+
+Two existing assertions changed for correctness. The registry existence-oracle test now uses an actually generated foreign-owner ID rather than a nonexistent hard-coded `bash-1`. The native MCP cancellation test now expects TOOL_OUTCOME_UNKNOWN after a dispatched request explicitly reports uncertain remote effects; its mount reuse/disposal checks remain. The old CANCELLED expectation reproduced a real assertion failure in `wp16-mcp-cancel-red.log`. No MCP source was changed.
+
+Real red/green artifacts also cover stale-ID collision, premature kernel sealing, public asynchronous child cleanup, and unknown job-stop results being overwritten by turn cancellation. Guard mutation evidence covers 32 reversions across 13 isolated Vitest transform runs, with matching source hashes before/after and corresponding assertion failures for every planned reversion. These are grouped runs, not 32 independent executions. Receipts: `wp16-mutation-receipt.json`, `wp16-subagent-mutation-receipt.json`, `wp16-runner-mutation-receipt.json`, `wp16-mutant-stop-unknown-receipt.json`; the stale-ID probe log is `wp16-mutant-probe.log`. All production hashes still match the recorded restored source.
+
+Tests use Node 22.23.3, the original Vitest config with `--configLoader runner --cache=false --maxWorkers=2`, and external task-specific checkpoint directories. A 30-second fixture hook allowance avoids signing-fixture setup timeouts under concurrent load; behavior deadlines were not relaxed. The full repository test suite was not run.
+
+## Final verification result
+
+The exact required command `bash /Users/sid/AgentMaturityCompass-worktrees/s442cd919/work/verify-wt.sh /Users/sid/AgentMaturityCompass-worktrees/s442cd919/work/amc-gap-wp16 dff352a3e` **exited 0** on the final rerun. Build, source typecheck, test typecheck, lint, counts, docs drift, citations, architecture boundaries, threat model, API reference, schemas, gates, dead code, duplicates and freeze all passed. `git diff --check` also passed.
+
+The first full verifier run exited 1 only for the terminal export findings and two stale module entries. That failure is preserved in `wp16-verify-first-pass.log` and its exit-code file. The authorized narrow baseline update now has zero new and zero stale findings; it retains all prior acceptance values and their original ordering. No freeze exception or wholesale rebaseline was used.
+
+Git staging was refused by the sandbox before amendment, as expected. HEAD remains the base SHA above; nothing was committed, pushed or merged.
+
+Regeneration updates test-source inventory counts from 2,194 to 2,200 in ten documentation/site targets (`CONTRIBUTING.md`, `README.md`, the two content drafts, the two internal documents, three website files and the whitepaper). It also adds the patch release note in `docs/releases/2.0.0.md` (326 changesets). These are inventory counts, not passing-test claims.
+
+Final verifier output tail:
+
+```text
+check:api-ref ok
+check:schemas ok
+check:gates ok
+check:dead-code ok
+check:duplicates ok
+freeze ok
+```
+
+
+## Remaining qualification and review
+
+Claude must review this uncommitted candidate, run the 19 excluded files and the blocked socket/Seatbelt/process-inspection cases in a permitted host, and qualify real Linux PTYs before accepting physical PTY support. Commit and merge only after review and the required qualification. Existing external-writer limits and unproven process-tree outcomes remain explicit. Detach/reattach remains separately admitted scope. The conventional commit message is `wp16-commit-message.txt` and ends with the required Codex co-author trailer.
 ## REV_FULLSTACK_ENGINEER — 2026-10-29 WP28 native catalog and cost projection
 
 Scope: `rtd/gap-wp28`, base `5c7958858`, for Claude integrator session `3c2ecdb1`. The existing model pricing table now supplies immutable provider/protocol/model metadata in native request headers. Native usage exposes provider-reported cost and separately labeled catalog estimates with request coverage, unknowns, cache semantics and dated provenance. Ops overlap rates and native endpoint defaults use the existing shared catalogs. Step usage preserves reasoning as an output subset.
@@ -591,3 +710,12 @@ Final qualification: normal verify-wt.sh against dff352a3e exited 0, including b
 Two existing Pi cycle probes initially timed out because TSX startup exceeded their unchanged 1,800 ms budget. Only subprocess loading changed to fresh built JavaScript; fixtures/assertions/timeout remain unchanged. The final full run passed them at 1,487/1,422 ms. The DSH unsupported-version table uses v5 instead of newly supported v4; historical v2 still refuses v4. Source-quality exceptions and the initial dist cleanup issue are documented in the detailed report; the final verifier used normal cleanup and no bypass.
 
 PI-065 full Durable snapshots/deltas/revision continuity and signed native lifecycle-to-Watch wiring remain deferred. This slice binds watch metadata only and declares content/revision losses. OTel exporter source and library-only label remain unchanged. No dependency, package/lockfile, CLI/Studio route, freeze exception, research edit or foreign worktree change was made. Generated counts/docs are included for review. Final before/after hashes match for 5,474 source/fixture/config files; no tracked files were deleted. This appendix preserves the original handoff history exactly.
+
+
+## WP22 part C - 2026-10-30
+
+Scope: D55 / PI-024 signed native-loop observer and deny-only pre-tool hooks. Source, regression tests, native wiring, documentation and a patch changeset are in `amc-gap-wp22c` on `rtd/gap-wp22c`, based on `3dcdf61a9`.
+
+Fifteen guard and evidence-head mutants were killed and source was restored. Claude took the lane over after the Codex usage limit, re-ran two mutants (guard registration, deny decision), 20 related test files (297 tests) and verify-wt.sh against 3dcdf61a9. Observer metadata is frozen and redacted; deny hooks retain all policy, approval and authority checks.
+
+Committed by Claude on `rtd/gap-wp22c`; not pushed or merged. Detailed evidence and the conventional commit message are under `/Users/sid/AgentMaturityCompass-worktrees/s442cd919/work/codex-runs/wp22c-*`.
