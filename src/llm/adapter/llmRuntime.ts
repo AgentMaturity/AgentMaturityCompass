@@ -219,6 +219,10 @@ export class LlmRuntime {
     if (spec.requiredProtocol !== undefined && route.capabilities?.protocol !== spec.requiredProtocol) {
       throw new LlmCapabilityError("required-protocol", route.capabilities === null ? "unknown" : "unsupported");
     }
+    // PXA-15: retention is the route's policy, committed in the signed header; a caller cannot choose or override it.
+    if (Object.hasOwn(spec.params, "cacheRetention")) {
+      throw new LlmRouteError("AMC_LLM_ROUTE_INVALID", "cacheRetention is a route setting; it cannot be passed as a request param");
+    }
     // Before anything durable: an adapter that cannot carry these params says so
     // now, rather than after a signed header row commits to bytes it will refuse.
     route.adapter.assertParams?.(spec.params);
@@ -234,7 +238,7 @@ export class LlmRuntime {
       // one is how a well-formed request of the wrong shape gets sent.
       encoderId: route.encoderId,
       encoderVersion: route.encoderVersion,
-      params: spec.params,
+      params: route.cacheRetention === undefined ? spec.params : { ...spec.params, cacheRetention: route.cacheRetention },
       systemPromptEventId: spec.systemPromptEventId,
       tools: spec.tools,
       assertRequest: (request) => {
