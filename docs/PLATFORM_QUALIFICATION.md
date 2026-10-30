@@ -11,7 +11,7 @@ npm run qualify:platform -- --out tmp/platform-qualification/report.json
 
 Run through npm so its actual JavaScript entry point is available on all supported platforms. This avoids relying on POSIX shell scripts or invoking a Windows `.cmd` shim as a native executable.
 
-The report records actual OS/architecture/Node, source commit and dirty state, packed artifact digest, executed steps, raw local command artifacts and their hashes. A failure or missing prerequisite does not become a pass. A successful run on an unsupported Node major is inconclusive. Successful scratch installations are removed; unsuccessful ones are retained with the path in the receipt. The nightly workflow is configured for Ubuntu (AMD64 and ARM64), macOS and Windows on both LTS majors, plus desktop installer lanes, and uploads receipts even when a job fails (see the P2-06 section below).
+The report records actual OS/architecture/Node, the Node module ABI (`process.versions.modules`, N-API) with every installed native addon and its digest, source commit and dirty state, packed artifact digest, executed steps, raw local command artifacts and their hashes. A failure or missing prerequisite does not become a pass. A successful run on an unsupported Node major is inconclusive. Successful scratch installations are removed; unsuccessful ones are retained with the path in the receipt. The nightly workflow is configured for Ubuntu (AMD64 and ARM64), macOS and Windows on both LTS majors, plus desktop installer lanes, and uploads receipts even when a job fails (see the P2-06 section below).
 
 On September 29, 2026, the [hosted compatibility matrix](https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/36542131466) passed all six Ubuntu/macOS/Windows and Node 22/24 combinations at source commit `5dd437c3e4af3b20952124dfd57d2c55e1863cb2`. Each receipt reports a clean source tree and 13 completed qualification steps. The [receipt summary](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/AMC_OS/RELEASES/2026-09-29-completion/platform-matrix-summary.json) records runtime versions and artifact digests. Later source revisions require their own qualification; earlier Linux-container and Darwin Node 25 receipts retain their original scopes.
 
@@ -38,6 +38,15 @@ cleanup and unsupported-runtime distinctions remain unchanged. The corresponding
 synthetic regressions in `tests/platformQualificationOutputOwnership.test.ts`
 passed in the September 29 full suite (14,119 tests at `5dd437c3`). The hosted
 matrix above separately exercises real fresh-output qualification runs.
+
+## WP32 — this host's lanes, without fallback
+
+On October 30, 2026, GAP-WP32 qualified the lanes one local Mac can run, at source commit `3e56038be`: macOS 26.6.2 on arm64 with Node 22, a fresh packed install, and the macOS Seatbelt boundary that AMC declares for the native shell. The receipt is [`qualification/2026-10-30-WP32/`](../qualification/2026-10-30-WP32/README.md), and `docs/PLATFORM_MATRIX.md` is generated from it.
+
+- Passed: the packed install and its keyless governed CLI turn, cold-verified from new processes; installed `native-modules`; the real-kernel Seatbelt escape, path, network and process-tree suite (run with `AMC_REQUIRE_REAL_SANDBOX=1`); and cancellation and restart through the owned-process lifecycle helpers, with no process or listener left behind.
+- Refused, with no unconfined fallback: every Linux-only backend requested on macOS. Bubblewrap, the only backend for executable extensions, returns `unavailable` with nothing run, and the native PTY refuses before launch. The generic write-only Seatbelt backend now also refuses a requested network, read or process boundary instead of reporting the run as confined.
+- Failed, and recorded rather than hidden: the SDK quickstart on the packed install. Its `fs.write` runs in SIMULATE mode after AXR-02, which is pre-existing on the base. The installed crash-recovery runner also failed: its fixture predates deferred MCP discovery and is refused at start.
+- Unavailable on this host: Linux x64 and arm64, Windows x64, and macOS x64, on Node 22 and Node 24, along with the Linux Bubblewrap shell. Node 24 on this Mac was not run. A matrix cell reads "unavailable on this host" only from a lane receipt that gives the reason; such a cell is never a pass.
 
 ## P2-06 — platform lanes, the generated matrix and the reference deployment
 

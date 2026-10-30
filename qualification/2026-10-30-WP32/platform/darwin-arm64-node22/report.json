@@ -1,0 +1,176 @@
+{
+  "schema": "amc.platform-qualification",
+  "version": 1,
+  "generatedAt": "2026-10-30T06:40:23.917Z",
+  "platform": "darwin",
+  "arch": "arm64",
+  "osRelease": "25.6.0",
+  "node": "v22.23.3",
+  "supportedNode": true,
+  "package": "agent-maturity-compass@1.2.0",
+  "abi": {
+    "nodeModules": "127",
+    "napi": "10",
+    "nativeAddons": [
+      {
+        "path": "node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+      }
+    ]
+  },
+  "sourceCommit": "3e56038befcf845c23a4db5389bcb802a468ce96",
+  "sourceDirty": false,
+  "packageSha256": "26db8f832fd0923e114b887102d6f68c30b6c92b9cc373833eae210e1ee11b2b",
+  "steps": [
+    {
+      "id": "pack",
+      "status": "passed",
+      "startedAt": "2026-10-30T06:40:23.977Z",
+      "durationMs": 5632.887667,
+      "exitCode": 0,
+      "signal": null,
+      "expectedFailure": false,
+      "artifact": "00-pack.json",
+      "artifactSha256": "7adc2b3aa4a61c68393642a44a65220cbe6883d7de79624aa87a92d6a2488fd5"
+    },
+    {
+      "id": "fresh-install",
+      "status": "passed",
+      "startedAt": "2026-10-30T06:40:29.620Z",
+      "durationMs": 23836.868875,
+      "exitCode": 0,
+      "signal": null,
+      "expectedFailure": false,
+      "artifact": "01-fresh-install.json",
+      "artifactSha256": "4958d44c7981c12c2ee743c6859d613988ba5e0064c4847a0cfb065e9c395e37"
+    },
+    {
+      "id": "private-kernel-absent",
+      "status": "passed",
+      "startedAt": "2026-10-30T06:40:53.600Z",
+      "durationMs": 49.79691699999967,
+      "exitCode": 0,
+      "signal": null,
+      "expectedFailure": false,
+      "artifact": "02-private-kernel-absent.json",
+      "artifactSha256": "f2cdc9e1b80657136926755a4861e2155f686c7ec3b17fa88e0edb7ba46d1232"
+    },
+    {
+      "id": "help",
+      "status": "passed",
+      "startedAt": "2026-10-30T06:40:53.650Z",
+      "durationMs": 1019.1280830000032,
+      "exitCode": 0,
+      "signal": null,
+      "expectedFailure": false,
+      "artifact": "03-help.json",
+      "artifactSha256": "c962f8f17554ce9e5d71b80f798faea6ecdaeb5abf731d2fb38c90e7e6e32007"
+    },
+    {
+      "id": "read-only-guide",
+      "status": "passed",
+      "startedAt": "2026-10-30T06:40:54.669Z",
+      "durationMs": 1037.1480420000007,
+      "exitCode": 0,
+      "signal": null,
+      "expectedFailure": false,
+      "artifact": "04-read-only-guide.json",
+      "artifactSha256": "efa5d7430f1e69251848aab445329d678fb7f3b8e171935f92ecd47f39c37c5e"
+    },
+    {
+      "id": "initialize",
+      "status": "passed",
+      "startedAt": "2026-10-30T06:40:55.706Z",
+      "durationMs": 3029.288124999999,
+      "exitCode": 0,
+      "signal": null,
+      "expectedFailure": false,
+      "artifact": "05-initialize.json",
+      "artifactSha256": "5f513acc53adb705216c643d18fbbeef6ee566c8ba86aa14d06087ce2b43e4ff"
+    },
+    {
+      "id": "native-keyless-task",
+      "status": "passed",
+      "startedAt": "2026-10-30T06:40:58.736Z",
+      "durationMs": 1468.440582999996,
+      "exitCode": 0,
+      "signal": null,
+      "expectedFailure": false,
+      "artifact": "06-native-keyless-task.json",
+      "artifactSha256": "703171c13113f510df594b54eb7dd85618698912c0f257c1c2ab98073b77f416"
+    },
+    {
+      "id": "amc session verify --json",
+      "status": "passed",
+      "startedAt": "2026-10-30T06:41:00.205Z",
+      "durationMs": 1057.0462500000067,
+      "exitCode": 0,
+      "signal": null,
+      "expectedFailure": false,
+      "artifact": "07-amc-session-verify---json.json",
+      "artifactSha256": "24316c18490ccb424625b0e18fe45f570ab023cb6484a7b253f081162bdf054f"
+    },
+    {
+      "id": "amc agent-loop verify --json",
+      "status": "passed",
+      "startedAt": "2026-10-30T06:41:01.262Z",
+      "durationMs": 1237.9413749999949,
+      "exitCode": 0,
+      "signal": null,
+      "expectedFailure": false,
+      "artifact": "08-amc-agent-loop-verify---json.json",
+      "artifactSha256": "23473c9c75a1f74a837c7e6ef8b8c38ba27ac7206fd1852788bd852304b337fc"
+    },
+    {
+      "id": "missing-launcher-refuses",
+      "status": "passed",
+      "startedAt": "2026-10-30T06:41:02.504Z",
+      "durationMs": 49.96283399999811,
+      "exitCode": 1,
+      "signal": null,
+      "expectedFailure": true,
+      "artifact": "09-missing-launcher-refuses.json",
+      "artifactSha256": "2d1c7c24157c8a9dbd341590932e8e615af0f925f739dfca85fb68aaf7998b47"
+    },
+    {
+      "id": "restored-launcher",
+      "status": "passed",
+      "startedAt": "2026-10-30T06:41:02.558Z",
+      "durationMs": 1032.1647920000032,
+      "exitCode": 0,
+      "signal": null,
+      "expectedFailure": false,
+      "artifact": "10-restored-launcher.json",
+      "artifactSha256": "c962f8f17554ce9e5d71b80f798faea6ecdaeb5abf731d2fb38c90e7e6e32007"
+    },
+    {
+      "id": "amc session verify --json",
+      "status": "passed",
+      "startedAt": "2026-10-30T06:41:03.591Z",
+      "durationMs": 1028.389916,
+      "exitCode": 0,
+      "signal": null,
+      "expectedFailure": false,
+      "artifact": "11-amc-session-verify---json.json",
+      "artifactSha256": "24316c18490ccb424625b0e18fe45f570ab023cb6484a7b253f081162bdf054f"
+    },
+    {
+      "id": "amc agent-loop verify --json",
+      "status": "passed",
+      "startedAt": "2026-10-30T06:41:04.619Z",
+      "durationMs": 1148.6223329999993,
+      "exitCode": 0,
+      "signal": null,
+      "expectedFailure": false,
+      "artifact": "12-amc-agent-loop-verify---json.json",
+      "artifactSha256": "23473c9c75a1f74a837c7e6ef8b8c38ba27ac7206fd1852788bd852304b337fc"
+    }
+  ],
+  "status": "passed",
+  "cleanup": "retained-for-inspection",
+  "scratch": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-platform-cev29n",
+  "scope": "local npm artifact, Node entry point, keyless native SQLite/signing and cold verification",
+  "limitations": [
+    "No real-provider task, desktop installer, OS shell sandbox, global npm shim or published release qualification."
+  ]
+}

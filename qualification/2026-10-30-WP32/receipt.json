@@ -1,0 +1,172 @@
+{
+  "schemaVersion": 1,
+  "key": "WP32",
+  "date": "2026-10-30",
+  "commit": "3e56038befcf845c23a4db5389bcb802a468ce96",
+  "branch": "rtd/gap-wp32",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "os": "darwin 25.6.0 (macOS 26.6.2)",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run qualify:platform -- --out qualification/2026-10-30-WP32/platform/darwin-arm64-node22/report.json --keep",
+      "exit": 0,
+      "durationMs": 41628
+    },
+    {
+      "cmd": "node <tmp>/consumer/node_modules/agent-maturity-compass/dist/cli.js doctor --json (installed, qualified workspace)",
+      "exit": 0,
+      "durationMs": 2200
+    },
+    {
+      "cmd": "node scripts/packed-install-check.mjs --tarball <tmp>/agent-maturity-compass-1.2.0.tgz",
+      "exit": 1,
+      "durationMs": 32000
+    },
+    {
+      "cmd": "node scripts/installed-crash-recovery-check.mjs --artifact <tmp>/agent-maturity-compass-1.2.0.tgz ... --out <scratch>/crash-1",
+      "exit": 0,
+      "durationMs": 28000
+    },
+    {
+      "cmd": "AMC_REQUIRE_REAL_SANDBOX=1 npx vitest run <8 sandbox files> --maxWorkers=2",
+      "exit": 0,
+      "durationMs": 50000
+    },
+    {
+      "cmd": "npx vitest run <8 lifecycle files> --maxWorkers=2",
+      "exit": 0,
+      "durationMs": 63000
+    }
+  ],
+  "tests": {
+    "total": 165,
+    "passed": 165,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "lanes.json",
+      "sha256": "dde57a763951b9afbce6cc2339c3a7a2651dcdd2bdbba5536edd993d9509fb43"
+    },
+    {
+      "path": "lifecycle/installed-crash-receipt.json",
+      "sha256": "864e90d8e427ed8975935bdba9a91dbf2a7afc41b7bfc3e5ea8b580bdeea514c"
+    },
+    {
+      "path": "lifecycle/lifecycle-tests.json",
+      "sha256": "53fd0706593ebd40767245923943c1f5f72f603db908ac3690c81a39e9812e51"
+    },
+    {
+      "path": "packed-install-check.txt",
+      "sha256": "f1ededc747c25d812e6b8722248e50c79b801f9697c4f218c09016be5a5e699a"
+    },
+    {
+      "path": "platform/darwin-arm64-node22/00-pack.json",
+      "sha256": "7adc2b3aa4a61c68393642a44a65220cbe6883d7de79624aa87a92d6a2488fd5"
+    },
+    {
+      "path": "platform/darwin-arm64-node22/01-fresh-install.json",
+      "sha256": "4958d44c7981c12c2ee743c6859d613988ba5e0064c4847a0cfb065e9c395e37"
+    },
+    {
+      "path": "platform/darwin-arm64-node22/02-private-kernel-absent.json",
+      "sha256": "f2cdc9e1b80657136926755a4861e2155f686c7ec3b17fa88e0edb7ba46d1232"
+    },
+    {
+      "path": "platform/darwin-arm64-node22/03-help.json",
+      "sha256": "c962f8f17554ce9e5d71b80f798faea6ecdaeb5abf731d2fb38c90e7e6e32007"
+    },
+    {
+      "path": "platform/darwin-arm64-node22/04-read-only-guide.json",
+      "sha256": "efa5d7430f1e69251848aab445329d678fb7f3b8e171935f92ecd47f39c37c5e"
+    },
+    {
+      "path": "platform/darwin-arm64-node22/05-initialize.json",
+      "sha256": "5f513acc53adb705216c643d18fbbeef6ee566c8ba86aa14d06087ce2b43e4ff"
+    },
+    {
+      "path": "platform/darwin-arm64-node22/06-native-keyless-task.json",
+      "sha256": "703171c13113f510df594b54eb7dd85618698912c0f257c1c2ab98073b77f416"
+    },
+    {
+      "path": "platform/darwin-arm64-node22/07-amc-session-verify---json.json",
+      "sha256": "24316c18490ccb424625b0e18fe45f570ab023cb6484a7b253f081162bdf054f"
+    },
+    {
+      "path": "platform/darwin-arm64-node22/08-amc-agent-loop-verify---json.json",
+      "sha256": "23473c9c75a1f74a837c7e6ef8b8c38ba27ac7206fd1852788bd852304b337fc"
+    },
+    {
+      "path": "platform/darwin-arm64-node22/09-missing-launcher-refuses.json",
+      "sha256": "2d1c7c24157c8a9dbd341590932e8e615af0f925f739dfca85fb68aaf7998b47"
+    },
+    {
+      "path": "platform/darwin-arm64-node22/10-restored-launcher.json",
+      "sha256": "c962f8f17554ce9e5d71b80f798faea6ecdaeb5abf731d2fb38c90e7e6e32007"
+    },
+    {
+      "path": "platform/darwin-arm64-node22/11-amc-session-verify---json.json",
+      "sha256": "24316c18490ccb424625b0e18fe45f570ab023cb6484a7b253f081162bdf054f"
+    },
+    {
+      "path": "platform/darwin-arm64-node22/12-amc-agent-loop-verify---json.json",
+      "sha256": "23473c9c75a1f74a837c7e6ef8b8c38ba27ac7206fd1852788bd852304b337fc"
+    },
+    {
+      "path": "platform/darwin-arm64-node22/doctor.json",
+      "sha256": "6096b3598e2bd783d59985815dfa9aee70894b82f3ea7665f8a0ff920655a2bb"
+    },
+    {
+      "path": "platform/darwin-arm64-node22/lane.json",
+      "sha256": "7d8164a2f3dcad2a8b4cadb4268cbbf64a224cc980e7f530e7f63dee81031a2c"
+    },
+    {
+      "path": "platform/darwin-arm64-node22/report.json",
+      "sha256": "a27df4c7a182a35e1a410ab7ea918a40b7d64cd347786b47142d9073951bde0d"
+    },
+    {
+      "path": "platform/darwin-arm64-sandbox/lane.json",
+      "sha256": "b51f7295b7010285aab62babcfe42e87f447f6024efa86fcf9b2610e60fa5cf1"
+    },
+    {
+      "path": "platform/darwin-arm64-sandbox/sandbox.json",
+      "sha256": "8cadf17c0189d043c31032f24019d86f9a58431c946a5744dcab2949ef3879d3"
+    },
+    {
+      "path": "platform/linux-arm64-node22/lane.json",
+      "sha256": "b1586290699b0859a87023847352afffaded6624e3de601ef0ecb24bb70aa085"
+    },
+    {
+      "path": "platform/linux-arm64-node24/lane.json",
+      "sha256": "eb24609fc504085327ca6d3c73e8d30247989194aa3de07167a50d73be5fa6a3"
+    },
+    {
+      "path": "platform/linux-arm64-sandbox/lane.json",
+      "sha256": "2f35b6102146ec0880ba2693671abdeb97914304f626ab591db50fd007a7877d"
+    },
+    {
+      "path": "platform/linux-x64-node22/lane.json",
+      "sha256": "b8a7a3a57b463489fe7fc951bb097ddb114d5847fdea90dbee2e78663717b44f"
+    },
+    {
+      "path": "platform/linux-x64-node24/lane.json",
+      "sha256": "26f3cac432380cfec6dd1e27e53814c90a784b66714f7630367ca340bdcf817d"
+    },
+    {
+      "path": "platform/linux-x64-sandbox/lane.json",
+      "sha256": "cb0ab58c32dc1f7d73821a66b5f06807de7ce6a394531e67a556cb32cde49990"
+    },
+    {
+      "path": "platform/win32-x64-node22/lane.json",
+      "sha256": "6782f54f8203a2306c01a30bfcfdc63a0ec55d047551a6e19e308788e012b666"
+    },
+    {
+      "path": "platform/win32-x64-node24/lane.json",
+      "sha256": "79d814caef32f18d424ee8bd5f16e17a3e2c660f72c6c3f4865efca5d7eeab9e"
+    }
+  ],
+  "notes": "packed-install-check exited 1 at its SDK quickstart step: the governed fs.write ran in SIMULATE mode; pre-existing on base 660827742 (tests/sdkQuickstart.test.ts fails the same way, from AXR-02 1549fabbd). installed-crash-recovery-check exited 0 but wrote ok:false: amc acp refused deferred MCP tools without tool_search in the signed allowlist (d6441c858); its fixture needs a discovery turn. Both are recorded as failed lanes. Linux, Windows and other architectures are unavailable on this host, never passed."
+}

@@ -1,0 +1,10 @@
+{
+  "schema": "amc.platform-lane/1",
+  "kind": "platform",
+  "platform": "linux",
+  "arch": "arm64",
+  "nodeMajor": 22,
+  "outcome": "unavailable",
+  "reason": "recorded on darwin-arm64, macOS 26.6.2: no such host, emulator or remote runner here",
+  "commit": "3e56038befcf845c23a4db5389bcb802a468ce96"
+}

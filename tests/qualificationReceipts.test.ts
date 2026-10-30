@@ -96,6 +96,12 @@ describe("P0-01 qualification receipts", () => {
     expect(errorsFor()).toMatch(/folder key P0-01-NODE differs/);
   });
 
+  test("a gap work package (WP32) is a receipt key; a malformed one is not", () => {
+    writeReceipt(receipt({ key: "WP32", date: "2026-10-30" }), "2026-10-30-WP32");
+    writeReceipt(receipt({ key: "WP3", date: "2026-10-30" }), "2026-10-30-WP3");
+    expect(validateQualificationDir(root).errors).toEqual([expect.stringMatching(/^2026-10-30-WP3: receipt.json\/key must match pattern/)]);
+  });
+
   test("a folder date that differs from the receipt date fails", () => {
     writeReceipt(receipt({ date: "2026-10-06" }));
     expect(errorsFor()).toMatch(/date/);

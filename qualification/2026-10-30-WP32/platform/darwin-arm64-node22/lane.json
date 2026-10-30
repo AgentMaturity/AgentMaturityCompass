@@ -1,0 +1,9 @@
+{
+  "schema": "amc.platform-lane/1",
+  "kind": "platform",
+  "platform": "darwin",
+  "arch": "arm64",
+  "nodeMajor": 22,
+  "runner": "local macOS 26.6.2 (not a hosted runner)",
+  "commit": "3e56038befcf845c23a4db5389bcb802a468ce96"
+}
