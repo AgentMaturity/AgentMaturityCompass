@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { startTrustDriftMonitor } from "../src/monitor/trustDriftMonitor.js";
-import { writeSealedReport } from "./helpers/sealedRun.js";
+import { writeAnchoredRun } from "./helpers/sealedRun.js";
 
 const previousPassphrase = process.env.AMC_VAULT_PASSPHRASE;
 beforeEach(() => { process.env.AMC_VAULT_PASSPHRASE = "trust-drift-test-passphrase"; });
@@ -17,9 +17,10 @@ function newWorkspace(): string {
   return root;
 }
 
-/** Sealed like the runner's runs: since WP37 only sealed runs form the trust series. */
+/** Sealed and ledger-anchored like the runner's runs: only trusted runs form the trust series. */
 function writeRun(workspace: string, agentId: string, runId: string, ts: number, integrityIndex: number): void {
-  writeSealedReport(workspace, join(workspace, ".amc", "agents", agentId, "runs"), runId, { runId, ts, integrityIndex });
+  writeAnchoredRun(workspace, join(workspace, ".amc", "agents", agentId, "runs"),
+    { runId, agentId, ts, integrityIndex, windowStartTs: ts - 1, windowEndTs: ts, status: "VALID" });
 }
 
 afterEach(() => {

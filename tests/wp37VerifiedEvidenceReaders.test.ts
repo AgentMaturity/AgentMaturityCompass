@@ -107,7 +107,7 @@ describe("WP37 verified run readers", () => {
 
   test("trust drift monitor ignores a tampered run", () => {
     const ws = workspace();
-    writeSealedReport(ws, runsDir(ws), "run-1", run("run-1", 1000, 0.9));
+    writeAnchoredRun(ws, runsDir(ws), run("run-1", 1000, 0.9) as Parameters<typeof writeAnchoredRun>[2]);
     const edited = writeSealedReport(ws, runsDir(ws), "run-2", run("run-2", 2000, 0.9));
     tamperReport(edited, (report) => { report.integrityIndex = 0.1; });
 

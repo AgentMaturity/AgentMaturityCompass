@@ -6,7 +6,7 @@ import type { DiagnosticReport, LayerName, OutcomeReport } from "../types.js";
 import { parseWindowToMs } from "../utils/time.js";
 import { pathExists, readUtf8 } from "../utils/fs.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
-import { listVerifiedRuns } from "../diagnostic/runReportResolution.js";
+import { listTrustedRuns } from "../governor/runTrust.js";
 import { computeFailureRiskIndices } from "../assurance/indices.js";
 import { latestAssuranceByPack } from "../assurance/assuranceRunner.js";
 import { verifyPluginWorkspace } from "../plugins/pluginApi.js";
@@ -37,9 +37,9 @@ function parseOutcomeReport(file: string): OutcomeReport | null {
   }
 }
 
-/** Sealed runs only, oldest first (WP37): an edited run must not enter a signed bench. */
+/** Trusted runs only, oldest first: an edited, copied or unanchored run, or a thinned history, refuses a signed bench. */
 function listAgentRuns(workspace: string, agentId: string): DiagnosticReport[] {
-  return listVerifiedRuns(workspace, agentId).reverse();
+  return listTrustedRuns(workspace, agentId).reverse();
 }
 
 function listAgentOutcomeReports(workspace: string, agentId: string): OutcomeReport[] {

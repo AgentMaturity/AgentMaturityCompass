@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { latestAssuranceByPack } from "../assurance/assuranceRunner.js";
 import { sealedRunReportVerifies } from "../diagnostic/reportSeal.js";
 import { refusedRunsBlocking, scanVerifiedRuns } from "../diagnostic/runReportResolution.js";
+import { scanTrustedRuns } from "../governor/runTrust.js";
 import { openLedger } from "../ledger/ledger.js";
 import type { DiagnosticReport } from "../types.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
@@ -13,13 +14,16 @@ import { createFreezeIncident, createFreezeIncidentForSnapshot, createFreezeInci
 import { dispatchAlert, captureVerifiedAlertsConfig } from "./alerts.js";
 import { evaluateDriftRules } from "./driftRules.js";
 
-/** Sealed runs only (WP37): an edited run must neither trigger nor suppress a signed freeze. Bytes are kept for the TOCTOU re-check. */
-function loadRunRows(workspace: string, agentId: string): Array<{ path: string; bytes: Buffer; run: DiagnosticReport }> {
+/**
+ * Trusted runs only (`scanTrustedRuns`): an edited, copied or unanchored run must neither trigger nor suppress a signed
+ * freeze. Bytes are kept for the TOCTOU re-check.
+ */
+function loadRunRows(workspace: string, agentId: string, trusted = new Set(scanTrustedRuns(workspace, agentId).runs.map(run => run.runId))): Array<{ path: string; bytes: Buffer; run: DiagnosticReport }> {
   const runsDir = getAgentPaths(workspace, agentId).runsDir;
   if (!pathExists(runsDir)) return [];
   return readdirSync(runsDir).filter(name => name.endsWith(".json")).flatMap(name => {
     try { const path = join(runsDir, name), bytes = readFileSync(path), run = JSON.parse(bytes.toString("utf8")) as DiagnosticReport | null;
-      return run !== null && sealedRunReportVerifies(workspace, run as unknown as Record<string, unknown>) ? [{ path, bytes, run }] : []; }
+      return run !== null && trusted.has(run.runId) && sealedRunReportVerifies(workspace, run as unknown as Record<string, unknown>) ? [{ path, bytes, run }] : []; }
     catch { return []; }
   }).sort((a, b) => a.run.ts - b.run.ts);
 }
@@ -42,9 +46,12 @@ type ReadyDrift = { agentId: string; previous: DiagnosticReport; current: Diagno
   evaluated: ReturnType<typeof evaluateDriftRules>; comparisonWindow: NonNullable<FreezeIncident["comparisonWindow"]>; assertInputsCurrent(): void };
 
 function prepareDriftDecision(input: DriftCheckParams): { result: DriftCheckResult } | ReadyDrift {
-  const params = { ...input }, agentId = resolveAgentId(params.workspace, params.agentId), rows = loadRunRows(params.workspace, agentId), runs = rows.map(row => row.run);
+  const params = { ...input }, agentId = resolveAgentId(params.workspace, params.agentId), scan = scanTrustedRuns(params.workspace, agentId);
+  const rows = loadRunRows(params.workspace, agentId, new Set(scan.runs.map(run => run.runId))), runs = rows.map(row => row.run);
+  // Untrusted runs are left out and reported, never blocking: a planted copy must not silence a freeze (fail toward alerting).
+  const unverified = scan.untrusted.map(reason => `UNVERIFIED: ${reason}; excluded from drift`);
   const empty = (reasons: string[], previousRunId: string | null, currentRunId: string | null): { result: DriftCheckResult } => ({ result: {
-    agentId, triggered: false, ruleId: null, reasons, previousRunId, currentRunId, incidentId: null } });
+    agentId, triggered: false, ruleId: null, reasons: [...reasons, ...unverified], previousRunId, currentRunId, incidentId: null } });
   if (runs.length < 2) return empty(["not enough runs for drift comparison"], null, runs.at(-1)?.runId ?? null);
   const select = (values: ReturnType<typeof loadRunRows>) => {
     const current = (params.currentRunId ? values.find(row => row.run.runId === params.currentRunId) : values.at(-1)) ?? values.at(-1)!;

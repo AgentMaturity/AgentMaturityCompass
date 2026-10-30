@@ -1,19 +1,25 @@
-import { readFileSync, writeFileSync } from "node:fs";
+import { copyFileSync, readFileSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
+import { getAgentPaths } from "../src/fleet/paths.js";
 import { expect, test, vi } from "vitest";
 import { loadAlertsConfig, signAlertsConfig } from "../src/drift/alerts.js";
 import { runDriftCheck, runDriftCheckAsync } from "../src/drift/driftDetector.js";
 import { activeFreezeStatus, listIncidents, verifyIncidentSignature } from "../src/drift/freezeEngine.js";
 import { atFreezeSign, freezeFixture, pauseFreezeSign } from "./helpers/freezePublicationFixture.js";
-import { tamperReport, writeSealedReport } from "./helpers/sealedRun.js";
+import { tamperReport, writeAnchoredRun, writeSealedReport } from "./helpers/sealedRun.js";
 
-function inputs(scores: number[]) {
+/** Sealed, ledger-anchored window runs; `edit` shapes a run before it is sealed (the drift detector reads only trusted runs). */
+function inputs(scores: number[], edit: (index: number, report: Record<string, unknown>) => void = () => {}) {
   const f = freezeFixture();
   const config = loadAlertsConfig(f.workspace);
   config.alerts.rules[0]!.when = { overallDropGte: 0.4, layerDropGte: 0.4, integrityDropGte: 1, correlationDropBelow: 0, assuranceDropBelow: {} };
   writeFileSync(f.alertsPath, JSON.stringify(config)); signAlertsConfig(f.workspace);
-  const files = scores.map((score, index) => writeSealedReport(f.workspace, f.paths.runsDir, `window-${index}`,
-    { runId: `window-${index}`, agentId: "default", ts: index + 1, windowStartTs: 0, windowEndTs: 100,
-      layerScores: [{ layerName: "Skills", avgFinalLevel: score, confidenceWeightedFinalLevel: score }], integrityIndex: 1, correlationRatio: 1 }));
+  const files = scores.map((score, index) => {
+    const report = { runId: `window-${index}`, agentId: "default", ts: index + 1, windowStartTs: 0, windowEndTs: 100, status: "VALID" as const,
+      layerScores: [{ layerName: "Skills", avgFinalLevel: score, confidenceWeightedFinalLevel: score }], integrityIndex: 1 as number | null, correlationRatio: 1 };
+    edit(index, report);
+    return writeAnchoredRun(f.workspace, f.paths.runsDir, report);
+  });
   return { f, files };
 }
 
@@ -48,6 +54,17 @@ test("AXE-09: a single baseline keeps its freeze and records unconfirmed evidenc
   expect(verifyIncidentSignature(f.workspace, incident)).toBe(true);
 });
 
+test("a sealed run copied from another agent cannot become the current run and suppress a freeze", async () => {
+  const { f } = inputs([5, 4]);
+  // agent-b's genuine anchored run, copied into the default agent's runs dir as the newest run with no drop.
+  const copied = writeAnchoredRun(f.workspace, getAgentPaths(f.workspace, "agent-b").runsDir, { runId: "window-copied", agentId: "agent-b", ts: 3,
+    windowStartTs: 0, windowEndTs: 100, status: "VALID", layerScores: [{ layerName: "Skills", avgFinalLevel: 4, confidenceWeightedFinalLevel: 4 }],
+    integrityIndex: 1, correlationRatio: 1 });
+  copyFileSync(copied, join(f.paths.runsDir, "window-copied.json"));
+  const result = await runDriftCheck({ workspace: f.workspace });
+  expect(result).toMatchObject({ triggered: true, previousRunId: "window-0", currentRunId: "window-1" });
+});
+
 test("AXE-09: an unavailable assurance pack freezes honestly, without inventing a zero score", async () => {
   const { f } = inputs([5, 5]);
   const config = loadAlertsConfig(f.workspace); config.alerts.rules[0]!.when.assuranceDropBelow = { injection: 80 };
@@ -80,12 +97,13 @@ test("AXE-09: every window input is rechecked after asynchronous signing", async
 });
 
 test.each(["missing layer", "empty run", "nonfinite input"])("AXE-09: %s is insufficient evidence, without a numeric freeze", async kind => {
-  const { f, files } = inputs([5, 4]);
-  const report = JSON.parse(readFileSync(files[1]!, "utf8"));
-  if (kind === "missing layer") report.layerScores[0].layerName = "Resilience";
-  if (kind === "empty run") report.layerScores = [];
-  if (kind === "nonfinite input") report.integrityIndex = null;
-  writeSealedReport(f.workspace, f.paths.runsDir, "window-1", report);
+  const { f } = inputs([5, 4], (index, report) => {
+    if (index !== 1) return;
+    const layers = report.layerScores as Array<{ layerName: string }>;
+    if (kind === "missing layer") layers[0]!.layerName = "Resilience";
+    if (kind === "empty run") report.layerScores = [];
+    if (kind === "nonfinite input") report.integrityIndex = null;
+  });
   const result = await runDriftCheck({ workspace: f.workspace });
   expect(result.triggered).toBe(false); expect(result.reasons.join("; ")).toContain("INSUFFICIENT_EVIDENCE");
   expect(listIncidents(f.workspace)).toEqual([]);
