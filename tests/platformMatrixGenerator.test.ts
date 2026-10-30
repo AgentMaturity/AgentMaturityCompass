@@ -67,6 +67,26 @@ describe("platform matrix generator", () => {
     expect(text).toMatch(/\| Windows x64 \|.*refused by design \(until P2-14\) \|/);
   });
 
+  it("an unavailable lane is reported with its reason and never counts as qualified or run (WP32)", () => {
+    const root = receipts();
+    const away = (kind: string) => ({ "lane.json": { schema: "amc.platform-lane/1", kind, platform: "linux", arch: "x64", nodeMajor: 22, commit: COMMIT,
+      outcome: "unavailable", reason: "recorded on darwin-arm64" }, "report.json": { status: "passed", supportedNode: true, sourceCommit: COMMIT },
+      "sandbox.json": { status: "passed" } });
+    lane(root, "linux-x64-node22", away("platform"));
+    lane(root, "linux-x64-sandbox", away("sandbox"));
+    lane(root, "darwin-sandbox", { "lane.json": { schema: "amc.platform-lane/1", kind: "sandbox", platform: "darwin", arch: "arm64", nodeMajor: 22, commit: COMMIT },
+      "sandbox.json": { status: "passed" } });
+    lane(root, "unexplained", { "lane.json": { schema: "amc.platform-lane/1", kind: "platform", platform: "linux", arch: "arm64", nodeMajor: 22, commit: COMMIT, outcome: "unavailable" } });
+    const lanes = loadLanes(root);
+    expect(laneStatus(lanes, COMMIT, "linux-x64", 22)).toMatchObject({ status: STATUS.unavailable, why: "recorded on darwin-arm64" });
+    expect(laneStatus(lanes, COMMIT, "linux-arm64", 22).status, "an unavailable lane needs a reason").toBe(STATUS.notRun);
+    expect(desktopStatus(lanes, COMMIT, "linux-x64", "sandbox")).toMatchObject({ status: STATUS.unavailable, why: "recorded on darwin-arm64" });
+    expect(desktopStatus(lanes, COMMIT, "darwin-arm64", "sandbox").status).toBe(STATUS.qualified);
+    const text = renderMatrix({ lanes, commit: COMMIT, source: "receipts" });
+    expect(text).toMatch(/\| Linux AMD64 \| unavailable on this host \(`linux-x64-node22`; recorded on darwin-arm64\) \|.*\| unavailable on this host \(`linux-x64-sandbox`; recorded on darwin-arm64\) \|/);
+    expect(text).toMatch(/\| macOS ARM64 \|.*\| qualified \(`darwin-sandbox`\) \|$/m);
+  });
+
   it("docs/PLATFORM_MATRIX.md is exactly what its recorded receipts and commit produce", () => {
     const text = readFileSync("docs/PLATFORM_MATRIX.md", "utf8");
     const commit = /^Commit: `([0-9a-f]{40})`\. Receipts: `([^`]+)`/m.exec(text);

@@ -6,6 +6,8 @@
 // <dir> holds one folder per lane run with lane.json (amc.platform-lane/1) and doctor.json (`amc doctor --json`).
 // lane.kind "platform" adds report.json (scripts/qualify-platform.mjs); "desktop" adds desktop.json
 // (`npm run package:desktop:verify`); "gui" has gui.json (the manual docs/deploy/reference/GUI_CHECKLIST.md receipt).
+// "sandbox" has sandbox.json (the host's OS shell-sandbox suite, WP32). A lane.json with outcome "unavailable" and a
+// reason records a lane the recording host cannot run; it is never a pass.
 // A lane is "qualified" only with a passing receipt for the same commit; another commit's receipt is "not run".
 import { existsSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
@@ -19,7 +21,7 @@ const PLATFORMS = [
   { id: "win32-x64", label: "Windows x64", desktop: true }
 ];
 export const STATUS = { qualified: "qualified", notQualified: "not qualified", inconclusive: "inconclusive (unsupported Node)", notRun: "not run",
-  refused: "refused by design" };
+  refused: "refused by design", unavailable: "unavailable on this host" };
 
 function readJson(path) {
   try { return JSON.parse(readFileSync(path, "utf8")); } catch { return null; }
@@ -31,34 +33,39 @@ export function loadLanes(dir) {
   return readdirSync(dir, { withFileTypes: true }).filter((entry) => entry.isDirectory()).map((entry) => {
     const folder = join(dir, entry.name);
     return { folder: entry.name, lane: readJson(join(folder, "lane.json")), report: readJson(join(folder, "report.json")),
-      doctor: readJson(join(folder, "doctor.json")), desktop: readJson(join(folder, "desktop.json")), gui: readJson(join(folder, "gui.json")) };
+      doctor: readJson(join(folder, "doctor.json")), desktop: readJson(join(folder, "desktop.json")), gui: readJson(join(folder, "gui.json")),
+      sandbox: readJson(join(folder, "sandbox.json")) };
   }).filter((entry) => entry.lane?.schema === "amc.platform-lane/1");
 }
 
+const unavailable = (lane) => lane.outcome === "unavailable" && typeof lane.reason === "string" && lane.reason.length > 0;
 const nativeModulesPass = (doctor) => doctor?.checks?.some((check) => check.id === "native-modules" && check.status === "PASS") === true;
 
 /** Status of one platform and Node major: the best-ranked receipt for `commit` decides; none for it is "not run". */
 export function laneStatus(lanes, commit, platformId, nodeMajor) {
   const runs = lanes.filter(({ lane }) => lane.kind === "platform" && `${lane.platform}-${lane.arch}` === platformId && lane.nodeMajor === nodeMajor);
-  const current = runs.filter(({ lane, report }) => lane.commit === commit && report?.sourceCommit === commit);
+  const current = runs.filter(({ lane, report }) => lane.commit === commit && (unavailable(lane) || report?.sourceCommit === commit));
   if (current.length === 0) return { status: STATUS.notRun, evidence: null };
   const rank = (run) => {
+    if (unavailable(run.lane)) return { status: STATUS.unavailable, why: run.lane.reason };
     if (!NODE_MAJORS.includes(nodeMajor) || run.report.supportedNode !== true) return { status: STATUS.inconclusive, why: "unsupported Node" };
     if (run.report.status !== "passed") return { status: STATUS.notQualified, why: `platform qualification ${run.report.status}` };
     if (!nativeModulesPass(run.doctor)) return { status: STATUS.notQualified, why: "doctor native-modules did not PASS" };
     return { status: STATUS.qualified, why: null };
   };
-  const order = [STATUS.qualified, STATUS.notQualified, STATUS.inconclusive];
+  const order = [STATUS.qualified, STATUS.notQualified, STATUS.inconclusive, STATUS.unavailable];
   const best = current.map((run) => ({ run, ...rank(run) })).sort((a, b) => order.indexOf(a.status) - order.indexOf(b.status))[0];
   return { status: best.status, why: best.why, evidence: best.run.folder };
 }
 
-/** Desktop installer (package:desktop + verify) and GUI checklist status for one desktop platform. */
+/** Desktop installer (package:desktop + verify), GUI checklist or OS shell-sandbox status for one platform. */
 export function desktopStatus(lanes, commit, platformId, field) {
   const runs = lanes.filter(({ lane }) => lane.kind === field && `${lane.platform}-${lane.arch}` === platformId && lane.commit === commit);
   if (runs.length === 0) return { status: STATUS.notRun, evidence: null };
-  const passed = runs.find((run) => run[field]?.status === "passed" && (field === "gui" || nativeModulesPass(run.doctor)));
-  return passed ? { status: STATUS.qualified, evidence: passed.folder } : { status: STATUS.notQualified, evidence: runs[0].folder };
+  const passed = runs.find((run) => !unavailable(run.lane) && run[field]?.status === "passed" && (field !== "desktop" || nativeModulesPass(run.doctor)));
+  if (passed) return { status: STATUS.qualified, evidence: passed.folder };
+  const ran = runs.find((run) => !unavailable(run.lane));
+  return ran ? { status: STATUS.notQualified, evidence: ran.folder } : { status: STATUS.unavailable, evidence: runs[0].folder, why: runs[0].lane.reason };
 }
 
 const cell = (result) => result.evidence ? `${result.status} (\`${result.evidence}\`${result.why ? `; ${result.why}` : ""})` : result.status;
@@ -68,7 +75,8 @@ export function renderMatrix({ lanes, commit, source }) {
     const node = NODE_MAJORS.map((major) => cell(laneStatus(lanes, commit, platform.id, major)));
     const desktop = platform.desktop ? cell(desktopStatus(lanes, commit, platform.id, "desktop")) : "n/a";
     const gui = platform.desktop ? cell(desktopStatus(lanes, commit, platform.id, "gui")) : "n/a";
-    const shell = platform.id === "win32-x64" ? `${STATUS.refused} (until P2-14)` : "not evaluated by these lanes";
+    const sandbox = desktopStatus(lanes, commit, platform.id, "sandbox");
+    const shell = platform.id === "win32-x64" ? `${STATUS.refused} (until P2-14)` : sandbox.evidence ? cell(sandbox) : "not evaluated by these lanes";
     return `| ${platform.label} | ${node.join(" | ")} | ${desktop} | ${gui} | ${shell} |`;
   });
   return [
@@ -81,7 +89,8 @@ export function renderMatrix({ lanes, commit, source }) {
     "A cell is \"qualified\" only when a lane receipt for this commit passed `npm run qualify:platform` and `amc doctor --json` reported `native-modules` PASS.",
     "A receipt from another commit counts as \"not run\". A Node major other than 22 or 24 is \"inconclusive (unsupported Node)\".",
     "Desktop installer cells need `npm run package:desktop` and `npm run package:desktop:verify` on that platform; GUI cells need the manual",
-    "receipt from docs/deploy/reference/GUI_CHECKLIST.md. How lanes run: docs/PLATFORM_QUALIFICATION.md.",
+    "receipt from docs/deploy/reference/GUI_CHECKLIST.md. Native shell cells need a passing OS shell-sandbox suite on that platform.",
+    "\"Unavailable on this host\" records a lane the recording machine cannot run; it is not a pass. How lanes run: docs/PLATFORM_QUALIFICATION.md.",
     "",
     `| Platform | Node ${NODE_MAJORS[0]} | Node ${NODE_MAJORS[1]} | Desktop installer | GUI launcher (manual) | Native shell |`,
     "|---|---|---|---|---|---|",

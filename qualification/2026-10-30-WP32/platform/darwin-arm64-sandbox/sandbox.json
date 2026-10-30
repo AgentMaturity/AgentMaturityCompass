@@ -1,0 +1,99 @@
+{
+  "status": "passed",
+  "boundary": "macos-seatbelt",
+  "command": "AMC_REQUIRE_REAL_SANDBOX=1 npx vitest run <files> --maxWorkers=2",
+  "tests": {
+    "total": 107,
+    "passed": 107,
+    "failed": 0,
+    "skipped": 0
+  },
+  "files": [
+    {
+      "file": "tests/codeModeConfinement.test.ts",
+      "status": "passed",
+      "passed": 3,
+      "total": 3
+    },
+    {
+      "file": "tests/nativeShellComposition.test.ts",
+      "status": "passed",
+      "passed": 17,
+      "total": 17
+    },
+    {
+      "file": "tests/nativeShellPlatformGate.test.ts",
+      "status": "passed",
+      "passed": 11,
+      "total": 11
+    },
+    {
+      "file": "tests/platformHostRefusal.test.ts",
+      "status": "passed",
+      "passed": 3,
+      "total": 3
+    },
+    {
+      "file": "tests/sandboxConfinement.test.ts",
+      "status": "passed",
+      "passed": 25,
+      "total": 25
+    },
+    {
+      "file": "tests/toolsetConfinementProperty.test.ts",
+      "status": "passed",
+      "passed": 13,
+      "total": 13
+    },
+    {
+      "file": "tests/containment/escapeSuite.test.ts",
+      "status": "passed",
+      "passed": 9,
+      "total": 9
+    },
+    {
+      "file": "tests/sandbox/seatbeltNativeProfile.test.ts",
+      "status": "passed",
+      "passed": 26,
+      "total": 26
+    }
+  ],
+  "escapeCases": [
+    {
+      "case": "positive control writes the signed root and preserves the real policy/permit receipt",
+      "status": "passed"
+    },
+    {
+      "case": "an absolute write to the owned operator HOME is denied after native launch",
+      "status": "passed"
+    },
+    {
+      "case": "a writable-root symlink cannot modify an owned outside file",
+      "status": "passed"
+    },
+    {
+      "case": "owned SSH and workspace authority canaries cannot be read into output",
+      "status": "passed"
+    },
+    {
+      "case": "direct TCP to a healthy owned listener fails with an OS permission error",
+      "status": "passed"
+    },
+    {
+      "case": "the real proxy denies an unlisted host with 403 and a matching decision callback",
+      "status": "passed"
+    },
+    {
+      "case": "an explicitly listed loopback IP reaches the real owned origin through the authenticated proxy",
+      "status": "passed"
+    },
+    {
+      "case": "a listed localhost name without an IP exemption is refused after actual local resolution",
+      "status": "passed"
+    },
+    {
+      "case": "a finite process-cap probe reaches EAGAIN with at most 32 owned live cat children and reaps them",
+      "status": "passed"
+    }
+  ]
+}
