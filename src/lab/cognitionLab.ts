@@ -18,9 +18,11 @@ import { z } from "zod";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { getLabTemplates as builtInLabTemplates, buildLabExperiment, simulatedProbeInput } from "./cognitionLabBodies.js";
+import type { EvidenceOutcome } from "../types.js";
 import {
   saveWorkspaceRecord,
   loadWorkspaceRecords,
+  readTrustedWorkspaceRecords,
   updateWorkspaceRecord,
   captureWorkspaceRecordPredecessor,
   prepareWorkspaceRecordAsync,
@@ -145,6 +147,11 @@ export interface LabExperimentReport {
   summary: string;
   boundaryMarker: LabBoundaryMarker;
   generatedTs: number;
+  /** not_evaluated while the experiment has no probe result. */
+  outcome: EvidenceOutcome;
+  /** INSUFFICIENT_EVIDENCE when a stored lab record was refused or a register is not whole (`unverifiedRecords`). */
+  evidenceStatus: "MEASURED" | "INSUFFICIENT_EVIDENCE";
+  unverifiedRecords: string[];
   reportHash: string;
 }
 
@@ -235,7 +242,7 @@ export function createLabExperiment(opts: {
 /** Live experiments plus any persisted by an earlier process, deduped by id. */
 function allExperiments(workspace?: string): LabExperiment[] {
   if (!workspace) return [...experiments];
-  const stored = loadWorkspaceRecords<LabExperiment>(workspace, EXPERIMENTS_AT);
+  const stored = readTrustedWorkspaceRecords<LabExperiment>(workspace, EXPERIMENTS_AT).records;
   const seen = new Set(experiments.map((e) => e.experimentId));
   return [...experiments, ...stored.filter((e) => !seen.has(e.experimentId))];
 }
@@ -576,7 +583,7 @@ function storedProbeResults(workspace: string, experimentId: string): LabProbeRe
     const issue = error.issues[0];
     return new Error(`Invalid persisted lab probe result at ${issue?.path.join(".") || "record"}: ${issue?.message || "invalid record shape"}`);
   };
-  const results: LabProbeResult[] = [];
+  // Every stored record's shape is checked first, so a malformed one refuses the report; only trusted ones are counted.
   for (const record of loadWorkspaceRecords<unknown>(workspace, PROBE_RESULTS_AT)) {
     const identity = labProbeIdentitySchema.safeParse(record);
     if (!identity.success) throw invalid(identity.error);
@@ -590,10 +597,19 @@ function storedProbeResults(workspace: string, experimentId: string): LabProbeRe
         throw new Error(`Invalid persisted lab probe result at scores.${dimension}: expected a finite number between 0 and 1`);
       }
     }
-    // The schema validates without coercion; retain raw own keys that the validator's clone can omit.
-    results.push(result);
   }
-  return results;
+  // The schema validated without coercion; the raw records keep own keys that the validator's clone can omit.
+  return readTrustedWorkspaceRecords<LabProbeResult>(workspace, PROBE_RESULTS_AT).records.filter((row) => row.experimentId === experimentId);
+}
+
+/**
+ * The evidence label for lab outputs read from `workspace` (DXB-11): stored experiments and probe results are read
+ * through `readTrustedWorkspaceRecords`, so a tampered record is left out and listed here, never counted.
+ */
+export function labRecordEvidence(workspace?: string): Pick<LabExperimentReport, "evidenceStatus" | "unverifiedRecords"> {
+  const root = experimentWorkspace(workspace);
+  const unverified = root ? [EXPERIMENTS_AT, PROBE_RESULTS_AT].flatMap((at) => readTrustedWorkspaceRecords(root, at).unverified) : [];
+  return { evidenceStatus: unverified.length > 0 ? "INSUFFICIENT_EVIDENCE" : "MEASURED", unverifiedRecords: unverified };
 }
 
 /**
@@ -651,6 +667,8 @@ export function generateLabReport(experimentId: string, workspace?: string): Lab
     summary,
     boundaryMarker: experiment.boundaryMarker,
     generatedTs: Date.now(),
+    outcome: results.length > 0 ? "measured" : "not_evaluated",
+    ...labRecordEvidence(resolvedWorkspace),
     reportHash,
   };
 }
@@ -672,6 +690,8 @@ export function renderLabReportMarkdown(report: LabExperimentReport): string {
   lines.push(`Experiment: ${report.experimentId} (${report.kind})`);
   lines.push(`Model: ${report.modelId}`);
   lines.push(`Generated: ${new Date(report.generatedTs).toISOString()}`);
+  lines.push(`Outcome: ${report.outcome} · Evidence: ${report.evidenceStatus}`);
+  for (const line of report.unverifiedRecords) lines.push(`- ${line}`);
   lines.push("");
 
   // Summary

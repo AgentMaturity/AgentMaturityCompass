@@ -18741,6 +18741,7 @@ program
     console.log(chalk.bold.yellow(EXAMPLE_BANNER));
     printClaimResult(exampleEnvelope("lab:simulate"), {});
     console.log(chalk.bold(`\nComparison: ${opts.baseline} vs ${opts.candidate}\n`));
+    for (const line of lab.labRecordEvidence(process.cwd()).unverifiedRecords) console.log(chalk.yellow(line));
     const { printLabComparison } = await import("./lab/labComparisonCli.js");
     printLabComparison(pairs);
     // Unmatched rows are reported, but a comparison with no matched probe is not a successful comparison.
@@ -18889,6 +18890,7 @@ program
       packId: opts.pack,
       status: opts.status as "open" | "confirmed" | "rejected" | undefined,
     }, process.cwd());
+    for (const line of fp.fpReportEvidence(process.cwd()).unverifiedRecords) console.log(chalk.yellow(line));
     if (reports.length === 0) {
       console.log(chalk.green("No false positive reports found."));
       return;
@@ -18906,15 +18908,17 @@ program
   .option("--pack <id>", "filter by pack ID")
   .action(async (opts: { pack?: string }) => {
     const fp = await import("./assurance/falsePositiveTracker.js");
-    const summaries = fp.computeFPCostSummary(opts.pack, process.cwd());
+    const summaries = fp.computeFPCostSummary(opts.pack, process.cwd()), evidence = fp.fpReportEvidence(process.cwd());
+    for (const line of evidence.unverifiedRecords) console.log(chalk.yellow(line));
     if (summaries.length === 0) {
       console.log(chalk.green("No FP cost data available."));
       return;
     }
     console.log(chalk.bold("\nFalse Positive Cost Summary:\n"));
     for (const s of summaries) {
-      console.log(`  ${chalk.bold(s.packId)} — ${s.confirmedFPs} confirmed FPs, $${s.totalCostUsd.toFixed(2)} total cost, ${(s.fpRate * 100).toFixed(1)}% FP rate`);
+      console.log(`  ${chalk.bold(s.packId)} — ${s.confirmedFPs} confirmed FPs, $${s.totalCostUsd.toFixed(2)} total cost, ${s.outcome === "measured" ? `${(s.fpRate * 100).toFixed(1)}% FP rate` : "FP rate not evaluated (no resolved reports)"}`);
     }
+    console.log(`  Evidence: ${evidence.evidenceStatus}`);
   });
 
 program
@@ -18929,7 +18933,7 @@ program
       windowStartTs: Date.now() - windowMs,
       windowEndTs: Date.now(),
       fpRateThreshold: parseFloat(opts.threshold),
-    });
+    }, process.cwd());
     console.log(fp.renderFPTuningReportMarkdown(report));
   });
 

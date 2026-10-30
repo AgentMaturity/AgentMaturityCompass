@@ -10,8 +10,7 @@ import { validateExternalEvidenceProfile } from "./externalEvidenceProfile.js";
 import { publishedSchemas, serializeSchema } from "../contracts/index.js";
 import { inspectBenchArtifact } from "../bench/benchArtifact.js";
 import { inspectPromptPackArtifact } from "../prompt/promptPackArtifact.js";
-import { verifyAssuranceCertificateFile } from "../assurance/assuranceVerifier.js";
-import { verifyAuditBinderFile } from "../audit/binderVerifier.js";
+import { readVerified } from "../crypto/signing/verifiedArtifacts.js";
 import { inspectPassportArtifact } from "../passport/passportArtifact.js";
 import {
   STANDARD_ARTIFACT_SCHEMAS,
@@ -68,18 +67,14 @@ function extractPayloadForValidation(name: SchemaName, file: string, workspace: 
   }
   if (name === "amccert.schema.json" && resolved.endsWith(".amccert")) {
     // Schema validation of this workspace's own certificate: its own keys are the pins, labelled workspace-self.
-    const verify = verifyAssuranceCertificateFile({ file: resolved, trust: workspaceSelfTrust(workspace) });
-    if (!verify.ok || !verify.cert) {
-      throw new Error(`certificate verification failed: ${verify.errors.join("; ")}`);
-    }
-    return verify.cert;
+    const read = readVerified("assurance-certificate", { file: resolved, trust: workspaceSelfTrust(workspace) });
+    if (read.status !== "verified") throw new Error(`certificate verification failed: ${read.reasons.join("; ")}`);
+    return read.artifact;
   }
   if (name === "amcaudit.schema.json" && resolved.endsWith(".amcaudit")) {
-    const verify = verifyAuditBinderFile({ file: resolved, trust: workspaceSelfTrust(workspace) });
-    if (!verify.ok || !verify.binder) {
-      throw new Error(`audit binder verification failed: ${verify.errors.map((row) => row.message).join("; ")}`);
-    }
-    return verify.binder;
+    const read = readVerified("audit-binder", { file: resolved, trust: workspaceSelfTrust(workspace) });
+    if (read.status !== "verified") throw new Error(`audit binder verification failed: ${read.reasons.join("; ")}`);
+    return read.artifact;
   }
   if (name === "amcpass.schema.json" && resolved.endsWith(".amcpass")) {
     return inspectPassportArtifact(resolved).passport;
