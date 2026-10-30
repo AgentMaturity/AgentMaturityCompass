@@ -33,6 +33,7 @@ import type { PromptAssemblyRegistry } from "../prompt/assembly/promptRegistry.j
 import { renderPrompt } from "../prompt/assembly/interpolate.js";
 import { ContextPluginHost } from "../prompt/context/contextHost.js";
 import { createContextPreStep } from "../prompt/context/contextPreStep.js";
+import { LlmRouteError } from "../llm/adapter/adapterRegistry.js";
 
 /** The `session/close` reason of a session whose composition threw: it never became ready, so it did not complete. */
 export const COMPOSITION_FAILED = "composition_failed";
@@ -71,6 +72,9 @@ export interface NativeAgentInit {
   readonly route: LoopRoute;
   /** Composes the tool surface after the session opens; resources it creates are the caller's to close. */
   readonly tools: (session: SessionService) => AgentToolSeam;
+  /** Owned resources must drain while the session writer is still open. */
+  readonly cleanup?: () => Promise<boolean>;
+  readonly hasOwnedWork?: () => boolean;
   /** Runs after the prompt row and before the driver: admission checks and control rows. A throw fails composition. */
   readonly admit?: (composed: { readonly systemPrompt: string; readonly tools: AgentToolSeam }) => void;
   readonly driver?: Pick<AgentDriverInit, "validation" | "config">;
@@ -82,6 +86,8 @@ export interface NativeAgent {
   readonly systemPromptEventId: string;
   /** The section names of the system prompt as assembled (not as registered). */
   readonly promptSections: readonly string[];
+  /** Close admission and await bounded driver/resource cleanup before sealing. */
+  shutdown(): Promise<boolean>;
   /** Releases the composition's own registrations. Session lifetime stays with the surface. */
   dispose(): void;
 }
@@ -118,17 +124,38 @@ export function composeNativeAgent(init: NativeAgentInit): NativeAgent {
     }
     const llm = init.makeLlm(session);
     // An unknown route is a composition failure, not a turn that errors at its first request.
-    llm.pin?.({ providerId: init.route.providerId, model: init.route.model });
+    const pinned = init.route.pinned ?? llm.pin?.({ providerId: init.route.providerId, model: init.route.model });
+    if (pinned !== undefined && (pinned.providerId !== init.route.providerId || pinned.model !== init.route.model)) {
+      throw new LlmRouteError("AMC_LLM_ROUTE_INVALID", "the pinned route does not match the selected provider/model");
+    }
+    const route = pinned === undefined ? init.route : { ...init.route, pinned };
     const systemPromptEventId = session.recordSystemPrompt(systemPrompt).eventId;
     init.admit?.({ systemPrompt, tools });
-    const driver = new AgentDriver({ session, llm, route: init.route, systemPromptEventId, tools, hooks,
+    const driver = new AgentDriver({ session, llm, route, systemPromptEventId, tools, hooks,
       ...(init.driver?.validation === undefined ? {} : { validation: init.driver.validation }),
       ...(init.driver?.config === undefined ? {} : { config: init.driver.config }) });
     const composedPrompt = prompt;
-    return { driver, session, systemPromptEventId, promptSections, dispose: () => composedPrompt?.dispose() };
+    let shutdown: Promise<boolean> | undefined;
+    return { driver, session, systemPromptEventId, promptSections,
+      shutdown: () => {
+        if (!shutdown) {
+          const idle = driver.dispose();
+          let cleanup: Promise<boolean>;
+          try { cleanup = init.cleanup?.() ?? Promise.resolve(true); } catch { cleanup = Promise.resolve(false); }
+          shutdown = Promise.all([idle, cleanup]).then(results => results.every(Boolean), () => false);
+        }
+        return shutdown;
+      },
+      dispose: () => { void driver.dispose(); composedPrompt?.dispose(); } };
   } catch (error) {
     prompt?.dispose();
-    settleFailedComposition(session, opened ? "close" : init.open === undefined ? "release" : "dispose");
+    const how = opened ? "close" : init.open === undefined ? "release" : "dispose";
+    if (init.hasOwnedWork?.()) {
+      // A failed composition can still have resources created by a tool mount. Never seal ahead of their cleanup.
+      void Promise.resolve().then(() => init.cleanup?.()).then(
+        confirmed => settleFailedComposition(session, confirmed === true ? how : "dispose"),
+        () => settleFailedComposition(session, "dispose"));
+    } else settleFailedComposition(session, how);
     throw error;
   }
 }

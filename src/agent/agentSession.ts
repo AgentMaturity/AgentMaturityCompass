@@ -17,6 +17,7 @@ import type { AgentStatus, CompactionConfig, InboxReceipt } from "./loopTypes.js
 import { resolveCompactionConfig } from "./compaction/promptPressure.js";
 import { readAgentRunSummary } from "./runReport.js";
 import type { LoopLlm, LoopRoute } from "./stepRunner.js";
+import type { SessionOpenParams } from "../session/sessionApiTypes.js";
 import type { TurnCancelCause, TurnEndReason } from "../session/sessionTypes.js";
 import type { EvidenceEvent } from "../types.js";
 import { SessionService } from "../session/sessionService.js";
@@ -67,6 +68,7 @@ export interface AgentSessionInit {
   readonly workspace: string;
   /** Minted when absent, so a caller that has no id of its own need not invent one. */
   readonly sessionId?: string;
+  readonly acceptedWork?: SessionOpenParams["acceptedWork"];
   readonly agentId: string;
   readonly makeLlm: (session: SessionService) => LoopLlm;
   readonly route: LoopRoute;
@@ -98,8 +100,9 @@ export interface AgentSessionInit {
   /** WP40 seam: a surface's signed ask_user answerer and operator-configured web_search provider, passed to the toolset. */
   readonly askUser?: AgentToolsetOptions["askUser"];
   readonly webSearchProvider?: AgentToolsetOptions["webSearchProvider"];
+  readonly nativeTerminal?: AgentToolsetOptions["nativeTerminal"];
   readonly maxSteps?: number;
-  /** Automatic compaction; off unless `contextWindowTokens` is declared. */
+  /** Automatic compaction defaults to reviewed route metadata; an explicit null window disables it. */
   readonly compaction?: Partial<CompactionConfig>;
   readonly validation?: NativeValidationPlan;
   /** Bind approvals/extensions to the real owning session and its existing pipeline. */
@@ -185,7 +188,8 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
     if (init.tools !== undefined && init.tools !== "none" && init.tools !== "workspace") throw new Error("Unknown native tool mode.");
     if (init.expectedToolsDigest !== undefined && (init.tools !== "workspace" || !/^[a-f0-9]{64}$/.test(init.expectedToolsDigest))) throw new Error("A native tool policy pin requires explicit workspace tools and a SHA-256 digest.");
     if (init.maxSteps !== undefined && (!Number.isSafeInteger(init.maxSteps) || init.maxSteps < 1 || init.maxSteps > 1024)) throw new Error("Native maxSteps must be an integer from 1 through 1024.");
-    const compaction = init.compaction === undefined ? undefined : resolveCompactionConfig(init.compaction);
+    if (init.compaction !== undefined) resolveCompactionConfig(init.compaction);
+    const compaction = init.compaction;
     refuseRetired(workspace, init.agentId); // P2-23: a retired agent opens no session
     // P1-79: the caller's lease, or the run's (LeasePrincipalRefused before any session row or recovery).
     const lease = runLease({ workspace, agentId: init.agentId, model: init.route.model || init.route.providerId, tools: init.tools ?? "workspace",
@@ -214,6 +218,7 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
       ...(init.unconfinedShell === undefined ? {} : { unconfinedShell: init.unconfinedShell }),
       ...(init.askUser === undefined ? {} : { askUser: init.askUser }),
       ...(init.webSearchProvider === undefined ? {} : { webSearchProvider: init.webSearchProvider }),
+      ...(init.nativeTerminal === undefined ? {} : { nativeTerminal: init.nativeTerminal }),
       ...lease,
       // Handing over the writer is what keeps the session ANCHORABLE. Pointing the
       // rows at the right session id was only half of it: written through the raw
@@ -242,28 +247,38 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
     let driver!: AgentDriver;
     let composed: NativeAgent | undefined;
     let composing = false;
-    const finish = (release: boolean): void => withWorkspaceScope(workspace, () => {
-      if (closed) return;
+    let closing: Promise<void> | undefined;
+    const finish = (release: boolean): void | Promise<void> => withWorkspaceScope(workspace, () => {
+      if (closed) return closing;
       if (running) throw new Error("Cancel and settle the active prompt before closing or releasing its session.");
-      const errors: unknown[] = [];
-      try {
-        if (release) session.releaseWithoutClosing();
-        else {
-          if (driver?.status === "failed") throw new Error("Cannot seal a failed driver with incomplete evidence.");
-          session.close({ reason: "completed" });
-          sessionClosed = true;
+      const pending = toolset?.hasOwnedWork() ?? false;
+      closed = true; // Close admission before the first await, including duplicate close/release calls.
+      const seal = (confirmed: boolean): void => {
+        const errors: unknown[] = [];
+        try {
+          if (release) {
+            if (!confirmed) throw new Error("Cannot release a session whose owned resource cleanup is unknown.");
+            session.releaseWithoutClosing();
+          } else {
+            if (driver?.status === "failed") throw new Error("Cannot seal a failed driver with incomplete evidence.");
+            session.close({ reason: confirmed ? "completed" : "resource_outcome_unknown" });
+            sessionClosed = true;
+          }
+        } catch (error) {
+          errors.push(error);
+          try { session.disposeWithoutClosing(); } catch (error) { errors.push(error); }
+        } finally {
+          for (const cleanup of [() => composed?.dispose(), () => { void toolset?.close(); }]) {
+            try { cleanup(); } catch (error) { errors.push(error); }
+          }
         }
-      } catch (error) {
-        errors.push(error);
-        try { session.disposeWithoutClosing(); } catch (error) { errors.push(error); }
-      } finally {
-        closed = true;
-        for (const cleanup of [() => composed?.dispose(), () => toolset?.close()]) {
-          try { cleanup(); } catch (error) { errors.push(error); }
-        }
-      }
-      if (errors.length) throw new AggregateError(errors, errors.map(error => error instanceof Error ? error.message : String(error)).join("; "));
-
+        if (errors.length) throw new AggregateError(errors, errors.map(error => error instanceof Error ? error.message : String(error)).join("; "));
+      };
+      const shutdown = composed?.shutdown() ?? Promise.resolve(true);
+      if (pending) { closing = shutdown.then(seal); return closing; }
+      // Preserve the synchronous no-resource close contract. shutdown already closed idle driver admission.
+      void shutdown.catch(() => undefined);
+      seal(true);
     });
 
     try {
@@ -282,7 +297,8 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
       composed = composeNativeAgent({
         session,
         ...(claimant === undefined ? { open: { sessionId, agentId: init.agentId, harnessVersion: init.harnessVersion,
-          compositionDigest: init.compositionDigest, policyDigest: init.policyDigest } } : {}),
+          compositionDigest: init.compositionDigest, policyDigest: init.policyDigest,
+          ...(init.acceptedWork === undefined ? {} : { acceptedWork: init.acceptedWork }) } } : {}),
         prompt: { profile },
         makeLlm: init.makeLlm,
         route: init.route,
@@ -290,6 +306,8 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
           toolset = init.tools === "none" ? undefined : makeToolset();
           return init.bindTools?.({ session, toolset: toolset ?? null }) ?? toolset?.seam ?? EMPTY_TOOL_SEAM;
         },
+        cleanup: () => toolset?.shutdown() ?? Promise.resolve(true),
+        hasOwnedWork: () => toolset?.hasOwnedWork() ?? false,
         // P2-23 reassessment triggers and P2-26 change envelopes run on the composed tool surface, before the first turn;
         // an out-of-envelope change throws here and the session is settled as a failed composition.
         admit: ({ systemPrompt, tools }) => admitSessionAtOpen({ workspace, agentId: init.agentId, manifest: () => nativeSessionManifest({ workspace, agentId: init.agentId,
@@ -408,7 +426,7 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
         shutdownPromise = Promise.resolve().then(() => withWorkspaceScope(workspace, async () => {
           const result = await driver.shutdown({ timeoutMs });
           if (result.state !== "settled") return Object.freeze({ ...result, sessionClosed });
-          try { finish(false); }
+          try { await finish(false); }
           catch (error) {
             return Object.freeze({ ...result, state: "incomplete" as const, sessionClosed,
               errors: Object.freeze([...result.errors, error instanceof Error ? error.message : String(error)]) });
@@ -417,8 +435,8 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
         })).finally(() => { shutdownPending = false; });
         return shutdownPromise;
       },
-      close: () => { if (shutdownPending && !closed) throw new Error("Wait for native shutdown before closing the session."); finish(false); },
-      release: () => { if (shutdownPending && !closed) throw new Error("Wait for native shutdown before releasing the session."); finish(true); }
+      close: () => { if (shutdownPending && !closed) throw new Error("Wait for native shutdown before closing the session."); return finish(false); },
+      release: () => { if (shutdownPending && !closed) throw new Error("Wait for native shutdown before releasing the session."); return finish(true); }
     };
   });
 }

@@ -22,9 +22,15 @@ function assertCanonicalName(name: string): void {
   }
 }
 
-/** Stable for the exact canonical string, independently of every other offered tool. */
-export function providerToolWireName(name: string): string {
+/** The default name is stable for the exact canonical string; a declared alias overrides only its provider presentation. */
+export function providerToolWireName(name: string, modelAlias?: string): string {
   assertCanonicalName(name);
+  if (modelAlias !== undefined) {
+    if (typeof modelAlias !== "string" || !SAFE_NAME.test(modelAlias) || modelAlias.startsWith(RESERVED_PREFIX)) {
+      throw new RequestEncodingError("Provider tool alias requires 1-64 safe characters without the reserved amc_ prefix");
+    }
+    return modelAlias;
+  }
   if (SAFE_NAME.test(name) && !name.startsWith(RESERVED_PREFIX)) return name;
   const slug = name.replace(/[^A-Za-z0-9_-]+/g, "_").slice(0, 15);
   const digest = createHash("sha256").update(name, "utf8").digest("base64url");
@@ -33,8 +39,9 @@ export function providerToolWireName(name: string): string {
   return `${RESERVED_PREFIX}${slug}_${digest}`;
 }
 
-function addIdentity(bindings: Map<string, string>, name: string): string {
-  const wire = providerToolWireName(name);
+function addIdentity(bindings: Map<string, string>, name: string, modelAlias?: string, historicalWireName?: string): string {
+  const wire = historicalWireName === providerToolWireName(name)
+    ? historicalWireName : providerToolWireName(name, historicalWireName ?? modelAlias);
   const prior = bindings.get(wire);
   if (prior !== undefined && prior !== name) throw new RequestEncodingError("Provider tool wire names collide");
   bindings.set(wire, name);
@@ -42,12 +49,19 @@ function addIdentity(bindings: Map<string, string>, name: string): string {
 }
 
 /** Current offered functions only. Runtime decoding must not admit historical-only tools. */
-export function bindProviderToolNames(tools: readonly Pick<ToolSchema, "name">[]): ReadonlyMap<string, string> {
-  const bindings = new Map<string, string>(), canonical = new Set<string>();
+export function bindProviderToolNames(tools: readonly Pick<ToolSchema, "name" | "modelAlias">[]): ReadonlyMap<string, string> {
+  const bindings = new Map<string, string>(), canonical = new Set<string>(), reserved = new Set<string>();
   for (const tool of tools) {
     if (canonical.has(tool.name)) throw new RequestEncodingError("Duplicate canonical tool name in offered schema");
     canonical.add(tool.name);
-    addIdentity(bindings, tool.name);
+    reserved.add(tool.name);
+    reserved.add(providerToolWireName(tool.name));
+  }
+  for (const tool of tools) {
+    if (tool.modelAlias !== undefined && reserved.has(tool.modelAlias)) {
+      throw new RequestEncodingError("Provider tool alias collides with an offered canonical or generated wire identity");
+    }
+    addIdentity(bindings, tool.name, tool.modelAlias);
   }
   return bindings;
 }
@@ -57,12 +71,12 @@ function record(value: unknown): value is Record<string, unknown> {
 }
 
 function mappedToolChoice(choice: unknown, encoderId: ToolNameEncoderId, offered: ReadonlySet<string>,
-  universe: Map<string, string>): unknown {
+  universe: Map<string, string>, aliases: ReadonlyMap<string, string | undefined>): unknown {
   if (encoderId !== "anthropic-messages" && typeof choice === "string" && ["auto", "none", "required"].includes(choice)) return choice;
   if (!record(choice)) throw new RequestEncodingError("Provider tool_choice requires a supported explicit shape");
   const selected = (name: unknown): string => {
     if (typeof name !== "string" || !offered.has(name)) throw new RequestEncodingError("Provider tool_choice must select an offered canonical function");
-    return addIdentity(universe, name);
+    return addIdentity(universe, name, aliases.get(name));
   };
   if ((encoderId === "openai-chat" || encoderId === "deepseek-chat") && choice.type === "function" && record(choice.function)) {
     return { ...choice, function: { ...choice.function, name: selected(choice.function.name) } };
@@ -87,21 +101,22 @@ export function encodeProviderToolNames(request: EncodableRequest, encoderId: To
   }
   const bindings = new Map(bindProviderToolNames(request.tools ?? []));
   const offered = new Set(request.tools?.map(tool => tool.name) ?? []);
-  const tools = request.tools === null ? null : request.tools.map(tool => ({ ...tool, name: addIdentity(bindings, tool.name) }));
+  const aliases = new Map(request.tools?.map(tool => [tool.name, tool.modelAlias]));
+  const tools = request.tools === null ? null : request.tools.map(tool => ({ ...tool, name: addIdentity(bindings, tool.name, tool.modelAlias) }));
   // The same historical function can appear repeatedly, or no longer be
   // offered. That is replay, not a duplicate declaration or new authority.
   const messages = request.messages.map(message => ({ ...message, parts: message.parts.map(part =>
-    part.kind === "tool_use" ? { ...part, toolName: addIdentity(bindings, part.toolName) } : part) }));
+    part.kind === "tool_use" ? { ...part, toolName: addIdentity(bindings, part.toolName, aliases.get(part.toolName), part.providerWireName) } : part) }));
   const params = { ...request.params };
-  if (Object.hasOwn(params, "tool_choice")) params.tool_choice = mappedToolChoice(params.tool_choice, encoderId, offered, bindings);
+  if (Object.hasOwn(params, "tool_choice")) params.tool_choice = mappedToolChoice(params.tool_choice, encoderId, offered, bindings, aliases);
   return { ...request, tools, messages, params };
 }
 
 /** No optimistic admission of unknown future or historical encoder behavior. */
 export function usesProviderToolNames(encoderId: string, version: number): boolean {
-  return (encoderId === "openai-chat" && (version === 3 || version === 4))
-    || (encoderId === "anthropic-messages" && (version === 3 || version === 4))
-    || (encoderId === "openai-responses" && (version === 2 || version === 3))
+  return (encoderId === "openai-chat" && version >= 3 && version <= 5)
+    || (encoderId === "anthropic-messages" && version >= 3 && version <= 5)
+    || (encoderId === "openai-responses" && version >= 2 && version <= 4)
     || (encoderId === "deepseek-chat" && version === 1)
     || (encoderId === "ollama-chat" && version === 1)
     || (encoderId === "gemini-generate-content" && (version === 1 || version === 2))

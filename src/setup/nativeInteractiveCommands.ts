@@ -9,6 +9,8 @@ export const NATIVE_INTERACTIVE_COMMANDS = [
   { name: "fork", description: "Queue a child session; /fork cancel clears the queue." },
   { name: "sessions", description: "Browse recorded sessions without acquiring a writer." },
   { name: "resume", description: "Inspect and select a recorded session to resume." },
+  { name: "bookmark", description: "Name a verified sealed turn in the current session." },
+  { name: "bookmarks", description: "Browse signed bookmarks and inspect a verified turn." },
   { name: "mcp", description: "Show the last mounted MCP receipt and tool grants." },
   { name: "extensions", description: "List loaded signed extensions and their commands." },
   { name: "load", description: "Load an already signed extension manifest." },

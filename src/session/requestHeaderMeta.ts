@@ -23,17 +23,38 @@ import { catalogProtocolForEncoder, createModelMetadataSnapshot, parseModelMetad
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import type { RequestHeaderParams } from "./sessionApiTypes.js";
+import { parsePhysicalRouteIdentity, parseVirtualRoutingDecision,
+  type PhysicalRouteIdentity, type VirtualRoutingDecision } from "../llm/request/routeIdentity.js";
+
+type RouteHeader = Pick<RequestHeaderMeta, "providerId" | "model" | "encoderId" | "encoderVersion">;
+
+function matchesPhysicalRoute(header: RouteHeader, route: PhysicalRouteIdentity): boolean {
+  const protocol = catalogProtocolForEncoder(header.encoderId);
+  return route.providerId === header.providerId && route.model === header.model && route.encoderId === header.encoderId
+    && route.encoderVersion === header.encoderVersion && (protocol === null || route.protocol === protocol);
+}
 
 /** Separate from the wire digest, which remains SHA-256 of transmitted bytes. */
-function metadataIdentity(header: Pick<RequestHeaderMeta, "providerId" | "model" | "encoderId" | "encoderVersion" | "params" | "requestDigest">,
+function metadataIdentity(header: Pick<RequestHeaderMeta, "providerId" | "model" | "encoderId" | "encoderVersion" | "params" | "requestDigest" | "physicalRoute" | "routingDecision">,
   metadata: ModelMetadataSnapshot | null): string {
   return sha256Hex(canonicalize({ providerId: header.providerId, model: header.model, encoderId: header.encoderId,
-    encoderVersion: header.encoderVersion, params: header.params, requestDigest: header.requestDigest, modelMetadataDigest: metadata?.digest ?? null }));
+    encoderVersion: header.encoderVersion, params: header.params, requestDigest: header.requestDigest, modelMetadataDigest: metadata?.digest ?? null,
+    ...(header.physicalRoute === undefined ? {} : { physicalRoute: header.physicalRoute, routingDecision: header.routingDecision ?? null }) }));
 }
 
 /** Capture metadata at the writer boundary; existing explicit routes still work without catalog records. */
-export function pinnedHeaderMetadata(params: RequestHeaderParams): Pick<RequestHeaderMeta, "modelMetadata" | "requestIdentityDigest"> {
-  const protocol = catalogProtocolForEncoder(params.encoderId);
+export function pinnedHeaderMetadata(params: RequestHeaderParams): Pick<RequestHeaderMeta, "modelMetadata" | "requestIdentityDigest" | "physicalRoute" | "routingDecision"> {
+  const physicalRoute = params.physicalRoute === undefined ? undefined : parsePhysicalRouteIdentity(params.physicalRoute);
+  if (physicalRoute === null || (physicalRoute !== undefined && !matchesPhysicalRoute(params, physicalRoute))) {
+    throw new Error("Request physical route is invalid or incompatible with the selected provider, encoder or model");
+  }
+  const routingDecision = params.routingDecision == null ? null
+    : physicalRoute === undefined ? null : parseVirtualRoutingDecision(params.routingDecision, physicalRoute);
+  if ((params.routingDecision != null && routingDecision === null) || (physicalRoute === undefined && params.routingDecision !== undefined)) {
+    throw new Error("Request virtual routing decision is invalid or incompatible with the physical route");
+  }
+  const routeMetadata = physicalRoute === undefined ? {} : { physicalRoute, routingDecision };
+  const protocol = physicalRoute?.protocol ?? catalogProtocolForEncoder(params.encoderId);
   const modelMetadata = params.modelMetadata === undefined
     ? protocol === null ? null : createModelMetadataSnapshot(params.providerId, protocol, params.model)
     : params.modelMetadata === null ? null : parseModelMetadataSnapshot(params.modelMetadata);
@@ -41,7 +62,8 @@ export function pinnedHeaderMetadata(params: RequestHeaderParams): Pick<RequestH
     && (modelMetadata.providerId !== params.providerId || modelMetadata.model !== params.model || modelMetadata.protocol !== protocol))) {
     throw new Error("Request model metadata is invalid or incompatible with the selected provider, protocol or model");
   }
-  return { modelMetadata, requestIdentityDigest: metadataIdentity({ ...params, requestDigest: sha256Hex(params.requestBytes) }, modelMetadata) };
+  return { ...routeMetadata, modelMetadata,
+    requestIdentityDigest: metadataIdentity({ ...params, ...routeMetadata, requestDigest: sha256Hex(params.requestBytes) }, modelMetadata) };
 }
 
 /**
@@ -53,6 +75,10 @@ export function pinnedHeaderMetadata(params: RequestHeaderParams): Pick<RequestH
  * than of anything a caller kept in memory.
  */
 export interface RequestHeaderMeta {
+  /** Absent on historical rows. Full transport identity, without credentials or headers. */
+  readonly physicalRoute?: PhysicalRouteIdentity;
+  /** Explicit virtual selection; null means this request used an explicit physical route. */
+  readonly routingDecision?: VirtualRoutingDecision | null;
   /** Absent on historical rows. This pin is indicative metadata, never observed endpoint support. */
   readonly modelMetadata?: ModelMetadataSnapshot | null;
   /** Metadata/selection identity; requestDigest below continues to identify wire bytes only. */
@@ -140,15 +166,23 @@ export function parseRequestHeaderMeta(metaJson: string): RequestHeaderMeta | nu
   ) {
     return null;
   }
+  const physicalRoute = candidate.physicalRoute === undefined ? undefined : parsePhysicalRouteIdentity(candidate.physicalRoute);
+  if (physicalRoute === null || (physicalRoute !== undefined
+    && (!matchesPhysicalRoute(candidate as unknown as RequestHeaderMeta, physicalRoute) || typeof candidate.requestIdentityDigest !== "string"))) return null;
+  const routingDecision = candidate.routingDecision == null ? null
+    : physicalRoute === undefined ? null : parseVirtualRoutingDecision(candidate.routingDecision, physicalRoute);
+  if ((candidate.routingDecision != null && routingDecision === null)
+    || (physicalRoute === undefined && candidate.routingDecision !== undefined)) return null;
   const modelMetadata = candidate.modelMetadata == null ? null : parseModelMetadataSnapshot(candidate.modelMetadata);
   if ((candidate.modelMetadata !== undefined && candidate.modelMetadata !== null && modelMetadata === null)
       || (modelMetadata !== null && (modelMetadata.providerId !== candidate.providerId || modelMetadata.model !== candidate.model
-        || modelMetadata.protocol !== catalogProtocolForEncoder(candidate.encoderId)))) return null;
+        || modelMetadata.protocol !== (physicalRoute?.protocol ?? catalogProtocolForEncoder(candidate.encoderId))))) return null;
   try {
     if (candidate.requestIdentityDigest !== undefined && (typeof candidate.requestIdentityDigest !== "string"
       || candidate.requestIdentityDigest !== metadataIdentity(candidate as unknown as RequestHeaderMeta, modelMetadata))) return null;
   } catch { return null; }
   return {
+    ...(physicalRoute === undefined ? {} : { physicalRoute, routingDecision }),
     ...(candidate.modelMetadata === undefined ? {} : { modelMetadata }),
     ...(candidate.requestIdentityDigest === undefined ? {} : { requestIdentityDigest: candidate.requestIdentityDigest }),
     model: candidate.model,

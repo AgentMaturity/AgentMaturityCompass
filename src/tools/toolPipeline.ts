@@ -123,6 +123,8 @@ export interface BoundApprovalGate {
 }
 
 export interface ToolPipelineInit {
+  /** Bounded asynchronous guard preparation; synchronous guards still decide after every wait. */
+  readonly prepareGuards?: (execution: ToolExecution) => Promise<void>;
   readonly registry: ToolRegistry;
   readonly workspace: string;
   /** Defaults to `native`. */
@@ -150,6 +152,8 @@ export interface ToolPipelineInit {
 }
 
 export interface ToolCallInput {
+  /** Trusted native session step that owns any work this call starts. */
+  readonly ownerStep?: ToolExecution["ownerStep"];
   /** The turn's cancellation signal, for a body long enough to need one. */
   readonly signal?: AbortSignal;
   /** See `ToolExecution.onApprovalWait`. */
@@ -303,6 +307,7 @@ export class ToolPipeline {
         effectiveMode: this.entryMode(definition.name, definition.actionClass, input),
         arguments: freezeToolArguments(input.arguments),
         parentToken: input.parentToken ?? null,
+        ...(input.ownerStep === undefined ? {} : { ownerStep: Object.freeze({ ...input.ownerStep }) }),
         ...(input.signal === undefined ? {} : { signal: input.signal }),
         ...(input.onApprovalWait === undefined ? {} : { onApprovalWait: input.onApprovalWait })
       };
@@ -533,6 +538,7 @@ export class ToolPipeline {
     const approval = await this.askApproval(execution);
     if (approval !== null) return approval;
 
+    await this.init.prepareGuards?.(execution);
     const denied = this.init.registry.guardReason(execution);
     if (denied) {
       return denialOutcome({ stage: "guard", reason: denied.reason, guardLabel: denied.label });
@@ -557,8 +563,8 @@ export class ToolPipeline {
   }
 
   /**
-   * The stages of a journaled call (P1-03), each state a receipt. Everything after the approval wait, from the guards to
-   * the body, is synchronous: no cancellation, block, recheck or intent can change in this process between the last
+   * The stages of a journaled call (P1-03), each state a receipt. After bounded asynchronous guard preparation, the
+   * guard decisions through dispatch are synchronous: no cancellation, block, recheck or intent can change in this process between the last
    * check and dispatch, and `start` re-reads the block in its transaction against other processes. Everything read
    * before the wait is read again after it: the block here, the record's facts and approvals by the recheck.
    */
@@ -633,6 +639,7 @@ export class ToolPipeline {
     if (authorization.refused !== null) return deny(authorization.refused, "approval_denied");
     const approval = await this.askApproval(execution);
     if (approval?.denied) return deny(approval.denied, "approval_denied");
+    await this.init.prepareGuards?.(execution);
     const guard = this.init.registry.guardReason(execution);
     if (guard) return deny({ stage: "guard", reason: guard.reason, guardLabel: guard.label }, `guard_denied:${guard.label}`);
     if (selectedAvailability.get(execution)?.() !== true) {

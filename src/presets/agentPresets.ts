@@ -8,6 +8,7 @@ import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
 import { captureOrgPairs, assertOrgPairsCurrent, OrgPairsPublicationError, prepareOrgPairsAsync, type OrgPairsOptions } from "../org/preparedOrgPairs.js";
 import { DELEGATION_SCOPE_TOKENS } from "../agent/delegationScope.js";
+import { compactionPolicySchema } from "../agent/compaction/promptPressure.js";
 import { parseSubagentStopConditions } from "../agent/subagentStopConditions.js";
 
 /**
@@ -39,6 +40,7 @@ const delegateSchema = z
     enabled: z.boolean().default(false),
     scope: z.array(z.enum(DELEGATION_SCOPE_TOKENS as unknown as [string, ...string[]])).optional(),
     maxDepth: z.number().int().min(1).optional(),
+    maxActiveChildren: z.number().int().min(0).max(Number.MAX_SAFE_INTEGER).optional(),
     provider: z.string().min(1).optional(),
     /** Foreign process timeout; distinct from the whole-child stop below. */
     timeoutMs: z.number().int().min(1_000).optional(),
@@ -61,6 +63,8 @@ const presetSchema = z
     providerId: z.string().min(1),
     maxSteps: z.number().int().min(1).optional(),
     maxTokens: z.number().int().min(1).optional(),
+    /** Exact route compaction settings; covered by the existing BUNDLE signature. */
+    compaction: compactionPolicySchema.optional(),
     /** Which tool seam the run composes. Closed on purpose. */
     tools: z.enum(["workspace", "echo", "none"]).optional(),
     /** How a tool call is dispatched. */

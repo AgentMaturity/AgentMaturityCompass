@@ -188,7 +188,7 @@ describe("native Responses signed-image encoder and runtime (not executed)", () 
     for (const encoder of [openaiResponsesEncoder, openaiResponsesEncoderV2]) expect(() => encoder.encode(input())).toThrow(/image/);
     expect(publicLlm.openaiResponsesEncoderV3).toBe(openaiResponsesEncoderV3);
     expect(publicLlm.OPENAI_RESPONSES_TEXT_CAPABILITIES.features["image-input"]).toBe("unsupported");
-    expect(usesProviderToolNames("openai-responses", 3)).toBe(true); expect(usesProviderToolNames("openai-responses", 4)).toBe(false);
+    expect(usesProviderToolNames("openai-responses", 3)).toBe(true); expect(usesProviderToolNames("openai-responses", 4)).toBe(true); expect(usesProviderToolNames("openai-responses", 5)).toBe(false);
   });
   test("actual CLI route selects v3 while unsupported and unknown route identities cannot advertise images", () => {
     const fail = vi.fn();
@@ -198,7 +198,7 @@ describe("native Responses signed-image encoder and runtime (not executed)", () 
     const pinned = registry.pin({ providerId: "openai-responses", model: "fixture-model" });
     expect(pinned).toMatchObject({ encoderVersion: 3, capabilities: { modelSupport: "not-probed" } });
     expect(acpSupportsImageInput(pinned)).toBe(true);
-    for (const version of [1, 2, 4]) expect(acpSupportsImageInput({ ...pinned, encoderVersion: version })).toBe(false);
+    for (const version of [1, 2, 5]) expect(acpSupportsImageInput({ ...pinned, encoderVersion: version })).toBe(false);
     expect(acpSupportsImageInput({ ...pinned, encoderId: "unknown" })).toBe(false);
     expect(acpSupportsImageInput({ ...pinned, capabilities: null })).toBe(false);
     expect(acpSupportsImageInput({ ...pinned, capabilities: { ...pinned.capabilities!, protocol: "deepseek-chat-completions" } })).toBe(false);

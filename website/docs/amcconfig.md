@@ -55,6 +55,22 @@ AMC searches for config files in this order:
 6. `amc.config.yaml` in current directory
 7. Same filenames in `.amc/` subdirectory
 
+`--config <path>` replaces the discovered file; it is not layered over it. `.amc/amc.config.yaml` is also the workspace runtime policy, so reading it as evaluation config prints a deprecation note: move it to `amcconfig.yaml`.
+
+### Layers and provenance
+
+The effective config is built from these layers, lowest first:
+
+1. Schema defaults
+2. The discovered workspace file (not read when `--config` is given)
+3. A user file, only when you pass `--user-config` (reads `~/.amc/amcconfig.yaml`) or `--user-config <path>`. Without the flag no home config is read; `--no-user-config` is kept as an alias for that default.
+4. The `--config` file
+5. Command-line values on `config run` (`--window`, `--format`, `--output`)
+
+Objects merge by key and arrays replace whole. `amc config validate --json` and `amc config run --json` print per-value provenance: the layer, the file path and that file's SHA-256. A file with a `.sig` sidecar must verify against the workspace config-signature key. Once a signed file is in use, an unsigned higher layer, including command-line values, is refused.
+
+`amc config validate --schema [declarative|agent]` prints the input JSON Schema without loading any config.
+
 ## Schema Reference
 
 ### Top Level

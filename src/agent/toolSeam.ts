@@ -18,6 +18,7 @@
  * exited 137 because it was killed on a deadline is `exitCode: 137` AND
  * `timedOut: true`; collapsing them loses which one an operator is looking at.
  */
+import type { NativeExtensionHooks } from "../extensions/nativeExtensionHooks.js";
 import type { AuthorizationIntentResult } from "../actions/authorize.js";
 import type { ToolSchema } from "../llm/request/requestSpec.js";
 import type { ToolDispatch, ToolOutcome } from "../session/sessionTypes.js";
@@ -70,6 +71,11 @@ export interface ToolCallOutcome {
 
 /** How the loop reaches a tool registry. */
 export interface AgentToolSeam {
+  /** Native resource cleanup before the owning writer closes or is handed off. */
+  shutdown?(): Promise<boolean>;
+  hasOwnedWork?(): boolean;
+  /** The same selected native extension runtime used by the toolset guard. */
+  readonly extensionHooks?: NativeExtensionHooks;
   /** The seam enforces ToolCallRequest.beforeEffect after all approval waits, at the actual effect boundary. */
   readonly supportsEffectGuard?: true;
   /** The entered step owns this admission through completion, failure and cancellation. */

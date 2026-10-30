@@ -115,8 +115,13 @@ export class AgentLoopSeamService extends AmcSeam {
     // unloaded while a turn is still mid-unwind with its `turn/end` unwritten.
     this.ctx.effect(
       () => async () => {
+        // Disposal closes admission even for an idle or failed driver, within the driver's bounded grace.
+        if (!await this.driver.dispose()) throw new Error("Agent loop disposal timed out; cleanup remains unknown.");
         const result = await this.shutdown();
-        if (result.state !== "settled") throw new Error(`Native driver shutdown incomplete: ${result.errors.join("; ") || "pending work remains"}`);
+        // A failed driver is reported by its status; its open turn is left to recovery, not to this channel.
+        if (result.state !== "settled" && this.driver.status !== "failed") {
+          throw new Error(`Native driver shutdown incomplete: ${result.errors.join("; ") || "pending work remains"}`);
+        }
       },
       "amcAgentLoop driver"
     );

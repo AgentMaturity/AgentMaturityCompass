@@ -40,7 +40,7 @@
 import { Context } from "./amcRuntime.js";
 import { createHash, randomUUID } from "node:crypto";
 import { gateToolCallsOnApproval, type ToolApprovalGateOptions } from "../agent/approvalGate.js";
-import type { AgentLoopConfig, AgentStatus, LoopHooks, LoopNotification } from "../agent/loopTypes.js";
+import type { AgentLoopConfig, AgentStatus, CancelOptions, LoopHooks, LoopNotification } from "../agent/loopTypes.js";
 import type { LoopRoute } from "../agent/stepRunner.js";
 import { EMPTY_TOOL_SEAM, type AgentToolSeam } from "../agent/toolSeam.js";
 import type { NativeShellReadiness } from "../sandbox/nativeShellGate.js";
@@ -70,9 +70,10 @@ import type { SubagentRunContext, SubagentRunner } from "../agent/subagentSpawn.
 import { parseSubagentStopConditions } from "../agent/subagentStopConditions.js";
 import type { ActionClass } from "../types.js";
 import { createDriverRunner } from "../agent/subagentRunner.js";
-import { COMPOSITION_FAILED } from "../agent/nativeAgentComposition.js";
+import { sealComposedSession } from "./composedSessionSeal.js";
 import { LeasePrincipalRefused } from "../leases/leasePrincipal.js";
-import { planRequiresPrincipal } from "../tools/guards/compiledPolicyGuard.js";
+import { planRequiresAgentLease, planRequiresPrincipal } from "../tools/guards/compiledPolicyGuard.js";
+import { loadActiveCompiledPolicy } from "../catalog/compiler/activate.js";
 import { refuseRetired } from "../lifecycle/reassessment.js";
 import { admitSessionAtOpen } from "../runtime/changeEnvelope.js";
 import { nativeSessionManifest } from "../lifecycle/versionManifest.js";
@@ -133,7 +134,9 @@ export interface ComposedApprovalGate extends ToolApprovalGateOptions {
 export interface ComposedTurnHandle {
   readonly sessionId: string;
   /** Stop the turn. The cause rides inside the signed `turn/end`. */
-  cancel(cause: TurnCancelCause): void;
+  cancel(cause: TurnCancelCause, options?: CancelOptions): void;
+  /** Permanently close admission and bound the active driver drain. */
+  shutdown(): Promise<boolean>;
 }
 
 /** Narrow evidence capability for tools, bound to the actual selected session. */
@@ -279,6 +282,7 @@ export interface ComposedTurnOptions {
      */
     readonly runner?: SubagentRunner;
     readonly maxDepth?: number;
+    readonly maxActiveChildren?: number;
     /** Receives the composed capability. Called once, before the first turn. */
     grant(capability: SubagentCapability): void;
   };
@@ -410,6 +414,7 @@ function compositionDigestOf(options: ComposedTurnOptions, profile: AgentPromptP
             actionClass: gate.actionClass,
             riskTier: gate.riskTier,
             toolNames: gate.toolNames ?? null,
+            ...(gate.reviewedActionClasses === undefined ? {} : { reviewedActionClasses: gate.reviewedActionClasses }),
             answerers: (gate.answerers ?? []).map((answerer) => answerer.name)
           },
     version: amcVersion
@@ -449,6 +454,9 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
       approvalClass: options.approvalGate.actionClass });
   }
   if (options.goalRounds !== undefined) {
+    if (options.delegation?.maxActiveChildren !== undefined) {
+      throw new Error("Configured --max-active-children root child limits are not supported for --goal-rounds; no execution occurred.");
+    }
     const { maxRounds } = options.goalRounds;
     if (options.delegation === undefined || options.delegation.runner !== undefined || options.schedulePass !== undefined
       || options.audioParts !== undefined || images.length > 0 || options.prompt.trim() === "") {
@@ -460,6 +468,10 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
   if ((options.schedulePass !== undefined || (options.delegation !== undefined && options.delegation.runner === undefined))
     && options.leaseToken === undefined && planRequiresPrincipal(options.workspace)) {
     throw new LeasePrincipalRefused("the active plan requires a principal for every tool call, and this run holds no lease for its in-process children to inherit; no session was opened");
+  }
+  // AXR-20: refuse a lease-less run with root tools once, before any session row, instead of denying every governed call.
+  if (options.tools !== undefined && options.leaseToken === undefined && planRequiresAgentLease(loadActiveCompiledPolicy(options.workspace))) {
+    throw new Error("IDENTITY_UNRESOLVED: the active plan's identity-binding requires a verified agent lease for every tool call, and this run holds none; no session was opened. Start the task from Studio, or issue a lease with `amc lease issue` and pass it with --lease-file <path> (a private 0600 file).");
   }
   if (options.delegation !== undefined) {
     // An in-process child opens a second session writer; a foreign runner's process opens none here.
@@ -505,6 +517,8 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
   let steerTimer: NodeJS.Timeout | null = null;
   /** Set once the loop (or schedule pass) is ready; until then a throw is a failed composition, never a completion. */
   let composed = false;
+  let hostShutdown = false;
+  let loopOwner: AgentLoopSeamService | undefined;
 
   try {
     // P2-12: interrupted calls follow their resume rules before this turn's first request; nothing is dispatched again.
@@ -625,6 +639,7 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
           ...(options.leaseToken === undefined ? {} : { leaseToken: options.leaseToken }),
           ...(options.delegation === undefined ? {} : { grantDelegation: { runner: runNative,
             ...(options.delegation.maxDepth === undefined ? {} : { maxDepth: options.delegation.maxDepth }),
+            ...(options.delegation.maxActiveChildren === undefined ? {} : { maxActiveChildren: options.delegation.maxActiveChildren }),
             ...(options.delegation.scope === undefined ? {} : { delegationScope: options.delegation.scope }),
             ...(options.delegation.stopConditions === undefined ? {} : { stopConditions: options.delegation.stopConditions }) } })
         });
@@ -669,6 +684,7 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
           promptSections: prompt.assemble().sections.map(section => section.name) };
       }
       options.delegation!.grant({
+        ...(options.delegation!.maxActiveChildren === undefined ? {} : { maxActiveChildren: options.delegation!.maxActiveChildren }),
         identity: rootIdentity(options.agentId),
         session,
         runner,
@@ -698,11 +714,20 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
     fibers.push(loopFiber);
     composed = true;
 
-    const loop = serviceOn<AgentLoopSeamService>(ctx, AGENT_LOOP_SEAM.name);
+    const loop = loopOwner = serviceOn<AgentLoopSeamService>(ctx, AGENT_LOOP_SEAM.name);
+    let abandon!: (error: Error) => void;
+    const shutdownFailure = new Promise<never>((_resolve, reject) => { abandon = reject; });
+    void shutdownFailure.catch(() => undefined);
     options.onReady?.({
       sessionId,
-      cancel: (cause: TurnCancelCause) => {
-        loop.cancel(cause);
+      cancel: (cause: TurnCancelCause, options = {}) => {
+        loop.cancel(cause, options);
+      },
+      shutdown: async () => {
+        hostShutdown = true;
+        const confirmed = await loop.agent.dispose();
+        if (!confirmed) abandon(new Error("TOOL_OUTCOME_UNKNOWN: native driver did not drain within its shutdown grace."));
+        return confirmed;
       }
     });
     if (audioParts !== undefined) loop.agent.followupAudioParts(audioParts);
@@ -720,7 +745,7 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
         }
       }, steer.afterMs);
     }
-    await loop.whenIdle();
+    await Promise.race([loop.whenIdle(), shutdownFailure]);
     return {
       sessionId,
       status: loop.status,
@@ -736,35 +761,22 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
     if (steerTimer !== null) clearTimeout(steerTimer);
     // Reverse order: the loop lets go of the model seam before the model seam
     // lets go of the credentials it resolves per request.
-    let scheduleDisposalError: unknown;
+    let disposalError: unknown;
     for (const fiber of [...fibers].reverse()) {
       try { await fiber.dispose(); }
       catch (error) {
-        // oxlint-disable-next-line no-unsafe-finally -- Disposal failure must refuse successful ownership handover.
-        if (options.schedulePass === undefined) throw error;
-        scheduleDisposalError ??= error; // Try every remaining owner, including the parent session.
+        disposalError ??= error; // Try every owner, including the session writer, before reporting failure.
       }
     }
-    try {
-      if (options.keepOpen) {
-        // Hand-over point: the turn is sealed, the session is not. A later
-        // process resumes it through sessionResume.ts, which re-verifies first.
-        session.releaseWithoutClosing();
-      } else {
-        session.close({ reason: composed ? "completed" : COMPOSITION_FAILED });
-      }
-    } catch (error) {
-      // A driver that entered `failed` left an open turn only recovery may
-      // close, and the spine refuses a close over it. Swallowed HERE and only
-      // here: the status returned above already reports it, and throwing from a
-      // finally would replace the real failure with this one.
-      if (options.schedulePass !== undefined) {
-        try { session.disposeWithoutClosing(); } catch { /* preserve original closure failure */ }
-        // oxlint-disable-next-line no-unsafe-finally -- A schedule owner cannot report released/closed on a refused seal.
-        throw error;
-      }
-    }
+    const driverConfirmed = await (loopOwner?.agent.dispose() ?? Promise.resolve(true));
+    let resourcesConfirmed = false;
+    try { resourcesConfirmed = await (options.tools?.shutdown?.() ?? Promise.resolve(true)); }
+    catch (error) { disposalError ??= error; }
+    sealComposedSession(session, { stopped: driverConfirmed && loopOwner?.status !== "failed", resourcesConfirmed,
+      keepOpen: options.keepOpen === true, composed, hostShutdown, schedulePass: options.schedulePass !== undefined });
     // oxlint-disable-next-line no-unsafe-finally -- Report failed disposal after attempting every schedule owner.
-    if (scheduleDisposalError !== undefined) throw scheduleDisposalError;
+    if (disposalError !== undefined) throw new Error("TOOL_OUTCOME_UNKNOWN: native service cleanup failed.", { cause: disposalError });
+    // oxlint-disable-next-line no-unsafe-finally -- A cleanup timeout cannot be reported as successful shutdown.
+    if (!driverConfirmed || !resourcesConfirmed) throw new Error("TOOL_OUTCOME_UNKNOWN: native resources did not confirm cleanup.");
   }
 }

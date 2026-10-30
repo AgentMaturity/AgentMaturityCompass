@@ -12,7 +12,8 @@
  */
 
 import { randomUUID } from 'node:crypto';
-import { MODEL_PRICING } from '../product/modelPricing.js';
+import { createModelMetadataSnapshot, type ModelMetadataSnapshot } from '../llm/modelCatalog.js';
+import { lookupProviderCatalog } from '../llm/providerCatalog.js';
 
 /* ── Types ──────────────────────────────────────────────────────── */
 
@@ -40,13 +41,15 @@ export interface ModelSpec {
   name: string;
   provider: string;
   /** Cost per 1K input tokens in USD */
-  inputCostPer1K: number;
+  inputCostPer1K: number | null;
   /** Cost per 1K output tokens in USD */
-  outputCostPer1K: number;
+  outputCostPer1K: number | null;
   /** Max context window in tokens */
-  maxContext: number;
+  maxContext: number | null;
   /** Capabilities this model supports */
   capabilities: ModelCapability[];
+  /** Immutable reviewed catalog pin; absent facts stay unknown. */
+  modelMetadata?: ModelMetadataSnapshot | null;
   /** Average latency in ms */
   avgLatencyMs: number;
   /** Quality tier (1-5, 5=best) */
@@ -91,7 +94,7 @@ export interface RoutingDecision {
   strategy: RoutingStrategy;
   reason: string;
   alternativeModels: ModelSpec[];
-  estimatedCost: { inputPer1K: number; outputPer1K: number };
+  estimatedCost: { inputPer1K: number | null; outputPer1K: number | null };
   estimatedLatencyMs: number;
   timestamp: number;
 }
@@ -101,32 +104,43 @@ export interface RoutingStats {
   requestsByProvider: Record<string, number>;
   requestsByModel: Record<string, number>;
   requestsByStrategy: Record<string, number>;
-  avgCostPer1K: number;
+  avgCostPer1K: number | null;
   avgLatencyMs: number;
   failoverCount: number;
 }
 
 /* ── Built-in model catalog ──────────────────────────────────────── */
 
-// Shared records use the dated indicative product rates and limits, not live
-// provider billing data. Nonoverlapping legacy records remain indicative too.
-
+// Capability, latency and quality values below are legacy routing heuristics, not
+// provider support probes. Limits and prices come only from the shared catalog.
 const DEFAULT_MODELS: ModelSpec[] = [
-  { id: 'gpt-4o', name: 'GPT-4o', provider: 'openai', inputCostPer1K: MODEL_PRICING['gpt-4o']!.inputPer1kTokens, outputCostPer1K: MODEL_PRICING['gpt-4o']!.outputPer1kTokens, maxContext: MODEL_PRICING['gpt-4o']!.contextWindow, capabilities: ['text-generation', 'code-generation', 'function-calling', 'vision', 'json-mode', 'streaming', 'long-context'], avgLatencyMs: 800, qualityTier: 5 },
-  { id: 'gpt-4o-mini', name: 'GPT-4o Mini', provider: 'openai', inputCostPer1K: MODEL_PRICING['gpt-4o-mini']!.inputPer1kTokens, outputCostPer1K: MODEL_PRICING['gpt-4o-mini']!.outputPer1kTokens, maxContext: MODEL_PRICING['gpt-4o-mini']!.contextWindow, capabilities: ['text-generation', 'code-generation', 'function-calling', 'json-mode', 'streaming', 'long-context'], avgLatencyMs: 400, qualityTier: 3 },
-  { id: 'claude-sonnet-4-20250514', name: 'Claude Sonnet 4', provider: 'anthropic', inputCostPer1K: MODEL_PRICING['claude-sonnet-4-20250514']!.inputPer1kTokens, outputCostPer1K: MODEL_PRICING['claude-sonnet-4-20250514']!.outputPer1kTokens, maxContext: MODEL_PRICING['claude-sonnet-4-20250514']!.contextWindow, capabilities: ['text-generation', 'code-generation', 'function-calling', 'vision', 'json-mode', 'streaming', 'long-context'], avgLatencyMs: 700, qualityTier: 5 },
-  { id: 'claude-haiku-3.5', name: 'Claude 3.5 Haiku', provider: 'anthropic', inputCostPer1K: 0.0008, outputCostPer1K: 0.004, maxContext: 200000, capabilities: ['text-generation', 'code-generation', 'function-calling', 'json-mode', 'streaming', 'long-context'], avgLatencyMs: 300, qualityTier: 3 },
-  { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro', provider: 'google', inputCostPer1K: 0.00125, outputCostPer1K: 0.01, maxContext: 1000000, capabilities: ['text-generation', 'code-generation', 'function-calling', 'vision', 'json-mode', 'streaming', 'long-context'], avgLatencyMs: 600, qualityTier: 5 },
-  { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash', provider: 'google', inputCostPer1K: 0.00015, outputCostPer1K: 0.0006, maxContext: 1000000, capabilities: ['text-generation', 'code-generation', 'function-calling', 'json-mode', 'streaming', 'long-context'], avgLatencyMs: 250, qualityTier: 3 },
-  { id: 'llama-3.3-70b', name: 'Llama 3.3 70B', provider: 'local', inputCostPer1K: 0, outputCostPer1K: 0, maxContext: 128000, capabilities: ['text-generation', 'code-generation', 'function-calling', 'json-mode'], avgLatencyMs: 1200, qualityTier: 4 },
-];
+  { id: 'gpt-4o', name: 'GPT-4o', provider: 'openai', capabilities: ['text-generation', 'code-generation', 'function-calling', 'vision', 'json-mode', 'streaming', 'long-context'], avgLatencyMs: 800, qualityTier: 5 },
+  { id: 'gpt-4o-mini', name: 'GPT-4o Mini', provider: 'openai', capabilities: ['text-generation', 'code-generation', 'function-calling', 'json-mode', 'streaming', 'long-context'], avgLatencyMs: 400, qualityTier: 3 },
+  { id: 'claude-sonnet-4-20250514', name: 'Claude Sonnet 4', provider: 'anthropic', capabilities: ['text-generation', 'code-generation', 'function-calling', 'vision', 'json-mode', 'streaming', 'long-context'], avgLatencyMs: 700, qualityTier: 5 },
+  { id: 'claude-haiku-3.5', name: 'Claude 3.5 Haiku', provider: 'anthropic', capabilities: ['text-generation', 'code-generation', 'function-calling', 'json-mode', 'streaming', 'long-context'], avgLatencyMs: 300, qualityTier: 3 },
+  { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro', provider: 'google', capabilities: ['text-generation', 'code-generation', 'function-calling', 'vision', 'json-mode', 'streaming', 'long-context'], avgLatencyMs: 600, qualityTier: 5 },
+  { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash', provider: 'google', capabilities: ['text-generation', 'code-generation', 'function-calling', 'json-mode', 'streaming', 'long-context'], avgLatencyMs: 250, qualityTier: 3 },
+  { id: 'llama-3.3-70b', name: 'Llama 3.3 70B', provider: 'local', capabilities: ['text-generation', 'code-generation', 'function-calling', 'json-mode'], avgLatencyMs: 1200, qualityTier: 4 },
+].map(model => {
+  const protocol = model.provider === 'anthropic' ? 'anthropic-messages' : model.provider === 'google' ? 'gemini-generate-content' : 'openai-chat-completions';
+  const modelMetadata = createModelMetadataSnapshot(model.provider, protocol, model.id);
+  return { ...model, capabilities: model.capabilities as ModelCapability[], modelMetadata,
+    inputCostPer1K: modelMetadata?.pricing?.inputPer1kTokens ?? null,
+    outputCostPer1K: modelMetadata?.pricing?.outputPer1kTokens ?? null,
+    maxContext: modelMetadata?.contextWindowTokens ?? null };
+});
 
 const DEFAULT_PROVIDERS: ModelProvider[] = [
-  { id: 'openai', name: 'OpenAI', baseUrl: 'https://api.openai.com/v1', models: DEFAULT_MODELS.filter(m => m.provider === 'openai'), status: 'healthy', rateLimit: 500, currentLoad: 0, priority: 1, isLocal: false },
-  { id: 'anthropic', name: 'Anthropic', baseUrl: 'https://api.anthropic.com/v1', models: DEFAULT_MODELS.filter(m => m.provider === 'anthropic'), status: 'healthy', rateLimit: 500, currentLoad: 0, priority: 1, isLocal: false },
-  { id: 'google', name: 'Google', baseUrl: 'https://generativelanguage.googleapis.com/v1', models: DEFAULT_MODELS.filter(m => m.provider === 'google'), status: 'healthy', rateLimit: 500, currentLoad: 0, priority: 1, isLocal: false },
-  { id: 'local', name: 'Local', baseUrl: 'http://localhost:11434/v1', models: DEFAULT_MODELS.filter(m => m.provider === 'local'), status: 'healthy', rateLimit: 10, currentLoad: 0, priority: 2, isLocal: true },
-];
+  { id: 'openai', name: 'OpenAI', rateLimit: 500, priority: 1, isLocal: false },
+  { id: 'anthropic', name: 'Anthropic', rateLimit: 500, priority: 1, isLocal: false },
+  { id: 'google', name: 'Google', rateLimit: 500, priority: 1, isLocal: false },
+  { id: 'local', name: 'Local', rateLimit: 10, priority: 2, isLocal: true },
+].map(provider => ({ ...provider, baseUrl: lookupProviderCatalog(provider.id)!.defaultBaseUrl!,
+  models: DEFAULT_MODELS.filter(model => model.provider === provider.id), status: 'healthy', currentLoad: 0 }));
+
+function knownCost(model: ModelSpec): number | null {
+  return model.inputCostPer1K === null || model.outputCostPer1K === null ? null : model.inputCostPer1K + model.outputCostPer1K;
+}
 
 /* ── Model Router ────────────────────────────────────────────────── */
 
@@ -139,10 +153,10 @@ export class ModelRouter {
 
   constructor() {
     for (const p of DEFAULT_PROVIDERS) {
-      this.providers.set(p.id, { ...p });
+      this.providers.set(p.id, { ...p, models: p.models.map(model => ({ ...model, capabilities: [...model.capabilities] })) });
     }
-    this.allModels = [...DEFAULT_MODELS];
-    this.stats = { totalRequests: 0, requestsByProvider: {}, requestsByModel: {}, requestsByStrategy: {}, avgCostPer1K: 0, avgLatencyMs: 0, failoverCount: 0 };
+    this.allModels = [...this.providers.values()].flatMap(provider => provider.models);
+    this.stats = { totalRequests: 0, requestsByProvider: {}, requestsByModel: {}, requestsByStrategy: {}, avgCostPer1K: null, avgLatencyMs: 0, failoverCount: 0 };
   }
 
   /** Add a custom provider */
@@ -180,9 +194,11 @@ export class ModelRouter {
         if (!m.capabilities.includes(cap)) return false;
       }
       // Check context window
-      if (request.minContext && m.maxContext < request.minContext) return false;
+      if (request.minContext !== undefined && (m.maxContext === null || m.maxContext < request.minContext)) return false;
       // Check cost
-      if (request.maxCostPer1K && (m.inputCostPer1K + m.outputCostPer1K) > request.maxCostPer1K) return false;
+      const cost = knownCost(m);
+      if (request.strategy === 'cheapest' && cost === null) return false;
+      if (request.maxCostPer1K !== undefined && (cost === null || cost > request.maxCostPer1K)) return false;
       // Check latency
       if (request.maxLatencyMs && m.avgLatencyMs > request.maxLatencyMs) return false;
       // Check excluded providers
@@ -212,9 +228,9 @@ export class ModelRouter {
 
     switch (request.strategy) {
       case 'cheapest':
-        candidates.sort((a, b) => (a.inputCostPer1K + a.outputCostPer1K) - (b.inputCostPer1K + b.outputCostPer1K));
+        candidates.sort((a, b) => knownCost(a)! - knownCost(b)!);
         selected = candidates[0]!;
-        reason = `Cheapest model: $${(selected.inputCostPer1K + selected.outputCostPer1K).toFixed(5)}/1K tokens`;
+        reason = `Cheapest model: $${knownCost(selected)!.toFixed(5)}/1K tokens`;
         break;
       case 'fastest':
         candidates.sort((a, b) => a.avgLatencyMs - b.avgLatencyMs);
@@ -267,8 +283,8 @@ export class ModelRouter {
     this.stats.requestsByModel[mId] = (this.stats.requestsByModel[mId] ?? 0) + 1;
     this.stats.requestsByStrategy[sId] = (this.stats.requestsByStrategy[sId] ?? 0) + 1;
 
-    const totalCost = this.routingHistory.reduce((s, d) => s + d.estimatedCost.inputPer1K + d.estimatedCost.outputPer1K, 0);
-    this.stats.avgCostPer1K = totalCost / this.stats.totalRequests;
+    const costs = this.routingHistory.map(({ estimatedCost: cost }) => cost.inputPer1K === null || cost.outputPer1K === null ? null : cost.inputPer1K + cost.outputPer1K);
+    this.stats.avgCostPer1K = costs.some(cost => cost === null) ? null : costs.reduce<number>((sum, cost) => sum + cost!, 0) / this.stats.totalRequests;
     const totalLatency = this.routingHistory.reduce((s, d) => s + d.estimatedLatencyMs, 0);
     this.stats.avgLatencyMs = totalLatency / this.stats.totalRequests;
   }
@@ -289,7 +305,7 @@ export class ModelRouter {
   reset(): void {
     this.routingHistory = [];
     for (const p of this.providers.values()) p.currentLoad = 0;
-    this.stats = { totalRequests: 0, requestsByProvider: {}, requestsByModel: {}, requestsByStrategy: {}, avgCostPer1K: 0, avgLatencyMs: 0, failoverCount: 0 };
+    this.stats = { totalRequests: 0, requestsByProvider: {}, requestsByModel: {}, requestsByStrategy: {}, avgCostPer1K: null, avgLatencyMs: 0, failoverCount: 0 };
   }
 
   get providerCount(): number { return this.providers.size; }

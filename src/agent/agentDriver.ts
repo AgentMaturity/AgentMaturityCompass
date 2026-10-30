@@ -1,3 +1,4 @@
+import type { NativeExtensionHookEvent } from "../extensions/nativeExtensionHookSchema.js";
 import { randomBytes } from "node:crypto";
 /**
  * The turn/step machine — AMC running an agent (plan P3.2).
@@ -43,6 +44,7 @@ import { randomBytes } from "node:crypto";
 import type { SessionEventRef, SessionService } from "../session/sessionService.js";
 import type { TokenUsage, TurnCancelCause, TurnTrigger } from "../session/sessionTypes.js";
 import { isTurnCancelCause } from "../session/sessionTypes.js";
+import { canonicalTurnCancelCause } from "../session/turnLifecycleMeta.js";
 import { LoopInbox } from "./inbox.js";
 import type { NativeImageInput } from "../attachments/nativeImageInput.js";
 import { recordNativeImageMessage } from "./nativeImageMessage.js";
@@ -73,7 +75,7 @@ import { EMPTY_TOOL_SEAM, type AgentToolSeam } from "./toolSeam.js";
 import { freezeNativeValidationPlan, NativeValidationTurn, type NativeValidationPlan } from "./nativeValidation.js";
 import { NativeValidationRepair, NativeValidationRepairStop } from "./nativeValidationRepair.js";
 import { AutoCompactor } from "./compaction/autoCompact.js";
-import { resolveCompactionConfig } from "./compaction/promptPressure.js";
+import { resolveRouteCompaction } from "./compaction/promptPressure.js";
 import { shutdownTimeoutMs, shutdownToolResults, type AgentShutdownResult } from "./agentShutdown.js";
 export type { AgentShutdownResult } from "./agentShutdown.js";
 
@@ -123,12 +125,14 @@ export class AgentDriver {
 
   private readonly stepInit: StepRunnerInit;
   private readonly validation: NativeValidationPlan | undefined;
-  /** Null unless the operator declared a context window. */
+  /** Null when neither reviewed route metadata nor explicit settings supply a window. */
   private readonly compactor: AutoCompactor | null;
 
   private phase: Phase = { kind: "idle", lastTurn: 0 };
 
   private activityDone: Promise<void> = Promise.resolve();
+  private admissionClosed = false;
+  private disposal: Promise<boolean> | null = null;
 
   private shutdownPromise: Promise<AgentShutdownResult> | undefined;
   private shutdownErrors: string[] | undefined;
@@ -143,16 +147,29 @@ export class AgentDriver {
     // Wrapped once, here: every notify site below is an observer that cannot affect the evidence (DXA-16).
     this.hooks = { preStep: (input, next) => hooks.preStep(input, next), turnStopping: (input) => hooks.turnStopping(input),
       notify: isolatedNotify((notification) => hooks.notify(notification)) };
-    const compaction = init.config?.compaction === undefined ? undefined : resolveCompactionConfig(init.config.compaction);
-    this.config = { ...DEFAULT_AGENT_LOOP_CONFIG, ...init.config, ...(compaction === undefined ? {} : { compaction }) };
+    const selected = init.route.pinned ?? init.llm.pin?.(init.route);
+    const compaction = resolveRouteCompaction(init.config?.compaction, init.route, selected?.modelMetadata);
+    this.config = { ...DEFAULT_AGENT_LOOP_CONFIG, ...init.config, compaction };
     this.inbox = new LoopInbox(init.session, (notification) => {
       this.hooks.notify(notification);
     });
+    const tools = init.tools ?? EMPTY_TOOL_SEAM;
     this.stepInit = {
       session: init.session,
       llm: init.llm,
-      tools: init.tools ?? EMPTY_TOOL_SEAM,
-      route: init.route,
+      tools: tools.extensionHooks ? { ...tools,
+        // Keep the WP31 effect-guard capability: a spread alone drops class-defined members.
+        ...(tools.supportsEffectGuard ? { supportsEffectGuard: true as const } : {}),
+        schemas: () => tools.schemas(), executionMode: request => tools.executionMode(request),
+        prepareStep: tools.prepareStep?.bind(tools), authorizationIntent: tools.authorizationIntent?.bind(tools),
+        bindApprovalGate: tools.bindApprovalGate?.bind(tools),
+        execute: async request => {
+          await this.observeExtensions({ kind: "tool-start", turn: request.turn, step: request.step, toolName: request.toolName }, request.signal);
+          try { return await tools.execute(request); }
+          finally { await this.observeExtensions({ kind: "tool-end", turn: request.turn, step: request.step, toolName: request.toolName }, request.signal); }
+        }
+      } : tools,
+      route: selected === undefined ? init.route : { ...init.route, pinned: selected },
       systemPromptEventId: init.systemPromptEventId,
       config: this.config,
       retryRuntime: init.retryRuntime ?? DEFAULT_RETRY_RUNTIME,
@@ -166,13 +183,27 @@ export class AgentDriver {
         this.hooks.notify(notification);
       }
     };
-    const window = compaction?.contextWindowTokens ?? null;
-    this.compactor = compaction === undefined || window === null ? null : new AutoCompactor({ ...compaction, contextWindowTokens: window }, this.stepInit);
+    const window = compaction.contextWindowTokens;
+    this.compactor = window === null ? null : new AutoCompactor({ ...compaction, contextWindowTokens: window }, this.stepInit);
+  }
+
+  private async observeExtensions(event: NativeExtensionHookEvent, signal?: AbortSignal): Promise<void> {
+    // Observer failures, including reporting failures, cannot veto the signed turn or its seal.
+    try {
+      for (const report of await this.stepInit.tools.extensionHooks?.observe(event, signal) ?? []) {
+        if (this.phase.kind !== "running" || this.phase.turn !== event.turn || (event.step !== undefined && this.phase.step !== event.step)) continue;
+        try { this.head = this.session.recordProjectedEvidence({ eventType: "metric", payload: JSON.stringify(report), meta: { nativeExtensionHook: report } }); }
+        catch { /* The bounded manager report remains available; observation never owns turn closure. */ }
+      }
+    } catch { /* Isolate the observer adapter as well as each confined handler. */ }
   }
 
   get status(): AgentStatus {
     return this.phase.kind;
   }
+
+  /** Disposal closes admission before any asynchronous cleanup starts. */
+  get disposed(): boolean { return this.admissionClosed; }
 
   get sessionId(): string {
     return this.session.sessionId;
@@ -263,11 +294,12 @@ export class AgentDriver {
     if (!isTurnCancelCause(cause)) {
       throw new Error("AgentDriver.cancel: a cancellation must name its cause");
     }
+    const boundedCause = canonicalTurnCancelCause(cause);
     const keepInbox = options.keepInbox === true;
     try {
       this.head = this.session.recordLoopEvent({
         kind: "cancel",
-        cause,
+        cause: boundedCause,
         keepInbox,
         requestedBy: options.by ?? "local",
         observedHeadEventId: this.head?.eventId ?? null,
@@ -283,7 +315,8 @@ export class AgentDriver {
       // A failed queue splice must never prevent the active work from seeing its stop signal.
       if (this.phase.kind === "running") {
         if (!keepInbox) this.phase.wakeRequested = false;
-        this.phase.abort.abort(cause);
+        // The bounded cause IS the abort reason, so the turn's catch reads back exactly what was recorded.
+        this.phase.abort.abort(boundedCause);
       }
     }
   }
@@ -343,8 +376,31 @@ export class AgentDriver {
       pendingMessageIds: Object.freeze(pending), errors: Object.freeze(errors), verification: "not-verified" });
   }
 
+
+  /**
+   * Close admission, request cancellation, and wait a bounded time for logical
+   * work to settle. False is unconfirmed cleanup; the host must not seal it as
+   * clean or reuse this driver. Producer cleanup belongs to its resource owner.
+   */
+  dispose(graceMs = Math.min(30_000, Math.max(1_000, this.config.toolAbandonGraceMs + 1_000))): Promise<boolean> {
+    if (this.disposal) return this.disposal;
+    if (!Number.isSafeInteger(graceMs) || graceMs < 0 || graceMs > 30_000) throw new RangeError("Driver disposal grace must be between 0 and 30000 ms.");
+    this.admissionClosed = true;
+    let settle!: (confirmed: boolean) => void;
+    // Reserve before cancellation emits any row or observer notification.
+    this.disposal = new Promise<boolean>(resolve => { settle = resolve; });
+    const timer = setTimeout(() => settle(false), graceMs);
+    if (this.phase.kind !== "failed" && (this.phase.kind === "running" || this.inbox.hasPending)) {
+      try { this.cancel({ kind: "disposed" }, { by: "host:dispose" }); }
+      catch { if (this.phase.kind === "running") this.phase.abort.abort({ kind: "disposed" }); }
+    }
+    void this.whenIdle().then(() => { clearTimeout(timer); settle(true); }, () => { clearTimeout(timer); settle(false); });
+    return this.disposal;
+  }
+
   private assertUsable(): void {
     if (this.shutdownPromise) throw new Error("AgentDriver is shut down; admission is stopped.");
+    if (this.admissionClosed) throw new Error("AgentDriver is disposed: new work is refused");
     if (this.phase.kind === "failed") {
       throw new Error(
         "AgentDriver is in a terminal failed state: session evidence or pending context requires operator recovery"
@@ -381,7 +437,7 @@ export class AgentDriver {
    * teardown must never wait on a model turn.
    */
   private wakeDriver(wakeAfterAbort = false): void {
-    if (this.shutdownPromise || this.phase.kind === "failed") return;
+    if (this.admissionClosed || this.shutdownPromise || this.phase.kind === "failed") return;
     if (this.phase.kind === "running") {
       const reason: unknown = this.phase.abort.signal.reason;
       const disposed = isTurnCancelCause(reason) && reason.kind === "disposed";
@@ -454,6 +510,7 @@ export class AgentDriver {
       // whole finally exists to make impossible. A hook is untrusted code; it
       // must not be able to strand a turn just by failing.
       this.hooks.notify({ kind: "turn-start", turn: turnRef.turn });
+      await this.observeExtensions({ kind: "turn-start", turn: turnRef.turn }, signal);
 
       while (true) {
         signal.throwIfAborted();
@@ -483,6 +540,7 @@ export class AgentDriver {
         this.head = this.session.startStep();
         phase.step = step;
         this.hooks.notify({ kind: "step-start", turn: turnRef.turn, step });
+        await this.observeExtensions({ kind: "step-start", turn: turnRef.turn, step }, signal);
 
         let stopReason: string | null = null;
         let usage: TokenUsage | null = null;
@@ -520,6 +578,7 @@ export class AgentDriver {
           // granularity, and it is the shape crash repair also produces.
           this.head = this.session.endStep({ stopReason, usage });
           this.hooks.notify({ kind: "step-end", turn: turnRef.turn, step });
+          await this.observeExtensions({ kind: "step-end", turn: turnRef.turn, step }, signal);
         }
 
         signal.throwIfAborted();
@@ -574,7 +633,7 @@ export class AgentDriver {
       catch (error) { cleanupFailure = { error }; ending = { reason: "error", error }; this.notifyError(error); }
       try { repair?.finish(ending?.reason ?? "incomplete"); validation?.finish(signal.aborted ? "cancelled" : `turn-${ending?.reason ?? "incomplete"}`); }
       catch (error) { ending = { reason: "error", error }; this.notifyError(error); }
-      this.closeTurn(turnRef.turn, ending);
+      await this.closeTurn(turnRef.turn, ending, signal);
       if (cleanupFailure !== undefined) {
         this.setPhase({ kind: "failed", cause: cleanupFailure.error, turn: turnRef.turn });
       }
@@ -598,7 +657,7 @@ export class AgentDriver {
    * good and does NOT seal: see this module's header for why an unsealed open
    * turn is the honest outcome there.
    */
-  private closeTurn(turn: number, ending: TurnEnding | null): void {
+  private async closeTurn(turn: number, ending: TurnEnding | null, signal: AbortSignal): Promise<void> {
     // Unreachable: every exit above assigns an ending. Kept, and labelled, so
     // that a future edit which introduces an unassigned path produces a signed
     // `error` turn a reader can find rather than a crash inside a finally.
@@ -614,6 +673,7 @@ export class AgentDriver {
       return;
     }
     this.hooks.notify({ kind: "turn-end", turn, ending: resolved });
+    await this.observeExtensions({ kind: "turn-end", turn }, signal);
     try {
       this.head = this.session.sealTurn();
     } catch (error: unknown) {

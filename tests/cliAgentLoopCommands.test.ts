@@ -305,6 +305,29 @@ describe("amc agent-loop — the operator surface", () => {
       expect(captured.failures).toEqual([]);
     });
 
+    it("attributes SIGTERM cancellation and removes the handler after shutdown", async () => {
+      process.chdir(dir);
+      const { program, captured } = programWith();
+      const before = process.listenerCount("SIGTERM");
+      let signalled = false;
+      const timer = setInterval(() => {
+        if (!signalled && process.listenerCount("SIGTERM") > before) {
+          signalled = true;
+          process.emit("SIGTERM");
+        }
+      }, 5);
+      try {
+        await run(program, ["agent-loop", "run", "hello", "--credentials-home", home, "--think-ms", "500", "--json"]);
+      } finally { clearInterval(timer); }
+      expect(signalled).toBe(true);
+      expect(process.listenerCount("SIGTERM")).toBe(before);
+      const summary = JSON.parse(captured.out.at(-1)!) as AgentRunSummary;
+      expect(summary.endings).toEqual([{ turn: 1, reason: "cancelled", cancelCause: "parent", interrupted: false }]);
+      const row = events(summary.sessionId).find(event => event.event_type === "loop/cancel")!;
+      expect(JSON.parse(row.meta_json).requestedBy).toBe("signal:SIGTERM");
+      expect(captured.failures).toEqual([]);
+    });
+
     it("fails the CLI for a recorded budget error without changing idle driver semantics or poisoning a later successful resume", async () => {
       process.chdir(dir);
       const invoke = async (extra: string[] = []) => {

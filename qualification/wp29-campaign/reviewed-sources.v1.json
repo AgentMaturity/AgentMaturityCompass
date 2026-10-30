@@ -1,0 +1,34 @@
+{
+  "schemaVersion": "comparison-campaign-reviewed-sources/1",
+  "state": "source-review-not-installed-artifacts",
+  "reviewBase": "168cec13354127c514df8eb4a20f6f7a816b1b76",
+  "targets": [
+    {
+      "id": "amc",
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass",
+      "reviewedCommit": "168cec13354127c514df8eb4a20f6f7a816b1b76",
+      "installedArtifact": null
+    },
+    {
+      "id": "dsh",
+      "url": "https://github.com/deepseek-ai/deepseek-harness",
+      "reviewedCommit": "22ddee3792402c3e70ec5f86a63c3e3e895a2f60",
+      "installedArtifact": null
+    },
+    {
+      "id": "pi",
+      "url": "https://github.com/earendil-works/pi",
+      "reviewedCommit": "6c384aa30f619d7b28963f2bab24d8dacbe73cb6",
+      "installedArtifact": null
+    },
+    {
+      "id": "harness2",
+      "url": "https://github.com/google-research/harness2",
+      "reviewedCommit": "1cfe254e8d25b15f37048c3730134686abe60335",
+      "installedArtifact": null,
+      "executionSubstrate": null
+    }
+  ],
+  "provenance": "External harness revisions come from October research READING_GUIDE.md, whose AMC research baseline was 5ea5e866a. AMC reviewBase and its target commit record this campaign worktree base 168cec133, independently inspected here. These are not current upstream HEAD or installed distribution identities. Retain actual build/install receipts before binding an executable manifest.",
+  "researchAmcBaseline": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c"
+}

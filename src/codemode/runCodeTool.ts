@@ -96,6 +96,7 @@ export function runCodeTool(deps: RunCodeToolDeps): ToolDefinition {
             parentToken: execution.token,
             // The program's signal: aborted by any verdict and by this call's own cancellation (PXA-37).
             signal: context.signal,
+            ...(execution.ownerStep === undefined ? {} : { ownerStep: execution.ownerStep }),
             onApprovalWait: context.onApprovalWait
           });
           const status = subCallStatus(outcome);

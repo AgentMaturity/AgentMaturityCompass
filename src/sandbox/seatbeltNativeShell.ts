@@ -160,6 +160,7 @@ export function seatbeltNativeShell(): SandboxBackend {
             ...(limit === null ? command : withProcessLimit(limit, command))],
           cwd: workspace, env, stdin: "ignore", stdout: "capture", stderr: "capture", maxCaptureBytes: 64_000,
           scrubValues: [...(policy.scrubValues ?? []), ...(proxy ? [proxy.token] : [])], graceMs: 2_000, timeoutMs: policy.timeoutMs,
+          ...(policy.onOutput ? { onOutput: policy.onOutput } : {}),
           ...(policy.signal ? { signal: policy.signal } : {})
         }).done;
         // A profile sandbox-exec refused never reaches the wrapper, so no marker covers that case too.
