@@ -36,6 +36,7 @@ import { initToolsConfig } from "../../src/toolhub/toolhubValidators.js";
 import { initActionPolicy } from "../../src/governor/actionPolicyEngine.js";
 import { ToolHubService } from "../../src/toolhub/toolhubServer.js";
 import { AWS_ARN, awsFake, fakeKey } from "./providerFakes.js";
+import { writeRuntimeFirewallPolicy } from "../../src/runtime/firewall.js";
 
 const PASS = "owned-selected-provider-reader-passphrase";
 const fixtures: Array<{ root: string; workspace: string; ledger?: Ledger; service?: SessionService }> = [];
@@ -49,6 +50,7 @@ async function fixture() {
   vi.stubEnv("AMC_HOME", join(root, "home")); vi.stubEnv("AMC_VAULT_PASSPHRASE", PASS); vi.stubEnv("AMC_NO_SIGN", "0");
   vi.stubEnv("AMC_LEDGER_SQLITE_SYNCHRONOUS", "FULL"); vi.stubEnv("AMC_EXPECTED_MONITOR_FINGERPRINT", undefined);
   initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+  writeRuntimeFirewallPolicy({ workspace: workspace, mode: "observe" }); // AXR-01: ToolHub and hook control apply the runtime firewall as the native pipeline does; unsigned, it blocks every call.
   const key = fakeKey("p256"), id = AWS_ARN("selected-reader"), transport = awsFake({ [id]: key });
   const provider = awsKmsProvider(transport.call), description = await provider.describe({ provider: "aws-kms", id });
   const path = join(workspace, ".amc", "amc.config.yaml"), config = YAML.parse(readFileSync(path, "utf8"));

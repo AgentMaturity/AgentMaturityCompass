@@ -8,6 +8,7 @@ import {
   verifyApprovalPolicySignature,
 } from "../approvals/approvalPolicyEngine.js";
 import { runGovernorCheck } from "../governor/governorCli.js";
+import { governedCallDenial } from "../tools/guards/governedCallDecision.js";
 import {
   openLedger,
   hashBinaryOrPath,
@@ -444,19 +445,15 @@ function evaluateCanonicalRequest(input: {
       reasonCode: "TOOL_ARGUMENTS_REJECTED",
     };
   }
-  const argsValidation = validateToolRequest({
-    workspace: input.workspace,
-    tool,
-    args: input.request.args,
-  });
-  if (!argsValidation.ok) {
-    return {
-      request: input.request,
-      actionClass: tool.actionClass,
-      outcome: "steer",
-      reason: `Signed ToolHub policy rejected the current ${tool.name} arguments.`,
-      reasonCode: "TOOL_ARGUMENTS_REJECTED",
-    };
+  if (!validateToolRequest({ workspace: input.workspace, tool, args: input.request.args }).ok) {
+    return { request: input.request, actionClass: tool.actionClass, outcome: "steer", reasonCode: "TOOL_ARGUMENTS_REJECTED",
+      reason: `Signed ToolHub policy rejected the current ${tool.name} arguments.` };
+  }
+  // AXR-01: the checks every governed plane shares, so this call is denied here wherever the native or ToolHub plane denies it.
+  const governed = governedCallDenial(input.workspace, { name: tool.name, agentId: input.agentId, actionClass: tool.actionClass, arguments: input.request.args, requestedMode: "EXECUTE" });
+  if (governed !== null) {
+    return { request: input.request, actionClass: tool.actionClass, outcome: "deny", reasonCode: "ACTION_POLICY_DENIED",
+      reason: `Signed AMC policy denied this call (${governed.label}): ${governed.reason}` };
   }
 
   const governor = runGovernorCheck({

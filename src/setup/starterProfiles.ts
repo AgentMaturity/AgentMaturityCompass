@@ -234,6 +234,7 @@ function printReport(workspace: string, report: StarterProfileReport): void {
   console.log(`Starter profile: ${report.kind} (firewall ${report.firewallMode}; ${signed} signed)`);
   console.log(`Owner: ${report.owner.username} (ACTIVE OWNER in the signed users.yaml)`);
   console.log(readiness.ready ? "Readiness: ready" : `Readiness: not ready\n${readiness.blockers.map((b) => `  - ${b}`).join("\n")}`);
+  console.log(`Action policy: ${readiness.actionPolicy}`);
   console.log(`Shell: ${readiness.shell.offered ? `offered, ${readiness.shell.boundary ?? "UNCONFINED"}` : "not offered"}${readiness.shell.reason ? ` (${readiness.shell.reason})` : ""}`);
   console.log(`Monitor key fingerprint (record it outside the workspace; verification pins it): ${report.monitorFingerprint}`);
   console.log(`  export AMC_EXPECTED_MONITOR_FINGERPRINT=${report.monitorFingerprint}`);
