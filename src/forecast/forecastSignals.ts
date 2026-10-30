@@ -10,6 +10,7 @@ import { pathExists, readUtf8 } from "../utils/fs.js";
 import { computeFailureRiskIndices } from "../assurance/indices.js";
 import { loadTransformMap } from "../transformation/transformPlanner.js";
 import { canonicalize } from "../utils/json.js";
+import { ratioOrNull } from "../utils/ratio.js";
 import { loadForecastTransformPlan, type ForecastTransformPlanInput } from "./forecastTransformPlan.js";
 import type { TransformPlan } from "../transformation/transformTasks.js";
 import { FOUR_CS } from "../transformation/fourCs.js";
@@ -388,13 +389,8 @@ function collectForecastSignalsAt(params: {
         valueFromValueReport(latestValueReportBeforeTs(valueReports, run.ts)) ??
         valueFromOutcome(latestOutcomeBeforeTs(outcomes, run.ts));
       const backlog = Math.max(0, (run.approvalHygiene?.requested ?? 0) - (run.approvalHygiene?.consumed ?? 0));
-      const denialRate = (() => {
-        const usage = run.toolHubUsage;
-        if (!usage || usage.toolActionCount <= 0) {
-          return 0;
-        }
-        return usage.deniedActionCount / Math.max(1, usage.toolActionCount);
-      })();
+      // A run with no ToolHub actions did not measure a denial rate; it adds no point rather than a clean 0.
+      const denialRate = ratioOrNull(run.toolHubUsage?.deniedActionCount ?? 0, run.toolHubUsage?.toolActionCount ?? 0);
 
       points.maturityOverall.push({ ts: run.ts, value: Number(overall.toFixed(6)), runId: run.runId, trustTier });
       points.integrityIndex.push({ ts: run.ts, value: Number(run.integrityIndex.toFixed(6)), runId: run.runId, trustTier });
@@ -426,7 +422,7 @@ function collectForecastSignalsAt(params: {
         points.operating.toolhub_denial_rate = [];
       }
       points.operating.approval_backlog_size.push({ ts: run.ts, value: backlog, runId: run.runId, trustTier });
-      points.operating.toolhub_denial_rate.push({ ts: run.ts, value: denialRate, runId: run.runId, trustTier });
+      if (denialRate !== null) points.operating.toolhub_denial_rate.push({ ts: run.ts, value: denialRate, runId: run.runId, trustTier });
 
       runRefs.push(run.runId);
       observedAccumulator += run.evidenceTrustCoverage?.observed ?? 0;

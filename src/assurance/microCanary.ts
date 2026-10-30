@@ -863,9 +863,10 @@ export function renderMicroCanaryMarkdown(report: MicroCanaryReport): string {
 
 /**
  * Compute a micro-canary health score (0-100) for integration with assurance scoring.
+ * No probe executed in the window: the score is null (not measured), never 100.
  */
 export function computeCanaryHealthScore(sinceTs?: number): {
-  score: number;
+  score: number | null;
   probeCount: number;
   failCount: number;
   criticalFailCount: number;
@@ -875,7 +876,7 @@ export function computeCanaryHealthScore(sinceTs?: number): {
   const recent = executionHistory.filter((e) => e.ts >= cutoff);
 
   if (recent.length === 0) {
-    return { score: 100, probeCount: 0, failCount: 0, criticalFailCount: 0 };
+    return { score: null, probeCount: 0, failCount: 0, criticalFailCount: 0 };
   }
 
   const failCount = recent.filter((e) => e.result.status === "FAIL").length;

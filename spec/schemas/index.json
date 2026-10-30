@@ -88,7 +88,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/amcbench.schema.json",
       "name": "amcbench.schema.json",
-      "sha256": "5a55092f837c8cb29b8eef4df6c79dff81e9cbce0c39c40685349989131c1127"
+      "sha256": "d23fbd24919626e3f8a18497ee77b6e71957a6de4c78b53880caa2c6ddcff382"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/amccert.schema.json",

@@ -30,7 +30,7 @@ export const benchOperatingHealthSchema = z.object({
   approvalsBacklogCount: z.number().int().min(0),
   approvalsMedianAgeHours: z.number().min(0),
   budgetExceedEvents: z.number().int().min(0),
-  toolhubDenialRate: z.number().min(0).max(1),
+  toolhubDenialRate: z.number().min(0).max(1).nullable(),
   freezeEvents: z.number().int().min(0),
   assurance: z.object({
     latestScore: z.number().min(0).max(100),

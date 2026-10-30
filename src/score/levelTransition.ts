@@ -19,6 +19,7 @@
 import { existsSync, readFileSync } from "fs";
 import { join } from "path";
 import { evidencePathExists } from "./controlSurfaceScope.js";
+import { ratioOrNull } from "../utils/ratio.js";
 
 export interface LevelTransition {
   /** Agent identifier */
@@ -50,8 +51,8 @@ export interface LevelTransitionReport {
   transitions: LevelTransition[];
   /** Average transition quality */
   avgTransitionQuality: number;
-  /** Promotion success rate (promotions that stuck vs reverted) */
-  promotionRetentionRate: number;
+  /** Promotion success rate (promotions that stuck vs reverted); null when no promotion was observed */
+  promotionRetentionRate: number | null;
   /** Evidence decay rate (demotions per time period) */
   demotionRate: number;
   /** Overall score 0-100 */
@@ -125,7 +126,7 @@ export function scoreLevelTransitions(transitions: LevelTransition[]): LevelTran
     return {
       transitions: [],
       avgTransitionQuality: 0,
-      promotionRetentionRate: 0,
+      promotionRetentionRate: null,
       demotionRate: 0,
       score: 0,
       level: 0,
@@ -149,9 +150,8 @@ export function scoreLevelTransitions(transitions: LevelTransition[]): LevelTran
     if (revert) revertedPromotions++;
   }
 
-  const promotionRetentionRate = promotions.length > 0
-    ? (promotions.length - revertedPromotions) / promotions.length
-    : 1;
+  // No promotion observed: retention is not measured and earns no credit.
+  const promotionRetentionRate = ratioOrNull(promotions.length - revertedPromotions, promotions.length);
 
   // Demotion rate (per 30 days)
   const timestamps = transitions.map((t) => new Date(t.timestamp).getTime());
@@ -160,10 +160,10 @@ export function scoreLevelTransitions(transitions: LevelTransition[]): LevelTran
     : 30;
   const demotionRate = timeSpanDays > 0 ? (demotions.length / timeSpanDays) * 30 : 0;
 
-  const score = Math.round(avgQuality * 0.5 + promotionRetentionRate * 30 + Math.max(0, 20 - demotionRate * 10));
+  const score = Math.round(avgQuality * 0.5 + (promotionRetentionRate ?? 0) * 30 + Math.max(0, 20 - demotionRate * 10));
 
   if (avgQuality < 50) gaps.push("Low average transition quality — transitions lack sufficient evidence or duration");
-  if (promotionRetentionRate < 0.7) gaps.push("High promotion reversion rate — levels are being assigned prematurely");
+  if (promotionRetentionRate !== null && promotionRetentionRate < 0.7) gaps.push("High promotion reversion rate — levels are being assigned prematurely");
   if (demotionRate > 2) gaps.push("High demotion rate — agent performance is unstable");
   if (!transitions.some((t) => t.adversarialTested)) {
     gaps.push("No transitions include adversarial testing — level assignments are untested under pressure");
@@ -205,7 +205,7 @@ export function scanLevelTransitionInfra(root: string): LevelTransitionReport {
   return {
     transitions: [],
     avgTransitionQuality: infraScore,
-    promotionRetentionRate: 0,
+    promotionRetentionRate: null,
     demotionRate: 0,
     score: infraScore,
     level,

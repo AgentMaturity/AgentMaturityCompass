@@ -450,9 +450,9 @@ describe("markdown rendering", () => {
 // Health score
 // ---------------------------------------------------------------------------
 describe("health score", () => {
-  test("returns 100 with no executions", () => {
+  test("is not measured with no executions (AXE-27)", () => {
     const health = computeCanaryHealthScore();
-    expect(health.score).toBe(100);
+    expect(health.score).toBeNull();
     expect(health.probeCount).toBe(0);
   });
 
@@ -493,7 +493,8 @@ describe("health score", () => {
     const highHealth = computeCanaryHealthScore();
 
     // CRITICAL failure should produce lower score
-    expect(critHealth.score).toBeLessThanOrEqual(highHealth.score);
+    expect(highHealth.score).not.toBeNull();
+    expect(critHealth.score).toBeLessThanOrEqual(highHealth.score!);
     expect(critHealth.criticalFailCount).toBe(1);
   });
 });

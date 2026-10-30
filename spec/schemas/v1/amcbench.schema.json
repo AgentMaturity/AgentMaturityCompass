@@ -391,9 +391,16 @@
               "type": "object"
             },
             "toolhubDenialRate": {
-              "maximum": 1,
-              "minimum": 0,
-              "type": "number"
+              "anyOf": [
+                {
+                  "maximum": 1,
+                  "minimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
             }
           },
           "required": [
