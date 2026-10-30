@@ -71,6 +71,7 @@ import {
 import { runStep, type LoopLlm, type LoopRoute, type StepRunnerInit } from "./stepRunner.js";
 import { EMPTY_TOOL_SEAM, type AgentToolSeam } from "./toolSeam.js";
 import { freezeNativeValidationPlan, NativeValidationTurn, type NativeValidationPlan } from "./nativeValidation.js";
+import { NativeValidationRepair, NativeValidationRepairStop } from "./nativeValidationRepair.js";
 import { AutoCompactor } from "./compaction/autoCompact.js";
 import { resolveCompactionConfig } from "./compaction/promptPressure.js";
 
@@ -289,7 +290,7 @@ export class AgentDriver {
   private assertUsable(): void {
     if (this.phase.kind === "failed") {
       throw new Error(
-        "AgentDriver is in a terminal failed state: its session has an open turn that only recovery may close"
+        "AgentDriver is in a terminal failed state: session evidence or pending context requires operator recovery"
       );
     }
   }
@@ -379,9 +380,17 @@ export class AgentDriver {
     let ending: TurnEnding | null = null;
     let target: InboxTarget = "next-turn";
     let validation: NativeValidationTurn | undefined;
+    let repair: NativeValidationRepair | undefined;
+    const repairContextIds = new Set<string>();
+    const acceptRepairContext = (text: string): void => {
+      repair?.assertReady();
+      repairContextIds.add(this.inbox.insert("next-step", text, "tool", { wake: false, demotedFrom: null }).messageId);
+    };
     try {
+      if (this.validation?.repair && this.validation.repair.maxRounds > 0)
+        repair = new NativeValidationRepair(this.session, this.validation, this.validation.repair, signal, turnRef.turn);
       if (this.validation) validation = new NativeValidationTurn({ session: this.session, tools: this.stepInit.tools,
-        plan: this.validation, turn: turnRef.turn, signal, abandonGraceMs: this.config.toolAbandonGraceMs });
+        plan: this.validation, turn: turnRef.turn, ...(repair === undefined ? {} : { round: 0 }), signal, abandonGraceMs: this.config.toolAbandonGraceMs });
       // Inside the try, NOT between startTurn and it. The turn/start row is
       // already durable at this point, so an observer that throws here would
       // otherwise leave a turn/start with no turn/end — the truncated turn this
@@ -397,7 +406,8 @@ export class AgentDriver {
           break;
         }
 
-        const decision = await this.preStep(target, turnRef.turn, step);
+        const prepare = () => this.preStep(target, turnRef.turn, step, repair?.active ? repair.signal : signal);
+        const decision = await (repair?.active ? repair.waitForHook(prepare) : prepare());
         if (decision.kind === "reject") {
           ending = { reason: "blocked" };
           return false;
@@ -438,7 +448,8 @@ export class AgentDriver {
             }
             this.head = recordNativeImageMessage(this.session, message) ?? this.head;
           }
-          const outcome = await runStep(this.stepInit, turnRef.turn, step, signal);
+          const outcome = await runStep(repair?.active ? { ...repair.stepInit(this.stepInit), acceptContext: acceptRepairContext } : this.stepInit,
+            turnRef.turn, step, repair?.active ? repair.signal : signal);
           stopReason = outcome.stopReason;
           usage = outcome.usage;
           // `max_tokens` is sticky: once any step hit the ceiling, a later step
@@ -457,32 +468,59 @@ export class AgentDriver {
         signal.throwIfAborted();
         // Between steps only, after `step/end` committed the usage it measures. A
         // summary step it runs takes the next step number, so keep ours in line.
-        if (this.compactor !== null && this.head !== null) {
+        if (!repair?.active && this.compactor !== null && this.head !== null) {
           phase.step += await this.compactor.afterStep(turnRef.turn, step, this.head.eventId, usage, signal);
         }
         // A listener that objects to the turn stopping says so by steering; the
         // inbox is re-read after it runs, so listener ORDER cannot change the
         // outcome.
         if (ending !== null && this.inbox.nextStep.length === 0) {
-          await this.hooks.turnStopping({ turn: turnRef.turn, signal });
+          const stopping = () => this.hooks.turnStopping({ turn: turnRef.turn, signal: repair?.active ? repair.signal : signal });
+          await (repair?.active ? repair.waitForHook(stopping) : stopping());
           signal.throwIfAborted();
         }
-        if (ending !== null && this.inbox.nextStep.length === 0) break;
+        if (repair?.active) repair.assertReady();
+        if (ending !== null && this.inbox.nextStep.length === 0) {
+          if (ending.reason === "complete" && this.validation) {
+            validation ??= new NativeValidationTurn({ session: this.session,
+              tools: repair?.active ? repair.validationTools(this.stepInit.tools) : this.stepInit.tools, plan: this.validation,
+              turn: turnRef.turn, signal: repair?.active ? repair.signal : signal, abandonGraceMs: this.config.toolAbandonGraceMs,
+              ...(repair === undefined ? {} : { round: repair.round }) });
+            await validation.run(phase.step);
+            const feedback = repair?.next(validation.results, this.stepInit.tools, this.config.maxStepsPerTurn - phase.step);
+            if (feedback) {
+              acceptRepairContext(feedback);
+              validation = undefined;
+              ending = null;
+              target = "next-step";
+              continue;
+            }
+          }
+          break;
+        }
         target = "next-step";
       }
-      if (ending?.reason === "complete") await validation?.run(phase.step);
     } catch (error: unknown) {
       if (signal.aborted) {
         ending = { reason: "cancelled", cause: cancelCauseOf(signal) };
         throw error;
       }
-      ending = { reason: "error", error };
-      this.notifyError(error);
-      throw error;
+      if (error instanceof NativeValidationRepairStop || repair?.signal.aborted) ending = { reason: "complete" };
+      else {
+        ending = { reason: "error", error };
+        this.notifyError(error);
+        throw error;
+      }
     } finally {
-      try { validation?.finish(signal.aborted ? "cancelled" : `turn-${ending?.reason ?? "incomplete"}`); }
+      let cleanupFailure: { error: unknown } | undefined;
+      try { for (const id of repairContextIds) this.inbox.cancelNextStep(id); }
+      catch (error) { cleanupFailure = { error }; ending = { reason: "error", error }; this.notifyError(error); }
+      try { repair?.finish(ending?.reason ?? "incomplete"); validation?.finish(signal.aborted ? "cancelled" : `turn-${ending?.reason ?? "incomplete"}`); }
       catch (error) { ending = { reason: "error", error }; this.notifyError(error); }
       this.closeTurn(turnRef.turn, ending);
+      if (cleanupFailure !== undefined) {
+        this.setPhase({ kind: "failed", cause: cleanupFailure.error });
+      }
     }
 
     if (!this.inbox.hasPending) return false;
@@ -535,8 +573,7 @@ export class AgentDriver {
    * it rather than hiding it: the `loop/veto` row names the vetoing party and
    * every message id the veto burned.
    */
-  private async preStep(target: InboxTarget, turn: number, step: number): Promise<PreStepDecision> {
-    const signal = this.requireRunning().abort.signal;
+  private async preStep(target: InboxTarget, turn: number, step: number, signal: AbortSignal): Promise<PreStepDecision> {
     const claimed: readonly InboxMessage[] = this.inbox.claim(target);
     // A hook may mutate the batch array, but cannot erase the captured v2 claims.
     const orderedClaims = claimed.filter(message => message.parts !== undefined);

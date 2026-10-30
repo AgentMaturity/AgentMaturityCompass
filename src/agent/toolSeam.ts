@@ -41,6 +41,8 @@ export interface ToolCallRequest {
    * the model cannot reach it. The pipeline re-verifies every one against the exact call before the body runs.
    */
   readonly authority?: ToolAuthority;
+  /** Trusted narrowing guard, rechecked after approvals immediately before an effect; null alone permits dispatch. */
+  readonly beforeEffect?: () => string | null;
 }
 
 /** What running one tool produced. */
@@ -68,6 +70,8 @@ export interface ToolCallOutcome {
 
 /** How the loop reaches a tool registry. */
 export interface AgentToolSeam {
+  /** The seam enforces ToolCallRequest.beforeEffect after all approval waits, at the actual effect boundary. */
+  readonly supportsEffectGuard?: true;
   /** The entered step owns this admission through completion, failure and cancellation. */
   prepareStep?(context: { readonly turn: number; readonly step: number; readonly signal: AbortSignal }): Promise<() => void>;
   /**

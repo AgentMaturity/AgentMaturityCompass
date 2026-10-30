@@ -47,6 +47,7 @@ export interface RunOptions {
   audioInput?: string;
   validationConfig?: string;
   validationConfigSha256?: string;
+  validationRepair?: string;
   validate?: string[];
   extension?: string[];
   extensionPin?: string[];

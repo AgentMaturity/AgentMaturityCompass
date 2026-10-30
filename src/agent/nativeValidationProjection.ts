@@ -30,11 +30,24 @@ export function projectNativeValidation(workspace: string, rows: readonly Eviden
     const sessionId = rows[0]?.session_id;
     if (!sessionId) return unavailable();
     validateAcpCommittedTail(workspace, sessionId, rows, 0, null);
-    let requested = false, finished = false;
+    let requested = false, finished = false, round = 0, finishedAt = -1;
+    const argumentsByCheck = new Map<string, string>();
+    const repairStarts = rows.filter(row => row.event_type === "audit" && metaOf(row)?.kind === "native-validation-repair"
+      && metaOf(row)?.turn === turn && metaOf(row)?.phase === "round-start");
     for (const row of relevant) {
       const meta = metaOf(row)!;
       const parsed = header.parse(meta);
-      if (finished || (configSha256 !== null && configSha256 !== parsed.configSha256)) return unavailable();
+      const eventRound = meta.round === undefined ? 0 : z.number().int().min(0).max(8).parse(meta.round);
+      if (parsed.phase === "requested" && finished && eventRound === round + 1) {
+        const start = repairStarts.filter(row => metaOf(row)?.round === eventRound && metaOf(row)?.configSha256 === configSha256);
+        if (validationAggregate(checks) !== "failed" || start.length !== 1 || checks.some(check => check.status === "unavailable")) return unavailable();
+        const startAt = rows.indexOf(start[0]!);
+        if (startAt <= finishedAt || startAt >= rows.indexOf(row)) return unavailable();
+        const selected = z.array(identity).min(1).max(8).parse(meta.checks);
+        if (JSON.stringify(selected) !== JSON.stringify(checks.map(({ id, title }) => ({ id, title })))) return unavailable();
+        round = eventRound; requested = false; finished = false;
+      }
+      if (eventRound !== round || finished || (configSha256 !== null && configSha256 !== parsed.configSha256)) return unavailable();
       configSha256 = parsed.configSha256;
       if (parsed.phase === "requested") {
         if (requested) return unavailable();
@@ -59,6 +72,7 @@ export function projectNativeValidation(workspace: string, rows: readonly Eviden
         checks = reported;
         if (meta.status !== validationAggregate(checks)) return unavailable();
         finished = true;
+        finishedAt = rows.indexOf(row);
         continue;
       }
       const index = checks.findIndex(check => check.id === meta.checkId);
@@ -67,6 +81,9 @@ export function projectNativeValidation(workspace: string, rows: readonly Eviden
       if (check.status !== "pending" || typeof meta.callId !== "string" || !meta.callId) return unavailable();
       if (parsed.phase === "check-start") {
         if (check.callId !== null || meta.toolName !== "bash" || typeof meta.argumentsSha256 !== "string" || !/^[a-f0-9]{64}$/.test(meta.argumentsSha256)) return unavailable();
+        const priorArguments = argumentsByCheck.get(check.id);
+        if (priorArguments !== undefined && priorArguments !== meta.argumentsSha256) return unavailable();
+        argumentsByCheck.set(check.id, meta.argumentsSha256);
         checks[index] = { ...check, callId: meta.callId };
       } else {
         if (check.callId !== meta.callId) return unavailable();

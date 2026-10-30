@@ -26,6 +26,7 @@ import { escapeTerminalControls } from "../tools/builtin/askUserTool.js";
 export interface NativeChatOptions extends NativeChatProfileOptions {
   readonly validationConfig?: string;
   readonly validationConfigSha256?: string;
+  readonly validationRepair?: string;
   readonly validate?: readonly string[];
   readonly extension?: readonly string[];
   readonly extensionPin?: readonly string[];
@@ -282,7 +283,8 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       ...(options.autoSummary === false ? ["--no-auto-summary"] : []),
       ...(approvalClass === undefined ? [] : ["--approve-tools", approvalClass, "--approve-risk", approvalRisk]), ...mcpArgs,
       ...(validation === undefined ? [] : ["--validation-config", resolve(options.validationConfig!), "--validation-config-sha256", validation.configSha256,
-        ...validation.checks.flatMap(check => ["--validate", check.id])])];
+        ...validation.checks.flatMap(check => ["--validate", check.id]),
+        ...(validation.repair === undefined ? [] : ["--validation-repair", JSON.stringify(validation.repair)])])];
     const routeArgs = [...routeBaseArgs, ...nativeChatProfileArgv(profile)];
     const showScope = () => {
       io.log(`Native chat · agent ${guide.agentId} · provider ${provider} · model ${guide.model}`);

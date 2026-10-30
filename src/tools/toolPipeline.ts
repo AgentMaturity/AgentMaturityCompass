@@ -159,6 +159,8 @@ export interface ToolCallInput {
   readonly parentToken?: string | null;
   /** Set only by trusted composition, after an approval was granted. Arguments never grant anything. */
   readonly authority?: ToolAuthority;
+  /** Trusted narrowing guard after all approval waits and immediately before the body; null alone permits dispatch. */
+  readonly beforeEffect?: () => string | null;
 }
 
 /** What the authorization stage needs, decided when the call entered. */
@@ -257,6 +259,15 @@ function denialOutcome(denied: ToolDenial): ToolOutcome {
   };
 }
 
+/** A missing guard keeps existing behavior; malformed or throwing guards never grant an effect. */
+function effectGuardDenial(beforeEffect: ToolCallInput["beforeEffect"]): ToolDenial | null {
+  if (beforeEffect === undefined) return null;
+  let reason: unknown;
+  try { reason = beforeEffect(); }
+  catch { reason = "Trusted effect guard could not be verified."; }
+  return reason === null ? null : { stage: "guard", guardLabel: "trusted-before-effect",
+    reason: typeof reason === "string" ? reason : "Trusted effect guard returned no valid decision." };
+}
 // The selected body must remain distinguishable from a later scoped override
 // while approval is awaited. Callers cannot assign this binding through argv.
 const selectedDefinitions = new WeakMap<ToolExecution, ToolDefinition>();
@@ -365,8 +376,8 @@ export class ToolPipeline {
               execution = fresh;
               selectedDefinitions.set(execution, definition);
               selectedAvailability.set(execution, available);
-            })
-          : await this.runStages(execution, definition.body, authorization!);
+            }, input.beforeEffect)
+          : await this.runStages(execution, definition.body, authorization!, input.beforeEffect);
       } finally {
         release?.();
         selectedDefinitions.delete(execution);
@@ -561,7 +572,8 @@ export class ToolPipeline {
     };
   }
 
-  private async runStages(execution: ToolExecution, body: ToolBody, authorization: CallAuthorization): Promise<ToolOutcome> {
+  private async runStages(execution: ToolExecution, body: ToolBody, authorization: CallAuthorization,
+    beforeEffect: ToolCallInput["beforeEffect"]): Promise<ToolOutcome> {
     if (authorization.refused !== null) return denialOutcome(authorization.refused);
     const approval = await this.askApproval(execution);
     if (approval !== null) return approval;
@@ -579,6 +591,9 @@ export class ToolPipeline {
     // Read again after the approval wait: a call cancelled while it waited (a timed-out program's sub-call) never runs.
     if (execution.signal?.aborted) return notDispatched();
 
+    const effectDenial = effectGuardDenial(beforeEffect);
+    if (effectDenial !== null) return denialOutcome(effectDenial);
+
     try {
       return this.bodyOutcome(execution, await body(execution));
     } catch (error: unknown) {
@@ -593,7 +608,8 @@ export class ToolPipeline {
    * before the wait is read again after it: the block here, the record's facts and approvals by the recheck.
    */
   private async runJournaled(open: () => ActionJournal, execution: ToolExecution, body: ToolBody,
-    authorization: CallAuthorization | null, enter: () => Promise<CallAuthorization>, selectExecution: (execution: ToolExecution) => void): Promise<ToolOutcome> {
+    authorization: CallAuthorization | null, enter: () => Promise<CallAuthorization>, selectExecution: (execution: ToolExecution) => void,
+    beforeEffect: ToolCallInput["beforeEffect"]): Promise<ToolOutcome> {
     const initial = authorization?.bound;
     const executionId = initial?.ok ? initial.record.executionId : `exec_${randomUUID()}`;
     const idempotencyKey = initial?.ok ? initial.record.idempotencyKey : authorization === null ? mintIdempotencyKey() : null;
@@ -686,6 +702,8 @@ export class ToolPipeline {
     if (!recheck.ok) {
       return deny({ stage: "authorization", reason: recheck.failures.join(", "), guardLabel: null }, `recheck_failed:${recheck.failures.join(",")}`);
     }
+    const effectDenial = effectGuardDenial(beforeEffect);
+    if (effectDenial !== null) return deny(effectDenial, "guard_denied:trusted-before-effect");
     try {
       journal.start(executionId, bound.record);
     } catch (error) {
