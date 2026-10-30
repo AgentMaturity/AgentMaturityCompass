@@ -37,6 +37,27 @@ export class AMCNativeCancelledError extends AMCNativeProtocolError {
   }
 }
 
+const ACP_STARTUP_REFUSED = -32003;
+
+/**
+ * `amc acp` refused its own launch configuration before serving any session. `reason` is
+ * the runtime's stable code (mcp-config-tampered, mcp-config-unreviewed, mcp-config-duplicate,
+ * mcp-config-unpaired, mcp-grant-class-mismatch, mcp-config-invalid, or startup-refused for
+ * any other failure); the message is the runtime's fixed, secret-free text. @public
+ */
+export class AMCNativeStartupRefusedError extends AMCNativeRefusedError {
+  constructor(readonly reason: string, message: string) {
+    super(ACP_STARTUP_REFUSED, message, { reason }); this.name = "AMCNativeStartupRefusedError";
+  }
+}
+
+/** @internal The coded reply to `initialize` from a refused runtime, typed; anything else unchanged. */
+export function asStartupRefusal(error: unknown): unknown {
+  const data = error instanceof AMCNativeRefusedError && error.code === ACP_STARTUP_REFUSED ? error.data : undefined;
+  const reason = data !== null && typeof data === "object" ? (data as { reason?: unknown }).reason : undefined;
+  return typeof reason === "string" && /^[a-z][a-z-]{0,63}$/.test(reason) ? new AMCNativeStartupRefusedError(reason, (error as Error).message) : error;
+}
+
 /** Live retention stopped; awaiting the same turn result can recover committed text. @public */
 export class AMCNativeResyncRequiredError extends Error {
   readonly recoverable = true;

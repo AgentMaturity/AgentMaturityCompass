@@ -110,7 +110,17 @@ The contract covers the `agent-maturity-compass/sdk/native` entry only. Its stab
 - their options and update types: `AMCNativeClientOptions`, `AMCNativeEventBufferOptions`, `AMCNativeUpdate`,
   `AMCNativeRunResult` and `AMCNativeReceipt`;
 - the errors `AMCNativeInputError`, `AMCNativeProtocolError`, `AMCNativeLimitError`, `AMCNativeCancelledError`,
-  `AMCNativeProcessError` and `AMCNativeRefusedError`.
+  `AMCNativeProcessError`, `AMCNativeRefusedError` and `AMCNativeStartupRefusedError`;
+- `AMCNativeMcpStatus`, the result of `AMCNativeClient.mcpStatus(sessionId)`.
+
+`mcpConfig` and `mcpConfigSha256` take one reviewed config per server and one pin per config, in the same order; an
+unpaired or malformed entry is refused before the runtime is spawned. `mcpStatus(sessionId)` reads ACP
+`_amc/session/mcp`: each mounted server's id, catalog digest, protocol, auth issuer/scopes/expiry, granted tool names,
+local registration `state` and `execution: "not-evaluated"`, the projection chat's `/mcp` shows. Env values, headers,
+tokens and config content are never included. When `amc acp` refuses its launch configuration (an unreviewed,
+tampered, duplicate or unpaired config, or a grant class mismatch), `AMCNativeClient.start` rejects with
+`AMCNativeStartupRefusedError`: code -32003, `reason` the runtime's stable code (for example `mcp-config-tampered`) and
+its fixed, secret-free message.
 
 Everything else that entry exports is experimental: the in-process `openAgentSession` and `resumeAgentSession`, the
 `llm` namespace, the image and audio input helpers, `AMC_NATIVE_EVENT_LIMITS`, the session-history readers, and the

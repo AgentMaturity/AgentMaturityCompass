@@ -46,11 +46,15 @@ import { AMCNativeTurn } from "./nativeAgentTurn.js";
 export { AMCNativeTurn } from "./nativeAgentTurn.js";
 
 import {
-  AMCNativeCancelledError, AMCNativeInputError, AMCNativeLimitError, AMCNativeProcessError, AMCNativeProtocolError, AMCNativeRefusedError
+  AMCNativeCancelledError, AMCNativeInputError, AMCNativeLimitError, AMCNativeProcessError, AMCNativeProtocolError, AMCNativeRefusedError, asStartupRefusal
 } from "./nativeAgentErrors.js";
 export {
-  AMCNativeCancelledError, AMCNativeInputError, AMCNativeLimitError, AMCNativeProcessError, AMCNativeProtocolError, AMCNativeRefusedError, AMCNativeResyncRequiredError
+  AMCNativeCancelledError, AMCNativeInputError, AMCNativeLimitError, AMCNativeProcessError, AMCNativeProtocolError, AMCNativeRefusedError, AMCNativeResyncRequiredError,
+  AMCNativeStartupRefusedError
 } from "./nativeAgentErrors.js";
+import { admitNativeMcpStatus, NATIVE_MCP_STATUS_FORMAT, type NativeMcpStatus } from "../mcp/nativeMcpStatus.js";
+/** Per-server status of a session's reviewed MCP mounts, the `/mcp` projection: no env, header, token or config content. @public */
+export type AMCNativeMcpStatus = NativeMcpStatus;
 
 /** @public */ export interface AMCNativeClientOptions {
   readonly workspace: string;
@@ -328,7 +332,8 @@ export class AMCNativeClient {
     const abort = () => client.fail(new AMCNativeCancelledError("native client startup was cancelled"));
     try {
       signal?.addEventListener("abort", abort, { once: true });
-      const result = await client.request("initialize", { protocolVersion: 1, clientCapabilities: { _meta: { "dev.agentmaturity.amc": { currentPlanUpdates: "amc-current-plan-v1" } } } });
+      const result = await client.request("initialize", { protocolVersion: 1, clientCapabilities: { _meta: { "dev.agentmaturity.amc": { currentPlanUpdates: "amc-current-plan-v1" } } } })
+        .catch((error: unknown) => { throw asStartupRefusal(error); });
       if (result.protocolVersion !== 1 || !object(result.agentInfo) || result.agentInfo.name !== "agent-maturity-compass"
         || !object(result.agentCapabilities)) throw new AMCNativeProtocolError("unsupported native agent identity or protocol");
       const meta = result.agentCapabilities._meta, extension = object(meta) ? meta["dev.agentmaturity.amc"] : undefined;
@@ -425,6 +430,16 @@ export class AMCNativeClient {
     const result = await this.request("_amc/session/withdraw", { sessionId, messageId });
     if (typeof result.withdrawn !== "boolean") throw new AMCNativeProtocolError("native withdrawal returned an invalid outcome");
     return result.withdrawn;
+  }
+
+  /** Read-only per-mount status of an owned session's reviewed MCP servers; never probes, mounts or closes one. */
+  async mcpStatus(sessionId: string): Promise<AMCNativeMcpStatus> {
+    this.assertAvailable();
+    if (!this.sessions.has(sessionId) || this.releasing.has(sessionId)) throw new AMCNativeInputError("MCP status requires an owned usable session");
+    if (this.extension().mcpStatus !== NATIVE_MCP_STATUS_FORMAT) throw new AMCNativeRefusedError(-32601, "This runtime does not report per-mount MCP status");
+    const status = admitNativeMcpStatus(await this.request("_amc/session/mcp", { sessionId }));
+    if (!status) throw new AMCNativeProtocolError("native MCP status returned an invalid projection");
+    return status;
   }
 
   /** @internal */
@@ -767,10 +782,6 @@ export class AMCNativeClient {
     await this.close();
     if (!released) throw new AMCNativeProtocolError("A writer did not release cleanly; inspect its signed session before resuming it.");
   }
-
-
-
-
 }
 
 /** Pair each config with its pin before spawn; the runtime still reviews and refuses every one. */

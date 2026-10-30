@@ -48,6 +48,7 @@ export declare class AMCNativeClient {
     readSessionPage(sessionId: string, options?: AMCNativeReadPageOptions): Promise<AMCNativeSessionPage>;
     readSessionPages(sessionId: string, options?: AMCNativeReadPageOptions): AsyncIterableIterator<AMCNativeSessionPage>;
     withdrawSubmission(sessionId: string, messageId: string): Promise<boolean>;
+    mcpStatus(sessionId: string): Promise<AMCNativeMcpStatus>;
     close(): Promise<void>;
     verifySession(sessionId: string): Promise<AMCNativeReceipt>;
     pendingApprovals(): Promise<readonly AMCNativePendingApproval[]>;
@@ -75,8 +76,8 @@ export interface AMCNativeClientOptions {
     readonly validate?: readonly string[];
     readonly approveTools?: string;
     readonly approveRisk?: "low" | "medium" | "high" | "critical";
-    readonly mcpConfig?: string;
-    readonly mcpConfigSha256?: string;
+    readonly mcpConfig?: string | readonly string[];
+    readonly mcpConfigSha256?: string | readonly string[];
     readonly credentialsHome?: string;
     readonly credentialsFile?: string;
     readonly credentialsMode?: "layered" | "operator-only";
@@ -122,6 +123,12 @@ export declare class AMCNativeLimitError extends AMCNativeProtocolError {
     readonly limit: number;
     constructor(resource: "turn-events" | "turn-bytes" | "history-events" | "history-bytes" | "write-queue", limit: number);
 }
+```
+
+## AMCNativeMcpStatus (public)
+
+```ts
+export type AMCNativeMcpStatus = NativeMcpStatus;
 ```
 
 ## AMCNativePendingApproval (public)
@@ -285,6 +292,15 @@ export declare class AMCNativeSession {
 
 ```ts
 export type AMCNativeSessionPage = AcpSessionUpdatePage;
+```
+
+## AMCNativeStartupRefusedError (public)
+
+```ts
+export declare class AMCNativeStartupRefusedError extends AMCNativeRefusedError {
+    readonly reason: string;
+    constructor(reason: string, message: string);
+}
 ```
 
 ## AMCNativeTurn (public)

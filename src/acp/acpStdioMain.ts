@@ -11,7 +11,7 @@ import { resolveCompactionConfig } from "../agent/compaction/promptPressure.js";
 import type { CompactionConfig } from "../agent/loopTypes.js";
 import { isActionClass } from "../governor/actionCatalog.js";
 import { checkToolsetReadiness } from "../agent/agentToolset.js";
-import { reviewNativeMcpConfigurations } from "../setup/nativeMcpConfig.js";
+import { NativeMcpConfigError, reviewNativeMcpConfigurations } from "../setup/nativeMcpConfig.js";
 import { loadVerifiedToolsConfigSnapshot } from "../toolhub/toolhubValidators.js";
 import { sha256Hex } from "../utils/hash.js";
 import type { ToolApprovalGateOptions } from "../agent/approvalGate.js";
@@ -182,7 +182,7 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
   if (actionClass !== undefined && tools !== "workspace") throw new Error("ACP tool approvals require explicit --tools workspace.");
   const approval: ToolApprovalGateOptions | undefined = actionClass === undefined ? undefined : {
     actionClass: actionClass as ToolApprovalGateOptions["actionClass"], riskTier: riskTier as ToolApprovalGateOptions["riskTier"] };
-  if (init.mcpConfigSha256 !== undefined && init.mcpConfig === undefined) throw new Error("ACP MCP digest pin requires an explicit config path.");
+  if (init.mcpConfigSha256 !== undefined && init.mcpConfig === undefined) throw new NativeMcpConfigError("ACP MCP digest pin requires an explicit config path.", "mcp-config-unpaired");
   if (init.mcpConfig !== undefined && (tools !== "workspace" || !approval)) throw new Error("ACP MCP requires --tools workspace and --approve-tools.");
   const mcpPaths = init.mcpConfig === undefined ? [] : typeof init.mcpConfig === "string" ? [init.mcpConfig] : init.mcpConfig;
   const mcpPins = init.mcpConfigSha256 === undefined ? undefined : typeof init.mcpConfigSha256 === "string" ? [init.mcpConfigSha256] : init.mcpConfigSha256;

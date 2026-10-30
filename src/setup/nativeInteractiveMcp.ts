@@ -1,26 +1,15 @@
 import { z } from "zod";
 import type { MountedNativeMcpServer } from "../mcp/nativeMcpClient.js";
-import { isNativeMcpProtocolVersion, MCP_STATELESS_PROTOCOL_VERSION } from "../mcp/protocol/version.js";
+import { nativeMcpReceiptProjection, nativeMcpToolNamesProjection } from "../mcp/nativeMcpStatus.js";
 import { escapeTerminalControls } from "../tools/builtin/askUserTool.js";
 
 const RECEIPT = "amc/native-chat-mcp-receipt";
-const text = (max: number) => z.string().min(1).max(max);
-const protocol = z.object({
-  negotiatedVersion: text(32).refine(isNativeMcpProtocolVersion),
-  mode: z.enum(["stateless", "legacy"]),
-  serverInfo: z.object({ name: z.string().max(256), version: z.string().max(256) }).nullable()
-}).refine(value => value.mode === (value.negotiatedVersion === MCP_STATELESS_PROTOCOL_VERSION ? "stateless" : "legacy"));
-// Pick the receipt's known public fields. Unknown nested fields (including
-// accidental credentials on a future mount object) never cross the channel.
+// Pick the receipt's known public fields (the same projection `_amc/session/mcp` serves).
+// Unknown nested fields (including accidental credentials on a future mount object) never cross the channel.
 const receiptMessage = z.object({
   type: z.literal(RECEIPT), v: z.literal(1),
-  receipt: z.object({
-    serverId: z.string().regex(/^[A-Za-z0-9_-]{1,32}$/),
-    catalogDigest: z.string().regex(/^[a-f0-9]{64}$/),
-    protocol,
-    auth: z.object({ issuer: text(2_048), scopes: z.array(text(256)).max(256), tokenExpiresAt: text(128).nullable() }).nullable()
-  }),
-  toolNames: z.array(z.string().regex(/^mcp_[A-Za-z0-9_-]{1,32}_[a-f0-9]{16}$/)).min(1).max(256)
+  receipt: nativeMcpReceiptProjection,
+  toolNames: nativeMcpToolNamesProjection
 });
 type ReceiptMessage = z.infer<typeof receiptMessage>;
 
