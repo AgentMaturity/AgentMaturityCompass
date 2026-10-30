@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   MAX_PLAN_NODES,
+  MAX_PLAN_DEPTH,
+  MAX_PLAN_BYTES,
   parseWorkflowPlan,
   planAgentCount
 } from "../src/workflow/workflowPlan.js";
@@ -59,6 +61,69 @@ describe("a plan is validated before anything runs", () => {
     const parsed = parseWorkflowPlan({ kind: "parallel", id: "q", children });
     expect(parsed.ok).toBe(false);
     if (!parsed.ok) expect(parsed.reason).toContain(String(MAX_PLAN_NODES));
+  });
+
+  it("refuses an oversized child list before inspecting its nodes", () => {
+    let inspected = false;
+    const children = Array.from({ length: MAX_PLAN_NODES }, (_, index) => agent(`a${index}`));
+    Object.defineProperty(children[0], "goal", { get: () => { inspected = true; return "g"; } });
+    expect(parseWorkflowPlan({ kind: "parallel", id: "root", children }).ok).toBe(false);
+    expect(inspected).toBe(false);
+  });
+
+  it("counts nodes across nested branches before admitting a late sibling", () => {
+    const children = Array.from({ length: MAX_PLAN_NODES - 2 }, (_, index) => agent(`a${index}`));
+    const parsed = parseWorkflowPlan({ kind: "parallel", id: "root", children: [
+      { kind: "parallel", id: "branch", children }, agent("late")
+    ] });
+    expect(parsed.ok).toBe(false);
+    if (!parsed.ok) expect(parsed.reason).toContain(String(MAX_PLAN_NODES));
+  });
+
+  it("admits the depth boundary and refuses the next level before stack growth", () => {
+    const nested = (depth: number): unknown => {
+      let node: unknown = agent("leaf");
+      for (let level = 1; level < depth; level += 1) {
+        node = { kind: "pipeline", id: `p${level}`, stages: [node] };
+      }
+      return node;
+    };
+    expect(parseWorkflowPlan(nested(MAX_PLAN_DEPTH)).ok).toBe(true);
+    const parsed = parseWorkflowPlan(nested(MAX_PLAN_DEPTH + 1));
+    expect(parsed.ok).toBe(false);
+    if (!parsed.ok) expect(parsed.reason).toContain("depth");
+    expect(parseWorkflowPlan(nested(5000)).ok).toBe(false);
+  });
+
+  it("counts UTF-8 bytes across all node fields before accepting a plan", () => {
+    expect(parseWorkflowPlan(agent("a", "界".repeat(100_000))).ok).toBe(false);
+    const goal = "g".repeat(140_000);
+    expect(parseWorkflowPlan(agent("a", goal)).ok).toBe(true);
+    expect(parseWorkflowPlan({ kind: "parallel", id: "root", children: [agent("a", goal), agent("b", goal)] }).ok).toBe(false);
+    expect(parseWorkflowPlan(agent("a", "\u0000".repeat(50_000))).ok).toBe(false);
+    expect(parseWorkflowPlan(agent("a", "\ud800".repeat(50_000))).ok).toBe(false);
+    expect(parseWorkflowPlan({ ...agent("a"), scope: Array.from({ length: MAX_PLAN_BYTES }, () => "READ_ONLY") }).ok).toBe(false);
+  });
+
+  it("refuses cyclic nodes and deeply nested unknown kinds without serializing them", () => {
+    const cyclic: { kind: string; id: string; children: unknown[] } = { kind: "parallel", id: "root", children: [] };
+    cyclic.children.push(cyclic);
+    expect(parseWorkflowPlan(cyclic).ok).toBe(false);
+    let kind: unknown = {};
+    for (let depth = 0; depth < 10_000; depth += 1) kind = { nested: kind };
+    const parsed = parseWorkflowPlan({ kind, id: "unknown" });
+    expect(parsed.ok).toBe(false);
+    if (!parsed.ok) expect(parsed.reason).toContain("unknown kind object");
+  });
+
+  it("ignores unused metadata while retaining delegation scope validation", () => {
+    const unused: { self?: unknown } = {};
+    unused.self = unused;
+    expect(parseWorkflowPlan({ ...agent("a"), unused, scope: ["READ_ONLY"] })).toMatchObject({
+      ok: true, plan: { scope: ["READ_ONLY"] }
+    });
+    expect(parseWorkflowPlan({ ...agent("a"), scope: [] }).ok).toBe(false);
+    expect(parseWorkflowPlan({ ...agent("a"), scope: ["UNKNOWN"] }).ok).toBe(false);
   });
 
   it("refuses a shape it does not recognise", () => {
