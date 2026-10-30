@@ -15795,75 +15795,9 @@ program
   .option("--casebook <id>", "signed casebook for --execute-trials").option("--provider <id>", "trial provider for --execute-trials")
   .option("--mode <mode>", "supervise|sandbox for --execute-trials", "supervise").option("--max-steps <n>", "steps per trial", Number)
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .action(async (opts: {
-    name: string;
-    model: string;
-    baselineFile: string;
-    candidateFile: string;
-    baselineKind: string;
-    candidateKind: string;
-    executeTrials?: boolean;
-    casebook?: string;
-    provider?: string;
-    mode: string;
-    maxSteps?: number;
-    agent?: string;
-  }) => {
-    const { quickArchitectureComparison, simulateProbeOutcomes, parseArchitectureKind } = await import(
-      "./experiments/architectureExperiment.js"
-    );
-    let baselineKind: ReturnType<typeof parseArchitectureKind>, candidateKind: ReturnType<typeof parseArchitectureKind>;
-    try { baselineKind = parseArchitectureKind(opts.baselineKind); candidateKind = parseArchitectureKind(opts.candidateKind); }
-    catch (error) { console.error(chalk.red(`Architecture comparison ERROR: ${normalizeCliErrorMessage(error)}`)); process.exitCode = 1; return; }
-    if (opts.executeTrials) {
-      // GAP-WP06: the measured path runs both pinned artifacts through the experiment trial executor and gate.
-      if (!opts.casebook || !opts.provider) { console.error(chalk.red("Architecture comparison ERROR: --execute-trials requires --casebook and --provider")); process.exitCode = 1; return; }
-      const { architectureExecuteCommandCli } = await import("./experiments/architectureTrials.js");
-      await architectureExecuteCommandCli({ workspace: process.cwd(), agentId: opts.agent ?? activeAgent(program), name: opts.name, modelId: opts.model,
-        casebookId: opts.casebook, mode: opts.mode as "supervise" | "sandbox", /* the runner refuses any other mode */
-        baseline: { file: resolve(process.cwd(), opts.baselineFile), kind: baselineKind }, candidate: { file: resolve(process.cwd(), opts.candidateFile), kind: candidateKind },
-        trial: { providerId: opts.provider, ...(opts.maxSteps === undefined ? {} : { maxSteps: opts.maxSteps }) } }, normalizeCliErrorMessage);
-      return;
-    }
-    // Without --execute-trials there is no real probe runner: refuse rather than report LCG-generated scores as a
-    // measured comparison, unless the operator opts into a labelled simulation with exactly AMC_ARCHITECTURE_ALLOW_SIMULATED=1.
-    if (process.env.AMC_ARCHITECTURE_ALLOW_SIMULATED !== "1") {
-      console.error(
-        chalk.yellow("Architecture comparison INCONCLUSIVE — no real probe runner is configured.")
-      );
-      console.error(
-        chalk.gray(
-          "This command previously reported deterministic pseudo-random scores, tokens and latencies as a measured comparison."
-        )
-      );
-      console.error(
-        chalk.cyan(
-          "Use --execute-trials --casebook <id> --provider <id> for a measured comparison, or set AMC_ARCHITECTURE_ALLOW_SIMULATED=1 to run it explicitly as a simulation for pipeline testing."
-        )
-      );
-      process.exitCode = 3;
-      return;
-    }
-    const fs = await import("node:fs");
-    let baselineContent: string, candidateContent: string;
-    try { baselineContent = fs.readFileSync(opts.baselineFile, "utf-8"); candidateContent = fs.readFileSync(opts.candidateFile, "utf-8"); }
-    catch (error) { console.error(chalk.red(`Architecture comparison ERROR: ${normalizeCliErrorMessage(error)}`)); process.exitCode = 1; return; }
-    const { markdown } = quickArchitectureComparison({
-      name: opts.name,
-      modelId: opts.model,
-      baselineName: `Baseline (${opts.baselineFile})`,
-      baselineKind,
-      baselineContent,
-      baselineDescription: `Loaded from ${opts.baselineFile}`,
-      candidateName: `Candidate (${opts.candidateFile})`,
-      candidateKind,
-      candidateContent,
-      probeRunner: simulateProbeOutcomes,
-      candidateDescription: `Loaded from ${opts.candidateFile}`,
-    });
-    console.log(markdown);
-    console.log(chalk.yellow("Architecture comparison INCONCLUSIVE: simulated outcomes are not measured task results."));
-    process.exitCode = 3;
+  .action(async (opts: import("./experiments/architectureCli.js").ArchitectureCommandOptions) => {
+    const { architectureCommandCli } = await import("./experiments/architectureCli.js");
+    await architectureCommandCli({ ...opts, workspace: process.cwd(), agentId: opts.agent ?? activeAgent(program) }, normalizeCliErrorMessage);
   });
 
 program
