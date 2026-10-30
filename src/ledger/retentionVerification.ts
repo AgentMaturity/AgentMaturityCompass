@@ -103,8 +103,8 @@ function blobKeyOutOfReach(workspace: string, payloadPath: string, payloadSha256
   try {
     const meta = loadBlobMetadata(workspace, payloadPath);
     if (meta.keyVersion === null || meta.payloadSha256 !== payloadSha256 || !verifyBlobCurrentKeySignature(workspace).valid) return false;
-    // Version 0 (unvaulted) and the no-sign key never raise VaultLockedError, so they never count as out of reach.
-    if (meta.keyVersion > loadCurrentBlobKey(workspace).keyVersion) return false;
+    // Issued vaulted versions only: 0 is the unvaulted key, and none is above the signed current version.
+    if (meta.keyVersion < 1 || meta.keyVersion > loadCurrentBlobKey(workspace).keyVersion) return false;
     readBlobKeyMaterial(workspace, meta.keyVersion);
     return false;
   } catch (error) {
