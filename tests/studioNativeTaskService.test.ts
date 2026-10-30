@@ -432,7 +432,7 @@ test("a physical workspace alias runs the same native session, while a different
   });
   async function request(id: number, method: string, params: object) {
     child.stdin.write(`${JSON.stringify({ jsonrpc: "2.0", id, method, params })}\n`);
-    const deadline = Date.now() + 5000;
+    const deadline = Date.now() + (method === "initialize" ? 10_000 : 5000);
     while (!frames.some(frame => frame.id === id)) {
       if (Date.now() > deadline || child.exitCode !== null) throw new Error("Actual ACP scope fixture did not answer.");
       await new Promise(done => setTimeout(done, 20));

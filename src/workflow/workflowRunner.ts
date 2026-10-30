@@ -19,6 +19,7 @@ export interface WorkflowRunInit {
   readonly runId?: string;
   readonly maxParallelAgents?: number;
   readonly maxDepth?: number;
+  readonly maxActiveChildren?: number;
   readonly signal?: AbortSignal;
   readonly cancelGraceMs?: number;
   readonly parentLeaseToken?: string;
@@ -106,6 +107,7 @@ async function runAgent(node: Extract<WorkflowNode, { kind: "agent" }>, input: s
       session: init.session, runner, mintSessionId: () => checkpoint.childSessionId,
       ...(init.parentLeaseToken === undefined ? {} : { parentLeaseToken: init.parentLeaseToken }),
       ...(init.maxDepth === undefined ? {} : { maxDepth: init.maxDepth }),
+      ...(init.maxActiveChildren === undefined ? {} : { maxActiveChildren: init.maxActiveChildren }),
       ...(init.signal === undefined ? {} : { signal: init.signal }),
       ...(init.cancelGraceMs === undefined ? {} : { cancelGraceMs: init.cancelGraceMs })
     });
@@ -174,6 +176,7 @@ export async function runWorkflowPlan(init: WorkflowRunInit): Promise<WorkflowRu
   try {
     const progress = workflowProgress({ ...init, runId, controls: {
       maxDepth: init.maxDepth ?? null, delegationScope: init.delegationScope ?? null,
+      ...(init.maxActiveChildren === undefined ? {} : { maxActiveChildren: init.maxActiveChildren }),
       stopConditions: init.stopConditions ?? null, hookControl: init.runner.hookControl ?? null
     } });
     sessionKey = progress.sessionKey;

@@ -1,3 +1,10 @@
+import { consumeAcceptedWork, type WireWorkExecution } from "./workConsumer.js";
+import { nativeRouteFor, paramsFor, type RunOptions } from "../cli-agent-options.js";
+import { AdapterRegistry } from "../llm/adapter/adapterRegistry.js";
+import { LlmRuntime } from "../llm/adapter/llmRuntime.js";
+import { LocalCredentialsService } from "../credentials/localCredentialsService.js";
+import { stubProviderTransport, STUB_PROVIDER_MODEL } from "../agent/stubProvider.js";
+import { getMode } from "../mode/mode.js";
 import { randomUUID } from "node:crypto";
 import type { Command } from "commander";
 import { getPublicKeyHistory } from "../crypto/keys.js";
@@ -35,12 +42,20 @@ import { startWireListener, wireSocketPath } from "./wireListener.js";
 export function registerWireCommands(program: Command): void {
   program
     .command("wire")
-    .description("Serve the NDJSON JSON-RPC wire on a unix socket (accepts work; does not run it)")
+    .description("Serve the NDJSON JSON-RPC wire; optionally execute accepted work through an owner-configured native route")
     .option("--socket <path>", "Bind here instead of .amc/wire/wire.sock")
     .option("--max-connections <n>", "Concurrent peers allowed")
     .option("--idle-timeout <ms>", "Close a connection idle for this long")
+    .option("--execute-accepted", "Owner opt-in: consume new accepted work serially; refuse overflow, with no hidden queue")
+    .option("--provider <id>", "Reviewed native provider for accepted work, or stub for a recording demonstration")
+    .option("--model <model>", "Model for the reviewed execution route")
+    .option("--base-url <origin>", "Operator-selected provider origin")
+    .option("--credential <ref>", "Credential reference for the reviewed route")
+    .option("--max-steps <n>", "Native step ceiling for accepted work", "8")
+    .option("--max-tokens <n>", "Per-request output token ceiling", "1024")
     .option("--json", "Print the startup facts as JSON")
-    .action(async (opts: {
+    .action(async (opts: RunOptions & {
+      executeAccepted?: boolean;
       socket?: string;
       maxConnections?: string;
       idleTimeout?: string;
@@ -50,6 +65,31 @@ export function registerWireCommands(program: Command): void {
       const idleTimeoutMs = integerFlag("--idle-timeout", opts.idleTimeout);
 
       const workspace = process.cwd();
+      let credentials: LocalCredentialsService | undefined;
+      let execution: WireWorkExecution | undefined;
+      if (opts.executeAccepted === true) {
+        if (getMode(workspace) !== "owner") throw new Error("Wire work execution requires owner mode.");
+        if (opts.provider === undefined) throw new Error("--execute-accepted requires an operator-selected --provider.");
+        const route = nativeRouteFor(opts.provider, opts, opts.model);
+        const registry = new AdapterRegistry(); registry.register(route);
+        const maxSteps = integerFlag("--max-steps", opts.maxSteps) ?? 8;
+        if (maxSteps > 1024) throw new Error("--max-steps must be an integer from 1 through 1024.");
+        const maxTokens = integerFlag("--max-tokens", opts.maxTokens) ?? 1024;
+        credentials = new LocalCredentialsService({ projectDir: workspace, includeDotenv: false, watch: false });
+        const ownerCredentials = credentials;
+        execution = { route: { providerId: route.providerId, model: route.models?.[0] ?? STUB_PROVIDER_MODEL,
+          params: paramsFor(route.providerId, maxTokens, opts) },
+          makeLlm: session => new LlmRuntime({ session, registry, credentials: ownerCredentials,
+            ...(route.providerId === "stub" ? { transport: stubProviderTransport() } : {}) }),
+          tools: "none", maxSteps, systemPrompt: "Complete the accepted wire task within this native session's governance.",
+          harnessVersion: amcVersion,
+          compositionDigest: sha256Hex(JSON.stringify({ surface: "wire-native", provider: route.providerId, model: route.models, tools: "none", maxSteps, maxTokens })),
+          policyDigest: sha256Hex(JSON.stringify({ tools: "none" })) };
+      } else if (opts.provider !== undefined || opts.model !== undefined || opts.baseUrl !== undefined || opts.credential !== undefined) {
+        throw new Error("Wire execution route options require --execute-accepted.");
+      }
+      const controller = new AbortController();
+      const operations = new Set<Promise<unknown>>();
       const ledger = openLedger(workspace);
       const intakeSessionId = randomUUID();
 
@@ -82,6 +122,15 @@ export function registerWireCommands(program: Command): void {
         ledger,
         intakeSessionId,
         monitorPublicKeys: getPublicKeyHistory(workspace, "monitor"),
+        ...(execution === undefined ? {} : { onAccepted: (accepted, leaseToken) => {
+          const operation = consumeAcceptedWork({ workspace, ledger, intakeSessionId, receipt: accepted.receipt, leaseToken,
+            monitorPublicKeys: getPublicKeyHistory(workspace, "monitor"), execution, signal: controller.signal });
+          operations.add(operation);
+          void operation.then(result => {
+            if (!result.ok) console.error(`wire work ${accepted.workSessionId}: ${result.reason}`);
+          }, () => console.error(`wire work ${accepted.workSessionId}: consumer settlement unavailable; inspect its claim`))
+            .finally(() => operations.delete(operation));
+        } }),
         ...(opts.socket === undefined ? {} : { socketPath: opts.socket }),
         ...(maxConnections === undefined ? {} : { maxConnections }),
         ...(idleTimeoutMs === undefined ? {} : { idleTimeoutMs })
@@ -92,13 +141,20 @@ export function registerWireCommands(program: Command): void {
         intakeSessionId,
         defaultSocketPath: wireSocketPath(workspace),
         methods: ["work/accept", "work/describe"],
+        execution: execution === undefined ? "unconfigured" : { providerId: execution.route.providerId, model: execution.route.model, tools: "none", activeCap: 1 },
         requiredScope: "wire:submit"
       };
       console.log(opts.json ? JSON.stringify(facts, null, 2) : startupBanner(facts));
 
+      let stopping = false;
       for (const signal of ["SIGINT", "SIGTERM"] as const) {
         process.on(signal, () => {
-          void listener.close().then(() => {
+          if (stopping) return;
+          stopping = true;
+          controller.abort();
+          void listener.close().then(async () => {
+            await Promise.allSettled([...operations]);
+            await credentials?.close();
             // `seal` runs from the exit handler, so shutdown has one path
             // whether it was reached by a signal or by falling off the end.
             process.exit(0);

@@ -41,7 +41,7 @@ import {
 } from "./agent/stubProvider.js";
 import type { LoopNotification } from "./agent/loopTypes.js";
 import { echoToolSeam } from "./agent/echoTool.js";
-import { VALIDATION_REPAIR_HELP, WEB_SEARCH_SEARXNG_HELP, resolveBreadthRun, withBreadthRunOptions } from "./cli/agentLoopBreadthOptions.js";
+import { MAX_ACTIVE_CHILDREN_HELP, NO_DELEGATE_STOP_HELP, VALIDATION_REPAIR_HELP, WEB_SEARCH_SEARXNG_HELP, resolveBreadthRun, withBreadthRunOptions } from "./cli/agentLoopBreadthOptions.js";
 import { agentToolset, type AgentToolset } from "./agent/agentToolset.js";
 import { runLease } from "./leases/runLease.js";
 import { selectSupportedNativeTools } from "./agent/nativeToolCapabilities.js";
@@ -76,7 +76,7 @@ import { loadNativeAudioManifest } from "./attachments/nativeAudioFiles.js";
 import type { NativeAudioPart } from "./attachments/nativeAudioInput.js";
 
 import {
-  approvalGateFor, collectOption, collectDelegateStop, compactionOption, resetDelegateStops, integerOption, paramsFor, piAiRouteSelection, renderNotification, routeFor,
+  activeChildLimitOption, approvalGateFor, collectOption, collectDelegateStop, compactionOption, resetDelegateStops, integerOption, paramsFor, piAiRouteSelection, renderNotification, routeFor,
   type AgentLoopCliIo, type RunOptions
 } from "./cli-agent-options.js";
 export type { AgentLoopCliIo, RunOptions } from "./cli-agent-options.js";
@@ -142,10 +142,9 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--persona <text>", "explicit native persona override")
     .option("--delegate", "enable governed in-process child agents; requires workspace tools")
     .option("--no-delegate", "disable child delegation even when a signed preset enables it")
-    .option("--max-delegation-depth <n>", "maximum native child depth")
+    .option("--max-delegation-depth <n>", "maximum native child depth").option("--max-active-children <n>", MAX_ACTIVE_CHILDREN_HELP)
     .option("--delegate-scope <classes>", "explicit comma-separated child action classes")
-    .option("--delegate-stop <condition>", "repeatable child stop: max-turns:N (initial executor turn plus continuations) or timeout-ms:N (whole child lifetime including idle)", collectDelegateStop)
-    .option("--no-delegate-stop", "explicitly clear extra child stops from a preset; budgets, depth and approvals still apply", resetDelegateStops)
+    .option("--delegate-stop <condition>", "repeatable child stop: max-turns:N (initial executor turn plus continuations) or timeout-ms:N (whole child lifetime including idle)", collectDelegateStop).option("--no-delegate-stop", NO_DELEGATE_STOP_HELP, resetDelegateStops)
     .option("--provider <id>", "explicit provider; asks in a terminal when omitted")
     .option("--model <model>", "your model ID; asks for a real provider when omitted")
     .option("--base-url <origin>", "explicit HTTP(S) provider origin; retained for every turn and resume command")
@@ -215,7 +214,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       + "Requires \"delegate\" in the signed tool allowlist."
     )
     .option("--no-delegate", "disable child delegation even when a signed preset enables it")
-    .option("--max-delegation-depth <n>", "how deep a delegation chain may go (default 3)")
+    .option("--max-delegation-depth <n>", "how deep a delegation chain may go (default 3)").option("--max-active-children <n>", MAX_ACTIVE_CHILDREN_HELP)
     .option(
       "--delegate-provider <id>",
       "who executes a delegation: \"in-process\" (default) or a foreign CLI such as "
@@ -223,8 +222,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       + "requires AMC Studio to be running."
     )
     .option("--delegate-timeout <ms>", "how long a foreign delegate may run before it is killed")
-    .option("--delegate-stop <condition>", "repeatable child stop: max-turns:N (initial executor turn plus continuations) or timeout-ms:N (whole child lifetime including idle); applies to native and foreign children", collectDelegateStop)
-    .option("--no-delegate-stop", "explicitly clear extra child stops from a preset; budgets, depth and approvals still apply", resetDelegateStops)
+    .option("--delegate-stop <condition>", "repeatable child stop: max-turns:N (initial executor turn plus continuations) or timeout-ms:N (whole child lifetime including idle); applies to native and foreign children", collectDelegateStop).option("--no-delegate-stop", NO_DELEGATE_STOP_HELP, resetDelegateStops)
     .option(
       "--preset <id>",
       "compose this run from a signed preset in .amc/agents.yaml. Explicit flags override it."
@@ -450,6 +448,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       const wantsDelegation = opts.delegate === true;
       const breadth = resolveBreadthRun(io, opts, { toolMode, wantsDelegation });
       if (breadth === null) return;
+      const maxActiveChildren = activeChildLimitOption(io, opts.maxActiveChildren, wantsDelegation && toolMode === "workspace"); if (maxActiveChildren === null) return;
       if (!wantsDelegation && opts.delegateStop !== undefined) {
         io.error(chalk.red("--delegate-stop and --no-delegate-stop require --delegate or delegate.enabled in the signed preset."));
         io.fail(); return;
@@ -594,7 +593,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           // the operator's value and used the default would say so here.
           //
           progress(chalk.dim(
-            `delegation is offered, chains bounded at depth ${maxDelegationDepth}`
+            `delegation is offered, chains bounded at depth ${maxDelegationDepth}; root-wide active children capped at ${maxActiveChildren}`
             + (foreignRunner === null ? "; native children inherit approval, cancellation, limits and narrowed scopes" : "")
           ));
           // Named either way. The unscoped case is the one an operator is most
@@ -721,6 +720,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
                 delegation: delegationTurnOptions({
                   grant: grantDelegation,
                   maxDepth: maxDelegationDepth,
+                  ...(opts.maxActiveChildren === undefined ? {} : { maxActiveChildren }),
                   scope: delegateScope,
                   ...(opts.delegateStop === undefined ? {} : { stopConditions: delegateStops.conditions }),
                   runner: foreignRunner

@@ -16,6 +16,7 @@ import type { AgentStatus, CompactionConfig } from "./loopTypes.js";
 import { resolveCompactionConfig } from "./compaction/promptPressure.js";
 import { readAgentRunSummary } from "./runReport.js";
 import type { LoopLlm, LoopRoute } from "./stepRunner.js";
+import type { SessionOpenParams } from "../session/sessionApiTypes.js";
 import type { TurnCancelCause, TurnEndReason } from "../session/sessionTypes.js";
 import type { EvidenceEvent } from "../types.js";
 import { SessionService } from "../session/sessionService.js";
@@ -66,6 +67,7 @@ export interface AgentSessionInit {
   readonly workspace: string;
   /** Minted when absent, so a caller that has no id of its own need not invent one. */
   readonly sessionId?: string;
+  readonly acceptedWork?: SessionOpenParams["acceptedWork"];
   readonly agentId: string;
   readonly makeLlm: (session: SessionService) => LoopLlm;
   readonly route: LoopRoute;
@@ -256,7 +258,8 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
       composed = composeNativeAgent({
         session,
         ...(claimant === undefined ? { open: { sessionId, agentId: init.agentId, harnessVersion: init.harnessVersion,
-          compositionDigest: init.compositionDigest, policyDigest: init.policyDigest } } : {}),
+          compositionDigest: init.compositionDigest, policyDigest: init.policyDigest,
+          ...(init.acceptedWork === undefined ? {} : { acceptedWork: init.acceptedWork }) } } : {}),
         prompt: { profile },
         makeLlm: init.makeLlm,
         route: init.route,
