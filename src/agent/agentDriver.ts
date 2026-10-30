@@ -72,7 +72,7 @@ import { runStep, type LoopLlm, type LoopRoute, type StepRunnerInit } from "./st
 import { EMPTY_TOOL_SEAM, type AgentToolSeam } from "./toolSeam.js";
 import { freezeNativeValidationPlan, NativeValidationTurn, type NativeValidationPlan } from "./nativeValidation.js";
 import { AutoCompactor } from "./compaction/autoCompact.js";
-import { resolveCompactionConfig } from "./compaction/promptPressure.js";
+import { resolveRouteCompaction } from "./compaction/promptPressure.js";
 
 export interface AgentDriverInit {
   readonly session: SessionService;
@@ -120,7 +120,7 @@ export class AgentDriver {
 
   private readonly stepInit: StepRunnerInit;
   private readonly validation: NativeValidationPlan | undefined;
-  /** Null unless the operator declared a context window. */
+  /** Null when neither reviewed route metadata nor explicit settings supply a window. */
   private readonly compactor: AutoCompactor | null;
 
   private phase: Phase = { kind: "idle", lastTurn: 0 };
@@ -137,8 +137,9 @@ export class AgentDriver {
     // Wrapped once, here: every notify site below is an observer that cannot affect the evidence (DXA-16).
     this.hooks = { preStep: (input, next) => hooks.preStep(input, next), turnStopping: (input) => hooks.turnStopping(input),
       notify: isolatedNotify((notification) => hooks.notify(notification)) };
-    const compaction = init.config?.compaction === undefined ? undefined : resolveCompactionConfig(init.config.compaction);
-    this.config = { ...DEFAULT_AGENT_LOOP_CONFIG, ...init.config, ...(compaction === undefined ? {} : { compaction }) };
+    const selected = init.route.pinned ?? init.llm.pin?.(init.route);
+    const compaction = resolveRouteCompaction(init.config?.compaction, init.route, selected?.modelMetadata);
+    this.config = { ...DEFAULT_AGENT_LOOP_CONFIG, ...init.config, compaction };
     this.inbox = new LoopInbox(init.session, (notification) => {
       this.hooks.notify(notification);
     });
@@ -146,7 +147,7 @@ export class AgentDriver {
       session: init.session,
       llm: init.llm,
       tools: init.tools ?? EMPTY_TOOL_SEAM,
-      route: init.route,
+      route: selected === undefined ? init.route : { ...init.route, pinned: selected },
       systemPromptEventId: init.systemPromptEventId,
       config: this.config,
       retryRuntime: init.retryRuntime ?? DEFAULT_RETRY_RUNTIME,
@@ -160,8 +161,8 @@ export class AgentDriver {
         this.hooks.notify(notification);
       }
     };
-    const window = compaction?.contextWindowTokens ?? null;
-    this.compactor = compaction === undefined || window === null ? null : new AutoCompactor({ ...compaction, contextWindowTokens: window }, this.stepInit);
+    const window = compaction.contextWindowTokens;
+    this.compactor = window === null ? null : new AutoCompactor({ ...compaction, contextWindowTokens: window }, this.stepInit);
   }
 
   get status(): AgentStatus {

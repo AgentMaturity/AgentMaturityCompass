@@ -238,9 +238,10 @@ export function integerOption(io: AgentLoopCliIo, flag: string, raw: string | un
   return value;
 }
 
-/** Automatic compaction from the run flags; undefined when off, null after a reported error. */
-export function compactionOption(io: AgentLoopCliIo, options: Pick<RunOptions, "contextWindow" | "compactThreshold" | "autoSummary">): CompactionConfig | undefined | null {
-  try { return compactionFromFlags(options); }
+/** Explicit compaction settings; undefined leaves reviewed route defaults to the driver, null reports an error. */
+export function compactionOption(io: AgentLoopCliIo, options: Pick<RunOptions, "contextWindow" | "compactThreshold" | "autoSummary">,
+  preset?: Partial<CompactionConfig>, route?: { readonly providerId: string; readonly model: string }): Partial<CompactionConfig> | undefined | null {
+  try { return compactionFromFlags(options, preset, route); }
   catch (error) {
     io.error(chalk.red(error instanceof Error ? error.message : "Automatic compaction options were refused."));
     io.fail();
