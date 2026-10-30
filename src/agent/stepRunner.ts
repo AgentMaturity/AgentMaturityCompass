@@ -33,6 +33,7 @@
  * here into a number no single request corresponds to.
  */
 import type { LlmCallSpec, PreparedCall } from "../llm/adapter/llmRuntime.js";
+import type { PinnedRoute } from "../llm/adapter/adapterRegistry.js";
 import { droppedBlocks, type StreamAssembly } from "../llm/blockAssembler.js";
 import type { StreamTokenUsage, ToolUseContentBlock } from "../llm/streamChunk.js";
 import type { SessionService } from "../session/sessionService.js";
@@ -59,11 +60,13 @@ import type { AgentToolSeam } from "./toolSeam.js";
 export interface LoopLlm {
   prepare(spec: LlmCallSpec): PreparedCall;
   /** Resolve a route without logging anything. Where the seam offers it, composition refuses an unknown route up front. */
-  pin?(input: { readonly providerId: string; readonly model: string }): unknown;
+  pin?(input: { readonly providerId: string; readonly model: string }): PinnedRoute;
 }
 
 /** The provider route one loop instance sends on. */
 export interface LoopRoute {
+  /** Optional explicit selection; retained across all requests and retries in this loop. */
+  readonly pinned?: PinnedRoute;
   readonly providerId: string;
   readonly model: string;
   /** Provider parameters (max_tokens, temperature, …), verbatim into the body. */

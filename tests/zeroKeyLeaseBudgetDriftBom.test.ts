@@ -26,6 +26,7 @@ import { pinnedTrust, workspaceKeyTrust } from "./helpers/trustContext.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { questionBank } from "../src/diagnostic/questionBank.js";
 import { writeSealedReport } from "./helpers/sealedRun.js";
+import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 
 const roots: string[] = [];
 
@@ -34,6 +35,7 @@ function newWorkspace(): string {
   roots.push(dir);
   process.env.AMC_VAULT_PASSPHRASE = "zero-key-test-passphrase";
   initWorkspace({ workspacePath: dir, trustBoundaryMode: "isolated" });
+  writeRuntimeFirewallPolicy({ workspace: dir, mode: "observe" }); // AXR-01: ToolHub and hook control apply the runtime firewall as the native pipeline does; unsigned, it blocks every call.
   initBudgets(dir, "default");
   return dir;
 }

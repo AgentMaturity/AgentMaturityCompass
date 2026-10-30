@@ -168,6 +168,7 @@ export {
   type LlmRouteConfig,
   LlmRouteError,
   type PinnedRoute,
+  type VirtualRouteSelection,
   type ProviderDescription
 } from "./adapter/adapterRegistry.js";
 export { classifyResponseFailure } from "./adapter/responseFailure.js";
@@ -222,3 +223,13 @@ export {
   LlmCapabilityError, assertRequestCapabilities, assertRequiredCapabilities, snapshotCapabilities,
   type ProviderCapability, type CapabilitySupport, type ProviderCapabilities
 } from "./adapter/providerCapabilities.js";
+
+// Reviewed catalog and operator-invoked advisory enumeration.
+export {
+  catalogProtocolForEncoder, createModelMetadataSnapshot, createReviewedModelMetadataSnapshot,
+  listModelMetadata, parseModelMetadataSnapshot, type ModelMetadataSnapshot
+} from "./modelCatalog.js";
+export {
+  enumerateRemoteModels, parseModelDiscoveryResult, pinDiscoveredModel,
+  type DiscoveredModelReview, type ModelDiscoveryResult, type ModelEnumerationInput
+} from "./modelEnumeration.js";

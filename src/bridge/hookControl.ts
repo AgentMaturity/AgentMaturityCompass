@@ -8,6 +8,7 @@ import {
   verifyApprovalPolicySignature,
 } from "../approvals/approvalPolicyEngine.js";
 import { runGovernorCheck } from "../governor/governorCli.js";
+import { governedCallDenial } from "../tools/guards/governedCallDecision.js";
 import {
   openLedger,
   hashBinaryOrPath,
@@ -444,19 +445,15 @@ function evaluateCanonicalRequest(input: {
       reasonCode: "TOOL_ARGUMENTS_REJECTED",
     };
   }
-  const argsValidation = validateToolRequest({
-    workspace: input.workspace,
-    tool,
-    args: input.request.args,
-  });
-  if (!argsValidation.ok) {
-    return {
-      request: input.request,
-      actionClass: tool.actionClass,
-      outcome: "steer",
-      reason: `Signed ToolHub policy rejected the current ${tool.name} arguments.`,
-      reasonCode: "TOOL_ARGUMENTS_REJECTED",
-    };
+  if (!validateToolRequest({ workspace: input.workspace, tool, args: input.request.args }).ok) {
+    return { request: input.request, actionClass: tool.actionClass, outcome: "steer", reasonCode: "TOOL_ARGUMENTS_REJECTED",
+      reason: `Signed ToolHub policy rejected the current ${tool.name} arguments.` };
+  }
+  // AXR-01: the checks every governed plane shares, so this call is denied here wherever the native or ToolHub plane denies it.
+  const governed = governedCallDenial(input.workspace, { name: tool.name, agentId: input.agentId, actionClass: tool.actionClass, arguments: input.request.args, requestedMode: "EXECUTE" });
+  if (governed !== null) {
+    return { request: input.request, actionClass: tool.actionClass, outcome: "deny", reasonCode: "ACTION_POLICY_DENIED",
+      reason: `Signed AMC policy denied this call (${governed.label}): ${governed.reason}` };
   }
 
   const governor = runGovernorCheck({
@@ -742,6 +739,7 @@ function recoverControlResult(input: {
   sessionId: string;
   request: NormalizedProviderToolRequest;
   agentId: string;
+  blobKeyOptional?: boolean;
 }): ProviderHookControlResult | null {
   const existing = input.ledger.db.prepare(
     "SELECT id, session_id, event_type, meta_json FROM evidence_events WHERE id = ? LIMIT 1",
@@ -794,6 +792,7 @@ function recoverControlResult(input: {
     eventId: input.eventId,
     requireReceipt: true,
     requireSealedSession: true,
+    blobKeyOptional: input.blobKeyOptional === true,
   });
   const receipt = verifyReceipt(stored.receipt, getPurposeKeyHistory(input.ledger.workspace, "receipt"));
   const receiptKind = input.request.call ? "action_state" : "guard_check";
@@ -864,6 +863,8 @@ export function verifyProviderHookControlResult(input: {
   provider: HookProvider;
   rawInput: string;
   result: unknown;
+  /** WP35c: only AMC's hook forwarder passes this; a vault-held blob key it cannot reach is not evaluated (verifyEvidencePayload). */
+  blobKeyOptional?: boolean;
 }): { ok: boolean; error: string | null } {
   const parsed = providerHookControlResultSchema.safeParse(input.result);
   if (!parsed.success || parsed.data.provider !== input.provider) {
@@ -889,13 +890,8 @@ export function verifyProviderHookControlResult(input: {
     }
 
     ledger = openLedger(input.workspace);
-    const recovered = recoverControlResult({
-      ledger,
-      eventId,
-      sessionId,
-      request,
-      agentId: input.authenticatedAgentId,
-    });
+    const recovered = recoverControlResult({ ledger, eventId, sessionId, request, agentId: input.authenticatedAgentId,
+      blobKeyOptional: input.blobKeyOptional === true });
     if (!recovered) {
       return { ok: false, error: "hook control response has no matching sealed ledger event" };
     }

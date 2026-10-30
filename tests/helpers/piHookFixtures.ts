@@ -7,6 +7,7 @@ import { initApprovalPolicy } from "../../src/approvals/approvalPolicyEngine.js"
 import { questionBank } from "../../src/diagnostic/questionBank.js";
 import { getAgentPaths } from "../../src/fleet/paths.js";
 import { defaultActionPolicy, initActionPolicy } from "../../src/governor/actionPolicyEngine.js";
+import { writeRuntimeFirewallPolicy } from "../../src/runtime/firewall.js";
 import type { DiagnosticReport } from "../../src/types.js";
 import { initWorkspace } from "../../src/workspace.js";
 
@@ -34,6 +35,8 @@ export function controlledWorkspace(agentId: string): string {
   policy.riskTierDefaults.low.requireSandboxForExecute = false;
   policy.riskTierDefaults.medium.requireSandboxForExecute = false;
   initActionPolicy(workspace, policy);
+  // AXR-01: hook control applies the runtime firewall as the native pipeline does; without a signed policy it blocks every call.
+  writeRuntimeFirewallPolicy({ workspace, mode: "observe" });
   mkdirSync(join(workspace, "workspace"), { recursive: true });
   writeFileSync(join(workspace, "workspace", "public.txt"), "public fixture");
   return workspace;
