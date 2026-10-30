@@ -31,6 +31,8 @@ import type {
 // ---------------------------------------------------------------------------
 
 export interface ConfigRunOptions {
+  /** Optional user config overlay; false disables home discovery. */
+  userConfig?: string | false;
   /** Explicit config file path */
   configPath?: string;
   /** Workspace root */
@@ -71,6 +73,7 @@ export interface AgentResult {
 }
 
 export interface ConfigRunResult {
+  provenance: import("./configOverlays.js").ConfigProvenance;
   configPath: string;
   timestamp: number;
   agents: AgentResult[];
@@ -87,7 +90,13 @@ export async function runFromConfig(options: ConfigRunOptions): Promise<ConfigRu
   const ws = options.workspace;
 
   // Step 1: Load config
-  const loadResult = loadDeclarativeConfig(options.configPath, ws);
+  const overrides: Record<string, unknown> = {};
+  if (options.window !== undefined) overrides.diagnostic = { window: options.window };
+  if (options.format !== undefined || options.outputPath !== undefined) overrides.output = {
+    ...(options.format === undefined ? {} : { formats: [options.format] }),
+    ...(options.outputPath === undefined ? {} : { outputDir: options.outputPath }),
+  };
+  const loadResult = loadDeclarativeConfig(options.configPath, ws, { userConfig: options.userConfig, overrides });
   const { config, configPath, warnings } = loadResult;
 
   if (options.verbose) {
@@ -129,6 +138,7 @@ export async function runFromConfig(options: ConfigRunOptions): Promise<ConfigRu
 
     return {
       configPath,
+      provenance: loadResult.provenance,
       timestamp: Date.now(),
       agents: agents.map((a) => ({
         agentId: a.id,
@@ -204,6 +214,7 @@ export async function runFromConfig(options: ConfigRunOptions): Promise<ConfigRu
 
   return {
     configPath,
+    provenance: loadResult.provenance,
     timestamp: Date.now(),
     agents: results,
     overallPassed,

@@ -175,13 +175,17 @@ export function configInit(options: ConfigInitOptions): void {
 // ---------------------------------------------------------------------------
 
 export interface ConfigValidateOptions {
+  json?: boolean;
   workspace: string;
   config?: string;
+  userConfig?: string | false;
 }
 
 export function configValidate(options: ConfigValidateOptions): void {
   try {
-    const result = loadDeclarativeConfig(options.config, options.workspace);
+    const result = loadDeclarativeConfig(options.config, options.workspace, { userConfig: options.userConfig });
+
+    if (options.json) { console.log(JSON.stringify(result, null, 2)); return; }
 
     console.log(chalk.green("✓ Config is valid"));
     console.log();
@@ -208,12 +212,13 @@ export function configValidate(options: ConfigValidateOptions): void {
 export interface ConfigShowOptions {
   workspace: string;
   config?: string;
+  userConfig?: string | false;
   format: "yaml" | "json";
 }
 
 export function configShow(options: ConfigShowOptions): void {
   try {
-    const result = loadDeclarativeConfig(options.config, options.workspace);
+    const result = loadDeclarativeConfig(options.config, options.workspace, { userConfig: options.userConfig });
     const output =
       options.format === "json"
         ? JSON.stringify(result.config, null, 2)

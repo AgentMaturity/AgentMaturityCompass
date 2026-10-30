@@ -5,12 +5,12 @@
  * Supports explicit path, workspace-relative, and cwd-relative discovery.
  */
 
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync } from "node:fs";
+import { homedir } from "node:os";
 import { resolve, join, dirname } from "node:path";
 import YAML from "yaml";
-import { ZodError } from "zod";
+import { resolveConfigOverlays, type ConfigOverlayOptions, type ConfigProvenance } from "./configOverlays.js";
 import {
-  amcDeclarativeConfigSchema,
   defaultDeclarativeConfig,
   type AMCDeclarativeConfig,
   type AMCAgent,
@@ -40,6 +40,8 @@ export function discoverConfigFile(searchDir: string): string | null {
 
   for (const dir of dirs) {
     for (const filename of CONFIG_FILENAMES) {
+      // .amc/amc.config.yaml is the separate workspace runtime policy, not an evaluation overlay.
+      if (dir !== searchDir && filename === "amc.config.yaml") continue;
       const candidate = resolve(dir, filename);
       if (existsSync(candidate)) {
         return candidate;
@@ -57,6 +59,7 @@ export interface LoadConfigResult {
   config: AMCDeclarativeConfig;
   configPath: string;
   warnings: string[];
+  provenance: ConfigProvenance;
 }
 
 /**
@@ -69,58 +72,31 @@ export interface LoadConfigResult {
 export function loadDeclarativeConfig(
   explicitPath?: string,
   workspace?: string,
+  options: ConfigOverlayOptions = {},
 ): LoadConfigResult {
-  const ws = workspace ?? process.cwd();
+  const ws = resolve(workspace ?? process.cwd());
   const warnings: string[] = [];
-
-  // Resolve config file path
-  let configPath: string;
-  if (explicitPath) {
-    configPath = resolve(ws, explicitPath);
-    if (!existsSync(configPath)) {
-      throw new Error(`Config file not found: ${configPath}`);
-    }
-  } else {
-    const discovered = discoverConfigFile(ws);
-    if (!discovered) {
-      throw new Error(
-        `No amcconfig.yaml found in ${ws} or ${join(ws, ".amc")}.\n` +
-        `Create one with: amc config init\n` +
-        `Or specify a path with: --config <path>`
-      );
-    }
-    configPath = discovered;
+  const files: Array<{ layer: "workspace" | "user" | "explicit"; path: string }> = [];
+  const discovered = discoverConfigFile(ws);
+  if (discovered) files.push({ layer: "workspace", path: discovered });
+  const user = options.userConfig === false ? null
+    : typeof options.userConfig === "string" ? resolve(ws, options.userConfig) : join(homedir(), ".amc", "amcconfig.yaml");
+  if (user && (typeof options.userConfig === "string" || existsSync(user))) files.push({ layer: "user", path: user });
+  if (explicitPath !== undefined) files.push({ layer: "explicit", path: resolve(ws, explicitPath) });
+  for (const file of files) {
+    if (!existsSync(file.path)) throw new Error(`Config file not found: ${file.path}`);
   }
-
-  // Parse YAML
-  let raw: unknown;
+  const configPath = files[files.length - 1]?.path;
+  if (!configPath) {
+    throw new Error(`No amcconfig.yaml found in ${ws} or ${join(ws, ".amc")}.\nCreate one with: amc config init\nOr specify a path with: --config <path>`);
+  }
+  let resolved: ReturnType<typeof resolveConfigOverlays>;
   try {
-    const content = readFileSync(configPath, "utf8");
-    raw = YAML.parse(content);
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    throw new Error(`Failed to parse ${configPath}: ${msg}`);
+    resolved = resolveConfigOverlays(ws, files, options.overrides);
+  } catch (error) {
+    throw new Error(`Invalid amcconfig.yaml (${configPath}): ${error instanceof Error ? error.message : String(error)}`);
   }
-
-  if (raw === null || raw === undefined) {
-    throw new Error(`Config file is empty: ${configPath}`);
-  }
-
-  // Validate with Zod
-  let config: AMCDeclarativeConfig;
-  try {
-    config = amcDeclarativeConfigSchema.parse(raw);
-  } catch (err) {
-    if (err instanceof ZodError) {
-      const issues = err.issues.map(
-        (i) => `  - ${i.path.join(".")}: ${i.message}`
-      );
-      throw new Error(
-        `Invalid amcconfig.yaml (${configPath}):\n${issues.join("\n")}`
-      );
-    }
-    throw err;
-  }
+  const { config, provenance } = resolved;
 
   // Post-validation warnings
   if (config.agents.length === 0) {
@@ -149,7 +125,7 @@ export function loadDeclarativeConfig(
     }
   }
 
-  return { config, configPath, warnings };
+  return { config, configPath, warnings, provenance };
 }
 
 // ---------------------------------------------------------------------------
