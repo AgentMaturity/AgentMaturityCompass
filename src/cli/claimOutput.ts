@@ -210,8 +210,17 @@ export function runClaimEnvelope(report: DiagnosticReport, workspace = process.c
  */
 export function latestRunForDisplay(workspace: string, agentId: string): DiagnosticReport | null {
   const latest = latestDisplayRun(workspace, agentId);
-  if (latest && !latest.verified) {
-    console.error(`UNVERIFIED: diagnostic run ${latest.report.runId} is not sealed by this workspace's run key; shown for display only, never used by a gate.`);
-  }
+  if (latest && !latest.verified) warnUnverifiedDisplayRun(latest.report.runId);
   return latest?.report ?? null;
+}
+
+/** A run named by id (`--run`, `--previous-run`) for a display-only command, labelled like `latestRunForDisplay`. */
+export function namedRunForDisplay(workspace: string, runId: string, agentId: string): DiagnosticReport {
+  const report = loadRunReport(workspace, runId, agentId);
+  if (!sealedRunReportVerifies(workspace, report as unknown as Record<string, unknown>)) warnUnverifiedDisplayRun(report.runId);
+  return report;
+}
+
+function warnUnverifiedDisplayRun(runId: string): void {
+  console.error(`UNVERIFIED: diagnostic run ${runId} is not sealed by this workspace's run key; shown for display only, never used by a gate.`);
 }

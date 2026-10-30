@@ -1,13 +1,14 @@
 import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { agentToolset } from "../src/agent/agentToolset.js";
 import { loadAuditMapActive } from "../src/audit/auditMapStore.js";
 import { loadAuditPolicy } from "../src/audit/auditPolicyStore.js";
 import { collectAuditBinderData } from "../src/audit/binderCollector.js";
 import { initBudgets } from "../src/budgets/budgets.js";
 import { generateTrustCertificate } from "../src/cert/trustCertificate.js";
+import { namedRunForDisplay } from "../src/cli/claimOutput.js";
 import { runDiagnostic } from "../src/diagnostic/runner.js";
 import { getAgentPaths } from "../src/fleet/paths.js";
 import { latestRunForAgent, latestTrustedRun, summarizeGovernorInput } from "../src/governor/actionPolicyEngine.js";
@@ -157,5 +158,24 @@ describe("governor run trust", () => {
     const report = await runDiagnostic({ workspace: dir, agentId: "default", window: "14d", targetName: "default", claimMode: "auto" });
     expect(latestTrustedRun(dir, "default")).toEqual({ run: report, refusal: null });
     expect(summarizeGovernorInput(dir, "default").run?.runId).toBe(report.runId);
+  });
+});
+
+describe("display runs named by id (operator-dashboard --run / --previous-run)", () => {
+  it("an unsealed named run is shown but labelled UNVERIFIED; a sealed one is not", () => {
+    const dir = workspace();
+    installObservedRun(dir, "default");
+    const planted = { ...observedRunReport("default"), runId: "run_planted", runSealSig: "fixture", reportJsonSha256: "fixture" };
+    writeFileSync(runPath(dir, "default", "run_planted"), JSON.stringify(planted));
+    const stderr = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    try {
+      expect(namedRunForDisplay(dir, "run_planted", "default").runId).toBe("run_planted");
+      expect(stderr.mock.calls.flat().join("\n")).toMatch(/UNVERIFIED: diagnostic run run_planted .*display only/);
+      stderr.mockClear();
+      expect(namedRunForDisplay(dir, "run_action_policy_fixture", "default").runId).toBe("run_action_policy_fixture");
+      expect(stderr).not.toHaveBeenCalled();
+    } finally {
+      stderr.mockRestore();
+    }
   });
 });
