@@ -110,7 +110,8 @@ export function registerSessionCommands(program: Command): void {
           };
         });
         if (opts.json) {
-          console.log(JSON.stringify({ sessionId: id, spine, history, usage, diagnostics }, null, 2));
+          const { sessionTokenCounts } = await import("./session/sessionTokenCounts.js");
+          console.log(JSON.stringify({ sessionId: id, spine, history, usage, tokenCounts: sessionTokenCounts(events), diagnostics }, null, 2));
           return;
         }
         console.log(chalk.bold(`Session ${id}`));

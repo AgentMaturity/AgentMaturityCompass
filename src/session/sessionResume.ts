@@ -35,6 +35,8 @@ import { openSessionEventStore } from "../persistence/openSessionEventStore.js";
 import type { SessionEventStore } from "../persistence/sessionEventStore.js";
 import { verifyLedgerIntegrity, verifyNativeSessionContinuation } from "../ledger/ledgerVerification.js";
 import type { EvidenceEvent, RuntimeName } from "../types.js";
+import { settleInterruptedCompactions } from "./compactionRecovery.js";
+import { FORK_TOKEN_COUNTS_AUDIT, sessionTokenCounts } from "./sessionTokenCounts.js";
 import { recoverSession, type RecoveryClaimant, type RecoveryReport } from "./sessionRecovery.js";
 import { SessionService } from "./sessionService.js";
 import type { SessionLineage } from "./sessionApiTypes.js";
@@ -93,6 +95,8 @@ export interface ResumeReport {
   readonly recovery: RecoveryReport | null;
   /** How each interrupted call was settled after resume (P2-12), when the caller ran `reconcileInterruptedCalls`. */
   readonly interruptedCalls?: readonly InterruptedCallOutcome[];
+  /** Automatic compactions a crash or failure interrupted, settled on this resume (PI-025); absent when none. */
+  readonly interruptedCompactions?: number;
 }
 
 export interface ForkSessionParams extends OpenIdentity {
@@ -300,6 +304,7 @@ export function resumeSession(params: ResumeSessionParams): { service: SessionSe
         retainedOutput: "not-decrypted-by-recovery" };
       service.recordProjectedEvidence({ eventType: "audit", payload: JSON.stringify(boundary), meta: boundary });
     }
+    const interruptedCompactions = settleInterruptedCompactions(service);
     return {
       service,
       report: {
@@ -307,7 +312,8 @@ export function resumeSession(params: ResumeSessionParams): { service: SessionSe
         sessionId: params.sessionId,
         observedHeadEventId: head.id,
         resumedAfterSeq: extractEnvelope(head.meta_json)!.seq,
-        recovery
+        recovery,
+        ...(interruptedCompactions === 0 ? {} : { interruptedCompactions })
       }
     };
   } catch (error) {
@@ -339,7 +345,9 @@ export function forkSession(params: ForkSessionParams): { service: SessionServic
         const last = selected.rows.at(-1)!;
         const parent: SessionLineage = { sessionId: params.parentSessionId, finalEventHash: last.event_hash,
           seq: extractEnvelope(last.meta_json)!.seq, ...(selected.forkTurn === undefined ? {} : { forkTurn: selected.forkTurn }) };
-        return { parent, parts };
+        // PXA-12: the parent's measured counts at the fork point travel with the inherited conversation.
+        const tokenCounts = params.inheritConversation === false ? null : sessionTokenCounts(selected.rows);
+        return { parent, parts, tokenCounts };
       });
     } catch (error) {
       if (error instanceof SessionHistoryRefused) throw new SessionResumeRefused(
@@ -353,6 +361,10 @@ export function forkSession(params: ForkSessionParams): { service: SessionServic
     service.open({ runtime: params.runtime, agentId: params.agentId, harnessVersion: params.harnessVersion,
       compositionDigest: params.compositionDigest, policyDigest: params.policyDigest, parent: prepared.parent });
     copyForkConversation(redactingSessionFor(service), prepared.parts);
+    if (prepared.tokenCounts !== null) {
+      const inherited = { auditType: FORK_TOKEN_COUNTS_AUDIT, version: 1, parentSessionId: prepared.parent.sessionId, counts: prepared.tokenCounts };
+      service.recordProjectedEvidence({ eventType: "audit", payload: JSON.stringify(inherited), meta: inherited });
+    }
     return { service, parent: prepared.parent };
   } catch (error) {
     // Retain failed child evidence without returning a partially copied context.
