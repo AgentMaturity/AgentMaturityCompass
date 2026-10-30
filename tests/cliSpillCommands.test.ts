@@ -25,6 +25,7 @@ import { encodeBlobV1, encryptBlobV1 } from "../src/storage/blobs/blobEncryptor.
 import { formatSpillLocator, type SpillRef, type SpillRefV2 } from "../src/session/spill/spillTypes.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import type { EvidenceEvent } from "../src/types.js";
+import { nativeMeta } from "./helpers/nativeEnvelope.js";
 
 // AUTHORED, NOT EXECUTED in the implementation session. These are synthetic local
 // signed-store/CLI controls, not human observations, model runs or release receipts.
@@ -69,7 +70,7 @@ function append(path: string, sessionId: string, ref?: SpillRef, eventType: Evid
   try {
     if (!store.readSessionRecord(sessionId)) store.startSession({ sessionId, runtime: "unknown", binaryPath: "synthetic-cli-spill", binarySha256: sha256Hex("fixture") });
     return store.appendSessionEvent({ sessionId, runtime: "unknown", eventType,
-      meta: { fixtureKind: "SYNTHETIC_CLI_LIFECYCLE_CONTROL", ...(ref ? { spilled: ref } : {}) } });
+      meta: nativeMeta(store.readAllEvents(), sessionId, { fixtureKind: "SYNTHETIC_CLI_LIFECYCLE_CONTROL", ...(ref ? { spilled: ref } : {}) }) });
   } finally { store.close(); }
 }
 function object(path: string, sessionId: string = randomUUID(), materialize = true) {

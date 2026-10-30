@@ -195,7 +195,8 @@ export function packedInstallCheck({ root = process.cwd(), build = true, keep = 
       copyFileSync(join(root, "examples", "sdk", "quickstart.mjs"), script);
       const r = run("SDK quickstart (installed package; stub provider, synthetic)", "node", [script, quickstart],
         { cwd: consumer, env: { ...starterEnv, AMC_EXPECTED_MONITOR_FINGERPRINT: pin } });
-      const ok = r.ok && r.stdout.includes("hello.txt written: yes") && r.stdout.includes("verification: verified, externally-anchored");
+      // WP35b/AXR-02: the default signed Action Policy runs a fresh agent's EXECUTE as SIMULATE until an observed run.
+      const ok = r.ok && r.stdout.includes("completed as SIMULATE; hello.txt written: no") && r.stdout.includes("verification: verified, externally-anchored");
       console.log(`${ok ? "ok  " : "FAIL"} installed quickstart reached a verified synthetic action in ${((Date.now() - started) / 1000).toFixed(1)}s (amc init --coding included)`);
       return ok;
     },

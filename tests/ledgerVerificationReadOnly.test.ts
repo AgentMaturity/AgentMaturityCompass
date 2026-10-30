@@ -14,6 +14,7 @@ import { jsonlEventsPath } from "../src/persistence/jsonl/jsonlEventLog.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { decryptVaultPayload, encryptVaultPayload } from "../src/vault/vaultCrypto.js";
 import { lockVault, vaultPaths } from "../src/vault/vault.js";
+import { nativeMeta } from "./helpers/nativeEnvelope.js";
 
 const roots: string[] = [];
 function temporaryWorkspace(): string {
@@ -146,7 +147,7 @@ test("JSONL-only verification checks signed rows without creating a SQLite ledge
   const store = openSessionEventStore(workspace, "jsonl");
   try {
     store.startSession({ sessionId: "jsonl-only", runtime: "amc", binaryPath: "test", binarySha256: "fixture" });
-    store.appendSessionEvent({ sessionId: "jsonl-only", runtime: "amc", eventType: "user/message", meta: {}, payload: "signed local event" });
+    store.appendSessionEvent({ sessionId: "jsonl-only", runtime: "amc", eventType: "user/message", meta: nativeMeta([], "jsonl-only", {}), payload: "signed local event" });
     store.sealSession("jsonl-only");
   } finally {
     store.close();
