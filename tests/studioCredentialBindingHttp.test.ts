@@ -1,3 +1,4 @@
+import { writeAnchoredRun } from "./helpers/sealedRun.js";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { request as httpRequest } from "node:http";
 import { tmpdir } from "node:os";
@@ -110,7 +111,7 @@ async function approvedWrite(f: Fixture, agentId: string) {
     evidenceTrustCoverage: { observed: 0, attested: 0, selfReported: 1 }
   };
   mkdirSync(runsDir, { recursive: true });
-  writeFileSync(join(runsDir, "synthetic-credential-binding-http-control.json"), JSON.stringify(report), "utf8");
+  writeAnchoredRun(f.workspace, runsDir, { ...report, runId: report.runId!, windowStartTs: report.windowStartTs!, windowEndTs: report.windowEndTs!, status: "VALID" as const });
   const grant = lease(f, agentId), relativePath = `workspace/output/${agentId}-sentinel.txt`;
   const content = `authorized fs.write for ${agentId}`;
   const response = await request(f, "/toolhub/intent", "POST", { "x-amc-lease": grant.token },
