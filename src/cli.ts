@@ -15788,9 +15788,13 @@ program
   .requiredOption("--name <name>", "experiment name")
   .requiredOption("--model <modelId>", "model ID (must be same for both)")
   .requiredOption("--baseline-file <path>", "path to baseline architecture artifact")
-  .requiredOption("--candidate-file <path>", "path to candidate architecture artifact")
+  .requiredOption("--candidate-file <path>", "path to candidate architecture artifact (signed, for --execute-trials)")
   .option("--baseline-kind <kind>", "architecture kind", "POLICY_FRAME")
   .option("--candidate-kind <kind>", "architecture kind", "POLICY_FRAME")
+  .option("--execute-trials", "execute both artifacts on the model over the casebook's held-out cases (measured, bound report)")
+  .option("--casebook <id>", "signed casebook for --execute-trials").option("--provider <id>", "trial provider for --execute-trials")
+  .option("--mode <mode>", "supervise|sandbox for --execute-trials", "supervise").option("--max-steps <n>", "steps per trial", Number)
+  .option("--agent <agentId>", "agent ID (overrides global --agent)")
   .action(async (opts: {
     name: string;
     model: string;
@@ -15798,14 +15802,32 @@ program
     candidateFile: string;
     baselineKind: string;
     candidateKind: string;
+    executeTrials?: boolean;
+    casebook?: string;
+    provider?: string;
+    mode: string;
+    maxSteps?: number;
+    agent?: string;
   }) => {
-    const { quickArchitectureComparison, simulateProbeOutcomes } = await import(
+    const { quickArchitectureComparison, simulateProbeOutcomes, parseArchitectureKind } = await import(
       "./experiments/architectureExperiment.js"
     );
-    // Architecture comparison needs a probe runner that invokes the real model.
-    // Until one is wired, refuse rather than reporting LCG-generated scores as
-    // a measured comparison.
-    if (!process.env.AMC_ARCHITECTURE_ALLOW_SIMULATED) {
+    let baselineKind: ReturnType<typeof parseArchitectureKind>, candidateKind: ReturnType<typeof parseArchitectureKind>;
+    try { baselineKind = parseArchitectureKind(opts.baselineKind); candidateKind = parseArchitectureKind(opts.candidateKind); }
+    catch (error) { console.error(chalk.red(`Architecture comparison ERROR: ${normalizeCliErrorMessage(error)}`)); process.exitCode = 1; return; }
+    if (opts.executeTrials) {
+      // GAP-WP06: the measured path runs both pinned artifacts through the experiment trial executor and gate.
+      if (!opts.casebook || !opts.provider) { console.error(chalk.red("Architecture comparison ERROR: --execute-trials requires --casebook and --provider")); process.exitCode = 1; return; }
+      const { architectureExecuteCommandCli } = await import("./experiments/architectureTrials.js");
+      await architectureExecuteCommandCli({ workspace: process.cwd(), agentId: opts.agent ?? activeAgent(program), name: opts.name, modelId: opts.model,
+        casebookId: opts.casebook, mode: opts.mode as "supervise" | "sandbox", /* the runner refuses any other mode */
+        baseline: { file: resolve(process.cwd(), opts.baselineFile), kind: baselineKind }, candidate: { file: resolve(process.cwd(), opts.candidateFile), kind: candidateKind },
+        trial: { providerId: opts.provider, ...(opts.maxSteps === undefined ? {} : { maxSteps: opts.maxSteps }) } }, normalizeCliErrorMessage);
+      return;
+    }
+    // Without --execute-trials there is no real probe runner: refuse rather than report LCG-generated scores as a
+    // measured comparison, unless the operator opts into a labelled simulation with exactly AMC_ARCHITECTURE_ALLOW_SIMULATED=1.
+    if (process.env.AMC_ARCHITECTURE_ALLOW_SIMULATED !== "1") {
       console.error(
         chalk.yellow("Architecture comparison INCONCLUSIVE — no real probe runner is configured.")
       );
@@ -15816,20 +15838,16 @@ program
       );
       console.error(
         chalk.cyan(
-          "Set AMC_ARCHITECTURE_ALLOW_SIMULATED=1 to run it explicitly as a simulation for pipeline testing."
+          "Use --execute-trials --casebook <id> --provider <id> for a measured comparison, or set AMC_ARCHITECTURE_ALLOW_SIMULATED=1 to run it explicitly as a simulation for pipeline testing."
         )
       );
       process.exitCode = 3;
       return;
     }
     const fs = await import("node:fs");
-    let baselineContent = "{}";
-    let candidateContent = "{}";
-    try { baselineContent = fs.readFileSync(opts.baselineFile, "utf-8"); } catch { /* use default */ }
-    try { candidateContent = fs.readFileSync(opts.candidateFile, "utf-8"); } catch { /* use default */ }
-    const validKinds = ["POLICY_FRAME", "PROMPT_STRUCTURE", "IDENTITY_DOC", "GUARDRAIL_SET", "TOOL_PERMISSION_SET", "CUSTOM"] as const;
-    const baselineKind = (validKinds as readonly string[]).includes(opts.baselineKind) ? opts.baselineKind as typeof validKinds[number] : "POLICY_FRAME";
-    const candidateKind = (validKinds as readonly string[]).includes(opts.candidateKind) ? opts.candidateKind as typeof validKinds[number] : "POLICY_FRAME";
+    let baselineContent: string, candidateContent: string;
+    try { baselineContent = fs.readFileSync(opts.baselineFile, "utf-8"); candidateContent = fs.readFileSync(opts.candidateFile, "utf-8"); }
+    catch (error) { console.error(chalk.red(`Architecture comparison ERROR: ${normalizeCliErrorMessage(error)}`)); process.exitCode = 1; return; }
     const { markdown } = quickArchitectureComparison({
       name: opts.name,
       modelId: opts.model,

@@ -77,6 +77,8 @@ export interface ProbeOutcome {
   /** Free-form observations */
   observations: string[];
   ts: number;
+  /** Set by {@link simulateProbeOutcomes}: an invented outcome, never a measurement. */
+  simulated?: true;
 }
 
 export interface ArchitectureExperiment {
@@ -118,6 +120,12 @@ export interface ArchitectureComparisonReport {
   reportId: string;
   experimentId: string;
   ts: number;
+  /**
+   * What the outcomes are. Never "measured": `simulated` outcomes are invented by {@link simulateProbeOutcomes}, and
+   * `unbound` outcomes came from a caller's synchronous runner with no ledger-bound evidence. A measured architecture
+   * comparison is an experiment report from `runExecutedArchitectureExperiment` (GAP-WP06), gated by `amc experiment gate`.
+   */
+  evidence: "simulated" | "unbound";
   baselineSpecId: string;
   candidateSpecId: string;
   modelId: string;
@@ -199,7 +207,7 @@ export function createArchitectureSpec(params: {
   name: string;
   kind: ArchitectureSpecKind;
   modelId: string;
-  artifactContent: string;
+  artifactContent: string | Uint8Array;
   description: string;
   metadata?: Record<string, string>;
 }): ArchitectureSpec {
@@ -386,9 +394,10 @@ export function simulateProbeOutcomes(
       latencyMs: Math.floor(100 + rng4 * 2000),
       choiceAwareness: rng1 > 0.4,
       observations: [
-        `Probe ${probe.category}/${probe.measureDimension}: score=${score.toFixed(3)}`,
+        `SIMULATED probe ${probe.category}/${probe.measureDimension}: score=${score.toFixed(3)}`,
       ],
       ts: Date.now(),
+      simulated: true,
     });
   }
 
@@ -440,14 +449,42 @@ export function runArchitectureExperiment(
 // Analysis
 // ---------------------------------------------------------------------------
 
+/** The architecture kind named by `value`; an unknown kind is refused, never coerced to a default. */
+export function parseArchitectureKind(value: string): ArchitectureSpecKind {
+  const parsed = architectureSpecSchema.shape.kind.safeParse(value);
+  if (!parsed.success) throw new Error(`unknown architecture kind '${value}'; expected ${architectureSpecSchema.shape.kind.options.join(", ")}`);
+  return parsed.data;
+}
+
+/** Exactly one well-formed outcome per probe for `spec`: a missing, extra, duplicate or out-of-range outcome is refused. */
+function assertOutcomes(experiment: ArchitectureExperiment, spec: ArchitectureSpec, outcomes: ProbeOutcome[]): void {
+  const probeIds = new Set(experiment.probes.map((probe) => probe.probeId));
+  const seen = new Set<string>();
+  const counter = (value: unknown) => Number.isSafeInteger(value) && (value as number) >= 0;
+  for (const outcome of outcomes) {
+    const problem = outcome.specId !== spec.specId ? `belongs to spec ${outcome.specId}`
+      : !probeIds.has(outcome.probeId) ? "names an unknown probe"
+      : seen.has(outcome.probeId) ? "is a duplicate"
+      : !(Number.isFinite(outcome.score) && outcome.score >= 0 && outcome.score <= 1) ? `has score ${outcome.score} outside 0..1`
+      : !(counter(outcome.toolCallCount) && counter(outcome.tokenCount) && Number.isFinite(outcome.latencyMs) && outcome.latencyMs >= 0) ? "has a negative or non-integer counter"
+      : null;
+    if (problem !== null) throw new Error(`Outcome for probe ${outcome.probeId} of spec ${spec.specId} ${problem}.`);
+    seen.add(outcome.probeId);
+  }
+  if (seen.size !== probeIds.size) throw new Error(`Spec ${spec.specId} has outcomes for ${seen.size} of ${probeIds.size} probes; a missing outcome is not scored.`);
+}
+
 /**
- * Analyze experiment results and produce a comparison report.
+ * Analyze experiment results and produce a comparison report. The report is `simulated` or `unbound`, never measured.
  */
 export function analyzeArchitectureExperiment(
   experiment: ArchitectureExperiment,
   baselineOutcomes: ProbeOutcome[],
   candidateOutcomes: ProbeOutcome[],
 ): ArchitectureComparisonReport {
+  assertOutcomes(experiment, experiment.baselineSpec, baselineOutcomes);
+  assertOutcomes(experiment, experiment.candidateSpec, candidateOutcomes);
+  const evidence = [...baselineOutcomes, ...candidateOutcomes].some((outcome) => outcome.simulated === true) ? "simulated" as const : "unbound" as const;
   const reportId = `acr_${randomUUID().slice(0, 12)}`;
   const now = Date.now();
 
@@ -614,6 +651,7 @@ export function analyzeArchitectureExperiment(
     reportId,
     experimentId: experiment.experimentId,
     ts: now,
+    evidence,
     baselineSpecId: experiment.baselineSpec.specId,
     candidateSpecId: experiment.candidateSpec.specId,
     modelId: experiment.baselineSpec.modelId,
@@ -660,6 +698,10 @@ export function renderArchitectureComparisonMarkdown(
 ): string {
   const lines: string[] = [
     "# Architecture Comparison Report",
+    "",
+    report.evidence === "simulated"
+      ? "> **SIMULATED** — invented outcomes for pipeline testing; not measured, never eligible for promotion."
+      : "> **UNBOUND** — caller-supplied outcomes without ledger-bound evidence; not measured, never eligible for promotion.",
     "",
     `- Report ID: ${report.reportId}`,
     `- Experiment: ${report.experimentId}`,

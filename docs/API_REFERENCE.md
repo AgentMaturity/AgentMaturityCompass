@@ -5097,6 +5097,12 @@ Run a controlled architecture comparison experiment (exit 0 measured pass, 1 fai
 | `--candidate-file <path>` | - |
 | `--baseline-kind <kind>` | - |
 | `--candidate-kind <kind>` | - |
+| `--execute-trials` | - |
+| `--casebook <id>` | - |
+| `--provider <id>` | - |
+| `--mode <mode>` | - |
+| `--max-steps <n>` | - |
+| `--agent <agentId>` | - |
 
 #### `amc explain`
 
