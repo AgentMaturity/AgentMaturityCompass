@@ -45,7 +45,7 @@ export interface TrialRunInput {
   readonly signal: AbortSignal;
 }
 
-export type TrialRunResult = { readonly ok: true } | { readonly ok: false; readonly reason: string };
+type TrialRunResult = { readonly ok: true } | { readonly ok: false; readonly reason: string };
 export type TrialRunner = (input: TrialRunInput) => Promise<TrialRunResult>;
 
 export interface TrialLimits {
@@ -61,7 +61,7 @@ const MAX_TRIAL_TIMEOUT_MS = 3_600_000;
 /** How long a timed-out execution may take to settle after its abort before the executor moves on. */
 const ABORT_GRACE_MS = 5_000;
 
-export interface CaseExecutionRecord {
+interface CaseExecutionRecord {
   readonly side: "baseline" | "candidate";
   readonly trialId: string;
   readonly caseId: string;

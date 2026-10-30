@@ -14,7 +14,7 @@ import { canonicalize } from "../utils/json.js";
 import type { ExecutorCaseView, TrialRunner } from "./trialExecutor.js";
 
 /** Label of the guard that confines a trial's tool calls to its case's allowed action classes. */
-export const CASE_SCOPE_GUARD = "experiment-case-scope";
+const CASE_SCOPE_GUARD = "experiment-case-scope";
 
 export interface NativeTrialRunnerOptions {
   readonly workspace: string;

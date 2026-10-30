@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
-import { readdirSync, readFileSync, realpathSync, statSync } from "node:fs";
-import { basename, join, resolve, sep } from "node:path";
+import { readdirSync, readFileSync, statSync } from "node:fs";
+import { basename, join } from "node:path";
 import YAML from "yaml";
 import type { ExperimentExecution, ExperimentReport } from "../types.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
@@ -22,6 +22,7 @@ import { vaultStatus } from "../vault/vault.js";
 import { signWithPurposeKey } from "../keys/purposeProviders.js";
 import { capturePurposePublication, assertPurposePublicationCurrent } from "../keys/purposePublication.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
+import { admissibleConfigFile } from "./configFile.js";
 import { experimentGateSchema, experimentSchema, type ExperimentFile, type ExperimentGatePolicy } from "./experimentSchema.js";
 import { deterministicSeed, meanDifference, pairedBootstrapCI, pairedStandardizedEffect } from "./stats.js";
 import { DEFAULT_MIN_PAIRED_CASES, evaluateExperimentGate, type ExperimentGateStatus } from "./experimentGatePolicy.js";
@@ -196,18 +197,10 @@ export function createExperiment(params: {
   };
 }
 
-/**
- * A configuration file an experiment may read and hand to a trial: a regular file inside the workspace, outside its
- * `.amc` authority tree (keys, vault, signed policy), resolved through symlinks. Returns the real path.
- */
+/** The workspace configuration file at `path` (see admissibleConfigFile), or an input error. Returns the real path. */
 export function workspaceConfigFile(workspace: string, path: string): string {
-  let real: string, root: string;
-  try { root = realpathSync(workspace); real = realpathSync(resolve(workspace, path)); }
-  catch { throw new ExperimentInputError(`configuration file not found: ${path}`); }
-  const within = (dir: string) => real.startsWith(`${dir}${sep}`);
-  if (!within(root) || within(join(root, ".amc")) || !statSync(real).isFile()) {
-    throw new ExperimentInputError("a configuration file must be a regular file inside the workspace and outside .amc");
-  }
+  const real = admissibleConfigFile(workspace, path);
+  if (real === null) throw new ExperimentInputError("a configuration file must be an existing regular file inside the workspace and outside .amc");
   return real;
 }
 
@@ -218,15 +211,11 @@ export function setExperimentBaseline(params: {
   config: "current" | { path: string };
 }): { path: string } {
   const agentId = resolveAgentId(params.workspace, params.agentId);
-  const baselineConfig = params.config === "current"
-    ? { id: "current", kind: "current" as const, path: null }
-    : (() => {
-      const path = workspaceConfigFile(params.workspace, params.config.path), digestSha256 = sha256Hex(readFileSync(path));
-      return { id: digestSha256.slice(0, 12), kind: "file" as const, path, digestSha256 };
-    })();
-  return {
-    path: updateExperiment(params.workspace, agentId, params.experimentId, (experiment) => { experiment.experiment.baselineConfig = baselineConfig; })
-  };
+  const path = params.config === "current" ? null : workspaceConfigFile(params.workspace, params.config.path);
+  const digestSha256 = path === null ? null : sha256Hex(readFileSync(path));
+  const baselineConfig = path === null || digestSha256 === null ? { id: "current", kind: "current" as const, path: null }
+    : { id: digestSha256.slice(0, 12), kind: "file" as const, path, digestSha256 };
+  return { path: updateExperiment(params.workspace, agentId, params.experimentId, (experiment) => { experiment.experiment.baselineConfig = baselineConfig; }) };
 }
 
 export function setExperimentCandidate(params: {
@@ -278,6 +267,25 @@ function costPerSuccess(costs: Array<number | null>, successes: number): number 
   return Number(((costs as number[]).reduce((sum, cost) => sum + cost, 0) / successes).toFixed(6));
 }
 
+export interface ExperimentRunParams {
+  workspace: string;
+  agentId?: string;
+  experimentId: string;
+  mode: "supervise" | "sandbox";
+  /**
+   * Evidence window covering the candidate configuration's own run
+   * (e.g. "7d"). Required: without it there is nothing real to compare.
+   */
+  candidateWindow?: string;
+  /** Agent id the candidate ran under, when it differs from the baseline. */
+  candidateAgentId?: string;
+  /** Bound trials: the trial identities stamped on each side's case execution rows. Both or neither. */
+  baselineTrialId?: string;
+  candidateTrialId?: string;
+  /** Provenance of trials AMC executed itself; sealed into the report. */
+  execution?: ExperimentExecution;
+}
+
 /**
  * Compares a baseline run against a candidate run.
  *
@@ -295,24 +303,7 @@ function costPerSuccess(costs: Array<number | null>, successes: number): number 
  * @throws when no candidate evidence window is supplied (trials AMC executes itself, `--execute-trials`, supply their
  * own); when the casebook is empty; or when no case is determinate on both sides.
  */
-function prepareExperimentReport(params: {
-  workspace: string;
-  agentId?: string;
-  experimentId: string;
-  mode: "supervise" | "sandbox";
-  /**
-   * Evidence window covering the candidate configuration's own run
-   * (e.g. "7d"). Required: without it there is nothing real to compare.
-   */
-  candidateWindow?: string;
-  /** Agent id the candidate ran under, when it differs from the baseline. */
-  candidateAgentId?: string;
-  /** Bound trials: the trial identities stamped on each side's case execution rows. Both or neither. */
-  baselineTrialId?: string;
-  candidateTrialId?: string;
-  /** Provenance of trials AMC executed itself; sealed into the report. */
-  execution?: ExperimentExecution;
-}) {
+function prepareExperimentReport(params: ExperimentRunParams) {
   const agentId = resolveAgentId(params.workspace, params.agentId);
   const experiment = loadExperiment(params.workspace, agentId, params.experimentId);
   // Every input is checked before any casebook work, so invalid input cannot produce a partial comparison.
@@ -534,23 +525,7 @@ class ExperimentReportPublicationError extends Error {
   }
 }
 
-export function runExperiment(params: {
-  workspace: string;
-  agentId?: string;
-  experimentId: string;
-  mode: "supervise" | "sandbox";
-  /**
-   * Evidence window covering the candidate configuration's own run
-   * (e.g. "7d"). Required: without it there is nothing real to compare.
-   */
-  candidateWindow?: string;
-  /** Agent id the candidate ran under, when it differs from the baseline. */
-  candidateAgentId?: string;
-  /** Bound trials (both or neither): see prepareExperimentReport. */
-  baselineTrialId?: string;
-  candidateTrialId?: string;
-  execution?: ExperimentExecution;
-}): { report: ExperimentReport; jsonPath: string; mdPath: string } {
+export function runExperiment(params: ExperimentRunParams): { report: ExperimentReport; jsonPath: string; mdPath: string } {
   const prepared = prepareExperimentReport(params), { agentId, base, runsDir, jsonPath, mdPath } = prepared;
   const reportJsonSha256 = sha256Hex(canonicalize(base));
   const report: ExperimentReport = { ...base, reportJsonSha256,
