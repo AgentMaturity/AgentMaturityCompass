@@ -1,3 +1,4 @@
+import type { NativeExtensionHookEvent } from "../extensions/nativeExtensionHookSchema.js";
 import { randomBytes } from "node:crypto";
 /**
  * The turn/step machine — AMC running an agent (plan P3.2).
@@ -144,10 +145,22 @@ export class AgentDriver {
     this.inbox = new LoopInbox(init.session, (notification) => {
       this.hooks.notify(notification);
     });
+    const tools = init.tools ?? EMPTY_TOOL_SEAM;
     this.stepInit = {
       session: init.session,
       llm: init.llm,
-      tools: init.tools ?? EMPTY_TOOL_SEAM,
+      tools: tools.extensionHooks ? { ...tools,
+        // Keep the WP31 effect-guard capability: a spread alone drops class-defined members.
+        ...(tools.supportsEffectGuard ? { supportsEffectGuard: true as const } : {}),
+        schemas: () => tools.schemas(), executionMode: request => tools.executionMode(request),
+        prepareStep: tools.prepareStep?.bind(tools), authorizationIntent: tools.authorizationIntent?.bind(tools),
+        bindApprovalGate: tools.bindApprovalGate?.bind(tools),
+        execute: async request => {
+          await this.observeExtensions({ kind: "tool-start", turn: request.turn, step: request.step, toolName: request.toolName }, request.signal);
+          try { return await tools.execute(request); }
+          finally { await this.observeExtensions({ kind: "tool-end", turn: request.turn, step: request.step, toolName: request.toolName }, request.signal); }
+        }
+      } : tools,
       route: selected === undefined ? init.route : { ...init.route, pinned: selected },
       systemPromptEventId: init.systemPromptEventId,
       config: this.config,
@@ -164,6 +177,17 @@ export class AgentDriver {
     };
     const window = compaction.contextWindowTokens;
     this.compactor = window === null ? null : new AutoCompactor({ ...compaction, contextWindowTokens: window }, this.stepInit);
+  }
+
+  private async observeExtensions(event: NativeExtensionHookEvent, signal?: AbortSignal): Promise<void> {
+    // Observer failures, including reporting failures, cannot veto the signed turn or its seal.
+    try {
+      for (const report of await this.stepInit.tools.extensionHooks?.observe(event, signal) ?? []) {
+        if (this.phase.kind !== "running" || this.phase.turn !== event.turn || (event.step !== undefined && this.phase.step !== event.step)) continue;
+        try { this.head = this.session.recordProjectedEvidence({ eventType: "metric", payload: JSON.stringify(report), meta: { nativeExtensionHook: report } }); }
+        catch { /* The bounded manager report remains available; observation never owns turn closure. */ }
+      }
+    } catch { /* Isolate the observer adapter as well as each confined handler. */ }
   }
 
   get status(): AgentStatus {
@@ -398,6 +422,7 @@ export class AgentDriver {
       // whole finally exists to make impossible. A hook is untrusted code; it
       // must not be able to strand a turn just by failing.
       this.hooks.notify({ kind: "turn-start", turn: turnRef.turn });
+      await this.observeExtensions({ kind: "turn-start", turn: turnRef.turn }, signal);
 
       while (true) {
         signal.throwIfAborted();
@@ -427,6 +452,7 @@ export class AgentDriver {
         this.head = this.session.startStep();
         phase.step = step;
         this.hooks.notify({ kind: "step-start", turn: turnRef.turn, step });
+        await this.observeExtensions({ kind: "step-start", turn: turnRef.turn, step }, signal);
 
         let stopReason: string | null = null;
         let usage: TokenUsage | null = null;
@@ -464,6 +490,7 @@ export class AgentDriver {
           // granularity, and it is the shape crash repair also produces.
           this.head = this.session.endStep({ stopReason, usage });
           this.hooks.notify({ kind: "step-end", turn: turnRef.turn, step });
+          await this.observeExtensions({ kind: "step-end", turn: turnRef.turn, step }, signal);
         }
 
         signal.throwIfAborted();
@@ -518,7 +545,7 @@ export class AgentDriver {
       catch (error) { cleanupFailure = { error }; ending = { reason: "error", error }; this.notifyError(error); }
       try { repair?.finish(ending?.reason ?? "incomplete"); validation?.finish(signal.aborted ? "cancelled" : `turn-${ending?.reason ?? "incomplete"}`); }
       catch (error) { ending = { reason: "error", error }; this.notifyError(error); }
-      this.closeTurn(turnRef.turn, ending);
+      await this.closeTurn(turnRef.turn, ending, signal);
       if (cleanupFailure !== undefined) {
         this.setPhase({ kind: "failed", cause: cleanupFailure.error });
       }
@@ -542,7 +569,7 @@ export class AgentDriver {
    * good and does NOT seal: see this module's header for why an unsealed open
    * turn is the honest outcome there.
    */
-  private closeTurn(turn: number, ending: TurnEnding | null): void {
+  private async closeTurn(turn: number, ending: TurnEnding | null, signal: AbortSignal): Promise<void> {
     // Unreachable: every exit above assigns an ending. Kept, and labelled, so
     // that a future edit which introduces an unassigned path produces a signed
     // `error` turn a reader can find rather than a crash inside a finally.
@@ -558,6 +585,7 @@ export class AgentDriver {
       return;
     }
     this.hooks.notify({ kind: "turn-end", turn, ending: resolved });
+    await this.observeExtensions({ kind: "turn-end", turn }, signal);
     try {
       this.head = this.session.sealTurn();
     } catch (error: unknown) {
