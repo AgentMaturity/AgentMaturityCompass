@@ -6,6 +6,7 @@ import { initWorkspace } from "../src/workspace.js";
 import { openSessionEventStore } from "../src/persistence/openSessionEventStore.js";
 import { jsonlEventsPath } from "../src/persistence/jsonl/jsonlEventLog.js";
 import { verifyLedgerIntegrity } from "../src/ledger/ledgerVerification.js";
+import { nativeMeta } from "./helpers/nativeEnvelope.js";
 
 /**
  * `amc verify` must not report success on evidence it cannot see.
@@ -33,7 +34,7 @@ function withJsonlWorkspace<T>(fn: (workspace: string) => T): T {
     sessionId: "s",
     runtime: "amc",
     eventType: "user/message",
-    meta: {},
+    meta: nativeMeta([], "s", {}),
     payload: "the agent deleted production"
   });
   store.sealSession("s");

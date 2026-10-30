@@ -11,6 +11,7 @@ import { initWorkspace } from "../src/workspace.js";
 import { lockVault } from "../src/vault/vault.js";
 import { workspaceKeyPem } from "./helpers/trustContext.js";
 import type { EvidenceEventType } from "../src/types.js";
+import { nativeMeta } from "./helpers/nativeEnvelope.js";
 
 const roots: string[] = [], records: Array<Record<string, unknown>> = [];
 let evidence: string;
@@ -44,8 +45,10 @@ function createFixture(name: string, tagged = false): Fixture {
     ownedSession: `p0-27-${name}-owned` };
   const ledger = openLedger(workspace);
   const append = (sessionId: string, id: string, eventType: EvidenceEventType, meta: Record<string, unknown>) => {
+    const typeMeta = { source: "manual", trustTier: "SELF_REPORTED", ...meta };
     ledger.appendEvidence({ sessionId, id, runtime: "unknown", eventType, inline: true, payloadExt: "json",
-      payload: JSON.stringify({ fixture: name, event: id }), meta: { source: "manual", trustTier: "SELF_REPORTED", ...meta } });
+      payload: JSON.stringify({ fixture: name, event: id }),
+      meta: eventType.includes("/") ? nativeMeta(ledger.getAllEvents(), sessionId, typeMeta) : typeMeta });
     f.all.push(id); return id;
   };
   const start = (sessionId: string) => {

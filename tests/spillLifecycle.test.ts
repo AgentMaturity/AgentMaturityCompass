@@ -14,6 +14,7 @@ import * as storage from "../src/session/spill/spillStore.js";
 import { formatSpillLocator, type SpillRef, type SpillRefV2 } from "../src/session/spill/spillTypes.js";
 import { eraseSessionSpills, exportSessionSpills, inventorySessionSpills, restoreSessionSpills, type SpillExportIndex } from "../src/session/spill/spillLifecycle.js";
 import type { EvidenceEvent } from "../src/types.js";
+import { nativeMeta } from "./helpers/nativeEnvelope.js";
 
 // Synthetic ciphertext and signed local ledger fixtures exercise the lifecycle,
 // not a model, measured maturity, installed package, or deployed service.
@@ -36,7 +37,7 @@ function appendReference(sessionId: string, ref: SpillRef, eventType: EvidenceEv
       ledger.startSession({ sessionId, runtime: "unknown", binaryPath: "synthetic-lifecycle-fixture", binarySha256: sha256Hex("fixture") });
     }
     const result = ledger.appendEvidenceDetailed({ sessionId, runtime: "unknown", eventType,
-      meta: { spilled: ref, fixtureKind: "SYNTHETIC_LIFECYCLE_CONTROL_INPUT", agentId: "default" } });
+      meta: nativeMeta(ledger.getAllEvents(), sessionId, { spilled: ref, fixtureKind: "SYNTHETIC_LIFECYCLE_CONTROL_INPUT", agentId: "default" }) });
     return ledger.getAllEvents().find(row => row.id === result.id)!;
   } finally { ledger.close(); }
 }
