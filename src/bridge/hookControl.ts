@@ -739,11 +739,6 @@ function recoverControlResult(input: {
   sessionId: string;
   request: NormalizedProviderToolRequest;
   agentId: string;
-  /**
-   * WP35c: the forwarder's check, in a delegated child without the vault passphrase. Everything returned comes from the
-   * signed metadata (chain, writer signature, receipt, seal: public keys), so a payload blob whose key is out of reach
-   * there is not evaluated rather than failing. The Bridge, which holds the vault, checks the blob too.
-   */
   blobKeyOptional?: boolean;
 }): ProviderHookControlResult | null {
   const existing = input.ledger.db.prepare(
@@ -868,6 +863,8 @@ export function verifyProviderHookControlResult(input: {
   provider: HookProvider;
   rawInput: string;
   result: unknown;
+  /** WP35c: only AMC's hook forwarder passes this; a vault-held blob key it cannot reach is not evaluated (verifyEvidencePayload). */
+  blobKeyOptional?: boolean;
 }): { ok: boolean; error: string | null } {
   const parsed = providerHookControlResultSchema.safeParse(input.result);
   if (!parsed.success || parsed.data.provider !== input.provider) {
@@ -893,14 +890,8 @@ export function verifyProviderHookControlResult(input: {
     }
 
     ledger = openLedger(input.workspace);
-    const recovered = recoverControlResult({
-      ledger,
-      eventId,
-      sessionId,
-      request,
-      agentId: input.authenticatedAgentId,
-      blobKeyOptional: true,
-    });
+    const recovered = recoverControlResult({ ledger, eventId, sessionId, request, agentId: input.authenticatedAgentId,
+      blobKeyOptional: input.blobKeyOptional === true });
     if (!recovered) {
       return { ok: false, error: "hook control response has no matching sealed ledger event" };
     }

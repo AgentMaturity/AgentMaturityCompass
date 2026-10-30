@@ -12,7 +12,7 @@ import { join } from "node:path";
 import { pathExists } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { loadBlobMetadata, loadBlobPlaintext } from "../storage/blobs/blobStore.js";
-import { readBlobKeyMaterial } from "../storage/blobs/blobKeys.js";
+import { loadCurrentBlobKey, readBlobKeyMaterial, VaultLockedError, verifyBlobCurrentKeySignature } from "../storage/blobs/blobKeys.js";
 import type { RetentionProofIndex } from "../ops/retention/retentionArchive.js";
 import type { EvidenceEvent } from "../types.js";
 import { inlinePlaintextOrNull } from "./encryption/ledgerCipher.js";
@@ -26,9 +26,9 @@ export function verifyEvidencePayload(
   /** Rows whose payload could not be checked here (key out of reach): reported, never counted as verified. */
   notEvaluated?: string[],
   /**
-   * WP35c: an encrypted blob whose key is out of reach here (vault locked) is listed in `notEvaluated` instead of failing,
-   * as an encrypted inline payload always is. For a reader of the signed metadata only (a delegated child's hook
-   * forwarder, which never holds the vault passphrase); a blob that does not open under a reachable key still fails.
+   * WP35c: an encrypted blob whose vaulted key is held by a locked vault here is listed in `notEvaluated` instead of
+   * failing, as an encrypted inline payload always is. Only for a reader of the signed metadata (a delegated child's hook
+   * forwarder, which never holds the vault passphrase); every other key or blob failure still fails (blobKeyOutOfReach).
    */
   blobKeyOptional = false
 ): void {
@@ -93,21 +93,22 @@ export function verifyEvidencePayload(
   }
 }
 
-/** Whether `payloadPath` is an encrypted blob naming `payloadSha256` whose key cannot be read here (vault locked or absent). */
+/**
+ * Whether `payloadPath` is an encrypted blob naming `payloadSha256`, under a key version this workspace issued (1 up to
+ * the signed current version; rotation adds one), whose key is held by a locked vault here. The envelope header is not
+ * authenticated without the key, so its version must be an issued one; any other key failure (the unvaulted key, the
+ * no-sign key, a missing secret in an unlocked vault, bad key material) is not "out of reach".
+ */
 function blobKeyOutOfReach(workspace: string, payloadPath: string, payloadSha256: string): boolean {
-  let keyVersion: number;
   try {
     const meta = loadBlobMetadata(workspace, payloadPath);
-    if (meta.keyVersion === null || meta.payloadSha256 !== payloadSha256) return false;
-    keyVersion = meta.keyVersion;
-  } catch {
+    if (meta.keyVersion === null || meta.payloadSha256 !== payloadSha256 || !verifyBlobCurrentKeySignature(workspace).valid) return false;
+    // Version 0 (unvaulted) and the no-sign key never raise VaultLockedError, so they never count as out of reach.
+    if (meta.keyVersion > loadCurrentBlobKey(workspace).keyVersion) return false;
+    readBlobKeyMaterial(workspace, meta.keyVersion);
     return false;
-  }
-  try {
-    readBlobKeyMaterial(workspace, keyVersion);
-    return false;
-  } catch {
-    return true;
+  } catch (error) {
+    return error instanceof VaultLockedError;
   }
 }
 

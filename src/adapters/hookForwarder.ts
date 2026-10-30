@@ -301,6 +301,8 @@ export async function forwardProviderHookControl(input: {
         provider,
         rawInput: input.rawInput,
         result: payload,
+        // WP35c: this forwarder may run in a delegated child, which never holds the vault passphrase.
+        blobKeyOptional: true,
       });
       if (!verification.ok) {
         throw new HookIntegrationError(
