@@ -98,7 +98,7 @@ import { warnSupersededCommand } from "./cli/deprecatedCommand.js";
 import { commandPath, installClaimLabelHooks } from "./cli/claimLabelHooks.js";
 import {
   aggregateClaim, artifactClaim, assuranceClaim, controlSurfaceClaim, emitClaimResult, executedTestClaim, fleetHealthClaim, latestRunsClaim,
-  printClaimLegendFooter, printClaimResult, printControlSurfaceSkip, printLabelledReport, printTitledResult, runClaimEnvelope, runIdClaim, selfAnswerClaim,
+  latestRunForDisplay, printClaimLegendFooter, printClaimResult, printControlSurfaceSkip, printLabelledReport, printTitledResult, runClaimEnvelope, runIdClaim, selfAnswerClaim,
   unverifiedClaim, withClaimFields, withClaimFieldsEach
 } from "./cli/claimOutput.js";
 import { renderDiagnosticReportHtml } from "./cli/reportRenderers.js"; import { emitScoreEvidenceResult } from "./cli/scoreEvidenceOutput.js";
@@ -136,7 +136,6 @@ import {
   verifyFleetConfigSignature
 } from "./fleet/registry.js";
 import { getAgentPaths, resolveAgentId } from "./fleet/paths.js";
-import { latestRunForAgent } from "./governor/actionPolicyEngine.js";
 import { getProviderTemplateById, listProviderTemplates, providerTemplateChoices } from "./providers/providerTemplates.js";
 import { runSandboxCommand } from "./sandbox/sandbox.js";
 import { attestIngestSessionAsync, ingestEvidence, type IngestType } from "./ingest/ingest.js";
@@ -19144,6 +19143,16 @@ program
   });
 
 // ── Operator UX CLI ──────────────────────────────────────────────────
+/** Display-only latest run (labelled when unverified); without one, say so instead of fabricating scores. */
+function latestRunOrHint(workspace: string, agentId: string): DiagnosticReport | null {
+  const report = latestRunForDisplay(workspace, agentId);
+  if (!report) {
+    console.log(chalk.yellow(`No diagnostic run found for agent '${agentId}'.`));
+    console.log(chalk.cyan("Run 'amc run' to produce one, then re-run this command."));
+  }
+  return report;
+}
+
 program
   .command("operator-dashboard")
   .description("Generate operator dashboard showing why questions are capped and how to unlock")
@@ -19161,17 +19170,7 @@ program
     const agentId = activeAgent(program) ?? "default";
     const currentReport = opts.run && opts.run !== "latest"
       ? loadRunReport(workspace, opts.run, agentId)
-      : (() => {
-      const existing = latestRunForAgent(workspace, agentId);
-      if (!existing) {
-        // No run exists. Rendering fabricated scores here previously showed a
-        // "VALID / HIGH TRUST" diagnostic for an agent that was never assessed.
-        console.log(chalk.yellow(`No diagnostic run found for agent '${agentId}'.`));
-        console.log(chalk.cyan("Run 'amc run' to produce one, then re-run this command."));
-        return null;
-      }
-      return existing;
-    })();
+      : latestRunOrHint(workspace, agentId);
     if (!currentReport) return;
     const previousReport = opts.previousRun
       ? loadRunReport(workspace, opts.previousRun, agentId)
@@ -19188,17 +19187,7 @@ program
     const opux = await import("./ops/operatorUx.js");
     const workspace = process.cwd();
     const agentId = activeAgent(program) ?? "default";
-    const report = (() => {
-      const existing = latestRunForAgent(workspace, agentId);
-      if (!existing) {
-        // No run exists. Rendering fabricated scores here previously showed a
-        // "VALID / HIGH TRUST" diagnostic for an agent that was never assessed.
-        console.log(chalk.yellow(`No diagnostic run found for agent '${agentId}'.`));
-        console.log(chalk.cyan("Run 'amc run' to produce one, then re-run this command."));
-        return null;
-      }
-      return existing;
-    })();
+    const report = latestRunOrHint(workspace, agentId);
     // No run: nothing was evaluated, and the claim line says so.
     printClaimResult(report ? runClaimEnvelope(report, workspace) : unverifiedClaim("diagnostic:why-capped", 0), {});
     if (!report) return;
@@ -19226,17 +19215,7 @@ program
     const opux = await import("./ops/operatorUx.js");
     const workspace = process.cwd();
     const agentId = activeAgent(program) ?? "default";
-    const report = (() => {
-      const existing = latestRunForAgent(workspace, agentId);
-      if (!existing) {
-        // No run exists. Rendering fabricated scores here previously showed a
-        // "VALID / HIGH TRUST" diagnostic for an agent that was never assessed.
-        console.log(chalk.yellow(`No diagnostic run found for agent '${agentId}'.`));
-        console.log(chalk.cyan("Run 'amc run' to produce one, then re-run this command."));
-        return null;
-      }
-      return existing;
-    })();
+    const report = latestRunOrHint(workspace, agentId);
     if (!report) return;
     const whyCaps = opux.computeWhyCaps(report);
     const queue = opux.computeActionQueue(whyCaps);
@@ -19260,17 +19239,7 @@ program
     const opux = await import("./ops/operatorUx.js");
     const workspace = process.cwd();
     const agentId = activeAgent(program) ?? "default";
-    const report = (() => {
-      const existing = latestRunForAgent(workspace, agentId);
-      if (!existing) {
-        // No run exists. Rendering fabricated scores here previously showed a
-        // "VALID / HIGH TRUST" diagnostic for an agent that was never assessed.
-        console.log(chalk.yellow(`No diagnostic run found for agent '${agentId}'.`));
-        console.log(chalk.cyan("Run 'amc run' to produce one, then re-run this command."));
-        return null;
-      }
-      return existing;
-    })();
+    const report = latestRunOrHint(workspace, agentId);
     if (!report) return;
     const heatmap = opux.computeConfidenceHeatmap(report);
     console.log(chalk.bold(`\nConfidence Heatmap — Avg: ${(heatmap.avgConfidence * 100).toFixed(1)}%  Low: ${heatmap.lowConfidenceCount} questions\n`));
@@ -19744,7 +19713,7 @@ program
     const agentId = opts.agent ?? activeAgent(program) ?? "default";
     const { generateKnownUnknownsReport, renderKnownUnknownsMarkdown } = await import("./diagnostic/knownUnknowns.js");
     const workspace = process.cwd();
-    const report = latestRunForAgent(workspace, agentId);
+    const report = latestRunForDisplay(workspace, agentId);
     if (!report) {
       console.log(chalk.yellow("No diagnostic run found."));
       printClaimResult(unverifiedClaim("diagnostic:knownUnknowns", 0), {});
@@ -19765,7 +19734,7 @@ program
     const agentId = opts.agent ?? activeAgent(program) ?? "default";
     const { computeDiagnosticMetaConfidence, renderMetaConfidenceMarkdown } = await import("./diagnostic/metaConfidence.js");
     const workspace = process.cwd();
-    const report = opts.run ? loadRunReport(workspace, opts.run, agentId) : latestRunForAgent(workspace, agentId);
+    const report = opts.run ? loadRunReport(workspace, opts.run, agentId) : latestRunForDisplay(workspace, agentId);
     if (!report) {
       console.log(chalk.yellow("No diagnostic run found."));
       printClaimResult(unverifiedClaim("diagnostic:metaConfidence", 0), {});
@@ -19786,9 +19755,9 @@ governor
     const agentId = opts.agent ?? activeAgent(program) ?? "default";
     const { confidenceCheck, renderConfidenceGovernorMarkdown } = await import("./governor/confidenceGovernor.js");
     const workspace = process.cwd();
-    const report = loadRunReport(workspace, agentId);
+    const { run: report, refusal } = (await import("./governor/actionPolicyEngine.js")).latestTrustedRun(workspace, agentId);
     if (!report) {
-      console.log(chalk.yellow("No diagnostic run found."));
+      console.log(chalk.yellow(refusal ? `No verified diagnostic run: ${refusal}.` : "No diagnostic run found."));
       return;
     }
     const decision = confidenceCheck({

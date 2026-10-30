@@ -3,7 +3,7 @@ import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "nod
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { afterEach, describe, expect, test, vi } from "vitest";
-import { writeSealedReport } from "./helpers/sealedRun.js";
+import { writeAnchoredRun } from "./helpers/sealedRun.js";
 import { initWorkspace } from "../src/workspace.js";
 import { getAgentPaths } from "../src/fleet/paths.js";
 import { questionBank } from "../src/diagnostic/questionBank.js";
@@ -107,7 +107,7 @@ function writeRunFixture(params: {
     reportJsonSha256: "fixture"
   };
   // Forecasts read sealed runs only (GAP-WP37), so the fixture seals each run the way the runner does.
-  writeSealedReport(params.workspace, paths.runsDir, params.runId, run);
+  writeAnchoredRun(params.workspace, paths.runsDir, run);
 }
 
 function writeTransformHistory(workspace: string, agentId: string): void {

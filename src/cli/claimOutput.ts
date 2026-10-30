@@ -11,8 +11,7 @@ import {
 import { formatClaimLabel, renderClaimLabel } from "../claims/eligibility/render.js";
 import type { ClaimEnvelope, ClaimKind, StatusDimensions } from "../claims/eligibility/types.js";
 import { sealedRunReportVerifies } from "../diagnostic/reportSeal.js";
-import { loadRunReport } from "../diagnostic/runReportResolution.js";
-import { latestRunForAgent } from "../governor/actionPolicyEngine.js";
+import { latestDisplayRun, loadRunReport } from "../diagnostic/runReportResolution.js";
 import { assuranceReportClaim } from "../migration/legacy/classify.js";
 import { controlSurfaceScopeMessage, detectControlSurfaceScope } from "../score/controlSurfaceScope.js";
 import type { AssuranceReport, DiagnosticReport } from "../types.js";
@@ -156,7 +155,7 @@ export function fleetHealthClaim(health: { agents: readonly { agentId: string; r
 /** An organisation rollup over agents: each agent's latest run, seal-checked. */
 export function latestRunsClaim(producer: string, agentIds: readonly string[], workspace = process.cwd()): ClaimEnvelope {
   return aggregateClaim(producer, agentIds.flatMap((agentId) => {
-    const report = latestRunForAgent(workspace, agentId);
+    const report = latestDisplayRun(workspace, agentId)?.report;
     return report ? [runClaimEnvelope(report, workspace)] : [];
   }));
 }
@@ -203,4 +202,16 @@ export function runIdClaim(runId: string | null | undefined, agentId?: string, w
 export function runClaimEnvelope(report: DiagnosticReport, workspace = process.cwd(), now = Date.now()): ClaimEnvelope {
   const sealVerified = sealedRunReportVerifies(workspace, report as unknown as Record<string, unknown>);
   return envelopeForStoredRun(report, { sealVerified, now });
+}
+
+/**
+ * The latest run for a display-only command, or null when there is none. A run whose seal does not verify is still
+ * shown (noSign workspaces have no other kind) but labelled UNVERIFIED on stderr; gates never read runs through here.
+ */
+export function latestRunForDisplay(workspace: string, agentId: string): DiagnosticReport | null {
+  const latest = latestDisplayRun(workspace, agentId);
+  if (latest && !latest.verified) {
+    console.error(`UNVERIFIED: diagnostic run ${latest.report.runId} is not sealed by this workspace's run key; shown for display only, never used by a gate.`);
+  }
+  return latest?.report ?? null;
 }

@@ -21,7 +21,6 @@ import { listApprovalRequests } from "../src/approvals/approvalChainStore.js";
 import { questionBank } from "../src/diagnostic/questionBank.js";
 import { checkExec } from "../src/enforce/execGuard.js";
 import { parseShellCommandPlan } from "../src/enforce/shellCommandPlan.js";
-import { getAgentPaths } from "../src/fleet/paths.js";
 import {
   defaultActionPolicy,
   initActionPolicy,
@@ -33,6 +32,7 @@ import { initWorkspace } from "../src/workspace.js";
 import { claudeWorkspace, controlRequest, decide, recorded } from "./helpers/claudeCodeHookFixtures.js";
 import { removeFixtureWorkspaces } from "./helpers/piHookFixtures.js";
 import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
+import { writeSealedRun } from "./helpers/actionPolicyFixtures.js";
 
 const roots: string[] = [];
 
@@ -85,9 +85,7 @@ function installObservedRun(workspace: string, agentId: string): void {
     runSealSig: "fixture",
     reportJsonSha256: "fixture",
   };
-  const paths = getAgentPaths(workspace, agentId);
-  mkdirSync(paths.runsDir, { recursive: true });
-  writeFileSync(join(paths.runsDir, `${report.runId}.json`), JSON.stringify(report, null, 2));
+  writeSealedRun(workspace, report); // the governor reads only sealed, ledger-anchored runs
 }
 
 function permitAllActions(workspace: string): void {

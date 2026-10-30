@@ -1,5 +1,5 @@
 import { readdirSync } from "node:fs";
-import { join } from "node:path";
+import { basename, join } from "node:path";
 import { openLedger } from "../ledger/ledger.js";
 import {
   type ActionClass,
@@ -12,6 +12,7 @@ import {
 import { pathExists, readUtf8 } from "../utils/fs.js";
 import type { ActionPolicy, ActionPolicyRule, TrustTierAtLeast } from "./actionPolicySchema.js";
 import { getAgentPaths } from "../fleet/paths.js";
+import { latestVerifiedRun } from "../diagnostic/runReportResolution.js";
 import { defaultActionPolicy } from "./actionPolicyStore.js";
 export { ACTION_POLICY_WRITER_LOCK, actionPolicyWriterPendingPath, assertActionPolicyWriterReady,
   actionPolicyPath, actionPolicySigPath, defaultActionPolicy, loadActionPolicy,
@@ -36,6 +37,8 @@ export interface GovernorTrustSummary {
   sandboxEvidence: boolean;
   untrustedConfig: boolean;
   correlationRatio: number;
+  /** Why the latest run file was not used (seal, agent or ledger anchor failed); absent when there was none to refuse. */
+  runRefusal?: string;
 }
 
 export interface GovernorWorkOrderContext {
@@ -352,6 +355,7 @@ export function evaluateActionPermission(input: GovernorDecisionInput): Governor
     decision.allowed = true;
     decision.effectiveMode = "SIMULATE";
     decision.reasons.push("UNTRUSTED CONFIG: signed policy/config verification failed. EXECUTE is denied.");
+    if (input.trustSummary.runRefusal) decision.reasons.push(`UNTRUSTED RUN: ${input.trustSummary.runRefusal}.`);
     decision.requiredEvidence.push("Re-sign policy/config files and rerun amc verify.");
     return decision;
   }
@@ -658,28 +662,40 @@ export function deriveTrustSummaryFromRun(workspace: string, agentId: string, ru
   };
 }
 
+/**
+ * The run a gate may act on (governor, ToolHub, the native Action Policy guard, transformation planning, what-if): the
+ * newest run whose seal verifies under the workspace run-hash keys (`latestVerifiedRun`), that names this agent, and that
+ * the ledger `runs` table anchors with the same hash, seal and status. Anything else is refused with the reason, and a
+ * newer unverifiable or tampered file blocks rather than rolling back to an older sealed run. Display callers that may
+ * show an unverified run use `latestDisplayRun` and label it.
+ */
+export function latestTrustedRun(workspace: string, agentId: string): { run: DiagnosticReport | null; refusal: string | null } {
+  const { run, blocking } = latestVerifiedRun(workspace, agentId);
+  if (blocking.length > 0) {
+    return { run: null, refusal: `diagnostic run ${blocking.map((row) => basename(row.file)).join(", ")} failed seal verification` };
+  }
+  if (!run) return { run: null, refusal: null };
+  if (run.agentId !== agentId) {
+    return { run: null, refusal: `diagnostic run ${run.runId} is sealed for agent ${String(run.agentId)}, not ${agentId}` };
+  }
+  let anchored = false;
+  try {
+    const ledger = openLedger(workspace);
+    try {
+      const row = ledger.getRun(run.runId);
+      anchored = row !== null && row.report_json_sha256 === run.reportJsonSha256 && row.run_seal_sig === run.runSealSig && row.status === run.status;
+    } finally {
+      ledger.close();
+    }
+  } catch {
+    anchored = false;
+  }
+  return anchored ? { run, refusal: null } : { run: null, refusal: `diagnostic run ${run.runId} is not anchored in the ledger` };
+}
+
+/** `latestTrustedRun` without the reason. */
 export function latestRunForAgent(workspace: string, agentId: string): DiagnosticReport | null {
-  const paths = getAgentPaths(workspace, agentId);
-  if (!pathExists(paths.runsDir)) {
-    return null;
-  }
-  const files = readdirSync(paths.runsDir)
-    .filter((name) => name.endsWith(".json"))
-    .sort((a, b) => a.localeCompare(b));
-  if (files.length === 0) {
-    return null;
-  }
-  const parsed = files
-    .map((file) => {
-      try {
-        return JSON.parse(readUtf8(join(paths.runsDir, file))) as DiagnosticReport;
-      } catch {
-        return null;
-      }
-    })
-    .filter((row): row is DiagnosticReport => row !== null)
-    .sort((a, b) => b.ts - a.ts);
-  return parsed.find((run) => run.status === "VALID") ?? parsed[0] ?? null;
+  return latestTrustedRun(workspace, agentId).run;
 }
 
 export function summarizeGovernorInput(workspace: string, agentId: string): {
@@ -687,8 +703,8 @@ export function summarizeGovernorInput(workspace: string, agentId: string): {
   trust: GovernorTrustSummary;
   assurance: GovernorAssuranceSummary;
 } {
-  const run = latestRunForAgent(workspace, agentId);
-  const trust = deriveTrustSummaryFromRun(workspace, agentId, run);
+  const { run, refusal } = latestTrustedRun(workspace, agentId);
+  const trust = { ...deriveTrustSummaryFromRun(workspace, agentId, run), ...(refusal ? { runRefusal: refusal } : {}) };
   const assurance = run
     ? summarizeAssuranceForWindow(workspace, agentId, run.windowStartTs, run.windowEndTs)
     : { packs: {} };
