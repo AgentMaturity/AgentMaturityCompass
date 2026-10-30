@@ -59,6 +59,27 @@ describe("native chat read-only MCP receipt view", () => {
     expect(view.render()).toEqual(settled);
     expect(view.render().join("\n")).toContain("closed"); expect(view.render().join("\n")).not.toContain("state active");
   });
+  it("shows each reviewed server's own mount receipt and grants (WP21c)", () => {
+    const second = { ...mounted(), toolNames: ["mcp_second_fedcba0987654321"] };
+    Object.assign(second.receipt, { serverId: "second", catalogDigest: "b".repeat(64) });
+    const view = createNativeInteractiveMcpView(); view.accept(message()); view.accept(message(second));
+    const lines = view.render();
+    expect(lines.filter(line => line.startsWith("MCP mount receipt · server "))).toEqual([
+      expect.stringContaining("server fixture · state active"), expect.stringContaining("server second · state active")]);
+    expect(lines.filter(line => line.startsWith("Granted tools:"))).toEqual([
+      expect.stringContaining("mcp_fixture_1234567890abcdef."), expect.stringContaining("mcp_second_fedcba0987654321.")]);
+    expect(lines.join("\n")).toContain("a".repeat(64)); expect(lines.join("\n")).toContain("b".repeat(64));
+  });
+  it("refuses a second receipt for one server without showing either copy as mounted (WP21c)", () => {
+    const replay = mounted(); Object.assign(replay.receipt, { catalogDigest: "b".repeat(64) });
+    const other = mounted(); Object.assign(other.receipt, { serverId: "other", catalogDigest: "d".repeat(64) });
+    const view = createNativeInteractiveMcpView();
+    view.accept(message()); view.accept(message(replay)); view.accept(message()); view.accept(message(other));
+    const output = view.render().join("\n");
+    expect(output).toContain("receipt refused (2)"); expect(output).not.toContain("server fixture");
+    expect(output).not.toContain("a".repeat(64)); expect(output).not.toContain("b".repeat(64));
+    expect(output).toContain("server other · state active");
+  });
   it("copies receipt data and escapes untrusted display strings without interpreting terminal controls", () => {
     const mount = mounted();
     const auth = { issuer: "https://auth.example.org/\u001b[2J", scopes: ["lookup\rgrant"], tokenExpiresAt: null };

@@ -21,6 +21,16 @@ describe("native command operational audit", () => {
     expect(handler).not.toHaveBeenCalled();
   });
 
+  it("audits queued-submission withdrawal and refuses dispatch if its signed start cannot publish", async () => {
+    const publish = vi.spyOn(humanAudit, "appendHumanActionEventAsync").mockResolvedValue({} as humanAudit.HumanLogEntry);
+    const handler = vi.fn(async () => "withdrawn");
+    await expect(runNativeInteractiveCommand({ ...selection, command: "withdraw" }, handler)).resolves.toBe("withdrawn");
+    expect(publish.mock.calls.map(([input]) => [input.payload?.command, input.payload?.phase])).toEqual([["withdraw", "started"], ["withdraw", "settled"]]);
+    publish.mockRejectedValue(new Error("signing unavailable")); handler.mockClear();
+    await expect(runNativeInteractiveCommand({ ...selection, command: "withdraw" }, handler)).rejects.toThrow("signing unavailable");
+    expect(handler).not.toHaveBeenCalled();
+  });
+
   it("records start before dispatch and settled after a handler returns, preserving its result", async () => {
     const sequence: string[] = [];
     const publish = vi.spyOn(humanAudit, "appendHumanActionEventAsync").mockImplementation(async input => {

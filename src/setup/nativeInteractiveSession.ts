@@ -5,7 +5,7 @@ import { renderNativeRunUsage } from "../agent/nativeRunUsage.js";
 import { renderNativeRunDiagnostics } from "../agent/nativeFailureGuidance.js";
 import { parseNativeChatResult, type NativeChatChildSummary } from "./nativeChatResult.js";
 import { isActionClass } from "../governor/actionCatalog.js";
-import { loadNativeMcpConfiguration, requireReviewedNativeMcpGrants, NativeMcpConfigError } from "./nativeMcpConfig.js";
+import { reviewNativeMcpConfigurations, NativeMcpConfigError } from "./nativeMcpConfig.js";
 import { inspectNativeFirstUse, renderNativeFirstUseGuide, renderNativeGuideCommand } from "./nativeFirstUseGuide.js";
 import { resolveNativeChatProfile, nativeChatProfileArgv, assertNativeChatProfileCurrent, type NativeChatProfileOptions } from "./nativeChatProfile.js";
 import { createNativeInteractiveApprovals } from "./nativeInteractiveApprovals.js";
@@ -23,6 +23,7 @@ import { runNativeInteractiveCommand } from "./nativeInteractiveCommandAudit.js"
 import { createNativeInteractiveMcpView } from "./nativeInteractiveMcp.js";
 import { renderNativeInteractiveToolResults } from "./nativeInteractiveResults.js";
 import { escapeTerminalControls } from "../tools/builtin/askUserTool.js";
+import { listNativeQueuedSubmissions, withdrawNativeQueuedSubmission } from "./nativeInteractiveWithdraw.js";
 
 export interface NativeChatOptions extends NativeChatProfileOptions {
   readonly validationConfig?: string;
@@ -31,8 +32,9 @@ export interface NativeChatOptions extends NativeChatProfileOptions {
   readonly validate?: readonly string[];
   readonly extension?: readonly string[];
   readonly extensionPin?: readonly string[];
-  readonly mcpConfig?: string;
-  readonly mcpConfigSha256?: string;
+  /** One reviewed config per server; each grant keeps its signed action class. */
+  readonly mcpConfig?: readonly string[];
+  readonly mcpConfigSha256?: readonly string[];
   readonly approveTools?: string;
   readonly approveRisk?: string;
   readonly tools?: string;
@@ -261,9 +263,9 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
         io.error("MCP chat requires explicit --tools workspace and --approve-tools. Catalog discovery and grant review are separate explicit steps."); io.fail(); return;
       }
       try {
-        const loaded = loadNativeMcpConfiguration(options.mcpConfig, options.mcpConfigSha256);
-        requireReviewedNativeMcpGrants(loaded, cwd, approvalClass);
-        mcpArgs = ["--mcp-config", loaded.path, "--mcp-config-sha256", loaded.sha256];
+        // The run child repeats this review against the forwarded pins before any server starts.
+        mcpArgs = reviewNativeMcpConfigurations(options.mcpConfig, options.mcpConfigSha256, cwd, approvalClass)
+          .flatMap(({ config }) => ["--mcp-config", config.path, "--mcp-config-sha256", config.sha256]);
       } catch (error) {
         io.error(error instanceof NativeMcpConfigError ? error.message : "MCP chat preflight refused before server startup."); io.fail(); return;
       }
@@ -299,7 +301,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
         : tools === "echo" ? "Echo demonstration tool only; no workspace editing tool is offered."
           : "No tools offered; model replies cannot edit workspace files through this session.");
       if (approvalClass !== undefined) io.log(`Tool approval gate: ${approvalClass}, risk ${approvalRisk}. This terminal asks you to review actual queued requests using an existing authenticated reviewer session; quorum still applies.`);
-      if (mcpArgs.length > 0) io.log("MCP tools use the reviewed catalog and pinned config. Each turn starts and disposes its own configured server; changed catalogs or config refuse the run.");
+      if (mcpArgs.length > 0) io.log("MCP tools use each reviewed catalog and pinned config. Each turn starts and disposes its own configured servers; a changed catalog or config refuses the run. /mcp shows each mount.");
       if (extensions.list().length > 0) io.log(`Signed native extensions: ${extensions.list().map(item => item.id).join(", ")}. /extensions lists their commands and reviewed digests.`);
       if (validation) io.log(`Public task checks: ${validation.checks.map(check => check.title).join(", ")}. Existing shell permissions and approvals still apply.`);
       io.log(`Every turn writes AMC session evidence. Limit: ${maxSteps} model steps per turn, ${maxTokens} output tokens per request.`);
@@ -414,6 +416,21 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
         if (compacted.stdout.trim()) io.log(compacted.stdout.trimEnd());
         if (compacted.code !== 0 || compacted.truncated) io.error("Compaction refused or did not return a complete receipt. Inspect the session before continuing.");
         else io.log("Compaction recorded; original evidence is retained. /verify checks reconstruction separately.");
+        return false;
+      }
+      if (text === "/withdraw") {
+        if (sessionId === null || forkFrom !== null) throw new Error("Run a task or select its recorded session before withdrawing a queued submission.");
+        const queued = listNativeQueuedSubmissions(cwd, sessionId);
+        io.log(queued.pending.length ? "Queued submissions not yet dispatched to a turn:" : "No queued submission is pending in this session.");
+        for (const item of queued.pending) io.log(escapeTerminalControls(`  ${item.messageId} · ${item.target} · from ${item.origin}`));
+        const id = await question("Message ID to withdraw (blank cancels): ");
+        if (!id?.trim()) return false;
+        const outcome = withdrawNativeQueuedSubmission(cwd, sessionId, id.trim(), queued.headEventId);
+        const shown = escapeTerminalControls(outcome.messageId);
+        io.log(outcome.status === "withdrawn" ? `Withdrawn: ${shown} was removed from the queue by a signed cancel row; other queued work is unchanged.`
+          : outcome.status === "in-flight" ? `Not withdrawn: ${shown} was already dispatched to a turn that has no recorded ending; it is in flight or its outcome is TOOL_OUTCOME_UNKNOWN. /inspect shows what was recorded.`
+            : outcome.status === "dispatched" ? `Not withdrawn: ${shown} was already dispatched to a recorded turn. /inspect shows its outcome.`
+              : outcome.status === "already-withdrawn" ? `Not changed: ${shown} was already withdrawn.` : `Not withdrawn: no queued submission ${shown} exists in this session.`);
         return false;
       }
       if (text === "/fork cancel") {
