@@ -62,7 +62,7 @@ export interface LoadedNativeMcpConfiguration {
 }
 /** Stable refusal reasons; every message is a fixed string that never echoes config bytes, env values or secrets. */
 export type NativeMcpRefusalCode = "mcp-config-invalid" | "mcp-config-tampered" | "mcp-config-unpaired" | "mcp-config-duplicate"
-  | "mcp-config-unreviewed" | "mcp-grant-class-mismatch";
+  | "mcp-config-unreviewed" | "mcp-grant-class-mismatch" | "mcp-credential-unavailable" | "mcp-oauth-refused";
 export class NativeMcpConfigError extends Error {
   constructor(message: string, readonly code: NativeMcpRefusalCode = "mcp-config-invalid") { super(message); }
 }
@@ -301,7 +301,7 @@ export async function resolveNativeMcpServer(config: NativeMcpConfiguration, opt
       return { ...server, headers: { Authorization: `Bearer ${accessToken}` }, auth: receipt, renewAuth: resolveToken };
     } catch (error) {
       if (isEgressRefusal(error)) throw error; // a typed preflight refusal, never an OAuth failure
-      return refuse(oauthFailure(error));
+      return refuse(oauthFailure(error), "mcp-oauth-refused");
     }
   }
   if (references === undefined || Object.keys(references).length === 0) return server;
@@ -313,13 +313,13 @@ export async function resolveNativeMcpServer(config: NativeMcpConfiguration, opt
     const values: Record<string, string> = Object.create(null) as Record<string, string>;
     for (const [name, ref] of Object.entries(references)) {
       const value = store.resolve(credentialRef(ref));
-      if (value === null) return refuse("An MCP credential reference is not configured. Set it through AMC credentials and retry.");
+      if (value === null) return refuse("An MCP credential reference is not configured. Set it through AMC credentials and retry.", "mcp-credential-unavailable");
       values[name] = value;
     }
     return server.transport === "streamable-http" ? { ...server, headers: values } : { ...server, env: values };
   } catch (error) {
     if (error instanceof NativeMcpConfigError) throw error;
-    return refuse("Could not resolve the MCP credential references. Inspect credential metadata separately; values and file content are withheld.");
+    return refuse("Could not resolve the MCP credential references. Inspect credential metadata separately; values and file content are withheld.", "mcp-credential-unavailable");
   } finally { await store?.close(); }
 }
 
