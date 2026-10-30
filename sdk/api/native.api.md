@@ -75,8 +75,8 @@ export interface AMCNativeClientOptions {
     readonly validate?: readonly string[];
     readonly approveTools?: string;
     readonly approveRisk?: "low" | "medium" | "high" | "critical";
-    readonly mcpConfig?: string;
-    readonly mcpConfigSha256?: string;
+    readonly mcpConfig?: string | readonly string[];
+    readonly mcpConfigSha256?: string | readonly string[];
     readonly credentialsHome?: string;
     readonly credentialsFile?: string;
     readonly credentialsMode?: "layered" | "operator-only";
