@@ -48,7 +48,7 @@ report, each line labelled `[synthetic]`. The `fs.write` call passes through the
 budgets, signed Action Policy and evidence log a real provider's call does. `amc init` signs the default Action
 Policy, which runs an agent's EXECUTE calls as SIMULATE until it has a trusted diagnostic run at integrity 0.6 or
 above, so on a fresh workspace the call is recorded as SIMULATE and `hello.txt` is not written (see
-[Reaching EXECUTE](../GOVERNOR.md#reaching-execute)). `npm run check:packed-install` runs this quickstart against the
+"Reaching EXECUTE" in `docs/GOVERNOR.md`). `npm run check:packed-install` runs this quickstart against the
 installed package and bin and records its wall time.
 
 ## Local request preview (experimental)
