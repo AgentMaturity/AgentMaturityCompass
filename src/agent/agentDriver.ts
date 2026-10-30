@@ -576,7 +576,7 @@ export class AgentDriver {
       catch (error) { ending = { reason: "error", error }; this.notifyError(error); }
       this.closeTurn(turnRef.turn, ending);
       if (cleanupFailure !== undefined) {
-        this.setPhase({ kind: "failed", cause: cleanupFailure.error });
+        this.setPhase({ kind: "failed", cause: cleanupFailure.error, turn: turnRef.turn });
       }
     }
 

@@ -103,7 +103,7 @@ test("Studio usage stays bounded across many signed requests and preserves issue
     }
     const clean = readNativeTaskProjection(f.workspace, f.writer.sessionId, "default").usage;
     expect(clean).toMatchObject({ requests: count, reportedRequests: count, completeRequests: count, pendingRequests: 0, issueCount: 0 });
-    expect(clean).not.toHaveProperty("requestReports"); expect(clean).not.toHaveProperty("issues");
+    expect(clean).not.toHaveProperty("requestReports"); expect(clean).not.toHaveProperty("issues"); expect(clean).not.toHaveProperty("cost");
     expect(Buffer.byteLength(JSON.stringify(clean))).toBeLessThan(2048);
     const view = { history: { status: "authenticated" }, provider: "openai", usage: clean };
     expect(renderTaskUsage(view)).toContain("recorded session subtotals");

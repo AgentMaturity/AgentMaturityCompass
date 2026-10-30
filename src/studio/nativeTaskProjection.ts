@@ -139,7 +139,7 @@ export function readNativeTaskProjection(workspace: string, sessionId: string, a
     } catch { approvals.length = 0; approvalError = "Pending approval records could not be authenticated; use the signed approval inbox before deciding."; }
   }
   const validation = projectNativeValidation(workspace, rows);
-  const { requestReports: _reports, issues, ...usage } = projectNativeRunUsage(rows, sessionId);
+  const { requestReports: _reports, cost: _cost, issues, ...usage } = projectNativeRunUsage(rows, sessionId);
   return { history: { status: "authenticated", backend: history.backend, headEventHash: history.headEventHash,
       eventCount: rows.length, message: "Persisted session metadata authenticated. Displayed payloads are checked separately; full run verification remains a separate action." },
     storeHeadEventHash: history.storeHeadEventHash, validation, usage: { ...usage, issueCount: issues.length }, plans, validationOutputs: readNativeTaskValidationOutputs(workspace, rows, validation),

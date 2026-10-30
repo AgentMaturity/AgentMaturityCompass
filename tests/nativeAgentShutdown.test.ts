@@ -28,13 +28,15 @@ afterEach(() => {
   }
 });
 
-function nativeSession(h: LoopHarness, transport = silentTransport) {
+function nativeSession(h: LoopHarness, transport = silentTransport, tools?: StubToolSeam) {
   const registry = new AdapterRegistry();
-  registry.register({ providerId: LOOP_PROVIDER, adapter: scriptedAdapter([textStep("hello")]),
+  registry.register({ providerId: LOOP_PROVIDER,
+    adapter: scriptedAdapter([tools === undefined ? textStep("hello") : toolStepMulti([{ id: "stuck", name: "stuck", args: "{}" }])]),
     baseUrl: "https://api.anthropic.invalid", credentialRef: credentialRef("AMC_LOOP_TEST_KEY"), models: [LOOP_MODEL] });
   return openAgentSession({ workspace: h.dir, agentId: "default", tools: "none", systemPrompt: "test",
     makeLlm: spine => new LlmRuntime({ session: spine, registry, credentials: new FixedCredentials(), transport }),
     route: { providerId: LOOP_PROVIDER, model: LOOP_MODEL, params: { max_tokens: 256 } },
+    ...(tools === undefined ? {} : { bindTools: () => tools }),
     harnessVersion: "test", compositionDigest: "c".repeat(64), policyDigest: "p".repeat(64) });
 }
 
@@ -112,7 +114,9 @@ describe("WP20b native shutdown results", () => {
     expect(h.events().filter(row => row.event_type === "turn/end").map(row => JSON.parse(row.meta_json).reason)).toEqual(["cancelled"]);
   });
 
-  it("bounds a noncooperative provider and never promotes its late completion", async () => {
+  // Since the stream-deadline lane (aa5963795), caller cancellation aborts the upstream request instead of waiting
+  // on the transport, so a transport that ignores its signal no longer holds the turn open.
+  it("cancels a stalled provider request without waiting on its transport and never promotes its late completion", async () => {
     let started!: () => void, resume!: () => void;
     const dispatched = new Promise<void>(resolve => { started = resolve; });
     const paused = new Promise<void>(resolve => { resume = resolve; });
@@ -121,12 +125,28 @@ describe("WP20b native shutdown results", () => {
     } });
     h.driver.followup("work"); await dispatched;
     const result = await h.driver.shutdown({ timeoutMs: 5 });
+    expect(result).toMatchObject({ state: "settled", timedOut: false, unknown: [], errors: [] });
+    expect(h.events().filter(row => row.event_type === "turn/end").map(row => JSON.parse(row.meta_json).reason)).toEqual(["cancelled"]);
+    const before = h.events().length, snapshot = JSON.stringify(result);
+    resume(); await h.driver.whenIdle();
+    expect(JSON.stringify(result)).toBe(snapshot);
+    expect(h.events()).toHaveLength(before);
+    expect(() => h.driver.followup("late")).toThrow(/shut/i);
+  });
+
+  it("bounds noncooperative work and never promotes its late completion", async () => {
+    let started!: () => void, complete!: (value: ToolCallOutcome) => void;
+    const dispatched = new Promise<void>(resolve => { started = resolve; });
+    const h = harness({ scripts: [toolStepMulti([{ id: "stuck", name: "stuck", args: "{}" }])],
+      tools: new StubToolSeam({ stuck: () => { started(); return new Promise(resolve => { complete = resolve; }); } }),
+      config: { toolAbandonGraceMs: 60_000 } });
+    h.driver.followup("work"); await dispatched;
+    const result = await h.driver.shutdown({ timeoutMs: 5 });
     expect(result.state).toBe("incomplete");
     expect(result.timedOut).toBe(true);
     expect(result.errors).not.toEqual([]);
-    expect(result.unknown).toEqual([]); // No recorded tool call is not a known tool outcome.
     const snapshot = JSON.stringify(result);
-    resume(); await h.driver.whenIdle();
+    complete(ok("late success")); await h.driver.whenIdle();
     expect(JSON.stringify(result)).toBe(snapshot);
     expect(() => h.driver.followup("late")).toThrow(/shut/i);
   });
@@ -266,8 +286,9 @@ describe("WP20b native shutdown results", () => {
     let started!: () => void, resume!: () => void;
     const dispatched = new Promise<void>(resolve => { started = resolve; });
     const paused = new Promise<void>(resolve => { resume = resolve; });
+    // A noncooperative tool, not a stalled transport: provider requests are now aborted at cancellation (aa5963795).
     const h = harness({ scripts: [textStep("unused")] });
-    const session = nativeSession(h, async () => { started(); await paused; return { status: 200, headers: {}, body: bodyFromChunks([]) }; });
+    const session = nativeSession(h, silentTransport, new StubToolSeam({ stuck: () => { started(); return paused.then(() => ok("late")); } }));
     const prompt = session.prompt("work"); await dispatched;
     const stopping = session.shutdown({ timeoutMs: 0 });
     expect(() => session.close()).toThrow(/Wait/);

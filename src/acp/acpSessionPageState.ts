@@ -8,8 +8,9 @@ import { ACP_ERROR, AcpFailure } from "./acpErrors.js";
 
 export interface AcpSessionPageState {
   readonly validation: ReturnType<typeof projectNativeValidation>;
-  /** Aggregate counts describe the snapshot; consumers replace, never sum, page snapshots. */
-  readonly usage: Omit<NativeRunUsage, "requestReports" | "issues"> & { readonly issueCount: number };
+  /** Aggregate counts describe the snapshot; consumers replace, never sum, page snapshots. The per-request cost
+   * projection is omitted with the request reports: a page stays bounded; `agent-loop` usage keeps cost. */
+  readonly usage: Omit<NativeRunUsage, "requestReports" | "issues" | "cost"> & { readonly issueCount: number };
   readonly turn: { readonly number: number | null; readonly lastEnd: TurnEndMeta | null; readonly lastSeal: AcpCommittedTurn | null; readonly cancellationRequested: boolean };
   readonly approvals: { readonly pending: number; readonly answered: number; readonly denied: number; readonly unavailable: number };
   readonly toolOutcomes: { readonly unknown: number; readonly unavailable: number };
@@ -68,7 +69,7 @@ export function projectAcpSessionPageState(workspace: string, sessionId: string,
     }
   }
   const usage = projectNativeRunUsage(rows, sessionId);
-  const { requestReports: _reports, issues, ...aggregate } = usage;
+  const { requestReports: _reports, cost: _cost, issues, ...aggregate } = usage;
   const outcomes = [...approvals.values()];
   return { validation: projectNativeValidation(workspace, rows), usage: { ...aggregate, issueCount: issues.length },
     turn: projectAcpTurnState(rows),
