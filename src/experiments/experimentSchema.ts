@@ -17,10 +17,12 @@ export const experimentSchema = z.object({
     }),
     candidateConfig: z.object({
       id: z.string().min(1),
-      kind: z.enum(["overlay-file", "current"]),
+      /** "improvement-candidate": loop output (GAP-WP08), never auditor-signed; admitted only with its loop's journal binding. */
+      kind: z.enum(["overlay-file", "current", "improvement-candidate"]),
       path: z.string().nullable().optional(),
       digestSha256: z.string().length(64).nullable().optional(),
-      signatureValid: z.boolean().default(false)
+      signatureValid: z.boolean().default(false),
+      loopId: z.string().optional()
     }).nullable().default(null)
   })
 });

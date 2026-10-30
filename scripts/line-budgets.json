@@ -9,7 +9,7 @@
   ],
   "budgets": {
     "src/benchmarks/replayBenchmarkCorpus.ts": 29468,
-    "src/cli.ts": 24420,
+    "src/cli.ts": 24418,
     "src/score/metricValidity.ts": 16881,
     "src/watch/liveDriftAlerts.ts": 9792,
     "src/studio/studioServer.ts": 8707,
@@ -20,7 +20,7 @@
     "src/studio/openapi.ts": 2212,
     "src/enforce/resourceManifest.ts": 2032,
     "src/eval/evalImporters.ts": 1970,
-    "src/diagnostic/runner.ts": 1908,
+    "src/diagnostic/runner.ts": 1905,
     "src/gateway/server.ts": 1784,
     "src/workspaces/workspaceRouter.ts": 1774,
     "src/diagnostic/evidenceDrilldown.ts": 1714,
