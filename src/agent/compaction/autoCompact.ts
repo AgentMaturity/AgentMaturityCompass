@@ -12,6 +12,7 @@
 import type { SettledStream } from "../../llm/adapter/streamRecorder.js";
 import { isLlmError } from "../../llm/llmFailure.js";
 import { RequestEncodingError } from "../../llm/request/requestSpec.js";
+import { COMPACTION_PLAN_AUDIT } from "../../session/compactionRecovery.js";
 import { extractEnvelope, type TokenUsage } from "../../session/sessionTypes.js";
 import { describeLiveEntries, describeMeasuredLiveEntries, type LiveSurfaceEntry } from "../../session/surfaceCompaction.js";
 import { workspaceSelfTrust } from "../../trust/trustContext.js";
@@ -176,6 +177,9 @@ export class AutoCompactor {
     const targetBytes = target.reduce((sum, entry) => sum + (entry.bytes ?? 0), 0);
     const turns = new Set(range.map(entry => at.get(entry.originEventId)?.turn)).size;
 
+    // PI-025: the row right before the summary step names what it will replace and drop, so a resume can settle a crash.
+    const plan = { auditType: COMPACTION_PLAN_AUDIT, version: 1, turn, target: ids(target), earlier: earlier.map(ids) };
+    session.recordProjectedEvidence({ eventType: "audit", payload: JSON.stringify(plan), meta: plan });
     const opened = session.startStep(COMPACTION_SUMMARY_STEP);
     let settled: SettledStream | null = null, usage: TokenUsage | null = null, stopReason: string | null = null, failure: unknown = null;
     try {
