@@ -1,0 +1,12 @@
+[
+  {
+    "title": "DSH v4 Zstandard framing reference",
+    "adaptedIn": "src/importers/dshSessionFrames.ts",
+    "upstreamRepo": "https://github.com/deepseek-ai/deepseek-harness",
+    "provenance": "tests/fixtures/dsh-v4/frame-provenance.json",
+    "sourceModule": "packages/session/session-persistence-jsonl/src/zstd.ts",
+    "license": "MIT",
+    "licenseFile": "tests/fixtures/dsh-v4/frame-upstream-LICENSE.txt",
+    "note": "The bounded offline frame scanner adapts the upstream framing algorithm. Original source hashes, offline conformance references and fixture provenance are retained in `tests/fixtures/dsh-v4/frame-provenance.json`."
+  }
+]

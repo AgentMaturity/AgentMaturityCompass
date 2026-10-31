@@ -7,7 +7,8 @@
  * BSD-3-Clause, whose clause 2 requires the copyright notice to travel with
  * binary distributions. Generated rather than hand-kept for the same reason
  * as the counts and the API reference — a licence file maintained by memory
- * is a licence file that goes stale.
+ * is a licence file that goes stale. Modules adapted from upstream source
+ * rather than vendored whole are listed in `vendor/ADAPTED_MODULES.json`.
  *
  *   node scripts/vendor/gen-third-party-notices.mjs          write
  *   node scripts/vendor/gen-third-party-notices.mjs --check  fail if stale
@@ -70,6 +71,16 @@ if (missingLicence.length > 0) {
   process.exit(1);
 }
 
+/** Adapted modules: the provenance record pins the upstream commit and must list the adapted source module. */
+const adapted = JSON.parse(readFileSync(join(vendorDir, "ADAPTED_MODULES.json"), "utf8")).map((entry) => {
+  const provenance = JSON.parse(readFileSync(join(root, entry.provenance), "utf8"));
+  if (!/^[0-9a-f]{40}$/.test(provenance.revision ?? "") || !provenance.sources?.some((source) => source.path === entry.sourceModule)) {
+    console.error(`vendor/ADAPTED_MODULES.json: ${entry.title}: ${entry.provenance} pins no upstream commit for ${entry.sourceModule}`);
+    process.exit(1);
+  }
+  return { ...entry, commit: provenance.revision, licenseText: readFileSync(join(root, entry.licenseFile), "utf8").trim() };
+});
+
 const body = `# Third-Party Notices
 
 AMC vendors the packages below under \`vendor/\`, rescoped to the \`@amc/\`
@@ -117,7 +128,26 @@ under GPL-2.0-or-later. Its complete package notices, license text, source
 package link and exact file/package hashes are distributed alongside it in
 deploy/apparmor/COPYRIGHT.upstream, GPL-2.0.txt and README.md. AMC does not
 install or load this system policy automatically.
-`;
+${adapted
+  .map(
+    (entry) => `
+
+## ${entry.title}
+
+- Adapted in: \`${entry.adaptedIn}\`
+- Upstream source: ${entry.upstreamRepo}
+- Upstream commit: \`${entry.commit}\`
+- Source module: \`${entry.sourceModule}\`
+- License: ${entry.license}
+
+${entry.note}
+
+\`\`\`
+${entry.licenseText}
+\`\`\`
+`
+  )
+  .join("")}`;
 
 if (check) {
   if (!existsSync(outPath) || readFileSync(outPath, "utf8") !== body) {

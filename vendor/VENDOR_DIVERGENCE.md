@@ -101,7 +101,9 @@ step:
   reference has crept back in.
 - `node scripts/vendor/gen-third-party-notices.mjs --check` —
   `THIRD_PARTY_NOTICES` matches the tree, and every vendored package still
-  carries its `LICENSE`.
+  carries its `LICENSE`. Modules adapted from upstream source rather than
+  vendored whole are listed in `ADAPTED_MODULES.json`; each entry's
+  provenance record pins the upstream commit and lists the adapted module.
 
 ## Sync procedure
 
