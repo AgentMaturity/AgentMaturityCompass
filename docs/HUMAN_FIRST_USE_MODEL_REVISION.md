@@ -205,7 +205,7 @@ isolation, cold reads, public CLI functions and guided review/cancellation.
 They are authored assertions, not executed tests or mutation-qualified coverage.
 
 Authoring receipt:
-`AMC_OS/RESEARCH/2026-09-11-amc-1512-model-revision-implementation/`.
+an internal record that is not published.
 The retained transfer/2 and credential-review-binding/1 mappings remain pinned to
 their original credential-only applicability. Do not silently retarget their
 templates to this schema. The next bounded integration is an explicitly labelled

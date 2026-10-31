@@ -119,6 +119,6 @@ back to `newSession()`. Studio shows the same eligible recovery state and requir
 **Refresh status** after lost observation or a lost control response.
 
 This document describes the implementation contract. Qualification is recorded
-separately under `AMC_OS/RESEARCH/2026-09-10-native-jsonl-writer-resume/` and
-`AMC_OS/RESEARCH/2026-09-10-native-recovery-control-gap/`; source authoring alone is
+separately in the [writer-resume](https://github.com/AgentMaturity/AgentMaturityCompass/tree/main/AMC_OS/RESEARCH/2026-09-10-native-jsonl-writer-resume) and
+[recovery-control-gap](https://github.com/AgentMaturity/AgentMaturityCompass/tree/main/AMC_OS/RESEARCH/2026-09-10-native-recovery-control-gap) receipts; source authoring alone is
 not a passed restart, installed-package, browser or platform test.

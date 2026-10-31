@@ -90,7 +90,7 @@ the `export` line once; without it every signing command refuses with `Vault loc
 
 Measured on 2026-09-14 in the integrating root checkout at commit `d635a5e2` (Darwin
 25.6.0 arm64, Node v25.5.0, `dist/cli.js` built from that source, a fresh temporary
-workspace, stub provider; receipt `AMC_OS/RESEARCH/2026-09-14-fleet-sequential/README.md`):
+workspace, stub provider; [receipt](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/AMC_OS/RESEARCH/2026-09-14-fleet-sequential/README.md)):
 `init --minimal` 1.19 s, `amc doctor` before enabling 1.86 s (`runtime-firewall-policy`
 WARN naming the fix), `firewall enable` 0.94 s (revision 1) and 0.80 s when repeated
 ("nothing was written"), the stub turn 0.85 s (1 turn, 2 steps, 1 tool call, 24 events),

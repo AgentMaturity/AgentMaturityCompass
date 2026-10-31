@@ -336,7 +336,7 @@ A: No. Fine-tuning modifies model weights and behavior — both of which are bel
 
 ---
 
-*Files created: `/Users/sid/.openclaw/workspace/AMC_OS/DOCS/MULTI_MODEL_VALIDATION.md`*
+*Files created: `docs/MULTI_MODEL_VALIDATION.md`*
 *Acceptance checks: Verify architecture diagram is accurate; verify compatibility matrix covers all major providers; verify FAQ addresses likely customer objections.*
 *Next actions: Run AMC evidence modules against a Llama 3 agent to generate concrete cross-model evidence; document results in a follow-up technical report.*
 *Risks/unknowns: Multimodal model behavior (vision, audio) may introduce model-specific evidence collection challenges in future AMC versions.*

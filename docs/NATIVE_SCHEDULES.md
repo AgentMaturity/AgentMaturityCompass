@@ -8,8 +8,8 @@ automatic Studio activation, OS scheduler installation or external harness.
 **Qualification:** the original contract was authored on 2026-09-10 under
 AMC-1548. WP19's regression tests are `tests/scheduleWp19.test.ts` and the schedule,
 objective, goal and `nativeSchedule*` suites under `tests/`; its local source checks,
-regression results and mutation evidence are recorded in an internal handoff note,
-which is not published. Installed-package and platform
+regression results and mutation evidence are recorded in the
+[WP19 handoff note](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/AMC_OS/INBOX/REV_FULLSTACK_ENGINEER.md). Installed-package and platform
 acceptance remain **UNEXECUTED**. The command group remains hidden and experimental.
 Do not treat the commands below as instructions to activate an existing production
 workspace without its normal operator, signing, approval and deployment gates.
