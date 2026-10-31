@@ -36,7 +36,7 @@ import { canonicalize } from "../utils/json.js";
 import { derivedRefCount, revisionDerivedProblems } from "./a4Derived.js";
 import { a4AlgorithmAllowed, ledgerRowAgent, resolveRefs } from "./a4Evidence.js";
 import {
-  A4_ENVELOPE_KINDS, boundItemsFor, DEFAULT_A4_GATE_POLICY, a4EvidenceRefRowSchema, a4TransitionRowSchema, flatSlots, gatePolicyDigestOf, gateSupersededBy,
+  A4_ENVELOPE_KINDS, boundItemsFor, DEFAULT_A4_GATE_POLICY, storedBoundItems, a4EvidenceRefRowSchema, a4TransitionRowSchema, flatSlots, gatePolicyDigestOf, gateSupersededBy,
   ratchetedFromChain, type A4ChainLink, type A4EvidenceRefRow, type A4Stage
 } from "./a4Schema.js";
 import { authorsOf, buildersOf, evaluateSod, type SodDecision } from "./a4SoD.js";
@@ -447,7 +447,7 @@ function satisfactionOf(snapshot: ReturnType<ReturnType<typeof readA4Store>["sna
     const revisionNo = Number(gate.revision_no);
     const requested = links.find((link) => link.kind === "GATE_REQUESTED" && link.body.gateId === gateId);
     if (requested === undefined) continue; // a side row the chain does not name fails completeness first
-    const supersededBy = gateSupersededBy(links, { gateId, revisionNo, requestedSeq: requested.seq, boundItemIds: ([parsed(gate.bound_items_json)].flat() as unknown[]).map(String) });
+    const supersededBy = gateSupersededBy(links, { gateId, revisionNo, requestedSeq: requested.seq, stage: String(gate.stage), boundItemIds: storedBoundItems(gate.bound_items_json === null ? null : String(gate.bound_items_json)) });
     const counted = rows.a4_decisions.filter((row) => row.gate_id === gateId).flatMap((row) => {
       const decided = links.find((link) => link.kind === "GATE_DECIDED" && link.body.decisionId === row.decision_id);
       const record = approvalDecisionSchema.safeParse(object(row.decision_json));

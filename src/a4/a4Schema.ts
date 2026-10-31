@@ -90,6 +90,20 @@ const BOUND_ITEMS_BY_VERSION: Readonly<Record<number, Readonly<Record<A4Stage, r
 };
 export const A4_BOUND_ITEMS_VERSION = 2;
 export const A4_BOUND_ITEMS = BOUND_ITEMS_BY_VERSION[A4_BOUND_ITEMS_VERSION]!;
+/**
+ * The acknowledgements that leave open a gate whose known bound set does not hold them: the items a later intent version
+ * added (a version 1 Adapt gate never bound them). Every other acknowledgement supersedes as design §6.7 says.
+ */
+const NON_BINDING_ACKS: Readonly<Record<string, readonly string[]>> = { adapt: ["plan_unresolved", "regulatory_sources_status"] };
+/** A gate's stored `bound_items_json` as a list of ids; undefined when it is null or not such a list (unknown, so never narrower). */
+export const storedBoundItems = (text: string | null | undefined): string[] | undefined => {
+  try {
+    const value: unknown = JSON.parse(String(text));
+    return Array.isArray(value) && value.every((id) => typeof id === "string") ? value as string[] : undefined;
+  } catch {
+    return undefined;
+  }
+};
 /** The set a gate of `stage` binds under `version` (a GATE_REQUESTED body's `boundItemsVersion`; absent is 1); null for an unknown version. */
 export const boundItemsFor = (stage: A4Stage, version: unknown): readonly string[] | null =>
   (version === undefined ? BOUND_ITEMS_V1 : typeof version === "number" ? BOUND_ITEMS_BY_VERSION[version] : undefined)?.[stage] ?? null;
@@ -141,18 +155,19 @@ export interface A4ChainLink {
 /**
  * The later transition that supersedes `gate`, or null (design §6.7). A HOLD cleared by a later RESUME does not
  * supersede; GATE_CONSUMED supersedes only its own gate; EVIDENCE_REF and ACKNOWLEDGED only on the bound revision, and
- * ACKNOWLEDGED only for an item the gate's intent binds.
+ * ACKNOWLEDGED of a listed non-binding item (NON_BINDING_ACKS) only when the gate's intent binds it.
  */
 export function gateSupersededBy(chain: readonly A4ChainLink[], gate: { gateId: string; revisionNo: number; requestedSeq: number;
-  /** The gate's stored bound set: an ACKNOWLEDGED of an item outside it does not supersede (its intent never held it). */
-  boundItemIds?: readonly string[] }): A4ChainLink | null {
+  /** The gate's stage and stored bound set (`storedBoundItems`; undefined when unknown, and then every ACKNOWLEDGED supersedes). */
+  stage?: string; boundItemIds?: readonly string[] }): A4ChainLink | null {
   const later = chain.filter((link) => link.seq > gate.requestedSeq).sort((a, b) => a.seq - b.seq);
   for (const link of later) {
     if (!(A4_SUPERSEDING_KINDS as readonly string[]).includes(link.kind)) continue;
     if (link.kind === "HOLD" && later.some((resume) => resume.kind === "RESUME" && resume.seq > link.seq)) continue;
     if (link.kind === "GATE_CONSUMED" && link.body.gateId !== gate.gateId) continue;
     if ((link.kind === "EVIDENCE_REF" || link.kind === "ACKNOWLEDGED") && link.revisionNo !== gate.revisionNo) continue;
-    if (link.kind === "ACKNOWLEDGED" && gate.boundItemIds !== undefined && !gate.boundItemIds.includes(String(link.body.itemId))) continue;
+    if (link.kind === "ACKNOWLEDGED" && gate.boundItemIds !== undefined && !gate.boundItemIds.includes(String(link.body.itemId))
+      && (NON_BINDING_ACKS[gate.stage ?? ""] ?? []).includes(String(link.body.itemId))) continue;
     return link;
   }
   return null;

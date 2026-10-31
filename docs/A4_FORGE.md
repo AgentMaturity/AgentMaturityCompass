@@ -119,14 +119,15 @@ An owner may acknowledge some WAITING items (for example `sod.self_provisioned`)
 never cleared. A BLOCKED item cannot be acknowledged. An item is acknowledged only at the project's current stage
 (`409 A4_STEP_ORDER` at any other, and Studio offers Acknowledge only there, and only for an item whose acknowledgement
 would count, by the same rule as the server). Acknowledge before requesting the gate: an
-acknowledgement supersedes an open gate on the same revision whose intent binds the item, and no other gate. Adapt's `plan_unresolved` (an owner's out of scope; never on a regulated
+acknowledgement supersedes an open gate on the same revision. Adapt's `plan_unresolved` (an owner's out of scope; never on a regulated
 project, `409 A4_NOT_ACKNOWLEDGEABLE`, and one recorded earlier does not count there), `regulatory_sources_status`,
 `context_probe_unavailable` (a JSONL session store) and `plan_activated` (only from Review on while its activation is
 deferred, `PLAN_ACTIVATION_DEFERRED`: each step before Review records a new revision, and an acknowledgement counts only
 on its own; before Review or in any other state `409 A4_NOT_ACKNOWLEDGEABLE`) are acknowledgeable at Adapt; of them,
 `plan_unresolved` and `regulatory_sources_status` are in Adapt's bound set from intent version 2 (a gate's
-`GATE_REQUESTED` names its `boundItemsVersion`; a gate that names none is version 1, verifies under version 1's set, and
-an acknowledgement of an item outside that set leaves it open).
+`GATE_REQUESTED` names its `boundItemsVersion`; a gate that names none is version 1, verifies under version 1's set, and an
+acknowledgement of either item leaves it open; every other acknowledgement, and any on a gate whose stored set does not
+read, supersedes).
 
 ## Resources, the catalog lock and the compiled-plan lockout
 

@@ -4,7 +4,7 @@
  */
 import { describe, expect, test } from "vitest";
 import {
-  A4_BOUND_ITEMS, boundItemsFor, deriveSelfApprovalAllowed, gateSupersededBy, laneForClaimKind, ratchetedFromChain, type A4ChainLink
+  A4_BOUND_ITEMS, boundItemsFor, deriveSelfApprovalAllowed, storedBoundItems, gateSupersededBy, laneForClaimKind, ratchetedFromChain, type A4ChainLink
 } from "../../src/a4/a4Schema.js";
 import { acknowledgeable, PLAN_ACTIVATION_DEFERRED } from "../../src/a4/a4Readiness.js";
 import { evaluateSod, type SodDecision, type SodGate } from "../../src/a4/a4SoD.js";
@@ -175,12 +175,24 @@ describe("gateSupersededBy (a member or evidence ref added after the gate opened
     const { chain: links, gate: g } = opened(make);
     expect(gateSupersededBy(links, g)).toBeNull();
   });
-  test("an acknowledgement supersedes only a gate whose intent binds the item", () => {
+  test("an acknowledgement of a listed non-binding item leaves open only an Adapt gate whose intent does not bind it", () => {
     const bound = ["members.present", "plan_unresolved"];
     const { chain: links, rest, gate: g } = opened(() => [link("ACKNOWLEDGED", 3, { itemId: "plan_unresolved" })]);
-    expect(gateSupersededBy(links, { ...g, boundItemIds: bound })?.seq).toBe(rest[0]!.seq);
+    expect(gateSupersededBy(links, { ...g, stage: "adapt", boundItemIds: bound })?.seq).toBe(rest[0]!.seq);
     // A gate requested under intent version 1 does not bind plan_unresolved: the owner's acknowledgement leaves it open.
-    expect(gateSupersededBy(links, { ...g, boundItemIds: ["members.present"] })).toBeNull();
+    expect(gateSupersededBy(links, { ...g, stage: "adapt", boundItemIds: ["members.present"] })).toBeNull();
+    // Unknown bound items (an unreadable stored set) fail closed: the acknowledgement supersedes.
+    expect(gateSupersededBy(links, { ...g, stage: "adapt" })?.seq).toBe(rest[0]!.seq);
+  });
+  test("an acknowledgement of any other item supersedes, bound or not", () => {
+    const { chain: links, rest, gate: g } = opened(() => [link("ACKNOWLEDGED", 3, { itemId: "plan_activated" })]);
+    expect(gateSupersededBy(links, { ...g, stage: "adapt", boundItemIds: ["members.present"] })?.seq).toBe(rest[0]!.seq);
+    const other = opened(() => [link("ACKNOWLEDGED", 3, { itemId: "plan_unresolved" })]);
+    expect(gateSupersededBy(other.chain, { ...other.gate, stage: "activate", boundItemIds: ["members.present"] })?.seq).toBe(other.rest[0]!.seq);
+  });
+  test("a stored bound set that is null or does not parse as a list of ids is unknown", () => {
+    expect(storedBoundItems('["a","b"]')).toEqual(["a", "b"]);
+    for (const text of [null, "null", "not json", "{}", '["a",1]']) expect(storedBoundItems(text)).toBeUndefined();
   });
   test("a superseding link before the request does not count", () => {
     const early = link("MEMBER", 3, {});
