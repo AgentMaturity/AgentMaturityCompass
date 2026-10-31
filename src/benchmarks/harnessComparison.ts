@@ -193,7 +193,7 @@ export async function runHarnessComparison(options: HarnessComparisonOptions): P
       "Automated conformance is not a human usability study or a coding-performance ranking.",
       "Shared manifest settings match requested conditions; effective model, permission and token/spend enforcement remain the pinned adapter's responsibility.",
       "The runner enforces wall time, isolated HOME/work directories, bounded capture and process-group termination; it is not an OS filesystem/network sandbox.",
-      "Evaluation is public, not hidden: the target's context names the oracle only by an opaque digest and the oracle runs with its own fresh HOME and temporary directory, but without an OS sandbox the target could still read oracle files on the host.",
+      "Evaluation is public, not hidden: the target's context names the oracle only by an opaque digest and the oracle runs with its own fresh HOME, temporary and working directory, but without an OS sandbox the target could still read oracle files on the host.",
       "Source commits are declared provenance. Determinate trials require artifact, executable, fixture, adapter and oracle file digests to match before and after execution; this does not attest a build-to-source relationship or every dynamic dependency.",
       "Latency is complete target-command wall time including adapter startup and process-group wait, not model-only latency. Failed and inconclusive executions retain their timing.",
       "Token/cache/cost/action counters remain attributed observations; missing values are unknown, and token/spend comparisons are retrospective rather than a substitute for live budget enforcement.",
@@ -298,13 +298,14 @@ export async function runHarnessComparison(options: HarnessComparisonOptions): P
           // The oracle sees the bounded original captures through stdin, before
           // publication redaction. Otherwise runner redaction could fake a pass.
           // Created only after the target's process group has exited, outside its TMPDIR, so the target cannot seed the
-          // judge's HOME, configuration or temporary files.
+          // judge's HOME, configuration or temporary files. The judge also runs there, not in the workspace the target
+          // wrote, so cwd-scoped configuration cannot seed it; it reaches the workspace only through {workspace}.
           judgeRoot = mkdtempSync(join(tmpdir(), "amc-harness-judge-"));
           const judgeHome = join(judgeRoot, "home");
           mkdirSync(judgeHome, { mode: 0o700 });
           const judgeEnv = { ...publicEnv, HOME: judgeHome, USERPROFILE: judgeHome, XDG_CONFIG_HOME: join(judgeHome, ".config"),
             XDG_CACHE_HOME: join(judgeHome, ".cache"), TMPDIR: judgeRoot };
-          const oracleRun = runProcess({ argv: oracleArgv, cwd: workspace, env: judgeEnv, stdin: "pipe", stdout: "capture", stderr: "capture",
+          const oracleRun = runProcess({ argv: oracleArgv, cwd: judgeRoot, env: judgeEnv, stdin: "pipe", stdout: "capture", stderr: "capture",
             maxCaptureBytes: manifest.captureBytesPerStream, scrubValues: [], graceMs: 2000,
             timeoutMs: judgeTimeoutMs, ...(options.signal ? { signal: options.signal } : {}) });
           const delivered = await oracleRun.write(Buffer.from(oracleInput)); oracleRun.endStdin();
