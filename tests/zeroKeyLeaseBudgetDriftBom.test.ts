@@ -25,7 +25,7 @@ import { signBomFile, verifyBomSignature } from "../src/bom/bomVerifier.js";
 import { pinnedTrust, workspaceKeyTrust } from "./helpers/trustContext.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { questionBank } from "../src/diagnostic/questionBank.js";
-import { writeAnchoredRun } from "./helpers/sealedRun.js";
+import { writeAnchoredRun, writeSealedReport } from "./helpers/sealedRun.js";
 import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 
 const roots: string[] = [];
@@ -431,13 +431,12 @@ describe("zero-key, leases, budgets, drift, and BOM", () => {
     const workspace = newWorkspace();
     initActionPolicy(workspace);
     initToolsConfig(workspace);
+    // Dated before the run is written, so inside its window: the governor reads only sealed assurance reports dated within it.
+    const now = Date.now();
     writeHighMaturityRunForGovernor(workspace, "run_high");
     const agentPaths = getAgentPaths(workspace, "default");
-    const now = Date.now();
-    mkdirSync(join(agentPaths.reportsDir, "assurance"), { recursive: true });
-    writeFileSync(
-      join(agentPaths.reportsDir, "assurance", `assurance_${now}.json`),
-      JSON.stringify(
+    // The governor reads assurance packs from sealed reports only; an unsealed file counts as missing evidence.
+    writeSealedReport(workspace, join(agentPaths.reportsDir, "assurance"), `assurance_${now}`,
         {
           assuranceRunId: `assurance_${now}`,
           agentId: "default",
@@ -460,10 +459,7 @@ describe("zero-key, leases, budgets, drift, and BOM", () => {
               scenarioResults: [{ auditEventTypes: [] }]
             }
           ]
-        },
-        null,
-        2
-      )
+        }
     );
 
     const budgets = loadBudgetsConfig(workspace);

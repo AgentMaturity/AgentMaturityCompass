@@ -63,7 +63,7 @@ function assertAbortRows(ledger){const all=rows(ledger);const sessions=all.sessi
  assert.equal(sessions.length,1);const events=all.evidence_events.filter(row=>row.session_id===sessions[0].session_id);
  const audits=events.map(row=>JSON.parse(row.meta_json));assert.equal(audits.filter(row=>row.auditType==='ASSURANCE_RUN_STARTED').length,1);
  const aborts=audits.filter(row=>row.auditType==='ASSURANCE_RUN_ABORTED');assert.equal(aborts.length,1);assert.equal(aborts[0].reason,'AgentResponderUnavailableError');
- assert.equal(events.length,mode==='sandbox'?3:2);assert(events.every(row=>row.event_type==='audit'));
+ assert.equal(events.length,2);assert.equal(audits.filter(row=>row.auditType==='SANDBOX_EXECUTION_ENABLED').length,0);assert(events.every(row=>row.event_type==='audit'));
  assert.equal(all.assurance_runs.length,0);assert.equal(filesUnder(join(workspace,'.amc/agents/default/reports/assurance')).length,0);
  return{all,session:sessions[0],events};}
 const report={caseName,node:process.version,executable:process.execPath,runnerModule:request.runnerModule??moduleAt('assurance/assuranceRunner.js'),success:false,checks:{},originalError:null};
