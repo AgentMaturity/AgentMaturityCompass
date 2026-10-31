@@ -68,6 +68,14 @@ describe("WP37 verified run readers", () => {
     expect(loadVerifiedRunReport(ws, "missing", "agent-x")).toBeNull();
   });
 
+  test("loadVerifiedRunReport refuses a sealed run of another agent or stored under another run's name", () => {
+    const ws = workspace();
+    writeSealedReport(ws, runsDir(ws), "run-foreign", { ...run("run-foreign", 1000, 0.5), agentId: "agent-other" });
+    writeSealedReport(ws, runsDir(ws), "run-renamed", run("run-original", 1000, 0.5));
+    expect(loadVerifiedRunReport(ws, "run-foreign", "agent-x")).toBeNull();
+    expect(loadVerifiedRunReport(ws, "run-renamed", "agent-x")).toBeNull();
+  });
+
   test("generateTrustCertificate refuses rather than roll back past a tampered newest run", () => {
     const ws = workspace();
     writeSealedReport(ws, runsDir(ws), "run-1", run("run-1", 1000, 0.5));
