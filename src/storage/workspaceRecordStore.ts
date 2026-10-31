@@ -168,9 +168,17 @@ function sealKeys(workspace: string): { keys: string[]; keyed: boolean; unverifi
  * the previous hash along with the deletion is not caught; anchor heads in the transparency log if that matters.
  */
 export function verifyWorkspaceRecords<T>(workspace: string, at: RecordLocation): { records: T[]; findings: WorkspaceRecordFinding[] } {
+  const { current, findings } = verifyStoredRecords(workspace, at);
+  return { records: current.map((row) => row.record as unknown as T), findings };
+}
+
+type StoredRecord = { file: string; record: RecordEnvelope & Record<string, unknown> };
+
+/** verifyWorkspaceRecords with the rows it parsed, each read once, and whether the workspace is keyed. */
+function verifyStoredRecords(workspace: string, at: RecordLocation): { current: StoredRecord[]; findings: WorkspaceRecordFinding[]; keyed: boolean } {
   const dir = recordDir(workspace, at);
   const findings: WorkspaceRecordFinding[] = [];
-  const read = (folder: string): Array<{ file: string; record: RecordEnvelope & Record<string, unknown> }> =>
+  const read = (folder: string): StoredRecord[] =>
     !pathExists(folder) ? [] : readdirSync(folder).filter((name) => name.endsWith(".json")).flatMap((name) => {
       const file = join(folder, name);
       try {
@@ -183,7 +191,7 @@ export function verifyWorkspaceRecords<T>(workspace: string, at: RecordLocation)
       }
     });
   const current = read(dir), revisions = read(join(dir, REVISIONS_DIR)), all = [...current, ...revisions];
-  const { keys, unverifiable } = sealKeys(workspace);
+  const { keys, keyed, unverifiable } = sealKeys(workspace);
   if (unverifiable !== null && all.length > 0) {
     findings.push({ file: vaultPaths(workspace).keysDir, code: "KEYSET_UNVERIFIABLE", detail: `the workspace key set does not verify (${unverifiable}): no record signature can be checked and unsigned records are refused` });
   }
@@ -220,7 +228,7 @@ export function verifyWorkspaceRecords<T>(workspace: string, at: RecordLocation)
         : `an earlier newest record ${lost.slice(0, 16)}… was already missing when a later record was written` });
     }
   }
-  return { records: current.map((row) => row.record as unknown as T), findings };
+  return { current, findings, keyed };
 }
 
 /** Findings that make a record itself untrusted; the others describe the store around it. */
@@ -234,15 +242,11 @@ const RECORD_REFUSALS: ReadonlySet<WorkspaceRecordFinding["code"]> = new Set(["H
  * writes nothing else); with a key, a stripped signature must not downgrade a record to "reported but kept".
  */
 export function readTrustedWorkspaceRecords<T>(workspace: string, at: RecordLocation): { records: T[]; unverified: string[] } {
-  const { findings } = verifyWorkspaceRecords<RecordEnvelope>(workspace, at);
-  const { keyed } = sealKeys(workspace);
+  // The rows returned are the rows verified: a file swapped after its check is never what a report reads (WP37 review).
+  const { current, findings, keyed } = verifyStoredRecords(workspace, at);
   const refused = new Set(findings.filter((row) => RECORD_REFUSALS.has(row.code) || (keyed && row.code === "UNSIGNED")).map((row) => row.file));
-  const dir = recordDir(workspace, at);
-  const records = !pathExists(dir) ? [] : readdirSync(dir).filter((name) => name.endsWith(".json") && !refused.has(join(dir, name)))
-    .flatMap((name) => {
-      try { return [JSON.parse(readUtf8(join(dir, name))) as T]; } catch { return []; }
-    });
-  return { records, unverified: findings.map((row) => `UNVERIFIED: ${at.kind} ${row.code} ${basename(row.file)}: ${row.detail}`) };
+  return { records: current.filter((row) => !refused.has(row.file)).map((row) => row.record as unknown as T),
+    unverified: findings.map((row) => `UNVERIFIED: ${at.kind} ${row.code} ${basename(row.file)}: ${row.detail}`) };
 }
 
 function lastRecordHash(workspace: string, at: RecordLocation): string {

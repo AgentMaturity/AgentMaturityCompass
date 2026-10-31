@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { readTrustedWorkspaceRecords, saveWorkspaceRecord, verifyWorkspaceRecords } from "../src/storage/workspaceRecordStore.js";
+import * as files from "../src/utils/fs.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { canonicalize } from "../src/utils/json.js";
 import { initWorkspace } from "../src/workspace.js";
@@ -53,5 +54,20 @@ describe("an unverifiable key set (WP37 review)", () => {
     expect(read.records.map((row) => row.tenantId)).not.toContain("forged");
     expect(codes(ws)).toContain("KEYSET_UNVERIFIABLE");
     expect(read.unverified.join("\n")).toMatch(/UNVERIFIED: tenants KEYSET_UNVERIFIABLE/);
+  });
+});
+
+describe("the trusted read returns what it verified (WP37 review)", () => {
+  test("a record swapped on disk after verification is not what the read returns", () => {
+    const ws = keyed("amc-wp37s-toctou-");
+    saveWorkspaceRecord(ws, AT, "a", { tenantId: "a" }, 1);
+    const file = recordFile(ws, "a"), genuine = readFileSync(file, "utf8");
+    const swapped = genuine.replace('"tenantId": "a"', '"tenantId": "swapped"');
+    const actual = files.readUtf8;
+    let reads = 0;
+    vi.spyOn(files, "readUtf8").mockImplementation((path) => path === file && ++reads > 1 ? swapped : actual(path));
+
+    expect(readTrustedWorkspaceRecords<{ tenantId: string }>(ws, AT).records.map((row) => row.tenantId)).toEqual(["a"]);
+    expect(reads).toBe(1);
   });
 });
