@@ -14,8 +14,12 @@ import { NATIVE_MCP_STATUS_FORMAT } from "../mcp/nativeMcpStatus.js";
 export const ACP_RUNTIME_META_KEY = "dev.agentmaturity.amc";
 export const ACP_RUNTIME_FORMAT = "amc-acp-runtime@1";
 export const ACP_MAX_UPDATE_PARAMS_BYTES = 900_000;
-/** Where a spawning composer (Studio native tasks, P1-67) hands `amc acp` the lease it minted for that process. */
-export const NATIVE_TASK_LEASE_ENV = "AMC_NATIVE_TASK_LEASE";
+/**
+ * A spawning composer (Studio native tasks, P1-67) hands `amc acp` the lease it minted for that process over an inherited
+ * pipe on fd NATIVE_TASK_LEASE_FD, and names that fd in this variable; the token itself never enters the environment.
+ */
+export const NATIVE_TASK_LEASE_FD_ENV = "AMC_NATIVE_TASK_LEASE_FD";
+export const NATIVE_TASK_LEASE_FD = 3;
 /** The Studio principal a native task belongs to (P1-78), recorded as the initiator of the approvals its runtime raises. */
 export const NATIVE_TASK_INITIATOR_ENV = "AMC_NATIVE_TASK_INITIATOR";
 /** The system prompt Studio composed for a native task's agent (P2-37, src/studio/nativeTaskContext.ts); read and unset at startup. */

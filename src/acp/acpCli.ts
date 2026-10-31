@@ -1,7 +1,8 @@
+import { closeSync, readFileSync } from "node:fs";
 import type { Command } from "commander";
 import { startAcpStdio } from "./acpStdioMain.js";
 import { serveAcpStartupRefusal } from "./acpStartupRefusal.js";
-import { NATIVE_TASK_INITIATOR_ENV, NATIVE_TASK_LEASE_ENV, NATIVE_TASK_SYSTEM_PROMPT_ENV } from "./acpRuntimeContracts.js";
+import { NATIVE_TASK_INITIATOR_ENV, NATIVE_TASK_LEASE_FD, NATIVE_TASK_LEASE_FD_ENV, NATIVE_TASK_SYSTEM_PROMPT_ENV } from "./acpRuntimeContracts.js";
 import { compactionFromFlags } from "../agent/compaction/promptPressure.js";
 
 /**
@@ -18,6 +19,23 @@ import { compactionFromFlags } from "../agent/compaction/promptPressure.js";
  * THE PROCESS STAYS UP UNTIL THE CLIENT CLOSES ITS SIDE. There is no idle
  * timeout: an editor may hold a session open for hours with nothing to say.
  */
+/**
+ * The lease a spawning composer handed this process (P1-67): read once from the inherited pipe the environment names,
+ * then the pipe is closed and the name unset, so no tool, check or MCP child inherits either. None without the name;
+ * a named pipe that cannot be read throws (the caller answers it as a startup refusal).
+ */
+export function takeNativeTaskLease(): string | undefined {
+  const fd = process.env[NATIVE_TASK_LEASE_FD_ENV];
+  delete process.env[NATIVE_TASK_LEASE_FD_ENV];
+  if (fd === undefined) return undefined;
+  if (fd !== String(NATIVE_TASK_LEASE_FD)) throw new Error(`${NATIVE_TASK_LEASE_FD_ENV} must name fd ${NATIVE_TASK_LEASE_FD}`);
+  try {
+    return readFileSync(NATIVE_TASK_LEASE_FD, "utf8") || undefined;
+  } finally {
+    try { closeSync(NATIVE_TASK_LEASE_FD); } catch { /* already closed: the read reported why */ }
+  }
+}
+
 export function registerAcpCommands(program: Command): void {
   program
     .command("acp")
@@ -83,16 +101,15 @@ export function registerAcpCommands(program: Command): void {
       systemPrompt: string;
     }) => {
       let handle;
-      // P1-67: Studio hands a native task's lease to this process alone. Unset before anything runs, so no tool,
-      // check or MCP child inherits it; the toolset also scrubs it from tool output.
-      const leaseToken = process.env[NATIVE_TASK_LEASE_ENV];
       const initiator = process.env[NATIVE_TASK_INITIATOR_ENV];
-      delete process.env[NATIVE_TASK_LEASE_ENV];
       delete process.env[NATIVE_TASK_INITIATOR_ENV];
-      // P2-37: the agent's verified prompt pack and A4 context plugin, as Studio composed them; unset like the lease.
+      // P2-37: the agent's verified prompt pack and A4 context plugin, as Studio composed them; unset before anything runs.
       const composedPrompt = process.env[NATIVE_TASK_SYSTEM_PROMPT_ENV];
       delete process.env[NATIVE_TASK_SYSTEM_PROMPT_ENV];
       try {
+        // P1-67: Studio hands a native task's lease to this process alone, over a pipe (never the environment); the
+        // toolset also scrubs it from tool output.
+        const leaseToken = takeNativeTaskLease();
         const compaction = compactionFromFlags(opts);
         handle = startAcpStdio({
           ...(leaseToken ? { leaseToken } : {}),

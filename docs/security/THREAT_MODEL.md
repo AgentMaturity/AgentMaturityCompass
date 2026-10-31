@@ -175,7 +175,7 @@ Each block names the threat, the control today and the gap. "Not applicable" car
 - Repudiation: an SDK call without a record. Control: the same session spine as the native runtime. Gap: none known.
 - Information disclosure: tools exposed to an ACP client by default. Control: `amc acp` defaults to `--tools none`. Gap: none known.
 - Denial of service: a client floods prompts. Control: none specific. Gap: one execution API with shared limits (P2-13).
-- Elevation of privilege: `AMCNativeClient` turns a bridge lease into execution authority. Control: it spawns the governed ACP runtime and does not. A native task lease reaches `amc acp` only through `AMC_NATIVE_TASK_LEASE`, which the process unsets before anything runs and scrubs from tool output, and it covers only `toolhub:execute` for the task's agent and pinned classes (P1-67). Gap: the variable is in the child's initial environment, which a same-user process can read while the runtime lives.
+- Elevation of privilege: `AMCNativeClient` turns a bridge lease into execution authority. Control: it spawns the governed ACP runtime and does not. A native task lease reaches `amc acp` only over an inherited pipe on fd 3 (`AMC_NATIVE_TASK_LEASE_FD` names the fd, never the token), which the process reads and closes before anything runs and scrubs from tool output, and it covers only `toolhub:execute` for the task's agent and pinned classes (P1-67). The token is never in the child's environment, so a same-user process cannot read it there while the runtime lives.
 
 ### Extensions
 

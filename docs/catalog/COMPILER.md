@@ -237,8 +237,8 @@ The `compiled-policy` guard runs first in the native pipeline and fails closed:
   `identity-binding` requires a lease (`L0-IDN-01`) runs under a lease Studio mints for that runtime alone (P1-67): the
   task's agent, the task id as the work order, `toolhub:execute` narrowed to the action classes of its pinned signed
   tools, the task's step and token caps as its rate fields (the tool pipeline does not read them), and at most the
-  runtime's one-hour lifetime. The token reaches the `amc acp` child through `AMC_NATIVE_TASK_LEASE`, which the child
-  unsets before anything runs and scrubs from tool output; only the lease id is recorded on the signed task
+  runtime's one-hour lifetime. The token reaches the `amc acp` child over an inherited pipe on fd 3 (named by `AMC_NATIVE_TASK_LEASE_FD`), never its
+  environment; the child reads and closes it before anything runs and scrubs it from tool output; only the lease id is recorded on the signed task
   descriptor, once the runtime holds the session's writer claim. The lease also names the task's own `users.yaml` user
   (P1-78). Every call binds the lease to its authorization record through the pipeline's own lease verifier (signature,
   expiry, agent, workspace, scope, class, signed revocations): the record's `delegation.leaseId` names the verified

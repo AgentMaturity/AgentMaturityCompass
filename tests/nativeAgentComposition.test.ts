@@ -11,7 +11,7 @@ import { openLedger } from "../src/ledger/ledger.js";
 import { readEventPayload } from "../src/session/eventPayload.js";
 import { runComposedTurn } from "../src/kernel/agentLoopRunner.js";
 import { startAcpStdio } from "../src/acp/acpStdioMain.js";
-import { NATIVE_TASK_LEASE_ENV, NATIVE_TASK_SYSTEM_PROMPT_ENV } from "../src/acp/acpRuntimeContracts.js";
+import { NATIVE_TASK_SYSTEM_PROMPT_ENV } from "../src/acp/acpRuntimeContracts.js";
 import { openAgentSession } from "../src/agent/agentSession.js";
 import { COMPOSITION_FAILED } from "../src/agent/nativeAgentComposition.js";
 import { AgentDriver } from "../src/agent/agentDriver.js";
@@ -150,8 +150,8 @@ async function studioChild(dir: string): Promise<{ systemPrompt: string; leaseTo
     await vi.waitFor(() => expect(start).toHaveBeenCalledTimes(1));
   } finally { await service.close(); }
   const env = start.mock.calls[0]![0].env ?? {};
-  // `amc acp` (src/acp/acpCli.ts): Studio's composed prompt when it sent one, else the child's default.
-  const lease = env[NATIVE_TASK_LEASE_ENV];
+  // `amc acp` (src/acp/acpCli.ts): Studio's composed prompt when it sent one, else the child's default; a lease goes over a pipe.
+  const lease = start.mock.calls[0]![0].leaseToken;
   return { systemPrompt: env[NATIVE_TASK_SYSTEM_PROMPT_ENV] ?? NATIVE_DEFAULT_SYSTEM_PROMPT, ...(lease ? { leaseToken: lease } : {}) };
 }
 
