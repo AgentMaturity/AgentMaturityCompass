@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "key": "P2-12",
+  "date": "2026-10-19",
+  "commit": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+  "branch": "rtd/p2-12-writer-fencing",
+  "node": "22 (major only; red.txt records Node 22)",
+  "pnpm": "not recorded",
+  "os": "macOS (version not recorded), local, not CI",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npx vitest run tests/resumeRules.test.ts tests/sessionWriterFencing.test.ts tests/resumeReconciliation.test.ts tests/sessionMigrationReceipt.test.ts --maxWorkers=2",
+      "exit": 1,
+      "durationMs": 0
+    }
+  ],
+  "tests": {
+    "total": 2,
+    "passed": 0,
+    "failed": 2,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "red.txt",
+      "sha256": "069af61fda3c5d4037503aa468aad93753f7963400bc344d4ca3d72e2dbf53f7"
+    }
+  ],
+  "notes": "Red-first run only. red.txt transcribes the summary of one vitest run on base int dc8c34d04 plus the new P2-12 tests, before any src change (local macOS arm64, Node 22, not CI): 4 test files failed; three could not load because src/session/resumeRules.ts and src/session/writerFence.ts did not exist yet, and tests/sessionMigrationReceipt.test.ts failed its 2 tests. The failing run is why the command's exit is non-zero: red.txt transcribes the summary, not the exit code, and vitest exits 1 when a test fails. tests holds that red run's totals (2 failed of 2); it is not a passing qualification of P2-12. red.txt points to a receipt.json with the green focused tests, but no such file was ever committed: the folder arrived in 247d9bbc5 (2026-10-27), a snapshot of session 7fccbbfa's uncommitted work in wt/p2-12 last edited 2026-10-19, merged by c7ea18470 (Merge branch 'rtd/p2-12-writer-fencing'). No green run, check or mutation result for P2-12 is recorded in this folder, and none is added here. commit is the red run's base dc8c34d04; the run also had the new, then uncommitted, test files. branch is the branch git history merged this folder from; red.txt names only 'base int'. Not recorded: pnpm, the macOS version, the exact Node version and the run's duration (durationMs 0 means not recorded)."
+}
