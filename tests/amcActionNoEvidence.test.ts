@@ -136,7 +136,7 @@ describe("AMC action: no evidence yet is a result, never a crash or a score", { 
     const drop = run.step("Score-drop detection (base branch comparison)", "drop");
     expect(drop.status, drop.stderr).toBe(0);
     expect(drop.outputs).toMatchObject({ dropped: "false", base_score: "unavailable" });
-    expect(drop.summary).toContain("No evidence yet on this branch; skipping drop comparison.");
+    expect(drop.summary).toContain("Neither branch has evidence yet; skipping drop comparison.");
     const gate = run.step("Target-level gate", "gate");
     expect(gate.status, gate.stderr).toBe(0);
     expect(gate.outputs.passed).toBe("true");
@@ -190,15 +190,33 @@ describe("AMC action: no evidence yet is a result, never a crash or a score", { 
 
     run.stub({ statusDimensions: { result: "pass" }, layerScores: [{ layerName: "Skills", avgFinalLevel: 1.5 }, { layerName: "Resilience", avgFinalLevel: 2.24 }] });
     expect(run.step("Run AMC evaluation", "run-amc").outputs).toMatchObject({ score: "1.87", level: "L1", level_num: "1" });
-    writeFileSync(join(run.repo, "README.md"), "base\n");
-    for (const args of [["init", "-q"], ["add", "README.md"], ["-c", "user.name=t", "-c", "user.email=t@example.com", "-c", "commit.gpgsign=false", "commit", "-q", "-m", "base"],
-      ["update-ref", "refs/remotes/origin/main", "HEAD"]]) {
-      expect(spawnSync("git", args, { cwd: run.repo }).status).toBe(0);
-    }
+    commitBase(run.repo);
     run.stub(NOT_EVALUATED);
     const drop = run.step("Score-drop detection (base branch comparison)", "drop");
     expect(drop.status, drop.stderr).toBe(0);
     expect(drop.outputs).toMatchObject({ dropped: "false", base_score: "unavailable" });
     expect(drop.summary).toContain("Base branch could not be scored");
   });
+
+  test("removing evidence is a drop: a measured base and no evidence here fails fail-on-drop", () => {
+    const run = job({ "fail-on-drop": "true" });
+    run.stub(NOT_EVALUATED);
+    expect(run.step("Run AMC evaluation", "run-amc").outputs.evidence).toBe("none");
+    commitBase(run.repo);
+    run.stub({ percentage: 60, preliminaryLevel: "L3", statusDimensions: { result: "pass" } });
+    const drop = run.step("Score-drop detection (base branch comparison)", "drop");
+    expect(drop.status, drop.stderr).toBe(0);
+    expect(drop.outputs).toMatchObject({ dropped: "true", base_score: "60", evidence_removed: "true" });
+    const gate = run.step("Target-level gate", "gate");
+    expect(gate.status).toBe(1);
+    expect(gate.stdout).toContain("::error::AMC gate failed: evidence removed");
+  });
 });
+
+function commitBase(repo: string) {
+  writeFileSync(join(repo, "README.md"), "base\n");
+  for (const args of [["init", "-q"], ["add", "README.md"], ["-c", "user.name=t", "-c", "user.email=t@example.com", "-c", "commit.gpgsign=false", "commit", "-q", "-m", "base"],
+    ["update-ref", "refs/remotes/origin/main", "HEAD"]]) {
+    expect(spawnSync("git", args, { cwd: repo }).status).toBe(0);
+  }
+}

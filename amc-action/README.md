@@ -71,8 +71,9 @@ repository secret in the job's `env`.
 
 A fresh workspace has no evidence yet. The action reports that as a result, not as a crash and not as a score: the step
 summary and the PR comment say "AMC: no evidence yet", the badge reads "no evidence yet", `score` and `level` are empty,
-the drop comparison is skipped, and the gate fails only when `target-level` is above 0, naming that reason. Capture
-evidence first (`amc wrap <runtime> -- <your-agent-command>`), or score self-reported survey answers with `answers-file`.
+and the gate fails when `target-level` is above 0, naming that reason. With `fail-on-drop`, the base branch is still
+scored: a measured base with no evidence on this branch fails the gate as "evidence removed", and the comparison is skipped
+only when neither branch has evidence. Capture evidence first (`amc wrap <runtime> -- <your-agent-command>`), or score self-reported survey answers with `answers-file`.
 
 ## Advanced: Use Outputs in Downstream Steps
 

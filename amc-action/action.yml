@@ -182,13 +182,6 @@ runs:
           node -e 'let s="";process.stdin.setEncoding("utf8");process.stdin.on("data",c=>{s+=c;});process.stdin.on("end",()=>{const start=s.indexOf("{");if(start<0){console.error("AMC produced no JSON output");process.exit(2);}let depth=0,inString=false,escape=false,end=-1;for(let i=start;i<s.length;i++){const ch=s[i];if(escape){escape=false;continue;}if(ch==="\\"){escape=true;continue;}if(ch==="\""){inString=!inString;continue;}if(inString)continue;if(ch==="{")depth++;if(ch==="}"){depth--;if(depth===0){end=i+1;break;}}}if(end<0){console.error("AMC JSON output was truncated");process.exit(2);}const candidate=s.slice(start,end);try{JSON.parse(candidate);console.log(candidate);}catch{console.error("AMC output was not valid JSON");process.exit(2);}});'
         }
 
-        if [ "${{ steps.run-amc.outputs.evidence }}" = "none" ]; then
-          echo "dropped=false" >> "$GITHUB_OUTPUT"
-          echo "base_score=unavailable" >> "$GITHUB_OUTPUT"
-          echo "No evidence yet on this branch; skipping drop comparison." >> "$GITHUB_STEP_SUMMARY"
-          exit 0
-        fi
-
         # Checkout base branch, score it, compare
         git fetch origin "${{ github.base_ref }}" --depth=1 2>/dev/null || true
         git stash push -u -m "amc-action-base-comparison" >/dev/null 2>&1 || true
@@ -214,7 +207,20 @@ runs:
           BASE_RESULT=$(printf '%s\n' "$RAW_BASE_RESULT" | extract_json)
           BASE_SCORE=$(echo "$BASE_RESULT" | jq -r 'if .scoreStatus == "AUTO_NO_EVIDENCE" or .statusDimensions.result == "not_evaluated" then empty else .score // .percentage // ([.layerScores[]?.avgFinalLevel] | if length > 0 then add / length * 100 | round / 100 else empty end) end')
         fi
-        if [ -n "${BASE_SCORE:-}" ]; then
+        # Removing evidence is a drop: a measured base with no evidence on this branch fails fail-on-drop. Only when
+        # neither side has evidence is there nothing to compare.
+        if [ "${{ steps.run-amc.outputs.evidence }}" = "none" ]; then
+          if [ -n "${BASE_SCORE:-}" ]; then
+            echo "base_score=$BASE_SCORE" >> "$GITHUB_OUTPUT"
+            echo "evidence_removed=true" >> "$GITHUB_OUTPUT"
+            echo "⚠️ Evidence removed: the base branch scored ${BASE_SCORE}; this branch has no evidence yet." >> "$GITHUB_STEP_SUMMARY"
+            DROPPED=true
+          else
+            echo "base_score=unavailable" >> "$GITHUB_OUTPUT"
+            echo "Neither branch has evidence yet; skipping drop comparison." >> "$GITHUB_STEP_SUMMARY"
+            DROPPED=false
+          fi
+        elif [ -n "${BASE_SCORE:-}" ]; then
           echo "base_score=$BASE_SCORE" >> "$GITHUB_OUTPUT"
           DROPPED=$(python3 -c "print('true' if float('$HEAD_SCORE') < float('$BASE_SCORE') else 'false')")
         else
@@ -224,7 +230,7 @@ runs:
         fi
         echo "dropped=$DROPPED" >> "$GITHUB_OUTPUT"
 
-        if [ "$DROPPED" = "true" ]; then
+        if [ "$DROPPED" = "true" ] && [ "${{ steps.run-amc.outputs.evidence }}" != "none" ]; then
           echo "⚠️ Score dropped: ${BASE_SCORE} → ${HEAD_SCORE}" >> "$GITHUB_STEP_SUMMARY"
         fi
 
@@ -257,7 +263,11 @@ runs:
 
         if [ "$FAIL_ON_DROP" = "true" ] && [ "$DROPPED" = "true" ]; then
           PASSED=false
-          REASON="${REASON:+${REASON}; }Score dropped from base branch"
+          if [ "${{ steps.drop.outputs.evidence_removed }}" = "true" ]; then
+            REASON="${REASON:+${REASON}; }evidence removed: the base branch has a measured score and this branch has none"
+          else
+            REASON="${REASON:+${REASON}; }Score dropped from base branch"
+          fi
         fi
 
         echo "passed=$PASSED" >> "$GITHUB_OUTPUT"
@@ -343,7 +353,7 @@ runs:
 
           No measured maturity score was produced. ${result.firstRunHint ?? 'Capture evidence with `amc wrap <runtime> -- <your-agent-command>`, or score survey answers with the `answers-file` input.'}
 
-          **Status:** ${passed ? 'No target level is set' : `No measured level to compare with the required L${targetLevel}`}
+          **Status:** ${'${{ steps.drop.outputs.evidence_removed }}' === 'true' ? `Evidence removed: the base branch scored ${baseScore}` : passed ? 'No target level is set' : `No measured level to compare with the required L${targetLevel}`}
 
           ${footer}`
             : !level
