@@ -1,0 +1,142 @@
+{
+  "schemaVersion": 1,
+  "key": "P2-41",
+  "date": "2026-10-29",
+  "commit": "efaa4a55410adfb86a7a2c218448e6194af2c06e",
+  "branch": "rtd/w6-p2-41",
+  "node": "not recorded",
+  "pnpm": "not recorded",
+  "os": "not recorded",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run build",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run typecheck",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run typecheck:tests",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run lint",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npx vitest run <44 test files: tests/a4 plus every file touching a4Gates, a4Router, a4Openapi and the MCP A4 tools, and tests/a4PostgresMirror.test.ts; output in tests.txt>",
+      "exit": 0,
+      "durationMs": 500300
+    },
+    {
+      "cmd": "npm run check:gates",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:dead-code",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:duplicates",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:counts",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:api-ref",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npx vitest run tests/a4/scenario13TamperedRecord.test.ts (output in followup-green.txt)",
+      "exit": 0,
+      "durationMs": 20320
+    }
+  ],
+  "tests": {
+    "total": 588,
+    "passed": 588,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "check:api-ref.txt",
+      "sha256": "b3f05c856b6880ccf5985f87f8939d6948fc30ce3dc70edd6c71e0e1dff3cb2d"
+    },
+    {
+      "path": "check:counts.txt",
+      "sha256": "f22f32c8cce95da49779f77a8612a0ff3f01e55a3673dd741fc91b51cba93f8e"
+    },
+    {
+      "path": "check:dead-code.txt",
+      "sha256": "55249e7bc6ad18e7ce809a708ea92386ff7b95aa77e4880e760442a15be5fb8b"
+    },
+    {
+      "path": "check:docs-drift.txt",
+      "sha256": "d069ee3964690a5068b1dabe858ed30d571d77fefea0290a221beb4b480d9bc6"
+    },
+    {
+      "path": "check:duplicates.txt",
+      "sha256": "b543e2fabc40e6524309ff9ce4939dea37d9f77733a1fb488074425e5407839f"
+    },
+    {
+      "path": "check:gates.txt",
+      "sha256": "e59398d6b10bd12bbfdd3ab4f1094f5a49247370760dfafe11996cce02f585f1"
+    },
+    {
+      "path": "followup-checks.txt",
+      "sha256": "0810d7123fe9a86f7f3fecd3c4415c0005a746e7fa89cc5b26b8345c0926f49c"
+    },
+    {
+      "path": "followup-green.txt",
+      "sha256": "f108f02be7f1af9b8f001e6264e65299ad0759b43d9e91629e1193defefa1033"
+    },
+    {
+      "path": "followup-mutations.txt",
+      "sha256": "d15518a06e519bc8bd24db74519a8e36d09779bf656ad4c85a48f38cede82c47"
+    },
+    {
+      "path": "followup-red.txt",
+      "sha256": "5eab877a186d825dd013ddfd96076ac3485c1c0d1fcdb4e007d1c70bee9f63ac"
+    },
+    {
+      "path": "gen-api-ref.txt",
+      "sha256": "31fb71b9c2fd1b4c4622b90d9ad85aa947e378d69965454722cd602b0822c152"
+    },
+    {
+      "path": "gen-counts.txt",
+      "sha256": "228c5b550b1a134b952b855f5c44cb5cf65ba7aa328e53c37b4685dad222dc22"
+    },
+    {
+      "path": "lint.txt",
+      "sha256": "b7096a28a4ef9fc9c2b3964e45ba643cee6913af3b85795f8e22294d36c7ec33"
+    },
+    {
+      "path": "receipt.md",
+      "sha256": "dd3017432ea2535cdbbd09f012bb1a9aea7c1ba79f135497f2c1dd7935ae8cc8"
+    },
+    {
+      "path": "tests.txt",
+      "sha256": "7fb5439c6312fe90d54217c4f9687970e86499603c62e028d2f786c3d9e6b8f7"
+    }
+  ],
+  "notes": "P2-41 on rtd/w6-p2-41, base cafe5751f, in two commits: 650129366 and the follow-up efaa4a554, the commit named here. receipt.md is the lane's own receipt for both. Rows 1-11 are followup-checks.txt, the follow-up's checks in order, written as the npm scripts they name; flags were not recorded. Row 5 ('tests' there) is the suite run in tests.txt, and row 12 the green run in followup-green.txt; their command lines were not recorded, and their durationMs is the Duration vitest reported. Row 12's file is the one followup-red.txt names. tests is the suite run in tests.txt (44 files, 588 tests passed), which includes row 12's file. Row 7: check:dead-code first flagged the exported A4_INTEGRITY_VERDICT; it is module-local now and the rerun exits 0. Follow-up red: scenario13 with the new assertions on the previous tip's source failed 8 of 9 (followup-red.txt). Mutations (followup-mutations.txt): (1) no central detail override, 7 of 8 failed; (2) verify back to 403 when the member rows fail, 1 failed; (3) ZodError detail re-added, survived, an equivalent mutant because the central override replaces any A4_INTEGRITY_FAILED detail; the parse-issue message is covered by the head-row test, which failed on the old source. First commit 650129366, not listed as commands because it is not the commit named here: red first, with only the test edits, scenario10 (expected [409, A4_ON_HOLD], received [409, A4_NOT_READY]) and all five scenario13 tamper cases failed, 6 of 7; green 7/7; each guard's removal is that red state; suite 42 files, 567 tests passed (its tests.txt, replaced by the follow-up's run, is in git at 650129366); build, typecheck, typecheck:tests, lint, check:gates, check:dead-code, check:duplicates (new 0), check:counts, check:api-ref and check:docs-drift all exit 0 (check:*.txt, gen-api-ref.txt and gen-counts.txt are that round's outputs). No new CLI command, audit type, deletion site or signing path. Not recorded: node, pnpm, the OS and the other commands' durations (durationMs 0 means not recorded). arch is not recorded either; arm64 is a same-host inference from the receipts of the same day that record it (2026-10-29-P0-36 and 2026-10-29-P3-19: darwin 25.6.0 arm64), because the schema allows only arm64 or x64."
+}
