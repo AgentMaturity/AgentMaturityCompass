@@ -11,6 +11,7 @@ import { canonicalize } from "../utils/json.js";
 import { createSignedTargetProfile, saveTargetProfile } from "../targets/targetProfile.js";
 import { loadContextGraph, riskTierRank, type ContextGraph } from "../context/contextGraph.js";
 import { hashBinaryOrPath, openLedger } from "../ledger/ledger.js";
+import { writerStore } from "../ledger/ledgerConnection.js";
 
 const riskTierSchema = z.enum(["low", "med", "high", "critical"]);
 
@@ -838,7 +839,7 @@ export function recordArchetypeAudit(params: {
   archetypeId: string;
   fileHashes: Record<string, string>;
 }): string {
-  const ledger = openLedger(params.workspace);
+  const ledger = openLedger(params.workspace, writerStore());
   const sessionId = randomUUID();
   try {
     ledger.startSession({

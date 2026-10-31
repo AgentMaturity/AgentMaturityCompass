@@ -4,6 +4,7 @@ import YAML from "yaml";
 import { z } from "zod";
 import { getSigningKey, getPublicKeyPem, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { openLedger } from "../ledger/ledger.js";
+import { writerStore } from "../ledger/ledgerConnection.js";
 import { assertKeysetComplete, boundProviderKey, keysetDeclared } from "../keys/keyset.js";
 import { getPurposeKeyHistory, readHistory, getSigningPublicKeyPem, assertSigningKeyUsable } from "../keys/signingKeys.js";
 import { publicKeyFromPrivate } from "../crypto/keyHistoryEnvelope.js";
@@ -381,7 +382,7 @@ export function resetBudgetDay(params: {
   if (Number.isNaN(date.getTime())) {
     throw new Error(`Invalid --day format: ${params.day} (expected yyyy-mm-dd)`);
   }
-  const ledger = openLedger(params.workspace);
+  const ledger = openLedger(params.workspace, writerStore());
   const sessionId = `budget-reset-${Date.now()}`;
   try {
     ledger.startSession({

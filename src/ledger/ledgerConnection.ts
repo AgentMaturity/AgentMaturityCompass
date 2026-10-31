@@ -20,6 +20,8 @@ function ledgerPoolSize(): number {
  */
 export const UNSIGNED_EVIDENCE_STORE = ".amc/unsigned/evidence.sqlite";
 export type LedgerStore = "unsigned";
+/** The store an evidence writer opens (P0-55): the unsigned one under AMC_NO_SIGN=1, so no unsigned row reaches `.amc/evidence.sqlite`. */
+export const writerStore = (): { store?: LedgerStore } => process.env.AMC_NO_SIGN === "1" ? { store: "unsigned" } : {};
 
 /** Owns connection setup so evidence readers cannot accidentally initialize writers. */
 export function openLedgerConnection(

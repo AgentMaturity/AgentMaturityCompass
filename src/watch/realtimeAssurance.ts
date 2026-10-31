@@ -19,6 +19,7 @@ import type { MonitoringEvent } from "./continuousMonitor.js";
 import { sha256Hex } from "../utils/hash.js";
 import { ensureDir, writeFileAtomic } from "../utils/fs.js";
 import { openLedger } from "../ledger/ledger.js";
+import { writerStore } from "../ledger/ledgerConnection.js";
 import { dispatchAlert, type AlertPayload } from "../drift/alerts.js";
 
 /* ── Types ───────────────────────────────────────────────────────── */
@@ -670,7 +671,7 @@ export class RealtimeAssuranceEngine extends EventEmitter {
 
   private async recordViolationsToLedger(violations: RealtimeAssuranceViolation[]): Promise<void> {
     try {
-      const ledger = openLedger(this.config.workspace);
+      const ledger = openLedger(this.config.workspace, writerStore());
       const sessionId = `rt-assurance-${randomUUID()}`;
       ledger.startSession({
         sessionId,
