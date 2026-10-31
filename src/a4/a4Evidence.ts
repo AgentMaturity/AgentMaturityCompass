@@ -173,7 +173,7 @@ export function ledgerRowAgent(event: Pick<EvidenceEvent, "meta_json" | "session
   return open !== undefined && open.event_type === "session/open" && open.session_id === event.session_id && signed(open) ? metaAgent(open) : null;
 }
 /** The first row of `sessionId` in this ledger (a native session's `session/open`). */
-export const firstSessionRow = (ledger: Ledger, sessionId: string): EvidenceEvent | undefined =>
+const firstSessionRow = (ledger: Ledger, sessionId: string): EvidenceEvent | undefined =>
   ledger.db.prepare("SELECT * FROM evidence_events WHERE session_id = ? ORDER BY rowid LIMIT 1").get(sessionId) as EvidenceEvent | undefined;
 /** `ledgerRowAgent` on this ledger: the session's first row, signed and intact on its chain. */
 export const liveLedgerRowAgent = (ledger: Ledger, event: EvidenceEvent): string | null => ledgerRowAgent(event, (sessionId) => firstSessionRow(ledger, sessionId),
