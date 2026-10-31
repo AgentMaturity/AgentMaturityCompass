@@ -1,3 +1,4 @@
+import { generateKeyPairSync } from "node:crypto";
 import { copyFileSync, existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, unlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -128,6 +129,14 @@ describe("the head anchor is signed like a record (WP37 review)", () => {
     expect(existsSync(recordFile(ws, "b"))).toBe(false);
   });
 
+  test("the prepared publishers refuse an anchor signed by another key than the record", async () => {
+    const ws = keyed("amc-wp37s-head-");
+    const other = generateKeyPairSync("ed25519").privateKey.export({ format: "pem", type: "pkcs8" }).toString();
+    vi.spyOn(keyFacade, "getSigningKey").mockReturnValue(other);
+    await expect(prepareWorkspaceRecordAsync(ws, AT, "a", { tenantId: "a" }, 1)).rejects.toThrow("the head anchor was signed by another key than its record");
+    expect(existsSync(headFile(ws))).toBe(false);
+  });
+
   test("the prepared publishers never write an unsigned anchor", async () => {
     const ws = keyed("amc-wp37s-head-");
     vi.spyOn(keyFacade, "getSigningKey").mockImplementation(() => { throw new Error("owned anchor signing refusal"); });
@@ -176,16 +185,82 @@ describe("stores written before head anchors are anchored once (WP37 review)", (
     expect(headCodes(ws)).toEqual(["HEAD_MISSING"]);
   }, 60_000);
 
-  test("the first verifying read of a keyed workspace anchors the store, and a later anchor deletion is not re-anchored", () => {
+  test("a verifying read never anchors: an unanchored store stays HEAD_UNANCHORED until doctor", () => {
     const ws = keyed("amc-wp37s-adopt-");
     legacyStore(ws);
-    expect(codes(ws)).toEqual([]);
-    expect(headAudits(ws)).toHaveLength(1);
+    expect(headCodes(ws)).toEqual(["HEAD_UNANCHORED"]);
+    expect(readTrustedWorkspaceRecords(ws, AT).unverified.join("\n")).toMatch(/HEAD_UNANCHORED/);
+    expect(existsSync(headFile(ws))).toBe(false);
+    expect(headAudits(ws)).toEqual([]);
+  });
+
+  test("doctor never anchors after the anchor was deleted from an adopted store", async () => {
+    const ws = keyed("amc-wp37s-adopt-");
+    legacyStore(ws);
+    expect(adoptWorkspaceRecordHead(ws, AT).status).toBe("adopted");
     unlinkSync(recordFile(ws, "b"));
     unlinkSync(headFile(ws));
     expect(headCodes(ws)).toEqual(["HEAD_MISSING"]);
+    expect(adoptWorkspaceRecordHead(ws, AT)).toMatchObject({ status: "deleted" });
     expect(existsSync(headFile(ws))).toBe(false);
     expect(headAudits(ws)).toHaveLength(1);
+  });
+
+  test("adoption refuses a store whose records do not verify", async () => {
+    const ws = keyed("amc-wp37s-adopt-");
+    legacyStore(ws);
+    const row = JSON.parse(readFileSync(recordFile(ws, "a"), "utf8")) as Record<string, unknown>;
+    writeFileSync(recordFile(ws, "a"), JSON.stringify({ ...row, tenantId: "edited" }, null, 2));
+    expect(adoptWorkspaceRecordHead(ws, AT)).toMatchObject({ status: "refused", reason: expect.stringMatching(/HASH_MISMATCH/) });
+    expect(existsSync(headFile(ws))).toBe(false);
+  });
+
+  test("adoption anchors the chain tip, not the record with the largest unsigned storedTs", async () => {
+    const ws = keyed("amc-wp37s-adopt-");
+    const [, newest] = legacyStore(ws);
+    const row = JSON.parse(readFileSync(recordFile(ws, "a"), "utf8")) as Record<string, unknown>;
+    writeFileSync(recordFile(ws, "a"), JSON.stringify({ ...row, storedTs: 99 }, null, 2));
+    expect(adoptWorkspaceRecordHead(ws, AT)).toEqual({ status: "adopted", head: newest!.record_hash });
+  });
+
+  test("every verified anchor of a store without a ledger row records one, and doctor backfills older anchors", async () => {
+    const ws = keyed("amc-wp37s-adopt-");
+    const actual = keyFacade.getSigningKey;
+    let calls = 0;
+    vi.spyOn(keyFacade, "getSigningKey").mockImplementation((workspace, purpose) => {
+      if (++calls === 2) throw new Error("owned anchor refusal");
+      return actual(workspace, purpose);
+    });
+    saveWorkspaceRecord(ws, AT, "a", { tenantId: "a" }, 1);
+    vi.restoreAllMocks();
+    expect(headAudits(ws)).toEqual([]);
+    const second = saveWorkspaceRecord(ws, AT, "b", { tenantId: "b" }, 2);
+    expect(headAudits(ws)).toEqual([expect.objectContaining({ kind: "tenants", recordHash: second.record_hash })]);
+
+    const older = keyed("amc-wp37s-adopt-");
+    const [, newest] = legacyStore(older);
+    const lost: string[] = [], digest = sha256Hex(canonicalize({ record_hash: newest!.record_hash, lost }));
+    writeFileSync(headFile(older), JSON.stringify({ record_hash: newest!.record_hash, lost,
+      signature: keyFacade.signHexDigest(digest, keyFacade.getSigningKey(older, "artifact-seal")) }, null, 2));
+    expect(headAudits(older)).toEqual([]);
+    expect(await headCheck(older)).toMatchObject({ status: "INFO", message: expect.stringContaining("ledger row recorded: compliance/residency/tenants") });
+    expect(headAudits(older)).toEqual([expect.objectContaining({ kind: "tenants", recordHash: newest!.record_hash })]);
+  }, 60_000);
+
+  test("a write after the anchor was deleted carries that forward instead of starting a clean anchor", () => {
+    const keyedWs = keyed("amc-wp37s-lost-");
+    saveWorkspaceRecord(keyedWs, AT, "a", { tenantId: "a" }, 1);
+    saveWorkspaceRecord(keyedWs, AT, "b", { tenantId: "b" }, 2);
+    unlinkSync(recordFile(keyedWs, "b"));
+    unlinkSync(headFile(keyedWs));
+    saveWorkspaceRecord(keyedWs, AT, "c", { tenantId: "c" }, 3);
+    expect(headCodes(keyedWs)).toEqual(["HEAD_MISSING"]);
+
+    const keyless = scratch("amc-wp37s-lost-");
+    saveWorkspaceRecord(keyless, AT, "a", { tenantId: "a" }, 1);
+    unlinkSync(headFile(keyless));
+    saveWorkspaceRecord(keyless, AT, "c", { tenantId: "c" }, 3);
+    expect(headCodes(keyless)).toEqual(["HEAD_UNANCHORED"]);
   });
 
   test("a store anchored by its first write is never re-anchored after its anchor is deleted; doctor fails it", async () => {
@@ -200,14 +275,15 @@ describe("stores written before head anchors are anchored once (WP37 review)", (
     expect(existsSync(headFile(ws))).toBe(false);
   }, 60_000);
 
-  test("a record written while the adopted anchor was being signed refuses the adoption", () => {
+  test("a record written while the adopted anchor was being signed refuses the adoption", async () => {
     const ws = keyed("amc-wp37s-adopt-");
-    legacyStore(ws);
+    const [, newest] = legacyStore(ws);
     const actual = keyFacade.getSigningKey;
-    vi.spyOn(keyFacade, "getSigningKey").mockImplementationOnce((workspace, purpose) => {
-      const late = JSON.parse(readFileSync(recordFile(ws, "b"), "utf8")) as Record<string, unknown>;
-      writeFileSync(recordFile(ws, "late"), JSON.stringify({ ...late, tenantId: "late", record_hash: "f".repeat(64), storedTs: 3 }, null, 2));
-      return actual(workspace, purpose);
+    vi.spyOn(keyFacade, "getSigningKey").mockImplementationOnce((...args) => {
+      const body = { tenantId: "late" }, hash = sha256Hex(canonicalize({ ...body, prev_record_hash: newest!.record_hash }));
+      writeFileSync(recordFile(ws, "late"), JSON.stringify({ ...body, prev_record_hash: newest!.record_hash, record_hash: hash,
+        signature: keyFacade.signHexDigest(hash, keyFacade.getSigningKey(ws, "artifact-seal")), storedTs: 3 }, null, 2));
+      return actual(...args);
     });
     expect(adoptWorkspaceRecordHead(ws, AT)).toEqual({ status: "refused", reason: "workspace records changed while their head anchor was prepared; retry" });
     expect(existsSync(headFile(ws))).toBe(false);

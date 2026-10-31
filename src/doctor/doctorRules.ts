@@ -143,19 +143,21 @@ const WORKSPACE_RECORD_STORES: readonly RecordLocation[] = [
 
 /**
  * The explicit, one-time anchoring of record stores written before head anchors existed (WP37 review): each such
- * store is anchored at its current head, signed, with a ledger audit row, and reads clean afterwards. A store whose
- * anchor was removed after it was anchored is never anchored again and fails.
+ * store is anchored at its chain tip, signed, with a ledger audit row, and reads clean afterwards; a verified anchor
+ * without a ledger row gets one. A store whose anchor was removed after it was anchored is never anchored again and
+ * fails.
  */
 function pushWorkspaceRecordHeadCheck(checks: DoctorCheck[], workspace: string): void {
   const rows = WORKSPACE_RECORD_STORES.map((at) => ({ store: [...at.area, at.kind].join("/"), result: adoptWorkspaceRecordHead(workspace, at) }));
   const named = (status: string) => rows.flatMap(({ store, result }) => result.status !== status ? []
     : [result.status === "adopted" ? `${store} at ${result.head.slice(0, 16)}…` : "reason" in result ? `${store} (${result.reason})` : store]);
-  const deleted = named("deleted"), refused = named("refused"), adopted = named("adopted");
+  const deleted = named("deleted"), refused = named("refused"), adopted = named("adopted"), recorded = named("recorded");
   const parts = [deleted.length > 0 ? `head anchor removed after anchoring: ${deleted.join(", ")}` : "",
-    refused.length > 0 ? `history not anchored: ${refused.join(", ")}` : "", adopted.length > 0 ? `existing history anchored once: ${adopted.join(", ")}` : ""];
+    refused.length > 0 ? `history not anchored: ${refused.join(", ")}` : "", adopted.length > 0 ? `existing history anchored once: ${adopted.join(", ")}` : "",
+    recorded.length > 0 ? `ledger row recorded: ${recorded.join(", ")}` : ""];
   checks.push({
     id: "workspace-record-heads",
-    status: deleted.length > 0 ? "FAIL" : refused.length > 0 ? "WARN" : adopted.length > 0 ? "INFO" : "PASS",
+    status: deleted.length > 0 ? "FAIL" : refused.length > 0 ? "WARN" : adopted.length + recorded.length > 0 ? "INFO" : "PASS",
     message: parts.some(Boolean) ? `Workspace record stores: ${parts.filter(Boolean).join("; ")}` : "Workspace record stores carry signed head anchors",
     ...(deleted.length > 0 ? { fixHint: "A removed head anchor hides whether the newest record was deleted: investigate the named store and restore its <kind>.head.json from a backup; doctor never anchors it again." }
       : refused.length > 0 ? { fixHint: "Run: export AMC_VAULT_PASSPHRASE='<the passphrase chosen or shown at amc init>', then rerun amc doctor" } : {})

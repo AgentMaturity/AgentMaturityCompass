@@ -25,7 +25,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import { basename, join, resolve } from "node:path";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
-import { signHexDigest, getSigningKey, verifyHexDigestAny } from "../crypto/keys.js";
+import { signHexDigest, getSigningKey, getSigningPublicKeyPem, verifyHexDigestAny } from "../crypto/keys.js";
 import { captureRunHashAuthority, runHashVerificationKeys } from "../ledger/runHashSignature.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { openLedger } from "../ledger/ledger.js";
@@ -87,6 +87,8 @@ const REVISIONS_DIR = "revisions";
  * artifact-seal key, in the same file so that one atomic write never leaves an anchor and a signature that disagree.
  */
 const UNREADABLE_ANCHOR = "unreadable", UNVERIFIED_ANCHOR = "unverified";
+/** Carried by an anchor written over records that had none: never anchored, or (per the ledger) its anchor was removed. */
+const UNANCHORED_MARK = "unanchored", REMOVED_ANCHOR_MARK = "anchor-removed";
 interface HeadAnchor { head: string; lost: string[] }
 type StoredAnchor = HeadAnchor | "absent" | typeof UNREADABLE_ANCHOR | typeof UNVERIFIED_ANCHOR;
 
@@ -129,9 +131,16 @@ function storedRecordHashes(workspace: string, at: RecordLocation): Set<string> 
     })));
 }
 
-/** What the next anchor carries forward: an earlier head that is no longer stored, or the marker of a bad anchor. */
-function lostAfter(prior: StoredAnchor, stored: Set<string>): string[] {
-  if (prior === "absent") return [];
+/**
+ * What the next anchor carries forward: an earlier head that is no longer stored, the marker of a bad anchor, or, when
+ * records exist with no anchor at all, whether that store was never anchored or lost its anchor (WP37 review). Only the
+ * explicit adoption of `head`, a record already stored, starts clean over existing records.
+ */
+function lostAfter(workspace: string, at: RecordLocation, prior: StoredAnchor, stored: Set<string>, head: string, keyed: boolean): string[] {
+  if (prior === "absent") {
+    if (stored.size === 0 || stored.has(head)) return [];
+    return [keyed && anchoredBefore(workspace, at) !== false ? REMOVED_ANCHOR_MARK : UNANCHORED_MARK];
+  }
   if (typeof prior === "string") return [prior];
   return stored.has(prior.head) ? [...prior.lost] : [...prior.lost, prior.head];
 }
@@ -145,39 +154,61 @@ export interface PreparedHeadAnchor {
   readonly lost: readonly string[]; readonly bytes: string;
 }
 
-/**
- * The anchor naming `recordHash` as the newest record of one kind, signed with the artifact-seal key. `required` is
- * for the prepared publishers, which never publish unsigned material; the synchronous compatibility writer leaves an
- * unsigned anchor beside its unsigned record, which a keyed workspace reads as HEAD_UNVERIFIED.
- */
-export function prepareWorkspaceRecordHead(workspace: string, at: RecordLocation, recordHash: string, required = false): PreparedHeadAnchor {
+function headAnchorBasis(workspace: string, at: RecordLocation, recordHash: string) {
   const seal = sealKeys(workspace), prior = readHeadAnchor(workspace, at, seal), stored = storedRecordHashes(workspace, at);
-  const lost = lostAfter(prior, stored), digest = anchorDigest(recordHash, lost);
+  const lost = lostAfter(workspace, at, prior, stored, recordHash, seal.keyed);
+  return { seal, digest: anchorDigest(recordHash, lost),
+    finish: (signature: string): PreparedHeadAnchor => Object.freeze({ head: recordHash, first: prior === "absent",
+      adopted: stored.has(recordHash), lost, verified: signature !== "unsigned" && verifyHexDigestAny(anchorDigest(recordHash, lost), signature, seal.keys),
+      bytes: JSON.stringify({ record_hash: recordHash, lost, signature }, null, 2) }) };
+}
+
+/**
+ * The synchronous compatibility writer's anchor, signed with the vault's artifact-seal key like its record; on a
+ * refused key both stay unsigned, which a keyed workspace reads as UNSIGNED and HEAD_UNVERIFIED.
+ */
+export function prepareWorkspaceRecordHead(workspace: string, at: RecordLocation, recordHash: string): PreparedHeadAnchor {
+  const basis = headAnchorBasis(workspace, at, recordHash);
   let signature = "unsigned";
-  try { signature = signHexDigest(digest, getSigningKey(workspace, "artifact-seal")); }
-  catch (error) { if (required) throw error; }
-  return Object.freeze({ head: recordHash, first: prior === "absent", adopted: stored.has(recordHash), lost,
-    verified: signature !== "unsigned" && verifyHexDigestAny(digest, signature, seal.keys),
-    bytes: JSON.stringify({ record_hash: recordHash, lost, signature }, null, 2) });
+  try { signature = signHexDigest(basis.digest, getSigningKey(workspace, "artifact-seal")); } catch { /* retained compatibility */ }
+  return basis.finish(signature);
+}
+
+/**
+ * The prepared publishers' anchor (WP37 review): signed by the very key that signed its record, never unsigned. In this
+ * release the artifact-seal purpose is held only by the vault ("file"; a provider binding for it is refused), so the
+ * vault key signs the anchor and must verify as `record.publicKeyPem`; any other holder refuses rather than sign twice
+ * through a provider or fall back to another key.
+ */
+export function prepareWorkspaceRecordHeadFor(workspace: string, at: RecordLocation, recordHash: string,
+  record: { provider: string; publicKeyPem: string }): PreparedHeadAnchor {
+  if (record.provider !== "file") throw new Error(`the ${record.provider} artifact-seal key cannot sign a head anchor; refusing an anchor by another key`);
+  const basis = headAnchorBasis(workspace, at, recordHash);
+  const signature = signHexDigest(basis.digest, getSigningKey(workspace, "artifact-seal"));
+  if (!verifyHexDigestAny(basis.digest, signature, [record.publicKeyPem])) throw new Error("the head anchor was signed by another key than its record");
+  return basis.finish(signature);
 }
 
 /**
  * Publishes a prepared anchor around the record write it anchors, under that store's publication lock: refuses before
- * `writeRecord` runs when the anchor it would replace changed while it was signed. A store's first verifiable anchor
- * is also recorded in the ledger (WORKSPACE_RECORD_HEAD_ANCHORED, before anything is written), so a later deletion
- * of the anchor is never taken for older history and anchored again (adoptWorkspaceRecordHead).
+ * `writeRecord` runs when the anchor it would replace changed while it was signed. Every verified anchor of a store
+ * the ledger has no WORKSPACE_RECORD_HEAD_ANCHORED row for records one first, so a later deletion of the anchor is
+ * never taken for older history and anchored again (adoptWorkspaceRecordHead).
  */
 export function anchorWorkspaceRecordHead(workspace: string, at: RecordLocation, prepared: PreparedHeadAnchor, writeRecord: () => void): void {
-  const prior = readHeadAnchor(workspace, at);
-  if ((prior === "absent") !== prepared.first || canonicalize(lostAfter(prior, storedRecordHashes(workspace, at))) !== canonicalize(prepared.lost)) {
+  const seal = sealKeys(workspace), prior = readHeadAnchor(workspace, at, seal);
+  if ((prior === "absent") !== prepared.first
+    || canonicalize(lostAfter(workspace, at, prior, storedRecordHashes(workspace, at), prepared.head, seal.keyed)) !== canonicalize(prepared.lost)) {
     throw new Error("workspace record head anchor changed while signing was prepared; retry");
   }
-  if (prepared.first && prepared.verified) {
-    appendOpsAuditEvent({ workspace, auditType: "WORKSPACE_RECORD_HEAD_ANCHORED", severity: prepared.adopted ? "MEDIUM" : "LOW",
-      payload: { area: at.area.join("/"), kind: at.kind, recordHash: prepared.head, adopted: prepared.adopted } });
-  }
+  if (prepared.verified && anchoredBefore(workspace, at) !== true) recordHeadAnchored(workspace, at, prepared.head, prepared.adopted);
   writeRecord();
   writeFileAtomic(headAnchorPath(workspace, at), prepared.bytes, 0o644);
+}
+
+function recordHeadAnchored(workspace: string, at: RecordLocation, recordHash: string, adopted: boolean): void {
+  appendOpsAuditEvent({ workspace, auditType: "WORKSPACE_RECORD_HEAD_ANCHORED", severity: adopted ? "MEDIUM" : "LOW",
+    payload: { area: at.area.join("/"), kind: at.kind, recordHash, adopted } });
 }
 
 /** appendOpsAuditEvent opens each audit's session as `ops-<auditType lowercased>-…`: an indexed range, never a scan. */
@@ -201,34 +232,57 @@ function anchoredBefore(workspace: string, at: RecordLocation): boolean | null {
   }
 }
 
-export type HeadAdoption = { status: "present" | "empty" } | { status: "adopted"; head: string } | { status: "deleted" | "refused"; reason: string };
+export type HeadAdoption = { status: "present" | "recorded" | "empty" } | { status: "adopted"; head: string } | { status: "deleted" | "refused"; reason: string };
+
+/** The one current record no stored record (current or kept revision) names as its predecessor; null when not exactly one. */
+function chainTip(workspace: string, at: RecordLocation): { tip: string | null; findings: WorkspaceRecordFinding[]; records: number } {
+  const { current, revisions, findings } = verifyStoredRecords(workspace, at);
+  const named = new Set([...current, ...revisions].map((row) => row.record.prev_record_hash));
+  const tips = current.filter((row) => !named.has(row.record.record_hash));
+  return { tip: tips.length === 1 ? tips[0]!.record.record_hash : null, findings, records: current.length };
+}
 
 /**
- * The one-time anchoring of a store whose records predate head anchors (WP37 review), run by `amc doctor` and by the
- * store's first verifying read in a keyed workspace (which never waits for the lock). It anchors the current head,
- * signed, with its ledger row. A store the ledger shows anchored before is never anchored again: its anchor was
- * deleted ("deleted"), and that stays a finding. A ledger that cannot answer, or a key that cannot sign, refuses.
+ * The explicit, one-time anchoring of a store whose records predate head anchors (WP37 review), run only by `amc
+ * doctor`, never by a read. It anchors the chain tip, signed by the vault artifact-seal key, with its ledger
+ * row, and refuses a store the ledger shows anchored before ("deleted": its anchor was removed, which stays a finding),
+ * a ledger that cannot answer, a store with record-level findings and a chain without exactly one tip. A verified
+ * anchor with no ledger row (written before rows existed) gets its row ("recorded").
  */
-export function adoptWorkspaceRecordHead(workspace: string, at: RecordLocation, wait = true): HeadAdoption {
-  if (readHeadAnchor(workspace, at) !== "absent") return { status: "present" };
-  const head = lastRecordHash(workspace, at);
-  if (genesisHashes(at).has(head)) return { status: "empty" };
+export function adoptWorkspaceRecordHead(workspace: string, at: RecordLocation): HeadAdoption {
+  const anchor = readHeadAnchor(workspace, at);
+  if (anchor !== "absent") {
+    if (typeof anchor === "string" || anchoredBefore(workspace, at) !== false) return { status: "present" };
+    try {
+      withWorkspaceRecordPublicationLock(workspace, at, () => {
+        const now = readHeadAnchor(workspace, at);
+        if (typeof now !== "object" || now.head !== anchor.head) throw new Error("the head anchor changed while its ledger row was prepared; retry");
+        recordHeadAnchored(workspace, at, anchor.head, false);
+      });
+    } catch (error) { return { status: "refused", reason: error instanceof Error ? error.message : String(error) }; }
+    return { status: "recorded" };
+  }
+  const { tip, findings, records } = chainTip(workspace, at);
+  if (records === 0) return { status: "empty" };
   const before = anchoredBefore(workspace, at);
   if (before !== false) {
     return before ? { status: "deleted", reason: "the ledger records this store's head as anchored before; its anchor was removed" }
       : { status: "refused", reason: "the ledger cannot show that this store was never anchored" };
   }
+  const recordFindings = [...new Set(findings.filter((row) => !row.code.startsWith("HEAD_")).map((row) => row.code))];
+  if (recordFindings.length > 0) return { status: "refused", reason: `its records do not verify (${recordFindings.join(", ")})` };
+  if (tip === null) return { status: "refused", reason: "its record chain does not have exactly one newest record" };
   try {
-    const prepared = prepareWorkspaceRecordHead(workspace, at, head, true);
+    const prepared = prepareWorkspaceRecordHeadFor(workspace, at, tip, { provider: "file", publicKeyPem: getSigningPublicKeyPem(workspace, "artifact-seal") });
     if (!prepared.verified) return { status: "refused", reason: "the signed head anchor does not verify under the workspace artifact-seal keys" };
     withWorkspaceRecordPublicationLock(workspace, at, () => {
-      if (lastRecordHash(workspace, at) !== head) throw new Error("workspace records changed while their head anchor was prepared; retry");
+      if (chainTip(workspace, at).tip !== tip) throw new Error("workspace records changed while their head anchor was prepared; retry");
       anchorWorkspaceRecordHead(workspace, at, prepared, () => {});
-    }, wait ? undefined : 0);
+    });
   } catch (error) {
     return { status: "refused", reason: error instanceof Error ? error.message : String(error) };
   }
-  return { status: "adopted", head };
+  return { status: "adopted", head: tip };
 }
 
 function genesisHashes(at: RecordLocation): Set<string> {
@@ -271,8 +325,8 @@ function sealKeys(workspace: string): { keys: string[]; keyed: boolean; unverifi
  * name genesis or a stored record (current or a kept revision), so a deleted or corrupted middle record is a finding
  * rather than a silent omission. The head anchor covers the newest record, which no successor names: an anchored hash
  * that is not a current record means the newest record was deleted or rolled back (HEAD_MISSING). Records with no
- * anchor are HEAD_UNANCHORED, unless a keyed workspace's first read anchors them once (adoptWorkspaceRecordHead) or the
- * ledger shows the store anchored before, when the removed anchor is HEAD_MISSING. An anchor whose signature does
+ * anchor are HEAD_UNANCHORED until `amc doctor` anchors them once (adoptWorkspaceRecordHead), or HEAD_MISSING when the
+ * ledger shows the store anchored before. An anchor whose signature does
  * not verify, or an unsigned one in a keyed workspace, is HEAD_UNVERIFIED: a writer who deletes the newest record and
  * rewrites the anchor to the older hash cannot sign it (WP37 review).
  * ponytail: an earlier signed anchor replayed from a backup, together with the records it named, still reads clean;
@@ -285,8 +339,8 @@ export function verifyWorkspaceRecords<T>(workspace: string, at: RecordLocation)
 
 type StoredRecord = { file: string; record: RecordEnvelope & Record<string, unknown> };
 
-/** verifyWorkspaceRecords with the rows it parsed, each read once, and whether the workspace is keyed. */
-function verifyStoredRecords(workspace: string, at: RecordLocation): { current: StoredRecord[]; findings: WorkspaceRecordFinding[]; keyed: boolean } {
+/** verifyWorkspaceRecords with the rows it parsed (current and kept revisions), each read once, and whether the workspace is keyed. */
+function verifyStoredRecords(workspace: string, at: RecordLocation): { current: StoredRecord[]; revisions: StoredRecord[]; findings: WorkspaceRecordFinding[]; keyed: boolean } {
   const dir = recordDir(workspace, at);
   const findings: WorkspaceRecordFinding[] = [];
   const read = (folder: string): StoredRecord[] =>
@@ -325,29 +379,29 @@ function verifyStoredRecords(workspace: string, at: RecordLocation): { current: 
       findings.push({ file, code: "CHAIN_GAP", detail: `prev_record_hash ${String(prev).slice(0, 16)}… names no stored record` });
     }
   }
-  const headFile = headAnchorPath(workspace, at);
-  let anchor = readHeadAnchor(workspace, at, { keys, keyed });
-  // A keyed workspace's first verifying read anchors records written before head anchors existed, once (WP37 review).
-  const adoption = anchor === "absent" && current.length > 0 && keyed ? adoptWorkspaceRecordHead(workspace, at, false) : null;
-  if (adoption?.status === "adopted") anchor = readHeadAnchor(workspace, at, { keys, keyed });
+  const headFile = headAnchorPath(workspace, at), anchor = readHeadAnchor(workspace, at, { keys, keyed });
   if (anchor === UNREADABLE_ANCHOR) {
     findings.push({ file: headFile, code: "UNREADABLE", detail: "the head anchor cannot be read" });
   } else if (anchor === UNVERIFIED_ANCHOR) {
     findings.push({ file: headFile, code: "HEAD_UNVERIFIED", detail: "the head anchor is unsigned or its signature does not verify under the workspace artifact-seal keys" });
   } else if (anchor === "absent") {
-    if (adoption?.status === "deleted") findings.push({ file: headFile, code: "HEAD_MISSING", detail: `${adoption.reason}: a deleted newest record cannot be ruled out` });
-    else if (current.length > 0) findings.push({ file: headFile, code: "HEAD_UNANCHORED", detail: "no head anchor: a deleted newest record cannot be ruled out" });
+    // A read never anchors (only amc doctor adopts); the ledger tells a removed anchor from one that never existed.
+    if (current.length > 0 && keyed && anchoredBefore(workspace, at) === true) {
+      findings.push({ file: headFile, code: "HEAD_MISSING", detail: "the ledger records this store's head as anchored before; its anchor was removed" });
+    } else if (current.length > 0) findings.push({ file: headFile, code: "HEAD_UNANCHORED", detail: "no head anchor: a deleted newest record cannot be ruled out" });
   } else {
     if (!current.some((row) => row.record.record_hash === anchor.head)) {
       findings.push({ file: headFile, code: "HEAD_MISSING", detail: `the newest record ${anchor.head.slice(0, 16)}… is missing: deleted or rolled back` });
     }
     for (const lost of anchor.lost) {
       findings.push(lost === UNVERIFIED_ANCHOR ? { file: headFile, code: "HEAD_UNVERIFIED", detail: "an earlier head anchor did not verify when a later record was written" }
+        : lost === UNANCHORED_MARK ? { file: headFile, code: "HEAD_UNANCHORED", detail: "records had no head anchor when a later record was written" }
         : { file: headFile, code: "HEAD_MISSING", detail: lost === UNREADABLE_ANCHOR ? "an earlier head anchor could not be read when a later record was written"
+          : lost === REMOVED_ANCHOR_MARK ? "the store's head anchor had been removed when a later record was written"
           : `an earlier newest record ${lost.slice(0, 16)}… was already missing when a later record was written` });
     }
   }
-  return { current, findings, keyed };
+  return { current, revisions, findings, keyed };
 }
 
 /** Findings that make a record itself untrusted; the others describe the store around it. */
@@ -395,9 +449,9 @@ export function captureWorkspaceRecordPredecessor(workspace: string, at: RecordL
  * Synchronous publication only. Signatures and any key/history initialization must finish before acquiring this lock;
  * the one ledger row a store's first head anchor appends under it is local and bounded, like the legal-hold registry's.
  */
-export function withWorkspaceRecordPublicationLock<T>(workspace: string, at: RecordLocation, operation: () => T, timeoutMs?: number): T {
+export function withWorkspaceRecordPublicationLock<T>(workspace: string, at: RecordLocation, operation: () => T): T {
   return withControlFileLock({ root: join(workspace, ".amc"),
-    name: `workspace-records-${sha256Hex(join(...at.area, at.kind)).slice(0, 24)}`, operation, timeoutMs });
+    name: `workspace-records-${sha256Hex(join(...at.area, at.kind)).slice(0, 24)}`, operation });
 }
 
 function assertPredecessorCurrent(workspace: string, at: RecordLocation, id: string, expected: WorkspaceRecordPredecessor): void {
@@ -478,7 +532,7 @@ export async function prepareWorkspaceRecordAsync<T extends Record<string, unkno
     assertPurposePublicationCurrent(root, captured, signed);
   };
   assertCurrent();
-  const head = prepareWorkspaceRecordHead(root, location, hash, true);
+  const head = prepareWorkspaceRecordHeadFor(root, location, hash, signed);
   const record = { ...ownBody, prev_record_hash: before.head, record_hash: hash,
     signature: signed.signature.toString("base64"), storedTs } as T & RecordEnvelope;
   const bytes = JSON.stringify(record, null, 2);
