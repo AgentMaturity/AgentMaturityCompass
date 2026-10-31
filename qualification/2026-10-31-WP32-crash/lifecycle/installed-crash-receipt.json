@@ -1,0 +1,508 @@
+{
+  "schemaVersion": "amc-installed-crash-recovery/v1",
+  "ok": true,
+  "startedAt": "2026-10-31T18:31:37.888Z",
+  "runId": "9f8e48b3-a995-475d-9323-48fa8360e9de",
+  "sourceCommit": "c7e999dd1bd46a9fd095a70e9d3cdf55eb90ed92",
+  "sourceFiles": {
+    "scripts/installed-crash-recovery-check.mjs": "983f1f3fce57bb8d400e4c7c6ccbbddf40332810e3ba1470ba08e5e5044310d4",
+    "scripts/lib/installedCrashMcpServer.mjs": "1ce79eba9a6db019b6054e909453ba055d43c72e23e652036f1f582e677e611c",
+    "scripts/lib/ownedProcessCommand.mjs": "cad3be3fdb81c13b74b6650a8fa719677d97333ac447a9d76538e855364ea560"
+  },
+  "artifactSha256": "de977cc3718a09027728d9533ed6d32e53560ef91a726a93c9b6eee6e1f3578e",
+  "expectedCliSha256": "215ba894e139eb5085014905f9d365eb91a846682bf84eed137a8c36dbf9526b",
+  "runtime": {
+    "node": "v22.23.3",
+    "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+    "nodeSha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd",
+    "npmSha256": "8e5f6f3429f8cdbe693cdc29904e9d5a7b127a494bd15c804bd54c7403bfcbe7",
+    "platform": "darwin",
+    "arch": "arm64"
+  },
+  "checks": [
+    {
+      "name": "owner-signed-run-integrity-waiver",
+      "ok": true,
+      "classes": [
+        "READ_ONLY",
+        "WRITE_LOW"
+      ],
+      "requireRunIntegrityAtLeast": 0,
+      "trustTier": "SELF_REPORTED",
+      "sandboxForLowMedium": false,
+      "policySha256": "275dc107c62fdfcd57f9ae741d1a6c84bcbba25b527494870d92e3e011fe556f",
+      "configResignedAuditEventId": "43263a39-e427-4c98-9741-2730ac056314",
+      "decisions": {
+        "READ_ONLY": {
+          "waived": "RUN INTEGRITY WAIVED: the signed READ_ONLY rule sets requireRunIntegrityAtLeast 0 (AMC default 0.6); latest trusted run 5362bec6-aa2c-4cb0-a7ac-858c58c1f411 has integrity 0.000 (UNRELIABLE — DO NOT USE FOR CLAIMS).",
+          "runIntegrity": 0
+        },
+        "WRITE_LOW": {
+          "waived": "RUN INTEGRITY WAIVED: the signed WRITE_LOW rule sets requireRunIntegrityAtLeast 0 (AMC default 0.6); latest trusted run 5362bec6-aa2c-4cb0-a7ac-858c58c1f411 has integrity 0.000 (UNRELIABLE — DO NOT USE FOR CLAIMS).",
+          "runIntegrity": 0
+        }
+      }
+    },
+    {
+      "name": "deferred-mcp-tool-discovered-and-activated-through-tool-search",
+      "ok": true,
+      "toolName": "mcp_crashfixture_3b74c681a9b88de1",
+      "schemaDigestSha256": "079584f599d0a6605b652506b954dd6df9052ecec8fa7bdf73fc3c35ca6f0a29",
+      "loadoutRevision": 1
+    },
+    {
+      "name": "real-approved-effect-before-ack-and-authenticated-writer-kill",
+      "ok": true,
+      "sessionId": "401e3c9b-93df-4934-bf86-4b5d235b6fa7",
+      "approvalId": "apprreq_3864e5284bb44b91aa76d58605b08dce",
+      "toolName": "mcp_crashfixture_3b74c681a9b88de1",
+      "callId": "stub-call-9",
+      "killedPid": 31818,
+      "effects": 1,
+      "toolResultsBeforeKill": 0,
+      "originalPrefixSha256": "d5a95170d2a08453978c636cb1b16e09f61966fa5ef0699a9b44505ec68891d4",
+      "effectSha256": "5dc51991617aa446c6ff8af6b1c4c570f68d6bd7a684111625eefbf0664e99c2",
+      "pendingWriteLow": 1
+    },
+    {
+      "name": "resume-preserves-original-prefix-uncertain-outcome-and-reservation",
+      "ok": true,
+      "unknownToolOutcomes": 1,
+      "automaticModelCalls": 0,
+      "effectCount": 1
+    },
+    {
+      "name": "new-explicit-turn-without-side-effect-replay-and-cold-verification",
+      "ok": true,
+      "finalModelCalls": 6,
+      "finalToolCalls": 3,
+      "effectCount": 1,
+      "pendingWriteLow": 1,
+      "payloads": "verified",
+      "historySha256": "0846abd5ed07f47d965c8744f186f14fa653a5f260500543d7d246d2a6d0d556"
+    }
+  ],
+  "commands": [
+    {
+      "label": "00-install",
+      "args": [
+        "/opt/homebrew/Cellar/node@22/22.23.3_2/lib/node_modules/npm/bin/npm-cli.js",
+        "install",
+        "--no-audit",
+        "--no-fund",
+        "--loglevel=error",
+        "<scratch>/pack-1/agent-maturity-compass-1.2.0.tgz"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 29431
+    },
+    {
+      "label": "01-bootstrap",
+      "args": [
+        "bootstrap"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 31117
+    },
+    {
+      "label": "02-initialize",
+      "args": [
+        "--agent",
+        "default",
+        "--json"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 31317
+    },
+    {
+      "label": "03-firewall",
+      "args": [
+        "firewall",
+        "enable",
+        "--mode",
+        "block",
+        "--json"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 31395
+    },
+    {
+      "label": "04-budget-sign",
+      "args": [
+        "budgets",
+        "sign",
+        "--json"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 31462
+    },
+    {
+      "label": "05-owner-login",
+      "args": [
+        "approvals",
+        "login",
+        "--username",
+        "crash-owner",
+        "--token-file",
+        "<scratch>/crash-1/private/approval-token",
+        "--password-stdin",
+        "--json"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 31463
+    },
+    {
+      "label": "06-mcp-catalog",
+      "args": [
+        "agent-loop",
+        "mcp-catalog",
+        "--config",
+        "<scratch>/crash-1/private/mcp.json",
+        "--json"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 31530
+    },
+    {
+      "label": "07-tools-sign",
+      "args": [
+        "tools",
+        "sign",
+        "--json"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 31596
+    },
+    {
+      "label": "07b-policy-owner-waiver-sign",
+      "args": [
+        "fix-signatures"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 31597
+    },
+    {
+      "label": "07c-governor-check-READ_ONLY",
+      "args": [
+        "governor",
+        "check",
+        "--agent",
+        "default",
+        "--action",
+        "READ_ONLY",
+        "--risk",
+        "med",
+        "--mode",
+        "execute"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 31674
+    },
+    {
+      "label": "07c-governor-check-WRITE_LOW",
+      "args": [
+        "governor",
+        "check",
+        "--agent",
+        "default",
+        "--action",
+        "WRITE_LOW",
+        "--risk",
+        "med",
+        "--mode",
+        "execute"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 31795
+    },
+    {
+      "label": "08-search-pending-1",
+      "args": [
+        "approvals",
+        "list",
+        "--agent",
+        "default",
+        "--status",
+        "pending",
+        "--json"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 31889
+    },
+    {
+      "label": "09-search-review",
+      "args": [
+        "approvals",
+        "show",
+        "--agent",
+        "default",
+        "apprreq_1345a33fce8a4f33ab843c2211f04bce"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 31916
+    },
+    {
+      "label": "10-search-approve",
+      "args": [
+        "approvals",
+        "approve",
+        "--agent",
+        "default",
+        "apprreq_1345a33fce8a4f33ab843c2211f04bce",
+        "--mode",
+        "execute",
+        "--reason",
+        "Explicit local crash-recovery acceptance",
+        "--username",
+        "crash-owner",
+        "--user-id",
+        "b2d577c5-63eb-4a50-a2c3-c94af22bef79",
+        "--roles",
+        "OWNER",
+        "--session-token-file",
+        "<scratch>/crash-1/private/approval-token",
+        "--expect-request-digest",
+        "34e73fb4c74004b336a95b9782cec8c89bbde7b9e2d8555014235f6de70786d1"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 31968
+    },
+    {
+      "label": "08-activate-pending-2",
+      "args": [
+        "approvals",
+        "list",
+        "--agent",
+        "default",
+        "--status",
+        "pending",
+        "--json"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 32118
+    },
+    {
+      "label": "09-activate-review",
+      "args": [
+        "approvals",
+        "show",
+        "--agent",
+        "default",
+        "apprreq_89aee4b2e36f42b999baa5862b94173b"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 32120
+    },
+    {
+      "label": "10-activate-approve",
+      "args": [
+        "approvals",
+        "approve",
+        "--agent",
+        "default",
+        "apprreq_89aee4b2e36f42b999baa5862b94173b",
+        "--mode",
+        "execute",
+        "--reason",
+        "Explicit local crash-recovery acceptance",
+        "--username",
+        "crash-owner",
+        "--user-id",
+        "b2d577c5-63eb-4a50-a2c3-c94af22bef79",
+        "--roles",
+        "OWNER",
+        "--session-token-file",
+        "<scratch>/crash-1/private/approval-token",
+        "--expect-request-digest",
+        "7791e9717f6398fad74c4751454ef663caec4e5c4fa9f0dd6091eef1bd72f6ec"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 32121
+    },
+    {
+      "label": "08-effect-pending-3",
+      "args": [
+        "approvals",
+        "list",
+        "--agent",
+        "default",
+        "--status",
+        "pending",
+        "--json"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 32124
+    },
+    {
+      "label": "09-effect-review",
+      "args": [
+        "approvals",
+        "show",
+        "--agent",
+        "default",
+        "apprreq_3864e5284bb44b91aa76d58605b08dce"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 32146
+    },
+    {
+      "label": "10-effect-approve",
+      "args": [
+        "approvals",
+        "approve",
+        "--agent",
+        "default",
+        "apprreq_3864e5284bb44b91aa76d58605b08dce",
+        "--mode",
+        "execute",
+        "--reason",
+        "Explicit local crash-recovery acceptance",
+        "--username",
+        "crash-owner",
+        "--user-id",
+        "b2d577c5-63eb-4a50-a2c3-c94af22bef79",
+        "--roles",
+        "OWNER",
+        "--session-token-file",
+        "<scratch>/crash-1/private/approval-token",
+        "--expect-request-digest",
+        "84273002121ededd607fe320d0b4f91f15e7fbae6e5c9ef170b02c0c682bf89a"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 32263
+    },
+    {
+      "label": "11-budget-before-resume",
+      "args": [
+        "budgets",
+        "status",
+        "--agent",
+        "default"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 32283
+    },
+    {
+      "label": "12-budget-after-resume",
+      "args": [
+        "budgets",
+        "status",
+        "--agent",
+        "default"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 32290
+    },
+    {
+      "label": "13-cold-native-verification",
+      "args": [
+        "agent-loop",
+        "verify",
+        "401e3c9b-93df-4934-bf86-4b5d235b6fa7",
+        "--json",
+        "--expect-monitor",
+        "aa0bcee44a263d9981edd7159215b99003fa5a48672540cf17bce9b82acd7feb"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 32292
+    },
+    {
+      "label": "14-cold-ledger-verification",
+      "args": [
+        "session",
+        "verify",
+        "--json",
+        "--expect-monitor",
+        "aa0bcee44a263d9981edd7159215b99003fa5a48672540cf17bce9b82acd7feb"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 32293
+    },
+    {
+      "label": "15-final-budget",
+      "args": [
+        "budgets",
+        "status",
+        "--agent",
+        "default"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 32295
+    }
+  ],
+  "limits": [
+    "Explicit deterministic stub provider and operator-trusted local stdio MCP tool; no live model or OS sandbox claim.",
+    "Monitor pin is captured locally before execution; it proves workspace-key consistency, not independent trust anchoring.",
+    "Artifact/source build correspondence is supplied by the release receipt; this runner independently pins artifact, installed CLI, and committed orchestration bytes.",
+    "Private fixture credentials and raw workspace evidence remain under the mode-0700 output directory; publish only reviewed redacted receipts.",
+    "EXECUTE is reached under an owner-signed Action Policy waiver (READ_ONLY and WRITE_LOW: tier SELF_REPORTED, no evidence gates, run-integrity threshold 0 over the baseline run 02-initialize sealed, no sandbox for low/medium). It proves the governed EXECUTE, signed-approval and crash-recovery path, not the agent's maturity or trust; the waiver's activation is the CONFIG_RESIGNED audit row named in check owner-signed-run-integrity-waiver."
+  ],
+  "installed": {
+    "publicNativeExport": "<scratch>/crash-1/consumer/node_modules/agent-maturity-compass/dist/sdk/nativeAgentClient.js",
+    "publicNativeExportSha256": "8d148f5425b5f42f29127f7154d9badc555d2632296f760502a040d2169d70d1",
+    "cliSha256": "215ba894e139eb5085014905f9d365eb91a846682bf84eed137a8c36dbf9526b"
+  },
+  "preExecutionMonitorSha256": "aa0bcee44a263d9981edd7159215b99003fa5a48672540cf17bce9b82acd7feb",
+  "closedProcesses": {
+    "writerPids": [
+      32287
+    ],
+    "helperPids": [
+      31595,
+      31888,
+      32289
+    ],
+    "allObservedGone": true
+  },
+  "endedAt": "2026-10-31T18:32:54.044Z"
+}

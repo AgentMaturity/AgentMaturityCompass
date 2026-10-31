@@ -71,3 +71,9 @@ The failed outcome above stands, and so does the follow-up note. A search for an
 - The default `READ_ONLY` rule also needs AMC-1.7 and AMC-3.3.1 at level 2, which no evidence map evaluates yet.
 
 The crash runner needs signed approvals, and those need a signed Action Policy. It therefore cannot use the "not configured" state either. This lane stays **failed** until there is a decision on the trust gate. The governor's reasons now name the actual cause on a fresh workspace (`UNTRUSTED RUN: agent default has no trusted diagnostic run`) instead of a signature failure. `docs/GOVERNOR.md` ("Reaching EXECUTE") records the state.
+
+## Note added 2026-10-31 (trust-gate decision, `rtd/gap-trustrule`)
+
+The failed crash-and-restart outcomes above stand as history. The AXR-02 trust-gate decision moved the run-integrity check into each Action Policy rule (`requireRunIntegrityAtLeast`, absent 0.6). A threshold below 0.6 is an owner waiver: it still needs a sealed, ledger-anchored run, it never covers findings against the agent, and every decision made under it names it.
+
+`scripts/installed-crash-recovery-check.mjs` now signs such a waiver for READ_ONLY and WRITE_LOW at threshold 0 over the sealed baseline run that `02-initialize` publishes, through `amc fix-signatures`. On a fresh packed install (darwin-arm64, Node 22) the lane then **passed**. AXR-02 was exercised as a waiver, not as evidence-earned EXECUTE, and no maturity is claimed. See `qualification/2026-10-31-WP32-crash/` and its `owner-signed-run-integrity-waiver` check, which records the `CONFIG_RESIGNED` audit event.
