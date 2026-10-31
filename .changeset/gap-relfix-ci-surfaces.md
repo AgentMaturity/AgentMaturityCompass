@@ -9,3 +9,5 @@ When the checkout has no `.amc` workspace, both run `amc init --minimal --profil
 Building the Python SDK wheel from a checkout (`python -m build --wheel sdk/python`) now packages the current `amc_sdk` sources: a stale tracked setuptools build copy, which made the wheel ship an old `client.py` without the `new_session` mapping, is removed.
 
 `npm run check:catalog-changelog` accepts a pushed range that carries several catalog changes when it appends one `catalog/CHANGELOG.md` entry per change, in order; each entry is checked for its own step exactly as a single entry is.
+
+The CI files `amc integrations setup --type github-action` and `--type gitlab-ci` generate now install this AMC version from its checksum-verified GitHub Release tarball (they named a nonexistent `@amc/cli` package), initialize the same way, score with `amc --json`, and report "no evidence yet" instead of reading `integrityIndex × 100` as a score.
