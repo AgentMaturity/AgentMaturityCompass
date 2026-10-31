@@ -15,7 +15,6 @@ import { join } from "node:path";
 import { sha256Hex } from "../utils/hash.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { openLedger } from "../ledger/ledger.js";
-import { writerStore } from "../ledger/ledgerConnection.js";
 import type { MonitoringEvent } from "./continuousMonitor.js";
 import { attributeUsage, normalizeSpanUsage, buildTrace } from "./observabilityUsage.js";
 
@@ -816,7 +815,7 @@ export class ObservabilityBridge extends EventEmitter {
 
   private async recordToLedger(traces: NormalizedTrace[]): Promise<void> {
     try {
-      const ledger = openLedger(this.config.workspace, writerStore());
+      const ledger = openLedger(this.config.workspace, process.env.AMC_NO_SIGN === "1" ? { store: "unsigned" } : {});
       const sessionId = `obs-bridge-${randomUUID()}`;
       ledger.startSession({
         sessionId,
