@@ -11,7 +11,7 @@ import { prepareRequest } from "../src/llm/request/prepareRequest.js";
 import { resolveRequestSources } from "../src/llm/request/requestSources.js";
 import { openSessionEventStore } from "../src/persistence/openSessionEventStore.js";
 import { readEventPayload } from "../src/session/eventPayload.js";
-import { forkSession } from "../src/session/sessionResume.js";
+import { forkSession, SessionResumeRefused } from "../src/session/sessionResume.js";
 import { SessionService } from "../src/session/sessionService.js";
 import { extractEnvelope } from "../src/session/sessionTypes.js";
 import { foldSurfaceEntries } from "../src/session/surfaceProjection.js";
@@ -265,5 +265,21 @@ describe.each(["sqlite", "jsonl"] as const)("verified conversation fork (%s)", b
     expect(attachment).toBeDefined(); expect(payload(root, attachment)).toEqual(image.bytes);
     expect(JSON.parse(attachment.meta_json)).toMatchObject({ filename: image.filename, mimeType: image.mediaType, bytes: image.bytes.length });
     expect(foldSurfaceEntries(child.readEvents()).find(entry => entry.sourceEventId === attachment.id)?.part.kind).toBe("image");
+  });
+});
+
+describe("a conversation fork keeps the controls resume enforces (secsweep 2026-10-31)", () => {
+  test("a session a policy hook stopped cannot be continued by forking its conversation; a lineage-only fork still can", () => {
+    const root = workspace("sqlite"), parent = open(root);
+    textTurn(parent, "first");
+    parent.startTurn({ trigger: "user" }); parent.recordUserMessage("stopped"); parent.startStep();
+    parent.endStep({ stopReason: "end_turn", usage: null });
+    parent.endTurn({ reason: "cancelled", cause: { kind: "hook", reason: "policy stop" } }); parent.sealTurn();
+    parent.close({ reason: "completed" });
+    let refusal: unknown;
+    try { fork(root, parent.sessionId); } catch (error) { refusal = error; }
+    expect(refusal).toBeInstanceOf(SessionResumeRefused);
+    expect((refusal as SessionResumeRefused).code).toBe("STOP_CONTROL");
+    expect(() => fork(root, parent.sessionId, { inheritConversation: false })).not.toThrow();
   });
 });
