@@ -68,10 +68,11 @@ describe.each(bodyRoutes)("assurance body-error contract: %s", (pathname, fallba
     });
   });
 
-  test("preserves an ordinary stream error's message", async () => {
+  // P0-55: the internal message stays in the server log; the body is the route's fallback.
+  test("answers the route's fallback for an ordinary stream error", async () => {
     expect(await requestError(pathname, { error: new Error("request stream failed") })).toEqual({
       status: 400,
-      body: { ok: false, error: "request stream failed" }
+      body: { ok: false, error: fallback }
     });
   });
 

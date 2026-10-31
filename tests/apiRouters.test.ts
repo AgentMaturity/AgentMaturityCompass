@@ -1679,7 +1679,7 @@ describe("AMC API routers", () => {
     await assertJsonRoute(handleEnforceRoute as any, { pathname: "/api/v1/enforce/evaluate", method: "POST", body: { action: "deploy", tool: "kubectl", agentId: "agent-1", context: { env: "prod" } } });
     await assertJsonRoute(handleEnforceRoute as any, { pathname: "/api/v1/enforce/formal/verify", method: "POST", body: { property: { id: "p1", name: "Safe", description: "desc", formula: "G safe", kind: "safety", severity: "high" }, agentState: { ok: true } } });
     await assertJsonRoute(handleEnforceRoute as any, { pathname: "/api/v1/enforce/formal/tla-spec", method: "POST" });
-    const certificate = await assertJsonRoute(handleEnforceRoute as any, { pathname: "/api/v1/enforce/formal/certificate", method: "POST", body: { certificate: { proof: true } } });
+    const certificate = await assertJsonRoute(handleEnforceRoute as any, { pathname: "/api/v1/enforce/formal/certificate", method: "POST", body: { certificate: { proofTree: { id: "n1" }, certificateHash: "0".repeat(64) } } });
     // P0-51: an unkeyed proof certificate is never an authentic artifact, even when its hash checks out.
     expect(certificate).toMatchObject({ valid: false, integrityValid: true, status: "UNTRUSTED" });
   });

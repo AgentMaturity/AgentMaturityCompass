@@ -457,7 +457,8 @@ export async function handleEnforceRoute(
   if (pathname === '/api/v1/enforce/formal/certificate' && method === 'POST') {
     try {
       const body = await bodyJsonSchema(req, z.object({
-        certificate: z.record(z.string(), z.unknown()),
+        // P0-55: a certificate with no proof tree or hash is a malformed request, not a 500 from inside the verifier.
+        certificate: z.object({ proofTree: z.record(z.string(), z.unknown()), certificateHash: z.string() }).passthrough(),
       }).passthrough());
       const refused = requestTrustOverride(body);
       if (refused) { apiError(res, 400, refused); return true; }
