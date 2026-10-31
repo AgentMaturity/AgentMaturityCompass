@@ -77,6 +77,14 @@ const writers: Array<[string, () => unknown | Promise<unknown>]> = [
     const violation = { violationId: "v-1", checkId: "latency", checkName: "latency", severity: "high", traceId: "t-1", message: "slow", details: {},
       recommendation: "none", ts: 1 };
     return (engine as unknown as { recordViolationsToLedger(v: unknown[]): Promise<void> }).recordViolationsToLedger([violation]);
+  }],
+  // P0-55 case 12 (af5f70ec): `amc monitor start` alert rows.
+  ["amc monitor start score-drop alert (ContinuousMonitor)", async () => {
+    const { ContinuousMonitor } = await import("../../src/watch/continuousMonitor.js");
+    const monitor = new ContinuousMonitor({ workspace, agentId: "default", enableWebhooks: false });
+    const inner = monitor as unknown as { metrics: Record<string, unknown>; handleScoreDrop(report: unknown): Promise<void> };
+    Object.assign(inner.metrics, { scoreDelta: -0.2, previousScore: 0.8, currentScore: 0.6 });
+    return inner.handleScoreDrop({ runId: "p055-run", layerScores: [], questionScores: [] });
   }]
 ];
 
