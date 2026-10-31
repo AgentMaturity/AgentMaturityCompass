@@ -9,6 +9,7 @@
  * transaction, signing outside it. Decisions, consumption and effects reuse the slice A functions unchanged. Stage
  * modules register through src/a4/a4Stages.ts, which evaluation and effect lookups run first.
  */
+import { rmSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 import { z } from "zod";
 import { apiSuccess } from "../api/apiHelpers.js";
@@ -93,9 +94,15 @@ export interface A4ProducerResult {
    */
   readonly afterCommit?: () => Promise<Record<string, unknown>>;
   /**
-   * Undoes the producer's own workspace writes when the step is not recorded after it returned (the produced
-   * specification refused, the head moved, the transition refused, or a replay answered instead): the replaced bytes are
-   * put back, so no change stays behind that no revision records (Adapt's Build). Never called after this run committed.
+   * A producer that stages its workspace writes (Adapt's Build: the bytes held in memory by sha256) publishes them here,
+   * inside the governed transition once its role, readiness, step and stale-head checks passed and before the revision
+   * reads the resource digests; it returns the outputs and the specification as published. Called at most once a request.
+   */
+  readonly publish?: () => { readonly outputs: A4ProducerResult["outputs"]; readonly spec: Record<string, unknown> };
+  /**
+   * Undoes what `publish` wrote when the step is not recorded after it ran (the commit refused, or a replay answered
+   * instead): the replaced bytes are put back, so no change stays behind that no revision records. Never called after
+   * this run committed.
    */
   readonly rollback?: () => void;
 }
@@ -174,7 +181,7 @@ function revisionSpec(workspace: string, state: A4ReadinessState, stage: A4Stage
 /**
  * The no-producer output: sealed into the project's blob store (personal text never enters the ledger), signed as an
  * `a4-stage-output` artifact before any transaction, and named by its path and ciphertext sha256.
- * ponytail: a blob whose transition then fails stays as an unreferenced file, as comment blobs do.
+ * A blob whose transition then fails is removed by the step route (its name is random-salted, so no other row names it).
  */
 function writeStageOutput(route: A4Route, projectId: string, text: string): { refId: string; sha256: string } {
   const keySha256 = route.store.readChain(projectId)[0]?.body.projectPublicKeySha256;
@@ -246,21 +253,35 @@ async function stageStep(route: A4Route, projectId: string, stage: A4Stage, kind
   const produced = producer === undefined ? null : await producer.run({ workspace: route.workspace, state: checked, principal, now, native: route.native,
     ...(fields.level !== undefined ? { level: fields.level } : {}), ...(fields.spec !== undefined ? { spec: fields.spec } : {}) });
   // Anything that refuses the step from here on (the produced specification, a moved head, the transition) puts back
-  // what the producer wrote; once the transition committed nothing is undone.
+  // what the producer published and removes the output blobs this request sealed; once the transition committed nothing is undone.
   let result: ReturnType<typeof governed>;
+  let outputs: Array<{ output: string; label: string; lane: "implementation" | "recommendation"; method: string | null; producer: string | null;
+    claimKind?: "self_reported" | "synthetic_example"; refId: string; sha256: string }> | null = null;
+  let producedSpec = produced?.spec;
+  const sealOutputs = (made: A4ProducerResult["outputs"]): NonNullable<typeof outputs> => [
+    ...made.map((entry) => ({ ...entry, producer: producer!.id, ...writeStageOutput(route, projectId, canonicalize(entry.body ?? null)) })),
+    ...(def.output !== null && fields.content !== undefined ? [{ output: def.output, lane: "implementation" as const, method: null, producer: null,
+      label: producer === undefined ? `${stage} ${def.output} (no producer registered; human-authored)` : `${stage} ${def.output}: the member's own statement (human-authored)`,
+      ...writeStageOutput(route, projectId, fields.content) }] : [])
+  ];
+  const discard = (): void => {
+    produced?.rollback?.();
+    for (const entry of outputs ?? []) for (const path of [entry.refId, `${entry.refId}.sig`]) rmSync(join(route.workspace, path), { force: true });
+  };
   try {
     // A producer's spec carries the members' free text inline (the brief, the hypotheses, the reflection): scanned as sent text is.
     if (produced?.spec !== undefined) assertNoSecrets(compactSpec(stage, produced.spec).spec, "The produced specification");
-    const outputs = [
-      ...(produced?.outputs ?? []).map((entry) => ({ ...entry, producer: producer!.id, ...writeStageOutput(route, projectId, canonicalize(entry.body ?? null)) })),
-      ...(def.output !== null && fields.content !== undefined ? [{ output: def.output, lane: "implementation" as const, method: null, producer: null,
-        label: producer === undefined ? `${stage} ${def.output} (no producer registered; human-authored)` : `${stage} ${def.output}: the member's own statement (human-authored)`,
-        ...writeStageOutput(route, projectId, fields.content) }] : [])
-    ];
+    if (produced?.publish === undefined) outputs = sealOutputs(produced?.outputs ?? []);
     result = governed(route.store, projectId, principal, { expectedHeadSeq: fields.expectedHeadSeq, request,
       ...(produced?.response === undefined ? {} : { response: produced.response }) }, (ts, load) => {
       const state = load(now);
       const readiness = check(state);
+      // Staged writes are published only now, once (a moved head rebuilds this body on the bytes already published).
+      if (outputs === null) {
+        const published = produced!.publish!();
+        producedSpec = published.spec;
+        outputs = sealOutputs(published.outputs);
+      }
       const project = state.project;
       const specs: A4ChangeSpec[] = [];
       const { spec, answers } = stageSpecOf(state, stage);
@@ -282,7 +303,7 @@ async function stageStep(route: A4Route, projectId: string, stage: A4Stage, kind
           principal.key, ts));
       }
       if (kind === "propose" && producer === undefined) specs.push(revisionSpec(route.workspace, state, stage, { ...fields.spec, answers }, principal.key, ts));
-      if (produced?.spec !== undefined) specs.push(revisionSpec(route.workspace, state, stage, produced.spec, principal.key, ts));
+      if (producedSpec !== undefined) specs.push(revisionSpec(route.workspace, state, stage, producedSpec, principal.key, ts));
       // A revision recorded here comes first, so the outputs and the step land on it.
       const revisionNo = project.revision_no + (specs.length > 0 ? 1 : 0);
       const refs = [...outputs.map((entry) => ({ refKind: "stage_output" as const, refId: entry.refId, sha256: entry.sha256, lane: entry.lane, method: entry.method,
@@ -316,11 +337,11 @@ async function stageStep(route: A4Route, projectId: string, stage: A4Stage, kind
       return { readiness, specs };
     });
   } catch (error) {
-    produced?.rollback?.();
+    discard();
     throw error;
   }
   // A replay recorded an earlier run of this request: what this run wrote over it is put back too.
-  if (result.replay) produced?.rollback?.();
+  if (result.replay) discard();
   const after = result.replay || produced?.afterCommit === undefined ? {} : await produced.afterCommit();
   apiSuccess(route.res, mutationResult(result, { ...(produced?.response ?? {}), ...after }), 201);
   return true;

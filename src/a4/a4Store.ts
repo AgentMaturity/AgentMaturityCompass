@@ -18,14 +18,14 @@ import { randomBytes } from "node:crypto";
 import { hostname } from "node:os";
 import type Database from "better-sqlite3";
 import { a4FloorFor, loadVerifiedApprovalPolicy } from "../approvals/approvalPolicyEngine.js";
-import { eventMeta, readerTrustFor } from "../claims/evidenceProvenance.js";
+import { readerTrustFor } from "../claims/evidenceProvenance.js";
 import type { ClaimKind } from "../claims/eligibility/types.js";
 import { getPrivateKeyPem } from "../crypto/keys.js";
 import { signDigestWithPolicy } from "../crypto/signing/signer.js";
 import type { SignedDigest } from "../crypto/signing/signerTypes.js";
 import { openLedger, type Ledger } from "../ledger/ledger.js";
 import { ledgerSynchronousMode } from "../ledger/ledgerDurability.js";
-import { A4_STORE_BINARY, runImmediateTransaction } from "../ledger/ledgerSessionTransactions.js";
+import { A4_STORE_BINARY, claimA4SessionCapability, runImmediateTransaction } from "../ledger/ledgerSessionTransactions.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import { highSeveritySecretTypes } from "../release/releaseSecretScan.js";
@@ -40,7 +40,7 @@ export type { A4Actor, A4ChangeSpec, A4RequestKey, A4TransitionOptions, A4Transi
 import { captureA4RecordSigner, assertA4HotWriters, createA4CurrentLatch, A4TransitionPublicationError, type A4TransitionAttempt, type A4TransitionProgress } from "./a4TransitionSigning.js";
 import { A4BlobError, a4ProjectsRoot, createProjectKey, putPrivate } from "./a4Blobs.js";
 import { a4MirrorDivergence, LEDGER_BACKEND_INCOMPLETE_MESSAGE, ledgerBackendGap, writeA4Mirror } from "./a4LedgerBackend.js";
-import { ledgerRefClaim, resolveLedgerEvent } from "./a4Evidence.js";
+import { ledgerRefClaim, liveLedgerRowAgent, resolveLedgerEvent } from "./a4Evidence.js";
 import { type LedgerMirror, openLedgerMirror } from "../persistence/postgres/postgresLedgerMirror.js";
 import { assertMember, liveRolesFor, memberCandidates, populationFacts, principalPopulation } from "./a4Identity.js";
 import {
@@ -52,6 +52,8 @@ import {
 } from "./a4Schema.js";
 
 const A4_AUDIT_TYPE = "A4_STATE" as const;
+/** Module-private: the only way to open an `a4-` session (a caller-chosen binaryPath "a4-store" is refused). */
+const SESSION_CAPABILITY = claimA4SessionCapability();
 /** The rows only this store writes in its `a4-<projectId>-<seq>` sessions (the ledger refuses any other writer there). */
 export const A4_WITNESS = { sessions: `binary_path = '${A4_STORE_BINARY}'`,
   events: `json_extract(meta_json, '$.source') = 'a4-store' AND json_extract(meta_json, '$.auditType') = '${A4_AUDIT_TYPE}'` };
@@ -198,6 +200,8 @@ function createStore(workspace: string, ledger: Ledger, trust?: TrustContext, mi
     const problems: string[] = [];
     if (a4WitnessExists(db, projectId, head.head_seq + 1)) problems.push("chain truncated: a later A4 audit session exists");
     const links = walk(readRows(projectId), problems);
+    // The head row is unsigned; receipts and the foreign-agent check read its agent id, so it must be the signed CREATED body's (A4_SCOPE_AGENT).
+    if (links[0]?.body.agentId !== head.agent_id) problems.push("A4_SCOPE_AGENT: the head row and the CREATED transition name different agents");
     const last = links.at(-1);
     if (last === undefined || last.seq !== head.head_seq || last.row.body_digest !== head.head_digest
       || head.verified_seq !== head.head_seq || head.verified_digest !== head.head_digest) {
@@ -415,7 +419,7 @@ function createStore(workspace: string, ledger: Ledger, trust?: TrustContext, mi
         current?.();
         const { spec, seq, stage, revisionNo } = entry;
         const sessionId = `a4-${projectId}-${seq}`;
-        ledger.startSession({ sessionId, runtime: "unknown", binaryPath: A4_STORE_BINARY, binarySha256: A4_STORE_BINARY });
+        ledger.startSession({ sessionId, runtime: "unknown", binaryPath: A4_STORE_BINARY, binarySha256: A4_STORE_BINARY, capability: SESSION_CAPABILITY });
         try {
           current?.();
           evidence = ledger.appendEvidenceWithReceipt({
@@ -739,7 +743,7 @@ function createStore(workspace: string, ledger: Ledger, trust?: TrustContext, mi
      * An EVIDENCE_REF transition. The lane is derived, never chosen: the writer names only the self-reported column. A
      * ledger_event ref is resolved under the project lock, before anything is signed: a missing row is 409
      * EVIDENCE_REF_DANGLING, a row whose digests are not the ref's or whose signature or chain does not verify is 409
-     * EVIDENCE_REF_UNVERIFIED, a row whose signed meta names another agent (or none) is 409 EVIDENCE_REF_FOREIGN_AGENT,
+     * EVIDENCE_REF_UNVERIFIED, a row whose agent (`ledgerRowAgent`) is another or none is 409 EVIDENCE_REF_FOREIGN_AGENT,
      * and the tier is the row's `effectiveTrustTier`, never its declared tier.
      */
     addEvidenceRef(projectId: string, input: { actor: A4Actor; refKind: A4RefKind; refId: string; sha256: string; claimKind: ClaimKind;
@@ -753,9 +757,9 @@ function createStore(workspace: string, ledger: Ledger, trust?: TrustContext, mi
           const resolved = resolveLedgerEvent(ledger, input.refId, input.sha256, readerTrustFor(workspace), []);
           if (!resolved.found) throw new A4StoreError(409, "EVIDENCE_REF_DANGLING", `no ledger row ${input.refId}`);
           if (resolved.status !== "resolved" && resolved.status !== "payload_pruned") throw new A4StoreError(409, "EVIDENCE_REF_UNVERIFIED", `ledger row ${input.refId} does not match that sha256 or does not verify`);
-          // The row's signed meta must name this project's agent: another agent's OBSERVED rows never fill this project's lanes.
-          const meta = eventMeta(ledger.getEventById(input.refId)!);
-          if ((meta.agentId ?? meta.agent_id) !== head!.agent_id) {
+          // The row's signed meta (or its session's signed session/open row) must name this project's agent: another
+          // agent's OBSERVED rows never fill this project's lanes.
+          if (liveLedgerRowAgent(ledger, ledger.getEventById(input.refId)!) !== head!.agent_id) {
             throw new A4StoreError(409, "EVIDENCE_REF_FOREIGN_AGENT", `ledger row ${input.refId} is not a row of agent ${head!.agent_id}`);
           }
           claim = ledgerRefClaim(ledger.getEventById(input.refId)!, input.claimKind, input.method, resolved.tier);

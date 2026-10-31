@@ -10,13 +10,14 @@
  * in-process frame is src/a4/adaptContextPlugin.ts), and their re-checks at Review. Everything A4 writes here is self_reported,
  * except the probe's ref to the stub-provider turn A4 ran, which is synthetic_example.
  */
-import { existsSync, lstatSync, readFileSync, rmdirSync, rmSync } from "node:fs";
-import { dirname } from "node:path";
+import { cpSync, existsSync, lstatSync, mkdtempSync, readFileSync, rmdirSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { dirname, join } from "node:path";
 import { loadAdmittedCatalog } from "../../catalog/admission/gate.js";
 import { activeControlPlanHead } from "../../catalog/compiler/activate.js";
 import { renderPlanDiffMarkdown } from "../../catalog/compiler/diff.js";
 import { CONTROL_PLAN_REVIEW_TOOL, planReviewIntent } from "../../catalog/compiler/sign.js";
-import { latestEnforceResourceManifestPath, verifyEnforceResourceManifest, writeEnforceResourceManifest } from "../../enforce/resourceManifest.js";
+import { buildEnforceResourceManifest, latestEnforceResourceManifestPath, verifyEnforceResourceManifest, writeEnforceResourceManifest } from "../../enforce/resourceManifest.js";
 import { artifactSigPath } from "../../lifecycle/artifactSignature.js";
 import { CLOCK_REVIEW_STATUS } from "../../incidents/regulatoryClocks.js";
 import { openLedger } from "../../ledger/ledger.js";
@@ -322,18 +323,44 @@ function assertEnforceCurrent(workspace: string, agentId: string, allowed: Reado
 }
 
 /**
- * The signed Enforce manifest after Build's writes (the agent stays ACTIVE, not DRIFTED). The writer is asked to refuse
- * before it publishes anything it could not sign (requireSignature); any refusal is 409 with its code (never a path),
- * so Build puts its writes back and records nothing.
+ * The signed Enforce manifest after Build's writes (the agent stays ACTIVE, not DRIFTED), and the snapshot files the
+ * write added. The writer is asked to refuse before it publishes anything it could not sign (requireSignature); any
+ * refusal is 409 with its code (never a path), so Build puts its writes back and records nothing.
  */
-function enforceSnapshot(workspace: string, agentId: string): { manifestId: string; path: string } {
+function enforceSnapshot(workspace: string, agentId: string): { manifest: { manifestId: string; path: string }; added: string[] } {
   try {
     const written = writeEnforceResourceManifest({ workspace, agentId, requireSignature: true });
-    return { manifestId: written.manifest.manifestId, path: relPath(workspace, written.manifestPath) };
+    return { manifest: { manifestId: written.manifest.manifestId, path: relPath(workspace, written.manifestPath) },
+      added: [written.snapshotPath, written.snapshotBundlePath, ...(written.snapshotSigPath === null ? [] : [written.snapshotSigPath])] };
   } catch (error) {
     const code = errorCodeOf(error, "ENFORCE_MANIFEST_REFUSED");
     throw fail(409, code, "The agent's Enforce manifest could not be re-written and signed after Build's writes; nothing Build wrote was kept.", { reasonCodes: [code] });
   }
+}
+
+/**
+ * The snapshot the Enforce re-snapshot is about to write (its id is the resources' digest, so an earlier Build of the
+ * same bytes left it already), kept before the write: the file and its signature as keptBytes keeps them, the bundle
+ * directory copied aside. `restore` puts the earlier snapshot back, or removes one that was not there; `release` drops the copy.
+ */
+function keptSnapshot(workspace: string, agentId: string, manifestPath: string): { paths: string[]; restore: () => void; release: () => void } {
+  const manifestId = buildEnforceResourceManifest({ workspace, agentId }).manifestId;
+  const file = join(dirname(manifestPath), "snapshots", `${manifestId}.json`);
+  const bundle = join(dirname(manifestPath), "snapshots", manifestId);
+  const files = keptBytes([file, artifactSigPath(file)]);
+  const aside = existsSync(bundle) ? join(mkdtempSync(join(tmpdir(), "amc-a4-snapshot-")), "bundle") : null;
+  if (aside !== null) cpSync(bundle, aside, { recursive: true });
+  const release = (): void => { if (aside !== null) rmSync(dirname(aside), { recursive: true, force: true }); };
+  return { paths: [file, bundle, artifactSigPath(file)], release, restore: () => {
+    files();
+    try {
+      rmSync(bundle, { recursive: true, force: true });
+      if (aside !== null) cpSync(aside, bundle, { recursive: true });
+    } catch {
+      // Left as it is: Enforce reads it as drift.
+    }
+    release();
+  } };
 }
 
 /**
@@ -381,11 +408,13 @@ function keptBytes(paths: readonly string[]): () => void {
  * beside the agent's files, and the Enforce manifest re-written.
  * Build is an owner's (it signs workspace artifacts: roleRefusals and the A4 access policy). Every refusal (agent mode,
  * invalid memory answers, Enforce drift, a weakening, the signing key, the spill cap, and the router's own size and
- * secret checks of the produced specification, run here on the record Build will make) comes before the writes; the
- * Enforce manifest is re-written, signed, only when the writes moved nothing but the agent's memory directory. A write
- * that fails, including a manifest that cannot be written or signed (refused before the writer publishes it), puts back
- * the bytes Build replaced and refuses Build, and so does the router (`rollback`) when it then refuses the step (a moved
- * head, the transition): no write stays behind that no revision records.
+ * secret checks of the produced specification, run here on the record Build will make) comes before any write. The
+ * memory policy and the context plugin are staged in memory, named by their sha256, and published (`publish`) only
+ * inside the governed transition once its role, readiness, step and stale-head checks passed; the Enforce manifest is
+ * then re-written, signed, only when the writes moved nothing but the agent's memory directory. A write that fails, a
+ * manifest that cannot be written or signed (refused before the writer publishes it), or a commit then refused (`rollback`)
+ * puts back the bytes Build replaced and the snapshot as it was before (removed when Build added it): no write stays
+ * behind that no revision records.
  */
 function build(ctx: A4ProducerContext): A4ProducerResult {
   const { spec, plan } = proposalOf(ctx);
@@ -406,33 +435,47 @@ function build(ctx: A4ProducerContext): A4ProducerResult {
   const manifestPath = latestEnforceResourceManifestPath(workspace, project.agent_id);
   const record = (manifest: NonNullable<AdaptBuild["manifest"]>): AdaptBuild => ({ ...signed,
     memoryPolicy: { path: relPath(workspace, memory.path), sha256: memory.sha256, policy: memory.policy }, context: context.record, manifest });
+  const placeholder = record({ manifestId: `enforce-resources-${"0".repeat(16)}`, path: relPath(workspace, manifestPath) });
   // The router checks the produced specification (256 KiB, credentials) only after Build returns: the same check, first.
-  assertNoSecrets(compactSpec("adapt", { ...spec, build: record({ manifestId: `enforce-resources-${"0".repeat(16)}`, path: relPath(workspace, manifestPath) }) }).spec,
-    "The produced specification");
-  const restore = keptBytes([memory.path, context.path, artifactSigPath(context.path), manifestPath, artifactSigPath(manifestPath)]);
-  let manifest: NonNullable<AdaptBuild["manifest"]>;
-  try {
-    writeMemoryPolicy(memory);
-    writeContextPlugin(workspace, context);
-    assertEnforceCurrent(workspace, project.agent_id, new Set(["memory"]));
-    manifest = enforceSnapshot(workspace, project.agent_id);
-  } catch (error) {
-    restore();
-    throw error;
-  }
-  const built = record(manifest);
+  assertNoSecrets(compactSpec("adapt", { ...spec, build: placeholder }).spec, "The produced specification");
+  const outputsFor = (built: AdaptBuild): A4ProducerResult["outputs"] => [
+    { output: "build", label: "adapt build: the compiled plan signed (CONTROL_PLAN; checked against this workspace's own keys, a local audit trail)",
+      lane: "implementation", method: null, body: { planDigest: signed.planDigest, compiledAt: signed.compiledAt, previousPlanDigest: signed.previousPlanDigest,
+        diff: signed.diff === null ? null : renderPlanDiffMarkdown(signed.diff) } },
+    { output: "build", label: `adapt build: the memory policy written (${MEMORY_ENFORCEMENT_NOTE}) and the Enforce manifest re-written`,
+      lane: "implementation", method: null, body: { memoryPolicy: built.memoryPolicy, manifest: built.manifest } },
+    { output: "build", label: "adapt build: the attributed A4 context plugin, signed (order 160; an in-process run and Studio native tasks load it, P2-37; a deployed agent does not)",
+      lane: "implementation", method: null, body: context.record }
+  ];
+  let restore: (() => void) | null = null;
+  let prior: ReturnType<typeof keptSnapshot> | null = null;
+  const rollback = (): void => {
+    restore?.();
+    prior?.restore();
+  };
   return {
-    rollback: restore,
-    outputs: [
-      { output: "build", label: "adapt build: the compiled plan signed (CONTROL_PLAN; checked against this workspace's own keys, a local audit trail)",
-        lane: "implementation", method: null, body: { planDigest: signed.planDigest, compiledAt: signed.compiledAt, previousPlanDigest: signed.previousPlanDigest,
-          diff: signed.diff === null ? null : renderPlanDiffMarkdown(signed.diff) } },
-      { output: "build", label: `adapt build: the memory policy written (${MEMORY_ENFORCEMENT_NOTE}) and the Enforce manifest re-written`,
-        lane: "implementation", method: null, body: { memoryPolicy: built.memoryPolicy, manifest } },
-      { output: "build", label: "adapt build: the attributed A4 context plugin, signed (order 160; an in-process run and Studio native tasks load it, P2-37; a deployed agent does not)",
-        lane: "implementation", method: null, body: context.record }
-    ],
-    spec: { ...spec, build: built }
+    rollback,
+    afterCommit: async () => { prior?.release(); return {}; },
+    publish: () => {
+      restore = keptBytes([memory.path, context.path, artifactSigPath(context.path), manifestPath, artifactSigPath(manifestPath)]);
+      let snapshot: ReturnType<typeof enforceSnapshot>;
+      try {
+        writeMemoryPolicy(memory);
+        writeContextPlugin(workspace, context);
+        assertEnforceCurrent(workspace, project.agent_id, new Set(["memory"]));
+        prior = keptSnapshot(workspace, project.agent_id, manifestPath);
+        snapshot = enforceSnapshot(workspace, project.agent_id);
+        // Only the snapshot kept above is put back; one written anywhere else is left as it is (never removed unkept) and Build refused.
+        if (snapshot.added.some((path) => !prior!.paths.includes(path))) throw fail(409, "ENFORCE_MANIFEST_REFUSED", "The Enforce snapshot was written where Build did not expect it; nothing Build wrote was kept.");
+      } catch (error) {
+        rollback();
+        throw error;
+      }
+      const built = record(snapshot.manifest);
+      return { outputs: outputsFor(built), spec: { ...spec, build: built } };
+    },
+    outputs: outputsFor(placeholder),
+    spec: { ...spec, build: placeholder }
   };
 }
 

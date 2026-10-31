@@ -4,7 +4,7 @@ import { approvalRuleForAction } from "../approvals/approvalPolicyEngine.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 import { A4_BOUND_ITEMS, gateStatus, isRegulated, readinessMoved, type A4ReadinessState } from "./a4Readiness.js";
-import { a4GatePolicyV1Schema, gatePolicyFloorViolations, type A4Stage } from "./a4Schema.js";
+import { A4_BOUND_ITEMS_VERSION, a4GatePolicyV1Schema, gatePolicyFloorViolations, type A4Stage } from "./a4Schema.js";
 import { assertAllowed, DAY_MS, engineRiskTier, evaluateFor, evaluateForAsyncRecord, fail, fileSha, governed, governedAsync,
   intentOf, livePrincipal, randomId, type A4Call } from "./a4Gates.js";
 import type { A4Store, A4TransitionResult } from "./a4Store.js";
@@ -71,6 +71,7 @@ function requestPlan(store: A4Store, projectId: string, input: GateRequest, eval
     return { readiness, specs: {
       kind: "GATE_REQUESTED", stage, revisionNo: project.revision_no,
       payload: { gateId, gate: input.gate, bindingDigest, intentHash: request.boundHashes.intentHash, readinessBindingDigest: intent.readinessBindingDigest,
+        boundItemsVersion: A4_BOUND_ITEMS_VERSION,
         // A regulated quorum that can only be LOCAL_USER keys is labelled on the gate from the start (design §5.2).
         degraded: readiness.items.some((entry) => entry.id === "sod.self_provisioned" && entry.status === "WAITING") ? ["SOD_DEGRADED_SELF_PROVISIONED"] : [],
         ...(proposed ? { proposedGatePolicy: proposed } : {}) },

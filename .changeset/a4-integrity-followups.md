@@ -1,0 +1,7 @@
+---
+"agent-maturity-compass": patch
+---
+
+A4 Forge integrity follow-ups. An A4 project whose head row names another agent than its signed CREATED record is refused as A4_INTEGRITY_FAILED. Only the A4 store can open an `a4-` ledger session; a caller that names the binary path "a4-store" is refused. `amc bundle export --run` and every other run lookup refuse run ids outside letters, digits, `_` and `-` (RUN_ID_INVALID). Studio hands a native task's lease to `amc acp` over an inherited pipe (fd 3, named by AMC_NATIVE_TASK_LEASE_FD) instead of the AMC_NATIVE_TASK_LEASE environment variable, which is gone. An evidence ref may name a session frame row with no agent in its meta when the session's signed session/open row names the project's agent, and an exported record carries that open row. Adapt's Build publishes its memory policy, context plugin and Enforce re-snapshot only inside the governed transition, and a refused Build leaves nothing behind.
+
+Upgrade note: A4 gates now record a `boundItemsVersion`. Adapt gates requested from this release bind `plan_unresolved` and `regulatory_sources_status` (version 2), so acknowledging either after requesting the gate makes it stale; acknowledge first, then request. Gates requested before this release name no version, verify under version 1's set, and are no longer made stale by an acknowledgement of `plan_unresolved` or `regulatory_sources_status`, which their intent does not bind; every other acknowledgement still makes an open gate stale.

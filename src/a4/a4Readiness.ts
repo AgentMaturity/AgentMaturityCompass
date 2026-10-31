@@ -19,7 +19,7 @@ import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import type { A4ResolvedRef } from "./a4Evidence.js";
 import {
-  A4_BOUND_ITEMS, A4_STAGES, deriveSelfApprovalAllowed, gatePolicyFloorViolations, gatePolicyOf, gateSupersededBy, ratchetedFromChain, type A4_BLOCKER_KINDS,
+  A4_BOUND_ITEMS, A4_STAGES, deriveSelfApprovalAllowed, storedBoundItems, gatePolicyFloorViolations, gatePolicyOf, gateSupersededBy, ratchetedFromChain, type A4_BLOCKER_KINDS,
   type A4ChainLink, type A4GatePolicyV1, type A4Member, type A4Principal, type A4ProjectRow, type A4ReadinessV1, type A4Stage,
   type a4DecisionRowSchema, type a4EffectRowSchema, type a4GateRowSchema, type a4ReadinessItemSchema, type a4RevisionRowSchema
 } from "./a4Schema.js";
@@ -211,7 +211,8 @@ export interface A4GateStatus {
 export function gateStatus(state: A4ReadinessState, row: A4GateRow, policy: ApprovalPolicy, now: number): A4GateStatus {
   const request = gateRequestOf(row);
   const requestedSeq = state.chain.find((link) => link.kind === "GATE_REQUESTED" && link.body.gateId === row.gate_id)?.seq ?? Number.MAX_SAFE_INTEGER;
-  const superseding = gateSupersededBy(state.chain, { gateId: row.gate_id, revisionNo: row.revision_no, requestedSeq });
+  const superseding = gateSupersededBy(state.chain, { gateId: row.gate_id, revisionNo: row.revision_no, requestedSeq,
+    stage: row.stage, boundItemIds: storedBoundItems(row.bound_items_json) });
   const counted = state.decisions.filter((decision) => decision.gate_id === row.gate_id && decision.request_digest === row.binding_digest
     && decisionRecordOf(decision)?.requestDigestSha256 === row.binding_digest);
   const quorum = evaluateApprovalQuorum({ request, decisions: counted.map((decision) => decisionRecordOf(decision)!), policy, now });

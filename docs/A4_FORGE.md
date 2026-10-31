@@ -123,9 +123,11 @@ acknowledgement supersedes an open gate on the same revision. Adapt's `plan_unre
 project, `409 A4_NOT_ACKNOWLEDGEABLE`, and one recorded earlier does not count there), `regulatory_sources_status`,
 `context_probe_unavailable` (a JSONL session store) and `plan_activated` (only from Review on while its activation is
 deferred, `PLAN_ACTIVATION_DEFERRED`: each step before Review records a new revision, and an acknowledgement counts only
-on its own; before Review or in any other state `409 A4_NOT_ACKNOWLEDGEABLE`) are not in Adapt's bound set yet, so their
-acknowledgements are on the chain but not in the gate's intent (a change to the bound set needs a versioned intent;
-requested).
+on its own; before Review or in any other state `409 A4_NOT_ACKNOWLEDGEABLE`) are acknowledgeable at Adapt; of them,
+`plan_unresolved` and `regulatory_sources_status` are in Adapt's bound set from intent version 2 (a gate's
+`GATE_REQUESTED` names its `boundItemsVersion`; a gate that names none is version 1, verifies under version 1's set, and an
+acknowledgement of either item leaves it open; every other acknowledgement, and any on a gate whose stored set does not
+read, supersedes).
 
 ## Resources, the catalog lock and the compiled-plan lockout
 
@@ -318,9 +320,12 @@ the agent's prompt pack.
   tools or a wider tools entry) it adds `TOOLS_CONFIG_CHANGED` and says to re-sign tools.yaml or rebuild the plan instead
   of changing the answers. Every refusal comes before Build writes, including the router's own size
   (256 KiB) and credential checks of the record Build makes (`413 INPUT_TOO_LARGE`; Propose already refuses a proposal
-  that leaves Build no room). When a write fails, or the step is not recorded after Build returned (the head moved, the
-  transition was refused, a replay answered), the memory policy, the context plugin and the Enforce manifest and its
-  signature are put back as they were, so no change stays behind that no revision records. **Review** is an owner's too
+  that leaves Build no room). Build stages the memory policy and the context plugin in memory, named by their sha256, and
+  publishes them, then re-writes the Enforce manifest, only inside the governed transition once its role, readiness,
+  step and stale-head checks passed; its outputs are sealed after that. When a write fails, or the commit is then
+  refused (the head moved twice, the ledger mirror could not commit, a replay answered), the memory policy, the context
+  plugin and the Enforce manifest and its signature are put back as they were, and the Enforce snapshot and the output
+  blobs it added are removed, so no change stays behind that no revision records. **Review** is an owner's too
   (owner mode): it signs the control results with the workspace auditor key. It refuses with `409 RESOURCE_DRIFTED` when
   the memory policy, the context plugin or the agent's Enforce resources moved since Build, then evaluates every
   requirement with `evaluateControl` (no loader binds runtime rows to catalog evidence contracts yet, so each reads

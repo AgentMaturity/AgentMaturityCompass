@@ -91,6 +91,15 @@ describe("scenario: tampered record", () => {
     }
   });
 
+  test("a head row whose agent id differs from the signed CREATED body is refused on read and write", async () => {
+    const { workspace, p, alice } = await project();
+    tamper(workspace, "a4_projects", "UPDATE a4_projects SET agent_id = 'another-agent' WHERE project_id = ?", p.projectId);
+    expect(codesOf(report(workspace, p.projectId))).toMatch(/A4_SCOPE_AGENT|A4_CHAIN_INVALID/);
+    blocked(await p.get(alice));
+    blocked(await p.get(alice, "/readiness"));
+    blocked(await p.post(alice, "/hold", { reason: "on a foreign agent id" }));
+  });
+
   /** A workspace VIEWER who is a project member, and one who is not; neither is a workspace OWNER or AUDITOR. */
   async function viewers() {
     const ws = await project();

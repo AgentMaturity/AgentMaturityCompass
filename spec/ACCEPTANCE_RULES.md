@@ -479,7 +479,8 @@ Integrity (`integrity: fail` with the code named):
 
 Scope (`scope: fail`): every exported row names the project (`A4_SCOPE_FOREIGN_ROW`), the head row and the `CREATED`
 body name one agent (`A4_SCOPE_AGENT`), and every row a `ledger_event` ref names is a row of that agent
-(`A4_SCOPE_FOREIGN_AGENT`). In a bundle, each listed record is about the bundle's subject: the `CREATED` body's
+(`A4_SCOPE_FOREIGN_AGENT`): its signed meta names the agent, or, when its meta names no agent, the record carries its
+session's one `session/open` row, which verifies and names the agent. In a bundle, each listed record is about the bundle's subject: the `CREATED` body's
 `agentId` and the `agentId` of the receipt a monitor key signed on the record's seq-0 audit row (receipt
 `session_id` `a4-<projectId>-0`) both equal the signed manifest's `agentId`; a record whose seq-0 row has no such
 receipt, or that names another agent, fails (`A4_SCOPE_AGENT`).
