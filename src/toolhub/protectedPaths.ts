@@ -1,4 +1,5 @@
-import { isAbsolute, join, relative, resolve } from "node:path";
+import { statSync } from "node:fs";
+import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 
 /**
  * The paths no tool policy may reach, declared.
@@ -65,16 +66,67 @@ export function protectedPathGlobs(): string[] {
  * line of work exists to remove — it merely wears code instead of YAML.
  */
 export function isProtectedPath(workspace: string, candidate: string): boolean {
-  // Folded on both sides: a case-insensitive volume opens `.amc` for `.AMC`.
-  const fold = (path: string): string => path.normalize("NFC").toLowerCase();
-  const resolved = fold(resolve(candidate));
-  const amcRoot = fold(resolve(join(workspace, ".amc")));
-  if (resolved === amcRoot) return true;
-  // `relative`, not a string prefix. `resolved.startsWith(amcRoot)` — which is
-  // what this replaced — also matches `.amcx` and `.amc-backup`, refusing
-  // directories nobody protected.
-  const within = relative(amcRoot, resolved);
-  return within !== "" && !within.startsWith("..") && !isAbsolute(within);
+  const resolved = resolve(candidate);
+  const amcRoot = resolve(join(workspace, ".amc"));
+  // Names alias on some volumes (`.AMC`, `AMC~1`, `.amc.`), so the location is
+  // decided by file identity: the protected directory itself, or any existing
+  // ancestor of the candidate that is it.
+  const amc = fileIdentity(amcRoot);
+  if (amc !== null) {
+    for (let current = resolved; ; current = dirname(current)) {
+      if (fileIdentity(current) === amc) return true;
+      if (dirname(current) === current) break;
+    }
+  }
+  // The name check stays as the second lock, folded: it holds where the
+  // directory does not exist yet, and against aliases of a missing one.
+  const fromWorkspace = relative(resolve(workspace), resolved);
+  if (fromWorkspace.startsWith("..") || isAbsolute(fromWorkspace)) return false;
+  // The first `relative` segment, not a string prefix: `startsWith(amcRoot)`,
+  // which this replaced, also matched `.amcx` and `.amc-backup`. This floor
+  // owns `.amc` alone; `.git` is the tool layer's (fsTools).
+  const first = fromWorkspace.split(sep)[0] ?? "";
+  return foldName(first) !== ".git" && aliasedSegmentReason(first) !== null;
+}
+
+const PROTECTED_DIRECTORY_NAMES = new Set([".amc", ".git"]);
+
+/** Case- and compatibility-folded (NFKC, so fullwidth `ａ` is `a`): a case-insensitive volume opens `.amc` for `.AMC`. */
+export function foldName(name: string): string {
+  return name.normalize("NFKC").toLowerCase().normalize("NFKC");
+}
+
+/**
+ * Why one path segment may name `.amc` or `.git`, or null. A second lock behind
+ * the identity check, because names alias: a folded name, and the shapes
+ * Windows resolves to another name, which are refused whatever they spell —
+ * trailing dots or spaces (dropped), `name:stream` (the file `name`) and 8.3
+ * short names (`AMC~1`).
+ */
+export function aliasedSegmentReason(segment: string): string | null {
+  if (segment === "" || segment === "." || segment === "..") return null;
+  if (PROTECTED_DIRECTORY_NAMES.has(foldName(segment))) return `path is inside a protected directory (${segment})`;
+  if (/[. ]$/.test(segment) || segment.includes(":") || /~\d/.test(segment)) {
+    return `path segment may alias a protected directory on some volumes (${segment})`;
+  }
+  return null;
+}
+
+/** `dev:ino` of an existing path, or null when nothing is there. Any other stat failure throws: unknown is not "absent". */
+export function fileIdentity(path: string): string | null {
+  try {
+    const stat = statSync(path, { bigint: true });
+    return `${stat.dev}:${stat.ino}`;
+  } catch (error) {
+    const code = (error as NodeJS.ErrnoException).code;
+    if (code === "ENOENT" || code === "ENOTDIR") return null;
+    throw error;
+  }
+}
+
+/** Identities of the workspace's `.amc` and `.git`, those that exist. */
+export function protectedDirectoryIdentities(root: string): ReadonlySet<string> {
+  return new Set([...PROTECTED_DIRECTORY_NAMES].map((name) => fileIdentity(join(root, name))).filter((id): id is string => id !== null));
 }
 
 /** Why a path was refused, for a message an operator can act on. */

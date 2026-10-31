@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, realpathSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
@@ -7,12 +7,13 @@ import { openLedger } from "../dist/ledger/ledger.js";
 import { initBudgets } from "../dist/budgets/budgets.js";
 import { writeRuntimeFirewallPolicy } from "../dist/runtime/firewall.js";
 import { agentToolset } from "../dist/agent/agentToolset.js";
-import { insideWorkspace } from "../dist/tools/builtin/fsTools.js";
-import { walkWorkspace } from "../dist/tools/builtin/workspaceWalk.js";
-import { protectedPathReason } from "../dist/toolhub/protectedPaths.js";
-import { pathAllowedByPatterns } from "../dist/toolhub/toolhubValidators.js";
-import { admissibleConfigFile } from "../dist/experiments/configFile.js";
+import { insideWorkspace } from "../src/tools/builtin/fsTools.js";
+import { walkWorkspace } from "../src/tools/builtin/workspaceWalk.js";
+import { protectedPathReason } from "../src/toolhub/protectedPaths.js";
+import { pathAllowedByPatterns } from "../src/toolhub/toolhubValidators.js";
+import { admissibleConfigFile } from "../src/experiments/configFile.js";
 
+// The pure path logic is imported from source; the toolset runs from dist because grep and glob run in a built worker.
 /**
  * `.amc` and `.git` are protected by NAME, and on a case-insensitive volume
  * (the macOS and Windows default) `.AMC` is the same directory. The grep and
@@ -81,6 +82,28 @@ describe("protected segments compare case-insensitively", () => {
     expect(pathAllowedByPatterns(dir, join(dir, "SECRETS", "a.txt"), [], ["**/secrets/**"]).ok).toBe(false);
   });
 
+  it("refuses the Windows and Unicode aliases of .amc and .git in the pure segment logic", () => {
+    // Windows drops trailing dots and spaces, reads `name:stream` as `name` and answers 8.3 short names; NFKC folds
+    // fullwidth letters. None of these can be created on this host, so the segment logic is asserted directly.
+    const dir = tempDir("amc-segcase-alias-");
+    const aliases = [".amc.", ".amc ", ".git...", ".amc::$DATA", ".git:hooks", "AMC~1", "GIT~1/config", "AM1F2A~1",
+      "\uFF0E\uFF41\uFF4D\uFF43", ".\uFF27IT", "pkg/.amc./x"];
+    for (const path of aliases) {
+      expect(() => insideWorkspace(dir, path), JSON.stringify(path)).toThrow(/protected directory/);
+    }
+    for (const path of [".amc.", ".amc::$DATA", "AMC~1", "AMC~1/vault.amcvault", "\uFF0E\uFF41\uFF4D\uFF43/x"]) {
+      expect(protectedPathReason(dir, join(dir, path)), JSON.stringify(path)).not.toBeNull();
+    }
+    for (const path of [".amc.", "AMC~1"]) {
+      mkdirSync(join(dir, path), { recursive: true });
+      writeFileSync(join(dir, path, "x.txt"), "x");
+      expect(walkWorkspace(dir, { maxFiles: 100, maxFileBytes: 1000 }).files.some((file) => file.startsWith(path)), path).toBe(false);
+    }
+    // Ordinary names stay usable.
+    expect(insideWorkspace(dir, "src/amc.ts").rel).toBe("src/amc.ts");
+    expect(protectedPathReason(dir, join(dir, ".amcx", "y"))).toBeNull();
+  });
+
   it("refuses .AMC, .Amc, .GIT and a nested .amc through the native toolset, where the volume folds case", async () => {
     const dir = workspace();
     if (!caseInsensitive(dir)) return; // the pure test above covers case-sensitive volumes
@@ -115,6 +138,39 @@ describe("protected segments compare case-insensitively", () => {
     } finally {
       await toolset.close();
     }
+  });
+
+  it("refuses a protected directory reached under another name, by identity", () => {
+    // `.amc` and `.git` linked to directories elsewhere in the workspace: the real path names `state/` and `gitdir/`,
+    // which no name check knows, so only the identity of the protected directories refuses them.
+    const dir = tempDir("amc-segcase-linked-");
+    mkdirSync(join(dir, "state"), { recursive: true });
+    writeFileSync(join(dir, "state", "vault.amcvault"), "v");
+    mkdirSync(join(dir, "gitdir", "hooks"), { recursive: true });
+    writeFileSync(join(dir, "gitdir", "config"), "c");
+    writeFileSync(join(dir, "visible.txt"), "x");
+    symlinkSync(join(dir, "state"), join(dir, ".amc"));
+    symlinkSync(join(dir, "gitdir"), join(dir, ".git"));
+    for (const path of ["state/vault.amcvault", "state", "gitdir/config", "gitdir/hooks/pre-commit", ".amc/vault.amcvault"]) {
+      expect(() => insideWorkspace(dir, path), path).toThrow(/protected directory/);
+    }
+    expect(insideWorkspace(dir, "visible.txt").rel).toBe("visible.txt");
+    expect(walkWorkspace(dir, { maxFiles: 100, maxFileBytes: 1000 }).files).toEqual(["visible.txt"]);
+    expect(() => walkWorkspace(dir, { maxFiles: 100, maxFileBytes: 1000, path: "gitdir" })).not.toThrow();
+    expect(walkWorkspace(dir, { maxFiles: 100, maxFileBytes: 1000, path: "gitdir" }).files).toEqual([]);
+    expect(protectedPathReason(dir, join(dir, "state", "vault.amcvault"))).not.toBeNull();
+  });
+
+  it("decides the toolhub floor by identity, so a re-cased absolute path to .amc is refused", () => {
+    const dir = tempDir("amc-segcase-identity-");
+    mkdirSync(join(dir, ".amc"), { recursive: true });
+    writeFileSync(join(dir, ".amc", "vault.amcvault"), "v");
+    if (!caseInsensitive(dir)) return;
+    // Every segment re-cased: `relative` from the workspace leaves it, so only the identity of `.amc` can refuse it.
+    const recased = join(dir, ".amc", "vault.amcvault").toUpperCase();
+    expect(protectedPathReason(dir, recased)).not.toBeNull();
+    expect(pathAllowedByPatterns(dir, recased, [], []).ok).toBe(false);
+    expect(protectedPathReason(dir, join(dir, "visible.txt").toUpperCase())).toBeNull();
   });
 
   it("refuses an experiment config file named through .AMC, where the volume folds case", () => {

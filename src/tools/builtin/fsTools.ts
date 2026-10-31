@@ -3,6 +3,7 @@ import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "nod
 import { z } from "zod";
 import { redactSecrets } from "../../shield/redaction/redactSecrets.js";
 import { sha256Hex } from "../../utils/hash.js";
+import { aliasedSegmentReason, fileIdentity, protectedDirectoryIdentities } from "../../toolhub/protectedPaths.js";
 import { noteFileChange } from "../toolEvidence.js";
 import { defineTool } from "../toolRegistry.js";
 import type { ToolDefinition, ToolExecution } from "../toolTypes.js";
@@ -63,8 +64,11 @@ const UTF8 = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true });
  * The signed `tools.yaml` allowlist denies these globs as well. This is the
  * second lock rather than the only one, because that allowlist is applied by a
  * guard — and a guard that a composition forgets to install enforces nothing.
+ *
+ * Decided by file identity (`protectedDirectoryIdentities`), because names
+ * alias: `.AMC` on a case-insensitive volume, `AMC~1` or `.amc.` on Windows.
+ * The folded name (`aliasedSegmentReason`) is the second lock.
  */
-const FORBIDDEN_SEGMENTS = new Set([".amc", ".git"]);
 
 /**
  * Resolve every symlink on the deepest existing prefix of a path.
@@ -78,7 +82,7 @@ function realPathOfNearestExisting(target: string): string {
   let current = target;
   for (;;) {
     try {
-      return trailing.length === 0 ? realpathSync(current) : join(realpathSync(current), ...trailing);
+      return trailing.length === 0 ? realpathSync.native(current) : join(realpathSync.native(current), ...trailing);
     } catch {
       const parent = dirname(current);
       if (parent === current) return target; // reached the root; nothing exists
@@ -109,12 +113,14 @@ export function insideWorkspace(workspace: string, path: string): { readonly ful
   if (rel.startsWith("..") || isAbsolute(rel)) {
     throw new Error(`path escapes the workspace: ${path}`);
   }
+  const protectedIds = protectedDirectoryIdentities(root);
+  let current = root;
   for (const segment of rel.split(/[/\\]/)) {
-    // Folded: on a case-insensitive volume `.AMC` opens `.amc`, and JS
-    // `realpathSync` keeps the typed case rather than the on-disk name.
-    if (FORBIDDEN_SEGMENTS.has(segment.normalize("NFC").toLowerCase())) {
-      throw new Error(`path is inside a protected directory (${segment}): ${path}`);
-    }
+    current = join(current, segment);
+    const alias = aliasedSegmentReason(segment);
+    if (alias !== null) throw new Error(`${alias}: ${path}`);
+    const id = protectedIds.size === 0 ? null : fileIdentity(current);
+    if (id !== null && protectedIds.has(id)) throw new Error(`path is inside a protected directory (${segment}): ${path}`);
   }
   return { full: real, rel: rel.split(sep).join("/") };
 }
