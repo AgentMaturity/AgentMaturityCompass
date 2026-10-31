@@ -92,13 +92,19 @@ export function buildSeatbeltShellProfile(input: SeatbeltShellProfileInput): str
     "(allow signal (target pgrp))",
     "(deny process-info* (target others))",
     `(deny process-exec ${LAUNCHERS.map(path => `(literal "${path}")`).join(" ")})`,
+    ";; Host state outside the write grants: named POSIX shared memory and System V IPC outlive the shell and reach other processes. The kernel still lets a System V segment be created; attaching it is denied.",
+    "(deny ipc-posix-shm-write-create ipc-posix-shm-write-data ipc-posix-shm-write-unlink)",
+    "(deny ipc-sysv*)",
+    ";; Kernel driver user clients (power management, displays, devices) are host state too; registry reads stay open.",
+    "(deny iokit-open)",
     ""
   ].join("\n");
 }
 
 const LIMITATIONS = [
   "Reads outside the deny-list stay open: the command can read any other file your user can.",
-  "Mach lookups are limited to the temp-directory helper, logging, notifications and user and group lookups; tools that need another system service (the keychain, certificate trust through trustd, LaunchServices) fail.",
+  "Mach lookups are limited to the temp-directory helper, logging, notifications and user and group lookups; tools that need another system service fail closed: keychain lookups (`security`, keychain credential helpers), Security.framework certificate trust through trustd, and LaunchServices.",
+  "Named POSIX shared memory cannot be created or written and IOKit user clients cannot be opened. System V shared memory segments can still be created, empty, but not attached, written or removed from inside; POSIX semaphores and IOKit registry reads stay available.",
   "sandbox-exec is deprecated by Apple; the profile is checked on the macOS versions AMC's CI runs, not on every release.",
   "This confines a shell subprocess, not AMC or worker-thread Code Mode.",
   "Hard-link creation is denied and existing hard-link aliases and special files in write grants are refused; concurrent trusted host writers are outside this subprocess boundary.",
@@ -148,6 +154,8 @@ export function seatbeltNativeShell(): SandboxBackend {
         if (policy.allowHosts && policy.onEgress && policy.egressScope) {
           proxy = await startShellEgressProxy({ allowHosts: policy.allowHosts, record: policy.onEgress, ...policy.egressScope });
           for (const name of ["HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY"]) env[name] = env[name.toLowerCase()] = proxy.url;
+          // Node's fetch ignores the proxy variables unless told to read them; it would connect directly and be denied.
+          env["NODE_USE_ENV_PROXY"] = "1";
         }
         const profilePath = join(launcher, "profile.sb");
         writeFileSync(profilePath, buildSeatbeltShellProfile({ workspace, writableRoots, privateTmp, denied, proxyPort: proxy?.port ?? null }), { mode: 0o600 });

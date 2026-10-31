@@ -100,9 +100,13 @@ Linux policy with `egress` is refused at launch.
 
 ## Known limits
 
-- macOS reads outside the deny-list stay open. The five allowed Mach services,
-  POSIX shared memory and IOKit are not restricted. Tools that need another
-  system service (the keychain, certificate trust through trustd) fail.
+- macOS reads outside the deny-list stay open, by design. Named POSIX shared
+  memory cannot be created or written, System V IPC cannot be attached and
+  IOKit user clients cannot be opened (measured 2026-11-01); the kernel still
+  lets a System V segment be created, empty and unattachable, and POSIX
+  semaphores and IOKit registry reads stay open. Tools that need another
+  system service fail closed: keychain lookups and Security.framework trust
+  evaluation through trustd.
 - `sandbox-exec` is deprecated. The profile was checked by hand on macOS 26.6.2
   (25G83, arm64); no CI job has run it yet.
 - RLIMIT_NPROC counts every process of the user (threads on Linux), so the cap

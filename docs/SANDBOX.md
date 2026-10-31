@@ -205,10 +205,18 @@ probe in the launcher's own directory and succeed in writing a marker in the
 private temporary directory. Without both, the command never ran and the
 receipt says `confined: false`.
 
+The profile also denies creating or writing named POSIX shared memory, System
+V IPC and opening IOKit user clients (power management, displays, devices),
+because those are host state outside the write grants.
+
 Limits. Reads outside the deny-list stay open: the shell can read any other
-file your user can. POSIX shared memory and IOKit are not restricted. Tools
-that need another system service, such as the keychain or certificate trust
-through `trustd`, fail.
+file your user can, because a toolchain loads from all over the filesystem.
+The kernel still lets the shell create a System V shared memory segment; it
+stays empty, because attaching, writing or removing it is denied. POSIX
+semaphores and IOKit registry reads (`ioreg`) stay available. Tools that need
+another system service fail closed: keychain lookups (`security`, keychain
+credential helpers such as git's `osxkeychain`) and certificate trust through
+Security.framework and `trustd` (`security verify-cert`).
 `sandbox-exec` is deprecated by Apple; the profile was checked by hand on macOS
 26.6.2 (25G83, arm64) and no CI job runs it yet. RLIMIT_NPROC counts every
 process of your user, so the process cap is relative to your count at launch.
@@ -245,7 +253,10 @@ writes a `NATIVE_SHELL_EGRESS` audit row (`callId`, `host`, `port`, `decision`,
 connection.
 
 curl and git over HTTPS read `http_proxy`/`HTTPS_PROXY`, npm and pip read
-`HTTPS_PROXY`, and Node's built-in `fetch` does not read them by default.
+`HTTPS_PROXY`. Node's built-in `fetch` reads them only with
+`NODE_USE_ENV_PROXY=1`, which the macOS shell sets with the proxy (measured
+with Node 22.23; a Node that does not know the variable ignores it, and its
+`fetch` connects directly and is denied).
 Check other tools' own proxy settings. A tool that ignores the variables, such as git over SSH, cannot
 reach the network. The gateway forward proxy uses the same host decision
 (`decideEgress`, through `resolveAndCheck`): it resolves a listed name for every

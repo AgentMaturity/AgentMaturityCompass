@@ -44,7 +44,7 @@
       "status": "enforced",
       "bypasses": [
         "On macOS without a usable /usr/bin/sandbox-exec the shell is absent unless the operator passes the unsafe unconfined-shell opt-in; that shell runs with the user's full rights and is recorded, not confined",
-        "The macOS Seatbelt profile leaves reads outside its deny-list open; Mach lookups are limited to five system services (temp-directory helper, logging, notifications, user and group lookups), and POSIX shared memory and IOKit are not restricted",
+        "The macOS Seatbelt profile leaves reads outside its deny-list open; Mach lookups are limited to five system services (temp-directory helper, logging, notifications, user and group lookups), named POSIX shared memory, System V attachment and IOKit user clients are denied, and an empty System V segment can still be created",
         "A signed shell egress allowlist is refused on Linux until the ADR-008 relay is reviewed and built",
         "RLIMIT_NPROC counts all of the user's processes, so the cap is relative to the count at launch; there is no memory or CPU limit"
       ],
