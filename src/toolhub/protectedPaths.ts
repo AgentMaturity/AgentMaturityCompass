@@ -74,7 +74,7 @@ export function isProtectedPath(workspace: string, candidate: string): boolean {
  * outside the workspace is not judged here, and is never "clear" — the caller's
  * containment check refuses it (pathAllowedByPatterns).
  */
-export function protectedPathStatus(workspace: string, candidate: string): "protected" | "clear" | "outside" {
+function protectedPathStatus(workspace: string, candidate: string): "protected" | "clear" | "outside" {
   const resolved = resolve(candidate);
   // Names alias on some volumes (`.AMC`, `AMC~1`, `.amc.`), so the location is
   // decided by file identity: the protected directory itself, or any existing
