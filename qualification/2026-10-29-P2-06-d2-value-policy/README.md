@@ -20,3 +20,8 @@ The P2-06 kind qualification (INS-1) still needs a rerun on a cluster with this 
 ## Receipt repaired 2026-10-31
 
 The folder had no `README.md` and no `receipt.json`, which `npm run check:qualification` requires; `receipt.md` stays as the lane wrote it. `receipt.json` was written from `receipt.md`, the files beside it and the git history. Its commands are the three test runs and ten checks `receipt.md` lists. The test runs are written as vitest commands because their command lines were not recorded, and the checks are written as the npm scripts they name, all with exit 0 as `receipt.md` records. `commit` is `69b45298b`, which holds the fix and this folder. `tests` is null because the three selections may overlap. Every evidence file is listed as a hashed artifact. The Node, pnpm and OS versions and the command durations were never recorded; they are written as `not recorded` and `durationMs: 0`. `arch` is `arm64`, a same-host inference from the same wave's D5 receipt of that day, because the schema allows only `arm64` or `x64`.
+
+
+## Folder renamed 2026-10-31
+
+This folder was `qualification/2026-10-29-P2-06-D2/`. `npm run check:qualification` reads a folder name as `<YYYY-MM-DD>-<KEY>`, where a second receipt for the same key and day may add a lowercase variant (`qualification/README.md`). The receipt key is `P2-06`. The old uppercase suffix `-D2` reads as another key, so it can never match. The folder now carries the lowercase variant `-d2-value-policy`, from the lane branch `rtd/w7-d2-value-policy`. The branch name is added because a rename that changed only the letter case may leave the old directory name in place in existing macOS checkouts, whose file systems ignore case. The evidence files are unchanged; git records the move as a rename.
