@@ -617,7 +617,8 @@ export class RegulatoryMonitor extends EventEmitter {
       regulatoryChange: change,
       currentCoverage: currentCoverage === null ? null : Math.round(currentCoverage * 10) / 10,
       projectedCoverage: currentCoverage === null ? null : Math.round(currentCoverage * 10) / 10,
-      outcome: currentCoverage === null ? "not_evaluated" : "measured",
+      // Without a covered list the coverage rests on assuming every mapped control is covered: not a measurement.
+      outcome: currentCoverage === null || currentCoveredControls === undefined ? "not_evaluated" : "measured",
       sampleSize: change.impactedControls.length,
       gaps,
       remediationPlan,
@@ -659,8 +660,10 @@ export class RegulatoryMonitor extends EventEmitter {
       };
     });
 
-    const affectedAgents = fleetScores.filter(a =>
-      affectedDimensions.some(d => (a.dimensionScores[d] ?? 0) < 55)
+    // The sample is the agents with a finite score in an affected dimension; a NaN or missing score evaluates nothing.
+    const scored = fleetScores.filter(a => affectedDimensions.some(d => Number.isFinite(a.dimensionScores[d])));
+    const affectedAgents = scored.filter(a =>
+      affectedDimensions.some(d => Number.isFinite(a.dimensionScores[d]) && a.dimensionScores[d]! < 55)
     ).length;
 
     const totalHours = affectedAgents * affectedDimensions.length * 2;
@@ -672,9 +675,9 @@ export class RegulatoryMonitor extends EventEmitter {
       affectedAgents,
       affectedDimensions,
       scoreImpact,
-      complianceRisk: fleetScores.length === 0 ? null : Math.min(100, Math.round((affectedAgents / fleetScores.length) * 100)),
-      outcome: fleetScores.length === 0 ? "not_evaluated" : "measured",
-      sampleSize: fleetScores.length,
+      complianceRisk: scored.length === 0 ? null : Math.min(100, Math.round((affectedAgents / scored.length) * 100)),
+      outcome: scored.length === 0 ? "not_evaluated" : "measured",
+      sampleSize: scored.length,
       timeToCompliance: totalHours,
       recommendations: [
         `${affectedAgents} of ${fleetScores.length} agents need remediation across ${affectedDimensions.length} dimensions.`,
