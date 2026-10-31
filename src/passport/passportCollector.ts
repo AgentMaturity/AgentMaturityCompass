@@ -18,7 +18,7 @@ import { latestAssuranceCertificateSummary } from "../assurance/assuranceStore.j
 import { loadVerifiedForecastArtifact } from "../forecast/forecastStore.js";
 import { listExportedBenchArtifacts } from "../bench/benchArtifact.js";
 import { loadBinderCache } from "../audit/binderStore.js";
-import { loadValueSnapshot, verifyValueSnapshotSignature } from "../value/valueStore.js";
+import { loadVerifiedValueSnapshot } from "../value/valueStore.js";
 import { loadBridgeConfig, verifyBridgeConfigSignature } from "../bridge/bridgeConfigStore.js";
 import { loadToolsConfig, verifyToolsConfigSignature } from "../toolhub/toolhubValidators.js";
 import { verifyApprovalPolicySignature } from "../approvals/approvalPolicyEngine.js";
@@ -211,10 +211,9 @@ function collectPassportLocalData(params: {
     ? report.questionScores.filter((row) => !Array.isArray(row.evidenceEventIds) || row.evidenceEventIds.length === 0).length
     : questionBank.length;
 
-  // Signed value snapshots only: an unsigned or tampered one leaves the dimensions unknown.
-  const signedValueSnapshot = (target: { type: "WORKSPACE" | "NODE" | "AGENT"; id: string }) =>
-    verifyValueSnapshotSignature(params.workspace, target).valid ? loadValueSnapshot(params.workspace, target) : null;
-  const valueSnapshot = signedValueSnapshot({ type: scope.type, id: scope.id }) ?? signedValueSnapshot({ type: "WORKSPACE", id: "workspace" });
+  // Signed value snapshots only, verified and parsed from one read: an unsigned or tampered one leaves the dimensions unknown.
+  const valueSnapshot = loadVerifiedValueSnapshot(params.workspace, { type: scope.type, id: scope.id })
+    ?? loadVerifiedValueSnapshot(params.workspace, { type: "WORKSPACE", id: "workspace" });
   const valueDimensions = valueSnapshot?.valueDimensions ?? {
     emotional: null,
     functional: null,

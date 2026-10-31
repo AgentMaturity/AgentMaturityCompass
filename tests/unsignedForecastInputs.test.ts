@@ -12,7 +12,9 @@ import { initWorkspace } from "../src/workspace.js";
 import { collectPassportData } from "../src/passport/passportCollector.js";
 import { defaultPassportPolicy } from "../src/passport/passportPolicySchema.js";
 import { createValueSnapshot } from "../src/value/valueReports.js";
-import { valueSnapshotLatestPath } from "../src/value/valueStore.js";
+import { loadVerifiedValueSnapshot, valueSnapshotLatestPath } from "../src/value/valueStore.js";
+import { signFileWithAuditor } from "../src/org/orgSigner.js";
+import { copyFileSync } from "node:fs";
 import { valueContractInitForApi, valueInitForApi } from "../src/value/valueApi.js";
 import { readFileSync } from "node:fs";
 
@@ -103,5 +105,41 @@ describe("unsigned forecast, bench and passport inputs are absent and named", ()
     const policy = defaultPassportPolicy();
     expect(policy.passportPolicy.contents.includeFiveValueDims).toBe(true);
     expect(Object.values(passport.valueDimensions as Record<string, unknown>)).not.toContain(99);
+  });
+
+  test("a signed forecast or value snapshot copied from another scope is absent", async () => {
+    const ws = workspace();
+    initForecastPolicy(ws);
+    createForecast({ workspace: ws, scope: { type: "AGENT", id: "default" } });
+    const workspaceScope = { type: "WORKSPACE" as const, id: "workspace" };
+    const from = forecastScopeLatestPath(ws, { type: "AGENT", id: "default" }), to = forecastScopeLatestPath(ws, workspaceScope);
+    mkdirSync(dirname(to), { recursive: true });
+    copyFileSync(from, to); copyFileSync(`${from}.sig`, `${to}.sig`);
+    expect(loadVerifiedForecastArtifact(ws, workspaceScope)).toBeNull();
+
+    valueInitForApi(ws);
+    valueContractInitForApi({ workspace: ws, scopeType: "AGENT", scopeId: "default", type: "code-agent" });
+    await createValueSnapshot({ workspace: ws, scopeType: "AGENT", scopeId: "default" });
+    expect(loadVerifiedValueSnapshot(ws, { type: "AGENT", id: "default" })).not.toBeNull();
+    const vFrom = valueSnapshotLatestPath(ws, { type: "AGENT", id: "default" }), vTo = valueSnapshotLatestPath(ws, workspaceScope);
+    mkdirSync(dirname(vTo), { recursive: true });
+    copyFileSync(vFrom, vTo); copyFileSync(`${vFrom}.sig`, `${vTo}.sig`);
+    expect(loadVerifiedValueSnapshot(ws, workspaceScope)).toBeNull();
+  });
+
+  test("a signed transform snapshot for another agent, or a second copy of one, is not counted", () => {
+    const ws = workspace();
+    const dir = join(ws, ".amc", "agents", "default", "transform", "snapshots");
+    const createdTs = Date.now() - 1000;
+    const snapshot = (agentId: string, taskId: string) => ({ createdTs, scope: { type: "AGENT", agentId },
+      tasks: [{ taskId, effort: 1, status: "DONE" }] });
+    const signed = (name: string, body: unknown) => { const path = join(dir, name); writeJson(path, body); signFileWithAuditor(ws, path); };
+    signed("1.json", snapshot("default", "own"));
+    signed("2.json", snapshot("default", "own"));
+    signed("3.json", snapshot("other-agent", "foreign"));
+    const signals = collectForecastSignals({ workspace: ws, scope: { type: "AGENT", id: "default" } });
+    expect(signals.targetProgress.throughputHistoryPerDay).toEqual([1]);
+    expect(signals.ignoredInputs).toEqual(expect.arrayContaining([join(".amc", "agents", "default", "transform", "snapshots", "3.json")]));
+    expect(signals.ignoredInputs.filter((input) => /snapshots\/[12]\.json$/.test(input))).toHaveLength(1);
   });
 });

@@ -12,6 +12,7 @@ import { pathExists, readUtf8 } from "../utils/fs.js";
 import { computeFailureRiskIndices } from "../assurance/indices.js";
 import { loadTransformMap } from "../transformation/transformPlanner.js";
 import { canonicalize } from "../utils/json.js";
+import { sha256Hex } from "../utils/hash.js";
 import { ratioOrNull } from "../utils/ratio.js";
 import { loadForecastTransformPlan, type ForecastTransformPlanInput } from "./forecastTransformPlan.js";
 import type { TransformPlan } from "../transformation/transformTasks.js";
@@ -309,15 +310,21 @@ function computeTargetProgress(workspace: string, agentId: string, runs: Diagnos
     : gapPoints;
 
   const snapshotsDir = join(workspace, ".amc", "agents", agentId, "transform", "snapshots");
-  // Signed snapshots only, verified over the bytes parsed: an unsigned one is named and left out of the throughput.
+  // Signed snapshots only, verified over the bytes parsed, and this agent's: the writer signs the transform plan, whose
+  // scope names the agent, so a snapshot signed for another agent, or a second copy of the same bytes, is named and left out.
+  const seen = new Set<string>();
   const snapshots = listJsonFiles(snapshotsDir)
     .map((file) => {
+      const skip = (): null => { ignored.push(relative(workspace, file)); return null; };
       let bytes: Buffer;
-      try { bytes = readFileSync(file); } catch { ignored.push(relative(workspace, file)); return null; }
-      if (!verifySignedFileWithAuditor(workspace, file, bytes).valid) { ignored.push(relative(workspace, file)); return null; }
-      try {
-        return JSON.parse(bytes.toString("utf8")) as { createdTs?: number; tasks?: Array<{ taskId: string; effort: number; status: string }> };
-      } catch { ignored.push(relative(workspace, file)); return null; }
+      try { bytes = readFileSync(file); } catch { return skip(); }
+      const digest = sha256Hex(bytes);
+      if (seen.has(digest) || !verifySignedFileWithAuditor(workspace, file, bytes).valid) return skip();
+      let body: { createdTs?: number; scope?: { type?: string; agentId?: string }; tasks?: Array<{ taskId: string; effort: number; status: string }> };
+      try { body = JSON.parse(bytes.toString("utf8")) as typeof body; } catch { return skip(); }
+      if (body.scope?.type !== "AGENT" || body.scope.agentId !== agentId) return skip();
+      seen.add(digest);
+      return body;
     })
     .filter((row): row is { createdTs?: number; tasks?: Array<{ taskId: string; effort: number; status: string }> } => Boolean(row))
     .sort((a, b) => Number(a.createdTs ?? 0) - Number(b.createdTs ?? 0));

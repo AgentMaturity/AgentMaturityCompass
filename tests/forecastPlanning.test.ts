@@ -151,8 +151,9 @@ function writeTransformHistory(workspace: string, agentId: string): void {
   ];
   for (let i = 0; i < snapshots.length; i += 1) {
     const path = join(snapshotsDir, `${now - (5 - i) * 60_000}.json`);
-    writeFileSync(path, JSON.stringify(snapshots[i], null, 2));
-    signFileWithAuditor(workspace, path); // forecasts read signed transform snapshots only
+    // Forecasts read only signed snapshots whose plan scope names this agent.
+    writeFileSync(path, JSON.stringify({ ...snapshots[i], scope: { type: "AGENT", agentId } }, null, 2));
+    signFileWithAuditor(workspace, path);
   }
   writeFileSync(
     join(baseDir, "latest.json"),
