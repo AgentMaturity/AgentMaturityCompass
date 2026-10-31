@@ -217,43 +217,66 @@ export function askUserTool(options: AskUserToolOptions): ToolDefinition {
       const answerer = options.answerer;
       if (!answerer) throw new NativeToolRefusal("ask_user", "no human answerer is composed for this session; ask_user never auto-answers");
 
-      const sessionId = currentSession();
-      const dir = join(sessionRecordDir(execution.workspace, sessionId), "ask-user");
-      const record: AskUserQuestionRecord = {
-        schemaVersion: "2026-10-29",
-        kind: "amc.native.ask_user.question",
-        questionId: `q_${randomUUID()}`,
-        sessionId,
-        agentId: execution.agentId,
-        callId: execution.callId,
-        questions,
-        askedAt: Date.now()
-      };
-      const signedQuestion = writeSignedRecord(execution.workspace, join(dir, `${record.questionId}.question.json`), record, "monitor");
-      const question: AskUserQuestion = { ...record, questionSha256: signedQuestion.digestSha256 };
-
-      const timeout = AbortSignal.timeout(options.timeoutMs ?? DEFAULT_TIMEOUT_MS);
-      const signal = execution.signal ? AbortSignal.any([execution.signal, timeout]) : timeout;
-      let given: SignedAskUserAnswer | null;
-      try {
-        // The answerer gets a copy, so it cannot change the question its answer is checked against.
-        given = await awaitAnswer(answerer, structuredClone(question), signal);
-      } catch (error: unknown) {
-        throw new Error(`ask_user: no answer (${error instanceof Error ? error.message : "answerer failed"})`);
-      }
-      if (!given) throw new Error("ask_user: no answer was given");
-      // Checked and used as one plain-data copy, so nothing the answerer handed
-      // back can read differently after it verified.
-      const answer = JSON.parse(JSON.stringify(given)) as SignedAskUserAnswer;
-      const problem = answerProblem(execution.workspace, question, answer);
-      if (problem) throw new NativeToolRefusal("ask_user", `${problem}; no answer is returned`);
-
-      const answerSha256 = recordDigest(answer.record);
-      allow({ questionId: record.questionId, questionSha256: question.questionSha256, answerSha256, questionCount: questions.length });
-      writeFileAtomic(join(dir, `${record.questionId}.answer.json`), JSON.stringify({
-        record: answer.record, digestSha256: answerSha256, signature: answer.signature, signer: "auditor"
-      }, null, 2), 0o600);
-      return { ok: true, output: `${renderAnswer(question, answer.record.answers)}\n[amc: signed answer to ${record.questionId}]` };
+      const asked = await askSignedHuman({ workspace: execution.workspace, sessionId: currentSession(), agentId: execution.agentId,
+        callId: execution.callId, questions, answerer, signal: execution.signal, timeoutMs: options.timeoutMs }, "ask_user");
+      allow({ questionId: asked.questionId, questionSha256: asked.questionSha256, answerSha256: asked.answerSha256, questionCount: questions.length });
+      return { ok: true, output: `${renderAnswer(asked.question, asked.answers)}\n[amc: signed answer to ${asked.questionId}]` };
     })
   });
+}
+
+export interface SignedHumanAnswer {
+  readonly questionId: string;
+  readonly questionSha256: string;
+  readonly answerSha256: string;
+  readonly question: AskUserQuestion;
+  readonly answers: readonly (readonly string[])[];
+}
+
+/**
+ * One signed question to the composed human answerer and its verified, signed
+ * answer, both written under the session's records. Shared by `ask_user` and
+ * MCP elicitation: no answer, a timeout or an unverifiable record throws, and
+ * nothing here can produce an answer the answerer did not sign.
+ */
+export async function askSignedHuman(input: {
+  readonly workspace: string; readonly sessionId: string; readonly agentId: string; readonly callId: string;
+  readonly questions: readonly AskUserItem[]; readonly answerer: AskUserAnswerer;
+  readonly signal?: AbortSignal | undefined; readonly timeoutMs?: number | undefined;
+}, tool: string): Promise<SignedHumanAnswer> {
+  const dir = join(sessionRecordDir(input.workspace, input.sessionId), "ask-user");
+  const record: AskUserQuestionRecord = {
+    schemaVersion: "2026-10-29",
+    kind: "amc.native.ask_user.question",
+    questionId: `q_${randomUUID()}`,
+    sessionId: input.sessionId,
+    agentId: input.agentId,
+    callId: input.callId,
+    questions: input.questions,
+    askedAt: Date.now()
+  };
+  const signedQuestion = writeSignedRecord(input.workspace, join(dir, `${record.questionId}.question.json`), record, "monitor");
+  const question: AskUserQuestion = { ...record, questionSha256: signedQuestion.digestSha256 };
+
+  const timeout = AbortSignal.timeout(input.timeoutMs ?? DEFAULT_TIMEOUT_MS);
+  const signal = input.signal ? AbortSignal.any([input.signal, timeout]) : timeout;
+  let given: SignedAskUserAnswer | null;
+  try {
+    // The answerer gets a copy, so it cannot change the question its answer is checked against.
+    given = await awaitAnswer(input.answerer, structuredClone(question), signal);
+  } catch (error: unknown) {
+    throw new Error(`${tool}: no answer (${error instanceof Error ? error.message : "answerer failed"})`);
+  }
+  if (!given) throw new Error(`${tool}: no answer was given`);
+  // Checked and used as one plain-data copy, so nothing the answerer handed
+  // back can read differently after it verified.
+  const answer = JSON.parse(JSON.stringify(given)) as SignedAskUserAnswer;
+  const problem = answerProblem(input.workspace, question, answer);
+  if (problem) throw new NativeToolRefusal(tool, `${problem}; no answer is returned`);
+
+  const answerSha256 = recordDigest(answer.record);
+  writeFileAtomic(join(dir, `${record.questionId}.answer.json`), JSON.stringify({
+    record: answer.record, digestSha256: answerSha256, signature: answer.signature, signer: "auditor"
+  }, null, 2), 0o600);
+  return { questionId: record.questionId, questionSha256: question.questionSha256, answerSha256, question, answers: answer.record.answers };
 }

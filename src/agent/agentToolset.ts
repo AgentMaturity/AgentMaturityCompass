@@ -292,6 +292,10 @@ export interface AgentToolset {
   hasOwnedWork(): boolean;
   shutdown(): Promise<boolean>;
   close(): void | Promise<void>;
+  /** Writes one audit row to this session's evidence; throws when it cannot. MCP stdio restarts record through it. */
+  readonly recordAudit?: (receipt: Record<string, unknown>) => string | null;
+  /** The composed `ask_user` answerer and the current session; absent when no human is reachable. MCP elicitation asks through it. */
+  readonly humanQuestion?: { readonly answerer: AskUserAnswerer; sessionId(): string };
 }
 
 export function agentToolset(options: AgentToolsetOptions): AgentToolset {
@@ -645,6 +649,8 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
     registry,
     pipeline,
     readiness,
+    recordAudit,
+    ...(options.askUser ? { humanQuestion: { answerer: options.askUser, sessionId: currentSessionId } } : {}),
     hasOwnedWork: () => background.hasOwnedWork(),
     shutdown: () => background.shutdown(),
     close: (): void | Promise<void> => {
