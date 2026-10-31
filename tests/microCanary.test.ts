@@ -456,6 +456,16 @@ describe("health score", () => {
     expect(health.probeCount).toBe(0);
   });
 
+  test("is not measured when every probe skipped, warned or errored", () => {
+    for (const status of ["SKIP", "WARN", "ERROR"] as const) {
+      registerProbe({ ...makePassingProbe(`p-${status}`), evaluate: () => ({ status, reason: "no telemetry", latencyMs: 1, evidenceRefs: [] }) });
+    }
+    runAllProbes(makeContext());
+    const health = computeCanaryHealthScore();
+    expect(health.score).toBeNull();
+    expect(health.probeCount).toBe(3);
+  });
+
   test("returns high score with all passing", () => {
     registerProbe(makePassingProbe("p1"));
     registerProbe(makePassingProbe("p2"));

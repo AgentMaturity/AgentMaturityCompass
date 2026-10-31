@@ -874,9 +874,8 @@ export function computeCanaryHealthScore(sinceTs?: number): {
   const cutoff = sinceTs ?? (now - 3600000);
   const recent = executionHistory.filter((e) => e.ts >= cutoff);
 
-  if (recent.length === 0) {
-    return { score: null, probeCount: 0, failCount: 0, criticalFailCount: 0 };
-  }
+  const measured = recent.filter((e) => e.result.status === "PASS" || e.result.status === "FAIL"); // SKIP/WARN/ERROR measure nothing
+  if (measured.length === 0) return { score: null, probeCount: recent.length, failCount: 0, criticalFailCount: 0 };
 
   const failCount = recent.filter((e) => e.result.status === "FAIL").length;
   const criticalFails = recent.filter(
@@ -885,7 +884,7 @@ export function computeCanaryHealthScore(sinceTs?: number): {
 
   // Weighted: critical failures count 3x
   const weightedFailures = (failCount - criticalFails) + criticalFails * 3;
-  const score = Math.max(0, Math.round(100 - (weightedFailures / recent.length) * 100));
+  const score = Math.max(0, Math.round(100 - (weightedFailures / measured.length) * 100));
 
   return { score, probeCount: recent.length, failCount, criticalFailCount: criticalFails };
 }
