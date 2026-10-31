@@ -928,9 +928,9 @@ export class Ledger {
     runtime: RuntimeName;
     binaryPath: string;
     binarySha256: string;
-  }): void {
+    capability?: symbol; /* only the A4 store holds one: it opens the reserved `a4-` namespace */ }): void {
     this.assertTrustedWriter();
-    assertSessionNamespace(this.db, params.sessionId, params.binaryPath);
+    assertSessionNamespace(this.db, params.sessionId, params.binaryPath, params.capability);
     this.db
       .prepare(
         `INSERT INTO sessions

@@ -23,16 +23,28 @@ function lastSessionEvent(db: Database.Database, sessionId: string): EvidenceEve
 /** The binary the A4 store (src/a4/a4Store.ts) starts each of its `a4-<projectId>-<seq>` sessions with. */
 export const A4_STORE_BINARY = "a4-store";
 
+let a4StoreCapability: symbol | null = null;
 /**
- * `a4-` sessions witness A4 transitions, so only the A4 store writes them: it starts each one as binary `a4-store`,
- * appends its audit row and seals it in one transaction. Any other session start (`binaryPath` given) or append in that
- * namespace is refused, whichever route named the session id.
+ * The A4 store's capability to open `a4-` sessions: a symbol no request body, flag or file can carry. src/a4/a4Store.ts
+ * claims it once at module load and keeps it module-private; a second claim is refused, so the store fails closed
+ * rather than share it.
  */
-export function assertSessionNamespace(db: Database.Database, sessionId: string, binaryPath?: string): void {
+export function claimA4SessionCapability(): symbol {
+  if (a4StoreCapability !== null) throw new Error("A4_SESSION_RESERVED: the A4 session capability is already claimed");
+  return (a4StoreCapability = Symbol(A4_STORE_BINARY));
+}
+
+/**
+ * `a4-` sessions witness A4 transitions, so only the A4 store writes them: it starts each one as binary `a4-store` with
+ * its capability, appends its audit row and seals it in one transaction. Any other session start (`binaryPath` given,
+ * whatever string it names) or append in that namespace is refused, whichever route named the session id.
+ */
+export function assertSessionNamespace(db: Database.Database, sessionId: string, binaryPath?: string, capability?: symbol): void {
   if (!sessionId.startsWith("a4-")) return;
-  const owner = binaryPath ?? (db.prepare("SELECT binary_path FROM sessions WHERE session_id = ? AND ended_ts IS NULL")
-    .get(sessionId) as { binary_path: string | null } | undefined)?.binary_path;
-  if (owner !== A4_STORE_BINARY) throw new Error(`A4_SESSION_RESERVED: only the A4 store writes session ${sessionId}`);
+  const allowed = binaryPath !== undefined
+    ? binaryPath === A4_STORE_BINARY && capability !== undefined && capability === a4StoreCapability
+    : (db.prepare("SELECT binary_path FROM sessions WHERE session_id = ? AND ended_ts IS NULL").get(sessionId) as { binary_path: string | null } | undefined)?.binary_path === A4_STORE_BINARY;
+  if (!allowed) throw new Error(`A4_SESSION_RESERVED: only the A4 store writes session ${sessionId}`);
 }
 
 /** Called inside the existing write transaction, before payload materialization. */

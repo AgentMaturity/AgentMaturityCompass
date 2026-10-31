@@ -25,7 +25,7 @@ import { signDigestWithPolicy } from "../crypto/signing/signer.js";
 import type { SignedDigest } from "../crypto/signing/signerTypes.js";
 import { openLedger, type Ledger } from "../ledger/ledger.js";
 import { ledgerSynchronousMode } from "../ledger/ledgerDurability.js";
-import { A4_STORE_BINARY, runImmediateTransaction } from "../ledger/ledgerSessionTransactions.js";
+import { A4_STORE_BINARY, claimA4SessionCapability, runImmediateTransaction } from "../ledger/ledgerSessionTransactions.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import { highSeveritySecretTypes } from "../release/releaseSecretScan.js";
@@ -52,6 +52,8 @@ import {
 } from "./a4Schema.js";
 
 const A4_AUDIT_TYPE = "A4_STATE" as const;
+/** Module-private: the only way to open an `a4-` session (a caller-chosen binaryPath "a4-store" is refused). */
+const SESSION_CAPABILITY = claimA4SessionCapability();
 /** The rows only this store writes in its `a4-<projectId>-<seq>` sessions (the ledger refuses any other writer there). */
 export const A4_WITNESS = { sessions: `binary_path = '${A4_STORE_BINARY}'`,
   events: `json_extract(meta_json, '$.source') = 'a4-store' AND json_extract(meta_json, '$.auditType') = '${A4_AUDIT_TYPE}'` };
@@ -417,7 +419,7 @@ function createStore(workspace: string, ledger: Ledger, trust?: TrustContext, mi
         current?.();
         const { spec, seq, stage, revisionNo } = entry;
         const sessionId = `a4-${projectId}-${seq}`;
-        ledger.startSession({ sessionId, runtime: "unknown", binaryPath: A4_STORE_BINARY, binarySha256: A4_STORE_BINARY });
+        ledger.startSession({ sessionId, runtime: "unknown", binaryPath: A4_STORE_BINARY, binarySha256: A4_STORE_BINARY, capability: SESSION_CAPABILITY });
         try {
           current?.();
           evidence = ledger.appendEvidenceWithReceipt({
