@@ -41,6 +41,8 @@ const recipes: Recipe[] = [
   {"path": "assurance advanced-threats", "args": ["--agent", "default", "--json"], "json": true, "refusal": {"reason": "No live model or assurance adapter is configured.", "pattern": "No real agent target available: no model configured for the agent under test"}},
   {"path": "assurance run", "args": ["--agent", "default", "--pack", "injection", "--no-sign", "--format", "text"], "refusal": {"reason": "No live agent adapter is registered; native transport is denied.", "pattern": "P0_22_OFFLINE_FIXTURE|no model configured|no agent under test was reachable"}},
   {"path": "assurance runs", "args": []},
+  {"path": "fp-cost", "args": []},
+  {"path": "fp-tuning-report", "args": [], "output": "markdown"},
   {"path": "assurance show", "args": ["--run", "fixture-missing-run"], "refusal": {"reason": "This fixture deliberately has no external artifact, imported export, receipt, or named secondary run.", "pattern": "ENOENT|not found|No .*found|missing|unavailable|unknown.*run|does not exist"}},
   {"path": "assurance cert-issue", "args": ["--run", "fixture-missing-run"], "refusal": {"reason": "This fixture deliberately has no external artifact, imported export, receipt, or named secondary run.", "pattern": "ENOENT|not found|No .*found|missing|unavailable|unknown.*run|does not exist"}},
   {"path": "assurance cert-verify", "args": ["@MISSING@", "--json"], "json": true, "refusal": {"reason": "This fixture deliberately has no external artifact, imported export, receipt, or named secondary run.", "pattern": "ENOENT|not found|No .*found|missing|unavailable|unknown.*run|does not exist"}},

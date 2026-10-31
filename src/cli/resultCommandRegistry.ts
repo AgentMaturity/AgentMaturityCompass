@@ -129,6 +129,8 @@ export const RESULT_COMMANDS: readonly ResultCommand[] = [
 
   // Assurance, shield, benchmarks. Tests AMC executed against the agent are observed when they reached it.
   self("assurance run", "assurance"),
+  self("fp-cost", "assurance:falsePositiveTracker"),
+  self("fp-tuning-report", "assurance:falsePositiveTracker"),
   self("assurance runs", "assurance:store"),
   self("assurance show", "assurance:store"),
   self("assurance verify", "assurance"),

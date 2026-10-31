@@ -454,7 +454,7 @@ export function generateFPTuningReport(opts?: {
 
 /** Developer-filed reports AMC did not observe: self-reported, and never a pass or fail of its own. */
 function fpTuningReportClaim(report: FPTuningReport): ReturnType<typeof envelopeForUnverifiedResult> {
-  return envelopeForUnverifiedResult({ producer: "assurance:false-positives", recordCount: report.totalFPReports, now: report.ts });
+  return envelopeForUnverifiedResult({ producer: "assurance:falsePositiveTracker", recordCount: report.totalFPReports, now: report.ts });
 }
 
 export function renderFPTuningReportMarkdown(report: FPTuningReport): string {

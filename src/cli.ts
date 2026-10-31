@@ -18907,8 +18907,9 @@ program
     const fp = await import("./assurance/falsePositiveTracker.js");
     const summaries = fp.computeFPCostSummary(opts.pack, process.cwd()), evidence = fp.fpReportEvidence(process.cwd());
     for (const line of evidence.unverifiedRecords) console.log(chalk.yellow(line));
-    if (summaries.length === 0) { console.log(chalk.green("No FP cost data available.")); return; }
-    console.log(chalk.bold("\nFalse Positive Cost Summary:\n"));
+    const claim = unverifiedClaim("assurance:falsePositiveTracker", summaries.reduce((count, s) => count + s.totalFPReports, 0));
+    if (summaries.length === 0) { console.log(chalk.green("No FP cost data available.")); printClaimResult(claim, {}); return; }
+    console.log(chalk.bold("\nFalse Positive Cost Summary:\n")); printClaimResult(claim, {});
     for (const s of summaries) {
       console.log(`  ${chalk.bold(s.packId)} — ${s.confirmedFPs} confirmed FPs, $${s.totalCostUsd.toFixed(2)} total cost, ${s.outcome === "measured" ? `${(s.fpRate * 100).toFixed(1)}% FP rate` : "FP rate not evaluated (no resolved reports)"}`);
     }
@@ -18928,7 +18929,7 @@ program
       windowEndTs: Date.now(),
       fpRateThreshold: parseFloat(opts.threshold),
     }, process.cwd());
-    console.log(fp.renderFPTuningReportMarkdown(report));
+    printLabelledReport(fp.renderFPTuningReportMarkdown(report));
   });
 
 // ── Production Wiring Diagnostics CLI ────────────────────────────────
