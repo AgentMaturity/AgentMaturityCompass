@@ -38,3 +38,7 @@ The design is write-through with fail-closed commit ordering. The alternative wa
 - `checks.txt`: build, typecheck, typecheck:tests, lint, check:gates, check:dead-code, check:duplicates, check:counts, check:api-ref, check:docs-drift and check:schemas. All exited 0.
 - `related-tests.txt`: 35 files and 596 tests passed. The files are every test that imports a changed module (listed in `related-test-selection.txt`), plus `tests/a4/*`, `tests/actions/*`, `tests/a4*.test.ts` and `tests/wormSideTables.test.ts`.
 - `mutation.txt`: 13 guards were each disabled in turn, and all 13 mutations were killed by the new tests.
+
+## Receipt repaired 2026-10-31
+
+The folder had no `receipt.json`, which `npm run check:qualification` requires. It was written from the files above and the git history. `commit` is the code commit `43fd678b0`; the folder's files were committed on top of it in `b129a50f7`. The commands are the eleven checks in `checks.txt` and the related-test run in `related-tests.txt`, and `tests` is that run's summary (596 of 596 passed). The four evidence files are listed as hashed artifacts. The folder never recorded the Node, pnpm or OS versions or the command durations; they are written as `not recorded` and `durationMs: 0`. `arch` is `arm64`, a same-host inference from the item's first receipt (`2026-10-27-P2-36`, macOS 26.6.2 arm64, committed the same day), because the schema allows only `arm64` or `x64`.
