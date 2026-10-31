@@ -1,8 +1,26 @@
+/**
+ * Legacy diagnostic harness compatibility utilities; not governed native execution.
+ * Canonical CLI detection and launching live in src/adapters/adapterDetection.ts
+ * and src/adapters/adapterRunner.ts. The interactive diagnostic fallback remains
+ * a legacy claim collection path, not an execution approval or maturity receipt.
+ */
 import { spawn, spawnSync } from "node:child_process";
 import { createInterface } from "node:readline/promises";
 import { stdin as input, stdout as output } from "node:process";
 import { z } from "zod";
 import type { AMCConfig, RuntimeName } from "../types.js";
+import { stripAmcSecrets } from "../utils/providerKeys.js";
+import { detectAdapter } from "../adapters/adapterDetection.js";
+import type { AdapterDefinition } from "../adapters/adapterTypes.js";
+import { claudeCliAdapter } from "../adapters/builtins/claudeCli.js";
+import { geminiCliAdapter } from "../adapters/builtins/geminiCli.js";
+import { openclawCliAdapter } from "../adapters/builtins/openclawCli.js";
+
+const legacyAdapters: Partial<Record<RuntimeName, AdapterDefinition>> = {
+  claude: claudeCliAdapter,
+  gemini: geminiCliAdapter,
+  openclaw: openclawCliAdapter
+};
 
 export interface RuntimeCapabilities {
   supportsVersion: boolean;
@@ -23,6 +41,27 @@ export interface RuntimeIntegration {
   };
 }
 
+/** @deprecated Compatibility projection; use src/adapters/adapterDetection.ts directly. */
+export function detectLegacyRuntime(definition: AdapterDefinition, command: string): ReturnType<RuntimeIntegration["detect"]> {
+  const detection = detectAdapter({
+    ...definition,
+    detection: {
+      ...definition.detection,
+      commandCandidates: command === definition.commandTemplate.executable ? definition.detection.commandCandidates : [command]
+    }
+  });
+  const selectedCommand = detection.command ?? command;
+  return {
+    available: detection.installed,
+    command: selectedCommand,
+    resolvedPath: detection.installed ? resolveCommand(selectedCommand) : null,
+    capabilities: detection.installed ? discoverCapabilities(selectedCommand) : {
+      supportsHelp: false, supportsVersion: false, knownFlags: [], rawHelp: ""
+    },
+    ...(!detection.installed ? { error: "command not found" } : {})
+  };
+}
+
 export interface HarnessOptions<T> {
   config: AMCConfig;
   schema: z.ZodSchema<T>;
@@ -32,6 +71,7 @@ export interface HarnessOptions<T> {
 export interface HarnessResult<T> {
   value: T;
   attempts: number;
+  /** True when a human pasted the JSON after the runtime failed; the value is not runtime output. */
   usedFallback: boolean;
 }
 
@@ -84,17 +124,21 @@ export async function runHarnessWithRetries<T>(
 ): Promise<HarnessResult<T>> {
   const maxRetries = opts.maxRetries ?? 2;
   const runtimeKey =
-    runtimeName === "unknown" || runtimeName === "gateway" || runtimeName === "any" || runtimeName === "sandbox" || runtimeName === "amc"
+    runtimeName === "unknown" || runtimeName === "gateway" || runtimeName === "any" || runtimeName === "sandbox" || runtimeName === "amc" || runtimeName === "pi"
       ? "mock"
       : runtimeName;
   const runtimeConfig = opts.config.runtimes[runtimeKey];
+  const definition = legacyAdapters[runtimeKey];
+  const command = definition && runtimeConfig.command === definition.commandTemplate.executable
+    ? detectAdapter(definition).command ?? runtimeConfig.command
+    : runtimeConfig.command;
 
   let currentPrompt = prompt;
   let attempts = 0;
 
   for (; attempts <= maxRetries; attempts += 1) {
     const { args, sendViaStdin } = buildArgsTemplate(runtimeConfig.argsTemplate, currentPrompt);
-    const result = await spawnCollect(runtimeConfig.command, args, sendViaStdin ? `${currentPrompt}\n` : null);
+    const result = await spawnCollect(command, args, sendViaStdin ? `${currentPrompt}\n` : null);
     const parsed = safeExtractJson(result.stdout || result.stderr || "");
 
     if (parsed.success) {
@@ -107,6 +151,10 @@ export async function runHarnessWithRetries<T>(
     currentPrompt = `${prompt}\n\nReturn ONLY valid JSON that matches the schema. No markdown, no extra text.`;
   }
 
+  // The human paste fallback needs a person at a terminal. On a pipe or protocol stream it would block or eat frames.
+  if (!input.isTTY) {
+    throw new Error(`Harness output for ${runtimeName} was not valid JSON after ${attempts} attempts and stdin is not a terminal; refusing the interactive fallback.`);
+  }
   const rl = createInterface({ input, output });
   try {
     while (true) {
@@ -131,6 +179,8 @@ export async function runHarnessWithRetries<T>(
 export function spawnCollect(command: string, args: string[], stdinPayload: string | null): Promise<{ code: number; stdout: string; stderr: string }> {
   return new Promise((resolve) => {
     const child = spawn(command, args, {
+      // The runtime under diagnosis may use its own provider key; it never gets AMC's secrets (WP36).
+      env: stripAmcSecrets(process.env),
       stdio: ["pipe", "pipe", "pipe"]
     });
 

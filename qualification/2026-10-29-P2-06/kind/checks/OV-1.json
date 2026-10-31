@@ -1,0 +1,11 @@
+{
+  "id": "OV-1",
+  "scenario": "Offline bundle check",
+  "status": "not_run",
+  "reason": "bundle export plus the standalone verifier on a network-less host, with tampered, forged-embedded-key, unpinned-issuer and revoked-key fixtures, is not wired into this harness yet",
+  "blockedBy": [
+    "P1-06",
+    "P2-06 follow-up"
+  ],
+  "durationMs": 1
+}

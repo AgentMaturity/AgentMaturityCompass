@@ -192,6 +192,24 @@
       "after": "import {\n  incidentTriageProofHashes,\n  benchmarkSubmissionProofHashes,\n  multiUserBenchmarkProofHashes,\n  continualLearningBenchmarkProofHashes,\n  hermesTurboPerformanceProofHashes,\n  iotFirmwareQuestionProofHashes,\n  retailSalesQuestionProofHashes,\n  scorableStudioDrilldownProofHashes,\n  obsStudioDrilldownProofHashes,\n} from \"./explainabilityContracts.js\";\n\nexport type ScoreEvidenceDrilldownState"
     }
   ],
+  "forwardEdits": [
+    {
+      "issue": "P1-07",
+      "commit": "8f666572749a13b5d656dc59edce723336445468",
+      "path": "src/diagnostic/questionScoreExplainability.ts",
+      "reason": "repairHintFor names a not-evaluated next level and its reason instead of advising toward it",
+      "before": "import { sha256Hex } from \"../utils/hash.js\";\n",
+      "after": "import { notEvaluatedLevel } from \"./levelSemantics.js\";\nimport { sha256Hex } from \"../utils/hash.js\";\n"
+    },
+    {
+      "issue": "P1-07",
+      "commit": "8f666572749a13b5d656dc59edce723336445468",
+      "path": "src/diagnostic/questionScoreExplainability.ts",
+      "reason": "repairHintFor names a not-evaluated next level and its reason instead of advising toward it",
+      "before": "function repairHintFor(question: DiagnosticQuestion, score: QuestionScore): string {\n  const nextLevel = Math.min(score.finalLevel + 1, 5);\n",
+      "after": "function repairHintFor(question: DiagnosticQuestion, score: QuestionScore): string {\n  const nextLevel = Math.min(score.finalLevel + 1, 5);\n  // P1-07: a next level AMC cannot evaluate gets its reason, not advice that would promise it.\n  const notEvaluated = notEvaluatedLevel(question, score.finalLevel, nextLevel);\n  if (notEvaluated) {\n    return `Target L${nextLevel}: ${notEvaluated.notice}`;\n  }\n"
+    }
+  ],
   "statusSites": [
     "hasReplayableRagFlowDiagnostic",
     "hasReplayableIncidentTriageLens",

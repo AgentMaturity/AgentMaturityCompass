@@ -6,7 +6,7 @@ const root = process.cwd();
 const indexHtml = readFileSync(resolve(root, "src/dashboard/templates/index.html"), "utf8");
 const appJs = readFileSync(resolve(root, "src/dashboard/templates/app.js"), "utf8");
 const stylesCss = readFileSync(resolve(root, "src/dashboard/templates/styles.css"), "utf8");
-const uxAudit = readFileSync(resolve(root, "docs/UX_AUDIT_REPORT.md"), "utf8");
+const uxAudit = readFileSync(resolve(root, "docs/archive/UX_AUDIT_REPORT.md"), "utf8");
 
 describe("dashboard board readiness overview", () => {
   test("adds a first-screen board brief with trend and drill-down mounts", () => {

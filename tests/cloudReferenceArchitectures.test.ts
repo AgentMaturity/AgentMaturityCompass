@@ -72,7 +72,7 @@ describe("cloud reference architecture documentation", () => {
   });
 
   test("closes the cloud-reference and OpenAPI audit gaps without overclaiming hosted SaaS", () => {
-    const audit = read("docs/AUDIT_50_AGENTS_BATCH5.md");
+    const audit = read("docs/archive/AUDIT_50_AGENTS_BATCH5.md");
     expect(audit).toContain("Cloud reference architectures** — ✅ Resolved 2026-06-16");
     expect(audit).toContain("OpenAPI self-hosted server template** — ✅ Resolved 2026-06-16");
     expect(audit).toContain("Pulumi Helm-release module** — ✅ Resolved 2026-06-16");

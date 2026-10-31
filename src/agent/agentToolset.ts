@@ -1,3 +1,5 @@
+import { composeNativeBackground } from "./nativeBackground.js";
+import type { NativeTerminalHostOptions } from "../terminal/nativeTerminal.js";
 import { existsSync } from "node:fs";
 import { runCodeTool } from "../codemode/runCodeTool.js";
 import { runtimeFirewallPolicyPath } from "../runtime/firewall.js";
@@ -10,11 +12,18 @@ import { bashTool } from "../tools/builtin/bashTool.js";
 import { fsTools } from "../tools/builtin/fsTools.js";
 import { ReadBeforeEditLedger } from "../tools/builtin/readBeforeEdit.js";
 import { searchTools } from "../tools/builtin/searchTools.js";
+import { sha256Hex } from "../utils/hash.js";
+import { canonicalize } from "../utils/json.js";
+import { toolSearchTool } from "../tools/builtin/toolSearchTool.js";
+import { sessionSpillReadTool } from "../tools/builtin/sessionSpillReadTool.js";
 import { webFetchTool } from "../tools/builtin/webFetchTool.js";
 import { webSearchTool, type WebSearchProvider } from "../tools/builtin/webSearchTool.js";
 import { askUserTool, type AskUserAnswerer } from "../tools/builtin/askUserTool.js";
 import { todoTool } from "../tools/builtin/todoTool.js";
+import { goalTool } from "../autonomy/goalTool.js";
 import { planTool } from "../tools/builtin/planTool.js";
+import { skillLoadTool } from "../skills/skillLoadTool.js";
+import { workspaceSkillRoots } from "../skills/skillTurn.js";
 import type { NativeReceiptRecorder } from "../tools/builtin/nativeToolBreadth/nativeReceipt.js";
 import type { ToolExecution } from "../tools/toolTypes.js";
 import {
@@ -24,13 +33,14 @@ import {
   runtimeFirewallGuard,
   toolhubAllowlistGuard
 } from "../tools/guards/policyGuards.js";
+import { actionPolicyGuard, actionPolicyMode, actionPolicyState, type ActionPolicyState } from "../tools/guards/actionPolicyGuard.js";
 import { compiledApprovalClasses, compiledPolicyFacts, compiledPolicyGuard, compiledPolicyShows, planRequiresAgentLease } from "../tools/guards/compiledPolicyGuard.js";
 import { ToolPipeline } from "../tools/toolPipeline.js";
 import type { ActionClass } from "../types.js";
-import { loadActiveCompiledPolicy } from "../catalog/compiler/activate.js";
+import { ControlCheckpointRootInWorkspaceError, loadActiveCompiledPolicy } from "../catalog/compiler/activate.js";
 import { ACTION_CLASSES } from "../governor/actionCatalog.js";
 import { writeEffectivePolicyReceipt } from "../policy/effectivePolicyReceipt.js";
-import { ToolRegistry } from "../tools/toolRegistry.js";
+import { ToolRegistry, ToolLoadoutError } from "../tools/toolRegistry.js";
 import { openLedger } from "../ledger/ledger.js";
 import { openActionJournal, type ActionJournal } from "../actions/actionJournal.js";
 import { checkLease } from "../actions/authorize.js";
@@ -39,6 +49,7 @@ import { delegateTool, type SubagentCapability } from "./delegateTool.js";
 import { workflowTool } from "../workflow/workflowTool.js";
 import { pipelineToolSeam } from "./pipelineToolSeam.js";
 import type { AgentToolSeam } from "./toolSeam.js";
+import type { NativeExtensionHooks } from "../extensions/nativeExtensionHooks.js";
 import { NATIVE_BUILTIN_CAPABILITIES, NATIVE_DELEGATION_CAPABILITIES, selectSupportedNativeTools, type NativeToolCapability } from "./nativeToolCapabilities.js";
 
 /**
@@ -52,6 +63,9 @@ import { NATIVE_BUILTIN_CAPABILITIES, NATIVE_DELEGATION_CAPABILITIES, selectSupp
  */
 
 export interface AgentToolsetOptions {
+  /** Explicit interactive authority; an argv-bound bash approval cannot supply this grant. */
+  readonly nativeTerminal?: NativeTerminalHostOptions;
+  readonly extensionHooks?: NativeExtensionHooks;
   readonly workspace: string;
   readonly agentId: string;
   /** Immutable reviewed tool scope, enforced on the execution guard's exact signed snapshot. */
@@ -93,8 +107,12 @@ export interface AgentToolsetOptions {
   };
   /** Human answerer for `ask_user` (P1-43). Absent: every ask_user call refuses. */
   readonly askUser?: AskUserAnswerer;
+  /** Current goal progress supplied by the owning scheduled run. Absent means unavailable. */
+  readonly getGoal?: () => unknown;
   /** Search provider for `web_search` (P1-43). Absent: every web_search call is denied; there is no default. */
   readonly webSearchProvider?: WebSearchProvider;
+  /** Skill roots `skill.load` advertises and loads from. Defaults to the workspace's own `.amc/skills`. */
+  readonly skillRoots?: readonly string[];
   /** Session the evidence rows belong to. Defaults to a per-agent bucket. */
   /**
    * The session tool evidence belongs to. REQUIRED, and deliberately so.
@@ -127,7 +145,31 @@ export interface AgentToolsetOptions {
       readonly payload: string;
       readonly meta: Record<string, unknown>;
     }): unknown;
+    /** Throws when the writer can no longer append (e.g. closed); checked before every tool body (P1-78). */
+    assertWritable?(): void;
   };
+}
+
+const UNVERIFIABLE_STATES = {
+  missing: "is not in the ledger and no session writer was passed",
+  sealed: "is already sealed in the ledger and no session writer was passed",
+  writer_unusable: "has a session writer that can no longer append",
+  write_failed: "lost a row: a write failed after a tool body ran, so this toolset refuses every later call"
+} as const;
+
+/**
+ * Evidence this toolset cannot write verifiably (P1-78), so the call is refused before its body: a writer-less toolset
+ * whose session the ledger does not hold open, a writer that can no longer append, or, after any failed write, every
+ * later call (an in-flight effect whose row was lost cannot be undone, so the toolset fails instead of continuing).
+ * Pass the session writer, or start the session in the ledger before the toolset records into it and seal it after.
+ */
+export class UnverifiableToolEvidence extends Error {
+  readonly code = "UNVERIFIABLE_TOOL_EVIDENCE";
+  constructor(readonly sessionId: string, readonly state: keyof typeof UNVERIFIABLE_STATES, cause?: unknown) {
+    super(`UNVERIFIABLE_TOOL_EVIDENCE: session ${sessionId} ${UNVERIFIABLE_STATES[state]}`
+      + `${cause === undefined ? "" : ` (${cause instanceof Error ? cause.message : String(cause)})`}`, cause === undefined ? undefined : { cause });
+    this.name = "UnverifiableToolEvidence";
+  }
 }
 
 /** What a workspace still needs before a governed agent can do anything. */
@@ -164,6 +206,8 @@ export interface ToolsetReadiness {
   readonly writeScope: readonly string[];
   /** Whether `bash` is offered, and under what enforcement (P0-06). */
   readonly shell: NativeShellReadiness;
+  /** The signed Action Policy native calls meet (AXR-02); "not configured" means none is checked. */
+  readonly actionPolicy: ActionPolicyState;
 }
 
 /**
@@ -198,6 +242,11 @@ export function checkToolsetReadiness(workspace: string, options: {
     blockers.push("the signed tool allowlist grants no supported native capability with its exact name, action class and context — review .amc/tools.yaml, then run: amc tools sign");
   }
 
+  const actionPolicy = actionPolicyState(workspace);
+  if (actionPolicy === "untrusted") {
+    blockers.push("the Action Policy does not verify, so every governed call is denied — restore .amc/action-policy.yaml or re-sign it: amc policy action init");
+  }
+
   const writeScope = [...new Set(selected.filter(tool => tool.name === "fs.write" || tool.name === "fs.edit")
     .flatMap(tool => tool.allow?.paths ?? []))];
 
@@ -219,6 +268,7 @@ export function checkToolsetReadiness(workspace: string, options: {
       ? `${confinementReason}; no sandbox backend on this machine: ${sandbox.unavailableReasons().join("; ")}`
       : confinementReason,
     writeScope,
+    actionPolicy,
     shell: options.parentShell === undefined ? nativeShellReadiness(workspace, options.unconfinedShell)
       : childShellReadiness(workspace, options.parentShell)
   };
@@ -236,7 +286,9 @@ export interface AgentToolset {
    * run, and a caller that forgot to close would leak a SQLite handle per
    * agent. Safe to call more than once.
    */
-  close(): void;
+  hasOwnedWork(): boolean;
+  shutdown(): Promise<boolean>;
+  close(): void | Promise<void>;
 }
 
 export function agentToolset(options: AgentToolsetOptions): AgentToolset {
@@ -257,6 +309,8 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   try {
     compiled = loadActiveCompiledPolicy(workspace);
   } catch (error) {
+    // P0-57: a misplaced checkpoint root is its own refusal; restoring .amc/control-plan/ would not fix it.
+    if (error instanceof ControlCheckpointRootInWorkspaceError) throw error;
     throw new Error(`Refusing to start: the active compiled policy cannot be verified (${error instanceof Error ? error.message : String(error)}). Restore .amc/control-plan/ from backup, or recompile and reactivate with amc catalog compile --activate (docs/catalog/COMPILER.md)`);
   }
   // P1-67: bound only when the pinned plan's identity-binding requires a lease (L0-IDN-01); otherwise records bind as before.
@@ -271,24 +325,98 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   ], ...(options.unconfinedShell === undefined ? {} : { unconfinedShell: options.unconfinedShell }),
   ...(options.parentShell === undefined ? {} : { parentShell: options.parentShell }) });
   const registry = new ToolRegistry();
+  let pipeline!: ToolPipeline;
+  const background = composeNativeBackground({ workspace, sessionId: () => options.sessionId,
+    pipeline: () => pipeline, confinedShell: () => readiness.shell.decision === "confined",
+    ...(options.nativeTerminal === undefined ? {} : { nativeTerminal: options.nativeTerminal }) });
   const nativeIdentities = new Map([...NATIVE_BUILTIN_CAPABILITIES, ...NATIVE_DELEGATION_CAPABILITIES]
     .map(capability => [capability.name, capability]));
 
   const ledger = new ReadBeforeEditLedger();
   for (const tool of fsTools({ ledger })) registry.define(tool);
   for (const tool of searchTools()) registry.define(tool);
+  const admittedCatalog = (scope: string, snapshot = loadVerifiedToolsConfigSnapshot(workspace), strict = true) => {
+    if (scope !== agentId) throw new ToolLoadoutError("UNAUTHORIZED");
+    if (!snapshot.signatureValid || !snapshot.config || (options.expectedToolsDigest !== undefined
+      && snapshot.digestSha256 !== options.expectedToolsDigest)) {
+      registry.synchronizeLoadout(scope, `unavailable:${options.sessionId}`);
+      if (strict) throw new ToolLoadoutError("CATALOG_UNAVAILABLE");
+      return [];
+    }
+    const selected = new Map(selectSupportedNativeTools(snapshot, [
+      ...NATIVE_DELEGATION_CAPABILITIES, ...(options.additionalCapabilities ?? [])
+    ]).map(tool => [tool.name, tool]));
+    const visible = registry.visible(scope);
+    // Discovery and activation obey the same signed identity and compiled visibility as native schema admission.
+    const catalog = registry.catalog(scope).filter(schema => (!compiled || compiledPolicyShows(compiled, schema.name))
+      && selected.has(schema.name) && selected.get(schema.name)!.actionClass === visible.get(schema.name)?.actionClass)
+      .sort((a, b) => a.name.localeCompare(b.name));
+    const identity = sha256Hex(canonicalize({ sessionId: options.sessionId, policyDigest: snapshot.digestSha256, catalogDigest: registry.catalogDigest(scope) }));
+    registry.synchronizeLoadout(scope, identity);
+    return catalog;
+  };
+  registry.define(toolSearchTool({
+    catalog: scope => admittedCatalog(scope),
+    discovered: (scope, schemas) => { admittedCatalog(scope); registry.rememberDiscovery(scope, schemas); },
+    activate: (execution, request) => {
+      const catalog = admittedCatalog(execution.agentId);
+      if (!catalog.some(schema => schema.name === request.name
+        && sha256Hex(canonicalize(schema.parameters)) === request.schemaDigestSha256)) {
+        throw new ToolLoadoutError(catalog.some(schema => schema.name === request.name) ? "STALE_ACTIVATION" : "UNAUTHORIZED");
+      }
+      const catalogDigestSha256 = sha256Hex(canonicalize(catalog));
+      return registry.activate(execution.agentId, request, activation => {
+        const evidenceRef = recordAudit({ schemaVersion: "2026-09-08", auditType: "NATIVE_TOOL_ACTIVATED",
+          sessionId: options.sessionId, agentId: execution.agentId, toolName: activation.name,
+          schemaDigestSha256: activation.schemaDigestSha256, catalogDigestSha256, loadoutRevision: activation.revision,
+          callId: execution.callId, publication: "prepared" });
+        // A writer callback cannot change session, signed scope or catalog while committing this activation.
+        admittedCatalog(execution.agentId);
+        if (!evidenceRef) throw new ToolLoadoutError("EVIDENCE_UNAVAILABLE");
+        return evidenceRef;
+      }, execution.signal);
+    }
+  }));
   // Use the actual native session writer. An owned session refuses raw
   // ledger appends; a receipt write failure also prevents tool success.
   // Returns the row's evidence event id when the writer reports one.
-  const recordAudit = (receipt: Record<string, unknown>): string | null => {
-    const row = { eventType: "audit" as const, payload: JSON.stringify(receipt), meta: receipt };
-    if (!options.recorder) {
-      ledgerHandle ??= openLedger(workspace);
-      return ledgerHandle.appendEvidence({ sessionId: options.sessionId, runtime: "amc", ...row, payloadExt: "json" });
+  // Without a writer, rows go to the raw ledger only into a session it holds open (P1-78): never an unverifiable row.
+  const rawLedger = (): ReturnType<typeof openLedger> => {
+    ledgerHandle ??= openLedger(workspace);
+    const session = ledgerHandle.getSessionById(options.sessionId);
+    if (!session || session.ended_ts !== null) throw new UnverifiableToolEvidence(options.sessionId, session ? "sealed" : "missing");
+    return ledgerHandle;
+  };
+  // Never swallowed (P1-78): the first failed write latches, and every later call is refused before its body.
+  let lostRow: UnverifiableToolEvidence | null = null;
+  const writeEvidence = <T>(write: () => T): T => {
+    if (lostRow) throw lostRow;
+    try {
+      return write();
+    } catch (error) {
+      lostRow = error instanceof UnverifiableToolEvidence ? error : new UnverifiableToolEvidence(options.sessionId, "write_failed", error);
+      throw lostRow;
     }
+  };
+  /** Before any tool body: the rows this call will write can be written verifiably now. */
+  const assertEvidenceWritable = (): void => {
+    if (lostRow) throw lostRow;
+    if (!options.recorder) {
+      rawLedger();
+      return;
+    }
+    try {
+      options.recorder.assertWritable?.();
+    } catch (error) {
+      throw new UnverifiableToolEvidence(options.sessionId, "writer_unusable", error);
+    }
+  };
+  const recordAudit = (receipt: Record<string, unknown>): string | null => writeEvidence(() => {
+    const row = { eventType: "audit" as const, payload: JSON.stringify(receipt), meta: receipt };
+    if (!options.recorder) return rawLedger().appendEvidence({ sessionId: options.sessionId, runtime: "amc", ...row, payloadExt: "json" });
     const ref = options.recorder.recordProjectedEvidence(row) as { readonly eventId?: unknown } | null | undefined;
     return typeof ref?.eventId === "string" ? ref.eventId : null;
-  };
+  });
   // P1-12: one effective-policy receipt per session and guard set, written before the session's first governed
   // call (the CLI binds its writer after composing). A receipt that cannot be written denies the call.
   let receipt: { readonly key: string; readonly ref: string } | null = null;
@@ -317,7 +445,10 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
     workspace,
     scrubValues,
     // The per-call refusal stays: availability at composition is a prerequisite, not proof.
-    record: (execution, outcome) => recordAudit({
+    onOutput: (execution, _stream, text) => background.outputShell(execution, text),
+    record: (execution, outcome) => {
+      background.captureShell(execution, outcome);
+      return recordAudit({
       schemaVersion: "2026-09-08", auditType: "NATIVE_SHELL_CONFINEMENT", platform: process.platform,
       backend: outcome.backend, confined: outcome.confined, failure: outcome.failure,
       enforcementLevel: outcome.confined ? "enforced" : "none", boundary: shell.boundary,
@@ -325,7 +456,8 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
       exitCode: outcome.exitCode, timedOut: outcome.timedOut, cancelled: outcome.cancelled ?? false,
       treeExitProven: outcome.treeExitProven ?? false, droppedBytes: outcome.droppedBytes ?? 0,
       callId: execution.callId, rootCallId: execution.rootCallId, token: execution.token
-    }),
+      });
+    },
     // Written before the proxy acts on the decision; a failed write denies the connection.
     recordEgress: (execution, row) => recordAudit({
       schemaVersion: "2026-09-08", auditType: "NATIVE_SHELL_EGRESS", platform: process.platform, boundary: shell.boundary, ...row,
@@ -357,11 +489,15 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   // The session getter is rebound by fork/resume after construction, so these
   // read it per call rather than capturing it now.
   const currentSessionId = (): string => options.sessionId;
+  registry.define(sessionSpillReadTool({ workspace, agentId, sessionId: currentSessionId }));
   registry.define(webFetchTool({ record: recordNative }));
   registry.define(webSearchTool({ record: recordNative, ...(options.webSearchProvider ? { provider: options.webSearchProvider } : {}) }));
   registry.define(askUserTool({ sessionId: currentSessionId, record: recordNative, ...(options.askUser ? { answerer: options.askUser } : {}) }));
   registry.define(todoTool({ sessionId: currentSessionId, record: recordNative }));
   registry.define(planTool({ sessionId: currentSessionId, record: recordNative }));
+  registry.define(skillLoadTool({ roots: options.skillRoots ?? workspaceSkillRoots(workspace), record: recordNative }));
+  registry.define(goalTool(options.getGoal));
+  for (const tool of background.tools) registry.define(tool);
   if (options.subagents !== undefined) {
     // Both tools, from one capability. `delegate` is one child; `workflow` is a
     // declared plan of them. Each is still gated a second time by the operator's
@@ -376,8 +512,18 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   // the allowlist so a denial reads as "the firewall stopped this" rather than
   // "this tool is not listed", which is the more actionable of two true answers.
   // The compiled policy goes first so its receipt exists before any guard decides.
-  const policyGuard = compiledPolicyGuard(workspace, compiled);
+  // P1-10F: one verified read of tools.yaml per guard pass. The compiled-policy guard runs first in every pass and starts
+  // it; the plan's tools.yaml pin, egress, the allowlist and the native identity all decide from those same bytes.
+  let passTools: VerifiedToolsConfigSnapshot | null = null;
+  const toolsThisPass = (): VerifiedToolsConfigSnapshot => (passTools ??= loadVerifiedToolsConfigSnapshot(workspace));
+  const policyGuard = compiledPolicyGuard(workspace, compiled, toolsThisPass);
   registry.guard("compiled-policy", execution => {
+    passTools = null;
+    try {
+      assertEvidenceWritable();
+    } catch (error) {
+      return error instanceof Error ? error.message : String(error);
+    }
     try {
       ensureReceipt(registry.guardLabelsFor(execution));
     } catch (error) {
@@ -390,27 +536,34 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   // CLI binds the native writer after constructing the toolset; forks can
   // replace it. Resolve the current session only when the guard executes.
   registry.guard("budgets", execution => budgetGuard(workspace, options.sessionId)(execution));
+  // AXR-02: the governor's signed Action Policy, as ToolHub decides it; not configured, it does not apply. After the
+  // budgets guard, so an exhausted budget is named by it; its SIMULATE downgrade is applied at entry (narrowMode).
+  registry.guard("action-policy", actionPolicyGuard(workspace));
+  if (options.extensionHooks) registry.guard("native-extensions", options.extensionHooks.guard);
   // web_search's destination is its composed provider's declared origin, never
   // a url the model passes; both host checks read that. Unconfigured, it names
   // no url and network-egress denies it.
   const governedArguments = (execution: ToolExecution): Readonly<Record<string, unknown>> =>
     execution.name === "web_search" ? { ...execution.arguments, url: options.webSearchProvider?.origin } : execution.arguments;
-  registry.guard("network-egress", networkEgressGuard(workspace, governedArguments));
-  registry.guard("tool-allowlist", toolhubAllowlistGuard(workspace, execution => registry.visible(execution.agentId).get(execution.name), options.expectedToolsDigest, governedArguments));
+  registry.guard("network-egress", networkEgressGuard(workspace, governedArguments, toolsThisPass));
+  registry.guard("tool-allowlist", toolhubAllowlistGuard(workspace, execution => registry.visible(execution.agentId).get(execution.name),
+    options.expectedToolsDigest, governedArguments, toolsThisPass));
   registry.guard("native-tool-identity", execution => {
     const identity = nativeIdentities.get(execution.name);
     if (!identity) return undefined; // Late reviewed extensions retain their own mount and policy guards.
-    const selected = selectSupportedNativeTools(loadVerifiedToolsConfigSnapshot(workspace), NATIVE_DELEGATION_CAPABILITIES);
+    const selected = selectSupportedNativeTools(toolsThisPass(), NATIVE_DELEGATION_CAPABILITIES);
     return execution.actionClass === identity.actionClass && selected.some(tool => tool.name === execution.name)
       ? undefined : "native tool is absent or its signed action class/context does not match the implementation";
   });
 
   const facts = compiled ? compiledPolicyFacts(compiled) : null;
-  const pipeline = new ToolPipeline({
+  pipeline = new ToolPipeline({
+    prepareGuards: options.extensionHooks?.prepare,
     registry,
     workspace,
     ...(options.mode ? { mode: options.mode } : {}),
     journal: () => (journal ??= openActionJournal(workspace)),
+    narrowMode: actionPolicyMode(workspace),
     // Under a compiled policy every call is bound to a record, and its approval classes need a signed approval.
     ...(compiled ? { authorizeClasses: new Set<string>(ACTION_CLASSES), boundApprovalRequiredFor: compiledApprovalClasses(compiled) } : {}),
     // Read per call: the CLI binds its session writer after composing.
@@ -430,10 +583,6 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
     // No try/catch here: `ToolPipeline` owns the guarantee that a failing
     // recorder cannot break a call, which is where it can actually be tested.
     record: (execution, outcome) => {
-      // One handle for the run, not one per call. Measured: opening and
-      // closing the ledger costs 1.6ms, which on a path this hot is a third of
-      // the whole governed call. `close()` on the toolset releases it.
-      ledgerHandle ??= openLedger(workspace);
       // The guards COMPOSED for this call, not just the one that denied.
       // A permitted call is a receipt that the control evaluated it, which is
       // what the question bank asks for; a denial alone cannot say which
@@ -443,28 +592,18 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
         outcome
       );
       const recorder = options.recorder;
-      if (recorder) {
-        // Through the session's own writer, so the rows carry an envelope and
-        // sit in the spine they describe. See `recordProjectedEvidence`.
-        for (const row of evidence) {
-          recorder.recordProjectedEvidence({
-            eventType: row.eventType,
-            payload: row.payload,
-            meta: row.meta
-          });
+      // A failure here latches (writeEvidence): the pipeline keeps the call's real outcome, and every later call is refused.
+      writeEvidence(() => {
+        if (recorder) {
+          // Through the session's own writer, so the rows carry an envelope and
+          // sit in the spine they describe. See `recordProjectedEvidence`.
+          for (const row of evidence) recorder.recordProjectedEvidence({ eventType: row.eventType, payload: row.payload, meta: row.meta });
+          return;
         }
-      } else {
-        ledgerHandle.appendEvidenceBatch(
-          evidence.map((row) => ({
-            sessionId: options.sessionId,
-            runtime: "amc" as const,
-            eventType: row.eventType,
-            payload: row.payload,
-            payloadExt: "json" as const,
-            meta: row.meta
-          }))
-        );
-      }
+        // One handle for the run, not one per call (opening the ledger costs a third of a governed call); `close()` releases it.
+        rawLedger().appendEvidenceBatch(evidence.map((row) => ({ sessionId: options.sessionId, runtime: "amc" as const,
+          eventType: row.eventType, payload: row.payload, payloadExt: "json" as const, meta: row.meta })));
+      });
     }
   });
 
@@ -479,10 +618,12 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   }
 
   const seam = pipelineToolSeam({ registry, pipeline, agentId });
+  const closeHandles = (): void => { ledgerHandle?.close(); ledgerHandle = null; journal?.close(); journal = null; };
   return {
-    seam: { ...seam, schemas: () => {
+    seam: { ...seam, extensionHooks: options.extensionHooks, shutdown: () => background.shutdown(), hasOwnedWork: () => background.hasOwnedWork(), schemas: () => {
       recordUnconfinedEnabled();
       const snapshot = loadVerifiedToolsConfigSnapshot(workspace);
+      admittedCatalog(agentId, snapshot, false);
       // The body guard runs after model/approval waits. It cannot stop a newer
       // signed policy from exposing unreviewed schemas to that earlier request.
       // Refuse before model preparation rather than silently switching to no tools.
@@ -501,11 +642,15 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
     registry,
     pipeline,
     readiness,
-    close: (): void => {
-      ledgerHandle?.close();
-      ledgerHandle = null;
-      journal?.close();
-      journal = null;
+    hasOwnedWork: () => background.hasOwnedWork(),
+    shutdown: () => background.shutdown(),
+    close: (): void | Promise<void> => {
+      registry.synchronizeLoadout(agentId, "closed");
+      const pending = background.hasOwnedWork();
+      const drain = background.shutdown();
+      if (pending) return drain.then(() => closeHandles(), error => { closeHandles(); throw error; });
+      closeHandles();
+      void drain.catch(() => undefined);
     }
   };
 }

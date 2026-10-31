@@ -39,9 +39,19 @@ export const a4PackageV1Schema = z.strictObject({
     updatePolicySha256: sha256HexSchema, secretScanSha256: sha256HexSchema, sbomSha256: sha256HexSchema.nullable(), aibomSha256: z.null()
   }),
   approvals: z.array(a4ApprovalRefSchema),
+  /** The leases the release effect minted, by id and scope (never a token): the staging lease (design §10.4 Build). */
+  leases: z.array(z.strictObject({ leaseId: nonEmpty, scope: z.enum(["staging", "production"]) })),
   integration: a4IntegrationClaimV1Schema,
   quality: a4QualitySpecSchema,
   provenance: z.strictObject({ note: z.literal("AMC provenance record (not a formal SLSA claim)"), builtFrom: z.record(z.string(), z.string()) }),
+  /**
+   * P2-23's AgentVersionManifest for the agent (P2-34): the approval-bound one, else the one observed at its last session
+   * open, with the `manifestDigest` P2-23's signed row carries. Absent from packages built before P2-34.
+   */
+  versionManifest: z.strictObject({
+    manifest: z.record(z.string(), z.unknown()).nullable(), manifestDigest: z.string().regex(/^sha256:[a-f0-9]{64}$/).nullable(),
+    source: z.enum(["lifecycle_bound", "lifecycle_observed", "not_governed", "not_observed"])
+  }).optional(),
   signing: z.strictObject({ algorithm: z.literal("ed25519"), kind: z.literal("A4_PACKAGE"), pubkeyFingerprint: nonEmpty }),
   generatedTs: z.number().int(),
   claimBoundary: nonEmpty

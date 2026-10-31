@@ -1,3 +1,5 @@
+import type { EvidenceOutcome } from "../types.js";
+import { ratioOrNull as ratio, weightedMean } from "../utils/ratio.js";
 import { randomUUID } from "node:crypto";
 import { join, resolve } from "node:path";
 import { artifactSigPath, trySignArtifactFile } from "../lifecycle/artifactSignature.js";
@@ -97,7 +99,15 @@ export interface RagGroundingEvalCase {
   caseHash: string;
 }
 
+type RagGroundingRatioMetricId =
+  | "faithfulnessScore" | "retrievedSupportQuality" | "unsupportedClaimRate" | "contradictionRate"
+  | "staleChunkRate" | "poisoningSignalRate" | "provenanceCoverage" | "citationProvenanceCoverage";
+
 export interface RagGroundingEvalMetrics {
+  outcome: EvidenceOutcome;
+  sampleSize: number;
+  metricOutcomes: Record<RagGroundingRatioMetricId, EvidenceOutcome>;
+  metricSampleSizes: Record<RagGroundingRatioMetricId, number>;
   queryCount: number;
   retrievedChunkCount: number;
   claimCount: number;
@@ -105,14 +115,14 @@ export interface RagGroundingEvalMetrics {
   unsupportedClaimCount: number;
   contradictedClaimCount: number;
   unknownClaimCount: number;
-  faithfulnessScore: number;
-  retrievedSupportQuality: number;
-  unsupportedClaimRate: number;
-  contradictionRate: number;
-  staleChunkRate: number;
-  poisoningSignalRate: number;
-  provenanceCoverage: number;
-  citationProvenanceCoverage: number;
+  faithfulnessScore: number | null;
+  retrievedSupportQuality: number | null;
+  unsupportedClaimRate: number | null;
+  contradictionRate: number | null;
+  staleChunkRate: number | null;
+  poisoningSignalRate: number | null;
+  provenanceCoverage: number | null;
+  citationProvenanceCoverage: number | null;
 }
 
 export interface RagGroundingFinding {
@@ -141,7 +151,9 @@ export interface RagGroundingEvalReceipt {
   findings: RagGroundingFinding[];
   enforcementAction: RagGroundingEnforcementAction;
   scoreImpact: {
-    penalty0to100: number;
+    penalty0to100: number | null;
+    outcome: EvidenceOutcome;
+    sampleSize: number;
     reason: string;
   };
   failClosed: boolean;
@@ -257,11 +269,6 @@ function normalizeCase(inputCase: RagGroundingEvalCaseInput): RagGroundingEvalCa
   return { ...normalizedWithoutHash, caseHash: caseDigest(normalizedWithoutHash) };
 }
 
-function ratio(numerator: number, denominator: number): number {
-  if (denominator <= 0) return 0;
-  return numerator / denominator;
-}
-
 function hasChunkProvenance(chunk: RagGroundingRetrievedChunk): boolean {
   return Boolean((chunk.sourceId || chunk.sourceUri) && chunk.documentVersion && chunk.ingestedAt);
 }
@@ -308,7 +315,20 @@ function computeMetrics(cases: RagGroundingEvalCase[]): RagGroundingEvalMetrics 
     }
   }
 
+  const metricSampleSizes: Record<RagGroundingRatioMetricId, number> = {
+    faithfulnessScore: claims.length, retrievedSupportQuality: claims.length,
+    unsupportedClaimRate: claims.length, contradictionRate: claims.length,
+    staleChunkRate: chunks.length, poisoningSignalRate: chunks.length, provenanceCoverage: chunks.length,
+    citationProvenanceCoverage: citationEvidenceEdgeCount,
+  };
+  const metricOutcomes = Object.fromEntries(Object.entries(metricSampleSizes).map(([id, size]) =>
+    [id, size === 0 ? "not_evaluated" : "measured"])) as RagGroundingEvalMetrics["metricOutcomes"];
+
   return {
+    outcome: claims.length + chunks.length === 0 ? "not_evaluated" : "measured",
+    sampleSize: claims.length + chunks.length,
+    metricOutcomes,
+    metricSampleSizes,
     queryCount: cases.length,
     retrievedChunkCount: chunks.length,
     claimCount: claims.length,
@@ -406,7 +426,7 @@ function buildFindings(cases: RagGroundingEvalCase[], metrics: RagGroundingEvalM
     }
   }
 
-  if (metrics.claimCount > 0 && metrics.retrievedSupportQuality < 0.8) {
+  if (metrics.retrievedSupportQuality !== null && metrics.retrievedSupportQuality < 0.8) {
     findings.push({
       findingId: findingId("weak_retrieved_support", null, null, null),
       kind: "weak_retrieved_support",
@@ -430,13 +450,19 @@ function enforcementActionFor(findings: RagGroundingFinding[]): RagGroundingEnfo
 }
 
 function scoreImpact(metrics: RagGroundingEvalMetrics): RagGroundingEvalReceipt["scoreImpact"] {
-  const penalty = Math.round(
-    Math.min(100, (1 - metrics.faithfulnessScore) * 45 + metrics.contradictionRate * 35 + metrics.poisoningSignalRate * 20)
-  );
+  const components: Array<readonly [number | null, number]> = [
+    [metrics.faithfulnessScore === null ? null : (1 - metrics.faithfulnessScore) * 100, 0.45],
+    [metrics.contradictionRate === null ? null : metrics.contradictionRate * 100, 0.35],
+    [metrics.poisoningSignalRate === null ? null : metrics.poisoningSignalRate * 100, 0.2],
+  ];
+  const measuredPenalty = weightedMean(components);
+  const penalty = measuredPenalty === null ? null : Math.round(Math.min(100, measuredPenalty));
   return {
     penalty0to100: penalty,
-    reason: penalty > 0
-      ? "RAG grounding findings lower Score confidence until unsupported or contradicted claims are resolved."
+    outcome: penalty === null ? "not_evaluated" : "measured",
+    sampleSize: components.filter(([value]) => value !== null).length,
+    reason: penalty === null ? "No grounding evidence was evaluated."
+      : penalty > 0 ? "RAG grounding findings lower Score confidence until unsupported or contradicted claims are resolved."
       : "No RAG grounding penalty."
   };
 }
@@ -602,12 +628,12 @@ export function renderRagGroundingEvalAuditExport(receipt: RagGroundingEvalRecei
     `- Agent: ${receipt.agentId}`,
     `- Status: ${status}`,
     `- Surfaces: ${receipt.surfaceBinding.join(", ")}`,
-    `- Faithfulness score: ${receipt.metrics.faithfulnessScore.toFixed(3)}`,
-    `- Retrieved support quality: ${receipt.metrics.retrievedSupportQuality.toFixed(3)}`,
-    `- Unsupported claim rate: ${receipt.metrics.unsupportedClaimRate.toFixed(3)}`,
-    `- Contradiction rate: ${receipt.metrics.contradictionRate.toFixed(3)}`,
-    `- Citation provenance coverage: ${receipt.metrics.citationProvenanceCoverage.toFixed(3)}`,
-    `- Score penalty: ${receipt.scoreImpact.penalty0to100}/100`,
+    `- Faithfulness score: ${receipt.metrics.faithfulnessScore?.toFixed(3) ?? "not evaluated"}`,
+    `- Retrieved support quality: ${receipt.metrics.retrievedSupportQuality?.toFixed(3) ?? "not evaluated"}`,
+    `- Unsupported claim rate: ${receipt.metrics.unsupportedClaimRate?.toFixed(3) ?? "not evaluated"}`,
+    `- Contradiction rate: ${receipt.metrics.contradictionRate?.toFixed(3) ?? "not evaluated"}`,
+    `- Citation provenance coverage: ${receipt.metrics.citationProvenanceCoverage?.toFixed(3) ?? "not evaluated"}`,
+    `- Score penalty: ${receipt.scoreImpact.penalty0to100 === null ? "not evaluated" : `${receipt.scoreImpact.penalty0to100}/100`}`,
     "",
     "## Citation Provenance",
     ...(receipt.cases.flatMap((inputCase) => inputCase.citationProvenance).length

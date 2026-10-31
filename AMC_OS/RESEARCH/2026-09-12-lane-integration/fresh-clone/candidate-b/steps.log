@@ -1,4 +1,4 @@
-=== clone: git clone -q /Users/sid/AgentMaturityCompass /private/tmp/claude-501/-Users-sid-AgentMaturityCompass/39a2e918-fc29-48df-9148-bb8801c84571/scratchpad/clone-b --branch amc/gap-register-execution ===
+=== clone: git clone -q ~/AgentMaturityCompass /private/tmp/claude-501/-Users-sid-AgentMaturityCompass/39a2e918-fc29-48df-9148-bb8801c84571/scratchpad/clone-b --branch amc/gap-register-execution ===
 clone exit=0 seconds=3
 === checkout: git checkout -q 40f80de180929ed1a2dcffeb4eca832ef3807ded ===
 checkout exit=0 seconds=0

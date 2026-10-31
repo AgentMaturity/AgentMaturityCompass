@@ -1,5 +1,5 @@
 
- RUN  v4.1.11 /Users/sid/AgentMaturityCompass
+ RUN  v4.1.11 ~/AgentMaturityCompass
 
  ❯ tests/nativeValidationSurfaces.test.ts (3 tests | 1 failed) 3615ms
    × SDK never turns absent or malformed validation metadata into a pass 3ms

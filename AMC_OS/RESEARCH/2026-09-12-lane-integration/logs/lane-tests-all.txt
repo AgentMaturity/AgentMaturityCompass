@@ -1,5 +1,5 @@
 
- RUN  v4.1.11 /Users/sid/AgentMaturityCompass
+ RUN  v4.1.11 ~/AgentMaturityCompass
 
  ❯ tests/nativeGeminiWire.test.ts (26 tests | 1 failed) 43ms
      × actual cold registry, exact public route and historical identities 12ms
@@ -94,7 +94,7 @@ SyntaxError: Unexpected end of JSON input
  FAIL  tests/nativeValidationOutcomeSurfaces.test.ts > Darwin 'SDK' public validation reports 'nonzero', preserves its actual output reference and survives cold inspection
  FAIL  tests/nativeValidationOutcomeSurfaces.test.ts > Darwin 'SDK' public validation reports 'denied', preserves its actual output reference and survives cold inspection
  FAIL  tests/nativeValidationOutcomeSurfaces.test.ts > Darwin 'SDK' public validation reports 'budget', preserves its actual output reference and survives cold inspection
-Error: Cannot find module 'file:///Users/sid/AgentMaturityCompass/dist/sdk/nativeAgentClient.js' imported from /Users/sid/AgentMaturityCompass/tests/nativeValidationOutcomeSurfaces.test.ts
+Error: Cannot find module 'file://~/AgentMaturityCompass/dist/sdk/nativeAgentClient.js' imported from ~/AgentMaturityCompass/tests/nativeValidationOutcomeSurfaces.test.ts
  ❯ tests/nativeValidationOutcomeSurfaces.test.ts:52:35
      50|       summary = JSON.parse(result.stdout) as AgentRunSummary;
      51|     } else if (surface === "SDK") {
@@ -109,7 +109,7 @@ Error: Cannot find module 'file:///Users/sid/AgentMaturityCompass/dist/sdk/nativ
  FAIL  tests/nativeValidationOutcomeSurfaces.test.ts > Darwin 'Studio' public validation reports 'nonzero', preserves its actual output reference and survives cold inspection
  FAIL  tests/nativeValidationOutcomeSurfaces.test.ts > Darwin 'Studio' public validation reports 'denied', preserves its actual output reference and survives cold inspection
  FAIL  tests/nativeValidationOutcomeSurfaces.test.ts > Darwin 'Studio' public validation reports 'budget', preserves its actual output reference and survives cold inspection
-Error: Cannot find module 'file:///Users/sid/AgentMaturityCompass/dist/studio/nativeTaskService.js' imported from /Users/sid/AgentMaturityCompass/tests/nativeValidationOutcomeSurfaces.test.ts
+Error: Cannot find module 'file://~/AgentMaturityCompass/dist/studio/nativeTaskService.js' imported from ~/AgentMaturityCompass/tests/nativeValidationOutcomeSurfaces.test.ts
  ❯ tests/nativeValidationOutcomeSurfaces.test.ts:62:43
      60|       } finally { await client.close(); }
      61|     } else {
@@ -121,7 +121,7 @@ Error: Cannot find module 'file:///Users/sid/AgentMaturityCompass/dist/studio/na
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/17]⎯
 
  FAIL  tests/nativeValidationOutcomeSurfaces.test.ts > Studio refuses a non-private operator credential directory before opening a native session
-Error: Cannot find module 'file:///Users/sid/AgentMaturityCompass/dist/studio/nativeTaskService.js' imported from /Users/sid/AgentMaturityCompass/tests/nativeValidationOutcomeSurfaces.test.ts
+Error: Cannot find module 'file://~/AgentMaturityCompass/dist/studio/nativeTaskService.js' imported from ~/AgentMaturityCompass/tests/nativeValidationOutcomeSurfaces.test.ts
  ❯ tests/nativeValidationOutcomeSurfaces.test.ts:116:39
     114|   vi.stubEnv("AMC_VAULT_PASSPHRASE", pass); vi.stubEnv("AMC_CONTROL_CH…
     115|   const f = validationOperatorFixture(workspace, "success");
@@ -145,7 +145,7 @@ SyntaxError: Unexpected end of JSON input
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/17]⎯
 
  FAIL  tests/nativeValidationSurfaces.test.ts > actual built SDK distinguishes completed turns from unavailable selected checks and seals evidence
-Error: Cannot find module 'file:///Users/sid/AgentMaturityCompass/dist/sdk/nativeAgentClient.js' imported from /Users/sid/AgentMaturityCompass/tests/nativeValidationSurfaces.test.ts
+Error: Cannot find module 'file://~/AgentMaturityCompass/dist/sdk/nativeAgentClient.js' imported from ~/AgentMaturityCompass/tests/nativeValidationSurfaces.test.ts
  ❯ tests/nativeValidationSurfaces.test.ts:44:33
      42|     summary = JSON.parse(result.stdout) as AgentRunSummary;
      43|   } else {

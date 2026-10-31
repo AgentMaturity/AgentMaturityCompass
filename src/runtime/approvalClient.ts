@@ -1,3 +1,8 @@
+/**
+ * Library-only, not enforced: parses untrusted text markers and builds traces.
+ * A marker is not approval evidence. Canonical execution approval is
+ * verifyApprovalForExecution in src/approvals/approvalEngine.ts.
+ */
 import type { TraceInput } from "./traceLogger.js";
 
 const APPROVAL_TOKEN_RE = /\bAPPROVED_BY_OWNER:([A-Za-z0-9_-]{6,})\b/;
@@ -7,9 +12,16 @@ export function extractApprovalToken(text: string): string | null {
   return match?.[1] ?? null;
 }
 
-export function hasValidApprovalToken(text: string): boolean {
+/** Detects marker syntax only; it does not verify a signed approval. */
+export function hasApprovalTokenMarker(text: string): boolean {
   return extractApprovalToken(text) !== null;
 }
+
+/**
+ * @deprecated Use hasApprovalTokenMarker for syntax only. This alias does not
+ * validate approval; use verifyApprovalForExecution in src/approvals/approvalEngine.ts.
+ */
+export const hasValidApprovalToken = hasApprovalTokenMarker;
 
 export function withApprovalTrace(params: {
   agentId: string;

@@ -636,10 +636,16 @@ function roleStatusSummary(status: OrgRoleRunStatus): string {
   return "Role is blocked by one or more policy gates.";
 }
 
+/**
+ * `signaturePaths`: what each signing call already made returned (null = skipped, failed or impossible). An artifact
+ * cannot record its own signature, so it reports only the lifecycle artifacts signed before it was written.
+ */
 function buildSurfaces(input: {
   roles: OrgRoleRun[];
-  signaturePath: string | null;
+  signaturePaths: ReadonlyArray<string | null>;
 }): Record<AMCSurface, LifecycleSurfaceSummary> {
+  const signed = input.signaturePaths.filter((path): path is string => path !== null);
+  const allSigned = signed.length > 0 && signed.length === input.signaturePaths.length;
   const blockedGateIds = input.roles.flatMap((role) => role.approvalGates.filter((gate) => gate.status !== "passed").map((gate) => `${role.roleId}:${gate.gateId}`));
   return {
     Score: {
@@ -660,9 +666,10 @@ function buildSurfaces(input: {
       refs: blockedGateIds
     },
     Vault: {
-      status: input.signaturePath ? "complete" : "degraded",
-      summary: input.signaturePath ? "Org run artifact and lifecycle artifacts were signed where keys were available." : "Org run artifact was written but not signed.",
-      refs: input.signaturePath ? [input.signaturePath] : []
+      status: allSigned ? "complete" : "degraded",
+      summary: allSigned ? "The lifecycle artifacts were signed; this artifact's own signature, if any, is the .sig file beside it."
+        : `${input.signaturePaths.length - signed.length} of ${input.signaturePaths.length} lifecycle artifact(s) were not signed.`,
+      refs: signed
     },
     Watch: {
       status: "complete",
@@ -685,13 +692,6 @@ function buildSurfaces(input: {
       refs: []
     }
   };
-}
-
-function orgRunSigningExpected(): boolean {
-  return Boolean(process.env.AMC_VAULT_PASSPHRASE)
-    || process.env.NODE_ENV === "test"
-    || process.env.VITEST === "true"
-    || process.env.VITEST === "1";
 }
 
 function roleWorkspacePath(workspace: string, orgRunId: string, roleId: string): string {
@@ -932,7 +932,7 @@ export function runOrg(input: RunOrgInput): OrgRunResult {
       ? "needs-approval"
       : "completed";
   const artifactPath = orgRunArtifactPath(workspace, orgRunId);
-  const expectedSignaturePath = orgRunSigningExpected() ? `${artifactPath}.sig` : null;
+  const roleSignatures = roles.map((role) => role.lifecycleArtifactRef.signaturePath);
   const parentReport = parentDiagnosticReport({
     orgRunId,
     roles,
@@ -962,7 +962,7 @@ export function runOrg(input: RunOrgInput): OrgRunResult {
       { episodeId: parentEpisode.episode.episodeId, path: parentEpisode.episodePath },
       ...roles.map((role) => role.episodeRecordRef)
     ],
-    surfaceOverrides: buildSurfaces({ roles, signaturePath: expectedSignaturePath })
+    surfaceOverrides: buildSurfaces({ roles, signaturePaths: roleSignatures })
   });
 
   const artifact: OrgRunArtifact = {
@@ -977,7 +977,7 @@ export function runOrg(input: RunOrgInput): OrgRunResult {
     createdAt,
     updatedAt: createdAt,
     heartbeatPolicy,
-    surfaces: buildSurfaces({ roles, signaturePath: expectedSignaturePath }),
+    surfaces: buildSurfaces({ roles, signaturePaths: [...roleSignatures, parentLifecycle.signaturePath] }),
     roles,
     parentEpisodeRecordRef: { episodeId: parentEpisode.episode.episodeId, path: parentEpisode.episodePath },
     parentLifecycleArtifactRef: {

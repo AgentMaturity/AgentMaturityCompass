@@ -697,7 +697,7 @@ function riskTierMax(a: ContextGraph["riskTier"], b: ContextGraph["riskTier"]): 
   return riskTierRank(a) >= riskTierRank(b) ? a : b;
 }
 
-function mergeContextGraph(existing: ContextGraph, archetype: Archetype): ContextGraph {
+export function mergeContextGraph(existing: ContextGraph, archetype: Archetype): ContextGraph {
   const seed = archetype.contextGraphSeed;
   const nextEntities = [...existing.entities];
 
@@ -747,7 +747,7 @@ function mergeContextGraph(existing: ContextGraph, archetype: Archetype): Contex
   return merged;
 }
 
-function renderGuardrails(archetype: Archetype, existingYaml: string | null): string {
+export function renderGuardrails(archetype: Archetype, existingYaml: string | null): string {
   const existing = existingYaml ? ((YAML.parse(existingYaml) as Record<string, unknown> | null) ?? {}) : {};
   const section = {
     archetype: {
@@ -768,7 +768,7 @@ function renderGuardrails(archetype: Archetype, existingYaml: string | null): st
   });
 }
 
-function renderPromptAddendum(archetype: Archetype, existingText: string | null): string {
+export function renderPromptAddendum(archetype: Archetype, existingText: string | null): string {
   const header = [
     `## Archetype: ${archetype.name} (${archetype.id})`,
     `- Description: ${archetype.description}`,
@@ -787,7 +787,7 @@ function renderPromptAddendum(archetype: Archetype, existingText: string | null)
   return existingText;
 }
 
-function renderEvalHarness(archetype: Archetype, existingYaml: string | null): string {
+export function renderEvalHarness(archetype: Archetype, existingYaml: string | null): string {
   const existing = existingYaml ? ((YAML.parse(existingYaml) as Record<string, unknown> | null) ?? {}) : {};
   const suites = Array.isArray(existing.suites) ? [...(existing.suites as Array<Record<string, unknown>>)] : [];
 
@@ -809,7 +809,7 @@ function renderEvalHarness(archetype: Archetype, existingYaml: string | null): s
   });
 }
 
-function topLevelDiff(before: ContextGraph, after: ContextGraph): string[] {
+export function topLevelDiff(before: ContextGraph, after: ContextGraph): string[] {
   const lines: string[] = [];
   if (before.riskTier !== after.riskTier) {
     lines.push(`riskTier: ${before.riskTier} -> ${after.riskTier}`);
@@ -832,7 +832,7 @@ function topLevelDiff(before: ContextGraph, after: ContextGraph): string[] {
   return lines;
 }
 
-function recordArchetypeAudit(params: {
+export function recordArchetypeAudit(params: {
   workspace: string;
   agentId: string;
   archetypeId: string;

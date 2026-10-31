@@ -26,13 +26,13 @@
  * the same circularity ADR-0007 fixed for the monitor key. Hence
  * `expectedAuditorKeyFingerprint` is a required parameter rather than an option.
  */
-import { verify } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { merkleRoot as sessionMerkleRoot } from "../session/sessionMerkle.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { verifyEntryInclusion } from "./merkle.js";
 import { verifySignatureEnvelope } from "../crypto/signing/signatureEnvelope.js";
+import { verifyWithKey } from "../keys/algorithmPolicy.js";
 import type { SignatureEnvelope } from "../crypto/signing/signerTypes.js";
 import {
   SESSION_ROOT_ARTIFACT_KIND,
@@ -76,7 +76,7 @@ export interface SessionAnchorVerifyParams {
  */
 function verifyHexDigestOffline(digestHex: string, signatureB64: string, publicKeyPem: string): boolean {
   try {
-    return verify(null, Buffer.from(digestHex, "hex"), publicKeyPem, Buffer.from(signatureB64, "base64"));
+    return verifyWithKey(Buffer.from(digestHex, "hex"), publicKeyPem, Buffer.from(signatureB64, "base64"));
   } catch {
     return false;
   }
@@ -190,7 +190,7 @@ function verifySignedRoot(proof: SessionAnchorProof, errors: string[]): number |
     return row.leafCount;
   }
   const envelope = signature.envelope;
-  const signatureValid = envelope
+  const signatureValid = envelope !== undefined
     ? signature.signature === envelope.sigB64 &&
       verifySignatureEnvelope(digest, envelope as SignatureEnvelope, {
         trustedPublicKeys: [proof.auditorPublicKeyPem],

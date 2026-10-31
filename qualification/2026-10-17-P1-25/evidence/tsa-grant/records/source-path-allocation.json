@@ -1,0 +1,67 @@
+{
+  "schema": "p125g-exact-source-and-owned-resource-allocation/1",
+  "at": "2026-10-16T22:47:13.419741+00:00",
+  "sourceCommit": "da61205c0817267133451bac11e57bd0318fe44f",
+  "onlySourcePath": "tests/time/tsaGrant.test.ts",
+  "candidate": {
+    "path": "/private/tmp/p1-25-fallback-qualification-20261017/next-grant-test-proposal/tsaGrant.test.ts.source.txt",
+    "physicalPath": "/private/tmp/p1-25-fallback-qualification-20261017/next-grant-test-proposal/tsaGrant.test.ts.source.txt",
+    "bytes": 27505,
+    "sha256": "9f9bd30790094ea2c8172a31ff2f9de69a2212fe2e46fee133e123349e8b63fc",
+    "dev": 16777231,
+    "inode": 543579188,
+    "nlink": 1
+  },
+  "reviews": [
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/scope-review/review.json",
+      "physicalPath": "/private/tmp/p1-25-grant-qualification-20261017/scope-review/review.json",
+      "bytes": 4869,
+      "sha256": "5dcf4acf3fc81d4f9fe5b5efa882ca3b5e0780bacdfd48437bbf5b37c6793730",
+      "dev": 16777231,
+      "inode": 543583839,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/next-grant-test-static-review/review.json",
+      "physicalPath": "/private/tmp/p1-25-fallback-qualification-20261017/next-grant-test-static-review/review.json",
+      "bytes": 6263,
+      "sha256": "85bb5d660c457d86f1ad3a851e401d920e28e198448831fa41978bbe9f417d2d",
+      "dev": 16777231,
+      "inode": 543580932,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/tool-doc-review/review.json",
+      "physicalPath": "/private/tmp/p1-25-grant-qualification-20261017/tool-doc-review/review.json",
+      "bytes": 7843,
+      "sha256": "5a94f0dcfc57cdd92abc2bb50fe26201e178cbe85625089a9f30bfd6cde2a522",
+      "dev": 16777231,
+      "inode": 543583903,
+      "nlink": 1
+    }
+  ],
+  "rootFull433LinesAndCompanionReviewsRead": true,
+  "all135ProtectedEightNativesAndHeldR18Exact": true,
+  "preFreezeExit": 0,
+  "d15": "none",
+  "hostedWip": 0,
+  "allPrPathsCheckedNoOverlap": true,
+  "ordinaryIgnoreCheckNone": true,
+  "selectedTool": {
+    "invoked": "/opt/homebrew/bin/openssl",
+    "physical": "/opt/homebrew/Cellar/openssl@4/4.0.3/bin/openssl",
+    "bytes": 881424,
+    "sha256": "bdeb769587e68e47dad86b42c2ea9758c5560ef6376eb69c18b85cf0c66ea36c"
+  },
+  "actualVersion": "OpenSSL4.0.3",
+  "toolDocs4StaticFitNotRuntimeCredit": true,
+  "resources": "Per body fresh owned0700 workspace and retained signing root/HOME; exclusive0600 new test keys/public files/private streams; six sequential naturally observed children planned and literal127 ephemeral server. No old key/CA DB reads, package, source generator, CI, parent-env or guard mutation.",
+  "unchangedClientMs": 10000,
+  "unchangedTestMs": 30000,
+  "bothBodiesMustExecuteForQualification": true,
+  "missingToolOnlyVisibleSkipGivesZeroCredit": true,
+  "futureMetadataAndCountChangesRequireSeparateAdmission": true,
+  "allHoldsF37FreezeQualityIntact": true,
+  "noWholeIssueOrPlanCompletion": true
+}

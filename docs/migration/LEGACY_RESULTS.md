@@ -29,7 +29,7 @@ Verifiers print integrity and the claim on separate lines. A valid signature nev
 
 ```
 Bundle verification PASSED
-Claim: Legacy (1.x), self-reported (notice AMC-LEGACY-2026-001 v1) · Result: not evaluated · Evidence: sufficient · Enforcement: none · Review: pending · Applicability: applicable
+Claim: Legacy (1.x), self-reported (notice AMC-LEGACY-2026-001 v1) · Result: not evaluated · Evidence: incomplete · Enforcement: none · Review: pending · Applicability: applicable
 ```
 
 JSON output carries `claimKind` (`self_reported` or `synthetic_example`) and `provenance.legacy` with the AMC version, the original tier and the notice.

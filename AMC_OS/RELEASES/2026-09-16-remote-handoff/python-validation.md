@@ -19,10 +19,10 @@ Preparation (all build/install writes were under `/tmp`):
 /tmp/amc-python-handoff-20260916/sdk-venv/bin/python -m pip install /tmp/amc-python-handoff-20260916/wheels/amc_sdk-0.2.0-py3-none-any.whl
 ```
 
-From `/Users/sid/AgentMaturityCompass/sdk/python`:
+From `~/AgentMaturityCompass/sdk/python`:
 
 ```sh
-AMC_PYTHON_INSTALLED=/tmp/amc-python-handoff-20260916/sdk-venv/bin/python AMC_BIN=/Users/sid/AgentMaturityCompass/dist/cli.js PYTHONDONTWRITEBYTECODE=1 /opt/homebrew/bin/python3 -m pytest tests -q -p no:cacheprovider
+AMC_PYTHON_INSTALLED=/tmp/amc-python-handoff-20260916/sdk-venv/bin/python AMC_BIN=~/AgentMaturityCompass/dist/cli.js PYTHONDONTWRITEBYTECODE=1 /opt/homebrew/bin/python3 -m pytest tests -q -p no:cacheprovider
 ```
 
 Wheel SHA-256: `e90b4054b80d2203bc15d596d08bf15209a8d586679098c1f695cb13b19b6b27`.
@@ -40,7 +40,7 @@ The existing Homebrew Python environment had pytest and nearly all runtime depen
 /tmp/amc-python-handoff-20260916/platform-venv/bin/python -m pip install 'httpx>=0.27.0'
 ```
 
-From `/Users/sid/AgentMaturityCompass/platform/python`:
+From `~/AgentMaturityCompass/platform/python`:
 
 ```sh
 PYTHONDONTWRITEBYTECODE=1 /tmp/amc-python-handoff-20260916/platform-venv/bin/python -m pytest tests -q -p no:cacheprovider

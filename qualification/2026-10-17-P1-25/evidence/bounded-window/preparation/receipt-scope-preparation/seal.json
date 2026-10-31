@@ -1,0 +1,65 @@
+{
+  "schema": "p125w-receipt-scope-private-seal/1",
+  "at": "2026-10-17T00:30:28.140455+00:00",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/receipt-scope-preparation/observations.json",
+      "bytes": 4832134,
+      "sha256": "15cda5ac62b4bac7286470d6623ad22c356ccb275ed540a0cbab632ab0947bdb",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/receipt-scope-preparation/observations.json",
+      "dev": 16777231,
+      "inode": 543820302,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/receipt-scope-preparation/read-tool-results.json",
+      "bytes": 1477,
+      "sha256": "edaf6249d211041538ab48ca46b8bdc57cef46c44ab909b1e1600d8b582eef32",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/receipt-scope-preparation/read-tool-results.json",
+      "dev": 16777231,
+      "inode": 543820311,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/receipt-scope-preparation/review.json",
+      "bytes": 12821,
+      "sha256": "0356aa901047919eea12c5f332b1e259739ce382ae9d2460f64d502795e1c1ef",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/receipt-scope-preparation/review.json",
+      "dev": 16777231,
+      "inode": 543820397,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/receipt-scope-preparation/README.md",
+      "bytes": 3198,
+      "sha256": "f0740b546fb8a3c83db626bcff7014f9cab450a9995075c75a478977ead14f29",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/receipt-scope-preparation/README.md",
+      "dev": 16777231,
+      "inode": 543820398,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/receipt-scope-preparation/pending-reservation-entry.md",
+      "bytes": 720,
+      "sha256": "fb852c14d893868c3a2574a04ae8c02c3f829bb27a4c6a9b6f487929fc00eb55",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/receipt-scope-preparation/pending-reservation-entry.md",
+      "dev": 16777231,
+      "inode": 543820399,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/receipt-scope-preparation/input-pins.json",
+      "bytes": 85886,
+      "sha256": "5706fc8ed1bc5ba6285a7a40509e9954d04dda2edce32a5a8432155a65e657b1",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/receipt-scope-preparation/input-pins.json",
+      "dev": 16777231,
+      "inode": 543820400,
+      "nlink": 1
+    }
+  ],
+  "inputCount": 166,
+  "blockers": [],
+  "all227ReadOnlyGitChildrenNatural0": true,
+  "noAllocation": true,
+  "largeObservationsPrivateOnly": true
+}

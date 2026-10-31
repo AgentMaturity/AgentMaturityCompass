@@ -1,0 +1,64 @@
+{
+  "schema": "p125-client-final181-scope-review-seal/1",
+  "at": "2026-10-16T21:35:40.857917+00:00",
+  "status": "closed",
+  "blockers": [],
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/scope-review/review.json",
+      "bytes": 5638,
+      "sha256": "9e75e7374ddb99670b4e3ee4b8d3cd745b2f97aafa04d2c4502e614d9da4f421",
+      "physicalPath": "/private/tmp/p1-25-client-qualification-20261017/scope-review/review.json",
+      "dev": 16777231,
+      "inode": 543440170,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/scope-review/README.md",
+      "bytes": 2137,
+      "sha256": "ce7675a14905884b0da5dc251997413b1b5fbe7f45ffcf98428b3249194eb491",
+      "physicalPath": "/private/tmp/p1-25-client-qualification-20261017/scope-review/README.md",
+      "dev": 16777231,
+      "inode": 543440171,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/scope-review/observations.json",
+      "bytes": 1137793,
+      "sha256": "413ba9e97ff225373b484ae5866dcc5c7718475f8f8d9f2b9fcac88b1cdcae73",
+      "physicalPath": "/private/tmp/p1-25-client-qualification-20261017/scope-review/observations.json",
+      "dev": 16777231,
+      "inode": 543439956,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/scope-review/active-metadata-paths.json",
+      "bytes": 1457,
+      "sha256": "e6c5a25a1b88de61a85d060c8202858c5364d31349a255b2ca7ac0edd015f6ed",
+      "physicalPath": "/private/tmp/p1-25-client-qualification-20261017/scope-review/active-metadata-paths.json",
+      "dev": 16777231,
+      "inode": 543440036,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/scope-review/interim-summary.json",
+      "bytes": 3016,
+      "sha256": "2c51e061a7b2c1b90f254ed9b8593a6f347bf4c0486e8ea230a55c9d2b89a483",
+      "physicalPath": "/private/tmp/p1-25-client-qualification-20261017/scope-review/interim-summary.json",
+      "dev": 16777231,
+      "inode": 543439957,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/scope-review/input-pins.json",
+      "bytes": 735214,
+      "sha256": "8f9dee0c0067b3b4eb85d68516340b419622ba20087a48e72a63798bc0a3afc6",
+      "physicalPath": "/private/tmp/p1-25-client-qualification-20261017/scope-review/input-pins.json",
+      "dev": 16777231,
+      "inode": 543440172,
+      "nlink": 1
+    }
+  ],
+  "scope": "Reused181-root finite ownership/preservation rebind only; no source allocation or execution credit.",
+  "privateFullObservationsRemainPrivate": true
+}

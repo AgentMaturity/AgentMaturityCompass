@@ -1,0 +1,10 @@
+{
+  "id": "CR-4",
+  "scenario": "KeyProvider outage",
+  "status": "not_run",
+  "reason": "the chart runs the file KeyProvider; blocking a networked KeyProvider (SoftHSM or a KMS) is not wired into the chart",
+  "blockedBy": [
+    "P2-08"
+  ],
+  "durationMs": 0
+}

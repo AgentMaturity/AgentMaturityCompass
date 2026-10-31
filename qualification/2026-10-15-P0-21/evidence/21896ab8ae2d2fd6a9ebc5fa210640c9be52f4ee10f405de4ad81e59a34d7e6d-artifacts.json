@@ -1,0 +1,47 @@
+[
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--restored/classification.json",
+    "bytes": 229,
+    "sha256": "e8e68f8574b185caf06434b728c6f0b183061d0a1229ef6297c02b106c4fabbc"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--restored/command.json",
+    "bytes": 1942,
+    "sha256": "05be39cac466de60a41933672f0d09af67bf494252f309c12a74ed6e3aeb01e6"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--restored/inputs-after.json",
+    "bytes": 830,
+    "sha256": "367f12fa041d23e4060e4b9c9e1442908a895d6c8a79d9417f02ad99024ee556"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--restored/inputs-before.json",
+    "bytes": 830,
+    "sha256": "22fdec4e6a0434cb019bba616551d9350ac23fdfccb91d0de3621ef584db9e01"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--restored/observer.json",
+    "bytes": 20517,
+    "sha256": "28eaa99e49c77754a1de29da0eb547378f3ffb8985ad5ae31e9c03379dc47b93"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--restored/owned-group-after-exit.json",
+    "bytes": 520,
+    "sha256": "9322a72b601c1a0880f85e2fa1d3c82b3f879f5a478cd8d07ea5ed63bdfb6f5a"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--restored/owned-process.json",
+    "bytes": 1567,
+    "sha256": "3b09f702052d4946bd835e93a001d492ee897644ec3df51e3938fff72282e60e"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--restored/raw.json",
+    "bytes": 13477,
+    "sha256": "abee15eef2e6673e55e2e38b17546ce96c2e7bd99f38826fab0ca7687385d0df"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--restored/stdout-stderr.log",
+    "bytes": 804,
+    "sha256": "93ac516fca51b109ef10e3412f209eb3c5eb7a2d5814fd959d126c5cdd0267d0"
+  }
+]

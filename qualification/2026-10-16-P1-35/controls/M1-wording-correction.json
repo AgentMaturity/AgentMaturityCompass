@@ -1,0 +1,7 @@
+{
+  "preservedOriginalClassification": "M1-promote-attested-legacy-classification.json",
+  "correction": "After the direct promotion witness at254, masked assertions cover rule/kind, original ATTESTED tier and secondary OBSERVED/OBSERVED_HARDENED rows at255-258. That test has no explicit cap assertion. The earlier kind/cap wording was inaccurate.",
+  "causalWitnessUnchanged": true,
+  "actualFailed": 1,
+  "additionalTestAssertionCredit": false
+}

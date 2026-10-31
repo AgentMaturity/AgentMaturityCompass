@@ -20,7 +20,7 @@ export interface NativeExecutableModuleSnapshot {
 export function assertNativeExecutableInstalled(workspace: string, selected: NativeExecutableReference): Buffer {
   const reference = nativeExecutableReference(selected);
   workspace = resolve(workspace);
-  const signed = readNativeExecutableSignedJson(workspace, pluginsInstalledLockPath(workspace), NATIVE_EXECUTABLE_LIMITS.policyBytes);
+  const signed = readNativeExecutableSignedJson(workspace, pluginsInstalledLockPath(workspace), NATIVE_EXECUTABLE_LIMITS.policyBytes, "INSTALLED_LOCK");
   const lock = installedPluginsLockSchema.safeParse(signed.value);
   if (!lock.success) throw new NativeExecutableError("EXECUTABLE_LOCK_INVALID", "The signed plugin installation lock has an unsupported shape.");
   const matches = lock.data.installed.filter(item => item.id === reference.pluginId);

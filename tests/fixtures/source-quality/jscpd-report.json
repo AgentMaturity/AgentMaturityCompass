@@ -1,0 +1,39 @@
+{
+  "duplicates": [
+    {
+      "firstFile": { "name": "a4/router.ts", "start": 73, "end": 78, "startLoc": { "line": 73, "column": 0, "position": 4140 }, "endLoc": { "line": 78, "column": 6, "position": 4495 } },
+      "secondFile": { "name": "a4/stages.ts", "start": 96, "end": 99, "startLoc": { "line": 96, "column": 0, "position": 6720 }, "endLoc": { "line": 99, "column": 5, "position": 6956 } },
+      "format": "typescript",
+      "fragment": "const requestId = z.string().regex(/^[A-Za-z0-9_-]{8,128}$/);\nconst body = z.object({ requestId, note: z.string().max(500) });\nexport function parse(input: unknown) {\n  return body.parse(input);\n}",
+      "isNew": false,
+      "kind": "exact",
+      "lines": 6,
+      "tokens": 57
+    },
+    {
+      "firstFile": { "name": "mcp/tools.ts", "start": 10, "end": 16, "startLoc": { "line": 10, "column": 0, "position": 300 }, "endLoc": { "line": 16, "column": 1, "position": 520 } },
+      "secondFile": { "name": "api/router.ts", "start": 40, "end": 46, "startLoc": { "line": 40, "column": 0, "position": 1300 }, "endLoc": { "line": 46, "column": 1, "position": 1520 } },
+      "format": "typescript",
+      "fragment": "if (!session) {\n  return { status: 401, body: { error: \"unauthenticated\" } };\n}\nif (!session.roles.includes(\"owner\")) {\n  return { status: 403, body: { error: \"forbidden\" } };\n}",
+      "isNew": false,
+      "kind": "exact",
+      "lines": 6,
+      "tokens": 52
+    },
+    {
+      "firstFile": { "name": "api/router.ts", "start": 90, "end": 96, "startLoc": { "line": 90, "column": 0, "position": 3300 }, "endLoc": { "line": 96, "column": 1, "position": 3520 } },
+      "secondFile": { "name": "mcp/tools.ts", "start": 80, "end": 86, "startLoc": { "line": 80, "column": 0, "position": 2300 }, "endLoc": { "line": 86, "column": 1, "position": 2520 } },
+      "format": "typescript",
+      "fragment": "if (!session) {\n    return { status: 401, body: { error: \"unauthenticated\" } };\n}\nif (!session.roles.includes(\"owner\")) {\n    return { status: 403, body: { error: \"forbidden\" } };\n}",
+      "isNew": false,
+      "kind": "exact",
+      "lines": 6,
+      "tokens": 52
+    }
+  ],
+  "statistics": {
+    "detectionDate": "2026-10-11T00:00:00.000Z",
+    "formats": {},
+    "total": { "clones": 3, "duplicatedLines": 18, "duplicatedTokens": 161, "lines": 900, "newClones": 0, "newDuplicatedLines": 0, "percentage": 2, "percentageTokens": 2, "sources": 5, "tokens": 6000 }
+  }
+}

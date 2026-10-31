@@ -26,7 +26,9 @@
     "node": ">=20"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json && npm run copy-assets && node scripts/bundle-kernel.mjs && npm run api:build",
+    "build": "tsc -p tsconfig.json && npm run copy-assets && node scripts/bundle-kernel.mjs && npm run api:build && npm run build:verifier",
+    "build:verifier": "tsc -p packages/verifier/tsconfig.json",
+    "test:verifier-conformance": "node packages/verifier/conformance/run.mjs --cmd \"node packages/verifier/bin/amc-verify.mjs\" --out tmp/conformance-results.json",
     "build:pages": "node scripts/build-pages-site.mjs",
     "docs:api": "typedoc --options typedoc.json",
     "build:sea": "node scripts/build-sea.mjs",
@@ -41,16 +43,20 @@
     "api:build": "node scripts/build-standalone-api.mjs",
     "api:start:production": "node dist/standalone-api.js",
     "lint": "oxlint --type-aware --deny-warnings -c .oxlintrc.json src && node scripts/lint-contract.mjs && node scripts/check-no-fabrication.mjs",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
-    "typecheck:tests": "tsc -p tsconfig.tests.json --noEmit",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p packages/verifier/tsconfig.json --noEmit",
+    "typecheck:tests": "node --max-old-space-size=8192 node_modules/typescript/bin/tsc -p tsconfig.tests.json --noEmit",
     "pretest": "npm run build",
     "test": "vitest run",
     "test:e2e": "node scripts/run-e2e.mjs",
     "accessibility:release-evidence": "node scripts/write-accessibility-release-evidence.mjs --report tmp/accessibility-playwright.json --out docs/runbooks/accessibility-release-evidence-latest.md",
     "test:watch": "vitest",
     "changeset": "changeset",
-    "version-packages": "changeset version",
-    "release": "changeset publish",
+    "version-packages": "node scripts/release-prepare.mjs --version-only",
+    "release": "node -e \"console.error('Not published from a shell: push the v<version> tag; release.yml is the only publisher (docs/RELEASE_RUNBOOK.md).');process.exit(1)\"",
+    "release:prepare": "node scripts/release-prepare.mjs",
+    "release:notes": "node scripts/release-notes.mjs",
+    "check:release-candidate": "node scripts/check-release-candidate.mjs",
+    "check:pack-contents": "node scripts/check-pack-contents.mjs",
     "release:gate": "node scripts/release-gate.mjs",
     "release:prepack-check": "node scripts/prepack-release-check.mjs",
     "qa:install-personas": "node scripts/install-persona-qa.mjs",
@@ -68,19 +74,31 @@
     "postinstall": "node scripts/postinstall.js || true",
     "gen-counts": "node scripts/gen-counts.mjs --write",
     "check:counts": "node scripts/gen-counts.mjs --check",
+    "check:spec": "node scripts/check-spec-sync.mjs --check",
+    "gen-industry-guides": "tsx scripts/gen-industry-guides.mts",
+    "check:industry-guides": "tsx scripts/gen-industry-guides.mts --check",
+    "gen:judge-calibration": "tsx scripts/gen-judge-calibration.mts",
+    "check:judge-calibration": "tsx scripts/gen-judge-calibration.mts --check",
+    "check:regulatory-calendar": "node scripts/gen-regulatory-calendar.mjs --check",
+    "mutation:batch": "node scripts/mutation-batch.mjs",
     "check:freeze": "node scripts/check-freeze.mjs",
     "check:no-fabrication": "node scripts/check-no-fabrication.mjs",
     "check:threat-model": "node scripts/check-threat-model.mjs",
     "check:qualification": "node scripts/check-qualification-receipts.mjs",
     "check:regulatory-currency": "node scripts/check-regulatory-currency.mjs",
+    "check:catalog-currency": "node scripts/check-catalog-currency.mjs",
+    "check:catalog-changelog": "node scripts/check-catalog-changelog.mjs",
+    "check:catalog-admission": "node scripts/check-catalog-admission.mjs",
     "check:citations": "node scripts/check-citations.mjs",
     "trust-list": "node scripts/trust-list.mjs",
     "check:compliance-freshness": "node scripts/compliance-artifact-freshness.mjs",
     "check:evidence-paths": "node scripts/evidence-path-check.mjs",
     "gen:api-ref": "node scripts/gen-api-ref.cjs",
+    "gen:pack-framework-strings": "node scripts/gen-pack-framework-strings.mjs",
     "check:api-ref": "node scripts/gen-api-ref.cjs --check",
     "gen:schemas": "node scripts/gen-spec-schemas.mjs --write",
     "check:schemas": "node scripts/gen-spec-schemas.mjs --check",
+    "gen:pi-conformance-matrix": "node scripts/gen-pi-conformance-matrix.mjs --write",
     "check:question-bank-export": "node scripts/gen-question-bank-export.mjs --check",
     "check:gates": "node scripts/check-gate-reachability.mjs",
     "test:coverage": "vitest run --coverage",
@@ -91,16 +109,26 @@
     "check:vendor-rescope": "node scripts/vendor/rescope-vendor.mjs --check",
     "gen:third-party-notices": "node scripts/vendor/gen-third-party-notices.mjs",
     "check:third-party-notices": "node scripts/vendor/gen-third-party-notices.mjs --check",
+    "gen:capability-matrix": "node scripts/gen-capability-matrix.mjs",
+    "check:capability-matrix": "node scripts/gen-capability-matrix.mjs --check",
     "build:vendor": "tsc -b vendor/cordis vendor/loader vendor/include vendor/group vendor/timer vendor/hmr vendor/logger-console vendor/schemastery",
     "graph:update": "graphify update .",
     "check:clean-source": "node scripts/clean-source-check.mjs",
     "bundle:kernel": "node scripts/bundle-kernel.mjs",
     "check:packed-install": "node scripts/packed-install-check.mjs",
+    "check:sdk-api": "node scripts/check-sdk-api.mjs",
     "qualify:platform": "node scripts/qualify-platform.mjs",
     "check:package": "node scripts/package-lint.mjs",
     "check:duplicates": "node scripts/source-quality.mjs duplicates",
+    "conformance:verifier": "node packages/amc-conformance/bin/amc-conformance.mjs run --class verifier --impl \"node packages/verifier/bin/amc-verify.mjs verify {artifact} {verifierArgs}\" --name amc-verify --impl-version 0.1.0 --repository https://github.com/AgentMaturity/AgentMaturityCompass --language TypeScript --out spec/conformance/results/amc-verify-0.1.0.json",
+    "conformance:a4-record": "node packages/amc-conformance/bin/amc-conformance.mjs run --class a4-record --impl \"env AMC_A4_PREVIEW=1 node dist/cli.js a4 verify {record} --trust-list {trustList} --trust-root {trustRoot} --json\" --name \"amc a4 verify\" --impl-version 1.2.0 --out spec/conformance/results/amc-a4-verify-1.2.0.json",
     "check:dead-code": "node scripts/source-quality.mjs dead-code",
-    "check:coverage": "node scripts/per-file-coverage.mjs"
+    "quality:baseline": "node scripts/source-quality.mjs",
+    "check:coverage": "node scripts/per-file-coverage.mjs",
+    "check:deploy-pack": "node scripts/deploy/deploy-pack-check.mjs",
+    "deploy:rollback-drill": "node scripts/deploy/rollback-drill.mjs",
+    "deploy:verify": "node scripts/deploy-verify.mjs",
+    "check:credentials-presence": "node scripts/credentials-presence-check.mjs"
   },
   "keywords": [
     "ai-agent",
@@ -150,6 +178,10 @@
       "types": "./dist/sdk/nativeAgentClient.d.ts",
       "import": "./dist/sdk/nativeAgentClient.js"
     },
+    "./pi": {
+      "types": "./dist/adapters/pi/amcPiExtension.d.ts",
+      "import": "./dist/adapters/pi/amcPiExtension.js"
+    },
     "./standard/external-evidence": {
       "types": "./dist/standard/externalEvidenceProfile.d.ts",
       "import": "./dist/standard/externalEvidenceProfile.js"
@@ -173,6 +205,34 @@
     "yaml": "^2.8.3",
     "zod": "^4.3.6"
   },
+  "peerDependencies": {
+    "@earendil-works/pi-ai": "1.3.0",
+    "@aws-sdk/client-kms": "3.1146.0",
+    "@google-cloud/kms": "6.2.1",
+    "@azure/keyvault-keys": "4.10.2",
+    "@azure/identity": "4.13.3",
+    "agent-maturity-compass-key-provider-pkcs11": "0.1.0"
+  },
+  "peerDependenciesMeta": {
+    "@earendil-works/pi-ai": {
+      "optional": true
+    },
+    "@aws-sdk/client-kms": {
+      "optional": true
+    },
+    "@google-cloud/kms": {
+      "optional": true
+    },
+    "@azure/keyvault-keys": {
+      "optional": true
+    },
+    "@azure/identity": {
+      "optional": true
+    },
+    "agent-maturity-compass-key-provider-pkcs11": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "@amc/cordis": "workspace:*",
     "@amc/cordis-plugin-loader": "workspace:*",
@@ -180,6 +240,7 @@
     "@amc/schemastery": "workspace:*",
     "@axe-core/playwright": "^4.11.1",
     "@changesets/cli": "^2.30.0",
+    "@earendil-works/pi-ai": "1.3.0",
     "@fontsource/inter": "5.2.8",
     "@fontsource/space-mono": "5.2.9",
     "@playwright/test": "^1.56.0",
@@ -188,6 +249,7 @@
     "@types/semver": "^7.7.1",
     "@vitest/coverage-v8": "^4.1.10",
     "ajv": "8.18.0",
+    "ajv-formats": "3.0.1",
     "date-fns": "^4.1.0",
     "esbuild": "0.28.2",
     "jscpd": "^5.4.0",
@@ -210,7 +272,7 @@
     "overrides": {
       "qs": ">=6.16.0",
       "fast-uri": "^3.1.8",
-      "@modelcontextprotocol/sdk>hono": "^4.13.5",
+      "@modelcontextprotocol/sdk>hono": "4.13.11",
       "ip-address": "^10.7.1",
       "proxy-addr": "^2.0.8"
     }

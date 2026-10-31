@@ -1,0 +1,74 @@
+{
+  "causalPlan": {
+    "path": "/private/tmp/p0-11-causal-readonly-plan-20261015.json",
+    "bytes": 47054,
+    "sha256": "154463c7ef958626a2fc7c2426343abd5184fddf8b754c9088ff07abbbd2e1b3"
+  },
+  "corpora": {
+    "map": [
+      "tests/threatModelMap.test.ts"
+    ],
+    "recording": [
+      "tests/toolEvidenceRecording.test.ts"
+    ]
+  },
+  "staticExpectedCasesByCorpus": {
+    "map": 7,
+    "recording": 7
+  },
+  "originalReportPins": {
+    "map": {
+      "path": "/private/tmp/p0-11-qualification-20261015/command-original-map/raw.json",
+      "bytes": 2588,
+      "sha256": "c8cdbcb952f46d7012a4dfaf6a5cf937c364a39056f3bfb1f3fb16083747640e"
+    },
+    "recording": {
+      "path": "/private/tmp/p0-11-qualification-20261015/command-original-recording/raw.json",
+      "bytes": 2720,
+      "sha256": "5fa08197911d76ad188fd610118cadf4e4c89c7cbf25dd1bc95c319a99e904cb"
+    }
+  },
+  "recipes": [
+    {
+      "id": "C1-map-missing-path-fail-open",
+      "file": "scripts/check-threat-model.mjs",
+      "baselineSha256": "e1e74e7d7cd426e84120fd4d0b937f26c89829f1f2015005c8b9cbfd985e8a4b",
+      "anchors": [
+        {
+          "find": "      if (!existsSync(file)) {\n        errors.push(`channel ${channel.id}: ${path} does not exist`);\n        continue;\n      }",
+          "replace": "      if (!existsSync(file)) {\n        continue;\n      }"
+        }
+      ],
+      "proposedMutantSha256": "363ba9d901a0075c74705f13bc0d73efbb8a60d3f9cd506b6d1d281324a3d4f9",
+      "corpusKey": "map"
+    },
+    {
+      "id": "C2-tool-recorder-error-propagates",
+      "file": "src/tools/toolPipeline.ts",
+      "baselineSha256": "de0791037badc8d0abc62642527d87e7a6030d1d364e322c30995d187ccaf794",
+      "anchors": [
+        {
+          "find": "      } catch {\n        // The guarantee belongs HERE, not to each recorder.",
+          "replace": "      } catch (error) {\n        throw error;\n        // The guarantee belongs HERE, not to each recorder."
+        }
+      ],
+      "proposedMutantSha256": "3a7f58aae191b877cea66f308648c0a330ad46c56259135dc14bf5828929eea0",
+      "corpusKey": "recording"
+    },
+    {
+      "id": "L1-optional-historical-literal-whole-branch-removal",
+      "file": "scripts/check-threat-model.mjs",
+      "baselineSha256": "e1e74e7d7cd426e84120fd4d0b937f26c89829f1f2015005c8b9cbfd985e8a4b",
+      "anchors": [
+        {
+          "find": "      if (!existsSync(file)) {\n        errors.push(`channel ${channel.id}: ${path} does not exist`);\n        continue;\n      }",
+          "replace": ""
+        }
+      ],
+      "proposedMutantSha256": "c843f26336d00d65286202d0f56102ceee75ced5d0cc7048bbbd196b241e8ccc",
+      "corpusKey": "map"
+    }
+  ],
+  "hypothesesOnly": true,
+  "formalAcceptanceClosed": false
+}

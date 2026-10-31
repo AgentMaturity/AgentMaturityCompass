@@ -34,6 +34,10 @@ process.exitCode = result.ok ? 0 : 1;
 
 `ok` means the supplied structure, references, digests and any supplied signature/authority checks agree. An unsigned file with internally consistent hashes can be valid and still self-reported. It does not prove that a task ran, succeeded, complied with a policy, or earned a score. Protect independently received digests and admitted keys separately from the evidence.
 
+## Standalone verification
+
+`amc-verify` (`docs/STANDALONE_VERIFIER.md` in the repository) verifies a profile without AMC, a workspace or a network. Authorities come only from the signed trust lists you supply: the entry whose `keyId` equals `signature.authorityId` must hold the `evidence-authority` purpose and an `authority` that names the profile's producer and capture method (otherwise `ISSUER_WRONG_PURPOSE`); an unsigned profile names no signer (`ISSUER_NOT_PINNED`). Completeness needs at least one event, the original bytes (supplied as evidence and found by `source.originalSha256`) and a result for every tool call (otherwise `EMPTY_EVIDENCE`, `EVIDENCE_MISSING` or `OUTCOME_UNKNOWN`). Satisfaction recomputes the tier: a declared `trustTier` above what the admitted authority and capture method support fails (`CLAIMED_RESULT_FAILED`), and a `SELF_REPORTED` profile is not evaluated. The normative cases are committed in `spec/fixtures/v1/` (`valid-external-evidence-attested`, `external-evidence-tier-inflated`, `external-evidence-digest-mismatch`, `external-evidence-unsigned`, `external-evidence-wrong-producer`); the vectors under `examples/external-evidence` remain format examples.
+
 ## Contract
 
 Every field is required unless described as nullable. Unknown values use JSON `null`; absent data is not zero.
@@ -47,7 +51,7 @@ Every field is required unless described as nullable. Unknown values use JSON `n
 | `normalization` | Normalizer version, semantic SHA-256, separate ingestion time, explicit losses |
 | `policyRefs` | Opaque declared references; no policy execution is inferred |
 | `events` | Ordered events with stable IDs and optional source parent/tool identities |
-| `signature` | Nullable Ed25519 envelope; the public key is supplied independently |
+| `signature` | Nullable Ed25519 or ECDSA P-256 signature; the public key is supplied independently |
 
 An event has `id`, `parentId`, `toolCallId`, `kind`, `outcome`, `sourceTime`, `durationNs`, `cost` and flat `attributes`. Kinds are `input`, `output`, `tool-call`, `tool-result`, `error`, `cancel` and `metadata`. Outcome is `success`, `failure`, `cancelled`, `unknown` or `null`. A reported successful tool call is not a successful overall task.
 
@@ -63,7 +67,7 @@ Canonical JSON uses object keys sorted by UTF-16 code units, unchanged array ord
 
 The normalized digest hashes `{profile, version, source, session, provenance, normalizer, losses, policyRefs, events}`. Here `normalizer` and `losses` come from the normalization object. Ingestion time and signature are excluded; re-ingesting unchanged semantic content does not manufacture a different semantic identity. It is separate from the reviewed multi-source import digest.
 
-The signature signs UTF-8 `amc.external-evidence/v1\n` followed by canonical JSON for the full profile with the `signature` field omitted. This includes the ingestion time and normalized digest. Use the exported `externalEvidenceSigningBytes` to obtain these bytes. The signature is exactly 64 bytes encoded as canonical padded Base64. Public keys must be Ed25519 PEMs admitted by the verifier operator.
+The signature signs UTF-8 `amc.external-evidence/v1\n` followed by canonical JSON for the full profile with the `signature` field omitted. This includes the ingestion time and normalized digest. Use the exported `externalEvidenceSigningBytes` to obtain these bytes. The signature is exactly 64 bytes encoded as canonical padded Base64. `algorithm` is `ed25519` or `ecdsa-p256-sha256` and must match the independently admitted public key. Ed25519 signs these bytes directly. ECDSA uses P-256 with SHA-256 over the same bytes and IEEE P1363 encoding (`r || s`, 32 bytes each) with low S; DER, high-S signatures, other curves and unknown algorithms are refused. The domain tag and signed profile fields are unchanged.
 
 Each admitted authority has `id`, `publicKeyPem`, `maxTrustTier`, `captureMethods` and `producers`. The signature identity must match the provenance identity and one uniquely admitted authority for the named producer. Import capture never exceeds `SELF_REPORTED`. Producer callbacks can reach at most `ATTESTED`; `OBSERVED` requires an admitted governed-capture authority. A declaration cannot exceed that admission, and the verifier never raises a producer's own lower declaration. Any verification error returns `SELF_REPORTED` with `ok: false`.
 

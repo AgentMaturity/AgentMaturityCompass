@@ -212,8 +212,11 @@ describe("notary + trust hard mode", () => {
         try {
           const att = await httpGetJson(`http://127.0.0.1:${port}/attest/current`);
           expect(att.status).toBe(200);
-          const attBody = JSON.parse(att.body) as { attestation?: { notary?: { attestationLevel?: string } } };
+          const attBody = JSON.parse(att.body) as { attestation?: { notary?: { attestationLevel?: string; attestationBasis?: string } } };
           expect(attBody.attestation?.notary?.attestationLevel).toBe("HARDWARE");
+          expect(attBody.attestation?.notary?.attestationBasis).toBe("provider-reported");
+          await enableNotaryTrust({ workspace, baseUrl: `http://127.0.0.1:${port}`, pinPubkeyPath: signerPubPath, requiredAttestationLevel: "HARDWARE" });
+          expect(await checkNotaryTrust(workspace)).toMatchObject({ ok: true, attestationLevel: "HARDWARE", attestationBasis: "provider-reported" });
 
           const payloadBytes = Buffer.from("notary-sign-payload", "utf8");
           const body = JSON.stringify({
@@ -242,6 +245,8 @@ describe("notary + trust hard mode", () => {
           const verified = verifyNotarySignResponse(parsed, payloadBytes);
           expect(verified.ok).toBe(true);
           expect(verified.parsed?.attestationLevel).toBe("HARDWARE");
+          expect(verified.parsed?.attestationBasis).toBe("provider-reported");
+          expect(tailNotaryLog(notaryDir).at(-1)).toMatchObject({ attestationLevel: "HARDWARE", attestationBasis: "provider-reported" });
         } finally {
           await runtime.close();
         }

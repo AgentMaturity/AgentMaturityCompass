@@ -1,0 +1,11 @@
+{
+  "schema": "amc-qualification-lossless-original/1",
+  "encoding": "base64",
+  "original": {
+    "relativePath": "evidence/bounded-window/preparation/control-preparation/OMIT-TOLERANCE-CONTRIBUTION.patch.txt",
+    "bytes": 756,
+    "sha256": "ac8aae830ca233586d291e0bd3b0f636e8a0000ebdf8126a0f19070f1d5e94da"
+  },
+  "dataBase64": "LS0tIGEvc3JjL3RpbWUvdGltZUV2aWRlbmNlLnRzCisrKyBiL3NyYy90aW1lL3RpbWVFdmlkZW5jZS50cwpAQCAtNTEsNyArNTEsNyBAQAogICBjb25zdCBjbGFpbWVkID0gbmV3IERhdGUoaW5wdXQuY2xhaW1lZEF0KTsKICAgY29uc3QgY2xhaW1lZEF0ID0gTnVtYmVyLmlzTmFOKGNsYWltZWQuZ2V0VGltZSgpKSA/IFN0cmluZyhpbnB1dC5jbGFpbWVkQXQpIDogY2xhaW1lZC50b0lTT1N0cmluZygpOwogICBjb25zdCBsb3dlciA9IGlucHV0Lmxvd2VyID8/IG51bGw7Ci0gIGNvbnN0IHNsYWNrID0gKGJvdW5kOiBBdHRlc3RlZFRpbWUpID0+IChib3VuZC5hY2N1cmFjeU1zID8/IDApICsgKGlucHV0LnRvbGVyYW5jZU1pbnV0ZXMgPz8gREVGQVVMVF9UT0xFUkFOQ0VfTUlOVVRFUykgKiA2MF8wMDA7CisgIGNvbnN0IHNsYWNrID0gKGJvdW5kOiBBdHRlc3RlZFRpbWUpID0+IChib3VuZC5hY2N1cmFjeU1zID8/IDApOwogICBjb25zdCBmaW5kaW5nczogVGltZUZpbmRpbmdbXSA9IFtdOwogICBpZiAobG93ZXIgJiYgIShjbGFpbWVkLmdldFRpbWUoKSA+PSBEYXRlLnBhcnNlKGxvd2VyLmdlblRpbWUpIC0gc2xhY2sobG93ZXIpKSkgZmluZGluZ3MucHVzaCgiQkFDS0RBVEVEX0NMQUlNIik7CiAgIGlmIChpbnB1dC51cHBlciAmJiAhKGNsYWltZWQuZ2V0VGltZSgpIDw9IERhdGUucGFyc2UoaW5wdXQudXBwZXIuZ2VuVGltZSkgKyBzbGFjayhpbnB1dC51cHBlcikpKSBmaW5kaW5ncy5wdXNoKCJQT1NUREFURURfQ0xBSU0iKTsK",
+  "boundary": "Exact original bytes retained losslessly; decode and verify bytes/SHA256 before use. No command result changes."
+}

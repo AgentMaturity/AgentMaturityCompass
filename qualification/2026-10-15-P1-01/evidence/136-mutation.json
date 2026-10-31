@@ -1,0 +1,7 @@
+{
+  "path": "src/contracts/v1/receipt.ts",
+  "anchorCount": 1,
+  "beforeSha256": "16c5ecce46d99e465923c7cde3eea81defc3375ccd417877b34ba4073e722e20",
+  "afterSha256": "e04ba8153eb7035f7b6273875b39463863c34ec6ed0c4a13ad811354d2bd8864",
+  "scope": "Only requested/authorized/started/outcome_unknown top-level receipt branch becomes permissive."
+}

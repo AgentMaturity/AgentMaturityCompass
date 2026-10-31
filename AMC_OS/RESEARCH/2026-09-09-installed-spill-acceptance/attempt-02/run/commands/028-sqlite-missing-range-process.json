@@ -2,7 +2,7 @@
   "label": "028-sqlite-missing-range",
   "command": [
     "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-    "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+    "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
     "session",
     "spill-read",
     "amc-spill:v2:8f5ea55897b6682f430656160638787ef82d65b29ebbf059a7cac5da546a368c:3685ae9928f75b7af05d6d00e3d5dc0c-owned_read_0",

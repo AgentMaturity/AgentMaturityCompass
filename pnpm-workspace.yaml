@@ -9,10 +9,26 @@
 packages:
   - "vendor/*"
   - "packages/*"
+  # P1-32: the conformance runner has no dependency and is run from its packed
+  # tarball, so it needs no lockfile importer. Remove this line together with
+  # adding `packages/amc-conformance: {}` to pnpm-lock.yaml if it ever gains one.
+  - "!packages/amc-conformance"
+  # P2-17: the DSH plugin imports nothing and only peers on DSH's own @deepseek-ai/cordis, which AMC must never
+  # install next to its vendored copy; it is tested from tests/dshAmcPlugin.test.ts and needs no lockfile importer.
+  - "!packages/dsh-amc-plugin"
 
 # Vendored names must resolve to the workspace copies, never to a registry
 # package of the same name. The verify-vendored-links gate asserts this.
 linkWorkspacePackages: true
+
+# P2-08: an ordinary pnpm 10.33.0 install otherwise installs these optional peers.
+# Keep cloud SDKs and native bindings opt-in; required workspace peers stay explicit.
+autoInstallPeers: false
+
+# PXB-44: pnpm >=10.16.0 supports this delay in minutes (pinned: 10.33.0).
+# Give newly published registry versions 48 hours for compromise reports to surface.
+# https://github.com/pnpm/pnpm/blob/v10.33.0/pnpm/CHANGELOG.md#10160
+minimumReleaseAge: 2880
 
 # Native modules whose install scripts must run.
 #
@@ -23,6 +39,7 @@ linkWorkspacePackages: true
 onlyBuiltDependencies:
   - better-sqlite3
   - esbuild
+  - pkcs11js
 
 # Flat node_modules, as npm produces.
 #

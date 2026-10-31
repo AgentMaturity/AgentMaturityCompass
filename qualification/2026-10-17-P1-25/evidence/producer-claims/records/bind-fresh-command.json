@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "python3",
+    "-B",
+    "/private/tmp/p1-25-producer-qualification-20261017/bind-fresh.py"
+  ],
+  "startedUtc": "2026-10-17T01:57:54.601285+00:00",
+  "endedUtc": "2026-10-17T01:57:55.141993+00:00",
+  "exit": 0,
+  "stdout": "{\"commit\": \"5d4e9e8d74bef32e68090369223947691c5fea21\", \"freshRoot\": \"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0F9GlT/checkout\", \"selectedPathsEachRoot\": 102, \"compiledPairs\": 23, \"activeProtectedPins\": 175, \"nativePins\": 13, \"freshNative\": {\"path\": \"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0F9GlT/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node\", \"physicalPath\": \"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0F9GlT/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node\", \"bytes\": 1931552, \"sha256\": \"1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560\", \"dev\": 16777231, \"inode\": 543985064, \"nlink\": 1}}\n",
+  "stderr": "",
+  "naturalDirectReturnObserved": true
+}

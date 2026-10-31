@@ -1,0 +1,6 @@
+{
+  "source": "Direct user reply in this chat",
+  "decision": "Skip and continue to the next relevant one as per the plan or claude\u2019s plan.",
+  "interpretation": "Preserve P0-29 as blocked and advance to P0-47. This supplies no successor mapping and no acceptance waiver.",
+  "fullSuite": "Stopped own runner after direct user skip; exit130; no final JSON report generated."
+}

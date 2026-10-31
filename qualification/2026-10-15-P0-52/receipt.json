@@ -1,0 +1,275 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-52",
+  "date": "2026-10-15",
+  "commit": "bc0666fbb25bc5e53f0cfb6e84d53eb9eb86f01b",
+  "branch": "codex/p0-52-current-qualification",
+  "node": "v22.23.3; Node24 not qualified",
+  "pnpm": "10.33.0",
+  "os": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "pnpm run typecheck",
+      "exit": 0,
+      "durationMs": 34094
+    },
+    {
+      "cmd": "pnpm run build",
+      "exit": 0,
+      "durationMs": 38343
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-52-functional-cli-20261015.mjs",
+      "exit": 0,
+      "durationMs": 10127
+    },
+    {
+      "cmd": "pnpm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 1212
+    },
+    {
+      "cmd": "pnpm run check:counts",
+      "exit": 0,
+      "durationMs": 1829
+    },
+    {
+      "cmd": "pnpm run check:freeze",
+      "exit": 0,
+      "durationMs": 3215
+    },
+    {
+      "cmd": "pnpm run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 3903
+    },
+    {
+      "cmd": "pnpm run lint",
+      "exit": 0,
+      "durationMs": 5333
+    },
+    {
+      "cmd": "pnpm run check:duplicates -- --json",
+      "exit": 1,
+      "durationMs": 2810
+    },
+    {
+      "cmd": "pnpm run check:dead-code -- --json",
+      "exit": 1,
+      "durationMs": 8449
+    },
+    {
+      "cmd": "env AMC_P0_52_FOLLOWUP_EFFECTS_DIR=/private/tmp/p0-52-final-followup-after-build-effects-20261015 AMC_P0_52_HISTORY_PHASE=final-bounded-node22-after-build pnpm exec vitest run tests/federationFollowupQualification.test.ts tests/federationImportDestinationQualification.test.ts tests/federationPublisherHistoryQualification.test.ts tests/federationImportContainment.test.ts tests/benchIdContainment.test.ts tests/federationComplianceIntegrationMerkle.test.ts tests/verifyFreshWorkspacePassport.test.ts tests/planEditsManifest.test.ts tests/privateModuleHelperVisibility.test.ts --reporter=json --outputFile=/private/tmp/p0-52-final-bounded-node22-after-build-20261015.json",
+      "exit": 1,
+      "durationMs": 24211
+    },
+    {
+      "cmd": "pnpm run typecheck:tests",
+      "exit": 0,
+      "durationMs": 50411
+    },
+    {
+      "cmd": "pnpm run check:clean-source",
+      "exit": 0,
+      "durationMs": 57374
+    }
+  ],
+  "tests": {
+    "total": 418,
+    "passed": 411,
+    "failed": 7,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "915f42433e0dd2b96b19b122856d2d6c67e4836db134d1b282df0b8ff1d71af4"
+    },
+    {
+      "path": "command-phases.json",
+      "sha256": "c658fa0c0c9be6d2bef2da4f7902149321c1483ba02b4b8ff4341eba5c38781a"
+    },
+    {
+      "path": "destination-cli-independent-review.json",
+      "sha256": "cb438b7a135b54f4a1876b110aef44bdb8b0916465311933b1af9b36b56fa6ac"
+    },
+    {
+      "path": "destination-cli-independent-review.md",
+      "sha256": "fc52fe02a3b3b6123bc9640d68e7b8009bac0523e0cf6e989713f4d871b77646"
+    },
+    {
+      "path": "final-architecture.log",
+      "sha256": "1b757676a4eb85deabebeb30cb83bad1d32517e076b062f10b2482726085e724"
+    },
+    {
+      "path": "final-bounded-node22-after-build.log",
+      "sha256": "4072530a4a2ac6f32f38539fd02fa8ad1b6206c5539861029617eccb8897eea9"
+    },
+    {
+      "path": "final-bounded-node22.json",
+      "sha256": "deb1d5bc32542050eb8529da3b75b3540424c4f08e00da1e7736dbf68305c66f"
+    },
+    {
+      "path": "final-bounded-summary.json",
+      "sha256": "bc078d3cdf86b91002fb66263480519f2088bc9f7f325f6a52da3bfffe154d87"
+    },
+    {
+      "path": "final-build.log",
+      "sha256": "05bc34899e90d2881b0c4434f88d5f9adf38a72c67f4650b52ebd27ad5b3911e"
+    },
+    {
+      "path": "final-clean-source.log",
+      "sha256": "e23f5ef8e1c1f6fd6bbb08af5e0c6015c7043cacaa9c217dc869917e291c7c6e"
+    },
+    {
+      "path": "final-cli-evidence.json",
+      "sha256": "8c03516bfb1ffa890bd994898d35b41f69751e6253e077ee15cd8d1877d1c7f3"
+    },
+    {
+      "path": "final-cli-harness.mjs",
+      "sha256": "336760bad10d0ae18f5c5cf6d790d8928704948ad62d7933ff04b0affe253f8e"
+    },
+    {
+      "path": "final-counts.log",
+      "sha256": "154e6967ef06e5d6ab5ffb25aa611a93d78380831b2d6068c703c68c98fd5079"
+    },
+    {
+      "path": "final-docs.log",
+      "sha256": "db2a4d349661ba5c730ff7b78c724aa787d399e21c404e2b91fccafe15226e8e"
+    },
+    {
+      "path": "final-followup-effects.json",
+      "sha256": "3609fef3a9b2412f2fb3fb729e2d1e2472d4ef3d902336d8748e6974dc911baf"
+    },
+    {
+      "path": "final-freeze.log",
+      "sha256": "2bf860d70edf95f1295cbbd587e02124cf9b5933d26ec57bf93803baa5b9ede7"
+    },
+    {
+      "path": "final-functional-cli.log",
+      "sha256": "c560103edb460ddcf6a39237281ddbd9a788535b067da073ac751e9de341119d"
+    },
+    {
+      "path": "final-lint.log",
+      "sha256": "50d13804832676e6615abb61072e344ff9a38cfe2608f0d72c994ec901f18631"
+    },
+    {
+      "path": "final-production-types.log",
+      "sha256": "fa5e1cdaecf03c40a0f9f6f0d70015555ec8e7cdc2b4a5c1d45a5b3c4c1ae560"
+    },
+    {
+      "path": "final-source-dead-code.log",
+      "sha256": "7863124ddb476e4e836e33f7a5ea0c420eca57ce4b9d200b8c723bd43627e958"
+    },
+    {
+      "path": "final-source-duplicates.log",
+      "sha256": "16c14dcf65f280c96455ad16c993163f7a5f9cfbce3214b2ba4dcc2056918a23"
+    },
+    {
+      "path": "final-source-manifest.json",
+      "sha256": "db43f1017dbe1c15b18be178bde5cd104a245a386cade95afde7abb5f3b95b7a"
+    },
+    {
+      "path": "final-test-types.log",
+      "sha256": "0cf0b1a1af9be4640f7ec367018b5e43c1632080ca42866418d17cb9c3cbad18"
+    },
+    {
+      "path": "first-destination-actual.json",
+      "sha256": "0d04be757c3adb8193db4963be444b43553205e7102d5512d6286f8cd2a77070"
+    },
+    {
+      "path": "first-followup-green.json",
+      "sha256": "7386ea20bf991782efc7ede2fdca6be3cffaa7612375ca1befcb89b796821ffd"
+    },
+    {
+      "path": "first-history-actual.json",
+      "sha256": "28801f1db4736c23ca2ee481a207673e54959d7ab734e704fc76ee517eb47e79"
+    },
+    {
+      "path": "first-history-fixture-failure.json",
+      "sha256": "485d77f20008df8f180bac47229870527188558d2743dc3c4edaaee0a458c529"
+    },
+    {
+      "path": "followup-qualification.json",
+      "sha256": "39842356fb2405fd76665899ff01fdcc37d41dc33b9704b55bef7b744484b807"
+    },
+    {
+      "path": "followup-qualification.md",
+      "sha256": "7ab2d4a986c55c5e98f202eb4093d504e83e4b9b5337253f8382780d7e45b298"
+    },
+    {
+      "path": "history-public-inputs.json",
+      "sha256": "ced191c673d8a551eaee7f336c4f29e011b1f462d7ba53586b672415be320052"
+    },
+    {
+      "path": "initial-cli-harness.mjs",
+      "sha256": "900fdd48942f30297495ca64d909dcc21d4cd0816589814171a42e4bbe19d535"
+    },
+    {
+      "path": "initial-cli-observations.json",
+      "sha256": "a293acb80a7a93c56b7523a57cb84aad65874679e5b8fda438bf78182f0228a3"
+    },
+    {
+      "path": "invalid-overlapping-build-run.json",
+      "sha256": "6457f6f5cdfca63e05fd5ec49727c52c09fa4cb27038149931b188908495c54f"
+    },
+    {
+      "path": "next-p0-54-preflight.json",
+      "sha256": "bde1fa3be9b477335a813383db79ef6b04da5028deb426e4a0f6f5e3a6756c88"
+    },
+    {
+      "path": "next-p0-54-preflight.md",
+      "sha256": "0842188054ba30a8e48bd233ca3c2c2efb0dfbb17f4cd06eb6c797ea3e605ec0"
+    },
+    {
+      "path": "original-bounded.json",
+      "sha256": "4b882dab4754fcc0d9faa4a5d4661b27c7e1a27871462b783de6802762c56519"
+    },
+    {
+      "path": "original-integration.json",
+      "sha256": "3dc275229077fbc6995d6c57bfa50a143bff14dd5556e6641f083776e924a417"
+    },
+    {
+      "path": "ownership-freeze-audit.json",
+      "sha256": "af158587e2a3276f9d85f45fc224615d7afc47af03d9dcee3027f55af1b1318d"
+    },
+    {
+      "path": "ownership-freeze-audit.md",
+      "sha256": "e1400409e88f43e0932303b1b1411d249c26b49f54094df3d0db497f6bcb762a"
+    },
+    {
+      "path": "preservation-check.json",
+      "sha256": "160054aed56308d9f28b636268e658782b02264568718c24a0d83a979c8cff80"
+    },
+    {
+      "path": "private-evidence-index.json",
+      "sha256": "f9575fe2a0bc5598059624146b7b46d5dac51990548d8cfe281f2a455201d464"
+    },
+    {
+      "path": "publisher-history-receipt.json",
+      "sha256": "171ef180f0f2f8e17a7384e7ee640e1e6e4e9efdbe7d2fde826dcd87e1363d25"
+    },
+    {
+      "path": "publisher-history-receipt.md",
+      "sha256": "d4efc0100b1982b8f54fcfe9599c3c52779462a50b7169691a1e2c3c082bbf4f"
+    },
+    {
+      "path": "readonly-preflight.json",
+      "sha256": "fad8ae38b309bfa6575eaa5323943de2b3279892dcce8ca9d3ddbed4f9540bf3"
+    },
+    {
+      "path": "readonly-preflight.md",
+      "sha256": "cc9fe24fe9547305dd4cc7e5a7b7f16d3c8692937437f59a2a22c68a9112c0c0"
+    },
+    {
+      "path": "remaining-acceptance.json",
+      "sha256": "b6af1880202364f731242435ab4552ca6979339ad78312958067f3932cf998ae"
+    },
+    {
+      "path": "source-quality.json",
+      "sha256": "7383f20c34f21ee21c8f4a7cf61f954edad5c0781661c8f915baec564d20e09f"
+    }
+  ],
+  "notes": "Bounded qualification completed with seven active production failures, not Done. Three linked destinations write outside recipient; four same-publisher alias changes bypass replay/rollback. All348 original and53 new benchmark/peer/config cases pass. Ten compiled CLI exits/effects and actual verified/imported content pass with independent pre-export keys. Corrected observer setup failures and first non-asserting effect harness are retained separately. Build/types/lint/freeze/architecture/counts/docs/clean-source pass. Required source-quality fails1269duplicates/2780dead-code. No production repair: historical ownership ambiguity awaits narrow scope decision, not a freeze refusal. Node24/current-source mutations/whole-suite/coverage/hostedfullCI/release remain open. Existing held debt stays active. Claude/main/held refs, original tests/archives/D15, signing purpose, dependencies and freeze/floors/baselines/shared routes preserved. No waiver, tracker closure, external message, push or publication."
+}

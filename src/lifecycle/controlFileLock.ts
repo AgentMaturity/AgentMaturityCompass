@@ -103,17 +103,20 @@ function tryReapDeadLock(lockPath: string, contendersDir: string): boolean {
   return false;
 }
 
-export function withControlFileLock<T>(input: {
-  root: string;
-  name: string;
-  operation: () => T;
-  timeoutMs?: number;
-}): T {
+interface HeldLockAttempt {
+  readonly lockPath: string;
+  readonly ownContenderPath: string;
+  readonly token: string;
+  readonly deadline: number;
+  readonly name: string;
+  readonly contendersDir: string;
+}
+
+function enterLockQueue(input: { root: string; name: string; timeoutMs?: number }): HeldLockAttempt {
   ensureDir(input.root);
   const lockPath = join(input.root, `.${input.name}.lock`);
   const contendersDir = join(input.root, `.${input.name}-locks`);
   ensureDir(contendersDir);
-  const deadline = Date.now() + (input.timeoutMs ?? 5_000);
   const token = randomUUID();
   const ownContenderPath = contenderPath(contendersDir, token);
   let descriptor: number | null = null;
@@ -127,34 +130,69 @@ export function withControlFileLock<T>(input: {
     throw error;
   }
   closeSync(descriptor);
+  return { lockPath, ownContenderPath, token, name: input.name, contendersDir, deadline: Date.now() + (input.timeoutMs ?? 5_000) };
+}
 
-  let acquired = false;
-  while (!acquired) {
-    try {
-      linkSync(ownContenderPath, lockPath);
-      acquired = true;
-    } catch (error) {
-      if ((error as NodeJS.ErrnoException).code !== "EEXIST") {
-        try { unlinkSync(ownContenderPath); } catch { /* Nothing to clean up. */ }
-        throw error;
-      }
-      if (tryReapDeadLock(lockPath, contendersDir)) continue;
-      if (Date.now() >= deadline) {
-        try { unlinkSync(ownContenderPath); } catch { /* Nothing to clean up. */ }
-        throw new ControlFileLockError(`${input.name} is busy; retry the operation.`);
-      }
-      sleep(15);
+/** One acquisition attempt: true when held, false to wait and retry; throws on timeout or an unexpected error. */
+function tryAcquire(attempt: HeldLockAttempt): boolean {
+  try {
+    linkSync(attempt.ownContenderPath, attempt.lockPath);
+    return true;
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== "EEXIST") {
+      try { unlinkSync(attempt.ownContenderPath); } catch { /* Nothing to clean up. */ }
+      throw error;
     }
+    if (tryReapDeadLock(attempt.lockPath, attempt.contendersDir)) return tryAcquire(attempt);
+    if (Date.now() >= attempt.deadline) {
+      try { unlinkSync(attempt.ownContenderPath); } catch { /* Nothing to clean up. */ }
+      throw new ControlFileLockError(`${attempt.name} is busy; retry the operation.`);
+    }
+    return false;
   }
+}
 
+function releaseLock(attempt: HeldLockAttempt): void {
+  try {
+    if (lockOwner(attempt.lockPath)?.token === attempt.token) unlinkSync(attempt.lockPath);
+  } catch {
+    // The operation is complete even if process shutdown races with cleanup.
+  }
+  try { unlinkSync(attempt.ownContenderPath); } catch { /* A stale-lock reaper may have claimed it. */ }
+}
+
+export function withControlFileLock<T>(input: {
+  root: string;
+  name: string;
+  operation: () => T;
+  timeoutMs?: number;
+}): T {
+  const attempt = enterLockQueue(input);
+  while (!tryAcquire(attempt)) sleep(15);
   try {
     return input.operation();
   } finally {
-    try {
-      if (lockOwner(lockPath)?.token === token) unlinkSync(lockPath);
-    } catch {
-      // The operation is complete even if process shutdown races with cleanup.
-    }
-    try { unlinkSync(ownContenderPath); } catch { /* A stale-lock reaper may have claimed it. */ }
+    releaseLock(attempt);
+  }
+}
+
+/**
+ * The same cross-process lock for an asynchronous critical section. Waiting
+ * yields the event loop instead of blocking it, so an in-process holder that is
+ * awaiting I/O can finish. Callers must still serialize in-process contenders
+ * themselves: a synchronous waiter in this process would block the holder.
+ */
+export async function withControlFileLockAsync<T>(input: {
+  root: string;
+  name: string;
+  operation: () => Promise<T>;
+  timeoutMs?: number;
+}): Promise<T> {
+  const attempt = enterLockQueue(input);
+  while (!tryAcquire(attempt)) await new Promise((resolve) => setTimeout(resolve, 15));
+  try {
+    return await input.operation();
+  } finally {
+    releaseLock(attempt);
   }
 }

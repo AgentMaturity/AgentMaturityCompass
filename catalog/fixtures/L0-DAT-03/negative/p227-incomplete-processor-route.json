@@ -1,0 +1,20 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L0-DAT-03",
+  "polarity": "negative",
+  "evidenceClass": "unknown_applicability",
+  "setup": {
+    "synthetic": true,
+    "metadataOnly": true,
+    "execution": {
+      "scenarioId": "hc-dlp-blocking",
+      "environmentId": "phi-incomplete-v1",
+      "caseId": "p227-incomplete-processor-route"
+    },
+    "note": "Unexecuted source-owned case declaration. A fresh seeded execution and sealed capture are required; expected below is assertion-only, never an observed result or production evidence."
+  },
+  "expected": {
+    "result": "not_evaluated",
+    "reasonCode": "unknown_policy"
+  }
+}

@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "command": "inventory",
-  "workspace": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+  "workspace": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
   "backend": "sqlite",
   "plaintextVerified": false,
   "inspection": {
     "phase": "read-only",
-    "workspace": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+    "workspace": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
     "backend": "sqlite",
     "eventCount": 58,
     "historySha256": "9a025e5b32f10927185a802a4ff6d3f54695a5f5c8ecb821ca3b87a375abef8e",

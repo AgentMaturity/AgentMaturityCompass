@@ -27,7 +27,8 @@ export async function handleBomRoute(
   method: string,
   req: IncomingMessage,
   res: ServerResponse,
-  workspace = process.cwd()
+  workspace = process.cwd(),
+  revalidateAuthority?: () => boolean
 ): Promise<boolean> {
   // ── BOM routes (/api/v1/bom/*) ─────────────────────────────────
   if (pathname.startsWith('/api/v1/bom')) {
@@ -71,14 +72,18 @@ export async function handleBomRoute(
       try {
         const body = await bodyJson<{ inputFile: string; outputSigFile?: string }>(req);
         if (!body.inputFile) { apiError(res, 400, 'inputFile required'); return true; }
-        const { signBomFile } = await import('../bom/bomVerifier.js');
-        const signed = signBomFile({
-          workspace,
-          inputFile: body.inputFile,
-          outputSigFile: body.outputSigFile,
-        });
+        const bom = await import('../bom/bomVerifier.js');
+        const input = { workspace, inputFile: body.inputFile, outputSigFile: body.outputSigFile };
+        // Only a trusted caller can opt into an awaited write with fresh authority; request fields cannot supply this.
+        const signed = revalidateAuthority ? await bom.signBomFileAsync(input, { beforePublish: () => {
+          if (!revalidateAuthority()) {
+            if (!res.headersSent) apiError(res, 401, 'authenticated authority changed before BOM publication');
+            throw new Error('authenticated authority changed before BOM publication');
+          }
+        } }) : bom.signBomFile(input);
         apiSuccess(res, { sigFile: signed.sigFile });
       } catch (err) {
+        if (res.headersSent) return true;
         apiError(res, 500, err instanceof Error ? err.message : 'BOM signing failed');
       }
       return true;

@@ -40,15 +40,17 @@
 import { Context } from "./amcRuntime.js";
 import { createHash, randomUUID } from "node:crypto";
 import { gateToolCallsOnApproval, type ToolApprovalGateOptions } from "../agent/approvalGate.js";
-import type { AgentLoopConfig, AgentStatus, LoopHooks, LoopNotification } from "../agent/loopTypes.js";
+import type { AgentLoopConfig, AgentStatus, CancelOptions, LoopHooks, LoopNotification } from "../agent/loopTypes.js";
 import type { LoopRoute } from "../agent/stepRunner.js";
 import { EMPTY_TOOL_SEAM, type AgentToolSeam } from "../agent/toolSeam.js";
 import type { NativeShellReadiness } from "../sandbox/nativeShellGate.js";
 import type { NativeValidationPlan, NativeValidationResult } from "../agent/nativeValidation.js";
 import { projectNativeValidation } from "../agent/nativeValidationProjection.js";
 import type { ApprovalAnswerer } from "../approvals/seam/approvalSeamTypes.js";
+import { cliInitiator } from "../approvals/approvalEngine.js";
 import type { LlmRouteConfig } from "../llm/adapter/adapterRegistry.js";
 import type { HttpTransport } from "../llm/adapter/transport.js";
+import type { RequestEncoderRegistry } from "../llm/request/requestEncoder.js";
 import type { LiveTextPreviewEvent } from "../llm/adapter/liveTextPreview.js";
 import {
   agentPromptProfile,
@@ -59,6 +61,8 @@ import { SessionService } from "../session/sessionService.js";
 import { materializeNativeImages, snapshotNativeImages, type NativeImageInput } from "../attachments/nativeImageInput.js";
 import { materializeNativeAudioParts, snapshotNativeAudioParts, type NativeAudioPart } from "../attachments/nativeAudioInput.js";
 import { forkSession, resumeSession, type ResumeReport } from "../session/sessionResume.js";
+import { reconcileInterruptedCalls } from "../session/resumeRules.js";
+import type { ReconcileAdapter } from "../actions/reconcile.js";
 import type { RecoveryClaimant } from "../session/sessionRecovery.js";
 import type { SessionLineage } from "../session/sessionApiTypes.js";
 import { rootIdentity } from "../agent/delegationIdentity.js";
@@ -66,7 +70,15 @@ import type { SubagentRunContext, SubagentRunner } from "../agent/subagentSpawn.
 import { parseSubagentStopConditions } from "../agent/subagentStopConditions.js";
 import type { ActionClass } from "../types.js";
 import { createDriverRunner } from "../agent/subagentRunner.js";
+import { sealComposedSession } from "./composedSessionSeal.js";
+import { LeasePrincipalRefused } from "../leases/leasePrincipal.js";
+import { planRequiresAgentLease, planRequiresPrincipal } from "../tools/guards/compiledPolicyGuard.js";
+import { loadActiveCompiledPolicy } from "../catalog/compiler/activate.js";
+import { refuseRetired } from "../lifecycle/reassessment.js";
+import { admitSessionAtOpen } from "../runtime/changeEnvelope.js";
+import { nativeSessionManifest } from "../lifecycle/versionManifest.js";
 import { runDueSchedules, type ScheduleRunResult } from "../autonomy/scheduleRunner.js";
+import { runGoalRounds, type GoalRoundsResult } from "../autonomy/goalRounds.js";
 import { assertNativeScheduleAdmission } from "../autonomy/scheduleService.js";
 import type { SubagentCapability } from "../agent/delegateTool.js";
 import type { TurnCancelCause } from "../session/sessionTypes.js";
@@ -81,6 +93,12 @@ import { approvalServices, APPROVAL_SEAM } from "./services/approvalServices.js"
 import type { ApprovalSeamService } from "./services/approvalServices.js";
 import { agentLoopServices, AGENT_LOOP_SEAM } from "./services/agentLoopServices.js";
 import type { AgentLoopSeamService } from "./services/agentLoopServices.js";
+import { assertSecondSessionWriter } from "../persistence/openSessionEventStore.js";
+import { redactingSessionFor } from "../dataflow/redactingSession.js";
+import { recordNativeComposition } from "../prompt/context/nativeCompositionContext.js";
+import type { NativeResourceStatus } from "../prompt/context/nativeResourceStatus.js";
+import type { CompositionSource } from "../prompt/context/compositionProvenance.js";
+import { renderPrompt } from "../prompt/assembly/interpolate.js";
 
 /** The section name a pinned system prompt is registered under. */
 export const PINNED_PROMPT_SECTION = "host:pinned-prompt";
@@ -119,19 +137,25 @@ export interface ComposedApprovalGate extends ToolApprovalGateOptions {
 /** What a caller may do to a turn while it runs. */
 export interface ComposedTurnHandle {
   readonly sessionId: string;
+  resourceStatus(): NativeResourceStatus;
   /** Stop the turn. The cause rides inside the signed `turn/end`. */
-  cancel(cause: TurnCancelCause): void;
+  cancel(cause: TurnCancelCause, options?: CancelOptions): void;
+  /** Permanently close admission and bound the active driver drain. */
+  shutdown(): Promise<boolean>;
 }
 
 /** Narrow evidence capability for tools, bound to the actual selected session. */
 export interface ComposedToolSession {
   readonly sessionId: string;
   readonly recordProjectedEvidence: SessionService["recordProjectedEvidence"];
+  readonly assertWritable: SessionService["assertWritable"];
 }
 
 export interface ComposedTurnOptions {
   readonly workspace: string;
   readonly agentId: string;
+  readonly resourceStatus?: () => NativeResourceStatus;
+  readonly compositionSources?: readonly CompositionSource[];
   /** Explicit owner-driven due pass, not a model turn, timer or resumable task. */
   readonly schedulePass?: {
     readonly now: number;
@@ -154,7 +178,14 @@ export interface ComposedTurnOptions {
    * sessionResume.ts before anything is dispatched; a refusal throws
    * SessionResumeRefused and this turn never starts.
    */
-  readonly resume?: { readonly claimant: RecoveryClaimant; readonly staleAfterMs?: number };
+  readonly resume?: {
+    readonly claimant: RecoveryClaimant;
+    readonly staleAfterMs?: number;
+    /** Claim a remote or unresponsive writer whose lease lapsed one lease ago; the reason is recorded (P2-12). */
+    readonly takeover?: { readonly reason: string };
+    /** Reconcile adapters by id for interrupted `reconcile-first` calls (P1-04); none leaves them unknown and blocking. */
+    readonly reconcileAdapters?: ReadonlyMap<string, ReconcileAdapter>;
+  };
   /** Open a NEW session whose open row names this parent's verified final row. */
   readonly forkFrom?: { readonly parentSessionId: string; readonly claimant: RecoveryClaimant };
   /**
@@ -199,6 +230,8 @@ export interface ComposedTurnOptions {
   readonly routes: readonly LlmRouteConfig[];
   /** Replaces the platform `fetch` — the stub provider answers in-process. */
   readonly transport?: HttpTransport;
+  /** Encoders beyond the built-ins, for a route whose encoder is loaded at selection (P1-38 pi-ai). */
+  readonly encoders?: RequestEncoderRegistry;
   readonly tools?: AgentToolSeam;
   readonly validation?: NativeValidationPlan;
   /** Binds prebuilt tools after new/resume/fork selects the writer, before dispatch. */
@@ -212,6 +245,12 @@ export interface ComposedTurnOptions {
   readonly onReady?: (handle: ComposedTurnHandle) => void;
   /** The parent's resolved shell decision, which in-process children inherit and never widen (P0-06). */
   readonly parentShell?: NativeShellReadiness;
+  /**
+   * The run's lease (P1-79, runLease), which in-process children inherit: delegated ones and a schedule pass's. Under a
+   * plan that requires a principal, a run that may spawn them without one is refused before its session opens. Never in
+   * a digest.
+   */
+  readonly leaseToken?: string;
   /**
    * Let this run delegate to in-process children (P6.1a).
    *
@@ -250,6 +289,7 @@ export interface ComposedTurnOptions {
      */
     readonly runner?: SubagentRunner;
     readonly maxDepth?: number;
+    readonly maxActiveChildren?: number;
     /** Receives the composed capability. Called once, before the first turn. */
     grant(capability: SubagentCapability): void;
   };
@@ -261,6 +301,12 @@ export interface ComposedTurnOptions {
    * steering works has to be demonstrating the mechanism users have.
    */
   readonly onSteer?: { readonly afterMs: number; readonly text: string };
+  /**
+   * Run the prompt as a goal for bounded rounds (D45) instead of one turn: each round is one in-process delegated child
+   * under this run's delegation grant, seeing the previous round's answer, through `runGoalRounds`. Requires in-process
+   * delegation; `maxRounds` is the hard ceiling and nothing extends it.
+   */
+  readonly goalRounds?: { readonly maxRounds: number; readonly signal?: AbortSignal };
 }
 
 export interface ComposedTurnOutcome {
@@ -269,6 +315,8 @@ export interface ComposedTurnOutcome {
   readonly status: AgentStatus;
   /** Mechanical schedule outcomes, never goal-quality or cold-verification claims. */
   readonly scheduleResults?: readonly ScheduleRunResult[];
+  /** How a goal-rounds run stopped; mechanical, never a goal-quality claim. */
+  readonly goalRounds?: GoalRoundsResult;
   readonly validation: NativeValidationResult;
   /**
    * The `system/prompt` row every request in this run cites.
@@ -357,6 +405,7 @@ function compositionDigestOf(options: ComposedTurnOptions, profile: AgentPromptP
       models: route.models
     })),
     route: { providerId: options.route.providerId, model: options.route.model },
+    sources: options.compositionSources ?? [],
     prompt: {
       sections: profile.sections.map((section) => section.name),
       contexts: profile.contextPlugins.map((plugin) => plugin.name),
@@ -373,6 +422,7 @@ function compositionDigestOf(options: ComposedTurnOptions, profile: AgentPromptP
             actionClass: gate.actionClass,
             riskTier: gate.riskTier,
             toolNames: gate.toolNames ?? null,
+            ...(gate.reviewedActionClasses === undefined ? {} : { reviewedActionClasses: gate.reviewedActionClasses }),
             answerers: (gate.answerers ?? []).map((answerer) => answerer.name)
           },
     version: amcVersion
@@ -411,7 +461,29 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
     assertNativeScheduleAdmission({ workspace: options.workspace, ...options.schedulePass,
       approvalClass: options.approvalGate.actionClass });
   }
+  if (options.goalRounds !== undefined) {
+    if (options.delegation?.maxActiveChildren !== undefined) {
+      throw new Error("Configured --max-active-children root child limits are not supported for --goal-rounds; no execution occurred.");
+    }
+    const { maxRounds } = options.goalRounds;
+    if (options.delegation === undefined || options.delegation.runner !== undefined || options.schedulePass !== undefined
+      || options.audioParts !== undefined || images.length > 0 || options.prompt.trim() === "") {
+      throw new Error("Goal rounds need a text goal and in-process delegation (--delegate with workspace tools); schedules, audio, images and foreign delegates are not goal rounds.");
+    }
+    if (!Number.isSafeInteger(maxRounds) || maxRounds < 1 || maxRounds > 100) throw new Error("Goal rounds must be an integer from 1 through 100.");
+  }
+  // P1-79: no in-process child may run without the run's principal; refused before any session row, spawn or lease.
+  if ((options.schedulePass !== undefined || (options.delegation !== undefined && options.delegation.runner === undefined))
+    && options.leaseToken === undefined && planRequiresPrincipal(options.workspace)) {
+    throw new LeasePrincipalRefused("the active plan requires a principal for every tool call, and this run holds no lease for its in-process children to inherit; no session was opened");
+  }
+  // AXR-20: refuse a lease-less run with root tools once, before any session row, instead of denying every governed call.
+  if (options.tools !== undefined && options.leaseToken === undefined && planRequiresAgentLease(loadActiveCompiledPolicy(options.workspace))) {
+    throw new Error("IDENTITY_UNRESOLVED: the active plan's identity-binding requires a verified agent lease for every tool call, and this run holds none; no session was opened. Start the task from Studio, or issue a lease with `amc lease issue` and pass it with --lease-file <path> (a private 0600 file).");
+  }
   if (options.delegation !== undefined) {
+    // An in-process child opens a second session writer; a foreign runner's process opens none here.
+    if (options.delegation.runner === undefined) assertSecondSessionWriter(options.workspace, "In-process delegation");
     const parsed = parseSubagentStopConditions(options.delegation.stopConditions);
     if (!parsed.ok) throw new Error(`Delegation stop conditions: ${parsed.reason}`);
     // Pin the operator's declaration before asynchronous composition or provider
@@ -428,6 +500,7 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
     compositionDigest: compositionDigestOf(options, profile),
     policyDigest: policyDigestOf(options)
   };
+  refuseRetired(options.workspace, options.agentId); // P2-23: before any session row
   let session: SessionService;
   let resumed: ResumeReport | null = null;
   let parent: SessionLineage | null = null;
@@ -444,15 +517,27 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
     session = new SessionService(options.workspace);
     session.open({ ...(options.sessionId === undefined ? {} : { sessionId: options.sessionId }), ...identity });
   }
+  // P2-02: in an opted-in workspace, messages and tool results are tokenized before any row is committed.
+  session = redactingSessionFor(session);
   const sessionId = session.sessionId;
   const ctx = new Context();
   const fibers: { dispose(): Promise<void> }[] = [];
   let steerTimer: NodeJS.Timeout | null = null;
+  /** Set once the loop (or schedule pass) is ready; until then a throw is a failed composition, never a completion. */
+  let composed = false;
+  let hostShutdown = false;
+  let loopOwner: AgentLoopSeamService | undefined;
 
   try {
+    // P2-12: interrupted calls follow their resume rules before this turn's first request; nothing is dispatched again.
+    if (resumed !== null) {
+      resumed = { ...resumed, interruptedCalls: await reconcileInterruptedCalls({ workspace: options.workspace, session,
+        adapters: options.resume?.reconcileAdapters ?? new Map() }) };
+    }
     options.bindToolSession?.({
       sessionId,
-      recordProjectedEvidence: (row) => session.recordProjectedEvidence(row)
+      recordProjectedEvidence: (row) => session.recordProjectedEvidence(row),
+      assertWritable: () => session.assertWritable()
     });
     const credentialsFiber = ctx.plugin(credentialsServices, options.credentials ?? {});
     await credentialsFiber.await();
@@ -463,12 +548,16 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
       credentials: serviceOn<CredentialsSeamService>(ctx, CREDENTIALS_SEAM.name),
       routes: options.routes,
       ...(options.onLiveText === undefined ? {} : { onLiveText: options.onLiveText }),
-      ...(options.transport !== undefined ? { transport: options.transport } : {})
+      ...(options.transport !== undefined ? { transport: options.transport } : {}),
+      ...(options.encoders !== undefined ? { encoders: options.encoders } : {})
     });
     await llmFiber.await();
     fibers.push(llmFiber);
+    // An unknown route fails composition here, before any prompt row or request (DXA-13).
+    serviceOn<LlmSeamService>(ctx, LLM_SEAM.name).pin({ providerId: options.route.providerId, model: options.route.model });
 
-    const promptFiber = ctx.plugin(promptServices, { profile, sessionId });
+    const promptFiber = ctx.plugin(promptServices, { profile, sessionId, session,
+      ...(options.resourceStatus === undefined ? {} : { resourceStatus: options.resourceStatus }) });
     await promptFiber.await();
     fibers.push(promptFiber);
     const prompt = serviceOn<PromptSeamService>(ctx, PROMPT_SEAM.name);
@@ -476,7 +565,9 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
     // Rendered BEFORE the loop is composed, so an unknown `{{variable}}` throws
     // here — with no turn started, no request sent, and a session that closes
     // cleanly in the `finally`. A prompt with a hole in it never reaches a model.
-    const systemPromptRef = session.recordSystemPrompt(prompt.render());
+    const promptAssembly = prompt.assemble();
+    const systemPromptText = renderPrompt(promptAssembly);
+    const systemPromptRef = session.recordSystemPrompt(systemPromptText);
 
     const gate = options.approvalGate;
     let approval: ApprovalSeamService | null = null;
@@ -485,6 +576,8 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
         session,
         workspace: options.workspace,
         agentId: options.agentId,
+        // P1-78 on the CLI too (P2-13): the OS account running this turn initiates its approvals, so it cannot approve them.
+        initiator: cliInitiator(),
         ...(gate.answerers === undefined ? {} : { answerers: gate.answerers }),
         ...(gate.onRaised === undefined ? {} : { onRaised: gate.onRaised })
       });
@@ -507,6 +600,12 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
       approval === null || gate === undefined
         ? options.tools
         : gateToolCallsOnApproval(options.tools ?? EMPTY_TOOL_SEAM, approval, gate);
+    // P2-23 reassessment triggers and P2-26 change envelopes run on the rendered prompt and composed tools, before the first request.
+    admitSessionAtOpen({ workspace: options.workspace, agentId: options.agentId, manifest: () => nativeSessionManifest({ workspace: options.workspace,
+      agentId: options.agentId, providerId: options.route.providerId, model: options.route.model, systemPrompt: systemPromptText,
+      harnessVersion: identity.harnessVersion, compositionDigest: identity.compositionDigest,
+      tools: options.tools === undefined ? "none" : "workspace", surface: options.tools ?? EMPTY_TOOL_SEAM }) });
+    recordNativeComposition(session, promptAssembly, tools ?? EMPTY_TOOL_SEAM, options.route, options.compositionSources);
 
     // Always present, so context reaches the model whether or not anyone asked
     // to watch. `notify` is the live mirror and is optional; `preStep` is how the
@@ -548,8 +647,10 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
           ...(options.config === undefined ? {} : { config: options.config }),
           ...(gate === undefined ? {} : { approvalGate: gate }),
           ...(options.parentShell === undefined ? {} : { parentShell: options.parentShell }),
+          ...(options.leaseToken === undefined ? {} : { leaseToken: options.leaseToken }),
           ...(options.delegation === undefined ? {} : { grantDelegation: { runner: runNative,
             ...(options.delegation.maxDepth === undefined ? {} : { maxDepth: options.delegation.maxDepth }),
+            ...(options.delegation.maxActiveChildren === undefined ? {} : { maxActiveChildren: options.delegation.maxActiveChildren }),
             ...(options.delegation.scope === undefined ? {} : { delegationScope: options.delegation.scope }),
             ...(options.delegation.stopConditions === undefined ? {} : { stopConditions: options.delegation.stopConditions }) } })
         });
@@ -558,6 +659,7 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
         Object.assign(runNative, { hookControl: runner.hookControl });
       }
       if (options.schedulePass !== undefined) {
+        composed = true;
         const pass = options.schedulePass;
         const nativeRunner = runner;
         const scheduleResults = await runDueSchedules({
@@ -578,7 +680,22 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
           systemPromptEventId: systemPromptRef.eventId,
           promptSections: prompt.assemble().sections.map(section => section.name) };
       }
+      if (options.goalRounds !== undefined) {
+        const goalRounds = await runGoalRounds({
+          workspace: options.workspace, parent: rootIdentity(options.agentId), session, runner,
+          mintSessionId: randomUUID, runAs: "goal-round", goal: options.prompt, maxRounds: options.goalRounds.maxRounds,
+          ...(options.delegation!.scope === undefined ? {} : { scope: options.delegation!.scope }),
+          ...(options.delegation!.stopConditions === undefined ? {} : { stopConditions: options.delegation!.stopConditions }),
+          ...(options.delegation!.maxDepth === undefined ? {} : { maxDepth: options.delegation!.maxDepth }),
+          ...(options.goalRounds.signal === undefined ? {} : { signal: options.goalRounds.signal })
+        });
+        return { sessionId, status: "idle", goalRounds,
+          validation: projectNativeValidation(options.workspace, session.readEvents()),
+          systemPromptEventId: systemPromptRef.eventId,
+          promptSections: prompt.assemble().sections.map(section => section.name) };
+      }
       options.delegation!.grant({
+        ...(options.delegation!.maxActiveChildren === undefined ? {} : { maxActiveChildren: options.delegation!.maxActiveChildren }),
         identity: rootIdentity(options.agentId),
         session,
         runner,
@@ -606,12 +723,23 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
     });
     await loopFiber.await();
     fibers.push(loopFiber);
+    composed = true;
 
-    const loop = serviceOn<AgentLoopSeamService>(ctx, AGENT_LOOP_SEAM.name);
+    const loop = loopOwner = serviceOn<AgentLoopSeamService>(ctx, AGENT_LOOP_SEAM.name);
+    let abandon!: (error: Error) => void;
+    const shutdownFailure = new Promise<never>((_resolve, reject) => { abandon = reject; });
+    void shutdownFailure.catch(() => undefined);
     options.onReady?.({
       sessionId,
-      cancel: (cause: TurnCancelCause) => {
-        loop.cancel(cause);
+      resourceStatus: prompt.resourceStatus,
+      cancel: (cause: TurnCancelCause, options = {}) => {
+        loop.cancel(cause, options);
+      },
+      shutdown: async () => {
+        hostShutdown = true;
+        const confirmed = await loop.agent.dispose();
+        if (!confirmed) abandon(new Error("TOOL_OUTCOME_UNKNOWN: native driver did not drain within its shutdown grace."));
+        return confirmed;
       }
     });
     if (audioParts !== undefined) loop.agent.followupAudioParts(audioParts);
@@ -629,7 +757,7 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
         }
       }, steer.afterMs);
     }
-    await loop.whenIdle();
+    await Promise.race([loop.whenIdle(), shutdownFailure]);
     return {
       sessionId,
       status: loop.status,
@@ -638,41 +766,29 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
       // From the ASSEMBLY, not from `sectionNames()`: a `complete` section
       // replaces the section list, and reporting the registered names there
       // would name sections the prompt does not contain.
-      promptSections: prompt.assemble().sections.map((section) => section.name)
+      promptSections: prompt.assemble().sections.map((section) => section.name),
+      ...(resumed === null ? {} : { resumed })
     };
   } finally {
     if (steerTimer !== null) clearTimeout(steerTimer);
     // Reverse order: the loop lets go of the model seam before the model seam
     // lets go of the credentials it resolves per request.
-    let scheduleDisposalError: unknown;
+    let disposalError: unknown;
     for (const fiber of [...fibers].reverse()) {
       try { await fiber.dispose(); }
       catch (error) {
-        // oxlint-disable-next-line no-unsafe-finally -- Disposal failure must refuse successful ownership handover.
-        if (options.schedulePass === undefined) throw error;
-        scheduleDisposalError ??= error; // Try every remaining owner, including the parent session.
+        disposalError ??= error; // Try every owner, including the session writer, before reporting failure.
       }
     }
-    try {
-      if (options.keepOpen) {
-        // Hand-over point: the turn is sealed, the session is not. A later
-        // process resumes it through sessionResume.ts, which re-verifies first.
-        session.releaseWithoutClosing();
-      } else {
-        session.close({ reason: "completed" });
-      }
-    } catch (error) {
-      // A driver that entered `failed` left an open turn only recovery may
-      // close, and the spine refuses a close over it. Swallowed HERE and only
-      // here: the status returned above already reports it, and throwing from a
-      // finally would replace the real failure with this one.
-      if (options.schedulePass !== undefined) {
-        try { session.disposeWithoutClosing(); } catch { /* preserve original closure failure */ }
-        // oxlint-disable-next-line no-unsafe-finally -- A schedule owner cannot report released/closed on a refused seal.
-        throw error;
-      }
-    }
+    const driverConfirmed = await (loopOwner?.agent.dispose() ?? Promise.resolve(true));
+    let resourcesConfirmed = false;
+    try { resourcesConfirmed = await (options.tools?.shutdown?.() ?? Promise.resolve(true)); }
+    catch (error) { disposalError ??= error; }
+    sealComposedSession(session, { stopped: driverConfirmed && loopOwner?.status !== "failed", resourcesConfirmed,
+      keepOpen: options.keepOpen === true, composed, hostShutdown, schedulePass: options.schedulePass !== undefined });
     // oxlint-disable-next-line no-unsafe-finally -- Report failed disposal after attempting every schedule owner.
-    if (scheduleDisposalError !== undefined) throw scheduleDisposalError;
+    if (disposalError !== undefined) throw new Error("TOOL_OUTCOME_UNKNOWN: native service cleanup failed.", { cause: disposalError });
+    // oxlint-disable-next-line no-unsafe-finally -- A cleanup timeout cannot be reported as successful shutdown.
+    if (!driverConfirmed || !resourcesConfirmed) throw new Error("TOOL_OUTCOME_UNKNOWN: native resources did not confirm cleanup.");
   }
 }

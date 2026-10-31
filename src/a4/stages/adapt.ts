@@ -11,8 +11,8 @@
  * except the probe's ref to the stub-provider turn A4 ran, which is synthetic_example.
  */
 import { existsSync, lstatSync, readFileSync, rmdirSync, rmSync } from "node:fs";
-import { dirname, relative, sep } from "node:path";
-import { loadCatalog } from "../../catalog/loader.js";
+import { dirname } from "node:path";
+import { loadAdmittedCatalog } from "../../catalog/admission/gate.js";
 import { activeControlPlanHead } from "../../catalog/compiler/activate.js";
 import { renderPlanDiffMarkdown } from "../../catalog/compiler/diff.js";
 import { CONTROL_PLAN_REVIEW_TOOL, planReviewIntent } from "../../catalog/compiler/sign.js";
@@ -25,38 +25,41 @@ import { pathExists, writeFileAtomic } from "../../utils/fs.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { canonicalize } from "../../utils/json.js";
 import type { A4EffectDef } from "../a4Effects.js";
-import { explain, type A4ExplainFact, type A4ExplainLevel } from "../a4Explain.js";
+import type { A4ExplainFact, A4ExplainLevel } from "../a4Explain.js";
 import { driftedSlots, RESOURCE_SLOTS, signedA4Floor } from "../a4Gates.js";
 import { isRegulated } from "../a4Readiness.js";
 import type { A4ProducerContext, A4ProducerResult } from "../a4RouterStages.js";
 import { flatSlots, gatePolicyOf, type A4Answer, type A4StageRegistry } from "../a4Schema.js";
 import { assertNoSecrets } from "../a4Router.js";
-import { A4StoreError } from "../a4Store.js";
 import { errorCodeOf } from "../aspireUnderstand.js";
 import { conformanceStatement, recordControlResults } from "../a4Conformance.js";
+import { compactSpec } from "../a4Derived.js";
 import { checkMemoryPolicy, MEMORY_ENFORCEMENT_NOTE, memoryPolicyDraft, memoryPolicyFields, memoryPolicySha256, writeMemoryPolicy } from "../adaptMemoryPolicy.js";
 import {
-  contextItems, contextPluginDraft, contextPluginSha256, PROBE_LIMITATION, PROBE_PURPOSE, probeFrameStatus, promptPackSha256, promptPackStatus, readContextPlugin,
+  contextItems, contextPluginDraft, contextPluginSha256, nativeDeliveryOf, PROBE_LIMITATION, PROBE_PURPOSE, probeFrameStatus, promptPackSha256, promptPackStatus, readContextPlugin,
   writeContextPlugin
 } from "../adaptContextPlugin.js";
 import {
   operatingProfileActivationSha256, operatingProfileSha256, permissionItems, permissionsDryRun, permissionsOf, profileGeneratedAt, profileStation
 } from "../adaptPermissions.js";
 import {
-  activateBoundPlan, activationExecutionId, activationWeakenings, activePlanRecord, boundPlanOf, openPlanReview, proposalDiff, shippedLockDigest, signAdaptPlan,
+  activateBoundPlan, activationExecutionId, activationWeakenings, activePlanRecord, dataClassEnforcement, boundPlanOf, openPlanReview, proposalDiff, shippedLockDigest, signAdaptPlan,
   understandAdapt
 } from "../adaptPolicy.js";
 import {
-  ACTIVATE_PLAN_EFFECT_ID, ADAPT_CLAIM_BOUNDARY, ADAPT_SPEC_SCHEMA, CARRIED, CATALOG_EXPERIMENTAL_NOTICE, NATIVE_LEASE_KEY, QUESTIONS, adaptItems, adaptSpecOf,
+  ACTIVATE_PLAN_EFFECT_ID, ADAPT_CLAIM_BOUNDARY, ADAPT_SPEC_SCHEMA, CARRIED, CATALOG_EXPERIMENTAL_NOTICE, NATIVE_LEASE_KEY, QUESTIONS, RUN_LEASE_KEY, adaptItems, adaptSpecOf,
   answerGaps, buildOf, carriedValues, currentPlan, factAnswer, factList, profileIdOf, proposedFor, proposedPlan, understandingOf, type AdaptBuild
 } from "../spec/adapt.js";
-import { answersDigestOf, answerValues, dependencyDigest, listValue, textValue, understandingCurrent } from "../spec/aspire.js";
+import { answersDigestOf, answerValues, askGapCodes, listValue, mergeCarried, textValue, understandingCurrent } from "../spec/aspire.js";
+import { assertUnderstood, explanationResult, fail, relPath } from "./common.js";
 
-const fail = (status: number, code: string, message: string, detail?: unknown): A4StoreError => new A4StoreError(status, code, message, detail);
-const relPath = (workspace: string, path: string): string => relative(workspace, path).split(sep).join("/");
-/** The largest proposal Propose records: Build's record (signature, memory policy, context record, signed diff) must still fit the router's 256 KiB. */
+/**
+ * The largest proposal Propose records, as the row stores it (the plan bound by sha256, a4Derived): Build's record
+ * (signature, memory policy, context record, signed diff) must still fit the router's 256 KiB.
+ */
 const SPEC_ROOM_FOR_BUILD = 240 * 1024; // ponytail: Build's record is ~3 KiB plus the signed plan diff; Build checks the exact record before it writes
-const tooLargeForBuild = (spec: Record<string, unknown>): boolean => canonicalize(spec).length + canonicalize(spec.diff ?? null).length > SPEC_ROOM_FOR_BUILD;
+const tooLargeForBuild = (spec: Record<string, unknown>): boolean =>
+  canonicalize(compactSpec("adapt", spec).spec).length + canonicalize(spec.diff ?? null).length > SPEC_ROOM_FOR_BUILD;
 /** Build keeps the bytes it replaces (memory policy, context plugin, the Enforce manifest and its signature) to put them back. */
 const MAX_KEPT_BYTES = 4 * 1024 * 1024;
 
@@ -101,18 +104,7 @@ const ACTIVATE_PLAN_EFFECT: A4EffectDef = {
 
 /** The router's entry (src/a4/spec/adapt.ts PRODUCERS). */
 export async function produceAdapt(step: "understand" | "explain" | "propose" | "build" | "review", ctx: A4ProducerContext): Promise<A4ProducerResult> {
-  if (step === "understand") return understand(ctx);
-  if (step === "explain") return explainStep(ctx);
-  if (step === "propose") return propose(ctx);
-  if (step === "build") return build(ctx);
-  return review(ctx);
-}
-
-/** Explain and Propose build on Understand's facts: 409 UNDERSTANDING_STALE unless Understand ran on these answers. */
-function assertUnderstood(spec: Record<string, unknown>, answers: readonly A4Answer[]): void {
-  if (!understandingCurrent(spec, answers)) {
-    throw fail(409, "A4_NOT_READY", "Understand has not run on the current answers; run Understand again, then confirm it.", { reasonCodes: ["UNDERSTANDING_STALE"] });
-  }
+  return { understand, explain: explainStep, propose, build, review }[step](ctx);
 }
 
 /** Understand: the carried Aspire answers, the profile, the compiled plan and the facts around it; nothing proposes until a person confirms it. */
@@ -120,21 +112,7 @@ function understand(ctx: A4ProducerContext): A4ProducerResult {
   const { spec, answers } = adaptSpecOf(ctx.state);
   const carried = carriedValues(ctx.state);
   const project = ctx.state.project;
-  const revisionNo = project.revision_no + 1;
-  const kept = answers.filter((answer) => !(CARRIED as readonly string[]).includes(answer.questionId));
-  const values = answerValues(kept);
-  for (const [id, value] of carried) values.set(id, value);
-  const carriedAnswers: A4Answer[] = [...carried].map(([questionId, value]) => ({ questionId, value, source: "carried", answeredAtRevision: revisionNo,
-    dependencyDigest: dependencyDigest([], values) }));
-  // An answer given before a carried question had any value here (the answers route digested it as null) and current
-  // then is stamped against the values carried now; one given against another, earlier carried value stays stale.
-  const previous = answerValues(answers);
-  const restamp = (answer: A4Answer): A4Answer => {
-    const dependsOn = QUESTIONS.find((entry) => entry.id === answer.questionId)?.dependsOn ?? [];
-    const firstCarry = dependsOn.some((id) => (CARRIED as readonly string[]).includes(id) && (previous.get(id) ?? null) === null);
-    return firstCarry && answer.dependencyDigest === dependencyDigest(dependsOn, previous) ? { ...answer, dependencyDigest: dependencyDigest(dependsOn, values) } : answer;
-  };
-  const merged = [...kept.map(restamp), ...carriedAnswers].sort((a, b) => a.questionId.localeCompare(b.questionId));
+  const merged = mergeCarried(QUESTIONS, answers, CARRIED, carried, project.revision_no + 1);
   const facts = { ...understandAdapt({ workspace: ctx.workspace, projectId: project.project_id, workspaceId: project.workspace_id, agentId: project.agent_id,
     answers: merged, now: ctx.now }),
   // The station's operating profile, dry-run against the current verified configs (A4's own proposal file; nothing under .amc/).
@@ -154,7 +132,7 @@ function understand(ctx: A4ProducerContext): A4ProducerResult {
       output("reporting-clock candidates (each needs classification)", { reviewStatus: CLOCK_REVIEW_STATUS, clocks: facts.clocks }),
       output("signed configs and the active compiled plan", { configs: facts.configs, activePlan: facts.activePlan }, "implementation"),
       output("the station operating profile's dry run: widenings activateOperatingProfile({ allowWidening: false }) refuses", facts.permissions, "implementation"),
-      output("the agent's existing prompt pack (a signed Score resource; the runtime does not load it)", facts.promptPack, "implementation")
+      output("the agent's existing prompt pack (a signed Score resource; Studio native tasks load it when it verifies)", facts.promptPack, "implementation")
     ],
     spec: { ...spec, answers: merged, understanding },
     response: { understanding: { answersDigest: understanding.answersDigest, carried: understanding.carried, planDigest: plan?.digest ?? null,
@@ -182,7 +160,7 @@ export function adaptFacts(spec: Record<string, unknown>, answers: readonly A4An
         : `From your answers, ${count("applicable")} catalog requirement(s) apply, ${count("not_applicable")} do not, and ${count("unresolved")} cannot be decided until some answers are known.`,
       practitioner: plan === null ? `Compile refused: ${facts?.compileError?.code ?? "not compiled"}.`
         : requirements.map((row) => `${row.controlId} ${row.applicability}${row.missingFacts.length > 0 ? ` (missing ${row.missingFacts.join(", ")})` : ""}; pulled in by ${row.pulledInBy.join(", ")}`).join(". "),
-      expert: plan === null ? "parseDeploymentProfile/compilePlan threw." : `compilePlan({ profile, catalog: loadCatalog(), asOf }) → ${plan.digest}, status ${plan.status}; `
+      expert: plan === null ? "parseDeploymentProfile/compilePlan threw." : `compilePlan({ profile, catalog: loadAdmittedCatalog(), asOf, signedTools }) → ${plan.digest}, status ${plan.status}; `
         + requirements.map((row) => `${row.controlId}@${row.controlVersion}: ${row.reasons.join("; ")}`).join(" | ") },
     { id: "sources", sources: ["catalog/README.md", "src/compliance/regulatory"], dataStatus: "experimental",
       novice: `The catalog says: "${CATALOG_EXPERIMENTAL_NOTICE}" (D-08)`,
@@ -198,7 +176,7 @@ export function adaptFacts(spec: Record<string, unknown>, answers: readonly A4An
       novice: reviews.length === 0 ? "No extra review is required at completion." : `Completion also needs: ${reviews.map((entry) => entry.label).join("; ")}. A role's approval is an acknowledgement, not an expert review.`,
       practitioner: reviews.map((entry) => `${entry.kind}${entry.role === undefined ? "" : ` (${entry.role})`}: ${entry.label}`).join("; ") || "none",
       expert: `gatePolicyOf(chain).gates["adapt.completion"].requiredReviews = ${canonicalize(reviews)}` },
-    { id: "activation", sources: ["activateControlPlan", "compiledPolicyGuard", NATIVE_LEASE_KEY], dataStatus: null,
+    { id: "activation", sources: ["activateControlPlan", "compiledPolicyGuard", NATIVE_LEASE_KEY, RUN_LEASE_KEY], dataStatus: null,
       novice: activation === "regulated" ? "Because this project is regulated, completing Adapt switches the plan on for the whole workspace, after a second, separate approval."
         : activation === "active_elsewhere" ? "Another plan is already switched on for this workspace, a workspace has one plan for every agent, and this plan would weaken it, "
           + "so it cannot be switched on: it stays signed but not switched on, and a project owner records that, with a reason, after Review and before completing."
@@ -208,8 +186,13 @@ export function adaptFacts(spec: Record<string, unknown>, answers: readonly A4An
           + "is refused: plan_activated waits (PLAN_ACTIVATION_DEFERRED) until an owner acknowledges it with a reason after Review, recorded on the conformance statement, and "
           + "completion then leaves this plan signed, not activated. "
           : `Not regulated: completion leaves the plan signed, not activated; an owner may open ${ACTIVATE_PLAN_EFFECT_ID} before completing. `}`
-        + "Under an active plan with L0-IDN-01 every native tool call needs a verified lease: Studio native tasks with workspace tools started after activation get one (P1-67); tasks started before it, CLI agent sessions and delegated children do not and are denied.",
-      expert: "signPlan({ reviewAgentId, quorumFloor }) files the SECURITY review when the effect gate opens; activateControlPlan verifies it and consumes it as activate-<digest32>; compiledPolicyGuard denies any session whose pinned head differs from the journal's." },
+        + "Under an active plan with L0-IDN-01 every native tool call needs a verified lease: Studio native tasks with workspace tools started after activation get one (P1-67), "
+        + "and CLI agent runs (amc agent-loop run), SDK native client sessions, amc acp sessions and an in-process openAgentSession given none, with workspace tools, "
+        + "mint their own, which their delegated children inherit (P1-79); tasks started before it do not and are denied. "
+        + "L0-IDN-01 also requires a principal, and the lease names the task's signed-in principal, so a task whose principal is not an active local users.yaml user (a workspace-router session or the admin token included) is refused at start, 409 PRINCIPAL_UNRESOLVED (P1-78). "
+        + "A run's lease names the active users.yaml user whose username is the OS account, so a run whose OS account is not one is refused PRINCIPAL_UNRESOLVED before its session opens or a delegated child starts: the CLI exits non-zero and ACP answers -32602.",
+      expert: "signPlan({ reviewAgentId, quorumFloor }) files the SECURITY review when the effect gate opens; activateControlPlan verifies it and consumes it as activate-<digest32>; compiledPolicyGuard denies any session whose pinned head differs from the journal's; "
+        + "runLease (src/leases/runLease.ts) mints a run's lease through issueLeaseForPrincipal when planRequiresPrincipal holds; createDriverRunner composes each delegated child with it." },
     { id: "memory", sources: ["src/a4/adaptMemoryPolicy.ts", "ReasoningMemoryItem (src/learning/reasoningMemory.ts)"], dataStatus: null,
       novice: `The agent may remember items classed ${memory.privacyClass} for up to ${memory.expiresAfterDays} days, reviewed after ${memory.reviewAfterDays}, `
         + `read by ${memory.allowedConsumers.join(", ")}. AMC records this policy but does not enforce it yet.`,
@@ -231,17 +214,17 @@ export function adaptFacts(spec: Record<string, unknown>, answers: readonly A4An
         + `error ${permissions.error ?? "none"}. Not built yet: the effect a4.adapt.activate_profile, per-agent gatePolicy.json and lease caps, the prompt-pack build (A4_PROFILE_EFFECT).` },
     { id: "context", sources: ["src/a4/adaptContextPlugin.ts", "extraContextPlugins (src/prompt/agentPromptProfile.ts)", "P2-37"], dataStatus: null,
       novice: "Build turns your answers about audiences, markets, sector, languages, accessibility and data into a labelled note the agent reads as context. "
-        + "Today only an in-process run reads it: Studio native tasks and a deployed agent do not, and AMC says so.",
+        + "An in-process run reads it, and so does a Studio native task started after Build (when its signature checks out); a deployed agent does not, and AMC says so.",
       practitioner: "Build writes <agent>/a4/context-plugin.json (order 160, attributed to this project's revision). The probe runs one in-process turn on the stub provider "
         + `and records that session as a synthetic-example ref (A4 ran it on the stub provider, so it is never observed); the frame is the session's signed user/message row holding the `
         + `plugin's text, which AMC checks at the probe and again at Review (${PROBE_LIMITATION}). The turn makes no tool call, so the runtime writes no `
-        + "effective-policy receipt for it. Delivery to a model is not evaluated on the stub provider; delivery to native tasks and to a deployed agent is not evaluated (P2-37).",
+        + "effective-policy receipt for it. Delivery to a model is not evaluated on the stub provider. Studio native tasks load the signed plugin into the session's system prompt, and Review checks the agent's native sessions for it (P2-37); delivery to a deployed agent is not evaluated.",
       expert: "ContextPlugin { name: \"a4:context\", order: 160 } through runComposedTurn({ promptProfile: { extraContextPlugins } }) (never contextPlugins, which drops AGENTS.md); "
         + "no tools and no bindToolSession, so nothing A4 authors enters the session; the ref is its session/open row (claimKind synthetic_example, method synthetic; the session is named a4probe-<uuid>, and any A4 ref to its rows is synthetic_example); "
         + "the user/message snapshot row must carry the frame's exact text." },
     { id: "enforcement-none", sources: ["design §10.3", "P2-01", "P2-02", "P3-23"], dataStatus: null,
       novice: "Some of what you declared is recorded but not enforced by AMC yet: where data may go, how long it is kept, what the agent may remember, and which incident reporting deadlines apply.",
-      practitioner: `Data handling (classes, residency, retention, processors) is declared, not enforced (P2-01, P2-02). The memory policy is advisory until the writeback reads it. ${clocks.length} reporting clock(s) are candidates an operator classifies; AMC decides none (P3-23).`,
+      practitioner: `Data handling (classes, residency, retention, processors) is declared, not enforced (P2-01, P2-02); the data classes read enforced at redaction once the workspace opts into P2-02's redaction with a verified processor registry, which every native session (build sessions included) then applies before it records anything. The memory policy is advisory until the writeback reads it. ${clocks.length} reporting clock(s) are candidates an operator classifies; AMC decides none (P3-23).`,
       expert: `enforcement: none for data handling; advisory for the memory policy; clocks: ${clocks.map((clock) => clock.clockId).join(", ") || "none"}, each NEEDS_CLASSIFICATION; ${CLOCK_REVIEW_STATUS}.` }
   ];
 }
@@ -257,9 +240,7 @@ function explainStep(ctx: A4ProducerContext): A4ProducerResult {
   const weakens = understood?.activationWeakenings;
   const elsewhere = typeof activeProfile === "string" && activeProfile !== profileIdOf(ctx.state.project.project_id) && Array.isArray(weakens) && weakens.length > 0;
   const facts = adaptFacts(spec, answers, ctx.state.chain, !regulatedNow(ctx) ? "not_regulated" : elsewhere ? "active_elsewhere" : "regulated");
-  const items = explain(facts, level);
-  return { outputs: [{ output: "explanation", label: `adapt explain at the ${level} level`, lane: "recommendation", method: null, body: { level, items } }],
-    spec: { ...spec, explanation: { level, facts } }, response: { explanation: { level, items } } };
+  return explanationResult("adapt", spec, facts, level);
 }
 
 /** Readiness's own rule (isRegulated) on the producer's rows and the signed floor; an unverified policy reads regulated (fail closed). */
@@ -278,9 +259,7 @@ function regulatedNow(ctx: A4ProducerContext): boolean {
  */
 function propose(ctx: A4ProducerContext): A4ProducerResult {
   const { spec, answers } = adaptSpecOf(ctx.state);
-  const gaps = answerGaps(answers, carriedValues(ctx.state));
-  const codes = [...gaps.missing.map((id) => `ANSWER_MISSING:${id}`), ...gaps.stale.map((id) => `ANSWER_STALE:${id}`), ...gaps.invalid.map((id) => `ANSWER_INVALID:${id}`),
-    ...gaps.carried];
+  const codes = askGapCodes(answerGaps(answers, carriedValues(ctx.state)));
   if (codes.length > 0) throw fail(409, "A4_NOT_READY", "Answer or confirm the listed questions before proposing.", { reasonCodes: codes });
   assertUnderstood(spec, answers);
   for (const key of Object.keys(ctx.spec ?? {})) {
@@ -299,7 +278,7 @@ function propose(ctx: A4ProducerContext): A4ProducerResult {
       languages: listValue(values.get("languages")), dataClasses: fact("dataClasses"), activities: fact("useCases"), excludedUses: listValue(values.get("excludedUses")),
       deploymentNeeds: textValue(values.get("deploymentNeeds")) },
     dataHandling: { dataClasses: fact("dataClasses"), residency: textValue(values.get("dataResidency")), retention: textValue(values.get("dataRetention")),
-      processors: listValue(values.get("processors")), enforcement: "none", keys: ["P2-01", "P2-02"] },
+      processors: listValue(values.get("processors")), enforcement: "none", dataClassesEnforcement: dataClassEnforcement(ctx.workspace), keys: ["P2-01", "P2-02"] },
     claimBoundary: ADAPT_CLAIM_BOUNDARY };
   // Build would otherwise be refused only by the router's size check (its record joins this specification).
   if (tooLargeForBuild(next)) throw fail(413, "INPUT_TOO_LARGE", "The proposal leaves Build no room under the 256 KiB specification limit; shorten the answers.");
@@ -428,12 +407,13 @@ function build(ctx: A4ProducerContext): A4ProducerResult {
   const record = (manifest: NonNullable<AdaptBuild["manifest"]>): AdaptBuild => ({ ...signed,
     memoryPolicy: { path: relPath(workspace, memory.path), sha256: memory.sha256, policy: memory.policy }, context: context.record, manifest });
   // The router checks the produced specification (256 KiB, credentials) only after Build returns: the same check, first.
-  assertNoSecrets({ ...spec, build: record({ manifestId: `enforce-resources-${"0".repeat(16)}`, path: relPath(workspace, manifestPath) }) }, "The produced specification");
-  const restore = keptBytes([memory.path, context.path, manifestPath, artifactSigPath(manifestPath)]);
+  assertNoSecrets(compactSpec("adapt", { ...spec, build: record({ manifestId: `enforce-resources-${"0".repeat(16)}`, path: relPath(workspace, manifestPath) }) }).spec,
+    "The produced specification");
+  const restore = keptBytes([memory.path, context.path, artifactSigPath(context.path), manifestPath, artifactSigPath(manifestPath)]);
   let manifest: NonNullable<AdaptBuild["manifest"]>;
   try {
     writeMemoryPolicy(memory);
-    writeContextPlugin(context);
+    writeContextPlugin(workspace, context);
     assertEnforceCurrent(workspace, project.agent_id, new Set(["memory"]));
     manifest = enforceSnapshot(workspace, project.agent_id);
   } catch (error) {
@@ -449,7 +429,7 @@ function build(ctx: A4ProducerContext): A4ProducerResult {
           diff: signed.diff === null ? null : renderPlanDiffMarkdown(signed.diff) } },
       { output: "build", label: `adapt build: the memory policy written (${MEMORY_ENFORCEMENT_NOTE}) and the Enforce manifest re-written`,
         lane: "implementation", method: null, body: { memoryPolicy: built.memoryPolicy, manifest } },
-      { output: "build", label: "adapt build: the attributed A4 context plugin (order 160; delivered only to an in-process run; native tasks and a deployed agent do not load it, P2-37)",
+      { output: "build", label: "adapt build: the attributed A4 context plugin, signed (order 160; an in-process run and Studio native tasks load it, P2-37; a deployed agent does not)",
         lane: "implementation", method: null, body: context.record }
     ],
     spec: { ...spec, build: built }
@@ -474,6 +454,20 @@ function assertBuiltCurrent(ctx: A4ProducerContext): void {
 }
 
 /** Review's re-check of the probe's frame row (probeFrameStatus) against the plugin Build wrote; a code when it cannot be read. */
+/** Review's read of the agent's native sessions for the plugin Build wrote (P2-37; nativeDeliveryOf); a code when it cannot read. */
+function nativeDeliveryRead(ctx: A4ProducerContext, fileSha256: string): Record<string, unknown> {
+  let ledger: ReturnType<typeof openLedger> | null = null;
+  try {
+    const text = readContextPlugin(ctx.workspace, ctx.state.project.agent_id, fileSha256).text;
+    ledger = openLedger(ctx.workspace, { readonly: true });
+    return nativeDeliveryOf(ledger, ctx.state.project.agent_id, text);
+  } catch (error) {
+    return { status: "unreadable", reason: errorCodeOf(error, "NATIVE_DELIVERY_UNREADABLE") };
+  } finally {
+    ledger?.close();
+  }
+}
+
 function recheckFrame(ctx: A4ProducerContext, probe: Record<string, unknown>, fileSha256: string): string {
   let text: string;
   try {
@@ -505,7 +499,7 @@ function review(ctx: A4ProducerContext): A4ProducerResult {
   assertBuiltCurrent(ctx);
   const created = ctx.state.chain.find((link) => link.kind === "CREATED")?.body.ts;
   const conformance = recordControlResults({ workspace: ctx.workspace, projectId: project.project_id, workspaceId: project.workspace_id, agentId: project.agent_id,
-    plan, catalog: loadCatalog(), windowStartTs: typeof created === "number" ? created : project.created_ts, now: ctx.now });
+    plan, catalog: loadAdmittedCatalog(), windowStartTs: typeof created === "number" ? created : project.created_ts, now: ctx.now });
   // Review records a new revision, and an acknowledgement counts only on its own: none that counts on the reviewed
   // revision exists yet, so the owner's out-of-scope and the two acknowledgements are left empty here; the conformance
   // view fills them live from that revision (conformanceView), never from this record.
@@ -542,8 +536,9 @@ function review(ctx: A4ProducerContext): A4ProducerResult {
   const probe = probeLink === undefined || context === undefined ? { status: "not_run", reason: context === undefined ? "CONTEXT_PLUGIN_NOT_BUILT" : "CONTEXT_PROBE_NOT_RUN" }
     : { status: "recorded", refEventId: probeLink.body.refId, sessionId: probeLink.body.sessionId, inFrame: probeLink.body.inFrame, turnStatus: probeLink.body.turnStatus,
       snapshotEventId: probeLink.body.snapshotEventId, frame: recheckFrame(ctx, probeLink.body, context.fileSha256), claimKind: "synthetic_example",
-      effectivePolicyReceipt: "none: the turn made no governed tool call", modelDelivery: "not_evaluated", nativeDelivery: "not_evaluated", limitation: PROBE_LIMITATION };
+      effectivePolicyReceipt: "none: the turn made no governed tool call", modelDelivery: "not_evaluated", limitation: PROBE_LIMITATION };
   const promptPack = promptPackStatus(ctx.workspace, project.agent_id);
+  const nativeDelivery = context === undefined ? { status: "not_built" } : { ...nativeDeliveryRead(ctx, context.fileSha256), pluginSha256: context.sha256 };
   return {
     outputs: [
       { output: "review", label: "adapt review: the conformance statement (amc.a4-conformance-statement/v1; signed CONTROL_RESULT set; counts, never a percentage)",
@@ -553,11 +548,13 @@ function review(ctx: A4ProducerContext): A4ProducerResult {
       { output: "review", label: `adapt review: the memory policy re-read (${MEMORY_ENFORCEMENT_NOTE})`, lane: "implementation", method: null, body: memoryPolicy },
       { output: "review", label: "adapt review: the context probe's frame row re-checked (stub provider; A4 ran the turn, so its ref is synthetic_example; no effective-policy receipt)",
         lane: "implementation", method: null, body: probe },
-      { output: "review", label: "adapt review: the agent's prompt pack re-verified under this workspace's keys (integrity of bytes; the runtime does not load it)",
-        lane: "implementation", method: null, body: promptPack }
+      { output: "review", label: "adapt review: the agent's prompt pack re-verified under this workspace's keys (integrity of bytes; Studio native tasks load it when it verifies)",
+        lane: "implementation", method: null, body: promptPack },
+      { output: "review", label: "adapt review: the agent's native sessions read for the plugin in their signed system prompt (AMC's check; P2-37)",
+        lane: "implementation", method: null, body: nativeDelivery }
     ],
     // Nothing in Adapt is observed: the probe's ref is synthetic_example (A4 ran the turn on the stub provider) and no runtime receipt exists for it.
     notEvaluated: ["NO_OBSERVED_REF", probeLink === undefined ? "CONTEXT_PROBE_NOT_RUN" : "PROBE_SYNTHETIC_EXAMPLE"],
-    spec: { ...spec, review: { conformance, statement, head, memoryPolicy, probe, promptPack, claimBoundary: ADAPT_CLAIM_BOUNDARY } }
+    spec: { ...spec, review: { conformance, statement, head, memoryPolicy, probe, promptPack, nativeDelivery, claimBoundary: ADAPT_CLAIM_BOUNDARY } }
   };
 }

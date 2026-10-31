@@ -1,0 +1,50 @@
+{
+  "schema": "p125w-inert-runtime-audit-preparation-seal/1",
+  "at": "2026-10-17T00:07:45.286847+00:00",
+  "preferredObservedAdapter": "/private/tmp/p1-25-window-qualification-20261017/runtime-audit-preparation/audit-observed.py.source.txt",
+  "preferredPublicAdapter": "/private/tmp/p1-25-window-qualification-20261017/runtime-audit-preparation/audit-public.py.source.txt",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/runtime-audit-preparation/audit-observed.py.source.txt",
+      "bytes": 2195,
+      "sha256": "ecfc3fe96e8b0d895645c229e4c67bd92e54e0d395544d82f1711e08b4fbfe88"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/runtime-audit-preparation/audit-public.py.source.txt",
+      "bytes": 14619,
+      "sha256": "bfafc3c25fa9c1f5f15da69b7dca818e63ddfb78bda66ae74a2965e31b11a0f5"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/runtime-audit-preparation/audit-observed.adaptation.patch.txt",
+      "bytes": 873,
+      "sha256": "8f4cd15b20d62dc175017038bb3d96714040f15175f70019b2b4095ca9cd07a2"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/runtime-audit-preparation/audit-public.adaptation.patch.txt",
+      "bytes": 14628,
+      "sha256": "f50f457300a1e83ec8a484dd5e74579bb13f78de970a1d1da5fcd8e16700e4dd"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/runtime-audit-preparation/input-pins.json",
+      "bytes": 3312,
+      "sha256": "54282b73e7550cd330c108772b8af5d76b6e23bb977609b66a5af9df88ed8acf"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/runtime-audit-preparation/matrix.json",
+      "bytes": 1747,
+      "sha256": "3ae8fa9d86193fdc0a8935b9d79f9bff0ddf4202ad66cd7d6c840a44e31c65bc"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/runtime-audit-preparation/README.md",
+      "bytes": 3344,
+      "sha256": "a1c245e999f48c821990d969f6087d65b5748c284afd25bdb8bf7b5ffe3fa6a6"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/runtime-audit-preparation/author-static-review.json",
+      "bytes": 700,
+      "sha256": "910fd611e39ca1269d7ba9a3eb2adb1220d4f317ee5d780aa65c7d8c03068cc2"
+    }
+  ],
+  "rootFullReadAndIndependentReviewBeforeUse": true,
+  "noHelperProductExecutionOrSourceIndexQaWrites": true
+}

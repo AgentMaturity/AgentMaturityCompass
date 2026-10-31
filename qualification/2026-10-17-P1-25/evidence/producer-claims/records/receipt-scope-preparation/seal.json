@@ -1,0 +1,75 @@
+{
+  "schema": "p125pc-producer-receipt-scope-readonly-seal/1",
+  "at": "2026-10-17T02:13:41.993970+00:00",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-scope-preparation/raw-read-observations.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/receipt-scope-preparation/raw-read-observations.json",
+      "bytes": 8316970,
+      "sha256": "ac57f5bf31084cab045f9ee51bcb3f326368c276e3fa565933ffb76d0044a964",
+      "dev": 16777231,
+      "inode": 544002331,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-scope-preparation/observations.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/receipt-scope-preparation/observations.json",
+      "bytes": 8341015,
+      "sha256": "ce6e891b333b11433e429a0fe814aee8d0a6afd88e888d76403d01a42f645d99",
+      "dev": 16777231,
+      "inode": 544002332,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-scope-preparation/attempt1-read-error.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/receipt-scope-preparation/attempt1-read-error.json",
+      "bytes": 806,
+      "sha256": "8f377ff55fcf64199122646e8bdc298c8cabe162101561e1f60af3f2540e864e",
+      "dev": 16777231,
+      "inode": 544002239,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-scope-preparation/review.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/receipt-scope-preparation/review.json",
+      "bytes": 26284,
+      "sha256": "820ed76a9d349296a5593b58f311a64e0842d1a07e97f0f4e90e2b15869c292f",
+      "dev": 16777231,
+      "inode": 544002515,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-scope-preparation/README.md",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/receipt-scope-preparation/README.md",
+      "bytes": 2678,
+      "sha256": "f69b9ff1ba0b011e72d0ff2fcdc6a2b3ecd5a993227afcf621bd6ef06b6894b7",
+      "dev": 16777231,
+      "inode": 544002516,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-scope-preparation/read-tool-results.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/receipt-scope-preparation/read-tool-results.json",
+      "bytes": 1303,
+      "sha256": "9179d6ecedf806ffa52a61780368d6b58ec6648c015f5366bf507ddc25a02478",
+      "dev": 16777231,
+      "inode": 544002517,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-scope-preparation/input-pins.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/receipt-scope-preparation/input-pins.json",
+      "bytes": 4879,
+      "sha256": "2b690de94959329b69a843501f3e56d3a101a20141dff176a0ca4f85d1c0a32d",
+      "dev": 16777231,
+      "inode": 544002518,
+      "nlink": 1
+    }
+  ],
+  "blockers": [],
+  "correctedScanOuterClosed0AndAll1158GitChildrenNatural0": true,
+  "attempt1ErrorPreservedAndUnpersistedFactsZeroCredit": true,
+  "noSourceCopyReadyOwnershipOrImplementationApproval": true,
+  "largeObservationsPrivateOnly": true,
+  "rootHostedFreezeD15AndExactSuccessorAdmissionStillRequired": true
+}

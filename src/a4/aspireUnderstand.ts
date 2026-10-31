@@ -21,7 +21,7 @@ import { pathExists } from "../utils/fs.js";
 import { ANSWER_RULES, answerGaps, listValue, PREFILL_SOURCES, textValue } from "./spec/aspire.js";
 import type { A4Answer } from "./a4Schema.js";
 
-export interface AspireFact {
+interface AspireFact {
   readonly id: string;
   readonly lane: "implementation" | "recommendation";
   /** The claim method the ref is labelled with: a file scan or a keyword match is a weak method (claims/eligibility). */
@@ -29,7 +29,7 @@ export interface AspireFact {
   readonly label: string;
   readonly body: Record<string, unknown>;
 }
-export interface AspireReflection {
+interface AspireReflection {
   readonly agent: string | null;
   readonly mission: string | null;
   readonly audiences: string[];

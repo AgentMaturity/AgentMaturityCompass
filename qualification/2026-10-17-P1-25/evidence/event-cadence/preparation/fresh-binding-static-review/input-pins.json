@@ -1,0 +1,249 @@
+{
+  "schema": "p125ec-independent-fresh-binder-static-input-pins/1",
+  "inputs": [
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/seal.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/seal.json",
+      "bytes": 3655,
+      "sha256": "010ddd25dac8f9152cc0cfc2331196c4524c8f08ee7f4402a7ec57c10bb27861",
+      "dev": 16777231,
+      "inode": 543849506,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/bind-fresh.py.source.txt",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/bind-fresh.py.source.txt",
+      "bytes": 8411,
+      "sha256": "955730b704804f6089fb3d23971092230283ff38d9f0732c2b18cf81fdf24237",
+      "dev": 16777231,
+      "inode": 543835909,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/b38-to-b39.patch.txt",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/b38-to-b39.patch.txt",
+      "bytes": 10997,
+      "sha256": "59c74cb5a84f0d6c270a7d6b6cb5a7f47b4c7c9c92dbcb0ab1a3dc943b688f4e",
+      "dev": 16777231,
+      "inode": 543835910,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/source-selection.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/source-selection.json",
+      "bytes": 8137,
+      "sha256": "02552fd970f0aff01496e9d954da4f554275a0aec076a461087c156662ce6083",
+      "dev": 16777231,
+      "inode": 543835908,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/fields.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/fields.json",
+      "bytes": 2639,
+      "sha256": "b8af2327740b14fb1ae5edbb9e135ccdff26a66602d6e79102cfc4447d725d84",
+      "dev": 16777231,
+      "inode": 543849491,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/input-pins.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/input-pins.json",
+      "bytes": 2628,
+      "sha256": "93e0b130727975de1040947947c9eaeae6e723af77c3556c6a3c5a6fbbbce569",
+      "dev": 16777231,
+      "inode": 543849496,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/report.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/report.json",
+      "bytes": 2780,
+      "sha256": "34c38f39dbff6e80292c0e1967cc20042c41d27aabaae0de8a3387ae0d0cc0d2",
+      "dev": 16777231,
+      "inode": 543849500,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/README.md",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/README.md",
+      "bytes": 2621,
+      "sha256": "934537f1ebf598a333594212b89983dac07476d709fc8fabeb42e77162ba9261",
+      "dev": 16777231,
+      "inode": 543849502,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/read-only-lookup-diagnosis.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/read-only-lookup-diagnosis.json",
+      "bytes": 676,
+      "sha256": "52ec889c1727dbc28a005d60086f92dea1c3d1d9fd5669bbdc85627822834a86",
+      "dev": 16777231,
+      "inode": 543835911,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/bind-fresh.py",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/bind-fresh.py",
+      "bytes": 4948,
+      "sha256": "aa3eca5d09af75a3c12cc3062a81ae72d091b9da03f49d8c18a04bac05a64898",
+      "dev": 16777231,
+      "inode": 543750156,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/source-pinset.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/source-pinset.json",
+      "bytes": 6867,
+      "sha256": "68e48c9fa34740becdd93ff48cbabd548674a4064479a3ed2d2a8836f8292606",
+      "dev": 16777231,
+      "inode": 543742990,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/fresh-source-binding.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/fresh-source-binding.json",
+      "bytes": 116305,
+      "sha256": "3ded5106edab5d7512418ab2ba1c0021faca650d8e0886b691ea6dbe36d701e1",
+      "dev": 16777231,
+      "inode": 543811246,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/readonly-dependency-pairs-before-build.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/readonly-dependency-pairs-before-build.json",
+      "bytes": 2796,
+      "sha256": "3f3ff70af2d9ffe63bc268df67b2d14a71634c119343451e11f1bb6144462356",
+      "dev": 16777231,
+      "inode": 543829326,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/runtime-protected-inputs.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/runtime-protected-inputs.json",
+      "bytes": 80498,
+      "sha256": "78523e735a11a6aef300a4609d2ee79f45a1b56a0edc1bfd8536bb52b7abb49f",
+      "dev": 16777231,
+      "inode": 543829387,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/protected-inputs.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/protected-inputs.json",
+      "bytes": 78167,
+      "sha256": "fba2c86d4c578b729658d50dc26a102d7b00f8b80a4ca392a29071d4b1066c11",
+      "dev": 16777231,
+      "inode": 543829325,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/v2/seal.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/v2/seal.json",
+      "bytes": 2801,
+      "sha256": "3d0f5d6f9457f73fc5fc30e261c5eec7d3ad60728df8b377039e03c8109864db",
+      "dev": 16777231,
+      "inode": 543898375,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/v2/bind-fresh.py.source.txt",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/v2/bind-fresh.py.source.txt",
+      "bytes": 8794,
+      "sha256": "bda011325cac08d92fcb56ac5314754075920e78d21e7b7a9999df724273fa6a",
+      "dev": 16777231,
+      "inode": 543898369,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/v2/v1-to-v2.patch.txt",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/v2/v1-to-v2.patch.txt",
+      "bytes": 2011,
+      "sha256": "ef6e76d17c7cc30099893b8cd39c92690b591f8f03f83c93898ab2a4a0aa06f3",
+      "dev": 16777231,
+      "inode": 543898370,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/v2/fields.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/v2/fields.json",
+      "bytes": 3417,
+      "sha256": "b75451d8890643f7b4d3e4abc65b8be89a966e2cc73d5d3ea148cf273c7ef089",
+      "dev": 16777231,
+      "inode": 543898371,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/v2/input-pins.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/v2/input-pins.json",
+      "bytes": 2209,
+      "sha256": "ebc5d6a33c5309b03f655ca77d7ba364de3db414205033b7ecc6882b2ebcbe55",
+      "dev": 16777231,
+      "inode": 543898372,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/v2/report.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/v2/report.json",
+      "bytes": 1506,
+      "sha256": "1d3f996eb4b422d4078b3e83b5132fcd71f0bb18a31462897dac212906469d3e",
+      "dev": 16777231,
+      "inode": 543898373,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/v2/README.md",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/v2/README.md",
+      "bytes": 861,
+      "sha256": "0346ce2f25aa2c3507cc8dbe2770592d05a070ff05b7eb0c8adf5b70aa286a22",
+      "dev": 16777231,
+      "inode": 543898374,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/source-checkpoint.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/source-checkpoint.json",
+      "bytes": 541,
+      "sha256": "987d5d871240290965fb544196d6aba695c38e3ba11737f4b9b29f37d4049103",
+      "dev": 16777231,
+      "inode": 543836072,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/original-owned-source/checkpointWindow.test.ts.source.txt",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/original-owned-source/checkpointWindow.test.ts.source.txt",
+      "bytes": 34549,
+      "sha256": "1b14338d3978f83cd6518f99f3f12aebbc4a3624fc0416464c84bf4868d82cd7",
+      "dev": 16777231,
+      "inode": 543829328,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-test-proposal/checkpointWindow.test.ts.source.txt",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-test-proposal/checkpointWindow.test.ts.source.txt",
+      "bytes": 48568,
+      "sha256": "e5a7e326b7adbc2af4fafd65269313a2f49a39e6041862c24ab6ec4bb544e3d7",
+      "dev": 16777231,
+      "inode": 543817801,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125ec-clean-source/command.json",
+      "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p125ec-clean-source/command.json",
+      "bytes": 1488,
+      "sha256": "2bb74f6567c12d9e6b0ce43f0aa2509cfa8acbccc2d4675294d7135cddffa24f",
+      "dev": 16777231,
+      "inode": 543898362,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125ec-clean-source/stdout-stderr.log",
+      "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p125ec-clean-source/stdout-stderr.log",
+      "bytes": 852,
+      "sha256": "5d5ff223ddf7797cf4830ec82bca3351d7d84b5a208fd684447b3c77041ccf51",
+      "dev": 16777231,
+      "inode": 543836089,
+      "nlink": 1
+    }
+  ],
+  "underlyingLiveSourceAndNativePinsNotRead": true
+}

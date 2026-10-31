@@ -1,0 +1,254 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-22",
+  "date": "2026-10-14",
+  "commit": "a4822f4a829b7724f1213f464d98ace6f6c978e5",
+  "branch": "codex/p0-22-current-qualification",
+  "node": "v22.23.3; no final Node24 qualification claim",
+  "pnpm": "10.33.0",
+  "os": "macOS-26.6.2-arm64-arm-64bit",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run build",
+      "exit": 0,
+      "durationMs": 31168
+    },
+    {
+      "cmd": "npm run typecheck",
+      "exit": 0,
+      "durationMs": 33580
+    },
+    {
+      "cmd": "npm run typecheck:tests",
+      "exit": 0,
+      "durationMs": 38764
+    },
+    {
+      "cmd": "npm run lint",
+      "exit": 0,
+      "durationMs": 3060
+    },
+    {
+      "cmd": "npm run check:freeze",
+      "exit": 0,
+      "durationMs": 1285
+    },
+    {
+      "cmd": "npm run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 1640
+    },
+    {
+      "cmd": "npm run check:counts",
+      "exit": 0,
+      "durationMs": 344
+    },
+    {
+      "cmd": "npm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 279
+    },
+    {
+      "cmd": "npm run check:duplicates",
+      "exit": 1,
+      "durationMs": 1334
+    },
+    {
+      "cmd": "npm run check:dead-code",
+      "exit": 1,
+      "durationMs": 3401
+    },
+    {
+      "cmd": "npm run check:clean-source",
+      "exit": 0,
+      "durationMs": 54100
+    },
+    {
+      "cmd": "pnpm exec vitest run tests/cliResultCommandRegistry.test.ts tests/cliClaimLabels.e2e.test.ts tests/fleetScoring.test.ts tests/cognitionLab.test.ts tests/diagnosticReportStatus.test.ts tests/industryPackAudit.test.ts tests/transparencyReport.test.ts tests/assuranceReportProvenance.test.ts tests/executiveBrief.test.ts tests/noCertificationFromSelfAssessment.test.ts tests/benchmarks/benchRunner.test.ts tests/complianceReportReadability.test.ts tests/compliance/complianceMatrix.test.ts tests/dataResidency.test.ts tests/claims/claimEligibility.test.ts tests/claims/claimAdapters.test.ts tests/claims/claimLabels.test.ts tests/domainExampleMode.test.ts tests/selfReportedLevelCap.test.ts tests/complyReportFrameworkSelection.test.ts --reporter=default --reporter=json --outputFile.json=tmp/p0-22-qualification/final-bounded-node22.json",
+      "exit": 1,
+      "durationMs": 159953
+    }
+  ],
+  "tests": {
+    "total": 512,
+    "passed": 510,
+    "failed": 2,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "5f38072b126f4418d874aa2a8bc8a234cedaddbe4cc43b0f4bf1ab6ded536c42"
+    },
+    {
+      "path": "actual-mutations-initial.json",
+      "sha256": "ecf47435fa749e8626d26e9a7ec6f47a08b7307be2faa8189b3da98f748bae06"
+    },
+    {
+      "path": "canonical-review.json",
+      "sha256": "99f5664633771c92a4d50c6c8c3f731735549e052bafee741be6fae3b5d53ecb"
+    },
+    {
+      "path": "canonical-review.md",
+      "sha256": "0b7606c61300ca128ebd1d3947a0ce436d31ac6e7e06abf5e165bc0183923817"
+    },
+    {
+      "path": "cli-acceptance-disposition.json",
+      "sha256": "fadca576cd50c33484dcd8531013053620008cba23fac9184e71347bd93c8c5b"
+    },
+    {
+      "path": "cli-test-design.json",
+      "sha256": "64ae9b35399f9e1587cd49ef2b6c6861855f0d84af4878a8c7e91b0ef42a3135"
+    },
+    {
+      "path": "command-phases.json",
+      "sha256": "7d4d44753283dad42a1bf002753b1a2c19a0eb2e8e8f3d660465b97c249a29b8"
+    },
+    {
+      "path": "evidence-index.json",
+      "sha256": "bb64a8fcca6910304a2fd1146e05a66f607c6d2f65b7b9c1e1d52a68d502e7b9"
+    },
+    {
+      "path": "evidence-index.md",
+      "sha256": "a941f3a39ef2bfea3e4df483b3550f607747a4a6363b6a9cd8817cde5c711e1e"
+    },
+    {
+      "path": "final-architecture.log",
+      "sha256": "273eafb01e0f6a883ccb28c3eaa5842b760db3aec8534890a6839f057276b534"
+    },
+    {
+      "path": "final-bounded-node22.json",
+      "sha256": "5f519062d66f4f463a9b07c3da144b609f87ef522f6b3929ebf519314dbbc2b8"
+    },
+    {
+      "path": "final-bounded-node22.log",
+      "sha256": "c6a3b562b26b7f860e37a9567fbc306ac87e8b1d652cc89675339f7fbdfed004"
+    },
+    {
+      "path": "final-bounded-summary.json",
+      "sha256": "4c6cc570d0e467a88087ae0a60f026c0cf3510908465a1f67725aea84a695d0d"
+    },
+    {
+      "path": "final-clean-source.log",
+      "sha256": "bc1945632dc7fa560ce282a7ae6b060adaefae02ba4a954aa8b39a15118dc832"
+    },
+    {
+      "path": "final-counts.log",
+      "sha256": "a2ae3cae17c8353cf503e5a8c33c8def635220fcc2892e5514a8824f74454630"
+    },
+    {
+      "path": "final-docs-drift.log",
+      "sha256": "496e5a178832976fb79379985f745b649d87a7783285b90590a936e8202207c0"
+    },
+    {
+      "path": "final-freeze.log",
+      "sha256": "26127faafb4df55e7ae5d92af2cdc72f2537f6b58a4dd716d96e427f0c20b811"
+    },
+    {
+      "path": "final-lint.log",
+      "sha256": "040222d6959186f49b79c0b39e44d5ce4480cf11f1903c61fbd334c027ddf898"
+    },
+    {
+      "path": "final-restored-registry.json",
+      "sha256": "a61898e2134891a428753b35de819a81f1010ff9802d30f21c36c8ba3dc1110f"
+    },
+    {
+      "path": "final-source-build.log",
+      "sha256": "516ccd433616698b973476f1c77413724a1e6563c4cf02160260917164fc2c2a"
+    },
+    {
+      "path": "final-source-dead-code.log",
+      "sha256": "05a90bcd522819feb90bd3a49ae027eac3e1c9dfbbdf470a791ad013639c6998"
+    },
+    {
+      "path": "final-source-duplicates.log",
+      "sha256": "f2b9bac234b5ea83ee70cc0928bb26b945a42d288825600a635a2cae99c0c504"
+    },
+    {
+      "path": "final-source-manifest.json",
+      "sha256": "bdbda7927853e73ccb59a1c9a10e2ef47f5282e661ed3f87d8ab5659f76c4005"
+    },
+    {
+      "path": "final-test-typecheck.log",
+      "sha256": "366916d5096c94755a6df4da14b7567f0602cd91b70cfb77482368bc4293568b"
+    },
+    {
+      "path": "final-typecheck.log",
+      "sha256": "fcc68f772403ea039a2942eeaeec6ec00419f4c723add862d0afa87e27c23f6d"
+    },
+    {
+      "path": "fleet-legacy-repair.json",
+      "sha256": "5a4ba23676de627585b94ec5c2a1dbd8c21cf8a62a598ab7c9e487d2b6bdeb44"
+    },
+    {
+      "path": "fleet-snapshot.json",
+      "sha256": "064957588bcb331b0623bb397e4ef822ea91504a52d025d1ab316e8d397f2624"
+    },
+    {
+      "path": "graph-navigation.log",
+      "sha256": "aab530a21b61116e4afe4598aef416b9fd2250e12dcef7cf761e8dd387b4766d"
+    },
+    {
+      "path": "initial-source-inputs.json",
+      "sha256": "481fc2b1e0c251f94e97d167ee99c2f453062807439866e7bd9a1773a166fa07"
+    },
+    {
+      "path": "installer-disabled.json",
+      "sha256": "f634078b12df219f9b3e7532be8fd88e328b46d47badc7dc8ab0166ddaddd86b"
+    },
+    {
+      "path": "lab-final-guard-review.json",
+      "sha256": "bced0d018ec83c814c98408d3ff111966970714161e7ef608cc86e3bb86dd848"
+    },
+    {
+      "path": "lab-final-guard-review.md",
+      "sha256": "97b05017ada53cc1da4bbb7eaaf5ed7486837486e8b50ae208196e7b1782ee84"
+    },
+    {
+      "path": "lab-validation.patch",
+      "sha256": "c2a0008d578ae86bb1f84307975f3585db4c5ea2b79263d15ac289cb0a1dece4"
+    },
+    {
+      "path": "preservation-check.json",
+      "sha256": "ed8cb66dec1125a5d93fb59cbe413a2e9f431fdf98ca85fa3f8d89e6c26d8221"
+    },
+    {
+      "path": "readonly-preflight.json",
+      "sha256": "98a4ac6c8bf87280af689ab0b57daed24f61b14a5fceb0bf100764ea969ea0d8"
+    },
+    {
+      "path": "refined-mutations.json",
+      "sha256": "f541f35f7268e4c282b0198e21551650d2b32e4b35270d7664d910ef8bd0e7d9"
+    },
+    {
+      "path": "registry-entry-omitted.json",
+      "sha256": "faa97ad16cd763ef3c5eafbf413d035ed1ad0bfee3f8ad34b2c4db5e6185efcb"
+    },
+    {
+      "path": "registry-keyword-omission.json",
+      "sha256": "687f981843d010872949f989e5d324dd1e849cfb077f7db9bc83dcb0323c3c22"
+    },
+    {
+      "path": "report-contracts.json",
+      "sha256": "450fc6df48fdd01df9646b89c147dd66d2d7c9c91f5d12a5eee1ed16469ed351"
+    },
+    {
+      "path": "report-contracts.md",
+      "sha256": "e60008c16dfae08c9a22d341ea145d782e6731ab2c63731a4ce1597152e6f729"
+    },
+    {
+      "path": "sqlite-abi-after-repair.json",
+      "sha256": "1d98b1a993beb8138dab37f519ef2f7b126b368156f2bac4d5fe72b2988a62ae"
+    },
+    {
+      "path": "sqlite-abi-before-repair.json",
+      "sha256": "24cc6a65e6c43bc373c0feb3278c949ce01ff6a47419c6c9f7860a28f7e36552"
+    },
+    {
+      "path": "strict-cli-summary.json",
+      "sha256": "4a38a721c0da0776df3bbc4107473bcc0d41dd2f4d3fda2937a87e0a0be151ca"
+    }
+  ],
+  "notes": "Bounded qualification finished; P0-22 remains unresolved and not Done. User-directed successful empty passport/leaderboard arrays remain two literal failures. 512 final cases:510 pass,2 fail,0 pending/todo;23 snapshots match without updates. Final build/types/lint/freeze/architecture/counts/docs/clean-source pass. Required source-quality checks fail:1270duplicates2784dead-code. Full suite, measured global/per-file coverage, Node24 and hosted CI remain open on this source; earlier P0-50 evidence is contextual only. No acceptance weakening, floor/baseline/dependency change, held Claude overlay, paused work, external message, tracker closure, push or publication. See README and phase artifacts for real mutations, ABI repair and preserved intermediate RED/GREEN boundaries."
+}

@@ -1198,9 +1198,14 @@ async function refreshUnifiedBanner() {
       }
     }
     const freezes = Array.isArray(status?.studio?.activeFreezes) ? status.studio.activeFreezes.length : 0;
+    // P2-26: an active kill switch heads the banner; an unreadable status says so rather than showing nothing.
+    const killEnvelope = await apiGet("/api/v1/runtime/kill-switch").catch(() => null);
+    const kill = killEnvelope?.data ?? killEnvelope;
+    const killLine = kill === null ? `<div class="danger"><strong>Kill switch:</strong> status unavailable</div>`
+      : kill.active ? `<div class="danger"><strong>KILL SWITCH ACTIVE:</strong> ${htmlEscape(kill.kills.map((k) => `${k.killId} (${k.scope.kind}:${k.scope.id}, ${k.mode})`).join("; ") || "unverifiable record treated as stop_all")}. Protected effects are refused until an OWNER releases it.</div>` : "";
     const trustMode = status?.trust?.mode || "UNKNOWN";
     const trustOk = status?.trust?.ok === true;
-    bannerEl.innerHTML = `
+    bannerEl.innerHTML = `${killLine}
       <strong>Unified Clarity</strong>
       <div class="row wrap">
         <span><strong>Agent:</strong> ${htmlEscape(agentId)}</span>
@@ -1394,7 +1399,7 @@ async function renderHome() {
         <div class="studio-kicker">Desktop app</div>
         <h3>Native macOS shell, same AMC evidence-first surface.</h3>
         <p class="muted">
-          The macOS app now starts local demo-mode Studio and renders this Console inside a native WebKit window. Windows still launches the same local URL in the system browser. Both keep the same flow: 244 default questions, 264 lifecycle questions, 142 assurance packs, 41 Industry Packs, and 1,236 CLI paths.
+          The macOS app now starts local demo-mode Studio and renders this Console inside a native WebKit window. Windows still launches the same local URL in the system browser. Both keep the same flow: 244 default questions, 264 lifecycle questions, <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> registered assurance packs, 41 Industry Packs, and 1,268 CLI paths.
         </p>
       </div>
       <div class="row wrap">
@@ -2295,7 +2300,8 @@ async function renderIndustryPacks() {
   const entitlement = response.entitlement || {};
   const packs = response.packs || [];
   const locked = !entitlement.active;
-  const checkoutAvailable = entitlement.checkoutAvailable === true;
+  // The server's paywall text (src/domains/industryPackEntitlement.ts) is the one source for price and access steps.
+  const lockedMessage = entitlement.message || "Industry Packs are locked.";
   root.innerHTML = `
     ${card("Industry Packs", `
       <div class="grid">
@@ -2304,25 +2310,20 @@ async function renderIndustryPacks() {
           <div class="tile-value">${locked ? "Locked" : "Active"}</div>
         </div>
         <div>
-          <div class="muted">Plan</div>
-          <div class="tile-value">planned $${htmlEscape(entitlement.priceUsdMonthly || "9.99")}/mo</div>
+          <div class="muted">Price</div>
+          <div class="tile-value">US$${htmlEscape(entitlement.priceUsdMonthly || "")}/mo</div>
         </div>
       </div>
       ${locked ? `
-        <p class="muted">${checkoutAvailable
-          ? `$${htmlEscape(entitlement.priceUsdMonthly || "9.99")}/month for all 41 Industry Domain Packs.`
-          : "Public checkout and automatic license issuance are not live yet. Do not send payment based on this preview."}</p>
-        <div class="row">
-          ${checkoutAvailable ? `<button id="industryCheckout">Open verified checkout</button>` : ""}
-          <a class="button secondary" href="https://github.com/AgentMaturity/AgentMaturityCompass/discussions" target="_blank" rel="noopener">Launch status</a>
-        </div>
+        <p class="muted" style="white-space:pre-line">${htmlEscape(lockedMessage)}</p>
+        ${entitlement.checkoutAvailable === true ? `<div class="row"><button id="industryCheckout">Open checkout</button></div>` : ""}
+        ${entitlement.licenseVerificationConfigured === true ? `
         <div class="form-row">
-          <label for="industryLicenseKey">License key</label>
+          <label for="industryLicenseKey">Licence key</label>
           <input id="industryLicenseKey" placeholder="AMC-INDUSTRY-PACKS..." autocomplete="off" />
         </div>
-        <button id="industryActivate" class="secondary">Activate access</button>
-        <p class="muted">If an authorized AMC operator has already issued a valid key, paste it here or run <code>amc domain pack activate --key &lt;license-key&gt;</code>.</p>
-      ` : `<p class="status-ok">All 41 Industry Domain Packs are unlocked.</p>`}
+        <button id="industryActivate" class="secondary">Activate access</button>` : ""}
+      ` : `<p class="status-ok">Industry Packs are unlocked. A licence never changes a result.</p>`}
     `)}
     ${card("Pack Catalog", `<div id="industryPackRows" class="scroll"></div><pre id="industryPackOut" class="muted"></pre>`)}
   `;
@@ -2336,7 +2337,7 @@ async function renderIndustryPacks() {
         </div>
         <p class="muted">${htmlEscape(pack.description || "")}</p>
         <div class="row spaced">
-          <span class="muted">${htmlEscape(pack.domain || "")} · ${Number(pack.questionCount || 0)} questions</span>
+          <span class="muted">${htmlEscape(pack.domain || "")} · ${Number(pack.questionCount || 0)} questions${pack.contentStatus ? ` · ${htmlEscape(pack.contentStatus)}, self-reported` : ""}</span>
           <button class="secondary" data-industry-pack="${htmlEscape(pack.packId)}">${pack.locked ? "Locked" : "Open"}</button>
         </div>
       </div>
@@ -2349,13 +2350,14 @@ async function renderIndustryPacks() {
       cancelUrl: window.location.href,
       clientReferenceId: currentAgent()
     });
-    window.open(payload.checkoutUrl || entitlement.checkoutUrl, "_blank", "noopener");
+    if (payload.checkoutUrl) window.open(payload.checkoutUrl, "_blank", "noopener");
+    else out.textContent = payload.error || lockedMessage;
   });
   document.getElementById("industryActivate")?.addEventListener("click", async () => {
     const input = document.getElementById("industryLicenseKey");
     const licenseKey = input?.value?.trim();
     if (!licenseKey) {
-      out.textContent = "Paste the Industry Packs license key first.";
+      out.textContent = "Paste the Industry Packs licence key first.";
       return;
     }
     const activated = await apiPost("/industry-packs/activate", { licenseKey });
@@ -2366,9 +2368,7 @@ async function renderIndustryPacks() {
     button.addEventListener("click", async () => {
       const id = button.getAttribute("data-industry-pack");
       if (locked) {
-        out.textContent = checkoutAvailable
-          ? `Industry Packs are locked. Use the verified checkout for the planned $${entitlement.priceUsdMonthly || "9.99"}/month tier.\n${entitlement.checkoutUrl || ""}`
-          : "Industry Packs are locked. Public checkout and automatic license issuance are not live yet.";
+        out.textContent = lockedMessage;
         return;
       }
       const detail = await apiGet(`/industry-packs/${encodeURIComponent(id)}`);
@@ -2394,6 +2394,8 @@ async function renderCompliance() {
           .join("")}
       </div>
       <p>Config signature: <strong>${verify.valid ? "VALID" : "INVALID"}</strong></p>
+      <p>Mappings: <strong>${htmlEscape(report.familyReview?.status || "experimental")}</strong>: drafted and refuted by AI agents, not signed off by a named expert (D-08 pending).</p>
+      ${(report.familyReview?.flags || []).map((flag) => `<p class="muted">Flag: ${htmlEscape(flag)}</p>`).join("")}
       <p>Coverage score: <strong>${report.coverage?.score == null ? "not evaluated" : Number(report.coverage.score).toFixed(3)}</strong></p>
       <p>Trust coverage (OBS/ATT/SELF): ${((report.trustTierCoverage?.observed || 0) * 100).toFixed(1)}% /
       ${((report.trustTierCoverage?.attested || 0) * 100).toFixed(1)}% /
@@ -2559,7 +2561,7 @@ async function renderExperiments() {
         <button id="optimizerRunBtn">Generate Optimizer</button>
         <button id="optimizerRefreshBtn" class="secondary">Refresh</button>
       </div>
-      <div class="scroll"><table><thead><tr><th>Run</th><th>Accepted</th><th>Status</th><th>Candidates</th><th>Top Reason</th><th>Actions</th></tr></thead><tbody id="optimizerRows"></tbody></table></div>
+      <div class="scroll"><table><thead><tr><th>Run</th><th>Selected for probing (estimated metrics, not executed)</th><th>Structural status</th><th>Candidates</th><th>Top Reason</th><th>Actions</th></tr></thead><tbody id="optimizerRows"></tbody></table></div>
     `)}
     ${card("Experiment Registry", `<pre class="scroll">${JSON.stringify(listed.experiments || listed, null, 2)}</pre>`)}
   `;
@@ -2573,7 +2575,7 @@ async function renderExperiments() {
       const baselineCost = Number(latest.baselineCostPerSuccess || 0);
       const candidateCost = Number(latest.candidateCostPerSuccess || 0);
       const costRatio = baselineCost > 0 ? candidateCost / baselineCost : 0;
-      const verdict = upliftSuccess > 0 && upliftValue > 0 ? "READY" : "NOT READY";
+      const verdict = row.latestRunProblem ? "REFUSED" : !row.latestRun ? "NO RUN" : upliftSuccess > 0 && upliftValue > 0 ? "READY" : "NOT READY";
       return `<tr>
         <td>${htmlEscape(row.experimentId)}</td>
         <td>${htmlEscape(row.name)}</td>
@@ -2581,7 +2583,7 @@ async function renderExperiments() {
         <td>${upliftSuccess.toFixed(4)}</td>
         <td>${upliftValue.toFixed(4)}</td>
         <td>${costRatio.toFixed(4)}</td>
-        <td><strong>${verdict}</strong></td>
+        <td><strong title="${htmlEscape(row.latestRunProblem || "")}">${verdict}</strong></td>
         <td>
           <div class="row">
             <button data-run="${row.experimentId}">Run</button>
@@ -2638,7 +2640,10 @@ async function renderExperiments() {
     button.addEventListener("click", async () => {
       const id = button.getAttribute("data-run");
       const mode = window.prompt("Mode (sandbox|supervise):", "sandbox") || "sandbox";
-      const run = await apiPost(`/experiments/${encodeURIComponent(id)}/run`, { agentId, mode });
+      const candidateWindow = window.prompt("Candidate evidence window (e.g. 7d):", "");
+      if (!candidateWindow) return;
+      const candidateAgentId = window.prompt("Candidate agent (blank = same agent):", "") || undefined;
+      const run = await apiPost(`/experiments/${encodeURIComponent(id)}/run`, { agentId, mode, candidateWindow, candidateAgentId });
       out.textContent = JSON.stringify(run, null, 2);
       await renderExperiments();
     });

@@ -2,8 +2,8 @@
   "label": "010-sqlite-capture",
   "command": [
     "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-    "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/native-case.mjs",
-    "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/receipts/sqlite-capture/input.json"
+    "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/native-case.mjs",
+    "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/receipts/sqlite-capture/input.json"
   ],
   "startedAt": "2026-09-09T15:39:02.463026+00:00",
   "timeoutSeconds": 120,

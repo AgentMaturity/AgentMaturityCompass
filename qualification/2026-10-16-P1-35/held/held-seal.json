@@ -1,0 +1,38 @@
+{
+  "schema": "p135-knip-held-addendum-seal/1",
+  "preservedOriginalSeal": {
+    "path": "/private/tmp/p1-35-legacy-qualification-20261016/knip-manual-entry-ownership/seal.json",
+    "bytes": 1547,
+    "sha256": "8e863a7d3c126d0fa6f1b25a9880b3820b7fb3db1236f9410d192b01d6168c67"
+  },
+  "files": [
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/knip-manual-entry-ownership/held-addendum.json",
+      "bytes": 3186,
+      "sha256": "4d0ad499ad5dfe4d74f47a803c2f23c45a56159e789a7862681eb4e756609cd5"
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/knip-manual-entry-ownership/held-README.md",
+      "bytes": 1237,
+      "sha256": "15843be78c1f7c1bb6726153b8a49aa491c486f1e7a209d8b8a4b84a7f3e7cb7"
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/knip-manual-entry-ownership/held-manual-entry.proposed.patch",
+      "bytes": 681,
+      "sha256": "6a783945b7e764ef9aa3725a66874a3a5c53d262f8b68ddcfb7c24a3b0468e27"
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/knip-manual-entry-ownership/held-ignore-evidence.json",
+      "bytes": 467,
+      "sha256": "2708609dc13ce1693e36076673a54546485f3926c61474d2a201f8738188d5ad"
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/knip-manual-entry-ownership/held-input-pins.json",
+      "bytes": 2319,
+      "sha256": "c3ee5ab0acf477ee6dfee3a210bee03737e324fe51a1aa5c5efcbd74f5b34335"
+    }
+  ],
+  "state": "HELD_UNAPPLIED",
+  "noCheckoutWrites": true,
+  "newDeadCodeFindingUnwaived": true
+}

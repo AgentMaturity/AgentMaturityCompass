@@ -98,8 +98,11 @@ function renderActivation(ctx) {
     activated, only once an owner acknowledges <code>plan_activated</code> with a reason after Review (<code>PLAN_ACTIVATION_DEFERRED</code>); the conformance
     statement records that acknowledgement.</p>
     <p><strong>Lockout.</strong> An active compiled plan with <code>L0-IDN-01</code> denies every native tool call that carries no verified lease. Studio
-      native tasks with workspace tools started after activation run under a lease Studio mints (P1-67); tasks started before it, CLI agent sessions
-      and delegated children carry none and are denied. A non-regulated project therefore completes with the plan signed and not activated.</p>
+      native tasks with workspace tools started after activation run under a lease Studio mints (P1-67), and CLI agent runs, SDK native client
+      sessions, ACP sessions and in-process sessions with workspace tools mint their own, naming the active <code>users.yaml</code> user whose
+      username is the OS account, which their delegated children inherit (P1-79); a run whose OS account is not one is refused
+      <code>PRINCIPAL_UNRESOLVED</code> before its session opens or a child starts. Tasks started before activation carry none and are denied.
+      A non-regulated project therefore completes with the plan signed and not activated.</p>
     ${["plan_signed", "plan_activated", "plan_review_opened", "adapt.plan.nativeSessionsAllowed"].map((id) => status(ctx, id)).join("")}
     <div class="row wrap">${view.actionButton(request ? "Re-open the plan review" : "Open the plan review", "open-effect", openable,
       `data-gate="${esc(completion?.gateId ?? "")}"`)}</div>
@@ -134,13 +137,13 @@ function renderConformance(ctx) {
 const buildOf = (ctx) => (isObject(specOf(ctx).build) ? specOf(ctx).build : null);
 const factsOf = (ctx) => (isObject(specOf(ctx).understanding?.facts) ? specOf(ctx).understanding.facts : null);
 
-/** The context plugin Build wrote and the probe: where it reaches (an in-process run) and where it does not (native tasks, P2-37). */
+/** The context plugin Build wrote and the probe: where it reaches (an in-process run, Studio native tasks since P2-37) and where it does not (a deployed agent). */
 function renderContext(ctx) {
   const context = buildOf(ctx)?.context;
   const probeOffer = ctx.project.stage === "adapt" && ["built", "reviewed"].includes(ctx.project.step) ? ctx.allowed.build : view.held("The probe runs after Build");
   return `<p class="muted">Build writes your audience, market, sector, language, accessibility, data-handling and regulatory-note answers as one attributed
-      context plugin (order 160). Only an in-process run loads it: a Studio native task started now shows no A4 context plugin in its frame, and a deployed
-      agent does not load it either (P2-37). The probe runs one turn on the stub provider and AMC checks that session's signed user/message row for the
+      context plugin (order 160), signed. An in-process run loads it, and a Studio native task started after Build loads it into its system prompt
+      when its signature checks out (in a regulated workspace a plugin that does not verify refuses the task). A deployed agent does not load it. The probe runs one turn on the stub provider and AMC checks that session's signed user/message row for the
       plugin's text. A4 ran the turn on the stub provider, so the probe's ref is a synthetic example, never observed, and the runtime writes no
       effective-policy receipt for a turn with no tool call. A workspace on the JSONL session store cannot record the probe: an owner acknowledges that instead.</p>
     ${isObject(context) ? `<p class="muted">Plugin <code>${esc(context.name)}</code> · sha256 <code>${esc(context.sha256)}</code> · source <code>${esc(context.source)}</code>
@@ -148,7 +151,7 @@ function renderContext(ctx) {
     <div class="row wrap">${view.actionButton("Run the context probe", "probe", isObject(context) ? probeOffer : view.held("Build writes the context plugin first"))}</div>
     ${["prompts_attributed", "context_reaches_runtime_frame", "context_probe_unavailable", "model_delivery", "context.native_delivery", "adapt.prompt_pack_signature"]
     .map((id) => status(ctx, id)).join("")}
-    <p class="muted">A prompt pack is a signed Score resource; the runtime does not load it into a model's prompt.</p>`;
+    <p class="muted">A prompt pack is a signed Score resource; Studio native tasks load it into the system prompt when it verifies, and a deployed agent does not.</p>`;
 }
 
 /** The memory policy Build wrote, field by field with its source (answer or default); advisory, and the card says so. */
@@ -195,7 +198,8 @@ function renderClocks(ctx) {
 function renderDataHandling(ctx) {
   const declared = isObject(specOf(ctx).dataHandling) ? specOf(ctx).dataHandling : null;
   const shown = (value) => (Array.isArray(value) ? value.join(", ") : value) || "not stated";
-  const rows = declared === null ? [] : [["Data classes", declared.dataClasses, "none", "P2-01"], ["Residency", declared.residency, "none", "P2-01"],
+  // P2-36: Propose records whether P2-02's redaction was confirmed for the declared classes ("enforced at redaction").
+  const rows = declared === null ? [] : [["Data classes", declared.dataClasses, declared.dataClassesEnforcement ?? "none", "P2-02"], ["Residency", declared.residency, "none", "P2-01"],
     ["Retention", declared.retention, "none", "P2-02"], ["Processors", declared.processors, "none", "P2-01"],
     ["Memory policy", buildOf(ctx)?.memoryPolicy?.policy?.retentionTag, "advisory", "the reasoning-memory writeback"]]
     .map(([field, value, enforced, key]) => [esc(field), esc(shown(value)), `<code>${esc(enforced)}</code>`, esc(key)]);

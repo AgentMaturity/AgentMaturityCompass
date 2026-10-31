@@ -57,12 +57,15 @@ function renderConversation(ctx) {
 function renderPaths(ctx) {
   const spec = specOf(ctx);
   const rows = list(spec.understanding?.facts?.paths).map((path) => [`<code>${esc(path.path)}</code>`, `<code>${esc(path.enforcementBoundary)}</code>`,
-    esc(path.evidenceTier), `<code>${esc(path.supported)}</code>`, esc(path.reason ?? "")]);
+    esc(path.evidenceTier), `<code>${esc(path.label ?? path.supported)}</code>`, esc(path.reason ?? ""),
+    `${esc(path.source ?? "")}${path.pinnedVersion ? ` · pinned <code>${esc(path.pinnedVersion)}</code>` : ""}`]);
   const claim = isObject(spec.claim) ? spec.claim : null;
   return `<p class="muted">What AMC can enforce and evidence on each way of building the agent. A claim is about AMC's integration path,
-    never about the agent; "enforced" outside the native pipeline needs a conformance receipt for the pinned version, and none exists yet.</p>
-    ${table(["Path", "Enforcement boundary", "Evidence", "Status", "Reason"], rows, "Run Understand to list the paths.")}
-    ${claim ? `<h4>Chosen: <code>${esc(claim.path)}</code></h4><p>Not covered:</p>${bullets(claim.notCovered)}` : ""}
+    never about the agent; "enforced" outside the native pipeline needs an adapter claim manifest whose hook enforces and blocks on
+    failure, with a conformance receipt for the pinned version.</p>
+    ${table(["Path", "Enforcement boundary", "Evidence", "Status", "Reason", "Source"], rows, "Run Understand to list the paths.")}
+    ${claim ? `<h4>Chosen: <code>${esc(claim.path)}</code></h4><p class="muted">Source ${esc(claim.source)}${claim.conformanceReceipt
+      ? ` · pinned <code>${esc(claim.conformanceReceipt.pinnedVersion)}</code>` : " · no conformance receipt"}</p><p>Not covered:</p>${bullets(claim.notCovered)}` : ""}
     ${status(ctx, "path_supported")}${status(ctx, "unsupported_acknowledged")}`;
 }
 
@@ -179,14 +182,14 @@ function renderReview(ctx) {
     `<code>${esc(session.coverage?.status)}</code>`, `<code>${esc(session.integrity?.notEvaluated ?? (session.integrity?.integrityOk ? "integrity ok" : "integrity failed"))}</code>`,
     `<code>${esc(session.effectivePolicy?.status)}</code> ${codes(session.effectivePolicy?.downgrades)}`]);
   const phases = list(review?.sessions).flatMap((session) => list(session.phases).map((phase) => [`<code>${esc(session.sessionId)}</code>`, esc(phase.phase),
-    `<code>${esc(phase.status)}</code>`, esc(phase.source)]));
+    `<code>${esc(phase.status)}</code>`, phase.detail ? `<code>${esc(phase.detail)}</code>` : "", esc(phase.source)]));
   return `<p class="muted">Review reads each build session through its owner and refuses while one runs, has failed or is still open: verify
     the session on the native tasks page first, which closes it, so it takes no turn after what is reviewed. AMC's verifyAgentRun
     is an integrity self-check under this workspace's keys (the Integrity panel), never a claim about the agent.</p>
     ${review?.wording ? `<p><strong>${esc(review.wording)}</strong></p>` : ""}
     ${table(["Session", "Provider", "Validation", "Action evidence", "Integrity", "Effective policy (downgrades)"], sessions, "Not reviewed yet.")}
     ${phases.length ? `<h4>Execution phases</h4><p class="muted">${esc(view.TRUTH.admission)}. The prompt each session ran is not compared with the approved plan
-      (<code>${esc(list(review?.sessions)[0]?.promptBinding)}</code>).</p>${table(["Session", "Phase", "Status", "Source"], phases, "")}` : ""}
+      (<code>${esc(list(review?.sessions)[0]?.promptBinding)}</code>).</p>${table(["Session", "Phase", "Status", "Detail", "Source"], phases, "")}` : ""}
     ${isObject(review?.external) ? `<p class="muted">External path recorded at this revision: ${esc(review.external.scaffold)} scaffold(s),
       ${esc(review.external.connect)} connect(s), ${esc(review.external.import)} import(s) (self-reported).</p>` : ""}
     ${review ? `<p class="muted">Enforce: <code>${esc(review.enforce?.state)}</code> decision <code>${esc(review.enforce?.decision)}</code>,

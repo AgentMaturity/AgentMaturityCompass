@@ -1,0 +1,16 @@
+{
+  "boundPathsEachRoot": 57,
+  "targetPhysicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/src/catalog/evidence/admission.ts",
+  "targetInode": 543158658,
+  "targetNlink": 1,
+  "regularFile": true,
+  "sourceAndFreshBytesExact": true,
+  "priorControl": "m1",
+  "restoredTests": {
+    "total": 88,
+    "passed": 88,
+    "failed": 0,
+    "skipped": 0
+  },
+  "boundary": "Current root-owned snapshot after M1 restore and before M2, not a retrospective pre-M1 physical identity capture or universal concurrent-isolation proof."
+}

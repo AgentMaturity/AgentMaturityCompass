@@ -1,0 +1,67 @@
+{
+  "schema": "p125ec-receipt-scope-private-seal/1",
+  "at": "2026-10-17T01:17:31.894659+00:00",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-scope-preparation/observations.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-scope-preparation/observations.json",
+      "bytes": 5967109,
+      "sha256": "d66a4151e36ea60b89d661d42c212e8d82e1f5d0c73b26383a1ed6320862061a",
+      "dev": 16777231,
+      "inode": 543908978,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-scope-preparation/input-pins.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-scope-preparation/input-pins.json",
+      "bytes": 6968,
+      "sha256": "7c4a451b0d6b846dbdf1e95477fbda61364215179a77d14db0e544759c3df0b6",
+      "dev": 16777231,
+      "inode": 543908979,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-scope-preparation/review.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-scope-preparation/review.json",
+      "bytes": 19235,
+      "sha256": "103e3ce10dc1eaa7c66a81fc23c915ac12a603bc9da1ec288b1297dd479c5f9a",
+      "dev": 16777231,
+      "inode": 543909112,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-scope-preparation/README.md",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-scope-preparation/README.md",
+      "bytes": 1998,
+      "sha256": "7a508c8aa80fe53ef01416555e5205872f05aae7ad558220967b860c3f1c8183",
+      "dev": 16777231,
+      "inode": 543909113,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-scope-preparation/pending-reservation-entry.md",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-scope-preparation/pending-reservation-entry.md",
+      "bytes": 861,
+      "sha256": "142e90f4d4e315b2df2ecbe8fd6688fb3032ef4b2cf4482923cb70fc6cedca33",
+      "dev": 16777231,
+      "inode": 543909114,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-scope-preparation/read-tool-results.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-scope-preparation/read-tool-results.json",
+      "bytes": 357,
+      "sha256": "9d9573c884883246b08ca3388f47c05d0791b713bfd0227bdb17314ba77667c5",
+      "dev": 16777231,
+      "inode": 543909115,
+      "nlink": 1
+    }
+  ],
+  "blockers": [],
+  "allOutputsCompleteAndClosed": true,
+  "all592ReadOnlyGitChildrenNatural0": true,
+  "noAllocationOrSourceCopyAdmission": true,
+  "largeObservationsPrivateOnly": true,
+  "priorArtifactsPreserved": true,
+  "rootHostedFreezeD15AndExactSuccessorAdmissionStillRequired": true
+}

@@ -1,0 +1,235 @@
+{
+  "schema": "p112-closed-command-inventory/1",
+  "at": "2026-10-16T20:13:39.332686+00:00",
+  "commands": [
+    {
+      "phase": "p112-pre-d15",
+      "exit": 0,
+      "durationMs": 321,
+      "startedUtc": "2026-10-16T19:49:31.765676+00:00"
+    },
+    {
+      "phase": "p112-pre-freeze",
+      "exit": 0,
+      "durationMs": 1188,
+      "startedUtc": "2026-10-16T19:49:35.422965+00:00"
+    },
+    {
+      "phase": "p112-duplicates-before",
+      "exit": 1,
+      "durationMs": 599,
+      "startedUtc": "2026-10-16T19:50:23.127091+00:00"
+    },
+    {
+      "phase": "p112-dead-code-before",
+      "exit": 1,
+      "durationMs": 2941,
+      "startedUtc": "2026-10-16T19:50:23.853600+00:00"
+    },
+    {
+      "phase": "p112-unchanged-tool-guards",
+      "exit": 0,
+      "durationMs": 4236,
+      "startedUtc": "2026-10-16T19:51:40.801198+00:00"
+    },
+    {
+      "phase": "p112-source-combined",
+      "exit": 0,
+      "durationMs": 3621,
+      "startedUtc": "2026-10-16T19:54:39.005938+00:00"
+    },
+    {
+      "phase": "p112-test-types",
+      "exit": 0,
+      "durationMs": 35285,
+      "startedUtc": "2026-10-16T19:55:28.555621+00:00"
+    },
+    {
+      "phase": "p112-counts-before",
+      "exit": 1,
+      "durationMs": 515,
+      "startedUtc": "2026-10-16T19:56:18.954882+00:00"
+    },
+    {
+      "phase": "p112-counts-d15",
+      "exit": 0,
+      "durationMs": 337,
+      "startedUtc": "2026-10-16T19:56:24.906587+00:00"
+    },
+    {
+      "phase": "p112-gen-counts",
+      "exit": 0,
+      "durationMs": 428,
+      "startedUtc": "2026-10-16T19:56:40.954640+00:00"
+    },
+    {
+      "phase": "p112-node-version",
+      "exit": 0,
+      "durationMs": 15,
+      "startedUtc": "2026-10-16T19:57:01.087847+00:00"
+    },
+    {
+      "phase": "p112-pnpm-version",
+      "exit": 0,
+      "durationMs": 249,
+      "startedUtc": "2026-10-16T19:57:01.243049+00:00"
+    },
+    {
+      "phase": "p112-source-types",
+      "exit": 0,
+      "durationMs": 25154,
+      "startedUtc": "2026-10-16T19:57:09.995425+00:00"
+    },
+    {
+      "phase": "p112-lint",
+      "exit": 0,
+      "durationMs": 2785,
+      "startedUtc": "2026-10-16T19:58:10.835878+00:00"
+    },
+    {
+      "phase": "p112-build",
+      "exit": 0,
+      "durationMs": 28896,
+      "startedUtc": "2026-10-16T19:58:39.172123+00:00"
+    },
+    {
+      "phase": "p112-counts-after",
+      "exit": 0,
+      "durationMs": 483,
+      "startedUtc": "2026-10-16T19:59:32.314347+00:00"
+    },
+    {
+      "phase": "p112-gates",
+      "exit": 0,
+      "durationMs": 427,
+      "startedUtc": "2026-10-16T19:59:32.917932+00:00"
+    },
+    {
+      "phase": "p112-threat-model",
+      "exit": 0,
+      "durationMs": 299,
+      "startedUtc": "2026-10-16T19:59:33.473526+00:00"
+    },
+    {
+      "phase": "p112-architecture",
+      "exit": 0,
+      "durationMs": 1610,
+      "startedUtc": "2026-10-16T19:59:33.897122+00:00"
+    },
+    {
+      "phase": "p112-docs",
+      "exit": 0,
+      "durationMs": 328,
+      "startedUtc": "2026-10-16T19:59:44.933374+00:00"
+    },
+    {
+      "phase": "p112-freeze",
+      "exit": 0,
+      "durationMs": 1186,
+      "startedUtc": "2026-10-16T19:59:45.387212+00:00"
+    },
+    {
+      "phase": "p112-duplicates-after",
+      "exit": 1,
+      "durationMs": 686,
+      "startedUtc": "2026-10-16T20:00:26.341384+00:00"
+    },
+    {
+      "phase": "p112-dead-code-after",
+      "exit": 1,
+      "durationMs": 2852,
+      "startedUtc": "2026-10-16T20:00:27.156028+00:00"
+    },
+    {
+      "phase": "p112-quality-delta-diagnostic",
+      "exit": 0,
+      "durationMs": 5532,
+      "startedUtc": "2026-10-16T20:02:54.835159+00:00"
+    },
+    {
+      "phase": "p112-fresh-clean-source",
+      "exit": 0,
+      "durationMs": 46076,
+      "startedUtc": "2026-10-16T20:04:37.978916+00:00"
+    },
+    {
+      "phase": "p112-fresh-canonical",
+      "exit": 0,
+      "durationMs": 4457,
+      "startedUtc": "2026-10-16T20:08:56.491593+00:00"
+    },
+    {
+      "phase": "p112-m1",
+      "exit": 1,
+      "durationMs": 3746,
+      "startedUtc": "2026-10-16T20:09:17.907078+00:00"
+    },
+    {
+      "phase": "p112-restore1",
+      "exit": 0,
+      "durationMs": 3712,
+      "startedUtc": "2026-10-16T20:09:39.925149+00:00"
+    },
+    {
+      "phase": "p112-m2",
+      "exit": 1,
+      "durationMs": 3723,
+      "startedUtc": "2026-10-16T20:09:52.212300+00:00"
+    },
+    {
+      "phase": "p112-restore2",
+      "exit": 0,
+      "durationMs": 3803,
+      "startedUtc": "2026-10-16T20:10:14.604647+00:00"
+    },
+    {
+      "phase": "p112-m3",
+      "exit": 1,
+      "durationMs": 3699,
+      "startedUtc": "2026-10-16T20:10:29.606329+00:00"
+    },
+    {
+      "phase": "p112-restore3",
+      "exit": 0,
+      "durationMs": 3673,
+      "startedUtc": "2026-10-16T20:10:51.437939+00:00"
+    },
+    {
+      "phase": "p112-q-counts",
+      "exit": 0,
+      "durationMs": 415,
+      "startedUtc": "2026-10-16T20:11:14.904250+00:00"
+    },
+    {
+      "phase": "p112-q-gates",
+      "exit": 0,
+      "durationMs": 392,
+      "startedUtc": "2026-10-16T20:11:26.265239+00:00"
+    },
+    {
+      "phase": "p112-q-freeze",
+      "exit": 0,
+      "durationMs": 1226,
+      "startedUtc": "2026-10-16T20:11:26.779846+00:00"
+    },
+    {
+      "phase": "p112-metadata-d15",
+      "exit": 0,
+      "durationMs": 360,
+      "startedUtc": "2026-10-16T20:11:37.243423+00:00"
+    }
+  ],
+  "expectedRedResultsRetained": {
+    "p112-duplicates-before": 1,
+    "p112-dead-code-before": 1,
+    "p112-counts-before": 1,
+    "p112-duplicates-after": 1,
+    "p112-dead-code-after": 1,
+    "p112-m1": 1,
+    "p112-m2": 1,
+    "p112-m3": 1
+  },
+  "allNaturalOwnedProcessGroupsAbsent": true,
+  "signalsSent": false,
+  "qualityGatesWaived": false
+}

@@ -10,7 +10,7 @@ def _request(tool_name: str, command: str, trust: SessionTrust, action: str = "r
         tool_name=tool_name,
         tool_category=ToolCategory.EXEC,
         parameters={"command": command, "action": action},
-        context={"workspace": "/Users/sid/.openclaw/workspace"},
+        context={"workspace": "~/.openclaw/workspace"},
     )
 
 
@@ -48,6 +48,6 @@ def test_gateway_config_change_step_up():
 
 def test_owner_trust_allows_exec():
     fw = ToolPolicyFirewall.from_preset("enterprise-secure")
-    req = _request("exec", "ls -la /Users/sid/.openclaw/workspace", SessionTrust.OWNER)
+    req = _request("exec", "ls -la ~/.openclaw/workspace", SessionTrust.OWNER)
     out = fw.evaluate(req)
     assert out.decision == PolicyDecision.ALLOW

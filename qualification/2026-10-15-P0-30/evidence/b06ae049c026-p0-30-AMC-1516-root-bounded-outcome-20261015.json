@@ -1,0 +1,671 @@
+{
+  "schemaVersion": 1,
+  "capturedUtc": "2026-10-15T00:19:45.934590+00:00",
+  "key": "P0-30",
+  "oldIssue": "AMC-1516",
+  "sourceCommit": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "mode": "bounded private current guard qualification, not formal issue closure",
+  "outcome": "Nine distinct guards produced intended runtime failures and passing restorations; ten historical IDs retained with one duplicate alias.",
+  "unchangedLiveBaseline": {
+    "cases": 44,
+    "passed": 44,
+    "failed": 0,
+    "pending": 0,
+    "todo": 0,
+    "file": "/private/tmp/p0-30-AMC-1516-unchanged-five-file-baseline-20261015.json"
+  },
+  "matrices": [
+    {
+      "id": "S7-M11-profile-import-gate-221",
+      "classification": "emitted-JS runtime guard sensitivity; exact TS mutant intentionally fails typecheck",
+      "baseline": {
+        "numTotalTests": 18,
+        "numPassedTests": 18,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/parser-emitted-S7-M11-profile-import-gate-221-baseline/raw-tests.json",
+          "bytes": 6749,
+          "sha256": "ec72d38534dae4718bce4c77936b8757dc8461b23528a02c215302c492ba0dd5"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/parser-emitted-S7-M11-profile-import-gate-221-baseline/command.json",
+          "bytes": 1997,
+          "sha256": "752c9b0fa2fde4eac4cc6611365abad2a9f3960bebc0e46ac39d4f1b80f81599"
+        }
+      },
+      "mutant": {
+        "numTotalTests": 18,
+        "numPassedTests": 17,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": false,
+        "exit": 1,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/parser-emitted-S7-M11-profile-import-gate-221-mutant/raw-tests.json",
+          "bytes": 8195,
+          "sha256": "f510ca1a211955f9e281e1038a7e4c1fcc0279f2c6e724ad4674cd1398bbaf2f"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/parser-emitted-S7-M11-profile-import-gate-221-mutant/command.json",
+          "bytes": 1983,
+          "sha256": "a88a7f084648143b9e74178b1625673102a67cbfe376937b65da58a3a9bfe01d"
+        }
+      },
+      "restored": {
+        "numTotalTests": 18,
+        "numPassedTests": 18,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/parser-emitted-S7-M11-profile-import-gate-221-restored/raw-tests.json",
+          "bytes": 6749,
+          "sha256": "f3492c0dcfc8e4c794de86cab1212de2ad50c488d4c78c60328c63f866e05ab5"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/parser-emitted-S7-M11-profile-import-gate-221-restored/command.json",
+          "bytes": 1996,
+          "sha256": "452dfe4b0c49f3d44c29fc9ddeeba660dc14a25fdc10b42a036c01cbefdf476f"
+        }
+      }
+    },
+    {
+      "id": "S7-M12-profile-lower-clamp-230",
+      "classification": "assertion-specific runtime sensitivity",
+      "baseline": {
+        "numTotalTests": 18,
+        "numPassedTests": 18,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M12-profile-lower-clamp-230-baseline/raw-tests.json",
+          "bytes": 6739,
+          "sha256": "3cb3a3cd568c847dab037124e29c7f5ac58c44761690efe8591e78dd3221299c"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M12-profile-lower-clamp-230-baseline/command.json",
+          "bytes": 1891,
+          "sha256": "7d476ff75c8bd5e9e21337cca7f29b197524e46a49ff7b7e7ca808dec626336a"
+        }
+      },
+      "mutant": {
+        "numTotalTests": 18,
+        "numPassedTests": 17,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": false,
+        "exit": 1,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M12-profile-lower-clamp-230-mutant/raw-tests.json",
+          "bytes": 8206,
+          "sha256": "932f6075e78a6d59e805ba2a52da86711b72128c292d155d4afc45ba7c4faff8"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M12-profile-lower-clamp-230-mutant/command.json",
+          "bytes": 1877,
+          "sha256": "7da61e9720e426b2290c9f2ff9a7a0550d807b3335826ac0dc6e28a2dfb701a8"
+        }
+      },
+      "restored": {
+        "numTotalTests": 18,
+        "numPassedTests": 18,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M12-profile-lower-clamp-230-restored/raw-tests.json",
+          "bytes": 6736,
+          "sha256": "256e2411672018b7d6e93958d4c60cf9ec0079ba2039241ec389f2aada2df19a"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M12-profile-lower-clamp-230-restored/command.json",
+          "bytes": 1891,
+          "sha256": "421491bfbd4e3508b5272b7cc4b4efe0ae896ecd7ce19230eaf32e37a792222b"
+        }
+      }
+    },
+    {
+      "id": "S7-M13-export-chunk-bound",
+      "classification": "assertion-specific runtime sensitivity",
+      "baseline": {
+        "numTotalTests": 26,
+        "numPassedTests": 26,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M13-export-chunk-bound-baseline/raw-tests.json",
+          "bytes": 10569,
+          "sha256": "a418da7f7656953101fdadb5bf08554d9fd8bae8f2014ae582dde958ebb15d60"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M13-export-chunk-bound-baseline/command.json",
+          "bytes": 1897,
+          "sha256": "e6437bc047f25069ef96df71947419d34f4d15eb6c7cb2cb0a88a949ea800958"
+        }
+      },
+      "mutant": {
+        "numTotalTests": 26,
+        "numPassedTests": 25,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": false,
+        "exit": 1,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M13-export-chunk-bound-mutant/raw-tests.json",
+          "bytes": 11846,
+          "sha256": "1d86f05f219d6e2f050d88c53ae7d0f055d41b0aa27b8320c105180e1c85756e"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M13-export-chunk-bound-mutant/command.json",
+          "bytes": 1883,
+          "sha256": "4373bc038d9ee3059aee0de7130b143fd2e7d35356c68c21f34164d2dc20e30d"
+        }
+      },
+      "restored": {
+        "numTotalTests": 26,
+        "numPassedTests": 26,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M13-export-chunk-bound-restored/raw-tests.json",
+          "bytes": 10557,
+          "sha256": "5391775021b144c7b21028398a52995e26e7f9a46695211ecc778c7c9efd74b2"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M13-export-chunk-bound-restored/command.json",
+          "bytes": 1897,
+          "sha256": "04c96ddd35908bd7ea8ebf5ce96fd4e8a3557ee5064ddb33407b41f0fe8fd12a"
+        }
+      }
+    },
+    {
+      "id": "S7-M14-export-callback-cancel",
+      "classification": "assertion-specific runtime sensitivity",
+      "baseline": {
+        "numTotalTests": 26,
+        "numPassedTests": 26,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M14-export-callback-cancel-baseline/raw-tests.json",
+          "bytes": 10563,
+          "sha256": "50e585c1a544f7516fd1ea2b6144721ef169ed7276500f7b66c280266446cda5"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M14-export-callback-cancel-baseline/command.json",
+          "bytes": 1925,
+          "sha256": "de70e01ab499020a69683dfcfac461604c99311ebbaccd4b8650011a2fb6c267"
+        }
+      },
+      "mutant": {
+        "numTotalTests": 26,
+        "numPassedTests": 25,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": false,
+        "exit": 1,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M14-export-callback-cancel-mutant/raw-tests.json",
+          "bytes": 11888,
+          "sha256": "10bd0ce25d771f9dd7dcd6040299c9a0b3b14c496f598c3c033a874be9521f3a"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M14-export-callback-cancel-mutant/command.json",
+          "bytes": 1911,
+          "sha256": "fa317b4310ef8c1ef091a81973326735534d12c2c8e1e63c184a9d4e682b451c"
+        }
+      },
+      "restored": {
+        "numTotalTests": 26,
+        "numPassedTests": 26,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M14-export-callback-cancel-restored/raw-tests.json",
+          "bytes": 10576,
+          "sha256": "bd9e65f0292e63e428b02da2a410bfba816b1763d353a8fcb6c0826833f93108"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M14-export-callback-cancel-restored/command.json",
+          "bytes": 1925,
+          "sha256": "b41f53ad78057aeee6e9e508018260a445ac54960558ddfc75f97db16852cdb7"
+        }
+      }
+    },
+    {
+      "id": "S7-M15-export-unicode-replace",
+      "classification": "runtime normalization refusal for previously handled malformed-Unicode input; no unsafe output acceptance",
+      "baseline": {
+        "numTotalTests": 26,
+        "numPassedTests": 26,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M15-export-unicode-replace-baseline/raw-tests.json",
+          "bytes": 10567,
+          "sha256": "708ee581543dcec866488a5244d53b9a0e498c9c142bbe027188dcd45695c6bc"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M15-export-unicode-replace-baseline/command.json",
+          "bytes": 1925,
+          "sha256": "bb3d965b9d84e6ae49ce34b9d937c41f9d4d8dd842f177e41de04f32b8bc93dd"
+        }
+      },
+      "mutant": {
+        "numTotalTests": 26,
+        "numPassedTests": 25,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": false,
+        "exit": 1,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M15-export-unicode-replace-mutant/raw-tests.json",
+          "bytes": 11771,
+          "sha256": "347be133a2317cc1167b279dc74f1c202bf7d27c3687cbbce57ca878442a2314"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M15-export-unicode-replace-mutant/command.json",
+          "bytes": 1911,
+          "sha256": "76ed630162378a07bba93544a85804ea7b187d43fbb5a93c237efc31d9790762"
+        }
+      },
+      "restored": {
+        "numTotalTests": 26,
+        "numPassedTests": 26,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M15-export-unicode-replace-restored/raw-tests.json",
+          "bytes": 10571,
+          "sha256": "8f3f8d638f40955886a2e426827d262f829f60aca0494570bd8d7b1684af08b8"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M15-export-unicode-replace-restored/command.json",
+          "bytes": 1925,
+          "sha256": "34234b19cbba0856660efbaeba9b53669f7f37a3de54f5cd8771b4dc7521ebc0"
+        }
+      }
+    },
+    {
+      "id": "S7-M16-export-time-range",
+      "classification": "runtime RangeError for previously handled out-of-range timestamp fixture; not invalid timestamp acceptance",
+      "baseline": {
+        "numTotalTests": 26,
+        "numPassedTests": 26,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M16-export-time-range-baseline/raw-tests.json",
+          "bytes": 10573,
+          "sha256": "570b773a02603982e125790261ef397c5ce2a71a7388426b58031b0d33ba9f61"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M16-export-time-range-baseline/command.json",
+          "bytes": 1890,
+          "sha256": "f03ee56eaf5fbc0986f1899d55222293ac1e2868a3b23949047f2beca1f16012"
+        }
+      },
+      "mutant": {
+        "numTotalTests": 26,
+        "numPassedTests": 25,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": false,
+        "exit": 1,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M16-export-time-range-mutant/raw-tests.json",
+          "bytes": 11600,
+          "sha256": "3daf7c94c8f4fb7b60414daf5891a479da3813b526b9ecc7729a7ae939f529fa"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M16-export-time-range-mutant/command.json",
+          "bytes": 1876,
+          "sha256": "8c05bba42b507be3c4f849cb4ec31d8df0db3fa7ea72dd49194d8e6332217a8b"
+        }
+      },
+      "restored": {
+        "numTotalTests": 26,
+        "numPassedTests": 26,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M16-export-time-range-restored/raw-tests.json",
+          "bytes": 10574,
+          "sha256": "96ad6be8487ff5eea64e1325f2e583e2d499a8309eea326037b7923e6f582f60"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M16-export-time-range-restored/command.json",
+          "bytes": 1890,
+          "sha256": "d6f86f725d2f6b925642afd987f714f5e9ef1ae71d9fc7d4becbe7a00d04c087"
+        }
+      }
+    },
+    {
+      "id": "S7-M17-export-duration-loss",
+      "classification": "assertion-specific runtime sensitivity",
+      "baseline": {
+        "numTotalTests": 26,
+        "numPassedTests": 26,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M17-export-duration-loss-baseline/raw-tests.json",
+          "bytes": 10562,
+          "sha256": "851a600a76b8976b3ee5f1a029da020d7ff1b12e9170b2ef4eb590796ef35f4f"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M17-export-duration-loss-baseline/command.json",
+          "bytes": 1911,
+          "sha256": "0010475bed0160f8495a9edf329fdf93305607e8645dcf114392b7b4090c9751"
+        }
+      },
+      "mutant": {
+        "numTotalTests": 26,
+        "numPassedTests": 25,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": false,
+        "exit": 1,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M17-export-duration-loss-mutant/raw-tests.json",
+          "bytes": 11849,
+          "sha256": "f854cc03b2aaf15e1d90ecacde50ea4001bdaed8730a569a6a59ba44342fe133"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M17-export-duration-loss-mutant/command.json",
+          "bytes": 1897,
+          "sha256": "d6083c0f571b807b624f6b32d97822e9775e0fafd8ea04cfba5c8e93283aa2b5"
+        }
+      },
+      "restored": {
+        "numTotalTests": 26,
+        "numPassedTests": 26,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M17-export-duration-loss-restored/raw-tests.json",
+          "bytes": 10570,
+          "sha256": "9076f7096881dcc8126e051e7f12f7fb4b01b99b80b03ec970bf4c37524dafa1"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M17-export-duration-loss-restored/command.json",
+          "bytes": 1911,
+          "sha256": "e2737061ae791b3190a9846f400283dff319632388daba563718cbb4e16375e7"
+        }
+      }
+    },
+    {
+      "id": "S7-M18-export-redaction-loss",
+      "classification": "assertion-specific runtime sensitivity",
+      "baseline": {
+        "numTotalTests": 26,
+        "numPassedTests": 26,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M18-export-redaction-loss-baseline/raw-tests.json",
+          "bytes": 10557,
+          "sha256": "38ca46f0f1672b5752cdfdae314a3d4b6066472aec3a2dc3adcbde0bb6afcd8a"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M18-export-redaction-loss-baseline/command.json",
+          "bytes": 1918,
+          "sha256": "4d15ce9eed48bd7ff8a73eaecdf129f5fa41a3a41e6541dd5f082eea3494c5e2"
+        }
+      },
+      "mutant": {
+        "numTotalTests": 26,
+        "numPassedTests": 25,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": false,
+        "exit": 1,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M18-export-redaction-loss-mutant/raw-tests.json",
+          "bytes": 11958,
+          "sha256": "7ef330359867a103026d4551bf9b124552ccc0ea096cc7b841325ee295439c2c"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M18-export-redaction-loss-mutant/command.json",
+          "bytes": 1904,
+          "sha256": "cd723c2a16a8e05fa5d5d22b4faf6e48a1e02181b856d70d001b84ba0645ea65"
+        }
+      },
+      "restored": {
+        "numTotalTests": 26,
+        "numPassedTests": 26,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M18-export-redaction-loss-restored/raw-tests.json",
+          "bytes": 10557,
+          "sha256": "ffc89e5652b21b0d294ff51af8b3427cd683708fa303181b2ff472fd8034d3ae"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M18-export-redaction-loss-restored/command.json",
+          "bytes": 1918,
+          "sha256": "6b7a176f1bf2587317f1e1f7ca5cd1cb0ff0a0898dd1de48d9530ec8e291092b"
+        }
+      }
+    },
+    {
+      "id": "S7-M19-export-time-loss",
+      "classification": "assertion-specific runtime sensitivity",
+      "baseline": {
+        "numTotalTests": 26,
+        "numPassedTests": 26,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M19-export-time-loss-baseline/raw-tests.json",
+          "bytes": 10571,
+          "sha256": "bf8b123e84cf3a7eaf070412428080de1cdcb399cb3e51f5f7f40ded33376cd1"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M19-export-time-loss-baseline/command.json",
+          "bytes": 1883,
+          "sha256": "a8edc39c9434cb3a23d6154c94fd5866ab042565cd3192f0787a833e85158fb2"
+        }
+      },
+      "mutant": {
+        "numTotalTests": 26,
+        "numPassedTests": 25,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": false,
+        "exit": 1,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M19-export-time-loss-mutant/raw-tests.json",
+          "bytes": 11840,
+          "sha256": "07a5718926be45ad7bf376d23b624b2fc8366f97143cbc7e545d6a49d5e36c5d"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M19-export-time-loss-mutant/command.json",
+          "bytes": 1869,
+          "sha256": "4532040dfb471e29cbfbe8d3074e9ecd6860c23ec30d6bf536ae4a2fd0e48f9f"
+        }
+      },
+      "restored": {
+        "numTotalTests": 26,
+        "numPassedTests": 26,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0,
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M19-export-time-loss-restored/raw-tests.json",
+          "bytes": 10568,
+          "sha256": "bec801cb697e5fdf766f5f55dba425ab0fe597f27f44ace5509ec44380646119"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M19-export-time-loss-restored/command.json",
+          "bytes": 1883,
+          "sha256": "333c6d69efe2c3780484118f0d0f2c3f33873d41aa6837817c3f730a59dfdf1e"
+        }
+      }
+    }
+  ],
+  "historicalDuplicateAliases": [
+    {
+      "id": "S7-M17b-export-duration-loss",
+      "measuredId": "S7-M17-export-duration-loss",
+      "reason": "Exact duplicate source guard and unchanged corpus; historical ID retained without redundant run or distinct-guard inflation.",
+      "measuredMatrix": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/S7-M17-export-duration-loss-matrix.json",
+        "bytes": 15013,
+        "sha256": "1c21545c2db54643db9feb02976f612a8190dba558381282d2a6d4556a04bfac"
+      },
+      "measuredCounts": {
+        "baseline": {
+          "numTotalTests": 26,
+          "numPassedTests": 26,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0,
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M17-export-duration-loss-baseline/raw-tests.json",
+            "bytes": 10562,
+            "sha256": "851a600a76b8976b3ee5f1a029da020d7ff1b12e9170b2ef4eb590796ef35f4f"
+          },
+          "command": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M17-export-duration-loss-baseline/command.json",
+            "bytes": 1911,
+            "sha256": "0010475bed0160f8495a9edf329fdf93305607e8645dcf114392b7b4090c9751"
+          }
+        },
+        "mutant": {
+          "numTotalTests": 26,
+          "numPassedTests": 25,
+          "numFailedTests": 1,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": false,
+          "exit": 1,
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M17-export-duration-loss-mutant/raw-tests.json",
+            "bytes": 11849,
+            "sha256": "f854cc03b2aaf15e1d90ecacde50ea4001bdaed8730a569a6a59ba44342fe133"
+          },
+          "command": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M17-export-duration-loss-mutant/command.json",
+            "bytes": 1897,
+            "sha256": "d6083c0f571b807b624f6b32d97822e9775e0fafd8ea04cfba5c8e93283aa2b5"
+          }
+        },
+        "restored": {
+          "numTotalTests": 26,
+          "numPassedTests": 26,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0,
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M17-export-duration-loss-restored/raw-tests.json",
+            "bytes": 10570,
+            "sha256": "9076f7096881dcc8126e051e7f12f7fb4b01b99b80b03ec970bf4c37524dafa1"
+          },
+          "command": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M17-export-duration-loss-restored/command.json",
+            "bytes": 1911,
+            "sha256": "e2737061ae791b3190a9846f400283dff319632388daba563718cbb4e16375e7"
+          }
+        }
+      },
+      "distinctGuard": false
+    }
+  ],
+  "limits": [
+    "M11 is emitted-JavaScript runtime sensitivity only: actual mutant tsc exit2/TS2345 is retained, with independently verified sole guard deletion plus formatting. Two stopped compiler/observer attempts remain unqualified. Normal source and restored compilation are separate.",
+    "M11 tests permissive direct-JavaScript authority input; no claim that the normal strict authority loader accepted imported evidence.",
+    "M12 first lower-declaration assertion fails; its later SELF_REPORTED branch is not independently killed.",
+    "M15 fails with unchanged-validator refusal of malformed Unicode; M16 fails with Date.toISOString RangeError. Neither demonstrates accepted unsafe output.",
+    "M17 isolated duration loss and M19 isolated timestamp loss have separate measured assertions; M17b reuses the exact M17 execution, not an additional distinct kill.",
+    "M18 qualifies the requested caller-redaction notice, not exhaustive secret scanning.",
+    "The current 44 original cases overlap later mapping/callback corpora; repeated B/M/R executions and duplicate IDs are not added as distinct cases.",
+    "No source repair, original test/helper/guard edit, held runner transfer, full suite, Node24, coverage, hosted CI, release or Done follows.",
+    "Freeze/quality findings, historical strict failures, missing held scopes and ownership decisions remain preserved."
+  ],
+  "preservation": "Full declared private 12,268-file closure restored exactly; live 7,739 source and 4,529 compiled files, 31/32 protected pins and native identity unchanged at review. Earlier AMC-1525 packages remained immutable.",
+  "evidence": [
+    {
+      "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015.json",
+      "bytes": 103946,
+      "sha256": "6c093e937c06c1c7a81161dfdbe32027424c29f483cd864c2d4cb177f7b31c5e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1516-independent-review-20261015.json",
+      "bytes": 91692,
+      "sha256": "264a473f739447a651c4094291f1c0c003167dbdeed910b49e1cc6dd9e1e8aed"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1516-M11-root-emitted-diff-review-20261015.json",
+      "bytes": 2685,
+      "sha256": "53dcd0bfdb63a6f740c04d45bd6e644bd08537ec9a7a0034ece433d835b8cdf5"
+    }
+  ],
+  "independentReviewFindings": [],
+  "nextRuntimeOldIssue": "AMC-1517"
+}

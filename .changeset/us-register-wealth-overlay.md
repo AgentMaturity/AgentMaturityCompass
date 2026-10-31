@@ -1,0 +1,13 @@
+---
+"agent-maturity-compass": major
+---
+
+Adds the US register as data and the experimental Wealth overlay v0.1. `catalog/registers/us.json` encodes the strategy's 11 US register rows, plus Regulation B for the credit-decision controls, as 33 law-as-data entries, one per clause, in the new register format v1 (`src/catalog/register.ts`, `docs/catalog/REGISTER.md`, JSON Schema `spec/schemas/v1/register-entry.schema.json`). Five entries carry a content hash from P1-17's recorded fetches; the other 28 are unverified, each with its reason. No entry names a legal reviewer, and every state-law entry is flagged litigation-exposed under EO 14365. `catalog/jurisdictions/us/profiles.json` adds a federal profile and six state profiles. The Wealth overlay (`catalog/layers/l1-wealth-us/`, pack `amc.l1.wealth.us`) adds 12 US finance-operations controls and 3 credit-decision controls, all `experimental`, agent-drafted and not independently reviewed; 6 have executed tests against an enforcement point and 9 wait for a producer. A control result is evidence of conformity, never proof of compliance. The S5 regulatory register gains `us-reg-e`, `us-glba-safeguards`, `us-bsa-sar`, `us-nydfs-part-500`, `us-sr-23-4`, `us-tprm-proposal-2026` and `us-hipaa-rules` (all unverified), the official hosts `consumerfinance.gov`, `dfs.ny.gov` and `cms.gov` (awaiting approval), and stations on four entries. `docs/catalog/WEALTH_US.md` lists every control, its executed test and the entries awaiting a legal reviewer.
+
+Breaking, for every workspace that compiles or activates control plans:
+
+- A profile whose stations include `wealth` and whose jurisdictions include `US` (or leave either unknown) now pulls in the twelve finance-operations controls, and its plan adds `FINANCIAL` to `toolPipeline.approvalRequiredFor`. The three credit-decision controls apply only when `useCases` include `credit_decision`; an unknown `useCases` leaves them unresolved and blocks the plan.
+- The catalog lock now also covers registers and jurisdiction profiles, and the shipped catalog and S5 register changed, so every plan activated before this release fails the catalog lock check. Recompile and reactivate with `amc catalog compile --profile <profile.json> --request-review`, two distinct approvals of the printed request, then `amc catalog compile --profile <profile.json> --activate <approvalRequestId>`.
+- `loadCatalog` now reads `catalog/registers/<id>.json` and `catalog/jurisdictions/<folder>/profiles.json` instead of refusing them as stray files, and `validateCatalog` checks them; a control citation whose key is a register entry id must restate that entry.
+
+No CLI command changes.

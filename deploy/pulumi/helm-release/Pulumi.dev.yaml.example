@@ -2,7 +2,7 @@ config:
   amc-helm-release:releaseName: amc
   amc-helm-release:namespace: amc-system
   amc-helm-release:chartPath: ../../helm/amc
-  amc-helm-release:imageRepository: ghcr.io/your-org/amc-studio
+  amc-helm-release:imageRepository: ghcr.io/agentmaturity/amc-studio
   amc-helm-release:imageTag: latest
   amc-helm-release:bootstrapSecretName: amc-bootstrap
   amc-helm-release:ingressEnabled: false

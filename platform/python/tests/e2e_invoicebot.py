@@ -247,7 +247,7 @@ def test_e1_policy_tool_decisions(harness: E2EHarness):
             tool_name="exec",
             tool_category=ToolCategory.EXEC,
             parameters={"command": "ls /tmp/invoices"},
-            context={"workspace": "/Users/sid/.openclaw/workspace"},
+            context={"workspace": "~/.openclaw/workspace"},
         )
         res = fw.evaluate(req_exec_safe)
         assert res.decision == PolicyDecision.ALLOW, f"Safe exec should be ALLOW, got {res.decision}"
@@ -260,7 +260,7 @@ def test_e1_policy_tool_decisions(harness: E2EHarness):
             tool_name="exec",
             tool_category=ToolCategory.EXEC,
             parameters={"command": "rm -rf /tmp/invoices"},
-            context={"workspace": "/Users/sid/.openclaw/workspace"},
+            context={"workspace": "~/.openclaw/workspace"},
         )
         res2 = fw.evaluate(req_exec_danger)
         assert res2.decision == PolicyDecision.DENY, f"rm -rf should be DENY, got {res2.decision}"

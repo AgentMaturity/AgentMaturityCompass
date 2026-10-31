@@ -1,0 +1,7 @@
+$ amc audit binder create --scope workspace --out binder.amcaudit
+# exit 0
+Audit binder exported
+Claim: Self-reported · Result: not evaluated · Evidence: sufficient · Enforcement: none · Review: pending · Applicability: applicable
+File: <tmp>/ws/binder.amcaudit
+sha256: 3b62f64cbff6fbbccc4ae217fe81eee3cd8a0669c6cd23d8f54b6f89ef2ed738
+binderId: ab_2c94f0bb7d45a0d1_1791688944375

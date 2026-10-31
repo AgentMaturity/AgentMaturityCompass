@@ -7,6 +7,7 @@
  */
 
 import { createHash, createHmac } from "node:crypto";
+import type { EvidenceOutcome } from "../types.js";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -80,8 +81,9 @@ export interface AttestationVerification {
 }
 
 export interface OutputAttestationReport {
-  score: number;
-  level: number;
+  outcome: EvidenceOutcome;
+  score: number | null;
+  level: number | null;
   hasOutputSigning: boolean;
   hasTrustLevelBinding: boolean;
   hasDelegationChainTracking: boolean;
@@ -93,7 +95,7 @@ export interface OutputAttestationReport {
   hasReceivingAgentVerification: boolean;
   attestationsIssued: number;
   attestationsVerified: number;
-  avgEffectiveTrust: number;
+  avgEffectiveTrust: number | null;
 }
 
 // ── Constants ────────────────────────────────────────────────────────────────
@@ -236,7 +238,7 @@ export function scoreOutputAttestation(input: {
 
   const avgEffectiveTrust = vers.length > 0
     ? vers.reduce((sum, v) => sum + v.effectiveWeight, 0) / vers.length
-    : 0;
+    : null;
 
   let score = 0;
   if (hasOutputSigning) score += 20;
@@ -250,11 +252,13 @@ export function scoreOutputAttestation(input: {
   if (hasReceivingAgentVerification) score += 15;
   score = Math.min(100, score);
 
+  const hasEvidence = atts.length > 0 || vers.length > 0;
   const level = score >= 85 ? 5 : score >= 65 ? 4 : score >= 45 ? 3 : score >= 25 ? 2 : score > 0 ? 1 : 0;
 
   return {
-    score,
-    level,
+    outcome: hasEvidence ? "measured" : "not_evaluated",
+    score: hasEvidence ? score : null,
+    level: hasEvidence ? level : null,
     hasOutputSigning,
     hasTrustLevelBinding,
     hasDelegationChainTracking,

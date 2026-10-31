@@ -1,0 +1,106 @@
+{
+  "schema": "p125p-source-scope-independent-input-pins/1",
+  "files": [
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/source-scope-preparation/observations.json",
+      "bytes": 2890242,
+      "sha256": "ea32383d0fce4642b3eb465fae0bd7a563871a8fcd944364a562312063d882e2"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/source-scope-preparation/read-tool-results.json",
+      "bytes": 185,
+      "sha256": "d1cb68eda2e37ff92a9e6539538fcf3fb5f883cd0a60cd55531e17b32cca7900"
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-scope-preparation/observations.json",
+      "bytes": 5967109,
+      "sha256": "d66a4151e36ea60b89d661d42c212e8d82e1f5d0c73b26383a1ed6320862061a"
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-scope-preparation/seal.json",
+      "bytes": 2895,
+      "sha256": "0f3480b8ac9eb37fef35631fcca14fda1d2d37e2b12f73509863f5ead29c18ba"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-source-scope/observations.json",
+      "bytes": 1674075,
+      "sha256": "70d199c3d2b821be705cb7c0a96a1fa94afff477c78aaf0c56b41f2bd6ab477a"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/protected-inputs-v3.json",
+      "bytes": 88277,
+      "sha256": "ba4495dc366f2e2051cc29679815f540f4159c7f205c6b25c22cba2fdc5a5aac"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/protected-inputs.json",
+      "bytes": 83164,
+      "sha256": "e0d8150bcb9782c676ded3ee1c1988f0a331929f2aa1dd81feb82296f5cd5a2c"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/readonly-compiled-dependencies-before-build.json",
+      "bytes": 2834,
+      "sha256": "bd48098b6b79a3a92da52b1bab4cbb9aa1327c508ffff4e7d6bbf3b2d14eb428"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/protected-inputs-v2.json",
+      "bytes": 92262,
+      "sha256": "0c5ab9e8c2c6044a4f0de4ea564f09eb23da59ccfb43eb0fa3c2c9f066c72d50"
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/bounded-closure.json",
+      "bytes": 1726,
+      "sha256": "0ced78f07ae71b625c2d5c9fb1c0eeb4b9e3f3d4a78dd1131dd7cf48c70a5a20"
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/final-preservation.json",
+      "bytes": 555,
+      "sha256": "b2910c4137d7104002c484d593be5061a68574323fa47f73eaa07f29c548e5f7"
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/root-metadata-admission.json",
+      "bytes": 43481,
+      "sha256": "6a51192a55b66db0a2deccb21da3440b1bc21765b89448c4a60547da078f8e37"
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/qa-append.json",
+      "bytes": 584,
+      "sha256": "beca459cd117230b5c5ff75833666f30c1e3c5edda27f6698da8f3d09c184e47"
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/next-producer-preparation/candidate-v1/seal.json",
+      "bytes": 1883,
+      "sha256": "8be6b473335782481943d806919ddef2b5b635c5309a4dfce99393881407a769"
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/next-producer-preparation/candidate-v1/body-map-and-pins.json",
+      "bytes": 4802,
+      "sha256": "e06619775ea1d966388403ecab6ed032464a23a0df986334a6ae380205dac4b4"
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/next-producer-preparation/candidate-v1/checkpointWindow.test.ts.source.txt",
+      "bytes": 61752,
+      "sha256": "36ba6394d4c8b824e2fbe9e2d2b5c1729431bf0206c9d5d08c357ca70a33082a"
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/next-producer-preparation/candidate-v1/checkpointWindow.test.ts.original.source.txt",
+      "bytes": 48568,
+      "sha256": "e5a7e326b7adbc2af4fafd65269313a2f49a39e6041862c24ab6ec4bb544e3d7"
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/next-producer-preparation/candidate-v1/checkpointWindow-from-80268079.patch.txt",
+      "bytes": 15903,
+      "sha256": "ec9e75935c573a49f1bd1267ff8a7ca1b46fedd6a4f177541385acec03fa3af1"
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/next-producer-preparation/independent-static-review/seal.json",
+      "bytes": 1214,
+      "sha256": "32c772ac9317fc002c09149fb740e60b8d940dc46eeb40b409dbd11e1df377db"
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/next-producer-preparation/independent-static-review/review.json",
+      "bytes": 8070,
+      "sha256": "c96bac8905edda6dd996318619df6aab484e2b3f2438c65339266da3f6c947a7"
+    }
+  ],
+  "rawObservationsPrivateOnly": true
+}

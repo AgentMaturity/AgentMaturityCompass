@@ -1,0 +1,20 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L0-DAT-02",
+  "polarity": "negative",
+  "evidenceClass": "unknown_applicability",
+  "setup": {
+    "synthetic": true,
+    "metadataOnly": true,
+    "execution": {
+      "scenarioId": "hc-phi-output-echo",
+      "environmentId": "phi-incomplete-v1",
+      "caseId": "p227-unknown-phi-boundary"
+    },
+    "note": "Unexecuted source-owned case declaration. A fresh seeded execution and sealed capture are required; expected below is assertion-only, never an observed result or production evidence."
+  },
+  "expected": {
+    "result": "not_evaluated",
+    "reasonCode": "unknown_policy"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "schema": "p111-root-assembler-static-review/1",
+  "at": "2026-10-16T19:27:46.085519+00:00",
+  "allReadsFinished": true,
+  "blockers": [],
+  "helper": {
+    "path": "/private/tmp/p1-11-decisive-qualification-20261017/assemble-receipt.py",
+    "bytes": 4107,
+    "sha256": "ae3bd8ffd1c3ba50e6925033490c6d0d18270c3bd39069e4b5ec0343e17d9939"
+  },
+  "initialConcreteFindingsCorrected": [
+    "Original raw data now receives PRIVATE KEY marker check before lossless base64 encoding.",
+    "Root manifest byte/hash check is in adopt and applies to the same one read used for the emitted artifact."
+  ],
+  "currentStaticFit": [
+    "Existing13-key receipt structure and cmd/exit/durationMs projections fit current ordinary schema when actual root environment/tests manifest fields fit.",
+    "Command phases must be closed with ESRCH/no signals and retained R wrapper head before projection. Root manifest supplies real source commit/canonical totals/controls and is copied as evidence; builder does not derive those proof obligations itself.",
+    "Exclusive output directory/file writes refuse collisions. Logs and explicitly marked patch rows use lossless-original/1 with original relative path/byte/hash and verified base64 roundtrip, without trimming raw bytes.",
+    "Output payload cap1MiB and marker checks remain; actual root-selected target names and complete packet get the unchanged ordinary checker separately.",
+    "No product/parser/compiler/validator/test/child/native/SQL/network execution was done by this reviewer. No checkout/index/QA writes."
+  ],
+  "adoptionConditions": [
+    "Root fully reviews the actual finite manifest, including exact closed phases, canonical raw/observer audit, source/fresh/control/preservation pins, actual quality/hold notes and explicit patch envelope flags.",
+    "Root runs unchanged ordinary qualification validator and ordinary Git whitespace checks on actual private/materialized packet.",
+    "A missing/unclosed input can leave a partial private output root because this compact builder creates it early. Retain that stopped root and use a distinct new root for a corrected run; do not overwrite/delete/reinterpret it as valid."
+  ],
+  "sourceAcceptanceBoundary": "These conditions describe construction/root responsibilities; no new human approval or product acceptance gate is invented. Whole-issue gaps and all holds remain explicit."
+}

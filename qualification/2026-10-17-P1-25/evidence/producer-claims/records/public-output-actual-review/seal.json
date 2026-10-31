@@ -1,0 +1,40 @@
+{
+  "schema": "p125pc-explicit-public-output-review-seal/1",
+  "at": "2026-10-17T02:18:20.724125+00:00",
+  "actualAllowlist": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/public-output-allowlist.json",
+    "bytes": 340585,
+    "sha256": "923373ef519e24ee9fa25f2f0d63bf60988a52d0fb5896035ad24bf129a8ad91"
+  },
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-output-actual-review/review.json",
+      "bytes": 10219,
+      "sha256": "c39af30f400890c549687eef090104d005e474fbeaf957f17ac010f92bba6faf"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-output-actual-review/review.md",
+      "bytes": 4070,
+      "sha256": "22b87bc3f7366807b07b600dcd47a3e529b122ce3dd4b26fb3d5e0144a98f839"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-output-actual-review/input-pins.json",
+      "bytes": 103957,
+      "sha256": "9eea525efca83493e682032d014578733e6af4de6359840c8841242ee8828845"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-output-actual-review/certificate-decodes.json",
+      "bytes": 53102,
+      "sha256": "ecf82dd0d388dbff9ae007d5f50b2b122c39352018f7f29ffe1bf60c93acc647"
+    }
+  ],
+  "inputPinCount": 235,
+  "allInputsRechecked": true,
+  "all218SelectedPublicPayloadsChecked": true,
+  "all84GeneratedDERByteEnvelopeDecodesChecked": true,
+  "blockers": [],
+  "stagingOrPublicationApproval": false,
+  "helperCryptoOrProductExecutedByReviewer": false,
+  "rawPemKeysPrivateStreamsNativePayloadsRead": false,
+  "noSourceIndexQaReservationOrPriorArtifactMutation": true
+}

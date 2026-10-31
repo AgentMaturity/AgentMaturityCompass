@@ -1,0 +1,19 @@
+{
+  "capturedUtc": "2026-10-15T22:56:37.650393+00:00",
+  "freshRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-UizbGn/checkout",
+  "head": "2e136618b1b011a7269f37f8c2715b180b5b5a46",
+  "tests": {
+    "total": 10,
+    "passed": 10,
+    "failed": 0,
+    "skipped": 0
+  },
+  "scopeAll10LauncherSourceAndBuildRoot": true,
+  "sourceOracleAndBuiltCliArgvBoundToFreshClone": true,
+  "all17FilesStillExact": true,
+  "gitClean": true,
+  "pinnedRRunnerBorrowed": true,
+  "independentRunnerClaim": false,
+  "phase": "p119-oracle-fresh",
+  "rawSha256": "ebf749148ca790d1a366155c43349783fec134f8b669ea328e7f9575287f3c6b"
+}

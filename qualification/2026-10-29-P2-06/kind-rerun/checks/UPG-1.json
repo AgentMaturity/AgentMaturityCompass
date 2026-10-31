@@ -1,0 +1,45 @@
+{
+  "id": "UPG-1",
+  "scenario": "Upgrade with data",
+  "status": "failed",
+  "reason": "failed criteria: workload fixture seeded on N-1",
+  "criteria": [
+    {
+      "name": "workload fixture seeded on N-1",
+      "ok": false,
+      "detail": {
+        "ok": false,
+        "status": "failed",
+        "taskId": null,
+        "exit": 1
+      }
+    },
+    {
+      "name": "pre-upgrade ledger snapshot",
+      "ok": true,
+      "detail": {
+        "count": 4,
+        "head": "c68383f093bf9c73af18ccf550cd74b1da9c7285c48335d2118375ba420f673e",
+        "linked": true,
+        "migrations": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14
+        ],
+        "integrity": "ok"
+      }
+    }
+  ],
+  "durationMs": 65861
+}

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "baseCommit": "f0ab8027208f3679029fa624225fe574d27bba30",
   "createdAt": "2026-10-01T17:24:58.279Z",
-  "privateClone": "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-10-01-pending-implementation/cos-workers/assurance",
+  "privateClone": "~/AgentMaturityCompass/AMC_OS/RESEARCH/2026-10-01-pending-implementation/cos-workers/assurance",
   "owner": {
     "session": "session2026-10-01-4e7a6ade",
     "conversation": "6abe8718-5750-83e8-bfb6-19606dd1eed8",

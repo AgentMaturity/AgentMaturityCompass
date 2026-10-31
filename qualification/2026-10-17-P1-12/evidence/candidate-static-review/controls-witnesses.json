@@ -1,0 +1,58 @@
+{
+  "schema": "p112-static-candidate-control-witnesses/1",
+  "candidate": {
+    "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/test-design/compiledPolicyGuard.test.ts",
+    "bytes": 11155,
+    "sha256": "0b045ee76d6136d72543b567f1345212d1284faee5259e1b2dc8ab3ddd988da0"
+  },
+  "recipes": "/private/tmp/p1-12-compiled-guard-qualification-20261017/contract-review/controls.json",
+  "witnesses": [
+    {
+      "recipe": "visibility-refusal",
+      "primaryCase": "compiled policy guard on already-derived unit inputs shows listed names and names a hidden-tool refusal",
+      "firstSensitiveAssertion": {
+        "line": 80,
+        "column": null
+      },
+      "meaning": "Listed/neutral positives precede exact hidden-tool refusal. Removing the refusal should be exposed by this assertion; actual failure is not yet observed.",
+      "additionalPotentialCases": [],
+      "masking": "No later assertion in this case; pure helper refusal only, no destination effect."
+    },
+    {
+      "recipe": "lease-presence",
+      "primaryCase": "compiled policy guard on already-derived unit inputs requires the already-derived authorization to carry its lease identity",
+      "firstSensitiveAssertion": {
+        "line": 118,
+        "column": null
+      },
+      "meaning": "Supplied nonempty leaseId neutral positive precedes missing-authorization refusal; only requireAgentLease is true.",
+      "additionalPotentialCases": [
+        {
+          "case": "compiled policy guard on already-derived unit inputs preserves lease-before-principal refusal when both identity requirements apply",
+          "line": 135,
+          "meaning": "Combined requirement precedence can change from missing-lease to missing-principal; classify actual first frame."
+        }
+      ],
+      "masking": "Null-lease negative at119 may be masked after the first refusal fails. In the combined case, later OS-user assertion137 may be masked."
+    },
+    {
+      "recipe": "principal-binding",
+      "primaryCase": "compiled policy guard on already-derived unit inputs rejects absent and OS-user principals while consuming the authenticated principal methods",
+      "firstSensitiveAssertion": {
+        "line": 127,
+        "column": null
+      },
+      "meaning": "All three typed principal-method positives run before missing-authorization refusal, with no lease requirement.",
+      "additionalPotentialCases": [
+        {
+          "case": "compiled policy guard on already-derived unit inputs preserves lease-before-principal refusal when both identity requirements apply",
+          "line": 137,
+          "meaning": "Nonempty supplied leaseId with cli-os-user reaches the second combined requirement check."
+        }
+      ],
+      "masking": "OS-user negative128 may be masked by missing-record failure127. Combined case first missing-lease refusal135 should retain its independent source check, but actual execution remains to be observed."
+    }
+  ],
+  "outcomesObserved": false,
+  "noPredictedCounts": true
+}

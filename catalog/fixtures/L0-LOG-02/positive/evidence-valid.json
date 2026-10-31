@@ -1,0 +1,55 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L0-LOG-02",
+  "polarity": "positive",
+  "evidenceClass": "valid",
+  "setup": {
+    "harness": "evidence",
+    "window": {
+      "start": "2025-01-01T00:00:00.000Z",
+      "end": "2026-09-30T23:59:59.000Z"
+    },
+    "subject": {
+      "tenantId": "tenant-a",
+      "workspaceId": "ws-a",
+      "deploymentId": "dep-a",
+      "agentId": "agent-1",
+      "subjectId": null
+    },
+    "plan": {
+      "applicability": "applicable",
+      "policyDigest": "sha256:fixture-policy",
+      "mode": "enforce"
+    },
+    "items": [
+      {
+        "ref": {
+          "kind": "ledger_event",
+          "id": "L0-LOG-02-ledger-1"
+        },
+        "producerId": "amc.ledger",
+        "provenance": {
+          "verified": true,
+          "producerId": "amc.ledger",
+          "trustTier": "OBSERVED"
+        },
+        "recordedAt": "2026-09-20T10:00:00.000Z",
+        "binding": {
+          "workspaceId": "ws-a",
+          "controlId": "L0-LOG-02"
+        },
+        "verdict": "conforms",
+        "attributes": {
+          "receiptId": "L0-LOG-02-ledger-1-receipt",
+          "observationKey": "L0-LOG-02-observation-1",
+          "observation": "conforms"
+        }
+      }
+    ],
+    "priorUses": []
+  },
+  "expected": {
+    "result": "pass",
+    "reasonCode": null
+  }
+}

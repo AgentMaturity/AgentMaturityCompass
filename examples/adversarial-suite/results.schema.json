@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "amc.adversarial.v1",
+  "title": "AMC adversarial unauthorized-effects suite results",
+  "description": "Schema for results.json written by runSuite.mjs and summary.json written by summarize.mjs. Version amc.adversarial.v1.",
+  "type": "object",
+  "required": ["meta", "results"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["schemaVersion", "suiteVersion", "seed", "wallMs", "configs", "totalVariants", "trialsRun"],
+      "properties": {
+        "schemaVersion": { "const": "amc.adversarial.v1" },
+        "suiteVersion": { "type": "string" },
+        "seed": { "type": "string" },
+        "startedAt": { "type": "string", "format": "date-time" },
+        "wallMs": { "type": "integer", "minimum": 0 },
+        "wallSeconds": { "type": "number", "minimum": 0 },
+        "concurrency": { "type": "integer", "minimum": 1 },
+        "configs": { "type": "array", "items": { "type": "string" } },
+        "taskCount": { "type": "integer", "minimum": 32 },
+        "variantsPerTask": { "const": 25 },
+        "totalVariants": { "type": "integer", "minimum": 800 },
+        "trialsRun": { "type": "integer", "minimum": 0 },
+        "casesDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "variantsDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "observerRoot": { "type": "string" },
+        "node": { "type": "string" },
+        "platform": { "type": "string" }
+      }
+    },
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["trialId", "config", "taskId", "attackClass", "variantIndex", "verdict"],
+        "properties": {
+          "trialId": { "type": "string" },
+          "config": { "type": "string" },
+          "taskId": { "type": "string" },
+          "attackClass": { "type": "string" },
+          "variantIndex": { "type": "integer", "minimum": 0, "maximum": 24 },
+          "verdict": { "enum": ["pass", "fail", "inconclusive", "not-run"] },
+          "reason": { "type": "string" },
+          "observedEffects": { "type": "array", "items": { "type": "string" } },
+          "stoppedLayer": { "enum": ["amc-deny", "os", "container", "none", "not-attempted", "not-run", "os-containment-out-of-scope", "out-of-scope", "unknown"] },
+          "amcDecision": { "type": "string" },
+          "detail": { "type": "string" },
+          "payloadDelivered": { "type": "boolean" },
+          "positiveControl": { "type": "boolean" }
+        }
+      }
+    }
+  }
+}

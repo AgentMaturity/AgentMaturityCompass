@@ -1,0 +1,28 @@
+mutated packs/healthcarePHI.json (credential)
+MUTATION credential | RED:  Test Files 1 failed (1); Tests 1 failed | 26 passed (27); | failing:  × contains no personal data and no credential-looking string 8ms; FAIL tests/industryAssuranceFixtures.test.ts > industry assurance scenario corpus > contains no personal data and no credential-looking string; | RESTORED:  Tests 27 passed (27)
+mutated packs/educationFERPA.json (email)
+MUTATION email | RED:  Test Files 1 failed (1); Tests 1 failed | 26 passed (27); | failing:  × contains no personal data and no credential-looking string 10ms; FAIL tests/industryAssuranceFixtures.test.ts > industry assurance scenario corpus > contains no personal data and no credential-looking string; | RESTORED:  Tests 27 passed (27)
+mutated anchors.json (unverifiedNoReason)
+MUTATION unverifiedNoReason | RED:  Test Files 1 failed (1); Tests 2 failed | 25 passed (27); | failing:  × resolves every scenario anchor to a source, and every mustCite to a live anchor of that scenario 2ms; × sources every anchor officially: url plus retrievedAt, or verified:false with a reason 1ms; FAIL tests/industryAssuranceFixtures.test.ts > industry assurance scenario corpus > resolves every scenario anchor to a source, and every mustCite to a live anchor of that scenario; | RESTORED:  Tests 27 passed (27)
+mutated anchors.json (verifiedNoDate)
+MUTATION verifiedNoDate | RED:  Test Files 1 failed (1); Tests 2 failed | 25 passed (27); | failing:  × resolves every scenario anchor to a source, and every mustCite to a live anchor of that scenario 4ms; × sources every anchor officially: url plus retrievedAt, or verified:false with a reason 2ms; FAIL tests/industryAssuranceFixtures.test.ts > industry assurance scenario corpus > resolves every scenario anchor to a source, and every mustCite to a live anchor of that scenario; | RESTORED:  Tests 27 passed (27)
+mutated anchors.json (lawFirmUrl)
+MUTATION lawFirmUrl | RED:  Test Files 1 failed (1); Tests 2 failed | 25 passed (27); | failing:  × resolves every scenario anchor to a source, and every mustCite to a live anchor of that scenario 3ms; × sources every anchor officially: url plus retrievedAt, or verified:false with a reason 1ms; FAIL tests/industryAssuranceFixtures.test.ts > industry assurance scenario corpus > resolves every scenario anchor to a source, and every mustCite to a live anchor of that scenario; | RESTORED:  Tests 27 passed (27)
+mutated packs/financialSOX.json (citeNotAnchored)
+MUTATION citeNotAnchored | RED:  Test Files 1 failed (1); Tests 1 failed | 26 passed (27); | failing:  × resolves every scenario anchor to a source, and every mustCite to a live anchor of that scenario 3ms; FAIL tests/industryAssuranceFixtures.test.ts > industry assurance scenario corpus > resolves every scenario anchor to a source, and every mustCite to a live anchor of that scenario; | RESTORED:  Tests 27 passed (27)
+mutated anchors.json (citeSuperseded)
+MUTATION citeSuperseded | RED:  Test Files 1 failed (1); Tests 1 failed | 26 passed (27); | failing:  × resolves every scenario anchor to a source, and every mustCite to a live anchor of that scenario 4ms; FAIL tests/industryAssuranceFixtures.test.ts > industry assurance scenario corpus > resolves every scenario anchor to a source, and every mustCite to a live anchor of that scenario; | RESTORED:  Tests 27 passed (27)
+mutated packs/legalCompliance.json (danglingAnchor)
+MUTATION danglingAnchor | RED:  Test Files 1 failed (1); Tests 1 failed | 26 passed (27); | failing:  × resolves every scenario anchor to a source, and every mustCite to a live anchor of that scenario 5ms; FAIL tests/industryAssuranceFixtures.test.ts > industry assurance scenario corpus > resolves every scenario anchor to a source, and every mustCite to a live anchor of that scenario; | RESTORED:  Tests 27 passed (27)
+mutated packs/sbom-supply-chain.json (wrongStation)
+MUTATION wrongStation | RED:  Test Files 1 failed (1); Tests 1 failed | 26 passed (27); | failing:  × gives every scenario a unique id and its pack's station 4ms; FAIL tests/industryAssuranceFixtures.test.ts > industry assurance scenario corpus > gives every scenario a unique id and its pack's station; | RESTORED:  Tests 27 passed (27)
+fixtures identical to snapshot
+G1 drop aws pattern |  × flags credential:aws-access-key 4ms; Tests 1 failed | 26 passed (27);
+G2 accept any email domain |  × flags personal:email 3ms; Tests 1 failed | 26 passed (27);
+G3 allowlist disabled |  × rejects non-official source https://www.examplelawfirm.com/hipaa-summary 4ms; × rejects non-official source https://news.example.org/hipaa 1ms; × rejects non-official source https://govinfo.gov.attacker.example/lookalike 0ms; Tests 3 failed | 24 passed (27);
+G5 retrievedAt-or-reason rule removed |  × requires retrievedAt when verified and a reason when not 3ms; Tests 1 failed | 26 passed (27);
+mutated packs/healthcarePHI.json (credential)
+G4 hygiene assertion removed + credential injected |  Tests 27 passed (27);
+RESTORED |  Tests 27 passed (27);
+test file identical to snapshot
+fixtures identical to snapshot

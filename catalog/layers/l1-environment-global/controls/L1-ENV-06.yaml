@@ -1,0 +1,185 @@
+# Experimental and unreviewed P3-16 content. JSON syntax is valid YAML.
+# Local synthetic observations never supply a production evidence verdict.
+{
+  "id": "L1-ENV-06",
+  "version": "0.1.0",
+  "support": "experimental",
+  "layer": 1,
+  "family": "due-diligence-bound-to-lot",
+  "stations": [
+    "environment"
+  ],
+  "title": "Bind a synthetic due-diligence reference to the exact lot",
+  "statement": "For an operator-declared covered lot in the local fixture, resolve the required statement reference to the same lot and commodity; missing, mismatched or unavailable records do not authorize the statement gate.",
+  "riskRationale": "A reference for another lot can conceal missing due-diligence evidence. Reference binding alone does not establish deforestation-free or lawful production.",
+  "mandatory": true,
+  "applicability": {
+    "predicate": {
+      "all": [
+        {
+          "fact": "stations",
+          "includesAny": [
+            "environment"
+          ]
+        },
+        {
+          "fact": "domains",
+          "includesAny": [
+            "environment.food-textiles-manufacturing"
+          ]
+        },
+        {
+          "fact": "jurisdictions",
+          "includesAny": [
+            "EU"
+          ]
+        },
+        {
+          "fact": "roles",
+          "includesAny": [
+            "deployer"
+          ]
+        },
+        {
+          "fact": "entityTypes",
+          "includesAny": [
+            "food_facility"
+          ]
+        },
+        {
+          "fact": "useCases",
+          "includesAny": [
+            "lot_due_diligence"
+          ]
+        }
+      ]
+    },
+    "reasons": [
+      "Experimental and unreviewed operator-policy scope, selected only by asserted categorical facts. No capacity, asset-authority or hazard-reviewed safe-state FactName exists.",
+      "Actual asset inventory, write authority, generator capacity, legal applicability, separate-order commencement and safe-state assessment remain manual/unresolved; a selected synthetic scenario does not resolve them."
+    ],
+    "exclusions": []
+  },
+  "citations": [
+    {
+      "key": "environment-eudr-lot-reference",
+      "registerId": "eu-eudr",
+      "instrument": "EU Deforestation Regulation",
+      "clause": "Art. 8-12 due-diligence context from the inherited S5 record; role-specific reference duties not established here",
+      "edition": "Inherited Regulation (EU) 2023/1115 as amended; no current primary-text edition read for this draft",
+      "jurisdiction": "EU",
+      "statusType": "binding-future",
+      "superseded": null,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "dateNote": "This draft records no newly verified date. Existing S5 is enacted-not-yet-applicable; operator class, later application dates and amendments require primary verification.",
+      "url": "https://publications.europa.eu/resource/celex/32023R1115",
+      "retrieval": {
+        "state": "unverified",
+        "reason": "Inherited official CELEX locator from src/compliance/regulatory/register.json#eu-eudr.sources[0]. No primary text fetched, read or hashed for P3-16; historical S5 dates are not this task's source reads."
+      },
+      "appliesWhen": {
+        "fact": "jurisdictions",
+        "includesAny": [
+          "EU"
+        ]
+      },
+      "legalReview": null,
+      "note": "Re-verification required. The local fixture imposes a synthetic reference policy only; primary, downstream and trader duties, geolocation, legality, risk assessment, simplified declarations and retention remain unresolved. It does not require every operator to file a new statement."
+    }
+  ],
+  "binding": {
+    "kind": "enforcement_point",
+    "points": [
+      "tool_pipeline"
+    ],
+    "mechanism": "Draft tool-pipeline boundary only; the test-local protocol is not installed as a production enforcement hook. Actual available evidence is self-reported and cannot pass this control.",
+    "parameters": [],
+    "manualDuty": null
+  },
+  "tests": [
+    {
+      "id": "L1-ENV-06-T1",
+      "type": "runtime_enforced",
+      "oracle": {
+        "kind": "system_of_record",
+        "observes": "The synthetic local statement registry and statement-gate decision log, bound to the exact lot, commodity and fixture context."
+      },
+      "fixtures": {
+        "positive": [
+          "L1-ENV-06/positive/evidence-valid.json",
+          "L1-ENV-06/positive/oracle-statement-same-lot.json"
+        ],
+        "negative": [
+          "L1-ENV-06/negative/evidence-stale.json",
+          "L1-ENV-06/negative/evidence-replayed.json",
+          "L1-ENV-06/negative/evidence-contradictory.json",
+          "L1-ENV-06/negative/evidence-cross-tenant.json",
+          "L1-ENV-06/negative/evidence-empty.json",
+          "L1-ENV-06/negative/evidence-violation.json",
+          "L1-ENV-06/negative/oracle-statement-missing.json",
+          "L1-ENV-06/negative/oracle-statement-other-lot.json",
+          "L1-ENV-06/negative/oracle-statement-register-unavailable.json"
+        ]
+      },
+      "passCriteria": "Same-lot and same-commodity binding may allow only the synthetic statement gate. Missing or wrong-lot references deny; an unavailable registry is not evaluated. Role-specific obligations, geolocation, legality, risk assessment, retention and actual filing remain unproved.",
+      "attempts": 1
+    }
+  ],
+  "evidence": [
+    {
+      "id": "L1-ENV-06-E1",
+      "producer": "amc.questionnaire",
+      "bindingFields": [
+        "tenantId",
+        "workspaceId",
+        "deploymentId",
+        "agentId",
+        "controlId",
+        "controlVersion"
+      ],
+      "freshness": {
+        "maxAgeDays": 30
+      },
+      "sampling": {
+        "method": "all",
+        "ratePercent": null,
+        "minItems": 1
+      },
+      "retention": {
+        "mode": "regime_max"
+      },
+      "residency": {
+        "mode": "inherit_deployment"
+      }
+    }
+  ],
+  "invalidatedBy": [
+    "model_version",
+    "prompt_version",
+    "tool_version",
+    "corpus_version",
+    "policy_version",
+    "deployment_version"
+  ],
+  "owner": {
+    "role": "head_of_qa"
+  },
+  "clock": null,
+  "levels": [
+    "L1"
+  ],
+  "crosswalk": [],
+  "review": {
+    "status": "pending",
+    "expert": null,
+    "credential": null,
+    "reviewedAt": null,
+    "nextReview": null
+  },
+  "provenance": {
+    "draftedBy": "ai",
+    "draftedAt": "2026-10-19",
+    "approvedBy": null
+  }
+}

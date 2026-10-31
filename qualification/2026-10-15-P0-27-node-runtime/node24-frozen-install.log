@@ -1,0 +1,46 @@
+Scope: all 12 workspace projects
+ WARN  There are cyclic workspace dependencies: /private/tmp/p0-27-runtime-compatibility-20261015/node24-source/vendor/cordis, /private/tmp/p0-27-runtime-compatibility-20261015/node24-source/vendor/include
+Lockfile is up to date, resolution step is skipped
+Packages: +387
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Progress: resolved 0, reused 0, downloaded 1, added 0
+
+   ╭──────────────────────────────────────────╮
+   │                                          │
+   │   Update available! 10.33.0 → 12.11.2.   │
+   │   Changelog: https://pnpm.io/v/12.11.2   │
+   │     To update, run: pnpm add -g pnpm     │
+   │                                          │
+   ╰──────────────────────────────────────────╯
+
+Progress: resolved 0, reused 0, downloaded 219, added 150
+Progress: resolved 0, reused 0, downloaded 383, added 385
+Progress: resolved 0, reused 0, downloaded 383, added 387, done
+node_modules/better-sqlite3 install$ prebuild-install || node-gyp rebuild --release
+node_modules/esbuild postinstall$ node install.js
+node_modules/better-sqlite3 install: (node:46699) [DEP0176] DeprecationWarning: fs.R_OK is deprecated, use fs.constants.R_OK instead
+node_modules/better-sqlite3 install: (Use `node --trace-deprecation ...` to show where the warning was created)
+node_modules/esbuild postinstall: Done
+node_modules/better-sqlite3 install: Done
+
+devDependencies:
++ @amc/cordis 4.0.1 <- vendor/cordis
++ @amc/cordis-plugin-loader 1.0.2 <- vendor/loader
++ @amc/core 0.1.0 <- packages/amc-core
++ @amc/schemastery 3.18.1 <- vendor/schemastery
+
+. postinstall$ node scripts/postinstall.js || true
+. postinstall:   ┌──────────────────────────────────────────────┐
+. postinstall:   │                                              │
+. postinstall:   │   🧭  Agent Maturity Compass installed!      │
+. postinstall:   │                                              │
+. postinstall:   │   Quick start:                               │
+. postinstall:   │     amc                                      │
+. postinstall:   │     amc up                                   │
+. postinstall:   │     amc quickscore --rapid                   │
+. postinstall:   │                                              │
+. postinstall:   │   Docs:  amc --help                          │
+. postinstall:   │                                              │
+. postinstall:   └──────────────────────────────────────────────┘
+. postinstall: Done
+Done in 4.6s using pnpm v10.33.0

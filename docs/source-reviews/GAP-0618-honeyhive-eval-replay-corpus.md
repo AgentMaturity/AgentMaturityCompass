@@ -1,7 +1,7 @@
 # GAP-0618 source review: HoneyHive
 
 Date: 2026-06-20
-Worktree: `/Users/sid/AgentMaturityCompass-worktrees/gap-0618`
+Worktree: `~/AgentMaturityCompass-worktrees/gap-0618`
 Branch: `agent/gap-0618`
 
 ## Gap

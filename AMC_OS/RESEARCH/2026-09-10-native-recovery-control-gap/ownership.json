@@ -42,15 +42,15 @@
   ],
   "scratchPrefix": "tmp/cos-native-recovery-control-gap-01/",
   "vaultPaths": [
-    "/Users/sid/Documents/AMC/Evidence/2026-09-10 Native Recovery Control Gap.md"
+    "~/Documents/AMC/Evidence/2026-09-10 Native Recovery Control Gap.md"
   ],
   "centralStatus": "Stale and not authoritative; prior refused update is not replayed.",
   "predecessor": "AMC_OS/RESEARCH/2026-09-10-native-jsonl-writer-resume/NEXT_ACTION.md",
   "instructionNeeded": true,
   "sourceCandidate": "8d09ddd4517ff86298ccc1a563dbdb945a28bf88",
   "receiptPaths": [
-    "/Users/sid/AgentMaturityCompass/tmp/cos-native-recovery-control-gap-01/candidate01/receipts/receipt.json",
-    "/Users/sid/AgentMaturityCompass/tmp/cos-native-recovery-control-gap-01/candidate02/receipts/receipt.json"
+    "~/AgentMaturityCompass/tmp/cos-native-recovery-control-gap-01/candidate01/receipts/receipt.json",
+    "~/AgentMaturityCompass/tmp/cos-native-recovery-control-gap-01/candidate02/receipts/receipt.json"
   ],
   "blocker": {
     "kind": "automatic-tool-review",

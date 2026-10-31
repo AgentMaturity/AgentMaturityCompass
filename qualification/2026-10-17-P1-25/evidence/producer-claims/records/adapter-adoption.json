@@ -1,0 +1,28 @@
+{
+  "schema": "p125pc-root-runtime-adapter-adoption/1",
+  "at": "2026-10-17T01:52:29.533469+00:00",
+  "rootReadFullC39BaseAndBothCompleteC2Deltas": true,
+  "oldFourBranchesCommonGuardsAndOnlyNamespaceAndOneLineLocationShiftPreserved": true,
+  "newProducerPartialNoLaterCreditAndCompleteTwoOwnQueryProofsRequired": true,
+  "observed": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/audit-observed.py",
+    "bytes": 2198,
+    "sha256": "468aee0d4ded5290f60e231fa6a94e3617f7a243de96f46f1ac1a77fd73dc439"
+  },
+  "public": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/audit-public.py",
+    "bytes": 40958,
+    "sha256": "805a2c8e5c5dc48c0d9f3dae9be5ed02babed5cc5a41fd94ef6bdff619d48a80"
+  },
+  "independentReview": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/runtime-adapter-review/review.json",
+    "bytes": 6206,
+    "sha256": "0315239cfc8b59072e11d1fb49662f74dcd78c3745836242951d9404dfe79321"
+  },
+  "independentSeal": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/runtime-adapter-review/seal.json",
+    "bytes": 914,
+    "sha256": "c278fdc46dac11cd8f81e24a2a63a80a43e73d86c13d0dbdfcaa26b4b84e98f2"
+  },
+  "noSourceCommitFreshControlsOrWholeIssueCredit": true
+}

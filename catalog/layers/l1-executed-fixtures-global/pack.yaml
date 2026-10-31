@@ -1,0 +1,33 @@
+{
+  "id": "assurance.executed.fixtures",
+  "version": "0.1.0",
+  "layer": 1,
+  "title": "Optional synthetic executed-fixture objectives (experimental and unreviewed)",
+  "stations": [
+    "health",
+    "wealth",
+    "mobility"
+  ],
+  "jurisdictions": [],
+  "compilerCompat": "^0.1.0",
+  "publisher": "AgentMaturity (agent-maturity-compass)",
+  "maintainers": [
+    {
+      "name": "Sid",
+      "role": "maintainer"
+    }
+  ],
+  "licence": "MIT",
+  "support": "experimental",
+  "controls": [
+    "L1-HLT-01",
+    "L1-MOB-07",
+    "L1-WLT-01"
+  ],
+  "stewardship": {
+    "partner": null,
+    "updatePlan": null,
+    "triageTargetDays": null,
+    "coverageDoc": "docs/assurance/EXECUTED_TESTS.md"
+  }
+}

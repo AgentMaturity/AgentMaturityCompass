@@ -82,9 +82,10 @@ deliberately: read the new release's schemas, update this page and the constant,
 
 Assets: `https://github.com/usnistgov/OSCAL/releases/download/v1.2.3/<asset>`. The schemas are JSON Schema draft-07.
 
-**Not vendored yet.** `spec/vendor/oscal/1.2.3/` (the three schemas, their source URLs, SHA-256s and NIST's licence
-notice) needs a maintainer to download the release assets; this change makes no network download. Until then the
-validation command below runs against copies fetched by hand.
+The three official schemas and the complete NIST licence notice are vendored in `spec/vendor/oscal/1.2.3/`.
+Their [provenance record](../../spec/vendor/oscal/1.2.3/README.md) separates raw upstream sizes and SHA-256 digests from stored-copy hashes.
+The raw retrieved schema bytes match the published v1.2.3 release-asset digests; stored schemas and the notice differ only by removal of terminal ASCII spaces and tabs.
+Every parsed schema value and all notice wording, punctuation and newlines remain unchanged; provenance and whitespace preservation alone do not validate an export.
 
 ### What the schemas require (checked against 1.2.3)
 
@@ -208,13 +209,18 @@ With the three schemas in `spec/vendor/oscal/1.2.3/` (or copies fetched from the
 ```
 node --input-type=module -e '
 import Ajv from "ajv"; import addFormats from "ajv-formats"; import { readFileSync } from "node:fs";
-const ajv = new Ajv({ allErrors: true, strict: false }); addFormats(ajv);
+const ajv = new Ajv({ allErrors: true, unicodeRegExp: true, validateFormats: true, validateSchema: true });
+addFormats(ajv, { mode: "full", keywords: true });
+let failed = false;
 const read = (p) => JSON.parse(readFileSync(p, "utf8"));
 for (const [schema, doc] of [["oscal_catalog_schema.json", "catalog.json"], ["oscal_profile_schema.json", "profile.json"],
   ["oscal_assessment-results_schema.json", "assessment-results.json"]]) {
   const validate = ajv.compile(read(`spec/vendor/oscal/1.2.3/${schema}`));
-  console.log(doc, validate(read(`out/${doc}`)) ? "valid" : validate.errors);
-}'
+  const valid = validate(read(`out/${doc}`));
+  if (valid) console.log(doc, "valid");
+  else { failed = true; console.error(doc, validate.errors); }
+}
+if (failed) process.exitCode = 1;'
 ```
 
 ajv and ajv-formats are development dependencies; the CLI does not validate at run time.

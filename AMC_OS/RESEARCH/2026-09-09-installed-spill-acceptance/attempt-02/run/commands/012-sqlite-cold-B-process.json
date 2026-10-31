@@ -2,7 +2,7 @@
   "label": "012-sqlite-cold-B",
   "command": [
     "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-    "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+    "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
     "agent-loop",
     "verify",
     "51c486fa-9367-491f-8ad1-16a418293fc6",

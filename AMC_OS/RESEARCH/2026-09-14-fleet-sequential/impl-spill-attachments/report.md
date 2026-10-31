@@ -1,6 +1,6 @@
 # IMPL-1 — large attachments through the encrypted spill store (PARTIAL)
 
-**Boundary.** Source commit 43f61d5eaabccc5652e1021e439cefbed6901eae (amc/gap-register-execution), worked in worktree branch `worktree-wf_e54e6c35-3e3-1` at `/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_e54e6c35-3e3-1` (fast-forwarded from 3d6b8d4a, the merge-base, before any edit). Environment: Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0, vitest 4.1.11, `AMC_VAULT_PASSPHRASE` and `AMC_NO_SIGN` unset in the shell. `pnpm install --frozen-lockfile --prefer-offline` exit 0. No `pnpm build`, no generators, no commits. Every number below was produced in this session.
+**Boundary.** Source commit 43f61d5eaabccc5652e1021e439cefbed6901eae (amc/gap-register-execution), worked in worktree branch `worktree-wf_e54e6c35-3e3-1` at `~/AgentMaturityCompass/.claude/worktrees/wf_e54e6c35-3e3-1` (fast-forwarded from 3d6b8d4a, the merge-base, before any edit). Environment: Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0, vitest 4.1.11, `AMC_VAULT_PASSPHRASE` and `AMC_NO_SIGN` unset in the shell. `pnpm install --frozen-lockfile --prefer-offline` exit 0. No `pnpm build`, no generators, no commits. Every number below was produced in this session.
 
 ## What was done (attachment door, end to end)
 

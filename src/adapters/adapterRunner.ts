@@ -1,6 +1,6 @@
 import { createHash, randomUUID } from "node:crypto";
 import { spawn } from "node:child_process";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { writeFileSync } from "node:fs";
 import { openLedger, hashBinaryOrPath } from "../ledger/ledger.js";
 import { loadGatewayConfig } from "../gateway/config.js";
@@ -8,7 +8,7 @@ import { loadAMCConfig } from "../workspace.js";
 import { resolveAgentId } from "../fleet/paths.js";
 import { loadBudgetsConfig } from "../budgets/budgets.js";
 import { runSandboxCommand } from "../sandbox/sandbox.js";
-import { issueLeaseToken } from "../leases/leaseSigner.js";
+import { captureLeaseTokenIssuance } from "../leases/leaseSigner.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 import { ensureDir } from "../utils/fs.js";
 import { studioStatus } from "../studio/studioSupervisor.js";
@@ -16,11 +16,15 @@ import { getAdapterDefinition } from "./catalog.js";
 import { detectAdapter } from "./adapterDetection.js";
 import { loadAdaptersConfig, verifyAdaptersConfigSignature } from "./adapterConfigStore.js";
 import { assembleAdapterEnv, redactSecretsInText } from "./envAssembler.js";
+import { processOutputRedactor, recordedArgv } from "../bridge/bridgeRedaction.js";
 import type { AdapterRunMode } from "./adapterTypes.js";
 import { nodeFetchSnippet } from "./snippets/nodeFetch.js";
 import { pythonRequestsSnippet } from "./snippets/pythonRequests.js";
 import { PROVIDER_KEY_ENV_NAMES } from "../utils/providerKeys.js";
 import { deepseekHarnessCoverage, detectDeepseekHarnessLaunch, prepareDeepseekHarnessLaunch, verifyDeepseekHarnessLaunch } from "./deepseekHarnessLaunch.js";
+
+import { captureOrgFiles, captureOrgPairs, assertOrgPairsCurrent } from "../org/preparedOrgPairs.js";
+import { canonicalize } from "../utils/json.js";
 
 function redactWithGatewayRules(text: string, lease: string, regexes: string[]): string {
   let out = redactSecretsInText(text, [lease]);
@@ -92,8 +96,29 @@ function resolveBudgetLimits(workspace: string, agentId: string): {
   }
 }
 
+/** Fixed original adapter inputs. These are finite path observations, never a permission proof. */
+function captureAdapterLeaseInputs(input: AdapterRunInput): () => void {
+  const workspace = input.workspace, root = resolve(workspace), cwd = process.cwd(), path = process.env.PATH;
+  const implicitAgent = !input.agentId || input.agentId.trim().length === 0;
+  const agentEnv = implicitAgent ? process.env.AMC_AGENT_ID : undefined;
+  const usesCurrentAgent = implicitAgent && (!agentEnv || agentEnv.trim().length === 0);
+  const pairs = captureOrgPairs(["adapters.yaml", "budgets.yaml", "gateway.yaml", "amc.config.yaml"]
+    .map(name => join(workspace, ".amc", name)));
+  const files = captureOrgFiles([join(workspace, ".amc", "studio", "state.json"),
+    ...(usesCurrentAgent ? [join(workspace, ".amc", "current-agent")] : [])]);
+  return () => {
+    if (resolve(workspace) !== root || process.cwd() !== cwd || process.env.PATH !== path
+      || (implicitAgent && process.env.AMC_AGENT_ID !== agentEnv)) throw new Error("original adapter workspace, CWD, PATH or agent selection changed");
+    assertOrgPairsCurrent(pairs); assertOrgPairsCurrent(files);
+  };
+}
+
 export async function runAdapterCommand(input: AdapterRunInput): Promise<AdapterRunResult> {
+  let leaseAttempt: ReturnType<typeof captureLeaseTokenIssuance> | undefined;
+  try {
+  input = { ...input, command: [...(input.command ?? [])] };
   const workspace = input.workspace;
+  const originalInputs = captureAdapterLeaseInputs(input);
   const status = studioStatus(workspace);
   if (!status.running || !status.state) {
     throw new Error("AMC Studio is not running. Start it first with: amc up");
@@ -157,7 +182,21 @@ export async function runAdapterCommand(input: AdapterRunInput): Promise<Adapter
   }
 
   const budget = resolveBudgetLimits(workspace, agentId);
-  const lease = issueLeaseToken({
+  // The selected descriptor has private nested arrays/objects before the provider can yield.
+  Object.assign(adapter, structuredClone(adapter));
+  const definition = canonicalize(adapter), originalState = canonicalize(status.state);
+  const assertInputs = (): void => {
+    originalInputs();
+    const current = studioStatus(workspace);
+    if (!current.running || current.state === null || canonicalize(current.state) !== originalState
+      || resolveAgentId(workspace, input.agentId) !== agentId
+      || verifyAdaptersConfigSignature(workspace).valid !== adaptersSig.valid
+      || canonicalize(getAdapterDefinition(workspace, adapterId)) !== definition) throw new Error("original adapter launch inputs or eligibility changed");
+    if (isDsh) verifyDeepseekHarnessLaunch(profile!.deepseekHarnessLaunch!);
+    originalInputs();
+  };
+  assertInputs();
+  leaseAttempt = captureLeaseTokenIssuance({
     workspace,
     workspaceId: workspaceIdFromDirectory(workspace),
     agentId,
@@ -169,7 +208,10 @@ export async function runAdapterCommand(input: AdapterRunInput): Promise<Adapter
     maxTokensPerMinute: budget.tpm,
     maxCostUsdPerDay: budget.maxCost,
     workOrderId: input.workOrderId ?? null
-  });
+  }, { beforeSign: assertInputs });
+  const lease = await leaseAttempt.issue();
+  const assertLaunch = leaseAttempt.assertCurrent;
+  assertLaunch();
 
   const env = assembleAdapterEnv({
     adapter,
@@ -180,7 +222,8 @@ export async function runAdapterCommand(input: AdapterRunInput): Promise<Adapter
     providerRoute: routePrefix,
     model,
     workOrderId: input.workOrderId ?? null,
-    includeProxyEnv: runtimeConfig.supervise.includeProxyEnv
+    includeProxyEnv: runtimeConfig.supervise.includeProxyEnv,
+    inheritHostEnv: mode !== "SANDBOX"
   });
   env.AMC_REQUESTED_MODE = forcedSimulate ? "SIMULATE" : "EXECUTE";
   env.AMC_ADAPTER_ROUTE = routePrefix;
@@ -201,20 +244,21 @@ export async function runAdapterCommand(input: AdapterRunInput): Promise<Adapter
   }
 
   if (mode === "SANDBOX") {
-    const exports = Object.entries(env)
-      .filter((row): row is [string, string] => typeof row[1] === "string")
-      .map(([key, value]) => `export ${key}=${shellQuote(value)}`)
-      .join(";");
+    // Only the adapter's variables (the lease among them) reach the container, by name (`docker run -e NAME`, the value
+    // from docker's own environment), never in argv, which the sandbox attestation and the process_start row record.
     const cmd = [shellQuote(executable), ...args.map((arg) => shellQuote(arg))].join(" ");
-    const script = `${exports}; exec ${cmd}`;
+      assertLaunch();
       const sandbox = await runSandboxCommand({
         workspace,
         agentId,
         command: "sh",
-        args: ["-lc", script],
+        args: ["-lc", `exec ${cmd}`],
+        env: Object.fromEntries(Object.entries(env).filter((row): row is [string, string] => typeof row[1] === "string")),
+        scrubValues: [lease.token],
+        leaseId: lease.payload.leaseId,
         gatewayRoute: routeUrl,
         gatewayProxyUrl: activeProxyBase
-      });
+      }, assertLaunch);
     return {
       sessionId: sandbox.sessionId,
       adapterId: adapter.id,
@@ -226,11 +270,16 @@ export async function runAdapterCommand(input: AdapterRunInput): Promise<Adapter
       leaseExpiresTs: lease.payload.expiresTs,
       forcedSimulate,
       dashboardUrl: status.state ? `http://${status.state.host}:${status.state.dashboardPort}` : null,
-      exitCode: 0
+      // docker run's status is the container's (AXR-05); a run that never reported one is already 1, never 0.
+      exitCode: sandbox.exitCode
     };
   }
 
+  assertLaunch();
   const ledger = openLedger(workspace);
+  // Where the workspace opted in (P2-02), the stored stdout and stderr rows get what `amc wrap`'s telemetry gets; elsewhere
+  // they hold what the terminal shows, the lease- and denylist-redacted text (`processOutputRedactor`).
+  const evidence = processOutputRedactor(workspace);
   const sessionId = randomUUID();
   let exitCode = 1;
   let dshLaunch: ReturnType<typeof prepareDeepseekHarnessLaunch> | undefined;
@@ -242,6 +291,7 @@ export async function runAdapterCommand(input: AdapterRunInput): Promise<Adapter
   let childExitCode: number | null = null;
   let childSignal: NodeJS.Signals | null = null;
   try {
+    assertLaunch();
     if (isDsh) {
       dshLaunch = prepareDeepseekHarnessLaunch({ launch: profile!.deepseekHarnessLaunch!, task: userCommand, routeUrl, model });
       executable = dshLaunch.executable;
@@ -259,8 +309,9 @@ export async function runAdapterCommand(input: AdapterRunInput): Promise<Adapter
       eventType: "agent_process_started",
       payload: JSON.stringify({
         adapterId: adapter.id,
-        command: executable,
-        args: isDsh ? ["--profile", "headless", "--patch", "<private per-launch overlay>", "<task omitted>"] : args,
+        // Stored like the run's output (P2-02); DSH's task is omitted outright.
+        ...(isDsh ? { command: executable, args: ["--profile", "headless", "--patch", "<private per-launch overlay>", "<task omitted>"] }
+          : recordedArgv(workspace, executable, args, [lease.token])),
         ...(isDsh ? {
           taskSha256: createHash("sha256").update(userCommand[0]!).digest("hex"),
           approvedLaunch: profile!.deepseekHarnessLaunch,
@@ -303,6 +354,7 @@ export async function runAdapterCommand(input: AdapterRunInput): Promise<Adapter
       }
     }
     await new Promise<void>((resolvePromise, rejectPromise) => {
+      assertLaunch();
       const child = spawn(executable, args, {
         stdio: ["pipe", "pipe", "pipe"],
         env,
@@ -339,7 +391,7 @@ export async function runAdapterCommand(input: AdapterRunInput): Promise<Adapter
           sessionId,
           runtime: "any",
           eventType: "agent_stdout",
-          payload: text,
+          payload: evidence(text),
           payloadExt: "txt",
           inline: true,
           meta: {
@@ -357,7 +409,7 @@ export async function runAdapterCommand(input: AdapterRunInput): Promise<Adapter
           sessionId,
           runtime: "any",
           eventType: "agent_stderr",
-          payload: text,
+          payload: evidence(text),
           payloadExt: "txt",
           inline: true,
           meta: {
@@ -379,7 +431,7 @@ export async function runAdapterCommand(input: AdapterRunInput): Promise<Adapter
           const text = stdoutOmitted ? "<DSH stdout omitted: exceeded 1 MiB>" : redactWithGatewayRules(redactSecretsInText(Buffer.concat(stdoutChunks).toString("utf8"), dshSecrets), lease.token, gatewayConfig.redaction.textRegexDenylist);
           process.stdout.write(text);
           for (const [eventType, payload] of [
-            ["agent_stdout", text],
+            ["agent_stdout", evidence(text)],
             ["agent_stderr", JSON.stringify({ bytes: stderrBytes, content: "omitted: may contain private reasoning or credentials" })]
           ] as const) ledger.appendEvidence({ sessionId, runtime: "any", eventType, payload, payloadExt: "txt", inline: true, meta: { adapterId: adapter.id, agentId, trustTier: "OBSERVED", evidenceBoundary: "process_only", signal, requestedSignal, spawnObserved } });
         }
@@ -425,6 +477,10 @@ export async function runAdapterCommand(input: AdapterRunInput): Promise<Adapter
     exitCode,
     ...(isDsh ? { captureCoverage: { ...deepseekHarnessCoverage(), stdoutBytes, stdoutOmitted, stderrBytes, spawnObserved, requestedSignal, childExitCode, childSignal } } : {})
   };
+  } catch (escaped) {
+    if (leaseAttempt === undefined) throw escaped;
+    return leaseAttempt.rethrow(escaped);
+  }
 }
 
 function nodeSampleScript(sampleName: string, routeUrl: string, agentId: string, importName: string): string {

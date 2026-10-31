@@ -1,0 +1,294 @@
+{
+  "at": "2026-10-16T16:59:32.164532+00:00",
+  "generationRoot": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0",
+  "allEightDecodedAndSourceBytesExact": true,
+  "storedBytes": 770886,
+  "rawOriginalBytes": 4104713,
+  "topLevelMembers": [
+    {
+      "name": "domain-report.md",
+      "bytes": 29387,
+      "sha256": "7ba8a5f6b5369046c72e82fd8aab240fb5a13c2a0762cb99501d5fa3f8ee97a4",
+      "decodedAndSourceBytesExact": true
+    },
+    {
+      "name": "ledger-observation.json",
+      "bytes": 6067,
+      "sha256": "ab95079658c7eb4e4b8aa6dfc74fe18e09425c9a18d623390ea56ccb726125db",
+      "decodedAndSourceBytesExact": true,
+      "inlineSnapshotObservation": {
+        "events": 9,
+        "sessions": 2,
+        "allInline": true
+      }
+    },
+    {
+      "name": "evidence.sqlite",
+      "bytes": 331776,
+      "sha256": "e7c3f5cc4bdb288cfdf2ced0828b8140316c82c85769bc24c6761443982bbc6e",
+      "decodedAndSourceBytesExact": true
+    },
+    {
+      "name": "diagnostic-report.json",
+      "bytes": 3333257,
+      "sha256": "1330fa0023da3913469913bbbf40ec8f92827c6763d47712eeb99419a9dce39a",
+      "decodedAndSourceBytesExact": true,
+      "actualMeanLevel": 0.0
+    },
+    {
+      "name": "assurance-report.json",
+      "bytes": 26126,
+      "sha256": "208410b987cf58c932b18295a4bb9839d6085b4c90668f15a35077751960880a",
+      "decodedAndSourceBytesExact": true
+    },
+    {
+      "name": "trust-certificate.json",
+      "bytes": 3118,
+      "sha256": "fe0e9d522b0ae24b2ec8e6819c8a2a5d81e7a58151ddc01f036db5b430284c8d",
+      "decodedAndSourceBytesExact": true
+    },
+    {
+      "name": "passport.amcpass",
+      "bytes": 3675,
+      "sha256": "40075ce877981d07ea045993551058421f8bdbf54b282512e269a09124f6518f",
+      "decodedAndSourceBytesExact": true
+    },
+    {
+      "name": "run.amcbundle",
+      "bytes": 371307,
+      "sha256": "557bce3cf5ebb31e0ac056c4961ccd087abf0503a4f5da7c74ccfcffc1dc61fa",
+      "decodedAndSourceBytesExact": true
+    }
+  ],
+  "nestedMembers": [
+    {
+      "container": "passport.amcpass",
+      "name": "amc-passport/checks/.keep",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "container": "passport.amcpass",
+      "name": "amc-passport/checks/pii-scan.json",
+      "bytes": 38,
+      "sha256": "0dfcc0a8176103aaba12ab202a518dd4cf93d5f5daeda9a8c6ac71327e727971"
+    },
+    {
+      "container": "passport.amcpass",
+      "name": "amc-passport/checks/pii-scan.sha256",
+      "bytes": 65,
+      "sha256": "c2d1b403bbcaa8e21c575bdb766a955fd896c72e6633a9f6d126ec380d1eb1c8"
+    },
+    {
+      "container": "passport.amcpass",
+      "name": "amc-passport/meta/.keep",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "container": "passport.amcpass",
+      "name": "amc-passport/meta/bank.sha256",
+      "bytes": 65,
+      "sha256": "417392d45561b917fc9ac6cb936298c739b9900133f3ee95484f87cfa96149c4"
+    },
+    {
+      "container": "passport.amcpass",
+      "name": "amc-passport/meta/build.json",
+      "bytes": 670,
+      "sha256": "c5135814e2ce5cb22d6d0205745fb1b83b1ab87367f66e7ac521faf47e79d12a"
+    },
+    {
+      "container": "passport.amcpass",
+      "name": "amc-passport/meta/build.sha256",
+      "bytes": 65,
+      "sha256": "505f2347698e16eadf11314225e9ed9d33172c6d14d3afbd8c39253793492eec"
+    },
+    {
+      "container": "passport.amcpass",
+      "name": "amc-passport/meta/calculation-manifest.json",
+      "bytes": 905,
+      "sha256": "97723153c891ed655dcf6b986046ab51cdd03f79ac75437b7d24a812d30d2db7"
+    },
+    {
+      "container": "passport.amcpass",
+      "name": "amc-passport/meta/canon.sha256",
+      "bytes": 65,
+      "sha256": "1a6085ca2114fd2c7f5b9cab2b022931729e6c02772aa6f272ed929a3aef5422"
+    },
+    {
+      "container": "passport.amcpass",
+      "name": "amc-passport/meta/cgx.pack.sha256",
+      "bytes": 65,
+      "sha256": "827d096d92f3deeaa0e8070d79f45beb176768e57a958a1cd325f5f4b754b048"
+    },
+    {
+      "container": "passport.amcpass",
+      "name": "amc-passport/meta/policy.sha256",
+      "bytes": 65,
+      "sha256": "0093430fe3ce26746c03e355f8fb1968feceeb0774bd33d201b8579d60e701ec"
+    },
+    {
+      "container": "passport.amcpass",
+      "name": "amc-passport/passport.json",
+      "bytes": 2403,
+      "sha256": "24dea7ca30678a7c7abf0a0837a32bf1a17234e70eedbda484f2e6540f0c90ba"
+    },
+    {
+      "container": "passport.amcpass",
+      "name": "amc-passport/passport.sig",
+      "bytes": 695,
+      "sha256": "436809f7c544b27ca35921d2a017fdc47a4fe9d2925c3daa0fd081d0c7b046c8"
+    },
+    {
+      "container": "passport.amcpass",
+      "name": "amc-passport/proofs/merkle.root.json",
+      "bytes": 218,
+      "sha256": "efdaba248002a2178da6adc49b75e5e3361d5887148dbff1f9cd04a713939bed"
+    },
+    {
+      "container": "passport.amcpass",
+      "name": "amc-passport/proofs/merkle.root.sig",
+      "bytes": 781,
+      "sha256": "003ab855d3165a6edbf68121540035167c7244b69423d752865f28d3dfdbb57d"
+    },
+    {
+      "container": "passport.amcpass",
+      "name": "amc-passport/proofs/transparency.root.json",
+      "bytes": 208,
+      "sha256": "bfdede13deecbfd951d52c2255e7db74ac8d49ee11cf43ac4cb21d28fb80c6e7"
+    },
+    {
+      "container": "passport.amcpass",
+      "name": "amc-passport/proofs/transparency.root.sig",
+      "bytes": 781,
+      "sha256": "ad59f4b32c8063a4d14d7eed0c9255f9b7c81f989c5f56b9f9a0225fa74549ad"
+    },
+    {
+      "container": "passport.amcpass",
+      "name": "amc-passport/signer.pub",
+      "bytes": 113,
+      "sha256": "5f24420aaadad3cffe4aa83f98e8b2044c3aadf60300485725fe1eb633bd2142"
+    },
+    {
+      "container": "run.amcbundle",
+      "name": "./target.json",
+      "bytes": 5030,
+      "sha256": "2a20a93c22b7fa29c14f0615ee9ee10544f1d73f05ee54ab224a23d55348da96"
+    },
+    {
+      "container": "run.amcbundle",
+      "name": "./target.sig",
+      "bytes": 250,
+      "sha256": "c4774d57e4db0a61290a3b66e692077a13273613a32004f650158f2443d9b76b"
+    },
+    {
+      "container": "run.amcbundle",
+      "name": "./manifest.sig",
+      "bytes": 249,
+      "sha256": "d729b4dc79a9b8992a4da16ebc1baaffc9c57e75fd35f7a9bb4b545464afad09"
+    },
+    {
+      "container": "run.amcbundle",
+      "name": "./context-graph.json",
+      "bytes": 1958,
+      "sha256": "a3c48fd3e92f41db74a978a59e410979fd66842b598aa68674aab515ec42e534"
+    },
+    {
+      "container": "run.amcbundle",
+      "name": "./manifest.json",
+      "bytes": 1926,
+      "sha256": "67c5c0b405f2aee11f3e58782266cb09e4da127f9e2b6f6ba9b19d8f3555b5cf"
+    },
+    {
+      "container": "run.amcbundle",
+      "name": "./run.md",
+      "bytes": 437214,
+      "sha256": "4ccb50e20249dbe735a6c332c3438e98c8495f1714b96e0ffde79dc856c9001b"
+    },
+    {
+      "container": "run.amcbundle",
+      "name": "./run.json",
+      "bytes": 3333257,
+      "sha256": "1330fa0023da3913469913bbbf40ec8f92827c6763d47712eeb99419a9dce39a"
+    },
+    {
+      "container": "run.amcbundle",
+      "name": "./metadata/exportInfo.json",
+      "bytes": 282,
+      "sha256": "bbc844d84067f98e034f0f298735f1321dee7ac9d93ee3495af769de5340b109"
+    },
+    {
+      "container": "run.amcbundle",
+      "name": "./public-keys/monitor.pub",
+      "bytes": 113,
+      "sha256": "61ee1b7a33aa0a87cfbd7c838b1be3f0d63f095d4ebed734d4687150b790d392"
+    },
+    {
+      "container": "run.amcbundle",
+      "name": "./public-keys/key-history.json",
+      "bytes": 594,
+      "sha256": "d786ad1df20f6f419872ba2047cb77e94aafb3a974273d3be6365d91f32420aa"
+    },
+    {
+      "container": "run.amcbundle",
+      "name": "./public-keys/auditor.pub",
+      "bytes": 113,
+      "sha256": "5f24420aaadad3cffe4aa83f98e8b2044c3aadf60300485725fe1eb633bd2142"
+    },
+    {
+      "container": "run.amcbundle",
+      "name": "./evidence/evidence.sqlite",
+      "bytes": 110592,
+      "sha256": "dddbc5776d4c2d70129586ecb27a4d1349fc652a6b9afc4be4e177279dd3a28d"
+    }
+  ],
+  "ledgerSnapshot": {
+    "boundary": "before-diagnostic-and-assurance",
+    "sourceAtClosure": {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/workspace/.amc/evidence.sqlite",
+      "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/workspace/.amc/evidence.sqlite",
+      "bytes": 331776,
+      "sha256": "e7c3f5cc4bdb288cfdf2ced0828b8140316c82c85769bc24c6761443982bbc6e",
+      "dev": 16777231,
+      "inode": 542884098,
+      "nlink": 1
+    },
+    "snapshot": {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/exports/evidence.sqlite",
+      "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/generation/amc-legacy-1.1.1-CUV7J0/exports/evidence.sqlite",
+      "bytes": 331776,
+      "sha256": "e7c3f5cc4bdb288cfdf2ced0828b8140316c82c85769bc24c6761443982bbc6e",
+      "dev": 16777231,
+      "inode": 542884253,
+      "nlink": 1
+    },
+    "walAbsent": true,
+    "observationCommandIndex": 7,
+    "observationPid": 92313
+  },
+  "sourceAtClosureIsHistoricalNotFinalDBPin": true,
+  "actualMeanDiagnosticLevel": 0.0,
+  "inlineObservation": {
+    "events": 9,
+    "sessions": 2,
+    "allInline": true
+  },
+  "gaps": [
+    {
+      "step": "genuine-L3",
+      "reason": "Actual diagnostic does not have mean level exactly L3; original bytes and seal retained unchanged."
+    },
+    {
+      "step": "diagnostic-certificate",
+      "reason": "Natural exit 1; retained original streams; no success or retry claimed."
+    },
+    {
+      "step": "run.amccert",
+      "reason": "No output file was emitted."
+    }
+  ],
+  "privateRawKeyOrVaultOrPEMFound": false,
+  "sourceAndRuntimePinsStillExact": true,
+  "noBlobReadOrDecryption": true,
+  "boundary": "In-memory archive/hash/content-shape review only; actual ledger and relabel runtime test still required."
+}

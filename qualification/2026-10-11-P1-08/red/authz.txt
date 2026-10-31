@@ -1,0 +1,6 @@
+     × each mutating function refuses in agent mode, called directly 836ms
+     × revoke needs the owner's real passphrase 836ms
+     × accept takes exactly the next generation, backed by the owner's vault, unless a gap is stated 615ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+ Test Files  1 failed (1)
+      Tests  3 failed | 24 skipped (27)

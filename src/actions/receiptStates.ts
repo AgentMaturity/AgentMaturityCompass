@@ -64,7 +64,9 @@ export const actionIntentV1Schema = z.strictObject({
   sessionId: nonEmpty.nullable(),
   callId: nonEmpty,
   owner: z.strictObject({ pid: z.number().int(), hostname: z.string() }),
-  startedAt: z.iso.datetime()
+  startedAt: z.iso.datetime(),
+  /** From a v2 lease (P2-25): the signed delegation chain the call ran under, its delegate's SPIFFE ID and the principal. */
+  delegation: z.strictObject({ chainDigest: sha256, spiffeId: nonEmpty.nullable(), principal: nonEmpty }).optional()
 });
 export type ActionIntentV1 = Readonly<z.infer<typeof actionIntentV1Schema>>;
 

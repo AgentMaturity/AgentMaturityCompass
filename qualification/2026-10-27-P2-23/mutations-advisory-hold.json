@@ -1,0 +1,23 @@
+[
+ {
+  "mutation": "M22 an explicit suspension only warns in an advisory workspace",
+  "file": "src/lifecycle/reassessment.ts",
+  "test": "tests/lifecycle/admission.test.ts",
+  "exit": 1,
+  "failing": [
+   "a suspended agent's read (an unbound READ_ONLY call) is denied too",
+   "an advisory plan still denies a suspended agent (an explicit suspension holds everywhere)"
+  ],
+  "restored": true
+ },
+ {
+  "mutation": "M23 pre-activation consequential calls denied in an advisory workspace",
+  "file": "src/lifecycle/reassessment.ts",
+  "test": "tests/lifecycle/admission.test.ts",
+  "exit": 1,
+  "failing": [
+   "an advisory plan lets a proposed agent's consequential call run and writes a warning row"
+  ],
+  "restored": true
+ }
+]

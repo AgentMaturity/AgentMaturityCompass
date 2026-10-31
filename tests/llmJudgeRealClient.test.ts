@@ -17,7 +17,8 @@ describe("LLM judge uses a real client", () => {
 
   it("delegates to the real production judge client", () => {
     expect(source).toContain("ProductionLLMJudgeEngine");
-    expect(source).toContain("productionEngine.callJudgeModel(prompt)");
+    // GAP-WP11: the configured model/temperature/token settings travel with the prompt.
+    expect(source).toContain("productionEngine.callJudgeModel(prompt, settings)");
   });
 
   it("reports a real cache hit rate rather than a hardcoded zero", () => {

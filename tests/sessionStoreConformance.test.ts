@@ -39,6 +39,9 @@ import {
  * conformance rule and its mutation test turns this file red.
  */
 const PASS = "session-store-conformance-passphrase";
+// Each composite test runs 16 cases with independently initialized workspaces and real signed persistence.
+// Keep the normal timeout for direct checks; bound only the complete conformance runs under coverage.
+const CONFORMANCE_TEST_TIMEOUT_MS = 120_000;
 
 function makeWorkspace(): ConformanceWorkspace {
   const workspace = mkdtempSync(join(tmpdir(), "amc-store-conf-"));
@@ -219,17 +222,17 @@ describe("session store conformance — both backends, one suite", () => {
     const report = sqliteReport();
     expect(report.failed).toEqual([]);
     expect(report.passed).toHaveLength(SESSION_STORE_CONFORMANCE_CASES.length);
-  });
+  }, CONFORMANCE_TEST_TIMEOUT_MS);
 
   it("the JSONL backend passes every case — signed and chained, not a fast path", () => {
     const report = jsonlReport();
     expect(report.failed).toEqual([]);
     expect(report.passed).toHaveLength(SESSION_STORE_CONFORMANCE_CASES.length);
-  });
+  }, CONFORMANCE_TEST_TIMEOUT_MS);
 
   it("both backends run the identical case list", () => {
     expect(jsonlReport().passed).toEqual(sqliteReport().passed);
-  });
+  }, CONFORMANCE_TEST_TIMEOUT_MS);
 
   it("identical control-plane input yields identical event hashes on both backends", () => {
     const parity = withPassphrase(() => compareBackendDeterminism([sqliteBackend, jsonlBackend]));
@@ -303,7 +306,7 @@ describe("the conformance suite has teeth (mutation tests)", () => {
       );
       expect(report.ok).toBe(false);
       expect(report.failed.map((failure) => failure.caseName)).toContain(mutation.expectedCase);
-    });
+    }, CONFORMANCE_TEST_TIMEOUT_MS);
   }
 
   it("the signature mutation is caught ONLY by the signature rule", () => {
@@ -320,5 +323,5 @@ describe("the conformance suite has teeth (mutation tests)", () => {
       "a-clean-log-verifies",
       "chain-head-survives-a-reopen"
     ]);
-  });
+  }, CONFORMANCE_TEST_TIMEOUT_MS);
 });

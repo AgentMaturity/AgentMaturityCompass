@@ -1,3 +1,4 @@
+import { workspaceSelfTrust } from "../trust/trustContext.js";
 import { randomUUID } from "node:crypto";
 import { resolve } from "node:path";
 import { loadTargetProfile } from "../targets/targetProfile.js";
@@ -8,6 +9,7 @@ import {
   verifyActionPolicySignature,
   type GovernorDecision
 } from "../governor/actionPolicyEngine.js";
+import { toolhubIntentDecisionEvidence } from "../governor/decisionLog.js";
 import { type ActionClass, type ExecutionMode } from "../types.js";
 import { openLedger } from "../ledger/ledger.js";
 import {
@@ -16,17 +18,16 @@ import {
   validateToolRequest,
   verifyToolsConfigSignature
 } from "./toolhubValidators.js";
-import { appendToolEvidenceWithReceipt } from "./toolhubReceipts.js";
+import { redactedEvidenceValue } from "./toolhubReceipts.js";
 import {
   buildToolBlastRadiusConsent,
   buildToolExecutedScope,
-  hashToolBlastRadiusConsent,
   validateToolBlastRadiusConsent,
   withToolBlastRadiusDecision,
   type ToolBlastRadiusConsent,
   type ToolBlastRadiusReviewerDecision
 } from "./blastRadiusConsent.js";
-import { ToolhubJournal, isJournaledToolhubExecution, toolhubApprovalIntent, toolhubExecutionId, openToolhubExecutionEvidence, classifyToolhubOutcome, type JournaledToolhubOutcome } from "./toolhubJournal.js";
+import { ToolhubJournal, isJournaledToolhubExecution, toolhubLifecycleHold, toolhubApprovalIntent, toolhubExecutionId, openToolhubExecutionEvidence, classifyToolhubOutcome, type JournaledToolhubOutcome } from "./toolhubJournal.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 import { executeFsRead, executeFsWrite } from "./toolhubExecutors/fs.js";
 import { executeGit } from "./toolhubExecutors/git.js";
@@ -35,24 +36,34 @@ import { executeProcessSpawn } from "./toolhubExecutors/process.js";
 import { loadWorkOrder } from "../workorders/workorderEngine.js";
 import { verifyExecTicket } from "../tickets/execTicketVerify.js";
 import { sha256Hex } from "../utils/hash.js";
+import { canonicalize } from "../utils/json.js";
 import { evaluateBudgetStatus } from "../budgets/budgets.js";
 import { activeFreezeStatus } from "../drift/freezeEngine.js";
+import { governedCallDenial, withGovernedCallDenial } from "../tools/guards/governedCallDecision.js";
 import {
   approvalStatusPayload,
   consumeApprovedExecution,
   createApprovalForIntent,
+  createApprovalForIntentAsync,
+  type ApprovalRequestInput,
   verifyApprovalForExecution
 } from "../approvals/approvalEngine.js";
-import { loadApprovalPolicy, verifyApprovalPolicySignature } from "../approvals/approvalPolicyEngine.js";
+import { loadApprovalPolicy, verifyApprovalPolicySignature, approvalPolicyPath } from "../approvals/approvalPolicyEngine.js";
+import { captureApprovalBoundInputs, ApprovalRequestContinuationError } from "../approvals/approvalRequestPublication.js";
+import { captureOrgPairs, assertOrgPairsCurrent } from "../org/preparedOrgPairs.js";
 import {
   inspectToolhubContext,
   requireTrustedToolhubContext,
   type ToolContextTool,
   type ToolHubContextProjection
 } from "./toolContext.js";
+import { inCheckPass } from "../utils/checkPass.js";
+const TOOLHUB_DECIDES = ["action-policy", "freeze", "tool-allowlist"]; // AXR-01: decided here (work order, EXECUTE-only freeze, validateToolArgs)
 
 export interface ToolIntentRequest {
   agentId: string;
+  /** Who raises an approval this intent needs (P1-78): the authenticated caller. */
+  initiator: string;
   workOrderId?: string;
   toolName: string;
   args: Record<string, unknown>;
@@ -108,6 +119,13 @@ interface IntentRecord {
   blastRadiusConsent: ToolBlastRadiusConsent;
 }
 
+interface IntentContext {
+  tool: NonNullable<ReturnType<typeof findToolDefinition>>;
+  configTrusted: boolean;
+  decision: GovernorDecision;
+  workOrderContext?: { workOrderId: string; riskTier: "low" | "med" | "high" | "critical"; allowedActionClasses: ActionClass[] };
+}
+
 export interface ExecutionRecord {
   executionId: string;
   ts: number;
@@ -149,7 +167,6 @@ function normalizeMode(value: unknown): ExecutionMode {
 export class ToolHubService {
   private readonly intents = new Map<string, IntentRecord>();
   private readonly executions = new Map<string, ExecutionRecord>();
-
   private readonly actionJournal: ToolhubJournal;
 
   constructor(private readonly workspace: string) { this.actionJournal = new ToolhubJournal(workspace); }
@@ -307,6 +324,69 @@ export class ToolHubService {
   }
 
   createIntent(input: ToolIntentRequest): ToolIntentResponse {
+    const state = this.prepareIntent(input, this.inspectIntentContext(input));
+    const approval = state.approvalInput === null ? undefined : createApprovalForIntent(state.approvalInput);
+    return this.finishIntent(state, approval);
+  }
+
+  /** Maintained async entry. The returned negative belongs to this attempt, never to the long-lived intent map. */
+  async createIntentAsync(input: ToolIntentRequest, options: { beforePublish?: () => void } = {}) {
+    const selected = structuredClone(input), shape = canonicalize(selected), caller = options.beforePublish;
+    const originalNoSign = process.env.AMC_NO_SIGN === "1";
+    const raw = captureApprovalBoundInputs(this.workspace, selected.agentId, selected.workOrderId);
+    const approvalBefore = captureOrgPairs([approvalPolicyPath(this.workspace)]);
+    const context = this.inspectIntentContext(selected);
+    raw.assertCurrent(); assertOrgPairsCurrent(approvalBefore);
+    const state = this.prepareIntent(selected, context), contextShape = canonicalize(context);
+    const recordShape = canonicalize({ ...state.record, approvalRequestId: undefined });
+    let finished = false, expectedApprovalId: string | undefined;
+    assertOrgPairsCurrent(approvalBefore); raw.assertCurrent();
+    let failure = null as { cause: unknown } | null;
+    let approval: Awaited<ReturnType<typeof createApprovalForIntentAsync>> | null = null;
+    const intrinsic = inCheckPass(() => {
+      if (canonicalize(input) !== shape || canonicalize(selected) !== shape || (process.env.AMC_NO_SIGN === "1") !== originalNoSign)
+        throw new Error("original tool intent input or no-sign choice changed");
+      if (Date.now() > state.record.expiresTs) throw new Error(`Intent expired: ${state.record.intentId}`);
+      if (canonicalize(context) !== contextShape || canonicalize({ ...state.record, approvalRequestId: undefined }) !== recordShape
+        || (state.record.approvalRequestId !== undefined && state.record.approvalRequestId !== expectedApprovalId)
+        || (finished && (this.intents.get(state.record.intentId) !== state.record || state.record.approvalRequestId !== expectedApprovalId)))
+        throw new Error("original tool intent record or actual map result changed");
+      raw.assertCurrent();
+      if (!state.record.approvalRequired) assertOrgPairsCurrent(approvalBefore);
+      if (canonicalize(this.inspectIntentContext(selected)) !== contextShape)
+        throw new Error("original tool intent policy or live eligibility changed");
+      raw.assertCurrent();
+      if (!state.record.approvalRequired) assertOrgPairsCurrent(approvalBefore);
+    });
+    const baseCurrent = () => {
+      if (failure !== null) throw failure.cause;
+      try { intrinsic(); caller?.(); intrinsic(); }
+      catch (cause) { failure = { cause }; throw cause; }
+    };
+    const fullCurrent = () => {
+      if (failure !== null) throw failure.cause;
+      try { baseCurrent(); approval?.assertCurrent(); baseCurrent(); }
+      catch (cause) { failure = { cause }; throw cause; }
+    };
+    try {
+      baseCurrent();
+      if (state.approvalInput !== null) approval = await createApprovalForIntentAsync(state.approvalInput,
+        { beforePublish: baseCurrent, beforePolicyCapture: () => assertOrgPairsCurrent(approvalBefore) });
+      expectedApprovalId = approval?.result.approval.approvalRequestId;
+      fullCurrent();
+      const response = this.finishIntent(state, approval?.result, fullCurrent);
+      finished = true; fullCurrent(); return Object.freeze({ response, assertCurrent: fullCurrent });
+    } catch (cause) {
+      if (failure !== null && failure.cause !== cause) {
+        if (cause instanceof ApprovalRequestContinuationError && cause.primaryCause === failure.cause) throw cause;
+        throw new ApprovalRequestContinuationError(failure.cause, cause);
+      }
+      throw cause;
+    }
+  }
+
+  /** Actual read-oriented inspection. Ledger/keyset/history/cache effects remain real on every invocation. */
+  private inspectIntentContext(input: ToolIntentRequest): IntentContext {
     const actionPolicySig = verifyActionPolicySignature(this.workspace);
     const toolsSig = verifyToolsConfigSignature(this.workspace);
     const configTrusted = actionPolicySig.valid && toolsSig.valid;
@@ -343,7 +423,8 @@ export class ToolHubService {
       };
     }
 
-    const decision = evaluateActionPermission({
+    // AXR-01: the checks every governed plane shares; this plane decides the Action Policy and freezes with its own context.
+    const decision = withGovernedCallDenial(evaluateActionPermission({
       agentId: input.agentId,
       actionClass: normalizeActionClass(tool.actionClass),
       riskTier: workOrderContext?.riskTier ?? "med",
@@ -358,11 +439,16 @@ export class ToolHubService {
       workOrder: workOrderContext,
       hasExecTicket: false,
       freezeStatus: activeFreezeStatus(this.workspace, input.agentId),
-      budgetStatus: evaluateBudgetStatus(this.workspace, input.agentId),
+      budgetStatus: evaluateBudgetStatus(this.workspace, input.agentId, Date.now(), { trust: workspaceSelfTrust(this.workspace) }),
       policy: loadActionPolicy(this.workspace),
       policySignatureValid: actionPolicySig.valid
-    });
+    }), governedCallDenial(this.workspace, { name: tool.name, agentId: input.agentId, actionClass: normalizeActionClass(tool.actionClass),
+      arguments: input.args, requestedMode: normalizeMode(input.requestedMode) }, TOOLHUB_DECIDES));
+    return { tool, configTrusted, decision, workOrderContext };
+  }
 
+  private prepareIntent(input: ToolIntentRequest, context: IntentContext) {
+    const { tool, decision, workOrderContext } = context;
     const intentId = `intent_${randomUUID().replace(/-/g, "")}`;
     const approvalPolicySig = verifyApprovalPolicySignature(this.workspace);
     let manualApprovalsRequired = 0;
@@ -400,9 +486,9 @@ export class ToolHubService {
     const boundIntent = isJournaledToolhubExecution(decision.effectiveMode, record.actionClass)
       ? toolhubApprovalIntent({ workspace: this.workspace, intentId, agentId: input.agentId, toolName: input.toolName,
           actionClass: record.actionClass, args: input.args, requestedMode: record.request.requestedMode, effectiveMode: decision.effectiveMode }) : null;
-    if (approvalRequired) {
-      const approval = createApprovalForIntent({
+    const approvalInput: ApprovalRequestInput | null = approvalRequired ? {
         workspace: this.workspace,
+        initiator: input.initiator,
         agentId: input.agentId,
         intentId,
         toolName: input.toolName,
@@ -421,8 +507,18 @@ export class ToolHubService {
           reasons: decision.reasons,
           blastRadiusConsent
         }
-      });
+    } : null;
+    return { input, context, record, approvalInput };
+  }
+
+  private finishIntent(state: { input: ToolIntentRequest; context: IntentContext; record: IntentRecord },
+    approval?: ReturnType<typeof createApprovalForIntent>, beforePublish?: () => void): ToolIntentResponse {
+    const { input, record } = state, { tool, configTrusted, decision } = state.context;
+    const { intentId, approvalRequired, blastRadiusConsent } = record;
+    if (approval !== undefined) {
+      beforePublish?.();
       record.approvalRequestId = approval.approval.approvalRequestId;
+      beforePublish?.();
       this.writeAuditWithReceipt({
         auditType: "APPROVAL_REQUEST_CREATED",
         severity: "MEDIUM",
@@ -435,6 +531,7 @@ export class ToolHubService {
           quorumReceived: approval.approval.receivedApprovals
         }
       });
+      beforePublish?.();
       this.writeAuditWithReceipt({
         auditType: "APPROVAL_REQUESTED",
         severity: "MEDIUM",
@@ -445,12 +542,14 @@ export class ToolHubService {
         }
       });
     }
+    beforePublish?.();
     this.intents.set(intentId, record);
-
+    beforePublish?.();
     const ledger = openLedger(this.workspace);
     let guardReceipt: string | undefined;
     const sessionId = `toolhub-intent-${randomUUID()}`;
     try {
+      beforePublish?.();
       ledger.startSession({
         sessionId,
         runtime: "unknown",
@@ -471,6 +570,7 @@ export class ToolHubService {
       };
       const payloadText = JSON.stringify(payload);
       const bodySha256 = sha256Hex(Buffer.from(payloadText, "utf8"));
+      beforePublish?.();
       const out = ledger.appendEvidenceWithReceipt({
         sessionId,
         runtime: "unknown",
@@ -492,7 +592,9 @@ export class ToolHubService {
         }
       });
       guardReceipt = out.receipt;
+      ledger.appendEvidence({ sessionId, runtime: "unknown", payloadExt: "json", inline: true, ...toolhubIntentDecisionEvidence(this.workspace, { intentId, agentId: input.agentId, toolName: input.toolName, actionClass: record.actionClass, args: input.args, allowed: decision.allowed, reasons: decision.reasons }) });
       if (input.workOrderId) {
+        beforePublish?.();
         this.appendOutcomeSignal({
           ledger,
           sessionId,
@@ -506,6 +608,7 @@ export class ToolHubService {
         });
       }
       if (approvalRequired) {
+        beforePublish?.();
         this.appendOutcomeSignal({
           ledger,
           sessionId,
@@ -518,12 +621,14 @@ export class ToolHubService {
           }
         });
       }
+      beforePublish?.();
       ledger.sealSession(sessionId);
     } finally {
       ledger.close();
     }
 
-    return {
+    beforePublish?.();
+    const response: ToolIntentResponse = {
       intentId,
       requiredExecTicket: decision.requiredExecTicket || tool.requireExecTicket === true,
       effectiveMode: decision.effectiveMode,
@@ -545,6 +650,7 @@ export class ToolHubService {
       guardReceipt,
       blastRadiusConsent
     };
+    beforePublish?.(); return response;
   }
 
   async executeIntent(input: ToolExecutionRequest): Promise<ToolExecutionResponse> {
@@ -578,20 +684,17 @@ export class ToolHubService {
       );
     }
 
+    const governed = governedCallDenial(this.workspace, { name: tool.name, agentId: intent.request.agentId, actionClass: intent.actionClass,
+      arguments: intent.request.args, requestedMode }, TOOLHUB_DECIDES); // AXR-01, re-read at execution
+    if (governed !== null) return this.auditDenied(intent, "TOOLHUB_GOVERNED_CALL_DENIED", `${governed.label}: ${governed.reason}`,
+      { executeAttempted: requestedMode === "EXECUTE", executeWithoutTicketAttempted: false });
     const freeze = activeFreezeStatus(this.workspace, intent.request.agentId);
     if (requestedMode === "EXECUTE" && freeze.active && freeze.actionClasses.includes(intent.actionClass)) {
-      return this.auditDenied(
-        intent,
-        "EXECUTE_FROZEN_ACTIVE",
-        `Execute is currently frozen for action class ${intent.actionClass}.`,
-        {
-          executeAttempted: true,
-          executeWithoutTicketAttempted: true
-        }
-      );
+      return this.auditDenied(intent, "EXECUTE_FROZEN_ACTIVE", `Execute is currently frozen for action class ${intent.actionClass}.`,
+        { executeAttempted: true, executeWithoutTicketAttempted: true });
     }
 
-    const budget = evaluateBudgetStatus(this.workspace, intent.request.agentId);
+    const budget = evaluateBudgetStatus(this.workspace, intent.request.agentId, Date.now(), { trust: workspaceSelfTrust(this.workspace) });
     if (!budget.budgetConfigValid && requestedMode === "EXECUTE") {
       return this.auditDenied(
         intent,
@@ -689,7 +792,7 @@ export class ToolHubService {
       });
     }
 
-    const journaled = isJournaledToolhubExecution(effectiveMode, intent.actionClass);
+    const journaled = isJournaledToolhubExecution(effectiveMode, intent.actionClass), held = journaled ? null : toolhubLifecycleHold(this.workspace, intent.request.agentId, intent.actionClass); if (held !== null) return this.auditDenied(intent, "AGENT_NOT_ACTIVE", held, { executeAttempted: requestedMode === "EXECUTE", executeWithoutTicketAttempted: false }); // P2-23: held agents, unjournaled calls
     const executionId = journaled ? toolhubExecutionId(workspaceIdFromDirectory(this.workspace), intent.intentId) : `exec_${randomUUID().replace(/-/g, "")}`;
     const blastRadiusReviewerDecision: ToolBlastRadiusReviewerDecision =
       approvalUsedId !== null
@@ -885,8 +988,11 @@ export class ToolHubService {
     const ledger = openLedger(this.workspace);
     const sessionId = `toolhub-deny-${randomUUID()}`;
     const eventIds: string[] = [];
-    const blastRadiusConsent = opts?.blastRadiusConsent;
-    const blastRadiusConsentHash = blastRadiusConsent ? hashToolBlastRadiusConsent(blastRadiusConsent) : null;
+    // A validator's reason quotes the agent's arguments (`path '...' not in allowlist`) and so does the consent: in an
+    // opted-in workspace both are stored redacted, in payload and meta, and the digest is over the redacted consent.
+    const blastRadiusConsent = redactedEvidenceValue(this.workspace, opts?.blastRadiusConsent);
+    const blastRadiusConsentHash = blastRadiusConsent ? sha256Hex(canonicalize(blastRadiusConsent)) : null;
+    const storedMessage = String(redactedEvidenceValue(this.workspace, message));
 
     try {
       ledger.startSession({
@@ -898,7 +1004,7 @@ export class ToolHubService {
       const payload = {
         auditType,
         severity: "HIGH",
-        message,
+        message: storedMessage,
         intentId: intent.intentId,
         toolName: intent.request.toolName,
         agentId: intent.request.agentId,
@@ -965,7 +1071,7 @@ export class ToolHubService {
           payload: JSON.stringify({
             auditType: "EXECUTE_WITHOUT_TICKET_ATTEMPTED",
             severity: "HIGH",
-            message,
+            message: storedMessage,
             intentId: intent.intentId,
             toolName: intent.request.toolName,
             agentId: intent.request.agentId,

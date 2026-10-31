@@ -1,0 +1,238 @@
+{
+  "schema": "p135-bounded-acceptance-and-gaps/1",
+  "at": "2026-10-16T17:25:11.829747+00:00",
+  "draftForRootAssembler": false,
+  "sourceCommit": "88e0dbdef8871f119325d289757ad1de38b88a1a",
+  "overall": "Bounded local checkpoint; full P1-35 acceptance remains open.",
+  "canonical": {
+    "passed": 85,
+    "total": 85,
+    "passingHooks": 20,
+    "migrationPublics": 10,
+    "unhandledErrors": 0
+  },
+  "genuineCorpus": {
+    "storedFiles": 4,
+    "storedBytes": 773756,
+    "decodedOriginals": 8,
+    "decodedBytes": 4104713,
+    "inlineEvents": 9,
+    "sessions": 2,
+    "coreDiagnosticMean": 0,
+    "exactGenuineL3": false
+  },
+  "separateCertificate": {
+    "privateOnly": true,
+    "bytes": 1996064,
+    "sha256": "8d1ec6ad5e4048ef0aec7bb0c15df6644f2f0b1b1defb257f7afbed925701384",
+    "originalLevel": "L3.92",
+    "mean": 3.923,
+    "currentBeforeAfterOk": false,
+    "currentBeforeAfterExit": 1,
+    "missingPayloadErrors": 711,
+    "beforeAfterVerdictStable": true,
+    "committedFixtureCoverage": false
+  },
+  "controls": [
+    {
+      "phase": "p135-m1",
+      "exit": 1,
+      "durationMs": 4775,
+      "passed": 84,
+      "total": 85,
+      "commandPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p135-m1/command.json",
+        "bytes": 3054,
+        "sha256": "296e483248d328a9a0a46714c7d2fbbb3077241dea7e750bb7fb60ab06fe7bc0"
+      },
+      "rawPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p135-m1/raw.json",
+        "bytes": 29686,
+        "sha256": "75ac33e49d0f30b5eddb274d061814014a57dba8202a708d087d6e3ab13a91a9"
+      }
+    },
+    {
+      "phase": "p135-m1-restored",
+      "exit": 0,
+      "durationMs": 4796,
+      "passed": 85,
+      "total": 85,
+      "commandPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p135-m1-restored/command.json",
+        "bytes": 3117,
+        "sha256": "8e5e4995bd58ec632b311ce007ac20602df3470cb1ad90db4b79f45ee5e2dbea"
+      },
+      "rawPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p135-m1-restored/raw.json",
+        "bytes": 28266,
+        "sha256": "90d8535be93dbfde3010987de80e1b28312178d0c081b6a5d00a083e816e296c"
+      }
+    },
+    {
+      "phase": "p135-m2",
+      "exit": 1,
+      "durationMs": 4734,
+      "passed": 81,
+      "total": 85,
+      "commandPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p135-m2/command.json",
+        "bytes": 3054,
+        "sha256": "8d26ff77e1aabae8791f3cb454dee8c856db802ceac9a73d5d9b2f0cbcbbb76f"
+      },
+      "rawPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p135-m2/raw.json",
+        "bytes": 31829,
+        "sha256": "30eb65db78c40f02d2d25dab0305e6ed8f6d970b090e6de10cbddf1ef9aee3b0"
+      }
+    },
+    {
+      "phase": "p135-m2-restored",
+      "exit": 0,
+      "durationMs": 4829,
+      "passed": 85,
+      "total": 85,
+      "commandPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p135-m2-restored/command.json",
+        "bytes": 3117,
+        "sha256": "5c7f5d1a54b352d7c7962cf01982b77ebfc145b53367919d553c5d3461efcfea"
+      },
+      "rawPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p135-m2-restored/raw.json",
+        "bytes": 28252,
+        "sha256": "66f070802151e574522a0de838df581632d7f2b06a1f58a43bd7f5e4eef8f198"
+      }
+    },
+    {
+      "phase": "p135-m3",
+      "exit": 1,
+      "durationMs": 4775,
+      "passed": 82,
+      "total": 85,
+      "commandPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p135-m3/command.json",
+        "bytes": 3054,
+        "sha256": "1f40ca12aab327e4b5d1f44c77201d5b40f9837378d247c2243b3f1d08a32c41"
+      },
+      "rawPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p135-m3/raw.json",
+        "bytes": 30935,
+        "sha256": "5441fb8a70599979bed22368adbffc355261933121738bdf7a4fbcc4555c2cda"
+      }
+    },
+    {
+      "phase": "p135-m3-restored",
+      "exit": 0,
+      "durationMs": 4816,
+      "passed": 85,
+      "total": 85,
+      "commandPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p135-m3-restored/command.json",
+        "bytes": 3117,
+        "sha256": "4ad1a626b33525b2507dd87d35fba4a8464eb73277a48197fa47e55cd0e7c103"
+      },
+      "rawPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p135-m3-restored/raw.json",
+        "bytes": 28249,
+        "sha256": "0c3a4c43f0fbd5dc711e178294c74341f3c24e2fdce034d8954178660f3ed345"
+      }
+    }
+  ],
+  "criteria": [
+    {
+      "criterion": "All table cases use genuine v1.1.1 fixtures with committed generator/log",
+      "status": "partial",
+      "evidence": "Four stored files773756bytes, eight exact decoded originals4104713bytes; genuine R1/R2/R3/R4 and diagnostic/bundle R5 evidence.",
+      "gaps": [
+        "Core diagnostic meanL0; no exact genuine L3.",
+        "Separate full old-run certificate isL3.92, private1996064bytes, and not a committed diagnostic-certificate fixture.",
+        "Unversioned passport/trust-certificate formats remain explicit identification bounds."
+      ]
+    },
+    {
+      "criterion": "Legacy artifacts never receive observed/independently_reviewed",
+      "status": "bounded-positive-and-causal",
+      "evidence": "Strict ten-case module and adjacent85-case cohort pass. M1 promotion fails never-promoted line254; exact restoration85/85.",
+      "gaps": [
+        "No universal all-reader/all-artifact proof from this finite corpus."
+      ]
+    },
+    {
+      "criterion": "Original artifacts/ledger remain byte-identical",
+      "status": "bounded-positive-and-causal",
+      "evidence": "Four stored/eight decoded originals and installed report/SQLite bytes preserved; separate whole certificate/embedded report/SQLite also preserved. M2 detects deliberate local copies rewritten at308/374/402/511 and cleanup475, then exact source restoration85/85.",
+      "gaps": [
+        "No encrypted-blob qualification or universal dependency trace."
+      ]
+    },
+    {
+      "criterion": "Hash-chained idempotent log and signed migration receipt",
+      "status": "bounded-positive",
+      "evidence": "Real inline nine-event/two-session ledger verifies with explicit fixture anchors; six relabel records, two unversioned skips; repeat adds0records and retains log; receipt/log checks pass.",
+      "gaps": [
+        "Imported anchors and integrity do not establish independent historical provenance."
+      ]
+    },
+    {
+      "criterion": "verify --relabel-legacy flag never triggers repair",
+      "status": "bounded-cli-positive",
+      "evidence": "Existing flag retained; actual dry-run0/no protected writes and incompatible repair flags2; eight protected files and receipt inventory unchanged.",
+      "gaps": [
+        "Generic prelaunch-pin KeyError timing retained; corrected postcheck is not retroactive pre-execution evidence.",
+        "Other CLI branches/surfaces not newly qualified."
+      ]
+    },
+    {
+      "criterion": "Verifiers separate integrity and legacy claim",
+      "status": "bounded-positive-with-explicit-negative-integrity",
+      "evidence": "Genuine bundle verifies without claim promotion; separate diagnostic certificate stays current-verifierfalse/exit1 with identical711missing-payload errors while R5self_reported/L1/originalL3.92 persists.",
+      "gaps": [
+        "No positive current integrity acceptance for that private certificate.",
+        "No newly qualified all-verifier CLI output matrix."
+      ]
+    },
+    {
+      "criterion": "All three mutation checks recorded",
+      "status": "actual-chain-complete",
+      "evidence": "M1=84/85, M2=81/85+one deliberate genuine cleanup, M3=82/85; each exact restored run85/85. All phases20passhooks/10publics/0unhandled.",
+      "gaps": [
+        "M1 later rule/kind, original ATTESTED tier and secondary-row assertions at255\u2013258 are masked after254; no explicit cap assertion exists there.",
+        "M2 later genuine signature/idempotence/ledger assertions masked after511.",
+        "M3 log-tamper prerequisite358 masks later direct tamper assertions; distinct receipt-signature case passes.",
+        "Source controls only; no compiled-mutant claim."
+      ]
+    },
+    {
+      "criterion": "Documentation/changeset",
+      "status": "existing-material-preserved",
+      "evidence": "Existing migration docs, versioned notice and legacy migration changeset retained. Bounded production repair only assurance R5 classifier/lazy adapter; authored Claude prose preserved.",
+      "gaps": [
+        "This packet does not independently close every historical surface declaration."
+      ]
+    },
+    {
+      "criterion": "Freeze/global quality/full-suite/release evidence",
+      "status": "open-global-acceptance",
+      "evidence": "Fresh clean-source0/49449ms; canonical85/85; finalQfreeze1236/1236/41/632/counts0; globalduplicates1268 anddeadcode2727 stayRED/unwaived.",
+      "gaps": [
+        "Dead-code delta adds manual generator file only; Knip adjustment held by D15 ignored required archive.",
+        "Full npm test, global coverage, broad reader/verifier matrix, PR/mergedSHA/release and full P1-35/plan completion are not claimed."
+      ]
+    }
+  ],
+  "quality": {
+    "duplicates": 1268,
+    "deadCode": 2727,
+    "added": [
+      "scripts/make-legacy-fixtures.mjs"
+    ],
+    "removed": [],
+    "waived": false,
+    "knipD15IgnoredArchiveHold": true
+  },
+  "allOtherHeldDecisionsPreserved": true,
+  "F37Skipped": true,
+  "nextSelectedScope": "P1-07 pure-levels/registry qualification",
+  "runtimeExecutedHere": false,
+  "sourceIndexQaWritesHere": false,
+  "sourceControlFutureResultsInvented": false
+}

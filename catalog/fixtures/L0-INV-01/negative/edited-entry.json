@@ -1,0 +1,15 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L0-INV-01",
+  "polarity": "negative",
+  "evidenceClass": "contradictory",
+  "setup": {
+    "harness": "agent_config",
+    "agentId": "fixture-agent",
+    "entry": "edited_after_signing"
+  },
+  "expected": {
+    "result": "fail",
+    "reasonCode": "signature_invalid"
+  }
+}

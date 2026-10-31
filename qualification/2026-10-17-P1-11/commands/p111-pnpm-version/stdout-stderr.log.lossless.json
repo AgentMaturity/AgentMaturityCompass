@@ -1,0 +1,11 @@
+{
+  "schema": "amc-qualification-lossless-original/1",
+  "encoding": "base64",
+  "original": {
+    "relativePath": "commands/p111-pnpm-version/stdout-stderr.log",
+    "bytes": 8,
+    "sha256": "62c33a14fe98185100efaeadf9bc76d70d6b76f1c026b4f7ead06cd6d417aacf"
+  },
+  "dataBase64": "MTAuMzMuMAo=",
+  "boundary": "Exact original bytes, including whitespace, are preserved by base64. Decode and verify original.bytes and original.sha256. The original producer remains retained privately; no normalization or command-result change."
+}

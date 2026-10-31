@@ -1,0 +1,309 @@
+{
+  "schema": "amc.pi-conformance/v1",
+  "key": "P1-22",
+  "followUp": "evidence-write latch, repeat and intake rules (P1-23's) for Pi",
+  "amcCommit": "86da8c341c9c750578c74b6a50d0eef4b30528b0",
+  "recordedAt": "2026-10-18T01:21:20.265Z",
+  "recordedAtSource": "this machine's clock when the record was written, after the runs",
+  "environment": {
+    "label": "local macOS arm64 (not CI)",
+    "load": "Other worktrees' AMC test runs were active; load averages 19.19 18.98 19.23 then 25.11 20.96 19.96. Latency was not measured on an idle host."
+  },
+  "pi": [
+    {
+      "version": "1.0.2",
+      "package": "@earendil-works/pi-coding-agent",
+      "tarball": "https://registry.npmjs.org/@earendil-works/pi-coding-agent/-/pi-coding-agent-1.0.2.tgz",
+      "integrity": "sha512-3ZdIghMSELMGV3sKi5iASOb1Jwb696fLjmNu0aezaqDxTLLWWoRpqBYkGxJ1CgAMCbtfqXWEF0lcRrlVXmiEGQ==",
+      "gitHead": "cd32f7725fdbddbaecdff5b1e68491563394e0ca",
+      "cliBundleSha256": "e79626f2dd6f94aa45d30f3fa63cd84319a6eefcd150b353cfaf274366926774",
+      "install": "the P1-22 install (qualification/2026-10-12-P1-22): npm install --ignore-scripts --no-audit --no-fund --save-exact @earendil-works/pi-coding-agent@1.0.2 (scratch prefix outside the repository)",
+      "resolvedDependencies": {
+        "@earendil-works/chord": {
+          "version": "1.1.0",
+          "integrity": "sha512-gsHzKfyQ3t0ZIQ3cLBjJ5Vqy1TYnFyruHIV3g3BwmulCDYe5BW4yT9vaJk9QzN6YANILIO75uzuq+Gdxtzz1og=="
+        },
+        "@earendil-works/pi-agent-core": {
+          "version": "1.1.0",
+          "integrity": "sha512-aX1KZomNCPmwYnXa3OivF3VYLJ+WPUkIJlEIZTgwdOZdY/+oToWTQ334WYpQeOz9POpiYFNMJLPwIhXQ4e48kg=="
+        },
+        "@earendil-works/pi-ai": {
+          "version": "1.1.0",
+          "integrity": "sha512-1T7LAkc/5Bvc0v6w4vAGVdCrli0o/E0pEmYKTnixu95vSFArBjvbhS/G4ZwI0RUePgf0Imcu0VyqlM4EcXxqfw=="
+        },
+        "@earendil-works/pi-codemode": {
+          "version": "1.1.0",
+          "integrity": "sha512-8Asc2AzhoNaXS1snmRFa96OhcWIlFM5k1Kuiz6p2DvIYgi5QHQccRAmDVY9oO92TzWrizpvQpconZGQ7JhlI7Q=="
+        },
+        "@earendil-works/pi-mcp": {
+          "version": "1.1.0",
+          "integrity": "sha512-xGKwvu3SvVTeoIx8Z7UGoJprB4VK20wKORMhufcWGx61fIauhu3J+UqfB5eeoF1oE/geYBA598K6nh1SdABQkg=="
+        },
+        "@earendil-works/pi-telemetry": {
+          "version": "1.1.0",
+          "integrity": "sha512-8gAK05/2pPozZZz6hCLOi8x2vsqzvsmO9gG92kbvuvTPm0qMHaFlaXX98ndXsrOi5pmzha7vNLguuG4+0Rgxjw=="
+        },
+        "@earendil-works/pi-tui": {
+          "version": "1.1.0",
+          "integrity": "sha512-v7wkS0y2ErZvZkSfemqd9RrBZJ5x6p8Ujsv7NdJj01IXJyFM0kNL6rMdcKcvTe7EVTd6ugvDB9VPZSoaBF9QxQ=="
+        }
+      },
+      "cases": {
+        "allowedRead": {
+          "exit": 0,
+          "decision": "allow",
+          "piVersion": "1.0.2",
+          "ranTool": true,
+          "sessionRegistered": true,
+          "claim": "enforced_at_pi_tool_call",
+          "outcomeBound": true
+        },
+        "auditLatch": {
+          "faultedCallRan": true,
+          "nextCallRan": false,
+          "recovered": true,
+          "ranAfterRecovery": true
+        },
+        "deniedWrite": {
+          "exit": 0,
+          "fileCreated": false,
+          "reason": "Signed Approval Policy requires 1 human approval before WRITE_LOW. A Pi tool call cannot carry an AMC approval, so AMC denied the action."
+        },
+        "deniedBash": {
+          "exit": 0,
+          "fileCreated": false,
+          "reason": "Signed ToolHub policy rejected the current process.spawn arguments. Pi tool_call has no verified corrective retry outcome, so AMC denied the action."
+        },
+        "unmappedExtensionTool": {
+          "exit": 0,
+          "effect": false,
+          "reason": "Pi tool amc_probe_effect is not mapped to an allowed ToolHub tool."
+        },
+        "codemode": {
+          "exit": 0,
+          "effect": false,
+          "reason": "Pi tool codemode is not mapped to an allowed ToolHub tool."
+        },
+        "pathResolution": {
+          "atPrefixRan": true,
+          "symlinkIntoAmcRead": false,
+          "reason": "Signed ToolHub policy rejected the current fs.read arguments. Pi tool_call has no verified corrective retry outcome, so AMC denied the action."
+        },
+        "builtinOverride": {
+          "exit": 0,
+          "effect": false,
+          "reason": "Pi's find tool is an extension's tool, not Pi's built-in; AMC maps only Pi's built-ins and denied the call."
+        },
+        "codemodeNestedToolCall": {
+          "events": 4,
+          "nestedToolCallId": "call_codemode_probe/1",
+          "parentToolCallId": "call_codemode_probe"
+        },
+        "untrustedProjectLimit": {
+          "exit": 0,
+          "fileCreated": true,
+          "amcDecisions": 0,
+          "newRegistrations": 0
+        },
+        "latencyMs": {
+          "n": 100,
+          "p50": 57.5,
+          "p95": 77.1,
+          "measured": "extension tool_call handler to its result: requested observation, control decision, receipt check; loopback Bridge"
+        },
+        "receiptsVerified": {
+          "decisions": 124,
+          "failures": 0
+        },
+        "bridgeStopped": {
+          "exit": 0,
+          "reason": "AMC control unavailable; action denied.",
+          "ranTool": false
+        }
+      }
+    },
+    {
+      "version": "1.0.4",
+      "package": "@earendil-works/pi-coding-agent",
+      "tarball": "https://registry.npmjs.org/@earendil-works/pi-coding-agent/-/pi-coding-agent-1.0.4.tgz",
+      "integrity": "sha512-+956nfMFHr5lDUVY/2Q4k+YzojzBuCaBXFgj0eSlXVGr7QVliVddKdc1Pz6yVg1dOlJQmb67doOVrlMsIcIdaw==",
+      "gitHead": "7c10bd4337495ee613f2224843ecdf349b80d1df",
+      "cliBundleSha256": "e79626f2dd6f94aa45d30f3fa63cd84319a6eefcd150b353cfaf274366926774",
+      "install": "the P1-22 install (qualification/2026-10-12-P1-22): npm install --ignore-scripts --no-audit --no-fund --save-exact @earendil-works/pi-coding-agent@1.0.4 (scratch prefix outside the repository)",
+      "resolvedDependencies": {
+        "@earendil-works/chord": {
+          "version": "1.1.0",
+          "integrity": "sha512-gsHzKfyQ3t0ZIQ3cLBjJ5Vqy1TYnFyruHIV3g3BwmulCDYe5BW4yT9vaJk9QzN6YANILIO75uzuq+Gdxtzz1og=="
+        },
+        "@earendil-works/pi-agent-core": {
+          "version": "1.1.0",
+          "integrity": "sha512-aX1KZomNCPmwYnXa3OivF3VYLJ+WPUkIJlEIZTgwdOZdY/+oToWTQ334WYpQeOz9POpiYFNMJLPwIhXQ4e48kg=="
+        },
+        "@earendil-works/pi-ai": {
+          "version": "1.1.0",
+          "integrity": "sha512-1T7LAkc/5Bvc0v6w4vAGVdCrli0o/E0pEmYKTnixu95vSFArBjvbhS/G4ZwI0RUePgf0Imcu0VyqlM4EcXxqfw=="
+        },
+        "@earendil-works/pi-codemode": {
+          "version": "1.1.0",
+          "integrity": "sha512-8Asc2AzhoNaXS1snmRFa96OhcWIlFM5k1Kuiz6p2DvIYgi5QHQccRAmDVY9oO92TzWrizpvQpconZGQ7JhlI7Q=="
+        },
+        "@earendil-works/pi-mcp": {
+          "version": "1.1.0",
+          "integrity": "sha512-xGKwvu3SvVTeoIx8Z7UGoJprB4VK20wKORMhufcWGx61fIauhu3J+UqfB5eeoF1oE/geYBA598K6nh1SdABQkg=="
+        },
+        "@earendil-works/pi-telemetry": {
+          "version": "1.1.0",
+          "integrity": "sha512-8gAK05/2pPozZZz6hCLOi8x2vsqzvsmO9gG92kbvuvTPm0qMHaFlaXX98ndXsrOi5pmzha7vNLguuG4+0Rgxjw=="
+        },
+        "@earendil-works/pi-tui": {
+          "version": "1.1.0",
+          "integrity": "sha512-v7wkS0y2ErZvZkSfemqd9RrBZJ5x6p8Ujsv7NdJj01IXJyFM0kNL6rMdcKcvTe7EVTd6ugvDB9VPZSoaBF9QxQ=="
+        }
+      },
+      "cases": {
+        "allowedRead": {
+          "exit": 0,
+          "decision": "allow",
+          "piVersion": "1.0.4",
+          "ranTool": true,
+          "sessionRegistered": true,
+          "claim": "enforced_at_pi_tool_call",
+          "outcomeBound": true
+        },
+        "auditLatch": {
+          "faultedCallRan": true,
+          "nextCallRan": false,
+          "recovered": true,
+          "ranAfterRecovery": true
+        },
+        "deniedWrite": {
+          "exit": 0,
+          "fileCreated": false,
+          "reason": "Signed Approval Policy requires 1 human approval before WRITE_LOW. A Pi tool call cannot carry an AMC approval, so AMC denied the action."
+        },
+        "deniedBash": {
+          "exit": 0,
+          "fileCreated": false,
+          "reason": "Signed ToolHub policy rejected the current process.spawn arguments. Pi tool_call has no verified corrective retry outcome, so AMC denied the action."
+        },
+        "unmappedExtensionTool": {
+          "exit": 0,
+          "effect": false,
+          "reason": "Pi tool amc_probe_effect is not mapped to an allowed ToolHub tool."
+        },
+        "codemode": {
+          "exit": 0,
+          "effect": false,
+          "reason": "Pi tool codemode is not mapped to an allowed ToolHub tool."
+        },
+        "pathResolution": {
+          "atPrefixRan": true,
+          "symlinkIntoAmcRead": false,
+          "reason": "Signed ToolHub policy rejected the current fs.read arguments. Pi tool_call has no verified corrective retry outcome, so AMC denied the action."
+        },
+        "builtinOverride": {
+          "exit": 0,
+          "effect": false,
+          "reason": "Pi's find tool is an extension's tool, not Pi's built-in; AMC maps only Pi's built-ins and denied the call."
+        },
+        "codemodeNestedToolCall": {
+          "events": 4,
+          "nestedToolCallId": "call_codemode_probe/1",
+          "parentToolCallId": "call_codemode_probe"
+        },
+        "untrustedProjectLimit": {
+          "exit": 0,
+          "fileCreated": true,
+          "amcDecisions": 0,
+          "newRegistrations": 0
+        },
+        "latencyMs": {
+          "n": 100,
+          "p50": 59.1,
+          "p95": 101.2,
+          "measured": "extension tool_call handler to its result: requested observation, control decision, receipt check; loopback Bridge"
+        },
+        "receiptsVerified": {
+          "decisions": 124,
+          "failures": 0
+        },
+        "bridgeStopped": {
+          "exit": 0,
+          "reason": "AMC control unavailable; action denied.",
+          "ranTool": false
+        }
+      }
+    }
+  ],
+  "notQualified": [
+    "@earendil-works/pi-coding-agent 1.1.0: not run; AMC denies it (AMC has not qualified Pi 1.1.0).",
+    "Pi embedded through its SDK: not run."
+  ],
+  "latencyTarget": "The overhead gate allows 50 ms p95 for local authorization (P1-22 risks); both versions measured above it here, on a loaded machine. The latency case measures tool_call only; tool_result outcomes are recorded after the call ran.",
+  "mutations": [
+    {
+      "mutation": "rule 1: a Pi outcome writer fault never counts as under a registration",
+      "file": "src/bridge/claudeCodeObservations.ts",
+      "result": "Tests  2 failed | 6 passed (8)",
+      "killedBy": [
+        "a writer fault while recording a registered session's tool outcome latches the workspace across a restart; only the owner's passphrase clears it",
+        "after a writer fault on a tool outcome, the extension blocks every later call of every session and tells Pi the workspace is latched"
+      ]
+    },
+    {
+      "mutation": "rule 2: control mode records a tool outcome at the observed ingress only (the original gap)",
+      "file": "src/adapters/pi/amcPiExtension.ts",
+      "result": "Tests  1 failed | 7 passed (8)",
+      "killedBy": [
+        "after a writer fault on a tool outcome, the extension blocks every later call of every session and tells Pi the workspace is latched"
+      ]
+    },
+    {
+      "mutation": "rule 3: the client counts a 409 as recorded",
+      "file": "src/adapters/pi/piControlClient.ts",
+      "result": "Tests  1 failed | 7 passed (8)",
+      "killedBy": [
+        "a call whose request observation conflicts with one already recorded is blocked and gets no decision"
+      ]
+    },
+    {
+      "mutation": "rule 3 (server): any repeat is answered as the same observation",
+      "file": "src/bridge/claudeCodeObservations.ts",
+      "result": "Tests  2 failed | 6 passed (8)",
+      "killedBy": [
+        "the same outcome re-sent is recorded once; a conflicting one is kept, flagged and refused",
+        "malformed, unauthenticated, conflicting, forwarder-reported or unregistered observations do not latch"
+      ]
+    },
+    {
+      "mutation": "rule 4: Pi decisions ignore intake backpressure",
+      "file": "src/bridge/hookAuthorization.ts",
+      "result": "Tests  1 failed | 7 passed (8)",
+      "killedBy": [
+        "outcomes over a session's cap are listed in a signed summary, and its calls are denied until the window passes"
+      ]
+    },
+    {
+      "mutation": "rule 4 (registrations): Pi registrations are not counted against the lease and workspace caps",
+      "file": "src/bridge/piSessionRegistry.ts",
+      "result": "Tests  1 failed | 7 passed (8)",
+      "killedBy": [
+        "churned registrations cannot defeat the caps: one lease registers at most 30 Pi sessions a minute; a re-registration is not counted"
+      ]
+    },
+    {
+      "mutation": "rule 5: any Pi outcome writer fault counts as under a registration",
+      "file": "src/bridge/claudeCodeObservations.ts",
+      "result": "Tests  1 failed | 7 passed (8)",
+      "killedBy": [
+        "malformed, unauthenticated, conflicting, forwarder-reported or unregistered observations do not latch"
+      ]
+    }
+  ],
+  "codeArtifacts": {
+    "dist/adapters/pi/amcPiExtension.js": "edffc24cb9b011fb0a20bf9b4c581c28c4d02b654ef7701aae43d749272e1a20",
+    "dist/adapters/pi/piControlClient.js": "6a7a24d148fff765c8140acc4271343cf3fb6b8a56de4c1fb420ed44e0a6f5f5",
+    "dist/bridge/piObservations.js": "653b17f9021798caf593b18e1c86d6ed79b0f7b73a4a3c94f8da9d24765ee276",
+    "dist/bridge/claudeCodeObservations.js": "60491dc5f9bc77e0226e07bf4e9e186407e708a3fc5dfe5d51407edbaaf3f689"
+  }
+}

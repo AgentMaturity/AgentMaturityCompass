@@ -1,0 +1,151 @@
+{
+  "ok": true,
+  "sourceRevision": "07125b76cb17ecf063f19b914085a5bfc968df35",
+  "tarballSha256": "c3932ba3b2d693c018c874191c608fbb06709e9e83c77c95f7b9a4ff4d8d82aa",
+  "node": "v22.23.3",
+  "checks": [
+    {
+      "name": "catalog-server-disposed",
+      "ok": true,
+      "activeSessions": 0,
+      "deletes": 1
+    },
+    {
+      "name": "17-cli-held-before-authenticated-approval",
+      "ok": true,
+      "approvalRequestId": "apprreq_3b270d1a93c14a598b36e6d0d7725aa6",
+      "effects": 0
+    },
+    {
+      "name": "cli-server-disposed",
+      "ok": true,
+      "activeSessions": 0,
+      "deletes": 2
+    },
+    {
+      "name": "cli-governed-mcp-executed",
+      "ok": true,
+      "sessionId": "c5a1ea6a-ad61-4368-a75b-026b4d7f7764",
+      "approvalRequestId": "apprreq_3b270d1a93c14a598b36e6d0d7725aa6"
+    },
+    {
+      "name": "drift-server-disposed",
+      "ok": true,
+      "activeSessions": 0,
+      "deletes": 3
+    },
+    {
+      "name": "changed-catalog-and-unsigned-grant-refused-before-dispatch",
+      "ok": true
+    },
+    {
+      "name": "redirect-and-oauth-challenge-refused",
+      "ok": true,
+      "secondOriginRequests": 0
+    },
+    {
+      "name": "20-sdk-held-before-authenticated-approval",
+      "ok": true,
+      "approvalRequestId": "apprreq_49a9b68ed50f46a0a7a49e50e29d7f59",
+      "effects": 1
+    },
+    {
+      "name": "sdk-server-disposed",
+      "ok": true,
+      "activeSessions": 0,
+      "deletes": 4
+    },
+    {
+      "name": "public-sdk-acp-mcp-forwarding",
+      "ok": true,
+      "sessionId": "d2522acf-2c9d-46b0-b317-308a4eef6ba0",
+      "approvalRequestId": "apprreq_49a9b68ed50f46a0a7a49e50e29d7f59"
+    },
+    {
+      "name": "20b-cancel-held-before-authenticated-approval",
+      "ok": true,
+      "approvalRequestId": "apprreq_7415ae4efdc24a69a2b7fa4dbbdf88a2",
+      "effects": 2
+    },
+    {
+      "name": "cancelled-http-session-disposed",
+      "ok": true,
+      "activeSessions": 0,
+      "deletes": 5
+    },
+    {
+      "name": "public-sdk-cancellation-disposes-http-session",
+      "ok": true,
+      "sessionId": "40732009-e50c-48a1-8319-51b67a114969",
+      "approvalRequestId": "apprreq_7415ae4efdc24a69a2b7fa4dbbdf88a2",
+      "effectsBefore": 2,
+      "effectsAfter": 2
+    },
+    {
+      "name": "cold-evidence-and-policy-pins",
+      "ok": true,
+      "sessionIds": [
+        "c5a1ea6a-ad61-4368-a75b-026b4d7f7764",
+        "d2522acf-2c9d-46b0-b317-308a4eef6ba0",
+        "40732009-e50c-48a1-8319-51b67a114969"
+      ],
+      "signedRows": 92
+    },
+    {
+      "name": "headers-redaction-sse-and-remote-session-cleanup",
+      "ok": true,
+      "httpRequests": 33,
+      "deletes": 5,
+      "sseReplies": 15
+    }
+  ],
+  "startedAt": "2026-10-14T15:27:19.841Z",
+  "installedCliSha256": "0040e8108d1df88bf377cdab98966ce6130f6d6931cbc6c5b7fd6e27475c3d5f",
+  "installedVersion": "1.2.0",
+  "installedSdk": {
+    "version": "1.32.1",
+    "resolutionImporter": "/private/tmp/p0-50-installed-http-attempt3-1vb61m0h/consumer/node_modules/agent-maturity-compass/dist/mcp/nativeMcpHttpTransport.js",
+    "resolvedTransport": "file:///private/tmp/p0-50-installed-http-attempt3-1vb61m0h/consumer/node_modules/@modelcontextprotocol/sdk/dist/esm/client/streamableHttp.js",
+    "transportSha256": "a477d0a95a1e1224a009e808d2ce01b1fca32de4f32ada4c589bec0443d41536",
+    "packageJsonPath": "/private/tmp/p0-50-installed-http-attempt3-1vb61m0h/consumer/node_modules/@modelcontextprotocol/sdk/package.json",
+    "packageJsonSha256": "0216319ea53177f7ed419d660b2f52ccc7e3327e57f9ee2ef03225ff543aeae4",
+    "consumerLockPath": "/private/tmp/p0-50-installed-http-attempt3-1vb61m0h/consumer/package-lock.json",
+    "consumerLockSha256": "d126240d81b1d49fe4cb98d0c79157bf65db665bf891ab52b9a78e29beb0024e",
+    "insideFreshConsumer": true
+  },
+  "completedAt": "2026-10-14T15:28:01.103Z",
+  "http": [
+    {
+      "label": "cli-0",
+      "at": 1791991660164,
+      "bodySha256": "2b8c583e656ff6cff4bc5d8737a54c5f5982f5b718ebf59966cbb9fa4cfb0f42"
+    },
+    {
+      "label": "cli-1",
+      "at": 1791991664031,
+      "bodySha256": "806c44c782f942bf368be1672492701ef503494cd8b4a914ba21309a66fbb597"
+    },
+    {
+      "label": "sdk-0",
+      "at": 1791991668016,
+      "bodySha256": "55471386ebdfb6420498035acd77f6fe82279cf788cc89ddc267a6468e56725e"
+    },
+    {
+      "label": "sdk-1",
+      "at": 1791991671895,
+      "bodySha256": "f00a6c1252cdee63c0e1f7ea406ed92df14941242c872b6fce3747f269ac879c"
+    },
+    {
+      "label": "cancel-0",
+      "at": 1791991673560,
+      "bodySha256": "eb3c28897afbe46b6e820dd75859264495b1dc51eecd9b1a82675b0dba1a975f"
+    }
+  ],
+  "limits": [
+    "Scripted local Responses provider and real loopback Streamable HTTP/SSE fixture; no live model or external vendor.",
+    "HTTPS validation is source-tested; this installed lane uses explicitly permitted loopback HTTP, not live TLS or OAuth.",
+    "Pinned catalog is a reviewed advertised contract, not proof of remote implementation behavior.",
+    "Cancellation proves local disposal and fixture DELETE, not reversal of a remote committed side effect.",
+    "macOS ARM64 Node22; other platforms and HTTP server implementations remain separate."
+  ]
+}

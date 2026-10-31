@@ -14,6 +14,7 @@ import type { ComplianceMapping } from "./mappingSchema.js";
 import { REGULATORY_REGISTER } from "./regulatory/index.js";
 
 const LAYER_0 = "Cross-cutting: the Layer 0 baseline applies to every station.";
+const REGISTER = (id: string): string => `The stations of register entry ${id} (src/compliance/regulatory/register.json).`;
 
 /** Stations each built-in framework binds. The Record type makes every new framework name its stations. */
 export const FRAMEWORK_STATIONS: Record<ComplianceFramework, readonly Station[]> = {
@@ -28,7 +29,15 @@ export const FRAMEWORK_STATIONS: Record<ComplianceFramework, readonly Station[]>
   HIPAA: ["health", "technology"],
   PCI_DSS: ["wealth", "technology"],
   SOX: ["wealth"],
-  FEDRAMP: ["governance", "technology"]
+  FEDRAMP: ["governance", "technology"],
+  DORA: ["wealth", "technology", "mobility"],
+  NIS2: ["environment", "health", "technology", "mobility", "governance"],
+  HHS_HTI_1: ["health"],
+  NIST_AI_600_1: STATIONS,
+  CO_AI_ACT: STATIONS,
+  TX_TRAIGA: ["health", "technology", "governance"],
+  CA_AI_LAWS: STATIONS,
+  KR_AI_BASIC_ACT: STATIONS
 };
 
 /** One line per framework: why it binds those stations. */
@@ -44,7 +53,15 @@ export const FRAMEWORK_STATION_BASIS: Record<ComplianceFramework, string> = {
   HIPAA: "Covered entities (health) and their business associates, which include technology vendors.",
   PCI_DSS: "Card-payment data held by financial services and by the technology platforms that process it.",
   SOX: "Financial-reporting controls of public companies, filed under wealth.",
-  FEDRAMP: "Federal cloud authorization: agencies (governance) and the cloud services they buy (technology)."
+  FEDRAMP: "Federal cloud authorization: agencies (governance) and the cloud services they buy (technology).",
+  DORA: REGISTER("eu-dora"),
+  NIS2: REGISTER("eu-nis2"),
+  HHS_HTI_1: REGISTER("us-onc-hti1-dsi"),
+  NIST_AI_600_1: REGISTER("us-nist-ai-600-1"),
+  CO_AI_ACT: REGISTER("us-co-sb26-189"),
+  TX_TRAIGA: REGISTER("us-tx-traiga"),
+  CA_AI_LAWS: "The union of register entries us-ca-sb53, us-ca-ab2013 and us-ca-cppa-admt (src/compliance/regulatory/register.json).",
+  KR_AI_BASIC_ACT: REGISTER("kr-ai-basic-act")
 };
 
 /**

@@ -1,0 +1,7 @@
+{
+  "id": "CR-5",
+  "scenario": "Database failover",
+  "status": "not_run",
+  "reason": "not selected (--only)",
+  "durationMs": 0
+}

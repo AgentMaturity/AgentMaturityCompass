@@ -1,0 +1,11 @@
+{
+  "schema": "amc-qualification-lossless-original/1",
+  "encoding": "base64",
+  "original": {
+    "relativePath": "evidence/producer-claims/records/control-preparation/DROP-PRODUCER-TS.patch.txt",
+    "bytes": 404,
+    "sha256": "63bc82d4bd12cff95009f82c76687175d027c2fb29aa9cb3e81ade9f1d9a943f"
+  },
+  "dataBase64": "LS0tIGZ1dHVyZS1mcmVzaC9zcmMvbGVkZ2VyL2xlZGdlci50cworKysgZnV0dXJlLWZyZXNoL3NyYy9sZWRnZXIvbGVkZ2VyLnRzIChEUk9QLVBST0RVQ0VSLVRTKQpAQCAtNTc3LDcgKzU3Nyw3IEBACiAgICAgdGhpcy5hc3NlcnRUcnVzdGVkV3JpdGVyKCk7CiAgICAgY29uc3QgcHJlcGFyZWQgPSB0aGlzLnJ1bkltbWVkaWF0ZVRyYW5zYWN0aW9uKCgpID0+IHsKICAgICAgIGNvbnN0IGlkID0gaW5wdXQuaWQgPz8gcmFuZG9tVVVJRCgpOwotICAgICAgY29uc3QgdHMgPSBpbnB1dC50cyA/PyBEYXRlLm5vdygpOworICAgICAgY29uc3QgdHMgPSBEYXRlLm5vdygpOwogICAgICAgY29uc3QgY2FuZGlkYXRlID0gdGhpcy5idWlsZEV2aWRlbmNlSW5zZXJ0KHsKICAgICAgICAgaW5wdXQsCiAgICAgICAgIGlkLAo=",
+  "boundary": "Exact original bytes retained losslessly; decode and verify bytes/SHA256 before use. No command result changes."
+}

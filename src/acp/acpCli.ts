@@ -1,6 +1,7 @@
 import type { Command } from "commander";
 import { startAcpStdio } from "./acpStdioMain.js";
-import { NATIVE_TASK_LEASE_ENV } from "./acpRuntimeContracts.js";
+import { serveAcpStartupRefusal } from "./acpStartupRefusal.js";
+import { NATIVE_TASK_INITIATOR_ENV, NATIVE_TASK_LEASE_ENV, NATIVE_TASK_SYSTEM_PROMPT_ENV } from "./acpRuntimeContracts.js";
 import { compactionFromFlags } from "../agent/compaction/promptPressure.js";
 
 /**
@@ -30,20 +31,23 @@ export function registerAcpCommands(program: Command): void {
     .option("--credentials-mode <mode>", "layered or operator-only (exclude project/user dotenv)", "layered")
     .option("--tools <mode>", "none or explicitly enabled workspace tools", "none")
     .option("--unsafe-unconfined-shell", "macOS without Seatbelt only: offer the native shell UNCONFINED, with your full user rights; ignored where Seatbelt or Bubblewrap confines it, refused on Windows")
+    .option("--ask-user", "Send ask_user to the client as _amc/ask_user and sign its answer host-side; requires workspace tools")
+    .option("--web-search-searxng <origin>", "Opt-in web_search provider: a SearXNG JSON origin, also granted under web_search in the signed tools policy")
     .option("--expected-tools-digest <sha256>", "Refuse any workspace tool call after its signed policy digest changes")
     .option("--validation-config <path>", "Operator JSON containing named public checks")
     .option("--validation-config-sha256 <digest>", "Pin exact reviewed validation configuration bytes")
+    .option("--validation-repair <json>", "Explicit bounded repair policy for selected public checks, including allowed edit paths")
     .option("--validate <id>", "Run this public check after each completed turn; repeat to select more", (id: string, previous: string[] = []) => [...previous, id])
     .option("--approve-tools <actionClass>", "Require the existing signed approval gate for tool calls")
     .option("--approve-risk <tier>", "Signed approval risk tier; requires --approve-tools")
-    .option("--mcp-config <path>", "Reviewed native MCP config; requires workspace tools and signed approvals")
-    .option("--mcp-config-sha256 <digest>", "Pin exact reviewed MCP configuration bytes")
+    .option("--mcp-config <path>", "Reviewed native MCP config; repeat for more servers; requires workspace tools and signed approvals", (path: string, previous: string[] = []) => [...previous, path])
+    .option("--mcp-config-sha256 <digest>", "Pin exact reviewed MCP configuration bytes; one per --mcp-config in the same order", (digest: string, previous: string[] = []) => [...previous, digest])
     .option("--max-tokens <n>", "Positive output-token bound per model request", "512")
     .option("--thinking <mode>", "DeepSeek only: enabled (default) or disabled")
     .option("--reasoning-effort <effort>", "DeepSeek only: exact low, high (default), or max with enabled thinking")
     .option("--max-steps <n>", "Positive model-step bound per turn (default 8, stub 2)")
-    .option("--context-window <tokens>", "Declared model context window; enables automatic compaction between steps")
-    .option("--compact-threshold <fraction>", "Measured prompt share of --context-window that triggers compaction (0.5-0.95, default 0.8)")
+    .option("--context-window <tokens>", "Override the reviewed model context window for automatic compaction")
+    .option("--compact-threshold <fraction>", "Use ratio trigger instead of the catalog token reserve (0.5-0.95; requires --context-window)")
     .option("--no-auto-summary", "Prune old tool output only; never run a model-written summary step")
     .option("--agent-id <id>", "Agent identity recorded in the ledger", "default")
     .option("--system-prompt <text>", "System prompt for each session", "You are a careful assistant.")
@@ -57,14 +61,17 @@ export function registerAcpCommands(program: Command): void {
       credentialsMode: string;
       tools: string;
       unsafeUnconfinedShell?: boolean;
+      askUser?: boolean;
+      webSearchSearxng?: string;
       expectedToolsDigest?: string;
       validationConfig?: string;
       validationConfigSha256?: string;
+      validationRepair?: string;
       validate?: string[];
       approveTools?: string;
       approveRisk?: string;
-      mcpConfig?: string;
-      mcpConfigSha256?: string;
+      mcpConfig?: string[];
+      mcpConfigSha256?: string[];
       maxTokens: string;
       thinking?: string;
       reasoningEffort?: string;
@@ -79,21 +86,30 @@ export function registerAcpCommands(program: Command): void {
       // P1-67: Studio hands a native task's lease to this process alone. Unset before anything runs, so no tool,
       // check or MCP child inherits it; the toolset also scrubs it from tool output.
       const leaseToken = process.env[NATIVE_TASK_LEASE_ENV];
+      const initiator = process.env[NATIVE_TASK_INITIATOR_ENV];
       delete process.env[NATIVE_TASK_LEASE_ENV];
+      delete process.env[NATIVE_TASK_INITIATOR_ENV];
+      // P2-37: the agent's verified prompt pack and A4 context plugin, as Studio composed them; unset like the lease.
+      const composedPrompt = process.env[NATIVE_TASK_SYSTEM_PROMPT_ENV];
+      delete process.env[NATIVE_TASK_SYSTEM_PROMPT_ENV];
       try {
         const compaction = compactionFromFlags(opts);
         handle = startAcpStdio({
           ...(leaseToken ? { leaseToken } : {}),
+          ...(initiator ? { initiator } : {}),
           ...(compaction === undefined ? {} : { compaction }),
           workspace: process.cwd(),
           agentId: opts.agentId,
           providerId: opts.provider,
-          systemPrompt: opts.systemPrompt,
+          systemPrompt: composedPrompt ? composedPrompt : opts.systemPrompt,
           tools: opts.tools as "none" | "workspace",
           ...(opts.unsafeUnconfinedShell === true ? { unconfinedShell: true } : {}),
+          ...(opts.askUser === true ? { askUser: true } : {}),
+          ...(opts.webSearchSearxng === undefined ? {} : { webSearchSearxng: opts.webSearchSearxng }),
           ...(opts.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: opts.expectedToolsDigest }),
           ...(opts.validationConfig === undefined ? {} : { validationConfig: opts.validationConfig }),
           ...(opts.validationConfigSha256 === undefined ? {} : { validationConfigSha256: opts.validationConfigSha256 }),
+          ...(opts.validationRepair === undefined ? {} : { validationRepair: opts.validationRepair }),
           ...(opts.validate === undefined ? {} : { validate: opts.validate }),
           maxTokens: Number(opts.maxTokens),
           ...(opts.thinking === undefined ? {} : { thinking: opts.thinking }),
@@ -111,10 +127,12 @@ export function registerAcpCommands(program: Command): void {
           ...(opts.credential === undefined ? {} : { credential: opts.credential })
         });
       } catch (error) {
-        // To stderr and a non-zero exit. A misconfiguration reported as a frame
-        // would be read by the client as a protocol message.
+        // To stderr and a non-zero exit. Never an unsolicited frame: the client would
+        // read it as a protocol message. Only a correlated reply carries the refusal.
         process.stderr.write(`amc acp: ${error instanceof Error ? error.message : String(error)}\n`);
-        process.exit(2);
+        // A spawning client (the SDKs) still gets the coded refusal as the reply to its first request.
+        void serveAcpStartupRefusal(error, { stdin: process.stdin, stdout: process.stdout }).finally(() => process.exit(2));
+        return;
       }
       for (const signal of ["SIGINT", "SIGTERM"] as const) {
         process.on(signal, () => {

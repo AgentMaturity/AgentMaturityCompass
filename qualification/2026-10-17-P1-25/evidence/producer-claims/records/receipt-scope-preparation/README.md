@@ -1,0 +1,13 @@
+# Producer receipt scope preparation
+
+No concrete metadata overlap was observed. This private read-only audit covers only the three existing P1-25 receipt indices and the prospective evidence/producer-claims/ prefix. It grants no source-copy, READY, implementation or ownership-release approval.
+
+The three refreshed registries name 170 logical roots. The retained roots plus the actual 0F9GlT fresh checkout give 188 physical roots and 189 known logical aliases. Every prior 187 physical root and twenty Git authorities remains present; the new checkout adds the twenty-first authority. All 752 exact path checks, current full/scoped statuses, HEAD/branch/index observations and complete all-ref receipt histories show no producer prefix or scoped edit. Full raw observations remain private.
+
+The three existing indices appear in eleven roots with seven versions per file. All earlier versions remain. Only own S has the three completed B39 metadata successors relative to the earlier snapshot; they match their explicit admitted old/new records and both metadata commit 88897847 and source commit 5d4e9e8d. Other historical root bytes and physical pins remain exact and must not be copied, normalized or replaced.
+
+All 175 active protected file pins and thirteen native byte/physical identities were checked exactly. Held R retains its exact HEAD, eighteen dirty rows, empty index and 31 source/document/config/archive pins. Source and fresh are clean at the same current source checkpoint. A clean root does not release Claude or another owner's work. The existing 102 source/fresh pairs and 23 compiled pairs were not reaudited by this metadata scope; root's actual preservation record remains separately pinned.
+
+The corrected read-only scan completed naturally with 1,158 Git children, each exit zero. Full argv, PIDs, start/end times, stdout, stderr and exits are retained. The first attempt stopped on an old history-field name mismatch before saving its observation object; its unpersisted child facts get no credit. That natural exit-one error is preserved, and the second scan saves raw results before report construction. No product, stored helper, source/index/QA mutation, network, key or child-stream operation occurred.
+
+The missing reservation path was not probed, searched, recreated or appended; Claude was not contacted. Current rule deltas remain unknown. Absence creates neither release nor a new human approval hold. Root still owns actual hosted all-path/WIP, freeze/D15, private-packet review and exact three-file metadata admission, ordinary validation/index/fullrange-whitespace/commit/export checks. Every held decision and F37's skip remain intact.

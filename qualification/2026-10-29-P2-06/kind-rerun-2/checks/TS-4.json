@@ -1,0 +1,10 @@
+{
+  "id": "TS-4",
+  "scenario": "Storage and network",
+  "status": "not_run",
+  "reason": "needs a second tenant release (one release per namespace) and per-tenant fixtures; kind's default CNI (kindnet) does not enforce NetworkPolicy, so a policy-enforcing CNI is needed",
+  "blockedBy": [
+    "P2-06 follow-up"
+  ],
+  "durationMs": 0
+}

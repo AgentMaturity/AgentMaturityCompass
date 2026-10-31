@@ -1,0 +1,2094 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-30",
+  "oldIssue": "AMC-1542",
+  "artifacts": [
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-consumer-bridge-matrix.json",
+      "bytes": 14651,
+      "sha256": "d91a65b1d775ebdd6684fcd0263deb155e72bbcb4392d961157c87545b55dfae"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-consumer-bridge-mutant-full-closure.json",
+      "bytes": 1399901,
+      "sha256": "1374f335d1e1800df0056a822a9a6042b3f4acaa61fafb8ae017aa12f2e01e0f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-consumer-bridge-mutant-source.ts",
+      "bytes": 8104,
+      "sha256": "1a51b0cfc60c89380b83747052d2cdb45d3cdb8ffea79f92152f0ed70ec54b0e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-consumer-bridge-restored-full-closure.json",
+      "bytes": 1399901,
+      "sha256": "575442e7fb2ba4bd222eed18d0a7dd6b2cd3ac5823246fecfad58743860c52cf"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-consumer-bridge-source-change.json",
+      "bytes": 1249,
+      "sha256": "85b0e40390f82c9753c785a1267e88ab11fb7c65d19de0b6ad16143abb52a6ad"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-consumer-bridge.patch",
+      "bytes": 276,
+      "sha256": "aa6baec712406ca57d4583b8be7d2d1bcb0fbd740cb9ebf8680706b2eadab575"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-consumer-gateway-matrix.json",
+      "bytes": 14977,
+      "sha256": "aff3555833862f107b3b9e8ea34f484d28a03dad54df3966b68ab373ea7f8108"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-consumer-gateway-mutant-full-closure.json",
+      "bytes": 1399901,
+      "sha256": "1e47f779929eb5a40146b69e28dffa7f178f83f4eeeca6e4407cb223d59c9eca"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-consumer-gateway-mutant-source.ts",
+      "bytes": 68386,
+      "sha256": "2e4b59367c3326d4bc08137657dd09e6b2f560c6a3f6ed0d5fa8954b9c4c95c8"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-consumer-gateway-restored-full-closure.json",
+      "bytes": 1399901,
+      "sha256": "575442e7fb2ba4bd222eed18d0a7dd6b2cd3ac5823246fecfad58743860c52cf"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-consumer-gateway-source-change.json",
+      "bytes": 1246,
+      "sha256": "c6d132fb7a0cd810655a6ce18b3728e8689a929f2f8d7fcebf8d8c9943c49458"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-consumer-gateway.patch",
+      "bytes": 273,
+      "sha256": "aa1c5d76116e7aaaeceaf94fc0e29bfcad77d3473e1eb61c51adada57e425586"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-consumer-router-matrix.json",
+      "bytes": 14671,
+      "sha256": "5672d225f073aac3ec9a5abfad0e8e2f56cadaba99064a22adfe20b17d1d58d6"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-consumer-router-mutant-full-closure.json",
+      "bytes": 1399901,
+      "sha256": "ab97cbbe8245d22ed7acf546ff8c885d68c1be7ee09dc2a0c417d505a40f7d8c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-consumer-router-mutant-source.ts",
+      "bytes": 65247,
+      "sha256": "aa2fb044594cb9cf3a94b3ff5fc7e26216508077c08e9c0f8e15bca138658f50"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-consumer-router-restored-full-closure.json",
+      "bytes": 1399901,
+      "sha256": "575442e7fb2ba4bd222eed18d0a7dd6b2cd3ac5823246fecfad58743860c52cf"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-consumer-router-source-change.json",
+      "bytes": 1276,
+      "sha256": "dfda3baff2ea2946465b48aaca8a803ac9355ad7eb3c636e67b0181f718c8ab3"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-consumer-router.patch",
+      "bytes": 456,
+      "sha256": "4eceb7f435c049fb564f9baeb0363f333e248b8594d091a8ec39f8fbd3361826"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-consumer-studio-matrix.json",
+      "bytes": 15363,
+      "sha256": "8c8ed7941c203915e1dceaaf58f4daa2993f458f62d54171d18e206873de20f4"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-consumer-studio-mutant-full-closure.json",
+      "bytes": 1399901,
+      "sha256": "957e2797f2838dcb33c10770b15be3abcbd98c2dd70698273bb0773310277e0d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-consumer-studio-mutant-source.ts",
+      "bytes": 323506,
+      "sha256": "ec8aeea76a031f521aa7d50e1ba8887d0c57e926ebecc9ce5ca2f3f89acafd86"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-consumer-studio-restored-full-closure.json",
+      "bytes": 1399901,
+      "sha256": "575442e7fb2ba4bd222eed18d0a7dd6b2cd3ac5823246fecfad58743860c52cf"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-consumer-studio-source-change.json",
+      "bytes": 1260,
+      "sha256": "b4a33ae584c4afb02deec547fef8c07b3ba9d92892ed5e5d246282600f94cff4"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-consumer-studio.patch",
+      "bytes": 288,
+      "sha256": "09dfe4a2bfa4cbe0bd75d2b4058cfd67ae5750836bcbbbb7a343cd2087d9b330"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-consumer-wire-matrix.json",
+      "bytes": 15337,
+      "sha256": "aa665f6ad6eb195ef157bb40705e4f10041fa8d6d2294df359f2993b04282ea7"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-consumer-wire-mutant-full-closure.json",
+      "bytes": 1399901,
+      "sha256": "da65a9f4ebd21518946ee859aa3b4a4bc3e6b0585ba9698ddaf7adae629ca880"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-consumer-wire-mutant-source.ts",
+      "bytes": 8008,
+      "sha256": "5deb291831187af68ed70a114cda5635924eecc5cef8270fa981007cfac037f4"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-consumer-wire-restored-full-closure.json",
+      "bytes": 1399901,
+      "sha256": "575442e7fb2ba4bd222eed18d0a7dd6b2cd3ac5823246fecfad58743860c52cf"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-consumer-wire-source-change.json",
+      "bytes": 1274,
+      "sha256": "cb524d59b69c080a3f72a355bb2a573e0a726cd8c4e42d833b3ad468ed4db83c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-consumer-wire.patch",
+      "bytes": 414,
+      "sha256": "31e3ab53ee06129707f1b4d144231c3cb6b7d55fad6aa2e777ec61ff3fced00f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-empty-set-seven-consumer-supplement-matrix.json",
+      "bytes": 16283,
+      "sha256": "0220c26e2c5161c6da43fb09c6f07c09c15b7edbfd91e317d37a8e8afe5b459e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-empty-set-seven-consumer-supplement-mutant-full-closure.json",
+      "bytes": 1399901,
+      "sha256": "f0212ad40fcf16c2ff0251b891dffa5037008ee20dc32ad40c6b6989b8762bff"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-empty-set-seven-consumer-supplement-mutant-source.ts",
+      "bytes": 6962,
+      "sha256": "98b9d58aae1b5ad8649190fd149f524293904ae0077d46236381c0ea1ccff3e1"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-empty-set-seven-consumer-supplement-restored-full-closure.json",
+      "bytes": 1399901,
+      "sha256": "575442e7fb2ba4bd222eed18d0a7dd6b2cd3ac5823246fecfad58743860c52cf"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-empty-set-seven-consumer-supplement-source-change.json",
+      "bytes": 1456,
+      "sha256": "bd0203650317a64ea65c756f1c62b6007ae7bd9a48ad2d6f5a99001b6d7cf313"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/P30-1542-current-empty-set-seven-consumer-supplement.patch",
+      "bytes": 454,
+      "sha256": "6dd95be19abfc7808c671af8b80ca664b9774ea406f2f2beadf6569ecf319de7"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/baseline-preservation-P30-1542-current-consumer-bridge-after.json",
+      "bytes": 144,
+      "sha256": "c6be150b300209d0d56c5b988514a6fd34324efb00a74cff7a7ea553414dbe41"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/baseline-preservation-P30-1542-current-consumer-bridge-before.json",
+      "bytes": 144,
+      "sha256": "c6be150b300209d0d56c5b988514a6fd34324efb00a74cff7a7ea553414dbe41"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/baseline-preservation-P30-1542-current-consumer-gateway-after.json",
+      "bytes": 144,
+      "sha256": "c6be150b300209d0d56c5b988514a6fd34324efb00a74cff7a7ea553414dbe41"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/baseline-preservation-P30-1542-current-consumer-gateway-before.json",
+      "bytes": 144,
+      "sha256": "c6be150b300209d0d56c5b988514a6fd34324efb00a74cff7a7ea553414dbe41"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/baseline-preservation-P30-1542-current-consumer-router-after.json",
+      "bytes": 144,
+      "sha256": "c6be150b300209d0d56c5b988514a6fd34324efb00a74cff7a7ea553414dbe41"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/baseline-preservation-P30-1542-current-consumer-router-before.json",
+      "bytes": 144,
+      "sha256": "c6be150b300209d0d56c5b988514a6fd34324efb00a74cff7a7ea553414dbe41"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/baseline-preservation-P30-1542-current-consumer-studio-after.json",
+      "bytes": 144,
+      "sha256": "c6be150b300209d0d56c5b988514a6fd34324efb00a74cff7a7ea553414dbe41"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/baseline-preservation-P30-1542-current-consumer-studio-before.json",
+      "bytes": 144,
+      "sha256": "c6be150b300209d0d56c5b988514a6fd34324efb00a74cff7a7ea553414dbe41"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/baseline-preservation-P30-1542-current-consumer-wire-after.json",
+      "bytes": 144,
+      "sha256": "c6be150b300209d0d56c5b988514a6fd34324efb00a74cff7a7ea553414dbe41"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/baseline-preservation-P30-1542-current-consumer-wire-before.json",
+      "bytes": 144,
+      "sha256": "c6be150b300209d0d56c5b988514a6fd34324efb00a74cff7a7ea553414dbe41"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/baseline-preservation-P30-1542-current-empty-set-seven-consumer-supplement-after.json",
+      "bytes": 144,
+      "sha256": "c6be150b300209d0d56c5b988514a6fd34324efb00a74cff7a7ea553414dbe41"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/baseline-preservation-P30-1542-current-empty-set-seven-consumer-supplement-before.json",
+      "bytes": 144,
+      "sha256": "c6be150b300209d0d56c5b988514a6fd34324efb00a74cff7a7ea553414dbe41"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/baseline-preservation-before.json",
+      "bytes": 144,
+      "sha256": "c6be150b300209d0d56c5b988514a6fd34324efb00a74cff7a7ea553414dbe41"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/baseline-preservation-final.json",
+      "bytes": 144,
+      "sha256": "c6be150b300209d0d56c5b988514a6fd34324efb00a74cff7a7ea553414dbe41"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/baseline-reference-pins-P30-1542-current-consumer-bridge-after.json",
+      "bytes": 32219,
+      "sha256": "783d8fbb380e4b95b0157de8c951bf4b2772d3015614bdae19d15731e49502b5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/baseline-reference-pins-P30-1542-current-consumer-bridge-before.json",
+      "bytes": 32219,
+      "sha256": "783d8fbb380e4b95b0157de8c951bf4b2772d3015614bdae19d15731e49502b5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/baseline-reference-pins-P30-1542-current-consumer-gateway-after.json",
+      "bytes": 32219,
+      "sha256": "783d8fbb380e4b95b0157de8c951bf4b2772d3015614bdae19d15731e49502b5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/baseline-reference-pins-P30-1542-current-consumer-gateway-before.json",
+      "bytes": 32219,
+      "sha256": "783d8fbb380e4b95b0157de8c951bf4b2772d3015614bdae19d15731e49502b5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/baseline-reference-pins-P30-1542-current-consumer-router-after.json",
+      "bytes": 32219,
+      "sha256": "783d8fbb380e4b95b0157de8c951bf4b2772d3015614bdae19d15731e49502b5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/baseline-reference-pins-P30-1542-current-consumer-router-before.json",
+      "bytes": 32219,
+      "sha256": "783d8fbb380e4b95b0157de8c951bf4b2772d3015614bdae19d15731e49502b5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/baseline-reference-pins-P30-1542-current-consumer-studio-after.json",
+      "bytes": 32219,
+      "sha256": "783d8fbb380e4b95b0157de8c951bf4b2772d3015614bdae19d15731e49502b5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/baseline-reference-pins-P30-1542-current-consumer-studio-before.json",
+      "bytes": 32219,
+      "sha256": "783d8fbb380e4b95b0157de8c951bf4b2772d3015614bdae19d15731e49502b5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/baseline-reference-pins-P30-1542-current-consumer-wire-after.json",
+      "bytes": 32219,
+      "sha256": "783d8fbb380e4b95b0157de8c951bf4b2772d3015614bdae19d15731e49502b5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/baseline-reference-pins-P30-1542-current-consumer-wire-before.json",
+      "bytes": 32219,
+      "sha256": "783d8fbb380e4b95b0157de8c951bf4b2772d3015614bdae19d15731e49502b5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/baseline-reference-pins-P30-1542-current-empty-set-seven-consumer-supplement-after.json",
+      "bytes": 32219,
+      "sha256": "783d8fbb380e4b95b0157de8c951bf4b2772d3015614bdae19d15731e49502b5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/baseline-reference-pins-P30-1542-current-empty-set-seven-consumer-supplement-before.json",
+      "bytes": 32219,
+      "sha256": "783d8fbb380e4b95b0157de8c951bf4b2772d3015614bdae19d15731e49502b5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/baseline-reference-pins-before.json",
+      "bytes": 32219,
+      "sha256": "783d8fbb380e4b95b0157de8c951bf4b2772d3015614bdae19d15731e49502b5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/baseline-reference-pins-final.json",
+      "bytes": 32219,
+      "sha256": "783d8fbb380e4b95b0157de8c951bf4b2772d3015614bdae19d15731e49502b5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/commands-frozen.jsonl",
+      "bytes": 33754,
+      "sha256": "0689c27dfe93552a9fd9aa3afb51b03708e33ceb53a3f07ffaadc86a203c1e8b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/compiled-original.json",
+      "bytes": 462540,
+      "sha256": "82ff86751e49686db52385c53bac4a2c7ef010a2034745289731d4e6d4ac7598"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/controller.py",
+      "bytes": 17513,
+      "sha256": "9710c6879b89ce6090e3d27213011da3ee2fb5822559ef7936daaef0c5c4bf1c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/core-preservation-P30-1542-current-consumer-bridge-after.json",
+      "bytes": 293,
+      "sha256": "899eb2761566ff9a4cfface513ab6db70e3c01f2297c928cf1c0445464d6348d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/core-preservation-P30-1542-current-consumer-bridge-before.json",
+      "bytes": 293,
+      "sha256": "899eb2761566ff9a4cfface513ab6db70e3c01f2297c928cf1c0445464d6348d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/core-preservation-P30-1542-current-consumer-gateway-after.json",
+      "bytes": 293,
+      "sha256": "899eb2761566ff9a4cfface513ab6db70e3c01f2297c928cf1c0445464d6348d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/core-preservation-P30-1542-current-consumer-gateway-before.json",
+      "bytes": 293,
+      "sha256": "899eb2761566ff9a4cfface513ab6db70e3c01f2297c928cf1c0445464d6348d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/core-preservation-P30-1542-current-consumer-router-after.json",
+      "bytes": 293,
+      "sha256": "899eb2761566ff9a4cfface513ab6db70e3c01f2297c928cf1c0445464d6348d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/core-preservation-P30-1542-current-consumer-router-before.json",
+      "bytes": 293,
+      "sha256": "899eb2761566ff9a4cfface513ab6db70e3c01f2297c928cf1c0445464d6348d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/core-preservation-P30-1542-current-consumer-studio-after.json",
+      "bytes": 293,
+      "sha256": "899eb2761566ff9a4cfface513ab6db70e3c01f2297c928cf1c0445464d6348d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/core-preservation-P30-1542-current-consumer-studio-before.json",
+      "bytes": 293,
+      "sha256": "899eb2761566ff9a4cfface513ab6db70e3c01f2297c928cf1c0445464d6348d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/core-preservation-P30-1542-current-consumer-wire-after.json",
+      "bytes": 293,
+      "sha256": "899eb2761566ff9a4cfface513ab6db70e3c01f2297c928cf1c0445464d6348d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/core-preservation-P30-1542-current-consumer-wire-before.json",
+      "bytes": 293,
+      "sha256": "899eb2761566ff9a4cfface513ab6db70e3c01f2297c928cf1c0445464d6348d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/core-preservation-P30-1542-current-empty-set-seven-consumer-supplement-after.json",
+      "bytes": 293,
+      "sha256": "899eb2761566ff9a4cfface513ab6db70e3c01f2297c928cf1c0445464d6348d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/core-preservation-P30-1542-current-empty-set-seven-consumer-supplement-before.json",
+      "bytes": 293,
+      "sha256": "899eb2761566ff9a4cfface513ab6db70e3c01f2297c928cf1c0445464d6348d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/core-preservation-before.json",
+      "bytes": 293,
+      "sha256": "899eb2761566ff9a4cfface513ab6db70e3c01f2297c928cf1c0445464d6348d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/core-preservation-final.json",
+      "bytes": 293,
+      "sha256": "899eb2761566ff9a4cfface513ab6db70e3c01f2297c928cf1c0445464d6348d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/core-reference-pins-P30-1542-current-consumer-bridge-after.json",
+      "bytes": 22267,
+      "sha256": "a3dfce086cfb3eee29505c8f096cb4af634502ccfb6e7f10443fee1b28b5dbac"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/core-reference-pins-P30-1542-current-consumer-bridge-before.json",
+      "bytes": 22267,
+      "sha256": "a3dfce086cfb3eee29505c8f096cb4af634502ccfb6e7f10443fee1b28b5dbac"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/core-reference-pins-P30-1542-current-consumer-gateway-after.json",
+      "bytes": 22267,
+      "sha256": "a3dfce086cfb3eee29505c8f096cb4af634502ccfb6e7f10443fee1b28b5dbac"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/core-reference-pins-P30-1542-current-consumer-gateway-before.json",
+      "bytes": 22267,
+      "sha256": "a3dfce086cfb3eee29505c8f096cb4af634502ccfb6e7f10443fee1b28b5dbac"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/core-reference-pins-P30-1542-current-consumer-router-after.json",
+      "bytes": 22267,
+      "sha256": "a3dfce086cfb3eee29505c8f096cb4af634502ccfb6e7f10443fee1b28b5dbac"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/core-reference-pins-P30-1542-current-consumer-router-before.json",
+      "bytes": 22267,
+      "sha256": "a3dfce086cfb3eee29505c8f096cb4af634502ccfb6e7f10443fee1b28b5dbac"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/core-reference-pins-P30-1542-current-consumer-studio-after.json",
+      "bytes": 22267,
+      "sha256": "a3dfce086cfb3eee29505c8f096cb4af634502ccfb6e7f10443fee1b28b5dbac"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/core-reference-pins-P30-1542-current-consumer-studio-before.json",
+      "bytes": 22267,
+      "sha256": "a3dfce086cfb3eee29505c8f096cb4af634502ccfb6e7f10443fee1b28b5dbac"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/core-reference-pins-P30-1542-current-consumer-wire-after.json",
+      "bytes": 22267,
+      "sha256": "a3dfce086cfb3eee29505c8f096cb4af634502ccfb6e7f10443fee1b28b5dbac"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/core-reference-pins-P30-1542-current-consumer-wire-before.json",
+      "bytes": 22267,
+      "sha256": "a3dfce086cfb3eee29505c8f096cb4af634502ccfb6e7f10443fee1b28b5dbac"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/core-reference-pins-P30-1542-current-empty-set-seven-consumer-supplement-after.json",
+      "bytes": 22267,
+      "sha256": "a3dfce086cfb3eee29505c8f096cb4af634502ccfb6e7f10443fee1b28b5dbac"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/core-reference-pins-P30-1542-current-empty-set-seven-consumer-supplement-before.json",
+      "bytes": 22267,
+      "sha256": "a3dfce086cfb3eee29505c8f096cb4af634502ccfb6e7f10443fee1b28b5dbac"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/core-reference-pins-before.json",
+      "bytes": 22267,
+      "sha256": "a3dfce086cfb3eee29505c8f096cb4af634502ccfb6e7f10443fee1b28b5dbac"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/core-reference-pins-final.json",
+      "bytes": 22267,
+      "sha256": "a3dfce086cfb3eee29505c8f096cb4af634502ccfb6e7f10443fee1b28b5dbac"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/dependency-links.json",
+      "bytes": 107437,
+      "sha256": "376aca4ecc978d5b49a3b86b13c0d3237cd0c3a0a63b3a5d98fa313e62f929de"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/finalize.py",
+      "bytes": 18563,
+      "sha256": "c832b103c96759deb819f51783399ed6f6db7dccbf1f10ad2a4389d433483d52"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/full-closure-final.json",
+      "bytes": 1399901,
+      "sha256": "575442e7fb2ba4bd222eed18d0a7dd6b2cd3ac5823246fecfad58743860c52cf"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/native-P30-1542-current-consumer-bridge-after.json",
+      "bytes": 457,
+      "sha256": "2ecb3371892b7c627be792d3aadf31d3e138c657b834d73777be7d527406fb26"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/native-P30-1542-current-consumer-bridge-before.json",
+      "bytes": 457,
+      "sha256": "2ecb3371892b7c627be792d3aadf31d3e138c657b834d73777be7d527406fb26"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/native-P30-1542-current-consumer-gateway-after.json",
+      "bytes": 457,
+      "sha256": "2ecb3371892b7c627be792d3aadf31d3e138c657b834d73777be7d527406fb26"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/native-P30-1542-current-consumer-gateway-before.json",
+      "bytes": 457,
+      "sha256": "2ecb3371892b7c627be792d3aadf31d3e138c657b834d73777be7d527406fb26"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/native-P30-1542-current-consumer-router-after.json",
+      "bytes": 457,
+      "sha256": "2ecb3371892b7c627be792d3aadf31d3e138c657b834d73777be7d527406fb26"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/native-P30-1542-current-consumer-router-before.json",
+      "bytes": 457,
+      "sha256": "2ecb3371892b7c627be792d3aadf31d3e138c657b834d73777be7d527406fb26"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/native-P30-1542-current-consumer-studio-after.json",
+      "bytes": 457,
+      "sha256": "2ecb3371892b7c627be792d3aadf31d3e138c657b834d73777be7d527406fb26"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/native-P30-1542-current-consumer-studio-before.json",
+      "bytes": 457,
+      "sha256": "2ecb3371892b7c627be792d3aadf31d3e138c657b834d73777be7d527406fb26"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/native-P30-1542-current-consumer-wire-after.json",
+      "bytes": 457,
+      "sha256": "2ecb3371892b7c627be792d3aadf31d3e138c657b834d73777be7d527406fb26"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/native-P30-1542-current-consumer-wire-before.json",
+      "bytes": 457,
+      "sha256": "2ecb3371892b7c627be792d3aadf31d3e138c657b834d73777be7d527406fb26"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/native-P30-1542-current-empty-set-seven-consumer-supplement-after.json",
+      "bytes": 457,
+      "sha256": "2ecb3371892b7c627be792d3aadf31d3e138c657b834d73777be7d527406fb26"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/native-P30-1542-current-empty-set-seven-consumer-supplement-before.json",
+      "bytes": 457,
+      "sha256": "2ecb3371892b7c627be792d3aadf31d3e138c657b834d73777be7d527406fb26"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/native-before.json",
+      "bytes": 457,
+      "sha256": "2ecb3371892b7c627be792d3aadf31d3e138c657b834d73777be7d527406fb26"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/native-final.json",
+      "bytes": 457,
+      "sha256": "2ecb3371892b7c627be792d3aadf31d3e138c657b834d73777be7d527406fb26"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-bridge-baseline/command.json",
+      "bytes": 1852,
+      "sha256": "34368772591fede76e869d4552904daba5b3909a5eb9d891276507b0c0fadce6"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-bridge-baseline/observations.json",
+      "bytes": 429329,
+      "sha256": "0d478b729cb868982aa2b9eeac87d478d384d17af577486582c729823151295d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-bridge-baseline/raw-tests.json",
+      "bytes": 2610,
+      "sha256": "311d9b7932a4af010199caa038e4bf7e8aa293d5f81aaff3c6814891c38950fa"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-bridge-baseline/semantic-validation.json",
+      "bytes": 45867,
+      "sha256": "0483130a3d1175f76d143e249886d859defee141ceb883e57c82e35a68ff4be9"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-bridge-baseline/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-bridge-baseline/stdout.log",
+      "bytes": 278834,
+      "sha256": "2dbf3b2e19c412b0e779ec90a8a75e38634a6c35f51f740cea0a5e5292003511"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-bridge-baseline/summary.json",
+      "bytes": 3940,
+      "sha256": "8897d037650d5cce0a8dd64aa7247b79674c25684a284919aecfb4b88eae0f5b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-bridge-mutant/command.json",
+      "bytes": 1841,
+      "sha256": "170bb90cdc9ed0e10e9c3ac6c7767fd9817b385bef52b80211f43b9a1c07b6de"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-bridge-mutant/observations.json",
+      "bytes": 429621,
+      "sha256": "e6692729a532273546b21732482e71441212ee3abd84af1c0d4ad1d6fc160d24"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-bridge-mutant/raw-tests.json",
+      "bytes": 3079,
+      "sha256": "113614e7519f4843399b0bc55a950e5462d39d9066064b5c64f223c940d45092"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-bridge-mutant/semantic-validation.json",
+      "bytes": 46203,
+      "sha256": "8609daa0aa442032dd1e5d9b42153976fc02863fa8ba2be2037a81b00e6d6002"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-bridge-mutant/stderr.log",
+      "bytes": 1316,
+      "sha256": "31a3f26ea9c83b991447e0407de1d6824345324586d6f4a1ccce1b02b0a69360"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-bridge-mutant/stdout.log",
+      "bytes": 279289,
+      "sha256": "8502712802a98694fc3b93f542c8a8ddd2e10a76e490a29cee599c5a52945385"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-bridge-mutant/summary.json",
+      "bytes": 5046,
+      "sha256": "12978c6afc08412be4d5d66639dbed25daa8dcd645ae4a9ad575c743f09c2234"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-bridge-restored/command.json",
+      "bytes": 1852,
+      "sha256": "cf57dfb7bf5e6b81d5067d03df3b5d8a7fa0522ce605502a3712c4a69c36462a"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-bridge-restored/observations.json",
+      "bytes": 429329,
+      "sha256": "2c3b746bb5a195d42770ee43d667c5ed8eae9d558d1cab727969316a5873582e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-bridge-restored/raw-tests.json",
+      "bytes": 2606,
+      "sha256": "99de651df7c3e6e5a20c334f2bfb5e008553afc8a483f586c7617af95dd0cade"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-bridge-restored/semantic-validation.json",
+      "bytes": 45867,
+      "sha256": "be285f35fd678e77644ef5843ef1ed2cc457213246f1491f67d65801c66994ac"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-bridge-restored/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-bridge-restored/stdout.log",
+      "bytes": 278834,
+      "sha256": "be152db80fbb61b2c9aea754acdb18e6b0f497bdd40153226b9346e2313eddf4"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-bridge-restored/summary.json",
+      "bytes": 3937,
+      "sha256": "56781799685cb3d812d8157c68161cd2513e623466a6acf65abea2c44a6c8d6d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-gateway-baseline/command.json",
+      "bytes": 1859,
+      "sha256": "b13930d2db7931d3e4613a5afa2b6c5d33360c44f8dab0dc0bb719c022a4d1f1"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-gateway-baseline/observations.json",
+      "bytes": 429343,
+      "sha256": "89a5eaa864c5b1aad5294b66a0ab510caa571446b6f50890a29f88fcfef21378"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-gateway-baseline/raw-tests.json",
+      "bytes": 2609,
+      "sha256": "827f95abd81dbdcccd99a1d13e075d90972a1e894a608eee4902424ff24b2793"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-gateway-baseline/semantic-validation.json",
+      "bytes": 45868,
+      "sha256": "8568198378a749153094e574f73b6f6e3d6c194a1f4e6a2d673b52345d162982"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-gateway-baseline/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-gateway-baseline/stdout.log",
+      "bytes": 278849,
+      "sha256": "e7860bafd182a4cce5482be8ed914b5a99762a30e8c1dfadeec61a0a48be8a36"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-gateway-baseline/summary.json",
+      "bytes": 3944,
+      "sha256": "8ceefcc3b41b29ffc8a7ceb815d13ee10bf4d132611df8d0f5fff16872ec74ef"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-gateway-mutant/command.json",
+      "bytes": 1848,
+      "sha256": "9a5ce658d81c9fe8beeae393891202ab20907a4f542c5525675a39319fbc975a"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-gateway-mutant/observations.json",
+      "bytes": 430189,
+      "sha256": "cdf99ace5d5f84a4087470431ab5b29523b345a38ed38a3ca490bb8306973e59"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-gateway-mutant/raw-tests.json",
+      "bytes": 3058,
+      "sha256": "3eb26fa5a68746895dc7b28f1964a220542a02aa02fa50c478b9140cde35f5fd"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-gateway-mutant/semantic-validation.json",
+      "bytes": 46782,
+      "sha256": "3ae48ec2ff09a4a69387c41d45dcd3cdd99e868c617c21a40044d805d1e7832f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-gateway-mutant/stderr.log",
+      "bytes": 1625,
+      "sha256": "b971fe068ba2f59f5da3c5ae00eb3f279cfe4b00ca9ebfa1c1630f72402a655b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-gateway-mutant/stdout.log",
+      "bytes": 279730,
+      "sha256": "60e676df6eba68c99b4cf67ed0e98142be068e3ce8bfebb316145e6aef85563b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-gateway-mutant/summary.json",
+      "bytes": 5356,
+      "sha256": "2c34ab7b50f0130a4c5e1483aa40be437fef91b31d4110b3aa2b41c11e3b7fd2"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-gateway-restored/command.json",
+      "bytes": 1859,
+      "sha256": "81b6cd5a8e8399a418c0833c0e0aaf81d0a9271be4f04c93440a5d8b632e7b3e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-gateway-restored/observations.json",
+      "bytes": 429343,
+      "sha256": "9d51a65ea5e7f25bfe358159b507a96d65a8402c0bc7d03c266ab2d1c1b0a4f2"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-gateway-restored/raw-tests.json",
+      "bytes": 2609,
+      "sha256": "bbbc8bc02f61bff830d740c4ddaec9d2c75cdb92ca77a3486b7cff0591a42694"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-gateway-restored/semantic-validation.json",
+      "bytes": 45868,
+      "sha256": "0aa1027b8b59f443b9eea455d3737bb760abe45f70f276ca9ca2e227fcd06aff"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-gateway-restored/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-gateway-restored/stdout.log",
+      "bytes": 278849,
+      "sha256": "a637e61d9ced73f83ffc2de365cef95ad7ceffd9b00442cc8af3e25ced3300de"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-gateway-restored/summary.json",
+      "bytes": 3943,
+      "sha256": "9579da658dec61a3ccc15cf1c278cf030aaf796a49cf615e6fcb5b79b656c2a7"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-router-baseline/command.json",
+      "bytes": 1852,
+      "sha256": "28e6c72bd691063840b1cc4611e7d1cae32136a2813748857f72a1f8030d0ee5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-router-baseline/observations.json",
+      "bytes": 429329,
+      "sha256": "dd5fc06b323c62177766d349b3d16995ddb986858ac3c7a9418b96159e372a95"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-router-baseline/raw-tests.json",
+      "bytes": 2601,
+      "sha256": "ae445ede2ae2a0f860cd883afcc372de061a99cc97253f849010ad1bee18fb53"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-router-baseline/semantic-validation.json",
+      "bytes": 45867,
+      "sha256": "8eea4bcabf8d8f90a6dd2e4b0aa9fdbe706b494286108f272ac7d653fac9e8d2"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-router-baseline/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-router-baseline/stdout.log",
+      "bytes": 278834,
+      "sha256": "720d7a31ad6a1c8775948a3336d127a07749cccf155b5732f2f083da3a2f1a94"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-router-baseline/summary.json",
+      "bytes": 3932,
+      "sha256": "221183a3dab4319a43e72129944426ea8f54ad0e6c2ba43e7d3b5cf7a16dbac0"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-router-mutant/command.json",
+      "bytes": 1841,
+      "sha256": "5e345b95e5e584f1c4c15c66d39e3e5bf6d1e853c0436c6f6ffe6d3de13b2660"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-router-mutant/observations.json",
+      "bytes": 429577,
+      "sha256": "893293078516869e7662607c2a6668e555c4b82dc8b89de117d7ffac72331efa"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-router-mutant/raw-tests.json",
+      "bytes": 3085,
+      "sha256": "e7361c1384931de0d4a0a527202220b33a6674fadda1a018853b2645ca2b51c6"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-router-mutant/semantic-validation.json",
+      "bytes": 46159,
+      "sha256": "4bd937807c0b2521a89668ec815b15616f6aa863f250b93600af12716d3801b7"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-router-mutant/stderr.log",
+      "bytes": 1326,
+      "sha256": "958f6baf4b97f88e906200c193778503f8443a49fc73f5a57d9df23b5d2d8981"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-router-mutant/stdout.log",
+      "bytes": 279246,
+      "sha256": "c2deacbe72f5422eed4c0d9903ff06e8af15623d24dea69155a82fb812b8e664"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-router-mutant/summary.json",
+      "bytes": 5057,
+      "sha256": "581690fc4979f674b27ed39a798daa6c4f449ce0aafc58bb455f6c07e2c8ad33"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-router-restored/command.json",
+      "bytes": 1852,
+      "sha256": "19b4e83307174e5b12d108044667d88ee787d676ba7051c9ca11262d9b7523b2"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-router-restored/observations.json",
+      "bytes": 429329,
+      "sha256": "83cb048f88794d3f4e7090883b0aede42e5050752b12aca78a8606ea4ea48dd9"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-router-restored/raw-tests.json",
+      "bytes": 2606,
+      "sha256": "8212fa81916612ab92c13050baf0e0f8cdc1ebe8300b63c4834677a51c32259a"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-router-restored/semantic-validation.json",
+      "bytes": 45867,
+      "sha256": "f1fe9387774b21234aac9c01f2114e42c6734b49e59a4abacc8cb06e5e51d967"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-router-restored/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-router-restored/stdout.log",
+      "bytes": 278834,
+      "sha256": "a8a5e77efea89a3861879f6327f8ebde9b3d01853319b5321708c8a805539e98"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-router-restored/summary.json",
+      "bytes": 3937,
+      "sha256": "050974f383d4b01131d2549cc9f82b31a7e4671c60e111187c23abcda9d64419"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-studio-baseline/command.json",
+      "bytes": 1852,
+      "sha256": "a80234b3362f2d5cd9ed7b5a633b3f9dbac88326f884986ff140224b1ac74b36"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-studio-baseline/observations.json",
+      "bytes": 429329,
+      "sha256": "fc12051fe29914c5e0f27ab18843dc451402013c204b9a43485cd3d352c71e7a"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-studio-baseline/raw-tests.json",
+      "bytes": 2609,
+      "sha256": "d9e1f73e789f67e3d1c7615f9a5afe4b12227f6d362941ac040927b57ec036e2"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-studio-baseline/semantic-validation.json",
+      "bytes": 45867,
+      "sha256": "4c643bb2f7f495942ba55f0070dbae32b3741115ee5eb766e08b1bfb3d7b464b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-studio-baseline/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-studio-baseline/stdout.log",
+      "bytes": 278834,
+      "sha256": "27f990ed6266b2db50d2992ff44277ac798cd7f4cef1befc5bd1669b09249e10"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-studio-baseline/summary.json",
+      "bytes": 3939,
+      "sha256": "8aa0e5bbaf0dcca9eb046a89843745bceb0b804f923cdea0973c961994a76c99"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-studio-mutant/command.json",
+      "bytes": 1841,
+      "sha256": "c42bec0c98e458d6dfb110aff21635c4e451ea205a8e79fbe66233ba12fca032"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-studio-mutant/observations.json",
+      "bytes": 432481,
+      "sha256": "5ea460121b11c6a756dece8dbfdae2b40cdc27124a3fedab1445c5a076426aaf"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-studio-mutant/raw-tests.json",
+      "bytes": 3082,
+      "sha256": "c0a83ff98e19a805fcba932f082080fbf9c01e019d186dba9a59d7b892d78831"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-studio-mutant/semantic-validation.json",
+      "bytes": 49167,
+      "sha256": "bc000800ff4a5513d44de062ebcedd36571eccf308a9bb201145acd4a85b9789"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-studio-mutant/stderr.log",
+      "bytes": 1973,
+      "sha256": "2e561964a4382edf76466d118536e26e9086bf8cddc30410afec40ad7c3a0ad9"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-studio-mutant/stdout.log",
+      "bytes": 281521,
+      "sha256": "39d54de616a4754bf0e6bddcaa2b625f1f2cb6de0262a8703c1bbfcf57437e44"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-studio-mutant/summary.json",
+      "bytes": 5735,
+      "sha256": "a7a240e2e72205ea48a7884796b03942e3a4bd362493c9b813b579c6eb2eb3fb"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-studio-restored/command.json",
+      "bytes": 1852,
+      "sha256": "7b942cd25df9f8b2428dae75218f4b448f94b49e0f9c2d24c4189e41d4346093"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-studio-restored/observations.json",
+      "bytes": 429329,
+      "sha256": "6423aad0ff080ad6bfd0fbd71ff4be7e89c35b4bc05d167671b5b0234f496a77"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-studio-restored/raw-tests.json",
+      "bytes": 2608,
+      "sha256": "419b1212f8fbffa8bddc03d315deabe1029a390dc1cae3beb90bbd8a2a55ab0c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-studio-restored/semantic-validation.json",
+      "bytes": 45867,
+      "sha256": "b12ba5a21d5f0f3704dfa900d5ce1b27fd92ecaee38144c29a0a41de0e279604"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-studio-restored/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-studio-restored/stdout.log",
+      "bytes": 278834,
+      "sha256": "aab8bd554512205c306da467205fa2e8a04ffa640f573c4dc40705154a28aa0c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-studio-restored/summary.json",
+      "bytes": 3938,
+      "sha256": "65684ddd96be105708e6c2abde1513344b98646e193c317b7c3025562baf2ae8"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-wire-baseline/command.json",
+      "bytes": 1838,
+      "sha256": "ba0aa1888c3e276ade5642473bba2c712d9325526da28435d1e0d0737db47ab1"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-wire-baseline/observations.json",
+      "bytes": 429301,
+      "sha256": "2c3304f7149bd7e0a1fe1e0b75a26a3c5dbcf8e742bea757dcc764243fa20e4f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-wire-baseline/raw-tests.json",
+      "bytes": 2609,
+      "sha256": "21569c1d39610791859246ff2126ebdb1f68d662619e1a28f874694705642633"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-wire-baseline/semantic-validation.json",
+      "bytes": 45865,
+      "sha256": "5669f7d6987637d42a9bd8e834de2259e911b90d793890b368e8b38be96f4925"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-wire-baseline/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-wire-baseline/stdout.log",
+      "bytes": 278804,
+      "sha256": "7a08da051a887464bd895dcf6bd5ad7a5bb7e602feebb98b23186952baf59c2c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-wire-baseline/summary.json",
+      "bytes": 3931,
+      "sha256": "325e1c3a35c04d3236cc90d61cda38f5d43a0fb6fb4c2be3483018183669bcd9"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-wire-mutant/command.json",
+      "bytes": 1827,
+      "sha256": "705c58048e8e33c99d60d905ac0334cbe9deb35ff13ef85c8cd9ff3220208881"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-wire-mutant/observations.json",
+      "bytes": 432189,
+      "sha256": "cf3d4b3676b97ef1260902d56156b56b78666b5be14b8de707b66f853080b430"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-wire-mutant/raw-tests.json",
+      "bytes": 3086,
+      "sha256": "4c66bb14179cbdd106c533fe2e220686355e47f24de7d9d2ac66851b426a64de"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-wire-mutant/semantic-validation.json",
+      "bytes": 48877,
+      "sha256": "bf453a4c206252a46a04e77235cc7c103c7289d90a7c753fbf88f3784de2af73"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-wire-mutant/stderr.log",
+      "bytes": 1949,
+      "sha256": "37776c306ec8ca5fb194577ef8380ba2b7e2cc53514e39ec8a63341e38a6707b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-wire-mutant/stdout.log",
+      "bytes": 281383,
+      "sha256": "b6cab974c0b7ebb57647b2fc2a06b36f1dd94d841198e4e839bd1315066b164c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-wire-mutant/summary.json",
+      "bytes": 5705,
+      "sha256": "cf71938a9008cf6c90f00f98ff30a10e8599fa6b34eb1ec16d44bc70c6a624d1"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-wire-restored/command.json",
+      "bytes": 1838,
+      "sha256": "fdae79d7dfc74d2ebe2c2b15d3a026119afa265230d182c285b7e9b0107d3da9"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-wire-restored/observations.json",
+      "bytes": 429301,
+      "sha256": "c4e4348f6f673f4eadfa07363ab9f2de7f73786d912f1cc57ea82031919ada22"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-wire-restored/raw-tests.json",
+      "bytes": 2610,
+      "sha256": "3f4d9ad070af37fe636c2169170ef2d26f04cdc073a19469ab6e8e50e728875c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-wire-restored/semantic-validation.json",
+      "bytes": 45865,
+      "sha256": "07a4872a7d10d938d911fe427af17b22c3b7a7ded6391afb029eef46613ff2f3"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-wire-restored/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-wire-restored/stdout.log",
+      "bytes": 278804,
+      "sha256": "6cf0ef56b8e564e349375a73b6bbf625fc7ef55bad8f05a35803f90bac090713"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-consumer-wire-restored/summary.json",
+      "bytes": 3932,
+      "sha256": "cadf121706caa331495f065a66f8a79a75d6f6a1ca846a648312e0265b57df13"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-empty-set-seven-consumer-supplement-baseline/command.json",
+      "bytes": 1992,
+      "sha256": "f36841f0e72c8717dc23d3e142722f26f4d1c1d4a1f375e5566257cdc3c63af0"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-empty-set-seven-consumer-supplement-baseline/observations.json",
+      "bytes": 429609,
+      "sha256": "2609dbecb02eede7aa4692f9b6b08b049a8f2be1808ab60677158dd36b3a0741"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-empty-set-seven-consumer-supplement-baseline/raw-tests.json",
+      "bytes": 2601,
+      "sha256": "04532d4847ec4de97f7cf8f2a41216e2f8bc58b1c5b34e962e2f098eeb0862fb"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-empty-set-seven-consumer-supplement-baseline/semantic-validation.json",
+      "bytes": 45887,
+      "sha256": "6ead81b6ea5338ece7b70b96eb09e78ea2a8e3645985806eb0a5e387f70450f2"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-empty-set-seven-consumer-supplement-baseline/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-empty-set-seven-consumer-supplement-baseline/stdout.log",
+      "bytes": 279134,
+      "sha256": "3203279ff3ddac1f3d1826492373904f0a9865ee45cb6f31e1ba52ff58bbdf91"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-empty-set-seven-consumer-supplement-baseline/summary.json",
+      "bytes": 4011,
+      "sha256": "3e94a207042d7cc7d2908d4093d5e49689cf32adb16318ee2f0332911b5f908d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-empty-set-seven-consumer-supplement-mutant/command.json",
+      "bytes": 1981,
+      "sha256": "0c2e19782011cceecc352c0ae0f03543d01a9c34eb3d41ec3d90dfc96aef8591"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-empty-set-seven-consumer-supplement-mutant/observations.json",
+      "bytes": 430893,
+      "sha256": "ef5f101288454f7f69c3f39b8e190c3a466acce729289d935a46e9359f0b6186"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-empty-set-seven-consumer-supplement-mutant/raw-tests.json",
+      "bytes": 3562,
+      "sha256": "8f1dde62b97d4d898d9507b9b73b66d7214e7de3e3c3cde7a4ca7ea8bcc32c32"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-empty-set-seven-consumer-supplement-mutant/semantic-validation.json",
+      "bytes": 47281,
+      "sha256": "0435dada5b65645a959d9ae0a30c535e62d276e7706413c887ce909fc27683a2"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-empty-set-seven-consumer-supplement-mutant/stderr.log",
+      "bytes": 2641,
+      "sha256": "7cb1f56642b371d420d79751cbaed28205d82f150b1380d6d0de07d5a3f57c08"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-empty-set-seven-consumer-supplement-mutant/stdout.log",
+      "bytes": 280195,
+      "sha256": "68b4a4ae9e95871167f93baab2e8a73bd3d4c1d9ecb148d9dfd54e1bf6f223f0"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-empty-set-seven-consumer-supplement-mutant/summary.json",
+      "bytes": 6308,
+      "sha256": "b796a4585dd9597d82878365c1772b3da9a6ed495ddea6e9371c19c3edc6f606"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-empty-set-seven-consumer-supplement-restored/command.json",
+      "bytes": 1992,
+      "sha256": "43ce42a9d12b3813e58f5e208a9c3960a02fd5a343f555012ad5f7535c58fb67"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-empty-set-seven-consumer-supplement-restored/observations.json",
+      "bytes": 429609,
+      "sha256": "afb8fa989dfad9d4f0e1a046860c78f3bde543118e9ce6bb22df4452c7a6f4d9"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-empty-set-seven-consumer-supplement-restored/raw-tests.json",
+      "bytes": 2609,
+      "sha256": "7fdccc024a1a7b9d2212c397b2bda481ba1f8f2db25e599eebb40accbb0a9376"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-empty-set-seven-consumer-supplement-restored/semantic-validation.json",
+      "bytes": 45887,
+      "sha256": "bba727c366381a0e4e5d14cd9727bdcc4df9b0fdd1d5a65d030e60a2e33dbb7d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-empty-set-seven-consumer-supplement-restored/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-empty-set-seven-consumer-supplement-restored/stdout.log",
+      "bytes": 279134,
+      "sha256": "1c6b3a850d57f7f896667055bbbd5fcf9992ca20382f94a438466fc9306dde98"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/P30-1542-current-empty-set-seven-consumer-supplement-restored/summary.json",
+      "bytes": 4019,
+      "sha256": "6d2d311f6e734991e89b2dbd2efdf4e1e825f2726e070d0edd07e701ce52454a"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/root-head-final/command.json",
+      "bytes": 1348,
+      "sha256": "ac7d7de1741b539d9e8506dc53906db2b046cef2c842d7866c46d1155f13dc99"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/root-head-final/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/root-head-final/stdout.log",
+      "bytes": 41,
+      "sha256": "4d6100c6870dbeb5ee06470bb88c465f6304ec0b7d1ef2684adc01718809997b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/root-status-final/command.json",
+      "bytes": 1357,
+      "sha256": "a6cc4e564a6618ad193f8f65ce3884e9aea622a2ff98db2efcd386ac143b68c6"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/root-status-final/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/phases/root-status-final/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/prepared.json",
+      "bytes": 835,
+      "sha256": "5c7beef45129e8bfb073152de8ae5c5b44200a053df1bc52707483f360539517"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/proposal-pins.json",
+      "bytes": 1050,
+      "sha256": "af4784e9111d7782ebbd99d32e9d9fb1ee907a0359298fa596e43b5a52e7d2c8"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/protected-pins-P30-1542-current-consumer-bridge-after.json",
+      "bytes": 28023,
+      "sha256": "2b9c4dd286d5ceb22c55c593fef4774a89ad1925c6ae6a3a66606eaef429d390"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/protected-pins-P30-1542-current-consumer-bridge-before.json",
+      "bytes": 28023,
+      "sha256": "2b9c4dd286d5ceb22c55c593fef4774a89ad1925c6ae6a3a66606eaef429d390"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/protected-pins-P30-1542-current-consumer-gateway-after.json",
+      "bytes": 28023,
+      "sha256": "2b9c4dd286d5ceb22c55c593fef4774a89ad1925c6ae6a3a66606eaef429d390"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/protected-pins-P30-1542-current-consumer-gateway-before.json",
+      "bytes": 28023,
+      "sha256": "2b9c4dd286d5ceb22c55c593fef4774a89ad1925c6ae6a3a66606eaef429d390"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/protected-pins-P30-1542-current-consumer-router-after.json",
+      "bytes": 28023,
+      "sha256": "2b9c4dd286d5ceb22c55c593fef4774a89ad1925c6ae6a3a66606eaef429d390"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/protected-pins-P30-1542-current-consumer-router-before.json",
+      "bytes": 28023,
+      "sha256": "2b9c4dd286d5ceb22c55c593fef4774a89ad1925c6ae6a3a66606eaef429d390"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/protected-pins-P30-1542-current-consumer-studio-after.json",
+      "bytes": 28023,
+      "sha256": "2b9c4dd286d5ceb22c55c593fef4774a89ad1925c6ae6a3a66606eaef429d390"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/protected-pins-P30-1542-current-consumer-studio-before.json",
+      "bytes": 28023,
+      "sha256": "2b9c4dd286d5ceb22c55c593fef4774a89ad1925c6ae6a3a66606eaef429d390"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/protected-pins-P30-1542-current-consumer-wire-after.json",
+      "bytes": 28023,
+      "sha256": "2b9c4dd286d5ceb22c55c593fef4774a89ad1925c6ae6a3a66606eaef429d390"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/protected-pins-P30-1542-current-consumer-wire-before.json",
+      "bytes": 28023,
+      "sha256": "2b9c4dd286d5ceb22c55c593fef4774a89ad1925c6ae6a3a66606eaef429d390"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/protected-pins-P30-1542-current-empty-set-seven-consumer-supplement-after.json",
+      "bytes": 28023,
+      "sha256": "2b9c4dd286d5ceb22c55c593fef4774a89ad1925c6ae6a3a66606eaef429d390"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/protected-pins-P30-1542-current-empty-set-seven-consumer-supplement-before.json",
+      "bytes": 28023,
+      "sha256": "2b9c4dd286d5ceb22c55c593fef4774a89ad1925c6ae6a3a66606eaef429d390"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/protected-pins-before.json",
+      "bytes": 28023,
+      "sha256": "2b9c4dd286d5ceb22c55c593fef4774a89ad1925c6ae6a3a66606eaef429d390"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/protected-pins-final.json",
+      "bytes": 28023,
+      "sha256": "2b9c4dd286d5ceb22c55c593fef4774a89ad1925c6ae6a3a66606eaef429d390"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/root-tracked-before.json",
+      "bytes": 914595,
+      "sha256": "93b780b8024ed47e494b7b8aad80bdb72664965f45b64c83755bcacebf6f74ef"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/semantic-classification.json",
+      "bytes": 35732,
+      "sha256": "cdee3e34f6a02d27ecc0ae02a4b9a040ec5fd09da64246d3ac3159eb8e43fb68"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/commands-frozen.jsonl",
+      "bytes": 5540,
+      "sha256": "7f72e8609ee1d711bea4733b9113c783af1e25a3f4ba95760d30ac550f83d180"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/compiled-original.json",
+      "bytes": 462540,
+      "sha256": "82ff86751e49686db52385c53bac4a2c7ef010a2034745289731d4e6d4ac7598"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/core-preservation-after.json",
+      "bytes": 293,
+      "sha256": "899eb2761566ff9a4cfface513ab6db70e3c01f2297c928cf1c0445464d6348d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/core-preservation-before.json",
+      "bytes": 293,
+      "sha256": "899eb2761566ff9a4cfface513ab6db70e3c01f2297c928cf1c0445464d6348d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/core-reference-pins-after.json",
+      "bytes": 22267,
+      "sha256": "a3dfce086cfb3eee29505c8f096cb4af634502ccfb6e7f10443fee1b28b5dbac"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/core-reference-pins-before.json",
+      "bytes": 22267,
+      "sha256": "a3dfce086cfb3eee29505c8f096cb4af634502ccfb6e7f10443fee1b28b5dbac"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/dependency-links.json",
+      "bytes": 105595,
+      "sha256": "e4a88d899d81f87e26c19dbbec5f931ea6db1cf41defc6065280d8723d39fad2"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/driver-first-json-only.py",
+      "bytes": 10608,
+      "sha256": "8c3dc5929eec944c8f2c835e149d9791301ab53e984c1e0e013c5103d8986303"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/driver.py",
+      "bytes": 10985,
+      "sha256": "546de3f39a83f65e7a9fd32f0810c3de22a76459b02344f5ab2aadf9d1afb855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/finalize.py",
+      "bytes": 18727,
+      "sha256": "efc69806c1c2c62d3aeeb0ebb847428b5f060fcd7c5bfde677465729d02e86aa"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/full-closure-final.json",
+      "bytes": 1399901,
+      "sha256": "575442e7fb2ba4bd222eed18d0a7dd6b2cd3ac5823246fecfad58743860c52cf"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/native-after.json",
+      "bytes": 457,
+      "sha256": "2ecb3371892b7c627be792d3aadf31d3e138c657b834d73777be7d527406fb26"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/native-before.json",
+      "bytes": 457,
+      "sha256": "2ecb3371892b7c627be792d3aadf31d3e138c657b834d73777be7d527406fb26"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/phases/observation-reporters-rerun/command.json",
+      "bytes": 1745,
+      "sha256": "7c1295a5ad210493812e6660b0c19ffb6cf2b998cf43307b23a8cadf27dfedf2"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/phases/observation-reporters-rerun/observations.json",
+      "bytes": 429203,
+      "sha256": "8ee83998b80a8fa48b0c8674816c89bdb531fc77f9ec77db501917f7e39c8674"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/phases/observation-reporters-rerun/raw-tests.json",
+      "bytes": 2603,
+      "sha256": "d8b613bf9c0f557e23de9bab49d86140b986994c10381b751cc9f50f5462fa15"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/phases/observation-reporters-rerun/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/phases/observation-reporters-rerun/stdout.log",
+      "bytes": 278682,
+      "sha256": "728c1696d960325ed513efa8d7fc8a52a68e989f821acb14634ceff5cd913d46"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/phases/observation-reporters-rerun/summary.json",
+      "bytes": 3448,
+      "sha256": "a1eade14d4127838b9f0389067789acbb3bcc725d94377c0a9747bff66e0f319"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/phases/reviewed-seven-consumer-first-baseline/command.json",
+      "bytes": 1760,
+      "sha256": "21e1197ed32b094016b00c107bf75951a1faf9d4fdf9f13d87737accf36849fb"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/phases/reviewed-seven-consumer-first-baseline/observations.json",
+      "bytes": 3,
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/phases/reviewed-seven-consumer-first-baseline/raw-tests.json",
+      "bytes": 2596,
+      "sha256": "7aa7b7050359c7588c555b369d8c5665cf7bcfdd2f4b779a08225d4d54648bb6"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/phases/reviewed-seven-consumer-first-baseline/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/phases/reviewed-seven-consumer-first-baseline/stdout.log",
+      "bytes": 144,
+      "sha256": "b150508ed36fa1bd77f7bee5709a84c2c1b827a5f228e6b557e9f6bfee6ed232"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/phases/reviewed-seven-consumer-first-baseline/summary.json",
+      "bytes": 3457,
+      "sha256": "00396cd516e57d418f49d3b1bedf9018ea688abf905c5935241b0f2c44197d1a"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/phases/root-head-final/command.json",
+      "bytes": 1249,
+      "sha256": "1f3e4fb8e81bfe90e55544f3d73634375fbec6e8cd2c02bf6edd587ebcef927e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/phases/root-head-final/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/phases/root-head-final/stdout.log",
+      "bytes": 41,
+      "sha256": "4d6100c6870dbeb5ee06470bb88c465f6304ec0b7d1ef2684adc01718809997b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/phases/root-status-final/command.json",
+      "bytes": 1258,
+      "sha256": "a7eab16e0b5fdfb871089f9ece5ee2bf245e4c79b8e777f1819f954e7d6d18e3"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/phases/root-status-final/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/phases/root-status-final/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/prepared.json",
+      "bytes": 763,
+      "sha256": "556cb7d7effe21c39677bd24dcb6e6f11954cecea724b93015a8d608f1cc8d62"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/proposal-pins.json",
+      "bytes": 1044,
+      "sha256": "d32945039a12a6e81ab830bd26c143eb0f77389c43352c8808c905a34d28ba19"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/protected-pins-after.json",
+      "bytes": 28023,
+      "sha256": "2b9c4dd286d5ceb22c55c593fef4774a89ad1925c6ae6a3a66606eaef429d390"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/protected-pins-before.json",
+      "bytes": 28023,
+      "sha256": "2b9c4dd286d5ceb22c55c593fef4774a89ad1925c6ae6a3a66606eaef429d390"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/reporter-retention-correction.json",
+      "bytes": 1440,
+      "sha256": "d530366f4f1bebe3e755e5e29deafb8498b4677b3eaa58489bb3955a9131cf64"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/root-tracked-before.json",
+      "bytes": 914595,
+      "sha256": "93b780b8024ed47e494b7b8aad80bdb72664965f45b64c83755bcacebf6f74ef"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/semantic-observation-validation.json",
+      "bytes": 40395,
+      "sha256": "a5e6cb9036b7a9eafd35090db04f463b6fca87d1527506da0570a1c0c0073c99"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-proposal-20261015/leaseRevocationConsumerQualification.test.ts",
+      "bytes": 31014,
+      "sha256": "11c5ea168b78429fc1f2e34acc71fd350c0bed92af513cb54f234816a471329c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-proposal-20261015/proposal.json",
+      "bytes": 17583,
+      "sha256": "1d161af04a91df217a0f1a794fef0a8fb92803641a5445d7b91dccc38bb6c512"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-proposal-20261015/README.md",
+      "bytes": 5547,
+      "sha256": "bd86508f4c5840ce4d9211ea8b832b5f5bae2516703b56af9ca2b28337de7af4"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-static-review-20261015.json",
+      "bytes": 2875,
+      "sha256": "9dcc4bf5bf3d993bae5b3fd909dca07b97d9825ea22c5c084288b1c142078623"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/closure/tests/leaseRevocationConsumerQualification.test.ts",
+      "bytes": 31014,
+      "sha256": "11c5ea168b78429fc1f2e34acc71fd350c0bed92af513cb54f234816a471329c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/P30-1542-current-empty-set-after-preservation.json",
+      "bytes": 905,
+      "sha256": "fd7a2b14af862a0eef32528f75485730410f89f2dbbfdb3779de26088d357a3b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/P30-1542-current-empty-set-before-preservation.json",
+      "bytes": 905,
+      "sha256": "fd7a2b14af862a0eef32528f75485730410f89f2dbbfdb3779de26088d357a3b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/P30-1542-current-empty-set-matrix.json",
+      "bytes": 70818,
+      "sha256": "2741c0c34adb1a0fa2c49b385c3af4704fbef33c30233a99fc1de90839227c3e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/P30-1542-current-empty-set-restoration.json",
+      "bytes": 159,
+      "sha256": "a881e18633e03bd87c06ce7412e155c5f3b82e6df534bdd79a11fe8be7307792"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/P30-1542-current-empty-set-source-mutant.json",
+      "bytes": 1564,
+      "sha256": "50d2513ae8af32116ddf701f479c6e29fafda08c1d00a7c51ac9bf3cca73a1d3"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/P30-1542-current-empty-set.patch",
+      "bytes": 454,
+      "sha256": "6dd95be19abfc7808c671af8b80ca664b9774ea406f2f2beadf6569ecf319de7"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/P30-1542-revoke-snapshot-after-preservation.json",
+      "bytes": 905,
+      "sha256": "fd7a2b14af862a0eef32528f75485730410f89f2dbbfdb3779de26088d357a3b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/P30-1542-revoke-snapshot-before-preservation.json",
+      "bytes": 905,
+      "sha256": "fd7a2b14af862a0eef32528f75485730410f89f2dbbfdb3779de26088d357a3b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/P30-1542-revoke-snapshot-matrix.json",
+      "bytes": 22444,
+      "sha256": "01f12eb4910e04bb8d618f607cd242b78ea3d3dec71b3aed1a49c3b82a915c40"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/P30-1542-revoke-snapshot-restoration.json",
+      "bytes": 159,
+      "sha256": "a881e18633e03bd87c06ce7412e155c5f3b82e6df534bdd79a11fe8be7307792"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/P30-1542-revoke-snapshot-source-mutant.json",
+      "bytes": 1313,
+      "sha256": "7d6ac49dfef03ff2c1045258c7cc8974abe10b92b5a456a4772bee275635fb0f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/P30-1542-revoke-snapshot.patch",
+      "bytes": 619,
+      "sha256": "0c128a81c698ef4d91f8b9f25e8f8f7a9bc9c59a25bc5f885bbe3c045e903235"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/after-baseline-preservation.json",
+      "bytes": 905,
+      "sha256": "fd7a2b14af862a0eef32528f75485730410f89f2dbbfdb3779de26088d357a3b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/before-baseline-preservation.json",
+      "bytes": 905,
+      "sha256": "fd7a2b14af862a0eef32528f75485730410f89f2dbbfdb3779de26088d357a3b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/commands-frozen.jsonl",
+      "bytes": 15715,
+      "sha256": "d48ebdd7f43ff4adb6ce8467572b325b1db33cd0b961892f033fb8ccd6f3c9ee"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/compiled-live-after.json",
+      "bytes": 462540,
+      "sha256": "82ff86751e49686db52385c53bac4a2c7ef010a2034745289731d4e6d4ac7598"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/compiled-original.json",
+      "bytes": 462540,
+      "sha256": "82ff86751e49686db52385c53bac4a2c7ef010a2034745289731d4e6d4ac7598"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/compiled-private-after.json",
+      "bytes": 462540,
+      "sha256": "82ff86751e49686db52385c53bac4a2c7ef010a2034745289731d4e6d4ac7598"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/dependency-links.json",
+      "bytes": 102832,
+      "sha256": "85498fc5f9551ea08abea80a28263d81dd1daaa12fdbab3aa18f79b4b549355f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/drivers/source_controller.py",
+      "bytes": 10745,
+      "sha256": "b399f1e7f9d7576c9a5ed80a72ca07bbdda4574b86afb14d1a18f3e997c62ef5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/final-preservation.json",
+      "bytes": 905,
+      "sha256": "fd7a2b14af862a0eef32528f75485730410f89f2dbbfdb3779de26088d357a3b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/finalize.py",
+      "bytes": 13994,
+      "sha256": "a3176722bac0157c65dd884cc38568b0837aedb4ea2d328548e4e02b42c58870"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/full-closure-final.json",
+      "bytes": 1399777,
+      "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/index/setup-artifact-index.json",
+      "bytes": 3051,
+      "sha256": "4fe9ae84c883f02ec4f49ca27dba99f93e6257b53fcebec715d1a047f60c4864"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/native-before.json",
+      "bytes": 457,
+      "sha256": "2ecb3371892b7c627be792d3aadf31d3e138c657b834d73777be7d527406fb26"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/original-corpus.json",
+      "bytes": 1802,
+      "sha256": "0986c0a2b68e0a99ed330a64e288d4f543056e759ae845cdf95f72a06e5ba246"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-baseline/command.json",
+      "bytes": 1850,
+      "sha256": "5c28a4af559249facb0a774f1a2bb01fbfee3844095fb8fc1bec664550e9a162"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-baseline/raw-tests.json",
+      "bytes": 14131,
+      "sha256": "f461eb53a5188de4ca91587f8f1a0aa2244e89496986e194d358732c29754393"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-baseline/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-baseline/stdout.log",
+      "bytes": 132,
+      "sha256": "3db826e0b47b03632dd70943ff04be577a8fcde26802d8b9da548d05ec5482a9"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-baseline/summary.json",
+      "bytes": 12971,
+      "sha256": "8c68a98e6e2759c05cab25463d00b98894c6997fa6a3cdb68318b7292868f6cd"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-mutant/command.json",
+      "bytes": 1836,
+      "sha256": "c504afc56cb0e34ef241aa57fbbab4bd6cf493da70493b7cb39720858f130679"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-mutant/raw-tests.json",
+      "bytes": 42664,
+      "sha256": "2f08ae1a07cecbb93ab5b0656b041689c5590d329660a14e7035158b295f8365"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-mutant/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-mutant/stdout.log",
+      "bytes": 130,
+      "sha256": "b458d0f12ba801aed033a70caf174ab149f938e56c2a7e94d800be5788e6cac6"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-mutant/summary.json",
+      "bytes": 41892,
+      "sha256": "9deb4281f8633b550232ee18ddffcee4d141336b854d233a18000090c16ebd91"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-restored/command.json",
+      "bytes": 1850,
+      "sha256": "bebef1726ef99d11707a8d8789ec38912a3255c0754bc37a9d1b75dffcdfb3c3"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-restored/raw-tests.json",
+      "bytes": 14108,
+      "sha256": "75eaaaf04e93ee5535a49237894d298ef41452e68a6afdf71ba165468db7dea4"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-restored/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-restored/stdout.log",
+      "bytes": 132,
+      "sha256": "92f962110716e5e7238ef83e691221fe1094244c5d73f43f003f8a725095f1e8"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-restored/summary.json",
+      "bytes": 12971,
+      "sha256": "124c329298e893b7dd1d5483fa1676dfd8506e47c34de84d5b867cfdd2415067"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-baseline/command.json",
+      "bytes": 1788,
+      "sha256": "362e103fec7c019d98a255c33ccba692b884ccfc52868f644468f344e98e9580"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-baseline/raw-tests.json",
+      "bytes": 4605,
+      "sha256": "6d1f4619e8bfd52e1ed3f1b50a07c34191e01af547e536a6db6f6d74e1aa6820"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-baseline/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-baseline/stdout.log",
+      "bytes": 130,
+      "sha256": "48576344666b85e70c10c0555db47118dd2ccbcaf7de8fb6b2a02dba40b1e8d2"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-baseline/summary.json",
+      "bytes": 4564,
+      "sha256": "73fc036af18b168fe1fc507839a65bff73bff8823e5d62b7ba6b6a730c84d905"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-mutant/command.json",
+      "bytes": 1774,
+      "sha256": "8991980da409d9d61175c6e43df93836aa584029164a1b3a10a072a8946da659"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-mutant/raw-tests.json",
+      "bytes": 11538,
+      "sha256": "3d8405b79b1012c4e4adfd9817b2871dfcfda283b4825045175db78e455b61cb"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-mutant/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-mutant/stdout.log",
+      "bytes": 128,
+      "sha256": "8fff9376a6eabd25853e8273973e5c171915c9f3e922ecf0760708a6cdce6cad"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-mutant/summary.json",
+      "bytes": 11573,
+      "sha256": "7d6e0b8da3ca0e16aec5611e33d88a4138684cd988bf19421691ecb7fd8cd0be"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-restored/command.json",
+      "bytes": 1788,
+      "sha256": "8588ffc81074e32175b3034f1da90fab18733ea74e4b3882d19c78907fda2817"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-restored/raw-tests.json",
+      "bytes": 4604,
+      "sha256": "a904ebae8fede6e90713e97c226044718a7515751baac581f6a88242ad98ef68"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-restored/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-restored/stdout.log",
+      "bytes": 130,
+      "sha256": "71d1da469e2905c5e8828b846990af1a5c897597ac3269c9effed61753f4e637"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-restored/summary.json",
+      "bytes": 4564,
+      "sha256": "37dcf2b1cc4b544e49e04e9279f9aa6a994455900ce6c769cffc9ad4a6b4584b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/actual-runtime-fingerprint/command.json",
+      "bytes": 1499,
+      "sha256": "988d4093ab61775c16ea88a99dcab17af0b4d44782de0e2f1b7a28567f36cc09"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/actual-runtime-fingerprint/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/actual-runtime-fingerprint/stdout.log",
+      "bytes": 114,
+      "sha256": "6356112c023d338d4ce2eb165c4ea56d3e428ef958059d868a720d4b17a6639c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/root-head-after/command.json",
+      "bytes": 1369,
+      "sha256": "f1a5b7fd6c5c8dd9f67d59ac0ef8f69396ec6d203aea32668e3437e26b25d5a7"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/root-head-after/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/root-head-after/stdout.log",
+      "bytes": 41,
+      "sha256": "4d6100c6870dbeb5ee06470bb88c465f6304ec0b7d1ef2684adc01718809997b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/root-status-after/command.json",
+      "bytes": 1384,
+      "sha256": "c4f9e434764c4f3ebc4662e7021c4ecba9e5342b5aead0b5ae8e02db126766db"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/root-status-after/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/root-status-after/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/unchanged-original-two-file-baseline/command.json",
+      "bytes": 1857,
+      "sha256": "7648f379d050d83fae586eec09223a0d886e7d48b276093349b8ddaa414c267b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/unchanged-original-two-file-baseline/raw-tests.json",
+      "bytes": 14134,
+      "sha256": "eddd548007d030849c0574997e2d9ca0f14d5efdfa1e5d8e3b8ff9f155965b00"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/unchanged-original-two-file-baseline/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/unchanged-original-two-file-baseline/stdout.log",
+      "bytes": 133,
+      "sha256": "b768d8ab790b115f34d4f2b2885c1d41da60caa2ea3c1ece7f62f716008eaf48"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/unchanged-original-two-file-baseline/summary.json",
+      "bytes": 12974,
+      "sha256": "eedd020c3d1f498b275509e0557443f422b930a0947bd503f4da79c549f7742c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/prepare.py",
+      "bytes": 6449,
+      "sha256": "8b065d6abacc28ef5c62b558ae9205ad7ff08f0eeb8f52b3d79b320478b7ced1"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/prepared-preservation.json",
+      "bytes": 2465,
+      "sha256": "fa6866474af22f7f8d75f362efb73c478f90c3c41c92b710264c0e6b2f61946f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/prior-package-pins-after.json",
+      "bytes": 2258,
+      "sha256": "726798ddec24e99c8bd2882ec7bcc229eb8cab7876e2b2ca4c0b6ff8da483793"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/prior-package-pins-before.json",
+      "bytes": 2258,
+      "sha256": "726798ddec24e99c8bd2882ec7bcc229eb8cab7876e2b2ca4c0b6ff8da483793"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/private-final-tracked.json",
+      "bytes": 914595,
+      "sha256": "93b780b8024ed47e494b7b8aad80bdb72664965f45b64c83755bcacebf6f74ef"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/private-original-tracked.json",
+      "bytes": 914595,
+      "sha256": "93b780b8024ed47e494b7b8aad80bdb72664965f45b64c83755bcacebf6f74ef"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/readiness-pins-before.json",
+      "bytes": 20083,
+      "sha256": "affa4f35b419e4dab4cc32e7ae96cfd1c6c8f7dcd3a507f025043a31c90fdf8a"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/recipes.json",
+      "bytes": 2051,
+      "sha256": "5028015a240aeae65370b6c56152a6daa0909ce0aea11be95ceb67979be6bfc4"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/root-protected-pins-before.json",
+      "bytes": 6857,
+      "sha256": "f16472958c623709b04de69d90ae6a1a3efb9b9b715ec59985e47d0568e03e22"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/root-runtime-release.json",
+      "bytes": 538,
+      "sha256": "5ae6327f85b81807db7c8f53ae1356001d205feafc2b111a4708b57744061aec"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/root-tracked-after.json",
+      "bytes": 914595,
+      "sha256": "93b780b8024ed47e494b7b8aad80bdb72664965f45b64c83755bcacebf6f74ef"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/root-tracked-before.json",
+      "bytes": 914595,
+      "sha256": "93b780b8024ed47e494b7b8aad80bdb72664965f45b64c83755bcacebf6f74ef"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/semantic-classification.json",
+      "bytes": 12549,
+      "sha256": "d1307460b0a516253fec20eed9974e8442e0bc87c22eb488720635961216f02a"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/setup-observer-history.json",
+      "bytes": 307,
+      "sha256": "5113edfc79fc1088b7919b36a9e966fb26298cf155e49af972d35dec3d1c2845"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/setup-receipt.json",
+      "bytes": 10954,
+      "sha256": "4db6c1143d69dabd490cc73d70e5870ff36b7c8332308d7826e8ff2facd64a8f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/setup-receipt.md",
+      "bytes": 2005,
+      "sha256": "34fbb3f4d39217ba8915a9587f5c2bd77cf18fcf9ff2153d8dd6a07fd602f670"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-readiness-20261015.json",
+      "bytes": 88597,
+      "sha256": "667481aa764a565553ff6bfb1bd7291a777e4bb7b940a06db50ce16dca1b7587"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-readiness-20261015.md",
+      "bytes": 5131,
+      "sha256": "e69b015f40c1974a482daba12994cfcee96ad0e17711ba04f8e634b4f5729746"
+    },
+    {
+      "path": "/private/tmp/p0-30-initial-tracked-manifest-20261015.json",
+      "bytes": 1449771,
+      "sha256": "a17289fed9769adb7e4985847b6698b013d2eb253928174f80a42839992ddfa0"
+    },
+    {
+      "path": "/private/tmp/p0-30-root-scope-preflight-20261015.json",
+      "bytes": 9648,
+      "sha256": "5a35eb722c60578da5f983e42d8dca457cbacc13bfab9d02cab2fe3cccbef88f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-unchanged-two-file-baseline-20261015.json",
+      "bytes": 14147,
+      "sha256": "3d85dbb79ec7f37a60640401950ce3c2f7fcdf4ddfb444a4c5f79ce4f3b2abc3"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015.json",
+      "bytes": 95234,
+      "sha256": "30117576890238946b4a001d6214c378dd8483cb737167a4982f27c4ebcc052d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015.md",
+      "bytes": 2742,
+      "sha256": "77d12b860e6747093ececf69f79f43e26988de7c2d0b55c69905235218391b6a"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/artifact-index.json",
+      "bytes": 80407,
+      "sha256": "88c47cfa764cab70825d6bf67ac3e23615bf6b95fbb7aee6ac6959b8d1f30339"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015.json",
+      "bytes": 21149,
+      "sha256": "e3bb16af1d94f4a6d8d7ba5c29710ca19dccd5b2de02b33fa397edb9469714ad"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015.md",
+      "bytes": 1464,
+      "sha256": "c325cea2e7f4c6c1284a4c937f8cba4fd32288dacde7c4352e541937ee618662"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/artifact-index.json",
+      "bytes": 15704,
+      "sha256": "861366240c5cf98002552bf3ce6820155af84125c12d10ef48aa08e9d74152c7"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015.json",
+      "bytes": 103946,
+      "sha256": "6c093e937c06c1c7a81161dfdbe32027424c29f483cd864c2d4cb177f7b31c5e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015.md",
+      "bytes": 2900,
+      "sha256": "b6032d4dbd002d22d3703bd91002b82b9fba0be1a708f4cce78bd0029851b1e6"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/artifact-index.json",
+      "bytes": 83180,
+      "sha256": "f814f7bca4271196598038dcb06da66e2ea2db4e928ae7297429bab8d3002903"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015.json",
+      "bytes": 189825,
+      "sha256": "300ef90a081ff8303ee74f760c5ccb2457a7d5c6e159d13a3b26107722f31c36"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015.md",
+      "bytes": 2153,
+      "sha256": "104ea6a122191bd06fe51425a703da59267efcfebdd6b66926f821fa9f13ad91"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/artifact-index.json",
+      "bytes": 45637,
+      "sha256": "ece9597aee903d7788f836a0610ece5bd3bf32c3c8b4fac99d22075fdd705331"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/artifact-index.json",
+      "bytes": 23209,
+      "sha256": "fdac085c74624c508572bdc469d3561583caa08d491bc7b048c66365461733a8"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015.json",
+      "bytes": 142868,
+      "sha256": "662259e4a654d757576bb3fe70c75a820bcc302469ef0b6f3cbb5776c8b8280f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015.md",
+      "bytes": 2759,
+      "sha256": "9f9287dab4ecad6a898b5a1a3cc51fe5e5072fff5b8abedf1657651960584710"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/artifact-index.json",
+      "bytes": 33613,
+      "sha256": "7b9eeaf467195bfe6e8d27143c3ce75cf6a86ff5958d49552a65ed0bfc76f838"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015.json",
+      "bytes": 8254,
+      "sha256": "f45962ff6d63a7e05610eaecd839ec6c6fbfe6847ca73bd16c30eb38b2a72ee8"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015.md",
+      "bytes": 2920,
+      "sha256": "b089457a1246fae287dd00937607c567e1523e1959de8ac18523e19ca4f75c4e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/closure/tests/leaseRevocationConsumerQualification.test.ts",
+      "bytes": 31014,
+      "sha256": "11c5ea168b78429fc1f2e34acc71fd350c0bed92af513cb54f234816a471329c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-mutation-proposal-20261015.json",
+      "bytes": 6847,
+      "sha256": "78b77be735524fa739c26f478d030574a6ad2c5e2296ef6958c35a6164b819e9"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-mutation-static-review-20261015.json",
+      "bytes": 22562,
+      "sha256": "6e799b6f6efa9108899dde99fe918278dc1424ca14e1406a479c47d1d3b72f98"
+    }
+  ],
+  "excludedMutableJournal": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/commands.jsonl",
+  "privateCodeAndLargeManifests": "Controller/source code and complete copied closures remain private. Huge phase manifests are hash references, not canonical source/native body copies."
+}

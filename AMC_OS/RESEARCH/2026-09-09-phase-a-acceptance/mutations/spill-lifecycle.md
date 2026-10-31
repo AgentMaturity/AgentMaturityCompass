@@ -14,7 +14,7 @@ Illustrative invocation; replace every placeholder deliberately and choose a pre
 
 ```text
 python3 /absolute/path/to/spill-lifecycle.py \
-  --repository /Users/sid/AgentMaturityCompass \
+  --repository ~/AgentMaturityCompass \
   --source FULL_LOWERCASE_40_CHARACTER_FINAL_CANDIDATE_SHA \
   --output /private/tmp/amc-spill-mutations-UNIQUE_RUN_ID \
   --node /absolute/path/to/node22/bin/node \

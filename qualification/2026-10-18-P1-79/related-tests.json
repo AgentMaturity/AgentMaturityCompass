@@ -1,0 +1,27 @@
+{
+ "commit": "bf92762462a21e7b9fd73fd6d6cb1a2c5d5818f5",
+ "environment": "darwin 25.6.0, local macOS arm64, not CI",
+ "node": "v22.23.3",
+ "related": {
+  "cmd": "npx vitest run <every test file that imports a changed module> (106 files listed by git grep, fixtures excluded)",
+  "files": 296,
+  "total": 1517,
+  "passed": 1513,
+  "failed": 4,
+  "skipped": 0,
+  "failing": [
+   "tests/acpProvenance.test.ts: a failed turn sends no content refuses before flushing, not after",
+   "tests/nativeValidationOutcomeSurfaces.test.ts: Darwin 'CLI' public validation reports 'budget', preserves its actual output reference and survives cold inspection",
+   "tests/runPrincipalLease.test.ts: CLI and ACP native runs under an activated identity-binding plan (P1-79) amc agent-loop run mints a lease naming the OS user's users.yaml user, and the ledger rows carry it",
+   "tests/runPrincipalLease.test.ts: what a run lease never replaces or requires (P1-79) an ACP session without workspace tools mints no lease and is not refused"
+  ]
+ },
+ "rerun": {
+  "cmd": "npx vitest run tests/acpProvenance.test.ts tests/nativeValidationOutcomeSurfaces.test.ts tests/runPrincipalLease.test.ts tests/nativeClientStartupAbort.test.ts",
+  "files": 10,
+  "total": 30,
+  "passed": 30,
+  "failed": 0,
+  "note": "The related run took 721 s at load average about 20 (other sessions on this machine). Its 4 failures were timing: acpProvenance (fixed 20 ms settle; composes its own session factory, not startAcpStdio), nativeValidationOutcomeSurfaces (Darwin budget/approval race, listed in the session baseline triage), and two runPrincipalLease tests whose beforeEach exceeded the 10 s hook timeout. The new tests now allow 120 s; this rerun of those files and nativeClientStartupAbort (which failed once in an earlier loaded run) passed."
+ }
+}

@@ -1,0 +1,153 @@
+{
+  "capturedUtc": "2026-10-14T21:21:07.938Z",
+  "scope": "Independent private receipt and crypto review, no tests/build/source/live-dist edits. All fixtures controlled local replies. WholeP019 and private repair ownership remain unresolved.",
+  "checks": [
+    {
+      "phase": "baseline",
+      "counts": {
+        "numTotalTests": 19,
+        "numPassedTests": 18,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "raw": {
+        "path": "/private/tmp/p0-19-private-runner-3yl41gpg/baseline.json",
+        "sha256": "628d1a2af505d1f3446e2754b323b92a636dd3ca975b68b8c700b3d3f6f7b442"
+      },
+      "effects": {
+        "path": "/private/tmp/p0-19-private-runner-3yl41gpg/baseline-effects/runner-effects.json",
+        "sha256": "7aa2308b5e1b8b4793ef091b4e451a200a63cc349487f804ec451fba2779b2a1"
+      },
+      "fixtures": [
+        {
+          "name": "tool-calls",
+          "events": 43,
+          "status": "INVALID",
+          "verificationPassed": false,
+          "evidenceStatus": "INSUFFICIENT_EVIDENCE",
+          "priorPins": true,
+          "reportAndRowsAndSealCrypto": true
+        },
+        {
+          "name": "measured-text",
+          "events": 56,
+          "status": "INVALID",
+          "verificationPassed": false,
+          "evidenceStatus": "MEASURED",
+          "priorPins": true,
+          "reportAndRowsAndSealCrypto": true
+        },
+        {
+          "name": "measured-failure",
+          "events": 66,
+          "status": "INVALID",
+          "verificationPassed": false,
+          "evidenceStatus": "MEASURED",
+          "priorPins": true,
+          "reportAndRowsAndSealCrypto": true
+        }
+      ]
+    },
+    {
+      "phase": "seal-order-proposal-changed",
+      "counts": {
+        "numTotalTests": 19,
+        "numPassedTests": 19,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "raw": {
+        "path": "/private/tmp/p0-19-private-runner-3yl41gpg/seal-order-proposal-changed.json",
+        "sha256": "9b9e0ed5e010ad7a195ff69fec2625aaf7b112bf92cb17f881526ffeaf4def1b"
+      },
+      "effects": {
+        "path": "/private/tmp/p0-19-private-runner-3yl41gpg/seal-order-proposal-changed-effects/runner-effects.json",
+        "sha256": "e57ddbfa013b25a3642ae83809391e8b80c3faa90ebe708f0174b234160e44e3"
+      },
+      "fixtures": [
+        {
+          "name": "tool-calls",
+          "events": 43,
+          "status": "VALID",
+          "verificationPassed": true,
+          "evidenceStatus": "INSUFFICIENT_EVIDENCE",
+          "priorPins": true,
+          "reportAndRowsAndSealCrypto": true
+        },
+        {
+          "name": "measured-text",
+          "events": 56,
+          "status": "VALID",
+          "verificationPassed": true,
+          "evidenceStatus": "MEASURED",
+          "priorPins": true,
+          "reportAndRowsAndSealCrypto": true
+        },
+        {
+          "name": "measured-failure",
+          "events": 66,
+          "status": "VALID",
+          "verificationPassed": true,
+          "evidenceStatus": "MEASURED",
+          "priorPins": true,
+          "reportAndRowsAndSealCrypto": true
+        }
+      ]
+    },
+    {
+      "phase": "seal-order-proposal-restored",
+      "counts": {
+        "numTotalTests": 19,
+        "numPassedTests": 18,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "raw": {
+        "path": "/private/tmp/p0-19-private-runner-3yl41gpg/seal-order-proposal-restored.json",
+        "sha256": "a9f564beae7b8e4ab8d115260c68355c6e08b918e525d02df8b1ea160a46b0f4"
+      },
+      "effects": {
+        "path": "/private/tmp/p0-19-private-runner-3yl41gpg/seal-order-proposal-restored-effects/runner-effects.json",
+        "sha256": "958f5c9ed7c38c81980dbf8fdbc0121a1ede1f5ac3945bc218119e95e99301b2"
+      },
+      "fixtures": [
+        {
+          "name": "tool-calls",
+          "events": 43,
+          "status": "INVALID",
+          "verificationPassed": false,
+          "evidenceStatus": "INSUFFICIENT_EVIDENCE",
+          "priorPins": true,
+          "reportAndRowsAndSealCrypto": true
+        },
+        {
+          "name": "measured-text",
+          "events": 56,
+          "status": "INVALID",
+          "verificationPassed": false,
+          "evidenceStatus": "MEASURED",
+          "priorPins": true,
+          "reportAndRowsAndSealCrypto": true
+        },
+        {
+          "name": "measured-failure",
+          "events": 66,
+          "status": "INVALID",
+          "verificationPassed": false,
+          "evidenceStatus": "MEASURED",
+          "priorPins": true,
+          "reportAndRowsAndSealCrypto": true
+        }
+      ]
+    }
+  ],
+  "compiledManifestRestorationReported": true,
+  "allActualCopiedFileHashesVerified": {
+    "count": 4529,
+    "mismatches": [],
+    "initialManifestSha256": "d8b6f3179a9b0a9ab56c5185ffeb56c65eb4a7712742b55d9b9270f8d04d73fb"
+  }
+}

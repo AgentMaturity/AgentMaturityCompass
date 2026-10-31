@@ -1,0 +1,64 @@
+{
+  "schema": "p125w-controls-v2-inert-successor-seal/1",
+  "at": "2026-10-17T00:12:01.506656+00:00",
+  "preferredHelper": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/v2/source-control.py.source.txt",
+    "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/v2/source-control.py.source.txt",
+    "bytes": 21942,
+    "sha256": "73203ebcbe63fcf8273510a79e5b4e72f78656c41c9ffd2c9228e8b266496b32",
+    "dev": 16777231,
+    "inode": 543750104,
+    "nlink": 1
+  },
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/v2/source-control.py.source.txt",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/v2/source-control.py.source.txt",
+      "bytes": 21942,
+      "sha256": "73203ebcbe63fcf8273510a79e5b4e72f78656c41c9ffd2c9228e8b266496b32",
+      "dev": 16777231,
+      "inode": 543750104,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/v2/v1-to-v2.patch.txt",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/v2/v1-to-v2.patch.txt",
+      "bytes": 1027,
+      "sha256": "460f904efcb583232f249b0b75cd95858848ef798fe08c5b7a902c547eece8ad",
+      "dev": 16777231,
+      "inode": 543750105,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/v2/README.md",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/v2/README.md",
+      "bytes": 1419,
+      "sha256": "57f6897e9e13140f13a137642351a12ddab44451ad09599953ca7835f9afbcd5",
+      "dev": 16777231,
+      "inode": 543750106,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/v2/input-pins.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/v2/input-pins.json",
+      "bytes": 2012,
+      "sha256": "08f6e51aff8883331f2085c8da6c364fb31553b1e92992368a5075afe60b4303",
+      "dev": 16777231,
+      "inode": 543750107,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/v2/author-static-review.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/v2/author-static-review.json",
+      "bytes": 2521,
+      "sha256": "2eb213325d2beef788e6b8be7b6640c83ed8b2c1433dfcf8749f7754141bdefc",
+      "dev": 16777231,
+      "inode": 543750108,
+      "nlink": 1
+    }
+  ],
+  "originalV1Retained": true,
+  "rootBindingCreated": false,
+  "helperExecuted": false,
+  "blockers": []
+}

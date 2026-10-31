@@ -1,0 +1,23 @@
+{
+  "schema": "p125-fresh-controls-admission/1",
+  "at": "2026-10-16T18:57:48.269351+00:00",
+  "sourceCommit": "2792ccc6ad68f9ec3df97fbdfc63718727245695",
+  "freshCheckout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout",
+  "canonical47Passed": true,
+  "operatorStaticReview": "test-design/control-static-review.json",
+  "operationScript": {
+    "path": "/private/tmp/p1-25-time-qualification-20261016/operate-control.py",
+    "bytes": 5085,
+    "sha256": "60c56b049981cedbc5877c39cd5fd5bb304a121a5a73ed146c19c833d7919a0e"
+  },
+  "fullCodeRead": true,
+  "syntaxCompiledWithoutExecution": true,
+  "sourceControls": [
+    "remove imprint comparison",
+    "replace final untrusted path refusal with first supplied anchor"
+  ],
+  "onlyFreshOwnedSourceTarget": "src/time/verifyTimestamp.ts",
+  "compiledMutation": false,
+  "required": "Apply one at a time; actualsame47inventory; classify all failures/primary witness, exact byte restoration, same47restored pass before next. Original errors remain preserved. No force/reset/stash/guard/baseline/quality waiver.",
+  "allHeldDecisionsRetained": true
+}

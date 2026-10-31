@@ -13,7 +13,7 @@ import re
 import hashlib
 
 record = pathlib.Path(__file__).resolve().parent
-root = pathlib.Path('/Users/sid/AgentMaturityCompass')
+root = pathlib.Path('~/AgentMaturityCompass')
 if (record / 'source.json').exists():
     raise SystemExit('Refusing to overwrite an earlier attempt')
 if len(sys.argv) != 2 or not re.fullmatch(r'[a-f0-9]{40}', sys.argv[1]):

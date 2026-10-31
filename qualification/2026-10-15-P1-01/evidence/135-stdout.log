@@ -1,0 +1,1 @@
+src/actions/actionJournal.ts(202,92): error TS2339: Property 'fromReceiptId' does not exist on type '{}'.

@@ -120,6 +120,7 @@ export function seatbeltNativeShell(): SandboxBackend {
       if (!command.length || command.some(argument => argument.includes("\0"))) return declined("Invalid confined command.");
       if (!Number.isFinite(policy.timeoutMs) || policy.timeoutMs <= 0) return declined("A positive finite shell deadline is required.");
       if (policy.allowHosts && !policy.onEgress) return declined("A shell egress allowlist requires an egress audit recorder.");
+      if (policy.allowHosts && !policy.egressScope) return declined("A shell egress allowlist requires the call's workspace and agent for egress checks.");
       if (policy.signal?.aborted) return { ...declined("The shell was cancelled before launch."), cancelled: true };
       let launcher: string | undefined;
       let proxy: ShellEgressProxy | undefined;
@@ -144,8 +145,8 @@ export function seatbeltNativeShell(): SandboxBackend {
         const home = realOrLiteral(homedir());
         const denied = [...MACOS_SECRET_PATHS.map(path => realOrLiteral(join(home, path))), ...(policy.readDeny ?? []).map(realOrLiteral)];
         const env: Record<string, string> = { PATH: process.env["PATH"] ?? "/usr/bin:/bin", HOME: privateTmp, TMPDIR: privateTmp, LANG: "en_US.UTF-8" };
-        if (policy.allowHosts && policy.onEgress) {
-          proxy = await startShellEgressProxy({ allowHosts: policy.allowHosts, record: policy.onEgress });
+        if (policy.allowHosts && policy.onEgress && policy.egressScope) {
+          proxy = await startShellEgressProxy({ allowHosts: policy.allowHosts, record: policy.onEgress, ...policy.egressScope });
           for (const name of ["HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY"]) env[name] = env[name.toLowerCase()] = proxy.url;
         }
         const profilePath = join(launcher, "profile.sb");
@@ -159,6 +160,7 @@ export function seatbeltNativeShell(): SandboxBackend {
             ...(limit === null ? command : withProcessLimit(limit, command))],
           cwd: workspace, env, stdin: "ignore", stdout: "capture", stderr: "capture", maxCaptureBytes: 64_000,
           scrubValues: [...(policy.scrubValues ?? []), ...(proxy ? [proxy.token] : [])], graceMs: 2_000, timeoutMs: policy.timeoutMs,
+          ...(policy.onOutput ? { onOutput: policy.onOutput } : {}),
           ...(policy.signal ? { signal: policy.signal } : {})
         }).done;
         // A profile sandbox-exec refused never reaches the wrapper, so no marker covers that case too.

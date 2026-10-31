@@ -7,7 +7,7 @@
     "--no-local",
     "--no-hardlinks",
     "--no-checkout",
-    "/Users/sid/AgentMaturityCompass",
+    "~/AgentMaturityCompass",
     "/private/tmp/amc-phase-a-acceptance-20260909-bz3ld3j9/checkout"
   ],
   "startedAt": "2026-09-09T11:11:51.157937+00:00",

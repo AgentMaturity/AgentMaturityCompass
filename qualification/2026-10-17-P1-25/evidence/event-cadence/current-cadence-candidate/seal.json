@@ -1,0 +1,85 @@
+{
+  "schema": "p125-next-event-cadence-private-proposal-seal/1",
+  "at": "2026-10-17T00:25:26.235634+00:00",
+  "preferredCandidate": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-test-proposal/checkpointWindow.test.ts.source.txt",
+  "target": "tests/time/checkpointWindow.test.ts",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-test-proposal/checkpointWindow.before.ts.source.txt",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-test-proposal/checkpointWindow.before.ts.source.txt",
+      "bytes": 34549,
+      "sha256": "1b14338d3978f83cd6518f99f3f12aebbc4a3624fc0416464c84bf4868d82cd7",
+      "dev": 16777231,
+      "inode": 543817800,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-test-proposal/checkpointWindow.test.ts.source.txt",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-test-proposal/checkpointWindow.test.ts.source.txt",
+      "bytes": 48568,
+      "sha256": "e5a7e326b7adbc2af4fafd65269313a2f49a39e6041862c24ab6ec4bb544e3d7",
+      "dev": 16777231,
+      "inode": 543817801,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-test-proposal/checkpointWindow.test.ts.patch.txt",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-test-proposal/checkpointWindow.test.ts.patch.txt",
+      "bytes": 16979,
+      "sha256": "dee2efd7b72bd896d52abf1f2c1d81bf00860d61fc5603e97cc1345573a31850",
+      "dev": 16777231,
+      "inode": 543817804,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-test-proposal/body-mapping.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-test-proposal/body-mapping.json",
+      "bytes": 4068,
+      "sha256": "a65a5409308574d7561c6a563fb7d0ab01372c33dc2e44f64fddcb801d43acee",
+      "dev": 16777231,
+      "inode": 543819910,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-test-proposal/matrix.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-test-proposal/matrix.json",
+      "bytes": 4750,
+      "sha256": "16a6b1a2cab0cfd1ae80b46c7ecc5a9a3b2d400ae9158cb8049f48c8c6f4dc0a",
+      "dev": 16777231,
+      "inode": 543819911,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-test-proposal/input-pins.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-test-proposal/input-pins.json",
+      "bytes": 8667,
+      "sha256": "112fa575c59b90ecaca59dd069ca6ce07bb569ddb588c9d2f563aca02432a912",
+      "dev": 16777231,
+      "inode": 543819912,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-test-proposal/README.md",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-test-proposal/README.md",
+      "bytes": 4379,
+      "sha256": "e9784a6dc0d3b4a2afbff0af38175decc9b3e5aebab2a14b2640d066750813a1",
+      "dev": 16777231,
+      "inode": 543819913,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-test-proposal/author-static-review.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-test-proposal/author-static-review.json",
+      "bytes": 1157,
+      "sha256": "d7f1b53f05c9138a86aca90d865a680fce97026f500351c072b27ffc9001d909",
+      "dev": 16777231,
+      "inode": 543819914,
+      "nlink": 1
+    }
+  ],
+  "constructionFragmentsNotPreferredOrForPublication": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-test-proposal/construction",
+  "preparedOnly": true,
+  "sourceAllocationOrExecution": false,
+  "futureSourceCommitQOrResults": null,
+  "blockers": []
+}

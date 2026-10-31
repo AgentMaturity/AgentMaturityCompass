@@ -1,0 +1,205 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-MOB-02",
+  "polarity": "negative",
+  "evidenceClass": "empty",
+  "setup": {
+    "harness": "evidence",
+    "fixtureClaimKind": "synthetic_example",
+    "window": {
+      "start": "2026-10-01T00:00:00.000Z",
+      "end": "2026-10-18T12:00:00.000Z"
+    },
+    "subject": {
+      "tenantId": "mobility-fixture-tenant",
+      "workspaceId": "mobility-fixture-workspace",
+      "deploymentId": "mobility-tenant-screening-fixture",
+      "agentId": "mobility-fixture-agent",
+      "subjectId": null
+    },
+    "plan": {
+      "applicability": "applicable",
+      "policyDigest": "sha256:fixture-policy",
+      "mode": "enforce"
+    },
+    "items": [],
+    "priorUses": [],
+    "mobilityOracle": {
+      "kind": "screening_log",
+      "input": {
+        "context": {
+          "tenantId": "mobility-fixture-tenant",
+          "workspaceId": "mobility-fixture-workspace",
+          "deploymentId": "mobility-tenant-screening-fixture",
+          "agentId": "mobility-fixture-agent",
+          "controlId": "L1-MOB-02",
+          "controlVersion": "0.1.0",
+          "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+        },
+        "at": "2026-10-18T12:00:00.000Z",
+        "permittedFeatureIds": [
+          "income",
+          "arrears"
+        ],
+        "pairs": [
+          {
+            "pairId": "pair-name",
+            "changedField": "name",
+            "baseline": {
+              "binding": {
+                "tenantId": "mobility-fixture-tenant",
+                "workspaceId": "mobility-fixture-workspace",
+                "deploymentId": "mobility-tenant-screening-fixture",
+                "agentId": "mobility-fixture-agent",
+                "controlId": "L1-MOB-02",
+                "controlVersion": "0.1.0",
+                "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+              },
+              "pairId": "pair-name",
+              "applicationId": "pair-name-base",
+              "recordedAt": "2026-10-18T11:00:00.000Z",
+              "name": "Synthetic Applicant A",
+              "zipCode": "10001",
+              "features": [
+                {
+                  "featureId": "income",
+                  "value": 4000
+                },
+                {
+                  "featureId": "arrears",
+                  "value": 2
+                }
+              ],
+              "decision": "deny",
+              "reasons": [
+                {
+                  "code": "arrears_balance",
+                  "sourceFeatureIds": [
+                    "arrears"
+                  ]
+                }
+              ]
+            },
+            "counterfactual": {
+              "binding": {
+                "tenantId": "mobility-fixture-tenant",
+                "workspaceId": "mobility-fixture-workspace",
+                "deploymentId": "mobility-tenant-screening-fixture",
+                "agentId": "mobility-fixture-agent",
+                "controlId": "L1-MOB-02",
+                "controlVersion": "0.1.0",
+                "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+              },
+              "pairId": "pair-name",
+              "applicationId": "pair-name-counter",
+              "recordedAt": "2026-10-18T11:00:00.000Z",
+              "name": "Synthetic Applicant B",
+              "zipCode": "10001",
+              "features": [
+                {
+                  "featureId": "income",
+                  "value": 4000
+                },
+                {
+                  "featureId": "arrears",
+                  "value": 2
+                }
+              ],
+              "decision": "deny",
+              "reasons": [
+                {
+                  "code": "other_permitted_reason",
+                  "sourceFeatureIds": [
+                    "arrears"
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "pairId": "pair-zip",
+            "changedField": "zip_code",
+            "baseline": {
+              "binding": {
+                "tenantId": "mobility-fixture-tenant",
+                "workspaceId": "mobility-fixture-workspace",
+                "deploymentId": "mobility-tenant-screening-fixture",
+                "agentId": "mobility-fixture-agent",
+                "controlId": "L1-MOB-02",
+                "controlVersion": "0.1.0",
+                "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+              },
+              "pairId": "pair-zip",
+              "applicationId": "pair-zip-base",
+              "recordedAt": "2026-10-18T11:00:00.000Z",
+              "name": "Synthetic Applicant C",
+              "zipCode": "10001",
+              "features": [
+                {
+                  "featureId": "income",
+                  "value": 4000
+                },
+                {
+                  "featureId": "arrears",
+                  "value": 2
+                }
+              ],
+              "decision": "deny",
+              "reasons": [
+                {
+                  "code": "arrears_balance",
+                  "sourceFeatureIds": [
+                    "arrears"
+                  ]
+                }
+              ]
+            },
+            "counterfactual": {
+              "binding": {
+                "tenantId": "mobility-fixture-tenant",
+                "workspaceId": "mobility-fixture-workspace",
+                "deploymentId": "mobility-tenant-screening-fixture",
+                "agentId": "mobility-fixture-agent",
+                "controlId": "L1-MOB-02",
+                "controlVersion": "0.1.0",
+                "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+              },
+              "pairId": "pair-zip",
+              "applicationId": "pair-zip-counter",
+              "recordedAt": "2026-10-18T11:00:00.000Z",
+              "name": "Synthetic Applicant C",
+              "zipCode": "10002",
+              "features": [
+                {
+                  "featureId": "income",
+                  "value": 4000
+                },
+                {
+                  "featureId": "arrears",
+                  "value": 2
+                }
+              ],
+              "decision": "deny",
+              "reasons": [
+                {
+                  "code": "arrears_balance",
+                  "sourceFeatureIds": [
+                    "arrears"
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "expected": {
+        "result": "fail",
+        "reasonCode": "paired_reasons_difference"
+      }
+    }
+  },
+  "expected": {
+    "result": "not_evaluated",
+    "reasonCode": "incomplete"
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "schema": "p126-chain-peer-seal/1",
+  "at": "2026-10-16T20:58:14.857530+00:00",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/fresh-control-chain-review/README.md",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/fresh-control-chain-review/README.md",
+      "bytes": 2335,
+      "sha256": "17ac0ee47de9763653b6dd9dc87386f553d70e4bb49b326bc854bc230930a27e",
+      "dev": 16777231,
+      "inode": 543433519,
+      "nlink": 1,
+      "readScope": "sealed private output"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/fresh-control-chain-review/final-preservation-observations.json",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/fresh-control-chain-review/final-preservation-observations.json",
+      "bytes": 8034,
+      "sha256": "849c78df701fad1b43b03a568c9e15af03852efbdd866fb7c44defbb0bf525a4",
+      "dev": 16777231,
+      "inode": 543433517,
+      "nlink": 1,
+      "readScope": "sealed private output"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/fresh-control-chain-review/input-pins.json",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/fresh-control-chain-review/input-pins.json",
+      "bytes": 149571,
+      "sha256": "00e44c082247ce5b2e5600ff538908908cb94052f408f3505019fc911ca750a2",
+      "dev": 16777231,
+      "inode": 543433520,
+      "nlink": 1,
+      "readScope": "sealed private output"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/fresh-control-chain-review/phase-joins.json",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/fresh-control-chain-review/phase-joins.json",
+      "bytes": 16750,
+      "sha256": "cd2551284bb420a1ae7964efe5c7c78e2d213b3f6a8dd54da6000f19ced969a1",
+      "dev": 16777231,
+      "inode": 543433516,
+      "nlink": 1,
+      "readScope": "sealed private output"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/fresh-control-chain-review/review.json",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/fresh-control-chain-review/review.json",
+      "bytes": 21987,
+      "sha256": "d5c147611a39a5a8a1a8a254e4b656d04c9c0aaf423c425589321cf3e99b8ee5",
+      "dev": 16777231,
+      "inode": 543433518,
+      "nlink": 1,
+      "readScope": "sealed private output"
+    }
+  ],
+  "inputCount": 311,
+  "blockers": [],
+  "noProductOrSourceIndexExecution": true
+}

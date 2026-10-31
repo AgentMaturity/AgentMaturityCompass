@@ -1,0 +1,106 @@
+{
+  "body": {
+    "schema": "amc.drill/1",
+    "drillId": "drill_ff04065427364f16a6579b9d68bb6766",
+    "kind": "provider_exit",
+    "provider": "openai",
+    "disabledAt": "2026-10-27T21:15:52.570Z",
+    "liftedAt": "2026-10-27T21:15:52.811Z",
+    "failClosed": true,
+    "alternate": {
+      "model": "anthropic/claude-fixture",
+      "outcome": "blocked_no_envelope",
+      "envelopeId": null,
+      "reasons": [
+        "no change envelope declares an alternate"
+      ]
+    },
+    "register": [
+      {
+        "providerId": "openai",
+        "kind": "model",
+        "source": "gateway.yaml upstreams",
+        "exit": {
+          "kind": "safe_stop"
+        }
+      },
+      {
+        "providerId": "xai_grok",
+        "kind": "model",
+        "source": "gateway.yaml upstreams",
+        "exit": {
+          "kind": "safe_stop"
+        }
+      },
+      {
+        "providerId": "anthropic",
+        "kind": "model",
+        "source": "gateway.yaml upstreams",
+        "exit": {
+          "kind": "safe_stop"
+        }
+      },
+      {
+        "providerId": "gemini",
+        "kind": "model",
+        "source": "gateway.yaml upstreams",
+        "exit": {
+          "kind": "safe_stop"
+        }
+      },
+      {
+        "providerId": "openrouter",
+        "kind": "model",
+        "source": "gateway.yaml upstreams",
+        "exit": {
+          "kind": "safe_stop"
+        }
+      },
+      {
+        "providerId": "local_openai",
+        "kind": "model",
+        "source": "gateway.yaml upstreams",
+        "exit": {
+          "kind": "safe_stop"
+        }
+      },
+      {
+        "providerId": "file:artifact-seal",
+        "kind": "key",
+        "source": "keyset bindings",
+        "exit": {
+          "kind": "safe_stop"
+        }
+      },
+      {
+        "providerId": "file:ledger-row",
+        "kind": "key",
+        "source": "keyset bindings",
+        "exit": {
+          "kind": "safe_stop"
+        }
+      },
+      {
+        "providerId": "file:config-signature",
+        "kind": "key",
+        "source": "keyset bindings",
+        "exit": {
+          "kind": "safe_stop"
+        }
+      },
+      {
+        "providerId": "sqlite-ledger",
+        "kind": "storage",
+        "source": ".amc/evidence.sqlite",
+        "exit": {
+          "kind": "safe_stop"
+        }
+      }
+    ],
+    "result": "pass",
+    "basis": "Designed to support an ICT third-party exit plan (register row eu-dora); no conformity claim."
+  },
+  "digestSha256": "04bc652c8e68a087b4f0125d025a8d90e95c60b5bb812865b91190cb7c714298",
+  "signature": "WIKOwoeMDruir6UgjLpk3pufwvKZRKCVOVcpJh43G1cQtEG1WnosQztZ5TWqICRE6YYugBRgZQYuwvnjou71BA==",
+  "signerPublicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEADrORZasZJwV6r07jU5ENBK/lZ5HIKzjxe8Wq6dRJUuY=\n-----END PUBLIC KEY-----\n"
+}

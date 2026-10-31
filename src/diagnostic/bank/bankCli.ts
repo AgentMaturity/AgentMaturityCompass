@@ -2,13 +2,10 @@ import {
   diagnosticBankApplyForApi,
   diagnosticBankGetForApi,
   diagnosticBankInitForApi,
-  diagnosticBankVerifyForApi
+  diagnosticBankVerifyForApi, diagnosticBankInitForApiAsync
 } from "./bankApi.js";
+import { assertOwnerMode } from "../../mode/mode.js";
 import type { DiagnosticBank } from "./bankSchema.js";
-
-export function diagnosticBankInitCli(workspace: string) {
-  return diagnosticBankInitForApi(workspace);
-}
 
 export function diagnosticBankVerifyCli(workspace: string) {
   return diagnosticBankVerifyForApi(workspace);
@@ -23,4 +20,8 @@ export function diagnosticBankApplyCli(params: {
   bank: DiagnosticBank;
 }) {
   return diagnosticBankApplyForApi(params);
+}
+
+export function diagnosticBankInitCliAsync(workspace: string) {
+  return diagnosticBankInitForApiAsync(workspace, { beforePublish: () => assertOwnerMode(workspace, "diagnostic bank init") });
 }

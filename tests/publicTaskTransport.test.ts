@@ -1,6 +1,6 @@
-import { writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { afterEach, expect, test } from "vitest";
 import { publicTaskHttpFixture, type PublicTaskFixture } from "./helpers/publicTaskHttpFixture.js";
 
@@ -74,15 +74,16 @@ test("JSONL HTTP cold history grants only eligible explicit recovery and withdra
   expect(resumed.status).toBe(200); expect(resumed.body.data.state).toBe("idle"); expect(resumed.body.data.sessionId).toBe(task.sessionId);
   expect(f.jsonlBytes().subarray(0, before.length)).toEqual(before);
   expect(f.history(task.sessionId!).events.filter(row => row.event_type === "request/header")).toHaveLength(1);
-  // Verification may legitimately refuse an unsealed archive; its label must
-  // never survive loss of authentic history, regardless of its previous value.
-  await f.control(task.taskId, "verify", task.revision);
+  // A released-then-resumed session is not sealed, so verification fails (P0-14 8c4bc10ec, P0-57 bcaac341c). Loss of
+  // authentic history withdraws every display, but never softens that failed verdict (P0-62 a207d1606).
+  const verify = await f.control(task.taskId, "verify", task.revision);
+  expect(verify.body.data.verification, JSON.stringify(verify.body)).toBe("failed");
   const path = join(f.workspace, ".amc/jsonl/events.jsonl"), authentic = f.jsonlBytes();
   const lines = authentic.toString("utf8").trimEnd().split("\n"); const row = JSON.parse(lines[0]!); row.writer_sig = "unsigned"; lines[0] = JSON.stringify(row);
   try {
     writeFileSync(path, lines.join("\n") + "\n"); await new Promise(done => setTimeout(done, 300));
     const invalid = await f.poll(task.taskId, task.nextCursor);
-    expect(invalid.task.history.status).toBe("unavailable"); expect(invalid.task.verification).toBe("not-verified");
+    expect(invalid.task.history.status).toBe("unavailable"); expect(invalid.task.verification).toBe("failed");
     expect(invalid.events).toEqual([]); expect(invalid.task.approvals).toEqual([]); expect(invalid.task.validationOutputs).toEqual([]);
     expect(invalid.task.canResume).toBe(false); expect(invalid.truncated).toBe(true);
   } finally { writeFileSync(path, authentic); }
@@ -113,8 +114,22 @@ test("an HTTP verifier label is withdrawn on evidence loss and is not restored b
     writeFileSync(path, Buffer.concat([original, Buffer.from('{"torn":')]));
     const unavailable = await f.poll(task.taskId, verified.body.data.nextCursor);
     expect(unavailable.task.history.status).toBe("unavailable");
-    expect(unavailable.task.verification).toBe("not-verified"); expect(unavailable.events).toEqual([]);
+    // A later read never softens a failed verdict (P0-62 a207d1606).
+    expect(unavailable.task.verification).toBe("failed"); expect(unavailable.events).toEqual([]);
   } finally { writeFileSync(path, original); }
   const restored = await f.poll(task.taskId);
-  expect(restored.task.history.status).toBe("authenticated"); expect(restored.task.verification).toBe("not-verified");
+  expect(restored.task.history.status).toBe("authenticated"); expect(restored.task.verification).toBe("failed");
+  // With the operator's pin the same run verifies; that positive label is withdrawn on evidence loss, and a metadata
+  // read of the restored history does not bring it back.
+  process.env.AMC_EXPECTED_MONITOR_FINGERPRINT = createHash("sha256").update(readFileSync(join(f.workspace, ".amc/keys/monitor_ed25519.pub"))).digest("hex");
+  await f.restart();
+  const pinned = await f.control(task.taskId, "verify", restored.task.revision);
+  expect(pinned.body.data.verification, JSON.stringify(pinned.body)).toMatch(/^(externally-anchored|anchored-prefix)$/);
+  try {
+    writeFileSync(path, Buffer.concat([original, Buffer.from('{"torn":')]));
+    const lost = await f.poll(task.taskId, pinned.body.data.nextCursor);
+    expect(lost.task.history.status).toBe("unavailable"); expect(lost.task.verification).toBe("not-verified");
+  } finally { writeFileSync(path, original); }
+  const reread = await f.poll(task.taskId);
+  expect(reread.task.history.status).toBe("authenticated"); expect(reread.task.verification).toBe("not-verified");
 }, 60_000);

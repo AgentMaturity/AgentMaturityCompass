@@ -14,7 +14,7 @@ import subprocess
 
 import pytest
 from amc_sdk import AmcAgent, AmcError, NativeAudioInput, NativeImageInput, NATIVE_AUDIO_INPUT_FORMAT
-from test_gemini_protocol import http_fixture, close_agents
+from test_gemini_protocol import http_fixture, close_agents, without_context_snapshot
 
 REPO = Path(__file__).resolve().parents[3]
 CLI = REPO / "tests/fixtures/nativeSignedAudioCli.ts"
@@ -96,7 +96,7 @@ def test_python_original_audio_http_resume_and_default_cold(tmp_path, audio_comm
             assert request["path"] == "/v1beta/models/fixture-model:streamGenerateContent?alt=sse"
             assert request["key"] == "disposable-not-a-provider-key"
             body = json.loads(request["body"])
-            assert body["contents"][0]["parts"] == expected_wire and body["generationConfig"] == {"maxOutputTokens": 64}
+            assert without_context_snapshot(body["contents"][0]["parts"]) == expected_wire and body["generationConfig"] == {"maxOutputTokens": 64}
             assert not {"messages", "stream", "model", "fileData"}.intersection(body)
         cold = subprocess.run([*audio_command[:3], str(COLD), str(root), session_id], env={**os.environ, **environment}, cwd=root,
                               capture_output=True, text=True, timeout=30, check=True)

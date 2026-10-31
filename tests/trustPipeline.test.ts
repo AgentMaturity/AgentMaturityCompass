@@ -15,6 +15,10 @@ function makeInput(overrides: Partial<TrustPipelineInput> = {}): TrustPipelineIn
     parameters: { path: '/tmp/test.txt' },
     sessionId: 'session-test-001',
     workspaceId: 'ws-test-001',
+    // Explicit trust context: since WP37 a missing one is treated as untrusted, never as fresh, confident user input.
+    instructionSource: 'user',
+    lastVerifiedAt: Date.now(),
+    cumulativeConfidence: 1.0,
     ...overrides,
   };
 }

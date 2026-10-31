@@ -35,9 +35,13 @@ describe("admitKey", () => {
     ["a pinned and distrusted key", { context: { ...listed(), distrust: [distrustEntry(issuer.keyId)] } }, ["distrusted", null, null]],
     ["a distrusted key with --allow-unpinned and an explicit pin", { context: context({ allowUnpinned: true, distrust: [distrustEntry(issuer.keyId)],
       explicitPins: [{ keyId: issuer.keyId, purposes: ["artifact-seal"], origin: "--pubkey a.pub" }] }) }, ["distrusted", null, null]],
+    // P1-06: distrust, validity and revocation are judged at the verification time (2026-10-06 here); a claimed signing
+    // time is the record's own word and never brings a key back.
     ["a key distrusted from a date, claim before it", { context: context({ distrust: [distrustEntry(issuer.keyId, { distrustedFrom: "2026-05-01T00:00:00.000Z" })],
       explicitPins: [{ keyId: issuer.keyId, purposes: ["artifact-seal"], origin: "--pubkey a.pub" }] }), claimedSignedAt: "2026-04-01T00:00:00.000Z" },
-      ["admitted", "explicit-key", null]],
+      ["distrusted", null, null]],
+    ["a key distrusted from a date after the verification time", { context: context({ distrust: [distrustEntry(issuer.keyId, { distrustedFrom: "2027-05-01T00:00:00.000Z" })],
+      explicitPins: [{ keyId: issuer.keyId, purposes: ["artifact-seal"], origin: "--pubkey a.pub" }] }) }, ["admitted", "explicit-key", null]],
     ["a key distrusted from a date, claim at it", { context: context({ distrust: [distrustEntry(issuer.keyId, { distrustedFrom: "2026-05-01T00:00:00.000Z" })] }),
       claimedSignedAt: "2026-05-01T00:00:00.000Z" }, ["distrusted", null, null]],
     ["a key distrusted from a date, no claimed time", { context: context({ distrust: [distrustEntry(issuer.keyId, { distrustedFrom: "2026-05-01T00:00:00.000Z" })] }) },
@@ -47,6 +51,8 @@ describe("admitKey", () => {
     ["a key-compromise revocation, no claimed time", { context: listed({ revokedAt: "2026-05-01T00:00:00.000Z", revocationReason: "key-compromise" }) },
       ["revoked", null, null]],
     ["a superseded key, claim before the revocation", { context: listed({ revokedAt: "2026-05-01T00:00:00.000Z", revocationReason: "superseded" }),
+      claimedSignedAt: "2026-02-01T00:00:00.000Z" }, ["revoked", null, null]],
+    ["a superseded key revoked after the verification time", { context: listed({ revokedAt: "2026-12-01T00:00:00.000Z", revocationReason: "superseded" }),
       claimedSignedAt: "2026-02-01T00:00:00.000Z" }, ["admitted", "trust-list", "claimed"]],
     ["a superseded key, claim at the revocation", { context: listed({ revokedAt: "2026-05-01T00:00:00.000Z", revocationReason: "superseded" }),
       claimedSignedAt: "2026-05-01T00:00:00.000Z" }, ["revoked", null, null]],
@@ -59,7 +65,7 @@ describe("admitKey", () => {
     ["a claim later than the verification time, for a key valid only from then", { context: listed({ validFrom: "2026-12-01T00:00:00.000Z" }),
       claimedSignedAt: "2026-12-15T00:00:00.000Z" }, ["not-yet-valid", null, null]],
     ["an expired key, claim before validTo", { context: { ...listed(), asOf: new Date("2027-02-01T00:00:00.000Z") },
-      claimedSignedAt: "2026-06-01T00:00:00.000Z" }, ["admitted", "trust-list", "claimed"]],
+      claimedSignedAt: "2026-06-01T00:00:00.000Z" }, ["expired", null, null]],
     ["a key-compromise revocation in one list and an entry in another", { context: context({ lists: [
       trustList([listEntry(issuer)], { listId: "stale" }),
       trustList([listEntry(issuer, { revokedAt: "2026-05-01T00:00:00.000Z", revocationReason: "key-compromise" })], { listId: "amc-project" })] }) },
@@ -87,9 +93,9 @@ describe("admitKey", () => {
     expect(refused.detail).toContain(issuer.keyId);
     expect(admit({ context: listed() }).listId).toBe("tenant-a");
     expect(admit({ context: listed({ revokedAt: "2026-05-01T00:00:00.000Z", revocationReason: "superseded" }),
-      claimedSignedAt: "2026-02-01T00:00:00.000Z" }).detail).toContain("claimed");
+      claimedSignedAt: "2026-02-01T00:00:00.000Z" }).detail).toMatch(/revoked this key at 2026-05-01T00:00:00.000Z \(superseded\)/);
     expect(admit({ context: { ...listed(), asOf: new Date("2027-02-01T00:00:00.000Z") }, claimedSignedAt: "2026-06-01T00:00:00.000Z" }).detail)
-      .toMatch(/expired.*claimed/);
+      .toMatch(/admitted this key until/);
     expect(admit({ publicKeyPem: crlf(issuer.publicKeyPem) }).keyId).toBe(issuer.keyId);
   });
 });

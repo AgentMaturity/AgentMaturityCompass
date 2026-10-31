@@ -1,0 +1,11 @@
+# P1-25 client source checkpoint review
+
+No concrete blocker was found. Source commit `5beb3eae69b08f2e895520c7f459e1465780beeb` contains exactly the reviewed eleven blobs: the unchanged sealed 11-case client test and fifteen numeric count spans across ten files. Parent, committed bytes, current working bytes, clean status, empty index and ordinary committed-range whitespace were independently checked with Git optional index locking disabled. The recorded historical staged whitespace result is also zero.
+
+The ordinary add exit1 is retained. It reported an ignored `docs/internal` ancestor even though all eleven intended staged paths were present. Root inspected tracked state and ignore evidence, used ordinary tracked `add --update` exit0, then completed the full blob/whitespace/protected review before ordinary commit0. No force, ignore change or check bypass was used.
+
+The actual source run joined all 28 ordered unique raw/observer identities: eleven new client cases and seventeen unchanged verifier cases. Two hook entries contain three passing hook values; there are no task, unhandled or late errors. Exit0 closed naturally in 11,811 ms, owned PGID42673 was absent by ESRCH, and no nonzero signal was sent. The unchanged 10,000 ms timeout produced its actual abort, measured at 10,004.961125 ms. Passing literal bodies and finally assertions support these local fixture closures without a universal resource-isolation claim.
+
+All eleven listed source checks closed naturally with exit0, including the unchanged freeze census1236/1236/41/632. Quality remains RED: duplicates1268 and dead-code2723 to2720, with the actual dead-code sets removing exactly the three newly imported client exports and adding none. Diagnostic exit0 does not pass either quality gate. All121 protected bytes, six prior native physical identities, twenty Claude/R count variants and held R head/status/empty index remain exact; reservations were not re-probed.
+
+This review supplies source checkpoint evidence only. Fresh-copy binding, canonical/control/restoration outcomes, whole P1-25 acceptance, full-suite coverage, public TSA behavior, held decisions, global quality and plan completion remain open. No product or helper was executed and no checkout, index or QA file was changed by this review.

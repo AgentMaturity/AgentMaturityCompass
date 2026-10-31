@@ -1,0 +1,26 @@
+{
+  "capturedUtc": "2026-10-15T05:11:24.728101+00:00",
+  "state": "Root sealed byte/physical/source verification only; independent sealed review and START still pending",
+  "setup": {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/setup-v3.json",
+    "bytes": 15393,
+    "sha256": "6b7cfa580a5718e414f8b1ebc36d91d286cfba646acaba780e6dfd21dff4942d"
+  },
+  "index": {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/setup-index-v3.json",
+    "bytes": 5376,
+    "sha256": "6366f1ac7a7507b68c9f0d0469cd91d935ea9016192c3c692fbf70221fd2e4b5"
+  },
+  "indexReferencesExact": 24,
+  "frozenOwnInputsExact": 23,
+  "parentAndPrivateProtectedFilesExact": 12474,
+  "physicalCopiesAllDistinctAndSingleLink": true,
+  "parentTrackedFiles": 7945,
+  "compiledFiles": 4529,
+  "noGitSpoof": true,
+  "borrowedNodeModulesLinkExact": true,
+  "parentGitStatus": "clean",
+  "noRuntimeOrMutantOrReleaseStarted": true,
+  "allRootVerificationReadsFinished": true,
+  "limits": "No product/controller import, parser or runtime; no independent dependency installation or OS isolation. Final static sealed review must precede START. All earlier acceptance, quality and ownership holds persist."
+}

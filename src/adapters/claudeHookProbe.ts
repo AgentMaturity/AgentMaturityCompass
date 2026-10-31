@@ -1,9 +1,10 @@
 import { spawn } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { isAbsolute, join, resolve } from "node:path";
 import { canonicalize } from "../utils/json.js";
 import { expectedClaudeControlHandler, getHookIntegrationStatus, HOOK_CONTROL_INTEGRATION_ID } from "./hookIntegration.js";
+import { CLAUDE_MANAGED_SETTINGS_DIRS } from "./hookProviders/claudeCode.js";
 
 export type ClaudeHookProbeReason =
   | "ok"
@@ -43,12 +44,30 @@ interface InstalledCommandHandler {
 const PROBE_PAYLOAD = JSON.stringify({ hook_event_name: "PreToolUse", amc_probe: "invalid-on-purpose" });
 const REINSTALL_COMMAND = "amc connect hooks install --provider claude-code --mode control --agent <agent>";
 
-// Not verified against the settings reference for every Claude Code release; see docs/ADAPTERS.md.
-const MANAGED_SETTINGS_PATHS: Partial<Record<NodeJS.Platform, string>> = {
-  darwin: "/Library/Application Support/ClaudeCode/managed-settings.json",
-  linux: "/etc/claude-code/managed-settings.json",
-  win32: "C:\\Program Files\\ClaudeCode\\managed-settings.json",
-};
+/** The file-based managed settings Claude Code merges: managed-settings.json, then managed-settings.d/*.json in name order. */
+function managedSettingsFiles(managedDir: string | null): string[] {
+  if (managedDir === null) return [];
+  let dropIns: string[] = [];
+  try {
+    dropIns = readdirSync(join(managedDir, "managed-settings.d")).filter((name) => name.endsWith(".json") && !name.startsWith(".")).sort()
+      .map((name) => join(managedDir, "managed-settings.d", name));
+  } catch {
+    // No drop-in directory.
+  }
+  return [join(managedDir, "managed-settings.json"), ...dropIns].filter((path) => existsSync(path));
+}
+
+/** Whether a managed settings document carries the exact PreToolUse control handler this AMC installs for the workspace. */
+function deliversAmcControl(settings: Record<string, unknown>, workspace: string): boolean {
+  try {
+    const expected = canonicalize(expectedClaudeControlHandler(workspace));
+    const groups = (settings.hooks as Record<string, unknown> | undefined)?.PreToolUse;
+    return Array.isArray(groups) && groups.some((group) => Array.isArray((group as { hooks?: unknown })?.hooks)
+      && ((group as { hooks: unknown[] }).hooks).some((handler) => canonicalize(handler) === expected));
+  } catch {
+    return false;
+  }
+}
 
 function readJsonObject(path: string): Record<string, unknown> | null {
   try {
@@ -152,8 +171,12 @@ export function probeInstalledClaudeHook(input: { workspace: string }): Promise<
   });
 }
 
-/** Settings that switch every hook off, which no probe of the handler itself can see. */
-export function claudeHookSettingsFindings(input: { workspace: string; home?: string }): { blockers: string[]; notes: string[] } {
+/**
+ * Settings that switch AMC's hook off, which no probe of the handler itself can see. `allowManagedHooksOnly` is a
+ * blocker unless file-based managed settings deliver AMC's own control handler (the enterprise path). MDM profiles,
+ * registry policy and server-managed settings are not read.
+ */
+export function claudeHookSettingsFindings(input: { workspace: string; home?: string; managedDir?: string | null }): { blockers: string[]; notes: string[] } {
   const workspace = resolve(input.workspace);
   const blockers: string[] = [];
   const notes: string[] = [];
@@ -165,14 +188,16 @@ export function claudeHookSettingsFindings(input: { workspace: string; home?: st
   for (const path of scoped) {
     if (readJsonObject(path)?.disableAllHooks === true) blockers.push(`disableAllHooks is true in ${path}`);
   }
-  const managedPath = MANAGED_SETTINGS_PATHS[process.platform];
-  const managed = managedPath && existsSync(managedPath) ? readJsonObject(managedPath) : null;
-  if (!managed) {
-    notes.push("managed settings not checked");
-  } else {
-    if (managed.disableAllHooks === true) blockers.push(`disableAllHooks is true in ${managedPath}`);
-    if (managed.allowManagedHooksOnly === true) blockers.push(`allowManagedHooksOnly is true in ${managedPath}`);
+  const managedFiles = managedSettingsFiles(input.managedDir === undefined ? CLAUDE_MANAGED_SETTINGS_DIRS[process.platform] ?? null : input.managedDir);
+  if (managedFiles.length === 0) notes.push("no file-based managed settings found; MDM, registry and server-managed settings are not checked");
+  const managed = managedFiles.map((path) => ({ path, value: readJsonObject(path) }));
+  const delivered = managed.some(({ value }) => value !== null && deliversAmcControl(value, workspace));
+  for (const { path, value } of managed) {
+    if (value === null) blockers.push(`managed settings ${path} cannot be read as a JSON object`);
+    if (value?.disableAllHooks === true) blockers.push(`disableAllHooks is true in ${path}`);
+    if (value?.allowManagedHooksOnly === true && !delivered) blockers.push(`allowManagedHooksOnly is true in ${path}, and managed settings do not deliver AMC's hooks`);
   }
+  if (delivered) notes.push("AMC's control hook is delivered by file-based managed settings");
   return { blockers, notes };
 }
 

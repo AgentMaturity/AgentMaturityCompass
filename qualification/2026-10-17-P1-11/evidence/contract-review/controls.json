@@ -1,0 +1,65 @@
+{
+  "schema": "p111-static-source-control-design/1",
+  "at": "2026-10-16T19:24:27.774096+00:00",
+  "controls": [
+    {
+      "id": "tenant-comparison",
+      "targetRel": "src/catalog/evidence/admission.ts",
+      "sourceSha256": "1a32690d77143674f62c6c904c8b9ad1619bd2be594f2db187bb45aa60697fb7",
+      "before": "  if (binding.tenantId !== undefined && binding.tenantId !== ctx.subject.tenantId) {\n    return reject(\"cross_tenant\", `tenant ${binding.tenantId} is not this evaluation's tenant`);\n  }\n",
+      "replacement": "",
+      "matchCount": 1,
+      "proposedBytes": 6233,
+      "proposedSha256ComputedOnly": "f343a310f028958440516ac3a85e7ac98d02dc1fa839545d26726a955dae21e9",
+      "firstMeaningfulWitness": "Cross-tenant isolated item: assert rejected reason cross_tenant before evidence untrusted/not_evaluated. Same fully bound current-tenant item must first admit.",
+      "precedenceAndMasking": "Later binding loop explicitly skips tenant; all other known bindings, producer/provenance, window/freshness and replay state must be valid.",
+      "candidateExactIdentity": "Pending sealed candidate; semantic mapping only.",
+      "execution": "Later root-owned freshQ only, one operator at a time, exact source restore and same-corpus green rerun; no compiled/native mutation or predicted counts."
+    },
+    {
+      "id": "freshness",
+      "targetRel": "src/catalog/evidence/admission.ts",
+      "sourceSha256": "1a32690d77143674f62c6c904c8b9ad1619bd2be594f2db187bb45aa60697fb7",
+      "before": "  if (end - recorded > contract.freshness.maxAgeDays * DAY_MS) {\n    return reject(\"stale\", `recorded ${item.recordedAt}, more than ${contract.freshness.maxAgeDays} days before the window end`);\n  }\n",
+      "replacement": "",
+      "matchCount": 1,
+      "proposedBytes": 6220,
+      "proposedSha256ComputedOnly": "b089900e17231953cedff22be388f0f2ba428bcc00962d51cefdbf454804c48f",
+      "firstMeaningfulWitness": "A 31-day-old recordedAt remains inside a wider window with maxAgeDays30: assert rejected stale and evidence stale. ClaimedAt fresh does not rescue it; paired fresh-recorded old-claimed item admits.",
+      "precedenceAndMasking": "Outside-window rejection precedes freshness; do not use a narrow30-day window or invalid date. Other admission fields must be valid.",
+      "candidateExactIdentity": "Pending sealed candidate; semantic mapping only.",
+      "execution": "Later root-owned freshQ only, one operator at a time, exact source restore and same-corpus green rerun; no compiled/native mutation or predicted counts."
+    },
+    {
+      "id": "operator-tier-consumption",
+      "targetRel": "src/catalog/evidence/admission.ts",
+      "sourceSha256": "1a32690d77143674f62c6c904c8b9ad1619bd2be594f2db187bb45aa60697fb7",
+      "before": "  return { admitted: true, trustTier: observed && producer.maxClaimKind !== \"observed\" ? \"SELF_REPORTED\" : provenance.trustTier };",
+      "replacement": "  return { admitted: true, trustTier: item.attributes.trustTier === \"OBSERVED\" ? \"OBSERVED\" : observed && producer.maxClaimKind !== \"observed\" ? \"SELF_REPORTED\" : provenance.trustTier };",
+      "matchCount": 1,
+      "proposedBytes": 6475,
+      "proposedSha256ComputedOnly": "3df8eae90e0a1a10100bb1d4ac8c148d9486c6a4b000201e3964554a95397443",
+      "firstMeaningfulWitness": "Observed-capable producer with verified already-derived SELF_REPORTED provenance and ignored attributes.trustTier OBSERVED: assert admitted trustTier SELF_REPORTED first, then self_reported/not_evaluated.",
+      "precedenceAndMasking": "This controls consumption of a typed derived result only. It does not exercise meta_json, imports, signatures, effectiveTrustTier or public report attribution. Do not count it as full spec meta.trustTier mutation proof.",
+      "candidateExactIdentity": "Pending sealed candidate; semantic mapping only.",
+      "execution": "Later root-owned freshQ only, one operator at a time, exact source restore and same-corpus green rerun; no compiled/native mutation or predicted counts."
+    },
+    {
+      "id": "replay",
+      "targetRel": "src/catalog/evidence/admission.ts",
+      "sourceSha256": "1a32690d77143674f62c6c904c8b9ad1619bd2be594f2db187bb45aa60697fb7",
+      "before": "  if (replay) return reject(\"replayed\", replay);\n",
+      "replacement": "",
+      "matchCount": 1,
+      "proposedBytes": 6370,
+      "proposedSha256ComputedOnly": "b1a9156fd714fe25be4897bea7646950b3c9294829ce4c8c45e52133aa74eda8",
+      "firstMeaningfulWitness": "First same-ref admission succeeds, then actual prefixed ref/receipt priorUses under a different useKey rejects replayed; assert rejection before dimensions. A same-key prior-use positive stays distinct.",
+      "precedenceAndMasking": "Keep replayDetail called so seen-id registration remains. Evidence recordedAt must lie in both overlapping windows and binding must match current context, or an earlier rejection masks replay.",
+      "candidateExactIdentity": "Pending sealed candidate; semantic mapping only.",
+      "execution": "Later root-owned freshQ only, one operator at a time, exact source restore and same-corpus green rerun; no compiled/native mutation or predicted counts."
+    }
+  ],
+  "mutantFilesWritten": false,
+  "sourceOrHelperExecuted": false,
+  "rootWillChooseAfterCandidateReview": true
+}

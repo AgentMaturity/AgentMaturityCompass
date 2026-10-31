@@ -242,7 +242,7 @@ Compliance guardrails include:
 - **Required assurance packs** — which packs to run for each obligation
 - **Required evidence types** — what AMC needs to observe
 - **Verification commands** — `amc compliance report --framework <fw>`
-- **Agent-readable rules** — your agent can follow these to become compliant
+- **Agent-readable rules** — rules your agent can follow to close the mapped gaps (evidence of conformity, not a compliance verdict)
 
 ### EU AI Act Deadline
 

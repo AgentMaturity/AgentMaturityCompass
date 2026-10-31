@@ -1,0 +1,837 @@
+{
+  "runId": 38132701944,
+  "jobId": 114450140435,
+  "headSha": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+  "runUrl": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/38132701944",
+  "jobUrl": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/38132701944/job/114450140435",
+  "artifactId": 11700781210,
+  "artifactName": "coverage-diagnostics-node-22",
+  "archiveSha256": "8e0605b2187c8d80e6e3c349ccf82556b5aa0310f586f1eecd5557fd7f1ce502",
+  "globalCoverage": null,
+  "reportTotals": {
+    "numFailedTestSuites": 35,
+    "numPassedTestSuites": 4824,
+    "numPendingTestSuites": 0,
+    "numTotalTestSuites": 4859,
+    "numFailedTests": 104,
+    "numPassedTests": 22972,
+    "numPendingTests": 27,
+    "numTodoTests": 0,
+    "numTotalTests": 23103,
+    "startTime": 1791715303641,
+    "success": false
+  },
+  "vitestDurationSeconds": 1745.54,
+  "actionsStepDurationSeconds": 1747,
+  "failedFiles": [
+    {
+      "file": "tests/apiRouters.test.ts",
+      "failed": 1,
+      "durationMs": 443.05322265625,
+      "failureDurationMinMs": 27.086217000000033,
+      "failureDurationMaxMs": 27.086217000000033,
+      "errorFirstLines": [
+        "AssertionError: expected 500 to be 200 // Object.is equality"
+      ]
+    },
+    {
+      "file": "tests/archiveFilesParity.test.ts",
+      "failed": 1,
+      "durationMs": 4900.535400390625,
+      "failureDurationMinMs": 59.414897999999994,
+      "failureDurationMaxMs": 59.414897999999994,
+      "errorFirstLines": [
+        "AssertionError: expected 'import { mkdtempSync, readFileSync, r…' to be 'import { mkdtempSync, readFileSync, r…' // Object.is equality"
+      ]
+    },
+    {
+      "file": "tests/compareBadgeDocs.test.ts",
+      "failed": 1,
+      "durationMs": 1504.2265625,
+      "failureDurationMinMs": 7.278165999999999,
+      "failureDurationMaxMs": 7.278165999999999,
+      "errorFirstLines": [
+        "AssertionError: expected '<p align=\"center\">\\n  <img src=\"websi…' to contain 'model-compare-badge.svg'"
+      ]
+    },
+    {
+      "file": "tests/enterpriseSsoScim.test.ts",
+      "failed": 3,
+      "durationMs": 7746.667236328125,
+      "failureDurationMinMs": 723.0270179999998,
+      "failureDurationMaxMs": 866.624742,
+      "errorFirstLines": [
+        "AssertionError: expected 400 to be 302 // Object.is equality"
+      ]
+    },
+    {
+      "file": "tests/evidencePathsExist.test.ts",
+      "failed": 1,
+      "durationMs": 63.62353515625,
+      "failureDurationMinMs": 7.623603000000003,
+      "failureDurationMaxMs": 7.623603000000003,
+      "errorFirstLines": [
+        "AssertionError: expected [ 'src/adversarial', …(123) ] to deeply equal [ 'src/adversarial', …(124) ]"
+      ]
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "failed": 28,
+      "durationMs": 376.114501953125,
+      "failureDurationMinMs": 7.773309000000154,
+      "failureDurationMaxMs": 25.454949999999826,
+      "errorFirstLines": [
+        "AssertionError: expected '{\"generatedAt\":\"2026-06-13T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-13T00:00:00.0…' // Object.is equality",
+        "AssertionError: expected '{\"generatedAt\":\"2026-06-14T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-14T00:00:00.0…' // Object.is equality",
+        "AssertionError: expected '{\"generatedAt\":\"2026-06-16T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-16T00:00:00.0…' // Object.is equality",
+        "AssertionError: expected '{\"generatedAt\":\"2026-06-17T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-17T00:00:00.0…' // Object.is equality",
+        "AssertionError: expected '{\"generatedAt\":\"2026-06-19T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-19T00:00:00.0…' // Object.is equality",
+        "AssertionError: expected '{\"generatedAt\":\"2026-06-20T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-20T00:00:00.0…' // Object.is equality"
+      ]
+    },
+    {
+      "file": "tests/jsonlWriterResume.test.ts",
+      "failed": 19,
+      "durationMs": 14304.592041015625,
+      "failureDurationMinMs": 422.6780850000014,
+      "failureDurationMaxMs": 1769.571389,
+      "errorFirstLines": [
+        "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none",
+        "Error: fixture exited before receipt: 1"
+      ]
+    },
+    {
+      "file": "tests/llmResponsesCapabilities.test.ts",
+      "failed": 1,
+      "durationMs": 20.95654296875,
+      "failureDurationMinMs": 6.754440000000045,
+      "failureDurationMaxMs": 6.754440000000045,
+      "errorFirstLines": [
+        "TypeError: The \"paths[0]\" argument must be of type string. Received undefined"
+      ]
+    },
+    {
+      "file": "tests/nativeSandboxPolicyBinding.test.ts",
+      "failed": 2,
+      "durationMs": 10920.029052734375,
+      "failureDurationMinMs": 473.3196590000007,
+      "failureDurationMaxMs": 568.911317,
+      "errorFirstLines": [
+        "AssertionError: expected '' to match /changed after shell admission/",
+        "AssertionError: expected '' to match /verifiable signed tools policy/"
+      ]
+    },
+    {
+      "file": "tests/privateModuleHelperVisibility.test.ts",
+      "failed": 1,
+      "durationMs": 14803.15283203125,
+      "failureDurationMinMs": 10.35872900000004,
+      "failureDurationMaxMs": 10.35872900000004,
+      "errorFirstLines": [
+        "AssertionError: expected '1351dd56270ba66159a5b5fd3747e5969b2d2…' to be 'de1469cf447c9ccf8a22fef1ebcce716b3af7…' // Object.is equality"
+      ]
+    },
+    {
+      "file": "tests/publicDocsGraph.test.ts",
+      "failed": 1,
+      "durationMs": 69.109619140625,
+      "failureDurationMinMs": 37.13648500000002,
+      "failureDurationMaxMs": 37.13648500000002,
+      "errorFirstLines": [
+        "AssertionError: expected [ { …(3) }, …(19) ] to deeply equal []"
+      ]
+    },
+    {
+      "file": "tests/questionScoreExplainability.test.ts",
+      "failed": 2,
+      "durationMs": 982.51318359375,
+      "failureDurationMinMs": 3.5132140000005165,
+      "failureDurationMaxMs": 28.846619999999348,
+      "errorFirstLines": [
+        "AssertionError: expected { questionId: 'AMC-1.3', …(8) } to match object { questionId: 'AMC-1.3', …(5) }",
+        "AssertionError: expected { questionId: 'AMC-1.3', …(8) } to match object { questionId: 'AMC-1.3', …(6) }"
+      ]
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "failed": 32,
+      "durationMs": 5426.780029296875,
+      "failureDurationMinMs": 50.29561300000023,
+      "failureDurationMaxMs": 125.66617899999983,
+      "errorFirstLines": [
+        "AssertionError: expected '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' // Object.is equality",
+        "AssertionError: expected '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' // Object.is equality",
+        "AssertionError: expected '{\"ok\":true,\"binder\":{\"v\":1,\"binderId\"…' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' // Object.is equality",
+        "AssertionError: expected '{\"ok\":true,\"passport\":{\"v\":1,\"passpor…' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' // Object.is equality",
+        "AssertionError: expected { ok: true, …(3) } to deeply equal Object{ ok: false, …(3) }"
+      ]
+    },
+    {
+      "file": "tests/studioNativeTaskService.test.ts",
+      "failed": 8,
+      "durationMs": 20697.894775390625,
+      "failureDurationMinMs": 2334.2009909999997,
+      "failureDurationMaxMs": 2511.4060510000018,
+      "errorFirstLines": [
+        "AssertionError: expected 'Native startup did not finish. No mod…' to be null"
+      ]
+    },
+    {
+      "file": "tests/compliance/dataResidencyPersistence.test.ts",
+      "failed": 1,
+      "durationMs": 309.631591796875,
+      "failureDurationMinMs": 100.25534700000003,
+      "failureDurationMaxMs": 100.25534700000003,
+      "errorFirstLines": [
+        "AssertionError: expected false to be true // Object.is equality"
+      ]
+    },
+    {
+      "file": "tests/compliance/evidenceBinding.test.ts",
+      "failed": 1,
+      "durationMs": 2482.8525390625,
+      "failureDurationMinMs": 86.8319019999999,
+      "failureDurationMaxMs": 86.8319019999999,
+      "errorFirstLines": [
+        "AssertionError: expected [ 'carried', …(12) ] to deeply equal []"
+      ]
+    },
+    {
+      "file": "tests/security/api-security.test.ts",
+      "failed": 1,
+      "durationMs": 5809.559814453125,
+      "failureDurationMinMs": 9.559704999999667,
+      "failureDurationMaxMs": 9.559704999999667,
+      "errorFirstLines": [
+        "AssertionError: expected 'id_token verification failed' to contain 'expired'"
+      ]
+    }
+  ],
+  "failedTests": [
+    {
+      "file": "tests/apiRouters.test.ts",
+      "test": "AMC API routers enforce router covers status and formal verification routes",
+      "durationMs": 27.086217000000033,
+      "errorFirstLine": "AssertionError: expected 500 to be 200 // Object.is equality"
+    },
+    {
+      "file": "tests/archiveFilesParity.test.ts",
+      "test": "archive file utility parity: src/audit/binderArtifact.ts preserves extraction bounds, all verifiers, domain errors and public APIs",
+      "durationMs": 59.414897999999994,
+      "errorFirstLine": "AssertionError: expected 'import { mkdtempSync, readFileSync, r…' to be 'import { mkdtempSync, readFileSync, r…' // Object.is equality"
+    },
+    {
+      "file": "tests/compareBadgeDocs.test.ts",
+      "test": "compare badge DevRel docs documents compare badge generation in public onboarding docs",
+      "durationMs": 7.278165999999999,
+      "errorFirstLine": "AssertionError: expected '<p align=\"center\">\\n  <img src=\"websi…' to contain 'model-compare-badge.svg'"
+    },
+    {
+      "file": "tests/enterpriseSsoScim.test.ts",
+      "test": "enterprise identity (OIDC/SAML/SCIM) OIDC auth code + PKCE flow creates session and mapped workspace roles",
+      "durationMs": 866.624742,
+      "errorFirstLine": "AssertionError: expected 400 to be 302 // Object.is equality"
+    },
+    {
+      "file": "tests/enterpriseSsoScim.test.ts",
+      "test": "enterprise identity (OIDC/SAML/SCIM) OIDC rejects identity tokens without an affirmative email_verified claim",
+      "durationMs": 743.8713639999996,
+      "errorFirstLine": "AssertionError: expected 400 to be 302 // Object.is equality"
+    },
+    {
+      "file": "tests/enterpriseSsoScim.test.ts",
+      "test": "enterprise identity (OIDC/SAML/SCIM) OIDC rejects bad state, bad nonce/signature, and missing email",
+      "durationMs": 723.0270179999998,
+      "errorFirstLine": "AssertionError: expected 400 to be 302 // Object.is equality"
+    },
+    {
+      "file": "tests/evidencePathsExist.test.ts",
+      "test": "evidence paths keeps the frozen list honest — every entry really is absent",
+      "durationMs": 7.623603000000003,
+      "errorFirstLine": "AssertionError: expected [ 'src/adversarial', …(123) ] to deeply equal [ 'src/adversarial', …(124) ]"
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows uses existing literal report inputs and exercises every changed domain with a ready original receipt",
+      "durationMs": 25.454949999999826,
+      "errorFirstLine": "AssertionError: expected '{\"generatedAt\":\"2026-06-13T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-13T00:00:00.0…' // Object.is equality"
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows ragFlowDiagnostics: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "durationMs": 24.31081199999994,
+      "errorFirstLine": "AssertionError: expected '{\"generatedAt\":\"2026-06-13T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-13T00:00:00.0…' // Object.is equality"
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows incidentTriageLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "durationMs": 17.744455000000016,
+      "errorFirstLine": "AssertionError: expected '{\"generatedAt\":\"2026-06-14T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-14T00:00:00.0…' // Object.is equality"
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows benchmarkSubmissionLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "durationMs": 13.321956999999884,
+      "errorFirstLine": "AssertionError: expected '{\"generatedAt\":\"2026-06-14T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-14T00:00:00.0…' // Object.is equality"
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows testSuiteEvaluationLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "durationMs": 12.4681250000001,
+      "errorFirstLine": "AssertionError: expected '{\"generatedAt\":\"2026-06-20T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-20T00:00:00.0…' // Object.is equality"
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows evalAiLibraryQuestionLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "durationMs": 13.188476000000037,
+      "errorFirstLine": "AssertionError: expected '{\"generatedAt\":\"2026-06-20T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-20T00:00:00.0…' // Object.is equality"
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows openModelRagQuestionLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "durationMs": 13.298772999999983,
+      "errorFirstLine": "AssertionError: expected '{\"generatedAt\":\"2026-06-20T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-20T00:00:00.0…' // Object.is equality"
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows opikEvaluationQuestionLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "durationMs": 13.181867000000011,
+      "errorFirstLine": "AssertionError: expected '{\"generatedAt\":\"2026-06-20T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-20T00:00:00.0…' // Object.is equality"
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows deepEvalQuestionLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "durationMs": 12.618450999999823,
+      "errorFirstLine": "AssertionError: expected '{\"generatedAt\":\"2026-06-20T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-20T00:00:00.0…' // Object.is equality"
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows statisticalAgentTrialLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "durationMs": 13.241175999999996,
+      "errorFirstLine": "AssertionError: expected '{\"generatedAt\":\"2026-06-19T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-19T00:00:00.0…' // Object.is equality"
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows codeQuestQualityLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "durationMs": 12.66605299999992,
+      "errorFirstLine": "AssertionError: expected '{\"generatedAt\":\"2026-06-19T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-19T00:00:00.0…' // Object.is equality"
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows multiUserBenchmarkLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "durationMs": 13.089468000000124,
+      "errorFirstLine": "AssertionError: expected '{\"generatedAt\":\"2026-06-16T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-16T00:00:00.0…' // Object.is equality"
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows professionalTaskLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "durationMs": 12.145281000000068,
+      "errorFirstLine": "AssertionError: expected '{\"generatedAt\":\"2026-06-16T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-16T00:00:00.0…' // Object.is equality"
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows iotFirmwareQuestionLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "durationMs": 12.58328900000015,
+      "errorFirstLine": "AssertionError: expected '{\"generatedAt\":\"2026-06-17T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-17T00:00:00.0…' // Object.is equality"
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows retailSalesQuestionLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "durationMs": 12.760573999999906,
+      "errorFirstLine": "AssertionError: expected '{\"generatedAt\":\"2026-06-17T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-17T00:00:00.0…' // Object.is equality"
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows continualLearningBenchmarkLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "durationMs": 12.173393000000033,
+      "errorFirstLine": "AssertionError: expected '{\"generatedAt\":\"2026-06-17T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-17T00:00:00.0…' // Object.is equality"
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows hermesTurboPerformanceLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "durationMs": 12.795337000000018,
+      "errorFirstLine": "AssertionError: expected '{\"generatedAt\":\"2026-06-19T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-19T00:00:00.0…' // Object.is equality"
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows obsStudioDrilldownLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "durationMs": 10.726400999999896,
+      "errorFirstLine": "AssertionError: expected '{\"generatedAt\":\"2026-06-13T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-13T00:00:00.0…' // Object.is equality"
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows scorableStudioDrilldownLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "durationMs": 11.329125000000204,
+      "errorFirstLine": "AssertionError: expected '{\"generatedAt\":\"2026-06-20T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-20T00:00:00.0…' // Object.is equality"
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows incidentTriageProofHashes: each omitted or malformed proof retains original refusal",
+      "durationMs": 13.672673000000032,
+      "errorFirstLine": "AssertionError: expected '{\"generatedAt\":\"2026-06-14T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-14T00:00:00.0…' // Object.is equality"
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows benchmarkSubmissionProofHashes: each omitted or malformed proof retains original refusal",
+      "durationMs": 8.04062900000008,
+      "errorFirstLine": "AssertionError: expected '{\"generatedAt\":\"2026-06-14T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-14T00:00:00.0…' // Object.is equality"
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows multiUserBenchmarkProofHashes: each omitted or malformed proof retains original refusal",
+      "durationMs": 8.591345999999703,
+      "errorFirstLine": "AssertionError: expected '{\"generatedAt\":\"2026-06-16T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-16T00:00:00.0…' // Object.is equality"
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows continualLearningBenchmarkProofHashes: each omitted or malformed proof retains original refusal",
+      "durationMs": 7.773309000000154,
+      "errorFirstLine": "AssertionError: expected '{\"generatedAt\":\"2026-06-17T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-17T00:00:00.0…' // Object.is equality"
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows hermesTurboPerformanceProofHashes: each omitted or malformed proof retains original refusal",
+      "durationMs": 8.269452999999885,
+      "errorFirstLine": "AssertionError: expected '{\"generatedAt\":\"2026-06-19T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-19T00:00:00.0…' // Object.is equality"
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows iotFirmwareQuestionProofHashes: each omitted or malformed proof retains original refusal",
+      "durationMs": 8.143985000000157,
+      "errorFirstLine": "AssertionError: expected '{\"generatedAt\":\"2026-06-17T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-17T00:00:00.0…' // Object.is equality"
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows retailSalesQuestionProofHashes: each omitted or malformed proof retains original refusal",
+      "durationMs": 9.043305000000146,
+      "errorFirstLine": "AssertionError: expected '{\"generatedAt\":\"2026-06-17T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-17T00:00:00.0…' // Object.is equality"
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows scorableStudioDrilldownProofHashes: each omitted or malformed proof retains original refusal",
+      "durationMs": 11.002656000000115,
+      "errorFirstLine": "AssertionError: expected '{\"generatedAt\":\"2026-06-20T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-20T00:00:00.0…' // Object.is equality"
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows obsStudioDrilldownProofHashes: each omitted or malformed proof retains original refusal",
+      "durationMs": 11.931590000000142,
+      "errorFirstLine": "AssertionError: expected '{\"generatedAt\":\"2026-06-13T00:00:00.0…' to be '{\"generatedAt\":\"2026-06-13T00:00:00.0…' // Object.is equality"
+    },
+    {
+      "file": "tests/jsonlWriterResume.test.ts",
+      "test": "authenticated native JSONL writer recovery real killed writer: original prefix, acknowledged effects and pending usage survive genuine resume",
+      "durationMs": 1769.571389,
+      "errorFirstLine": "Error: fixture exited before receipt: 1"
+    },
+    {
+      "file": "tests/jsonlWriterResume.test.ts",
+      "test": "authenticated native JSONL writer recovery two real resumers cannot acquire the same abandoned writer",
+      "durationMs": 1656.0481570000002,
+      "errorFirstLine": "Error: fixture exited before receipt: 1"
+    },
+    {
+      "file": "tests/jsonlWriterResume.test.ts",
+      "test": "authenticated native JSONL writer recovery an empty replacement operations journal cannot authorize uncertain dispatch recovery",
+      "durationMs": 1425.2746100000004,
+      "errorFirstLine": "Error: fixture exited before receipt: 1"
+    },
+    {
+      "file": "tests/jsonlWriterResume.test.ts",
+      "test": "authenticated native JSONL writer recovery a released complete turn resumes only as a new explicit turn",
+      "durationMs": 512.7859929999995,
+      "errorFirstLine": "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none"
+    },
+    {
+      "file": "tests/jsonlWriterResume.test.ts",
+      "test": "authenticated native JSONL writer recovery a released cancelled turn resumes only as a new explicit turn",
+      "durationMs": 572.5093859999997,
+      "errorFirstLine": "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none"
+    },
+    {
+      "file": "tests/jsonlWriterResume.test.ts",
+      "test": "authenticated native JSONL writer recovery a parent cancellation cannot be promoted to a standalone resumed agent",
+      "durationMs": 422.6780850000014,
+      "errorFirstLine": "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none"
+    },
+    {
+      "file": "tests/jsonlWriterResume.test.ts",
+      "test": "authenticated native JSONL writer recovery changed agent refuses before new writer rights or append",
+      "durationMs": 560.8414200000007,
+      "errorFirstLine": "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none"
+    },
+    {
+      "file": "tests/jsonlWriterResume.test.ts",
+      "test": "authenticated native JSONL writer recovery changed composition refuses before new writer rights or append",
+      "durationMs": 577.4508440000009,
+      "errorFirstLine": "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none"
+    },
+    {
+      "file": "tests/jsonlWriterResume.test.ts",
+      "test": "authenticated native JSONL writer recovery changed policy refuses before new writer rights or append",
+      "durationMs": 471.00721800000065,
+      "errorFirstLine": "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none"
+    },
+    {
+      "file": "tests/jsonlWriterResume.test.ts",
+      "test": "authenticated native JSONL writer recovery changed head refuses before new writer rights or append",
+      "durationMs": 464.9212270000007,
+      "errorFirstLine": "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none"
+    },
+    {
+      "file": "tests/jsonlWriterResume.test.ts",
+      "test": "authenticated native JSONL writer recovery changed trust refuses before new writer rights or append",
+      "durationMs": 502.9301660000001,
+      "errorFirstLine": "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none"
+    },
+    {
+      "file": "tests/jsonlWriterResume.test.ts",
+      "test": "authenticated native JSONL writer recovery torn history refuses without rewriting its bytes",
+      "durationMs": 542.6035309999988,
+      "errorFirstLine": "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none"
+    },
+    {
+      "file": "tests/jsonlWriterResume.test.ts",
+      "test": "authenticated native JSONL writer recovery unterminated history refuses without rewriting its bytes",
+      "durationMs": 439.49505599999975,
+      "errorFirstLine": "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none"
+    },
+    {
+      "file": "tests/jsonlWriterResume.test.ts",
+      "test": "authenticated native JSONL writer recovery signature history refuses without rewriting its bytes",
+      "durationMs": 531.6955589999998,
+      "errorFirstLine": "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none"
+    },
+    {
+      "file": "tests/jsonlWriterResume.test.ts",
+      "test": "authenticated native JSONL writer recovery future history refuses without rewriting its bytes",
+      "durationMs": 490.48770200000035,
+      "errorFirstLine": "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none"
+    },
+    {
+      "file": "tests/jsonlWriterResume.test.ts",
+      "test": "authenticated native JSONL writer recovery unreadable workspace owner is not stolen",
+      "durationMs": 441.37817899999936,
+      "errorFirstLine": "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none"
+    },
+    {
+      "file": "tests/jsonlWriterResume.test.ts",
+      "test": "authenticated native JSONL writer recovery foreign workspace owner is not stolen",
+      "durationMs": 502.64137499999924,
+      "errorFirstLine": "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none"
+    },
+    {
+      "file": "tests/jsonlWriterResume.test.ts",
+      "test": "authenticated native JSONL writer recovery live workspace owner is not stolen",
+      "durationMs": 505.7994089999993,
+      "errorFirstLine": "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none"
+    },
+    {
+      "file": "tests/jsonlWriterResume.test.ts",
+      "test": "authenticated native JSONL writer recovery direct recovery cannot steal a handle dropped by a live process",
+      "durationMs": 442.5919560000002,
+      "errorFirstLine": "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none"
+    },
+    {
+      "file": "tests/llmResponsesCapabilities.test.ts",
+      "test": "explicit Responses protocol and required capabilities explicit unknown or unsupported requirements refuse before reading session/credentials or transport",
+      "durationMs": 6.754440000000045,
+      "errorFirstLine": "TypeError: The \"paths[0]\" argument must be of type string. Received undefined"
+    },
+    {
+      "file": "tests/nativeSandboxPolicyBinding.test.ts",
+      "test": "the requirement follows the actual confined body refuses a signed policy change between admission and dispatch",
+      "durationMs": 568.911317,
+      "errorFirstLine": "AssertionError: expected '' to match /changed after shell admission/"
+    },
+    {
+      "file": "tests/nativeSandboxPolicyBinding.test.ts",
+      "test": "the requirement follows the actual confined body refuses a unsigned policy change between admission and dispatch",
+      "durationMs": 473.3196590000007,
+      "errorFirstLine": "AssertionError: expected '' to match /verifiable signed tools policy/"
+    },
+    {
+      "file": "tests/privateModuleHelperVisibility.test.ts",
+      "test": "individually reviewed module-private helper visibility retains the exact finite declaration manifest and supported package entries",
+      "durationMs": 10.35872900000004,
+      "errorFirstLine": "AssertionError: expected '1351dd56270ba66159a5b5fd3747e5969b2d2…' to be 'de1469cf447c9ccf8a22fef1ebcce716b3af7…' // Object.is equality"
+    },
+    {
+      "file": "tests/publicDocsGraph.test.ts",
+      "test": "AMC public Docs graph every local guide edge resolves to another promoted guide",
+      "durationMs": 37.13648500000002,
+      "errorFirstLine": "AssertionError: expected [ { …(3) }, …(19) ] to deeply equal []"
+    },
+    {
+      "file": "tests/questionScoreExplainability.test.ts",
+      "test": "question score explainability receipts GAP-0634 binds cognitive-retrieval preprint metadata to existing eval score explainability primitives",
+      "durationMs": 28.846619999999348,
+      "errorFirstLine": "AssertionError: expected { questionId: 'AMC-1.3', …(8) } to match object { questionId: 'AMC-1.3', …(6) }"
+    },
+    {
+      "file": "tests/questionScoreExplainability.test.ts",
+      "test": "question score explainability receipts binds UpTrain repository metadata to existing eval score explainability primitives",
+      "durationMs": 3.5132140000005165,
+      "errorFirstLine": "AssertionError: expected { questionId: 'AMC-1.3', …(8) } to match object { questionId: 'AMC-1.3', …(5) }"
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures binder real signatures verify through embedded, explicit and workspace trust paths",
+      "durationMs": 123.02432900000031,
+      "errorFirstLine": "AssertionError: expected '{\"ok\":true,\"binder\":{\"v\":1,\"binderId\"…' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' // Object.is equality"
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures binder public argument getters keep the original access order",
+      "durationMs": 89.92486899999994,
+      "errorFirstLine": "AssertionError: expected { ok: true, …(3) } to deeply equal Object{ ok: false, …(3) }"
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures binder preserves renamed child root discovery",
+      "durationMs": 125.66617899999983,
+      "errorFirstLine": "AssertionError: expected '{\"ok\":true,\"binder\":{\"v\":1,\"binderId\"…' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' // Object.is equality"
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures binder preserves flat root root discovery",
+      "durationMs": 102.06672000000026,
+      "errorFirstLine": "AssertionError: expected '{\"ok\":true,\"binder\":{\"v\":1,\"binderId\"…' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' // Object.is equality"
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures binder tampered digest refuses",
+      "durationMs": 106.03685399999995,
+      "errorFirstLine": "AssertionError: expected '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' // Object.is equality"
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures binder tampered signature refuses",
+      "durationMs": 102.9991340000006,
+      "errorFirstLine": "AssertionError: expected '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' // Object.is equality"
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures binder tampered envelope mismatch refuses",
+      "durationMs": 99.09553599999981,
+      "errorFirstLine": "AssertionError: expected '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' // Object.is equality"
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures binder privacy missing scan retains the domain policy",
+      "durationMs": 96.83295500000077,
+      "errorFirstLine": "AssertionError: expected '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' // Object.is equality"
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures binder privacy failed scan retains the domain policy",
+      "durationMs": 89.79763399999956,
+      "errorFirstLine": "AssertionError: expected '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' // Object.is equality"
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures binder privacy checksum mismatch retains the domain policy",
+      "durationMs": 112.37233899999956,
+      "errorFirstLine": "AssertionError: expected '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' // Object.is equality"
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures binder privacy missing checksum retains the domain policy",
+      "durationMs": 80.01494999999977,
+      "errorFirstLine": "AssertionError: expected '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' // Object.is equality"
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures binder absent inclusion directory and ignored suffixes preserve existing proof admission",
+      "durationMs": 68.76369700000032,
+      "errorFirstLine": "AssertionError: expected '{\"ok\":true,\"binder\":{\"v\":1,\"binderId\"…' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' // Object.is equality"
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures binder multiple privacy failures retain error order and checksum whitespace behavior",
+      "durationMs": 61.89267199999995,
+      "errorFirstLine": "AssertionError: expected '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' // Object.is equality"
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures binder root and calculation-manifest hash tampering refuses",
+      "durationMs": 59.33861499999966,
+      "errorFirstLine": "AssertionError: expected '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' // Object.is equality"
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures passport real signatures verify through embedded, explicit and workspace trust paths",
+      "durationMs": 76.20431400000052,
+      "errorFirstLine": "AssertionError: expected '{\"ok\":true,\"passport\":{\"v\":1,\"passpor…' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' // Object.is equality"
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures passport public argument getters keep the original access order",
+      "durationMs": 82.32091200000013,
+      "errorFirstLine": "AssertionError: expected { ok: true, …(3) } to deeply equal Object{ ok: false, …(3) }"
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures passport preserves renamed child root discovery",
+      "durationMs": 99.26170900000034,
+      "errorFirstLine": "AssertionError: expected '{\"ok\":true,\"passport\":{\"v\":1,\"passpor…' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' // Object.is equality"
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures passport preserves flat root root discovery",
+      "durationMs": 89.61552799999936,
+      "errorFirstLine": "AssertionError: expected '{\"ok\":true,\"passport\":{\"v\":1,\"passpor…' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' // Object.is equality"
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures passport tampered digest refuses",
+      "durationMs": 59.3480440000003,
+      "errorFirstLine": "AssertionError: expected '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' // Object.is equality"
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures passport tampered signature refuses",
+      "durationMs": 50.29561300000023,
+      "errorFirstLine": "AssertionError: expected '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' // Object.is equality"
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures passport tampered envelope mismatch refuses",
+      "durationMs": 60.83474000000024,
+      "errorFirstLine": "AssertionError: expected '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' // Object.is equality"
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures passport privacy missing scan retains the domain policy",
+      "durationMs": 58.10564599999998,
+      "errorFirstLine": "AssertionError: expected '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' // Object.is equality"
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures passport privacy failed scan retains the domain policy",
+      "durationMs": 62.77320799999961,
+      "errorFirstLine": "AssertionError: expected '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' // Object.is equality"
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures passport privacy checksum mismatch retains the domain policy",
+      "durationMs": 63.82987899999989,
+      "errorFirstLine": "AssertionError: expected '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' // Object.is equality"
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures passport privacy missing checksum retains the domain policy",
+      "durationMs": 66.71269399999983,
+      "errorFirstLine": "AssertionError: expected '{\"ok\":true,\"passport\":{\"v\":1,\"passpor…' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' // Object.is equality"
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures passport absent inclusion directory and ignored suffixes preserve existing proof admission",
+      "durationMs": 67.68237800000043,
+      "errorFirstLine": "AssertionError: expected '{\"ok\":true,\"passport\":{\"v\":1,\"passpor…' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' // Object.is equality"
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures passport multiple privacy failures retain error order and checksum whitespace behavior",
+      "durationMs": 78.88777600000049,
+      "errorFirstLine": "AssertionError: expected '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' // Object.is equality"
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures passport root and calculation-manifest hash tampering refuses",
+      "durationMs": 80.29457699999966,
+      "errorFirstLine": "AssertionError: expected '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' // Object.is equality"
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures multiple unbound expected proof ids refuse even when their input order differs",
+      "durationMs": 104.0884729999998,
+      "errorFirstLine": "AssertionError: expected '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' // Object.is equality"
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures workspace verification reports every refusal from a tampered registered binder",
+      "durationMs": 123.84177400000044,
+      "errorFirstLine": "AssertionError: expected '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId…' // Object.is equality"
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures passport revocation remains enforced with workspace trust",
+      "durationMs": 74.65522200000123,
+      "errorFirstLine": "AssertionError: expected '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' // Object.is equality"
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures passport expiry is enforced without changing the signed document",
+      "durationMs": 58.980943999999,
+      "errorFirstLine": "AssertionError: expected '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo…' // Object.is equality"
+    },
+    {
+      "file": "tests/studioNativeTaskService.test.ts",
+      "test": "real stub turns are committed once, survive release/restart/resume and cold verify",
+      "durationMs": 2503.8162159999993,
+      "errorFirstLine": "AssertionError: expected 'Native startup did not finish. No mod…' to be null"
+    },
+    {
+      "file": "tests/studioNativeTaskService.test.ts",
+      "test": "owner/selected-agent/demo and stale submission boundaries refuse without extra native requests",
+      "durationMs": 2334.2009909999997,
+      "errorFirstLine": "AssertionError: expected 'Native startup did not finish. No mod…' to be null"
+    },
+    {
+      "file": "tests/studioNativeTaskService.test.ts",
+      "test": "a stale non-owning observer recovers the exact lost follow-up acknowledgement without dispatching it again",
+      "durationMs": 2434.5273290000005,
+      "errorFirstLine": "AssertionError: expected 'Native startup did not finish. No mod…' to be null"
+    },
+    {
+      "file": "tests/studioNativeTaskService.test.ts",
+      "test": "JSONL managed task cold inspection, verification and archive retain actual history and create deduplication",
+      "durationMs": 2511.4060510000018,
+      "errorFirstLine": "AssertionError: expected 'Native startup did not finish. No mod…' to be null"
+    },
+    {
+      "file": "tests/studioNativeTaskService.test.ts",
+      "test": "archive frees a current-history slot while retaining sealed evidence and all dedup identities after restart",
+      "durationMs": 2474.818714000001,
+      "errorFirstLine": "AssertionError: expected 'Native startup did not finish. No mod…' to be null"
+    },
+    {
+      "file": "tests/studioNativeTaskService.test.ts",
+      "test": "archive refuses active, foreign, stale, unsealed and uncertain tasks without changing retained metadata",
+      "durationMs": 2408.9327239999984,
+      "errorFirstLine": "AssertionError: expected 'Native startup did not finish. No mod…' to be null"
+    },
+    {
+      "file": "tests/studioNativeTaskService.test.ts",
+      "test": "archive authenticates evidence again and hidden archived descriptors still fail closed on tampering",
+      "durationMs": 2385.351817999999,
+      "errorFirstLine": "AssertionError: expected 'Native startup did not finish. No mod…' to be null"
+    },
+    {
+      "file": "tests/studioNativeTaskService.test.ts",
+      "test": "a physical workspace alias runs the same native session, while a different ACP root is refused",
+      "durationMs": 2371.894862000001,
+      "errorFirstLine": "AssertionError: expected 'Native startup did not finish. No mod…' to be null"
+    },
+    {
+      "file": "tests/compliance/dataResidencyPersistence.test.ts",
+      "test": "data residency survives the process chains and signs stored records so tampering is detectable",
+      "durationMs": 100.25534700000003,
+      "errorFirstLine": "AssertionError: expected false to be true // Object.is equality"
+    },
+    {
+      "file": "tests/compliance/evidenceBinding.test.ts",
+      "test": "source-literal enumeration every source literal in src is classified",
+      "durationMs": 86.8319019999999,
+      "errorFirstLine": "AssertionError: expected [ 'carried', …(12) ] to deeply equal []"
+    },
+    {
+      "file": "tests/security/api-security.test.ts",
+      "test": "API security hardening OIDC JWT verifier rejects expired and nonce-mismatched tokens",
+      "durationMs": 9.559704999999667,
+      "errorFirstLine": "AssertionError: expected 'id_token verification failed' to contain 'expired'"
+    }
+  ],
+  "limitations": "Read-only extraction from GitHub artifact. Error first lines capped at 700 characters; full failure details remain in the source artifact. No tests, workflows or tracked file edits executed."
+}

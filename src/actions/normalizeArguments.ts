@@ -33,7 +33,13 @@ function nfc(value: unknown): unknown {
   if (typeof value === "string") return value.normalize("NFC");
   if (Array.isArray(value)) return value.map(nfc);
   if (value !== null && typeof value === "object") {
-    return Object.fromEntries(Object.entries(value).map(([key, item]) => [key.normalize("NFC"), nfc(item)]));
+    const keys = new Set<string>();
+    return Object.fromEntries(Object.entries(value).map(([key, item]) => {
+      const normalizedKey = key.normalize("NFC");
+      if (keys.has(normalizedKey)) throw new Error("argument keys collide after NFC normalization");
+      keys.add(normalizedKey);
+      return [normalizedKey, nfc(item)];
+    }));
   }
   return value;
 }
@@ -62,31 +68,32 @@ function urlOrigin(value: string): string {
  */
 export function normalizeArguments(definition: SignedToolDefinition | null, actionClass: ActionClass,
   args: Readonly<Record<string, unknown>>): NormalizedArguments {
-  const fields: BindingFields = definition?.bindingFields ?? {};
-  const required = REQUIRED_BINDINGS[actionClass] ?? [];
   const refuse = (reason: string): NormalizedArguments => ({ ok: false, failure: "binding_fields_missing", reason });
-  const undeclared = required.filter(role => fields[role] === undefined);
-  if (undeclared.length > 0) return refuse(`${actionClass} tools must declare bindingFields ${undeclared.join(", ")} in the signed tools config`);
-
-  const all = nfc(args) as Record<string, unknown>;
-  const carrier = definition?.effects?.idempotency?.carrier === "argument" ? definition.effects.idempotency.name : null;
-  const carried = carrier === null ? undefined : all[carrier];
-  const normalized = carrier === null ? all : Object.fromEntries(Object.entries(all).filter(([key]) => key !== carrier));
-  const read = (role: BindingRole): string | null => {
-    const name = fields[role];
-    const value = name === undefined ? undefined : normalized[name];
-    if (value === undefined || value === null) {
-      if (required.includes(role)) throw new Error(`${role} argument "${name}" is required`);
-      return null;
-    }
-    if (typeof value !== "string" || value.length === 0) {
-      throw new Error(role === "amount"
-        ? `amount argument "${name}" must be a decimal string such as "100.50", never a JSON number`
-        : `${role} argument "${name}" must be a non-empty string`);
-    }
-    return value;
-  };
   try {
+    const fields = nfc(definition?.bindingFields ?? {}) as BindingFields;
+    const required = REQUIRED_BINDINGS[actionClass] ?? [];
+    const undeclared = required.filter(role => fields[role] === undefined);
+    if (undeclared.length > 0) return refuse(`${actionClass} tools must declare bindingFields ${undeclared.join(", ")} in the signed tools config`);
+
+    const all = nfc(args) as Record<string, unknown>;
+    const carrier = definition?.effects?.idempotency?.carrier === "argument" ? definition.effects.idempotency.name : null;
+    if (carrier !== null && Object.values(fields).includes(carrier)) return refuse("the idempotency argument cannot be a binding field");
+    const carried = carrier === null ? undefined : all[carrier];
+    const normalized = carrier === null ? all : Object.fromEntries(Object.entries(all).filter(([key]) => key !== carrier));
+    const read = (role: BindingRole): string | null => {
+      const name = fields[role];
+      const value = name === undefined ? undefined : normalized[name];
+      if (value === undefined || value === null) {
+        if (required.includes(role)) throw new Error(`${role} argument "${name}" is required`);
+        return null;
+      }
+      if (typeof value !== "string" || value.length === 0) {
+        throw new Error(role === "amount"
+          ? `amount argument "${name}" must be a decimal string such as "100.50", never a JSON number`
+          : `${role} argument "${name}" must be a non-empty string`);
+      }
+      return value;
+    };
     const amountText = read("amount"), currencyText = read("currency");
     let amount: BindingFacts["amount"] = null;
     let digested = normalized;

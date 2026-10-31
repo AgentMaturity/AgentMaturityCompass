@@ -83,7 +83,7 @@
    },
    {
     "claim": "Obsidian note updated for this issue.",
-    "evidence": "Read-only grep of /Users/sid/Documents/AMC finds 20 notes mentioning AMC-1510 (e.g. Evidence/2026-09-08 AMC DSH Pi Current-State Evidence.md, Research/2026-09-08 DSH and Pi Gap Plan.md, several 2026-09-09 Roadmap checkpoints). No Evidence note for a reconciliation at 6e7875f2 exists; contents were not reviewed.",
+    "evidence": "Read-only grep of ~/Documents/AMC finds 20 notes mentioning AMC-1510 (e.g. Evidence/2026-09-08 AMC DSH Pi Current-State Evidence.md, Research/2026-09-08 DSH and Pi Gap Plan.md, several 2026-09-09 Roadmap checkpoints). No Evidence note for a reconciliation at 6e7875f2 exists; contents were not reviewed.",
     "holds": false,
     "note": "PARTIAL: earlier notes exist; nothing dated for the current integration commit."
    }

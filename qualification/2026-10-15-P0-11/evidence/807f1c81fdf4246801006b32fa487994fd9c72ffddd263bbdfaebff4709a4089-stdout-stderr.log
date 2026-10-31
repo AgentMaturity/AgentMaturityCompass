@@ -1,0 +1,11 @@
+
+ RUN  v4.1.11 /private/tmp/p0-11-causal-qualification-20261015/closure
+
+ ✓ tests/threatModelMap.test.ts (7 tests) 555ms
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+   Start at  12:14:45
+   Duration  681ms (transform 11ms, setup 19ms, import 5ms, tests 555ms, environment 0ms)
+
+JSON report written to /private/tmp/p0-11-causal-qualification-20261015/phases/L1-optional-historical-literal-whole-branch-removal--restored/raw.json

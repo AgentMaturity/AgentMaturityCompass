@@ -3,6 +3,20 @@
   "decision": "D-15",
   "files": [
     {
+      "path": "dist/experiments/governedOptimizer.d.ts",
+      "issue": "GAP-WP38",
+      "baseCommit": "2eb8d7e2fbffa3487c51bf0d961167829bfa0a18",
+      "archivePath": "unused-code/plan-edits/GAP-WP38/dist/experiments/governedOptimizer.d.ts.landed",
+      "sha256": "e2a36efef0396fbe6198a1ea2ce2953bded4707830d29ee7c3f0b9175ed59341"
+    },
+    {
+      "path": "dist/importers/piTelemetryCallbacks.d.ts",
+      "issue": "GAP-WP26",
+      "baseCommit": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "archivePath": "unused-code/plan-edits/GAP-WP26/dist/importers/piTelemetryCallbacks.d.ts.landed",
+      "sha256": "5db8ab813511f831a7c5c3a9808702b7c5f32e4db5182f8cd367fc9a0cd163b7"
+    },
+    {
       "path": "dist/index.d.ts",
       "issue": "P0-08",
       "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
@@ -10,11 +24,67 @@
       "sha256": "9aa3559ae0aa5ab9e73bd3f5f335e46bd2b249541dcfc326be2ac71ee8528b47"
     },
     {
+      "path": "dist/mechanic/fixerRca.d.ts",
+      "issue": "GAP-WP09",
+      "baseCommit": "dff352a3e42eda65d11fd3127f91d036208b2687",
+      "archivePath": "unused-code/plan-edits/GAP-WP09/dist/mechanic/fixerRca.d.ts.landed",
+      "sha256": "b753d5afaddd2bbb667f14fcc3ae6d01cb28a5e14e6755d22f2648171294080e"
+    },
+    {
+      "path": "dist/org/orgRun.d.ts",
+      "issue": "P0-37",
+      "baseCommit": "ee0afc9bc6099ffbd57e4929b67dc81acdff1741",
+      "archivePath": "unused-code/plan-edits/P0-37/dist/org/orgRun.d.ts.landed",
+      "sha256": "f1aaf94001038ab59a7e8713c8fbd7e7076a8bcbb9a8f5b44138b35411138043"
+    },
+    {
+      "path": "dist/runtime/firewall.d.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/dist/runtime/firewall.d.ts.landed",
+      "sha256": "b9d0d6ea421896588b78b7b7dc5c6afe3529209d06b0a7031642f7875e162527"
+    },
+    {
+      "path": "dist/runtime/runManager.d.ts",
+      "issue": "GAP-WP46",
+      "baseCommit": "2eb8d7e2fbffa3487c51bf0d961167829bfa0a18",
+      "archivePath": "unused-code/plan-edits/GAP-WP46/dist/runtime/runManager.d.ts.landed",
+      "sha256": "d82e2dea74dd01a0c4a5a07c6b65387b3048226e7687db8607e8979298fec825"
+    },
+    {
+      "path": "dist/score/metricValidity.d.ts",
+      "issue": "GAP-WP05",
+      "baseCommit": "c71c28e2c10cad64c72600e042a2121b07b9b38e",
+      "archivePath": "unused-code/plan-edits/GAP-WP05/dist/score/metricValidity.d.ts.landed",
+      "sha256": "79f5e7444e26cd28a6b8cfecc257b87e980d22f16b918407f1cfae766b484b4c"
+    },
+    {
+      "path": "dist/score/metricValidity.js",
+      "issue": "GAP-WP05",
+      "baseCommit": "c71c28e2c10cad64c72600e042a2121b07b9b38e",
+      "archivePath": "unused-code/plan-edits/GAP-WP05/dist/score/metricValidity.js.landed",
+      "sha256": "a4dbfed9efbf5ecb84afb56734d297a03f3a2744ffb217d7fdb04885ae7284d9"
+    },
+    {
       "path": "dist/sdk/nativeAgentClient.d.ts",
       "issue": "P0-06",
       "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
       "archivePath": "unused-code/plan-edits/P0-06/dist/sdk/nativeAgentClient.d.ts.landed",
       "sha256": "8652b7c9ffded332a5e277ce4511f3a8a0e06f0599d49677d73298a4e2b1bc8a"
+    },
+    {
+      "path": "dist/standard/externalEvidenceProfile.d.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/dist/standard/externalEvidenceProfile.d.ts.landed",
+      "sha256": "b14d55d260d9c5b5c84b97fce4fd4db27bec942d24feccb15477fb15c37c9d69"
+    },
+    {
+      "path": "knip.json",
+      "issue": "P1-58",
+      "baseCommit": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "archivePath": "unused-code/plan-edits/P1-58/knip.json.landed",
+      "sha256": "43edb97dc3e4d1fa55052249089e15dd6a6713d8480485d748e682be0ecd82c1"
     },
     {
       "path": "package.json",
@@ -31,11 +101,32 @@
       "sha256": "6ee56db74a48240aca2a66072fd62ada30a468a73bd2fc839b98fe5ab325466b"
     },
     {
+      "path": "pnpm-workspace.yaml",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/pnpm-workspace.yaml.landed",
+      "sha256": "fb6b23c507e6d97ecd5dac0a103f009ece6c0fcb35ff32373de92a81c8e2cf23"
+    },
+    {
+      "path": "scripts/source-quality.mjs",
+      "issue": "P0-14",
+      "baseCommit": "691a041dc552e57688175331959ada75e302e0c0",
+      "archivePath": "unused-code/plan-edits/P0-14/scripts/source-quality.mjs.landed",
+      "sha256": "c37dabc753cd0ede0a1a93af7498d139d4f654ea03a630848baa00a6cef6a34f"
+    },
+    {
       "path": "src/agent/nativeToolCapabilities.ts",
       "issue": "P1-43",
       "baseCommit": "e263c5718df833f7e35d63012a9999faa949f607",
       "archivePath": "unused-code/plan-edits/P1-43/src/agent/nativeToolCapabilities.ts.landed",
       "sha256": "d0a8f4c55a8f01db62a0c1c31807bf28ad8c553b98f71ce66817cacf71bed4f0"
+    },
+    {
+      "path": "src/agent/providers/delegationProviders.ts",
+      "issue": "GAP-WP35",
+      "baseCommit": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "archivePath": "unused-code/plan-edits/GAP-WP35/src/agent/providers/delegationProviders.ts.landed",
+      "sha256": "dca765aa0061e5dc01c54b0df5c56acdeb6dce3675082866e5c4ecb00fe8ea00"
     },
     {
       "path": "src/api/benchmarkRouter.ts",
@@ -66,6 +157,13 @@
       "sha256": "7773a77fc1ceeb9916ab09d62a99324d33cd33c5517b5a2d4fdbe003a2b61951"
     },
     {
+      "path": "src/api/watchRouter.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/api/watchRouter.ts.landed",
+      "sha256": "2350b8454ea2a361bd635823a644507e8b2bbd81ad3e0f99181988d7c3e457cd"
+    },
+    {
       "path": "src/assurance/assuranceCertificates.ts",
       "issue": "P0-15",
       "baseCommit": "c64a87641297be160f5901ed4d9c0634b341fef8",
@@ -94,11 +192,67 @@
       "sha256": "4df07f2532ae2547cb195abd083e8e2fb6ba403b0b478af50298a0322d562293"
     },
     {
+      "path": "src/audit/auditMapStore.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/audit/auditMapStore.ts.landed",
+      "sha256": "42bbbf3cb009e82b43d15be3c76560abc98e3a835348d1a3afd3324f3cec1743"
+    },
+    {
+      "path": "src/audit/auditPolicyStore.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/audit/auditPolicyStore.ts.landed",
+      "sha256": "fa36b73619fedde92914778acc6d3bfb24276d5a14ab38b3540acecbc2eaa8bf"
+    },
+    {
+      "path": "src/audit/binderArtifact.ts",
+      "issue": "P1-16",
+      "baseCommit": "1c1ff4b1ff3d94960aee7e130e5dba6988126d4c",
+      "archivePath": "unused-code/plan-edits/P1-16/src/audit/binderArtifact.ts.landed",
+      "sha256": "9b40bd627e04b45b395fba58e4318808b71c34ab40048d344088a22d635c7e46"
+    },
+    {
+      "path": "src/audit/binderStore.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/audit/binderStore.ts.landed",
+      "sha256": "25fc1e815c526d8cb1d4627acc81b6c5fca72b06dae19e12ac0c4e8decfe05a0"
+    },
+    {
+      "path": "src/audit/binderVerifier.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/audit/binderVerifier.ts.landed",
+      "sha256": "b7efcef92effb50588606e9a95d1bcc28b2e0de34a1a59b556194cca7fee7e7a"
+    },
+    {
       "path": "src/auth/authApi.ts",
       "issue": "P1-56",
       "baseCommit": "2a592a00f0e3c6452f19e9a3902b569c111eb4c1",
       "archivePath": "unused-code/plan-edits/P1-56/src/auth/authApi.ts.landed",
       "sha256": "964fd2bda09ef5e4dcbd373a8168cf4a4412c0b332eff2b5d51ab7d359be78df"
+    },
+    {
+      "path": "src/auth/humanLog.ts",
+      "issue": "P1-08",
+      "baseCommit": "42dfa8375817abd903bb4357c2ffcc0ce3b7ac74",
+      "archivePath": "unused-code/plan-edits/P1-08/src/auth/humanLog.ts.landed",
+      "sha256": "f89101f4d6afcecc1ed7631a6decdfd036657786b55f6bee2ba9b19c5e3199b5"
+    },
+    {
+      "path": "src/bench/benchArtifact.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/bench/benchArtifact.ts.landed",
+      "sha256": "1b3467ee2b3b6662bea9893f843c75d663a43d23f226be9be4f8ab9617852964"
+    },
+    {
+      "path": "src/bench/benchPolicyStore.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/bench/benchPolicyStore.ts.landed",
+      "sha256": "83d47eb7e0216f15ba8cb04ee932f24c52b3cada9a80913ade52fd1c6350d1f1"
     },
     {
       "path": "src/bench/benchRegistryClient.ts",
@@ -115,6 +269,13 @@
       "sha256": "404dd08ae477aa2ba6ff866170e69d853b4dc998e2a7e5a8327b187869d0401c"
     },
     {
+      "path": "src/benchmarks/replayBenchmarkCorpus.ts",
+      "issue": "GAP-WP05",
+      "baseCommit": "c71c28e2c10cad64c72600e042a2121b07b9b38e",
+      "archivePath": "unused-code/plan-edits/GAP-WP05/src/benchmarks/replayBenchmarkCorpus.ts.landed",
+      "sha256": "13ab83892c0d46f22e6594688102a16a2f4ed9a4d2ff7e75bd7ed5de4561e3ce"
+    },
+    {
       "path": "src/bom/bomVerifier.ts",
       "issue": "P0-51",
       "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
@@ -127,6 +288,34 @@
       "baseCommit": "f60406454b94e213290587911e6b8066c4126869",
       "archivePath": "unused-code/plan-edits/P2-01/src/bridge/bridgeServer.ts.landed",
       "sha256": "4899b523f54632cb489f5b9c09b092c18515c065ff3d0486aebe12cda20e4d2f"
+    },
+    {
+      "path": "src/bridge/hookActionIdentity.ts",
+      "issue": "P1-22",
+      "baseCommit": "e7123c69a2d9de7cacec9e552f4b431f9f825766",
+      "archivePath": "unused-code/plan-edits/P1-22/src/bridge/hookActionIdentity.ts.landed",
+      "sha256": "7d1770ee582af5fa127fcc9831c204c9ad779abc185c8051d5bde208357f2d3c"
+    },
+    {
+      "path": "src/canon/canonLoader.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/canon/canonLoader.ts.landed",
+      "sha256": "780ddc5faad962980c10ee64a652d5c9e82d1faf8ddea9cee4f6e181b0f42a18"
+    },
+    {
+      "path": "src/casebooks/casebookStore.ts",
+      "issue": "P1-08",
+      "baseCommit": "42dfa8375817abd903bb4357c2ffcc0ce3b7ac74",
+      "archivePath": "unused-code/plan-edits/P1-08/src/casebooks/casebookStore.ts.landed",
+      "sha256": "1a47a67926429b925b3b6e7233281a574f5c97c213685a40a884728ada8084e6"
+    },
+    {
+      "path": "src/cgx/cgxStore.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/cgx/cgxStore.ts.landed",
+      "sha256": "6e4272a79cfb920cac674d861d1af96ec7d7d75a818326e8bd288f4b5e5f216a"
     },
     {
       "path": "src/ci/gate.ts",
@@ -143,11 +332,25 @@
       "sha256": "ba998601991b6b5841c198b439b7f36bf13780a46beb08094f2336bcb2c43ad8"
     },
     {
+      "path": "src/corrections/lessonStore.ts",
+      "issue": "P1-08",
+      "baseCommit": "42dfa8375817abd903bb4357c2ffcc0ce3b7ac74",
+      "archivePath": "unused-code/plan-edits/P1-08/src/corrections/lessonStore.ts.landed",
+      "sha256": "86b7e1fdc0fead2c917dcfa83f22e8804550f1c901ae5080d7f1ff2c52478469"
+    },
+    {
       "path": "src/demo/prospectDemo.ts",
       "issue": "P0-15",
       "baseCommit": "b396249ad8d9ffc9b0b47db2c56464ca86183a4b",
       "archivePath": "unused-code/plan-edits/P0-15/src/demo/prospectDemo.ts.landed",
       "sha256": "af482db8700e0d6067c4084248cd97b11e3c82359da2be4d3a9d49c8cc064e63"
+    },
+    {
+      "path": "src/diagnostic/bank/bankLoader.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/diagnostic/bank/bankLoader.ts.landed",
+      "sha256": "4ce153049c4f1de1cee6a240c03596dc97c2e60574afaca8fec076e99c042703"
     },
     {
       "path": "src/diagnostic/l5DeltaReport.ts",
@@ -192,11 +395,25 @@
       "sha256": "de42434762596133deac32622fe725aaf6d7a30bc986d9782c71e7ab2430991a"
     },
     {
+      "path": "src/enforce/guardrailControlState.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/enforce/guardrailControlState.ts.landed",
+      "sha256": "fae71491ec4db25ba4c5969e84bb81249f6a8b3dbc23eb9f2be5854858647486"
+    },
+    {
       "path": "src/enforce/resourceManifest.ts",
       "issue": "P1-59",
       "baseCommit": "ebfa106dc45a853fc15f36e8d5312b499fc01806",
       "archivePath": "unused-code/plan-edits/P1-59/src/enforce/resourceManifest.ts.landed",
       "sha256": "770d74c94b33014b6d5401232043f214dc8c8478bd98252c2dda8150e4059849"
+    },
+    {
+      "path": "src/enterprise/license.ts",
+      "issue": "P1-51",
+      "baseCommit": "e02503aa756b4ca469a2ff435e04734df211029d",
+      "archivePath": "unused-code/plan-edits/P1-51/src/enterprise/license.ts.landed",
+      "sha256": "627eef85d9f59c55f38d1e18430216bcd65c995ee8a112af95baf223fb756309"
     },
     {
       "path": "src/evidence/exporter.ts",
@@ -213,11 +430,25 @@
       "sha256": "7cd20318c92def5052ec57cb8d0e28d3aec62c0a1eb54d1a1a9304faeebe647a"
     },
     {
+      "path": "src/experiments/governedOptimizer.ts",
+      "issue": "GAP-WP38",
+      "baseCommit": "2eb8d7e2fbffa3487c51bf0d961167829bfa0a18",
+      "archivePath": "unused-code/plan-edits/GAP-WP38/src/experiments/governedOptimizer.ts.landed",
+      "sha256": "0e8527f1d7deeefb3f08b8939567163bda80b9c5bdc100fec54115389ed602f1"
+    },
+    {
       "path": "src/federation/federationStore.ts",
       "issue": "P0-52",
       "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
       "archivePath": "unused-code/plan-edits/P0-52/src/federation/federationStore.ts.landed",
       "sha256": "7f8cd201e6850e2d14c9b176f1a258dd5c4fb0c4c2f4992f1a68287faca004b7"
+    },
+    {
+      "path": "src/forecast/forecastStore.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/forecast/forecastStore.ts.landed",
+      "sha256": "2cac2b32bc50f665bc05033d52754fcb45b1ceb1a65eb6ff59dfa386d2fd07da"
     },
     {
       "path": "src/gateway/config.ts",
@@ -234,6 +465,20 @@
       "sha256": "13ef944ee66ad891c4e13642de6bdcb563a81e023ae762961464da8b8971f44e"
     },
     {
+      "path": "src/governor/policyDebt.ts",
+      "issue": "P1-08",
+      "baseCommit": "42dfa8375817abd903bb4357c2ffcc0ce3b7ac74",
+      "archivePath": "unused-code/plan-edits/P1-08/src/governor/policyDebt.ts.landed",
+      "sha256": "65cca06ec04b9f961ebfecb66f4e8c807817188c0235bcc0b4f4472ed1841cf8"
+    },
+    {
+      "path": "src/identity/hostVault.ts",
+      "issue": "P0-37",
+      "baseCommit": "ee0afc9bc6099ffbd57e4929b67dc81acdff1741",
+      "archivePath": "unused-code/plan-edits/P0-37/src/identity/hostVault.ts.landed",
+      "sha256": "cbae38554491659d7d71828c21c6d919a1433458f3bd84174e65fb9d0420935c"
+    },
+    {
       "path": "src/importers/dshSessionImport.ts",
       "issue": "P1-24",
       "baseCommit": "e263c5718df833f7e35d63012a9999faa949f607",
@@ -241,11 +486,39 @@
       "sha256": "c5fd2a3203db0848bb9b745a27d13d6533fb8581fde99be8f7d529ce085956b4"
     },
     {
+      "path": "src/importers/piTelemetryCallbacks.ts",
+      "issue": "GAP-WP26",
+      "baseCommit": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "archivePath": "unused-code/plan-edits/GAP-WP26/src/importers/piTelemetryCallbacks.ts.landed",
+      "sha256": "165eeaef049f34d247768a86948d06ab17f4eb956936a2b37ceec793098d5333"
+    },
+    {
       "path": "src/index.ts",
       "issue": "P0-08",
       "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
       "archivePath": "unused-code/plan-edits/P0-08/src/index.ts.landed",
       "sha256": "9c33ae512e09e0526550c34a94c49001d997901a17136307650403f9c9414242"
+    },
+    {
+      "path": "src/integrations/integrationDeadLetters.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/integrations/integrationDeadLetters.ts.landed",
+      "sha256": "d11408dc51ac383c7d23e0972e7f4de28010f3365306ca29c4badd30f4a8d291"
+    },
+    {
+      "path": "src/integrations/noCodeGovernanceStore.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/integrations/noCodeGovernanceStore.ts.landed",
+      "sha256": "01b2d8f3aacfa89548c5bc00e789e2075134d7c3dca232051622dc18287fb7ab"
+    },
+    {
+      "path": "src/leases/leaseCli.ts",
+      "issue": "P0-30",
+      "baseCommit": "ee0afc9bc6099ffbd57e4929b67dc81acdff1741",
+      "archivePath": "unused-code/plan-edits/P0-30/src/leases/leaseCli.ts.landed",
+      "sha256": "5897f4f323f237a417163a64050831b6c5387dcfc22e1c3fb47ad062bb076598"
     },
     {
       "path": "src/leases/leaseStore.ts",
@@ -269,6 +542,48 @@
       "sha256": "4eef636358fb607e4ada186a19aee5e187b9c8e9022c5d04b77467c5b46bbe17"
     },
     {
+      "path": "src/mechanic/fixerRca.ts",
+      "issue": "GAP-WP09",
+      "baseCommit": "dff352a3e42eda65d11fd3127f91d036208b2687",
+      "archivePath": "unused-code/plan-edits/GAP-WP09/src/mechanic/fixerRca.ts.landed",
+      "sha256": "8710ade39145e1f0146016ab128926511a8bbde846346e008e9f348947c990e2"
+    },
+    {
+      "path": "src/mechanic/planStore.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/mechanic/planStore.ts.landed",
+      "sha256": "9a09f6df9655b6ed9fdb7ee2850d80b0d8fd14d0ec2e65a1d0a368478748b60e"
+    },
+    {
+      "path": "src/mechanic/profiles.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/mechanic/profiles.ts.landed",
+      "sha256": "fd2f2d0e55dc53e0470beecd438d5fac9f944beb60f590eb4713e88bee04ca9f"
+    },
+    {
+      "path": "src/mechanic/simulator.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/mechanic/simulator.ts.landed",
+      "sha256": "2c6ba7d0eff5f0d1b3fa18c573dfaf4f6cfa71796364840ff39f699654d138cb"
+    },
+    {
+      "path": "src/mechanic/targetsStore.ts",
+      "issue": "P0-28",
+      "baseCommit": "d6184fee3320635c8ca606aa2454b8dc27596111",
+      "archivePath": "unused-code/plan-edits/P0-28/src/mechanic/targetsStore.ts.landed",
+      "sha256": "abd2a0dce4dab30daec3c37ea969ea053e8a3ecd0a140e6e39ce9a8ea6166326"
+    },
+    {
+      "path": "src/mechanic/tuningStore.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/mechanic/tuningStore.ts.landed",
+      "sha256": "b7a481e7383c6b1a725867ec39bf8a1b264e3582753ad86b4e52de4f749e9eac"
+    },
+    {
       "path": "src/notary/notaryAttestation.ts",
       "issue": "P0-51",
       "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
@@ -276,11 +591,81 @@
       "sha256": "fe408e7383b4fd9fe46d30b0018cc387b6241ef16817ec6876e6e2ba9606c404"
     },
     {
+      "path": "src/ops/governanceSlo.ts",
+      "issue": "GAP-WP05",
+      "baseCommit": "c71c28e2c10cad64c72600e042a2121b07b9b38e",
+      "archivePath": "unused-code/plan-edits/GAP-WP05/src/ops/governanceSlo.ts.landed",
+      "sha256": "7a8882ec1bb07b4492a37ee9bcd05db1e8bc1ad3dd2ce39ca02a2829cf7896b1"
+    },
+    {
       "path": "src/ops/policy.ts",
       "issue": "P1-15",
       "baseCommit": "cd04963e99c096e7114734304524be6dae3470e8",
       "archivePath": "unused-code/plan-edits/P1-15/src/ops/policy.ts.landed",
       "sha256": "c017b7a3680d0544ab1e71ed9b665dab283f09100be3a5d722e201cc9a0549da"
+    },
+    {
+      "path": "src/ops/retention/retentionArchive.ts",
+      "issue": "P1-08",
+      "baseCommit": "42dfa8375817abd903bb4357c2ffcc0ce3b7ac74",
+      "archivePath": "unused-code/plan-edits/P1-08/src/ops/retention/retentionArchive.ts.landed",
+      "sha256": "5b0f86069ea1a4efe7f0810274ee9701c91f1a4d664da490caf82d308a423445"
+    },
+    {
+      "path": "src/org/orgAggregation.ts",
+      "issue": "GAP-WP05",
+      "baseCommit": "c71c28e2c10cad64c72600e042a2121b07b9b38e",
+      "archivePath": "unused-code/plan-edits/GAP-WP05/src/org/orgAggregation.ts.landed",
+      "sha256": "46bb1c70c55eda2a2f503e6ffaee003873880409c981f7f09477a397a14f3ab1"
+    },
+    {
+      "path": "src/org/orgRun.ts",
+      "issue": "P0-37",
+      "baseCommit": "ee0afc9bc6099ffbd57e4929b67dc81acdff1741",
+      "archivePath": "unused-code/plan-edits/P0-37/src/org/orgRun.ts.landed",
+      "sha256": "de6f8d70b8b3410b4476f1daa6169818bffbcf8e4fe131149df8a6c86cd2fcee"
+    },
+    {
+      "path": "src/org/orgSchema.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/org/orgSchema.ts.landed",
+      "sha256": "f7015e224378afe91406f387f52380ffaf474da9a23ee4b7d082298b35886b99"
+    },
+    {
+      "path": "src/org/orgScorecard.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/org/orgScorecard.ts.landed",
+      "sha256": "c8e87d768c30921a9032d5174335d46e4a0c7f5d9a9e8980bdf6fb64e1573c67"
+    },
+    {
+      "path": "src/outcomes/outcomeContractEngine.ts",
+      "issue": "P1-08",
+      "baseCommit": "42dfa8375817abd903bb4357c2ffcc0ce3b7ac74",
+      "archivePath": "unused-code/plan-edits/P1-08/src/outcomes/outcomeContractEngine.ts.landed",
+      "sha256": "51ba7ab24c1d190629f771ebab1e74780fea4b0a3012d26ff49fe1a34f72f24f"
+    },
+    {
+      "path": "src/pairing/lanMode.ts",
+      "issue": "P1-08",
+      "baseCommit": "42dfa8375817abd903bb4357c2ffcc0ce3b7ac74",
+      "archivePath": "unused-code/plan-edits/P1-08/src/pairing/lanMode.ts.landed",
+      "sha256": "fb677b55c759e9cf36a6fe5552245c3b2d3cad2efdcf38ebbe4bae1da43670a3"
+    },
+    {
+      "path": "src/pairing/pairingApi.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/pairing/pairingApi.ts.landed",
+      "sha256": "9fabef38494baa090d30775430a2260ed9830ff3920c27b3dac65306e92ef3d8"
+    },
+    {
+      "path": "src/passport/passportArtifact.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/passport/passportArtifact.ts.landed",
+      "sha256": "c9b5586946209565a8a0714a41161401868bb0b0078629b5eb7924af67c91533"
     },
     {
       "path": "src/passport/passportCli.ts",
@@ -297,6 +682,20 @@
       "sha256": "ddfbd29e5a0a69aa06be7648a4fcc44e3a474c6f6be8d5f7fd3f7756709d39bd"
     },
     {
+      "path": "src/passport/passportStore.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/passport/passportStore.ts.landed",
+      "sha256": "d4782f22d568b62f10d62d4eac7bd2fa73d4ab2ec67a9813c28c0cc6c961cab1"
+    },
+    {
+      "path": "src/passport/passportVerifier.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/passport/passportVerifier.ts.landed",
+      "sha256": "4c703c6d49ee7f17a2ca0ba8e0a2ce31b24412cbac066f6afdb8f5b6cce682a5"
+    },
+    {
       "path": "src/plugins/pluginPackage.ts",
       "issue": "P0-09",
       "baseCommit": "0b818f4f866dbd25226d5690cdf3f2e8f6837101",
@@ -311,6 +710,27 @@
       "sha256": "44236debfef1053173c2f5427e185141b566395b75608804fa8a08eb43c6724f"
     },
     {
+      "path": "src/plugins/pluginStore.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/plugins/pluginStore.ts.landed",
+      "sha256": "d8fcf3b4e4e7c79fa2841951a01adc7e6ca75feef40e38aba88784462aa1afd1"
+    },
+    {
+      "path": "src/prompt/promptPackArtifact.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/prompt/promptPackArtifact.ts.landed",
+      "sha256": "0cb3589919172da55dacb3eb2b1a02c4716230091ef4d5b7d28904b635dde674"
+    },
+    {
+      "path": "src/prompt/promptPackStore.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/prompt/promptPackStore.ts.landed",
+      "sha256": "85b638eaecab121b53687cfdd83b3d5faf16e3cb31567b0a3ab00e07ae13f1a3"
+    },
+    {
       "path": "src/prompt/promptPackVerifier.ts",
       "issue": "P0-09",
       "baseCommit": "0b818f4f866dbd25226d5690cdf3f2e8f6837101",
@@ -318,11 +738,116 @@
       "sha256": "0956285bdaf07793ecd40b5c70d9a47c3b2b9aa4762c65dfeeeb4df2abe254ad"
     },
     {
+      "path": "src/prompt/promptPolicyStore.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/prompt/promptPolicyStore.ts.landed",
+      "sha256": "535a626d6e1802003214e31dc98f61fedfa94f0e448205f43b446e3c011a0c7a"
+    },
+    {
+      "path": "src/receipts/receiptChain.ts",
+      "issue": "GAP-WP43",
+      "baseCommit": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "archivePath": "unused-code/plan-edits/GAP-WP43/src/receipts/receiptChain.ts.landed",
+      "sha256": "1e97a48511bfb7da0f7b0cfb885d1d25fec40bbf004138421fced0a609371cb9"
+    },
+    {
+      "path": "src/runtime/autonomyBoundary.ts",
+      "issue": "GAP-WP46",
+      "baseCommit": "2eb8d7e2fbffa3487c51bf0d961167829bfa0a18",
+      "archivePath": "unused-code/plan-edits/GAP-WP46/src/runtime/autonomyBoundary.ts.landed",
+      "sha256": "c0be8a3f5c3d172c92d78d6381bc696f819d678dd6c44ccd486942bed26d8529"
+    },
+    {
+      "path": "src/runtime/firewall.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/runtime/firewall.ts.landed",
+      "sha256": "922b0b6891478e7e234bc65eab67acf50d806f76d10ace5c560dbbd3cbd9fe05"
+    },
+    {
+      "path": "src/runtime/index.ts",
+      "issue": "GAP-WP46",
+      "baseCommit": "2eb8d7e2fbffa3487c51bf0d961167829bfa0a18",
+      "archivePath": "unused-code/plan-edits/GAP-WP46/src/runtime/index.ts.landed",
+      "sha256": "1ae6cde65db819929710dddc0c1a095c2ea112440f448f2a32c436655c3b5b50"
+    },
+    {
+      "path": "src/runtime/runManager.ts",
+      "issue": "GAP-WP46",
+      "baseCommit": "2eb8d7e2fbffa3487c51bf0d961167829bfa0a18",
+      "archivePath": "unused-code/plan-edits/GAP-WP46/src/runtime/runManager.ts.landed",
+      "sha256": "c73e94bb51e07e6f3fd2ace0e2bea154cc544d4c2bdbeb7d049650d4a0387236"
+    },
+    {
+      "path": "src/runtime/stateCheckpoint.ts",
+      "issue": "GAP-WP46",
+      "baseCommit": "2eb8d7e2fbffa3487c51bf0d961167829bfa0a18",
+      "archivePath": "unused-code/plan-edits/GAP-WP46/src/runtime/stateCheckpoint.ts.landed",
+      "sha256": "c34cdc21c3e05fa1be379e0d6b18b1b886c4508288065fcd51d8cc98bd83705e"
+    },
+    {
+      "path": "src/score/metricValidity.ts",
+      "issue": "GAP-WP05",
+      "baseCommit": "c71c28e2c10cad64c72600e042a2121b07b9b38e",
+      "archivePath": "unused-code/plan-edits/GAP-WP05/src/score/metricValidity.ts.landed",
+      "sha256": "69cdaaf21ca0f89cb225c3c7866f6705c77eec85a7ba4e835e69886ee9ea1082"
+    },
+    {
+      "path": "src/score/outputAttestation.ts",
+      "issue": "GAP-WP37",
+      "baseCommit": "7828ff53343de5ce2bef89bdad6b743ccf8a47b9",
+      "archivePath": "unused-code/plan-edits/GAP-WP37/src/score/outputAttestation.ts.landed",
+      "sha256": "1db61d14b575c1d73497c7eec18e807621081887bfa98ec39ba60bd65bb4e071"
+    },
+    {
       "path": "src/sdk/nativeAgentClient.ts",
       "issue": "P0-06",
       "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
       "archivePath": "unused-code/plan-edits/P0-06/src/sdk/nativeAgentClient.ts.landed",
       "sha256": "824475754824d4e4f4625b8545c30532418319583668401233c8383766edcf10"
+    },
+    {
+      "path": "src/session/spill/spillStore.ts",
+      "issue": "P2-01",
+      "baseCommit": "e89f4842892c1eae4e4acf6996c7d0d31a4b229e",
+      "archivePath": "unused-code/plan-edits/P2-01/src/session/spill/spillStore.ts.landed",
+      "sha256": "de1469cf447c9ccf8a22fef1ebcce716b3af7455b7127eb00ddc7cb5a7bc59e7"
+    },
+    {
+      "path": "src/setup/setupWizard.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/setup/setupWizard.ts.landed",
+      "sha256": "519a773d0a2b418ab62a063504fe6e640d45071f0ffc342e50782b3a85f2734a"
+    },
+    {
+      "path": "src/skills/skillPrompt.ts",
+      "issue": "GAP-WP40",
+      "baseCommit": "81a625bd4c1d53153c9757c97096d3ca01312e04",
+      "archivePath": "unused-code/plan-edits/GAP-WP40/src/skills/skillPrompt.ts.landed",
+      "sha256": "e0605cc537cebbc7fb87298acb9cf8e64a621057eea7f3bdc7abd6bc9678d8c5"
+    },
+    {
+      "path": "src/standard/externalEvidenceProfile.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/standard/externalEvidenceProfile.ts.landed",
+      "sha256": "788099197b820732d8e19693e95dec5b8070494ec208bd55a963dc47362058d5"
+    },
+    {
+      "path": "src/storage/blobs/blobStore.ts",
+      "issue": "P1-08",
+      "baseCommit": "42dfa8375817abd903bb4357c2ffcc0ce3b7ac74",
+      "archivePath": "unused-code/plan-edits/P1-08/src/storage/blobs/blobStore.ts.landed",
+      "sha256": "3be0ed5f62c63f9e0c98afa0dc3275fc7a495de8ee8276ad283b18b818fed277"
+    },
+    {
+      "path": "src/studio/apiDelegation.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/studio/apiDelegation.ts.landed",
+      "sha256": "fcf33617981088c66f3b6c8620948dc016eea953ca65fb942af294dbcfa0c38a"
     },
     {
       "path": "src/studio/studioServer.ts",
@@ -339,11 +864,39 @@
       "sha256": "3b2571d70377251e35752b9473ce7bbdc1f806441345e2f1be0f080c271cc33b"
     },
     {
+      "path": "src/toolhub/toolhubReceipts.ts",
+      "issue": "P2-02",
+      "baseCommit": "b657d0da08e29e3b30eef19988048b4426b30858",
+      "archivePath": "unused-code/plan-edits/P2-02/src/toolhub/toolhubReceipts.ts.landed",
+      "sha256": "4d58d0e910605459639e6ff5df9684ad6f2cc41afd4c529e4385649e26c46e3e"
+    },
+    {
       "path": "src/toolhub/toolhubValidators.ts",
       "issue": "P1-05",
       "baseCommit": "cd04963e99c096e7114734304524be6dae3470e8",
       "archivePath": "unused-code/plan-edits/P1-05/src/toolhub/toolhubValidators.ts.landed",
       "sha256": "3f3d55b71ab48147ea436d7b9b165ac75cbe8e7f2a40b6f95af40d7f5dfeb176"
+    },
+    {
+      "path": "src/tools/builtin/readBeforeEdit.ts",
+      "issue": "GAP-WP34",
+      "baseCommit": "7828ff53343de5ce2bef89bdad6b743ccf8a47b9",
+      "archivePath": "unused-code/plan-edits/GAP-WP34/src/tools/builtin/readBeforeEdit.ts.landed",
+      "sha256": "a776895cb04b874555caf063ede3f63450aa2e639f5a544e0144ecc53e21dda8"
+    },
+    {
+      "path": "src/transformation/transformAttestations.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/transformation/transformAttestations.ts.landed",
+      "sha256": "33ed3987cba89b9f29e1fd664fb5da6d480ac50c365d447b1eb710fd4b021fe3"
+    },
+    {
+      "path": "src/transformation/transformTasks.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/transformation/transformTasks.ts.landed",
+      "sha256": "fe4094ba31e9b451e459e0516b3a174bef21d016945aa0eac5342c6ae6cbe2c4"
     },
     {
       "path": "src/trust/trustConfig.ts",
@@ -360,6 +913,104 @@
       "sha256": "61ca2bd7d2394b3ef1d38666868c50f43698f642d84291e511baf9b603e11645"
     },
     {
+      "path": "src/value/valueStore.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/value/valueStore.ts.landed",
+      "sha256": "09811069c8c7f07f7011f9987ce6f777f37da28b2c3c0488d807d9b5beb0f40a"
+    },
+    {
+      "path": "src/watch/agentReadingTestLiveDrift.ts",
+      "issue": "AXE-23",
+      "baseCommit": "c71c28e2c10cad64c72600e042a2121b07b9b38e",
+      "archivePath": "unused-code/plan-edits/AXE-23/src/watch/agentReadingTestLiveDrift.ts.landed",
+      "sha256": "016ca52bb9325880177109033caa75e70cbc7194485857e47d1553b00d2d6e0c"
+    },
+    {
+      "path": "src/watch/aiReputationClaudeLiveDrift.ts",
+      "issue": "AXE-23",
+      "baseCommit": "c71c28e2c10cad64c72600e042a2121b07b9b38e",
+      "archivePath": "unused-code/plan-edits/AXE-23/src/watch/aiReputationClaudeLiveDrift.ts.landed",
+      "sha256": "13cfce44b753d8ed474ee3a1418fbc833edc663f3226608594005e929b6254df"
+    },
+    {
+      "path": "src/watch/awesomeAgentMemoryLiveDrift.ts",
+      "issue": "AXE-23",
+      "baseCommit": "c71c28e2c10cad64c72600e042a2121b07b9b38e",
+      "archivePath": "unused-code/plan-edits/AXE-23/src/watch/awesomeAgentMemoryLiveDrift.ts.landed",
+      "sha256": "0c1860b7274a88c499f3770eb742c2add5501b8183f50ead4622ad7f7d872d68"
+    },
+    {
+      "path": "src/watch/ctfAgentBenchmarkLiveDrift.ts",
+      "issue": "AXE-23",
+      "baseCommit": "c71c28e2c10cad64c72600e042a2121b07b9b38e",
+      "archivePath": "unused-code/plan-edits/AXE-23/src/watch/ctfAgentBenchmarkLiveDrift.ts.landed",
+      "sha256": "6fe1411d922dd58119d13a09be1628f7ee60fc689e958353d490d39fc9c3416b"
+    },
+    {
+      "path": "src/watch/darwinGodelMachineLiveDrift.ts",
+      "issue": "AXE-23",
+      "baseCommit": "c71c28e2c10cad64c72600e042a2121b07b9b38e",
+      "archivePath": "unused-code/plan-edits/AXE-23/src/watch/darwinGodelMachineLiveDrift.ts.landed",
+      "sha256": "aa193cbd3003b604aee8a38a279e6e0199fa788ca50a23939edeea396a962fea"
+    },
+    {
+      "path": "src/watch/driftMath.ts",
+      "issue": "AXE-23",
+      "baseCommit": "c71c28e2c10cad64c72600e042a2121b07b9b38e",
+      "archivePath": "unused-code/plan-edits/AXE-23/src/watch/driftMath.ts.landed",
+      "sha256": "645eb29d295ae3dd0e86b20e79b7fbde9f59da4807a56bb82668ef15a667c954"
+    },
+    {
+      "path": "src/watch/garageLiveDrift.ts",
+      "issue": "AXE-23",
+      "baseCommit": "c71c28e2c10cad64c72600e042a2121b07b9b38e",
+      "archivePath": "unused-code/plan-edits/AXE-23/src/watch/garageLiveDrift.ts.landed",
+      "sha256": "49cfc0e8e9ccea50fe8fec146f7586606309fcd849d8500dd76120568b269432"
+    },
+    {
+      "path": "src/watch/liveDriftAlerts.ts",
+      "issue": "AXE-23",
+      "baseCommit": "c71c28e2c10cad64c72600e042a2121b07b9b38e",
+      "archivePath": "unused-code/plan-edits/AXE-23/src/watch/liveDriftAlerts.ts.landed",
+      "sha256": "1ea774644363df1f4145408e19768dd05e96f2be74dc27ce73fcced80f45935b"
+    },
+    {
+      "path": "src/watch/liveDriftTypes.ts",
+      "issue": "AXE-23",
+      "baseCommit": "c71c28e2c10cad64c72600e042a2121b07b9b38e",
+      "archivePath": "unused-code/plan-edits/AXE-23/src/watch/liveDriftTypes.ts.landed",
+      "sha256": "58c67a8c97f02e279603aa333118b5ae15bea462844909535e91f34e083db5d6"
+    },
+    {
+      "path": "src/watch/llmFighterLiveDrift.ts",
+      "issue": "AXE-23",
+      "baseCommit": "c71c28e2c10cad64c72600e042a2121b07b9b38e",
+      "archivePath": "unused-code/plan-edits/AXE-23/src/watch/llmFighterLiveDrift.ts.landed",
+      "sha256": "476f353b9f9abdc11b9856b56082ebf622a8196fc58d579db604f882af2e0b02"
+    },
+    {
+      "path": "src/watch/railScoreLiveDrift.ts",
+      "issue": "AXE-23",
+      "baseCommit": "c71c28e2c10cad64c72600e042a2121b07b9b38e",
+      "archivePath": "unused-code/plan-edits/AXE-23/src/watch/railScoreLiveDrift.ts.landed",
+      "sha256": "479aa2bf8299a4e3951c85d95c4490d39be3616f6cd68a80ba5f818b82911282"
+    },
+    {
+      "path": "src/wire/wireListener.ts",
+      "issue": "GAP-WP43",
+      "baseCommit": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "archivePath": "unused-code/plan-edits/GAP-WP43/src/wire/wireListener.ts.landed",
+      "sha256": "23973858e390e6edc4d669a9083a8d56cc2403b346a4432880d8a02878d4bc06"
+    },
+    {
+      "path": "src/workorders/workorderEngine.ts",
+      "issue": "P1-08",
+      "baseCommit": "42dfa8375817abd903bb4357c2ffcc0ce3b7ac74",
+      "archivePath": "unused-code/plan-edits/P1-08/src/workorders/workorderEngine.ts.landed",
+      "sha256": "ced036fc4c9be0c9e2ca531200eb74b4b824610659eeb0547475ef7d6b3ac38f"
+    },
+    {
       "path": "src/workspace.ts",
       "issue": "P1-25",
       "baseCommit": "e263c5718df833f7e35d63012a9999faa949f607",
@@ -367,11 +1018,25 @@
       "sha256": "3357bbc8d9bf0c0b4d0a4a4768fb5206baac2dac7d97e4415c534824e8ff2661"
     },
     {
+      "path": "src/workspaces/workspaceRouter.ts",
+      "issue": "P0-30",
+      "baseCommit": "a1aef9d69c8cf7a362f158b95e5b0568e564f1b1",
+      "archivePath": "unused-code/plan-edits/P0-30/src/workspaces/workspaceRouter.ts.landed",
+      "sha256": "c06242bc22da1063a69649d6cdaf7e11d06e6c853df7845bb376a1ca8167560e"
+    },
+    {
       "path": "tests/apiRouterResponseParity.test.ts",
       "issue": "P0-23",
       "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
       "archivePath": "unused-code/plan-edits/P0-23/tests/apiRouterResponseParity.test.ts.landed",
       "sha256": "cc00ec46b8f325a35b7d216c9fdff449087729212d83c86f15f27a1798d9081a"
+    },
+    {
+      "path": "tests/controlHttpResponsesParity.test.ts",
+      "issue": "P1-55",
+      "baseCommit": "2572837113a903c9d8428be7d528b0a08b29b61d",
+      "archivePath": "unused-code/plan-edits/P1-55/tests/controlHttpResponsesParity.test.ts.landed",
+      "sha256": "eb78cebc58ba83070d181e81826218ab1154ffc0807bd185d5123d6afd9978a6"
     },
     {
       "path": "tests/privateModuleHelperVisibility.test.ts",
@@ -386,6 +1051,13 @@
       "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
       "archivePath": "unused-code/plan-edits/P0-23/tests/studioRouteRoleContextParity.test.ts.landed",
       "sha256": "0cfcfb81e9424e3e18c0db20e77ae68a41c37f4cc185e88ad00222262f3947b1"
+    },
+    {
+      "path": "vitest.config.ts",
+      "issue": "P0-37",
+      "baseCommit": "ee0afc9bc6099ffbd57e4929b67dc81acdff1741",
+      "archivePath": "unused-code/plan-edits/P0-37/vitest.config.ts.landed",
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
     }
   ]
 }

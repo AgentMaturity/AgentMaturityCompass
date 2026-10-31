@@ -1,0 +1,9 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`gaps and not-evaluated categories (P0-17) > failed categories are gaps; not-evaluated categories are listed apart and earn nothing 1`] = `
+[
+  "**Claim:** Self-reported · **Result:** fail · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved",
+  "- SOC 2 (Trust Services Categories): **Claim:** Self-reported · **Result:** fail · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved",
+  "- EU AI Act (Regulation (EU) 2024/1689) — High-Risk AI Obligations: **Claim:** Observed · **Result:** fail · **Evidence:** sufficient · **Enforcement:** observed · **Review:** pending · **Applicability:** unresolved",
+]
+`;

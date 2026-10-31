@@ -1,7 +1,7 @@
 # GAP-0596 source review: shipfastlabs/pest-plugin-evals
 
 Date: 2026-06-20
-Worktree: `/Users/sid/AgentMaturityCompass-worktrees/gap-0596`
+Worktree: `~/AgentMaturityCompass-worktrees/gap-0596`
 Branch: `agent/gap-0596`
 
 ## Relevance decision

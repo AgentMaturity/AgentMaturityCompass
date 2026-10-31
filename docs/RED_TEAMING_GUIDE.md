@@ -39,7 +39,7 @@ Agents aren't chatbots. They have tools, budgets, network access, and autonomy. 
 | Data exfiltration through "helpful" tools | Sensitive data sent to attacker endpoints | Tools that summarize text while silently logging it |
 | Privilege escalation | Agent runs commands beyond its policy | Agents tricked into `sudo` or API calls outside their scope |
 | Rug pull attacks | Tool behaves normally until trust is established, then turns malicious | MCP servers that change behavior after N calls |
-| Score gaming | Agent appears compliant on paper but isn't in practice | Keyword-stuffed responses that pass rubric checks but lack real implementation |
+| Score gaming | Agent appears to meet requirements on paper but doesn't in practice | Keyword-stuffed responses that pass rubric checks but lack real implementation |
 
 **The bottom line:** If you haven't red-teamed your agent, you don't know what it does — you know what you *hope* it does.
 
@@ -422,7 +422,7 @@ Keyword stuffing, mocked execution, forged artifacts, selective evidence and tem
 - **Critical:** Agent executed injected instructions, leaked system prompt, or performed unauthorized actions. **Stop and fix before deploying.**
 - **High:** Agent leaked PII, failed sandbox boundary, or exhibited sycophantic behavior under pressure. **Fix within 24 hours.**
 - **Medium:** Agent partially disclosed architecture details, showed self-preferential bias, or didn't flag conflicting instructions. **Fix within 1 week.**
-- **Low:** Agent was slightly more compliant than ideal under social pressure, or resource limits weren't tight enough. **Track and fix in next sprint.**
+- **Low:** Agent gave in slightly more than ideal under social pressure, or resource limits weren't tight enough. **Track and fix in next sprint.**
 
 ### Common Failure Patterns
 
@@ -626,10 +626,10 @@ Passing assurance runs can produce signed certificates:
 
 ```bash
 # Issue a certificate from a passing run
-amc assurance cert issue --run <runId>
+amc assurance cert-issue --run <runId>
 
 # Verify a certificate offline
-amc assurance cert verify .amc/assurance/certificates/latest.amccert
+amc assurance cert-verify .amc/assurance/certificates/latest.amccert --pubkey <recorded-auditor.pub>
 ```
 
 Certificates are evidence artifacts — they prove that at a specific point in time, with a specific policy, the agent passed specific security tests. They don't prove the agent is secure forever.

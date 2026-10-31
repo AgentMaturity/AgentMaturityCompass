@@ -3,14 +3,18 @@ import { canonicalMetadataForHash } from "../ledger/ledger.js";
 import { extractEnvelope, SESSION_GENESIS } from "../session/sessionTypes.js";
 import { sha256Hex } from "../utils/hash.js";
 import type { EvidenceEvent } from "../types.js";
+import { operationalEvidenceProblems, type OperationalEvidenceOptions } from "../keys/operationalLedgerReader.js";
 
 export const ACP_MAX_SESSION_ROWS = 100_000;
 export const ACP_MAX_TURN_UPDATE_BYTES = 8 * 1024 * 1024;
 
 /** Authenticate each newly committed row before projecting it as native output. */
-export function validateAcpCommittedTail(workspace: string, sessionId: string, events: readonly EvidenceEvent[], from: number, previousHash: string | null): string | null {
+export function validateAcpCommittedTail(workspace: string, sessionId: string, events: readonly EvidenceEvent[], from: number, previousHash: string | null, options: OperationalEvidenceOptions = {}): string | null {
   if (events.length > ACP_MAX_SESSION_ROWS || !Number.isSafeInteger(from) || from > events.length || from < 0) throw new Error("ACP session history exceeds its bound or was truncated.");
   if ((from === 0 && previousHash !== null) || (from > 0 && (previousHash === null || events[from - 1]?.event_hash !== previousHash))) throw new Error("ACP's previously observed session head changed.");
+  // Re-admit the observed prefix even when no new row arrived: archived issuers and the global quota remain relevant.
+  const delegated = operationalEvidenceProblems(workspace, events, options);
+  if (delegated.length) throw new Error(`ACP committed delegation invalid: ${delegated.slice(0, 3).join("; ")}`);
   if (from === events.length) return previousHash;
   const keys = getPublicKeyHistory(workspace, "monitor");
   let previous = from > 0 ? events[from - 1]!.event_hash : SESSION_GENESIS;

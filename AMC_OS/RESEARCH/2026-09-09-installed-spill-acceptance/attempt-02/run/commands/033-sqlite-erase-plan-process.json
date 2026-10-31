@@ -2,11 +2,11 @@
   "label": "033-sqlite-erase-plan",
   "command": [
     "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-    "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+    "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
     "spill",
     "erase",
     "--workspace",
-    "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+    "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
     "--expect-monitor",
     "7f3af702e029d3cee4468b300a91aa726616360bce94f0ff9c79f6ecfe2f574d",
     "--json",

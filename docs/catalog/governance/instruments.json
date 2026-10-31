@@ -1,0 +1,415 @@
+{
+  "station": "governance",
+  "support": "experimental",
+  "review": "pending",
+  "marketOrder": [
+    "US",
+    "EU",
+    "RoW",
+    "Standard"
+  ],
+  "instruments": [
+    {
+      "id": "governance-omb-m25-21",
+      "market": "US",
+      "instrument": "OMB M-25-21",
+      "domains": [
+        "governance.public-services"
+      ],
+      "status": "unverified",
+      "reverify": true,
+      "s5RegisterId": "us-omb-m-25-21",
+      "sourceLocator": "https://www.whitehouse.gov/omb/information-resources/guidance/memoranda/",
+      "sourceLocatorProvenance": "src/compliance/regulatory/register.json#us-omb-m-25-21",
+      "sourceReadInThisItem": false,
+      "retrievedAt": null,
+      "contentHash": null,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "legalReviewer": null,
+      "note": "Spec candidate for high-impact agency AI, inventory, oversight, review and appeal. Dates and applicability remain unverified here. No primary text was read or hashed in this item; source locators and inherited register status do not establish a fresh read or legal interpretation."
+    },
+    {
+      "id": "governance-omb-m25-22",
+      "market": "US",
+      "instrument": "OMB M-25-22",
+      "domains": [
+        "governance.public-services"
+      ],
+      "status": "unverified",
+      "reverify": true,
+      "s5RegisterId": "us-omb-m-25-22",
+      "sourceLocator": "https://www.whitehouse.gov/omb/information-resources/guidance/memoranda/",
+      "sourceLocatorProvenance": "src/compliance/regulatory/register.json#us-omb-m-25-22",
+      "sourceReadInThisItem": false,
+      "retrievedAt": null,
+      "contentHash": null,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "legalReviewer": null,
+      "note": "Spec candidate for restrictions on vendor training with non-public agency data and procurement terms. A canary fixture does not prove the complete contract. No primary text was read or hashed in this item; source locators and inherited register status do not establish a fresh read or legal interpretation."
+    },
+    {
+      "id": "governance-omb-m26-04",
+      "market": "US",
+      "instrument": "OMB M-26-04",
+      "domains": [
+        "governance.public-services"
+      ],
+      "status": "unverified",
+      "reverify": true,
+      "s5RegisterId": "us-omb-m-26-04",
+      "sourceLocator": "https://www.whitehouse.gov/omb/information-resources/guidance/memoranda/",
+      "sourceLocatorProvenance": "src/compliance/regulatory/register.json#us-omb-m-26-04",
+      "sourceReadInThisItem": false,
+      "retrievedAt": null,
+      "contentHash": null,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "legalReviewer": null,
+      "note": "Spec procurement-document assertions require comparison with the actual instrument, whose inherited S5 title concerns public trust and unbiased AI principles. No asserted deadline is encoded as verified. No primary text was read or hashed in this item; source locators and inherited register status do not establish a fresh read or legal interpretation."
+    },
+    {
+      "id": "governance-fedramp-20x",
+      "market": "US",
+      "instrument": "FedRAMP 20x AI prioritization",
+      "domains": [
+        "governance.public-services"
+      ],
+      "status": "unverified",
+      "reverify": true,
+      "s5RegisterId": null,
+      "sourceLocator": null,
+      "sourceLocatorProvenance": null,
+      "sourceReadInThisItem": false,
+      "retrievedAt": null,
+      "contentHash": null,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "legalReviewer": null,
+      "note": "No matching S5 entry exists on this base. Program timing, identity requirements and no-training scope remain candidate claims from the spec. No primary text was read or hashed in this item; source locators and inherited register status do not establish a fresh read or legal interpretation."
+    },
+    {
+      "id": "governance-california-ab302",
+      "market": "US",
+      "instrument": "California AB 302",
+      "domains": [
+        "governance.public-services"
+      ],
+      "status": "unverified",
+      "reverify": true,
+      "s5RegisterId": null,
+      "sourceLocator": null,
+      "sourceLocatorProvenance": null,
+      "sourceReadInThisItem": false,
+      "retrievedAt": null,
+      "contentHash": null,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "legalReviewer": null,
+      "note": "The spec describes an agency inventory duty; no matching S5 entry, source locator or verified date is available on this base. No primary text was read or hashed in this item; source locators and inherited register status do not establish a fresh read or legal interpretation."
+    },
+    {
+      "id": "governance-ny-loading-act",
+      "market": "US",
+      "instrument": "New York LOADinG Act",
+      "domains": [
+        "governance.public-services"
+      ],
+      "status": "unverified",
+      "reverify": true,
+      "s5RegisterId": null,
+      "sourceLocator": null,
+      "sourceLocatorProvenance": null,
+      "sourceReadInThisItem": false,
+      "retrievedAt": null,
+      "contentHash": null,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "legalReviewer": null,
+      "note": "The spec describes human review and periodic impact assessments. Chapter, filing period and application require primary-source verification; no matching S5 entry exists. No primary text was read or hashed in this item; source locators and inherited register status do not establish a fresh read or legal interpretation."
+    },
+    {
+      "id": "governance-aba-opinion-512",
+      "market": "US",
+      "instrument": "ABA Formal Opinion 512",
+      "domains": [
+        "governance.law-rights-democracy"
+      ],
+      "status": "unverified",
+      "reverify": true,
+      "s5RegisterId": null,
+      "sourceLocator": null,
+      "sourceLocatorProvenance": null,
+      "sourceReadInThisItem": false,
+      "retrievedAt": null,
+      "contentHash": null,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "legalReviewer": null,
+      "note": "The spec records a blocked source and requires re-verification. The host is not on the shared official-host list. No substituted authority, URL or review is supplied. No primary text was read or hashed in this item; source locators and inherited register status do not establish a fresh read or legal interpretation."
+    },
+    {
+      "id": "governance-california-court-rule-10430",
+      "market": "US",
+      "instrument": "California Rule of Court 10.430",
+      "domains": [
+        "governance.law-rights-democracy"
+      ],
+      "status": "unverified",
+      "reverify": true,
+      "s5RegisterId": null,
+      "sourceLocator": null,
+      "sourceLocatorProvenance": null,
+      "sourceReadInThisItem": false,
+      "retrievedAt": null,
+      "contentHash": null,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "legalReviewer": null,
+      "note": "The spec names this court rule. Its content, scope and stated start date remain unverified; no matching S5 entry or invented source locator is supplied. No primary text was read or hashed in this item; source locators and inherited register status do not establish a fresh read or legal interpretation."
+    },
+    {
+      "id": "governance-cmmc",
+      "market": "US",
+      "instrument": "CMMC (32 CFR 170)",
+      "domains": [
+        "governance.defense"
+      ],
+      "status": "unverified",
+      "reverify": true,
+      "s5RegisterId": null,
+      "sourceLocator": null,
+      "sourceLocatorProvenance": null,
+      "sourceReadInThisItem": false,
+      "retrievedAt": null,
+      "contentHash": null,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "legalReviewer": null,
+      "note": "The spec alleges Phase II was suspended on 13 Jul 2026. That suspension claim and the current phase schedule are unverified here. No Phase II duty is treated as binding; the local CUI fixture is a technical boundary example only. No primary text was read or hashed in this item; source locators and inherited register status do not establish a fresh read or legal interpretation."
+    },
+    {
+      "id": "governance-dfars-7012",
+      "market": "US",
+      "instrument": "DFARS 252.204-7012",
+      "domains": [
+        "governance.defense"
+      ],
+      "status": "unverified",
+      "reverify": true,
+      "s5RegisterId": null,
+      "sourceLocator": null,
+      "sourceLocatorProvenance": null,
+      "sourceReadInThisItem": false,
+      "retrievedAt": null,
+      "contentHash": null,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "legalReviewer": null,
+      "note": "CUI-boundary and reporting assertions from the spec require a primary-source and contract applicability review. No matching S5 entry exists on this base. No primary text was read or hashed in this item; source locators and inherited register status do not establish a fresh read or legal interpretation."
+    },
+    {
+      "id": "governance-eu-ai-act",
+      "market": "EU",
+      "instrument": "EU AI Act",
+      "domains": [
+        "governance.public-services",
+        "governance.law-rights-democracy",
+        "governance.defense"
+      ],
+      "status": "unverified",
+      "reverify": true,
+      "s5RegisterId": "eu-ai-act",
+      "sourceLocator": "https://publications.europa.eu/resource/celex/32024R1689",
+      "sourceLocatorProvenance": "src/compliance/regulatory/register.json#eu-ai-act",
+      "sourceReadInThisItem": false,
+      "retrievedAt": null,
+      "contentHash": null,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "legalReviewer": null,
+      "note": "Inherited S5 and source-question records refer to deployment, FRIA, registration, transparency and explanation provisions. This item does not re-read provisions, settle legal application dates or finalize EU dated profiles. No primary text was read or hashed in this item; source locators and inherited register status do not establish a fresh read or legal interpretation."
+    },
+    {
+      "id": "governance-eu-gdpr-art22",
+      "market": "EU",
+      "instrument": "GDPR Article 22",
+      "domains": [
+        "governance.law-rights-democracy"
+      ],
+      "status": "unverified",
+      "reverify": true,
+      "s5RegisterId": "eu-gdpr",
+      "sourceLocator": "https://commission.europa.eu/law/law-topic/data-protection/legal-framework-eu-data-protection_en",
+      "sourceLocatorProvenance": "src/compliance/regulatory/register.json#eu-gdpr",
+      "sourceReadInThisItem": false,
+      "retrievedAt": null,
+      "contentHash": null,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "legalReviewer": null,
+      "note": "The spec connects automated-decision safeguards and explanation requests. The routing fixture does not determine lawful eligibility, exceptions or explanation substance. No primary text was read or hashed in this item; source locators and inherited register status do not establish a fresh read or legal interpretation."
+    },
+    {
+      "id": "governance-eu-dsa",
+      "market": "EU",
+      "instrument": "Digital Services Act",
+      "domains": [
+        "governance.law-rights-democracy"
+      ],
+      "status": "unverified",
+      "reverify": true,
+      "s5RegisterId": "eu-dsa",
+      "sourceLocator": "https://publications.europa.eu/resource/celex/32022R2065",
+      "sourceLocatorProvenance": "src/compliance/regulatory/register.json#eu-dsa",
+      "sourceReadInThisItem": false,
+      "retrievedAt": null,
+      "contentHash": null,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "legalReviewer": null,
+      "note": "The inherited S5 instrument is a locator only for this draft. No new platform duty or full platform coverage is inferred from a citation or routing test. No primary text was read or hashed in this item; source locators and inherited register status do not establish a fresh read or legal interpretation."
+    },
+    {
+      "id": "governance-cjeu-c203-22",
+      "market": "EU",
+      "instrument": "CJEU C-203/22",
+      "domains": [
+        "governance.law-rights-democracy"
+      ],
+      "status": "unverified",
+      "reverify": true,
+      "s5RegisterId": null,
+      "sourceLocator": null,
+      "sourceLocatorProvenance": null,
+      "sourceReadInThisItem": false,
+      "retrievedAt": null,
+      "contentHash": null,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "legalReviewer": null,
+      "note": "The spec names this case in connection with an explanation of the procedure and principles actually applied. Its source, scope and interpretation are unverified here. No primary text was read or hashed, and no authority facts, source locator or legal conclusion are supplied."
+    },
+    {
+      "id": "governance-uk-atrs",
+      "market": "RoW",
+      "instrument": "UK Algorithmic Transparency Recording Standard",
+      "domains": [
+        "governance.public-services"
+      ],
+      "status": "unverified",
+      "reverify": true,
+      "s5RegisterId": null,
+      "sourceLocator": null,
+      "sourceLocatorProvenance": null,
+      "sourceReadInThisItem": false,
+      "retrievedAt": null,
+      "contentHash": null,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "legalReviewer": null,
+      "note": "The spec describes agency transparency records. UK overlays belong to P3-10; this draft records only an unverified dependency, with no matching S5 entry. No primary text was read or hashed in this item; source locators and inherited register status do not establish a fresh read or legal interpretation."
+    },
+    {
+      "id": "governance-uk-ai-playbook",
+      "market": "RoW",
+      "instrument": "UK AI Playbook",
+      "domains": [
+        "governance.public-services"
+      ],
+      "status": "unverified",
+      "reverify": true,
+      "s5RegisterId": null,
+      "sourceLocator": null,
+      "sourceLocatorProvenance": null,
+      "sourceReadInThisItem": false,
+      "retrievedAt": null,
+      "contentHash": null,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "legalReviewer": null,
+      "note": "The spec supplies an update claim that is not verified here. UK applicability and content remain P3-10 work; no matching S5 entry exists. No primary text was read or hashed in this item; source locators and inherited register status do not establish a fresh read or legal interpretation."
+    },
+    {
+      "id": "governance-india-ai-guidelines",
+      "market": "RoW",
+      "instrument": "India AI Governance Guidelines",
+      "domains": [
+        "governance.public-services"
+      ],
+      "status": "unverified",
+      "reverify": true,
+      "s5RegisterId": null,
+      "sourceLocator": null,
+      "sourceLocatorProvenance": null,
+      "sourceReadInThisItem": false,
+      "retrievedAt": null,
+      "contentHash": null,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "legalReviewer": null,
+      "note": "The spec names guidelines and a publication claim. Neither is newly read or verified here; India overlay work belongs to P3-09 and no matching S5 entry exists. No primary text was read or hashed in this item; source locators and inherited register status do not establish a fresh read or legal interpretation."
+    },
+    {
+      "id": "governance-nist-sp800171",
+      "market": "Standard",
+      "instrument": "NIST SP 800-171",
+      "domains": [
+        "governance.defense"
+      ],
+      "status": "unverified",
+      "reverify": true,
+      "s5RegisterId": null,
+      "sourceLocator": null,
+      "sourceLocatorProvenance": null,
+      "sourceReadInThisItem": false,
+      "retrievedAt": null,
+      "contentHash": null,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "legalReviewer": null,
+      "note": "Edition, CUI scope and contractual incorporation require verification. No matching S5 entry is available; a boundary fixture does not establish the complete standard. No primary text was read or hashed in this item; source locators and inherited register status do not establish a fresh read or legal interpretation."
+    },
+    {
+      "id": "governance-nist-sp80053",
+      "market": "Standard",
+      "instrument": "NIST SP 800-53 Rev. 5",
+      "domains": [
+        "governance.public-services"
+      ],
+      "status": "unverified",
+      "reverify": true,
+      "s5RegisterId": "us-nist-sp-800-53-cosais",
+      "sourceLocator": "https://csrc.nist.gov/projects/cosais",
+      "sourceLocatorProvenance": "src/compliance/regulatory/register.json#us-nist-sp-800-53-cosais",
+      "sourceReadInThisItem": false,
+      "retrievedAt": null,
+      "contentHash": null,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "legalReviewer": null,
+      "note": "The active generated deep questions refer to FedRAMP/FISMA control families. The inherited S5 entry covers the NIST publication and COSAiS context, not a new authorization result. No primary text was read or hashed in this item; source locators and inherited register status do not establish a fresh read or legal interpretation."
+    },
+    {
+      "id": "governance-nist-sp80063b4",
+      "market": "Standard",
+      "instrument": "NIST SP 800-63B-4",
+      "domains": [
+        "governance.law-rights-democracy"
+      ],
+      "status": "unverified",
+      "reverify": true,
+      "s5RegisterId": "us-nist-sp-800-63-4",
+      "sourceLocator": "https://csrc.nist.gov/pubs/sp/800/63/b/4/final",
+      "sourceLocatorProvenance": "src/compliance/regulatory/register.json#us-nist-sp-800-63-4",
+      "sourceReadInThisItem": false,
+      "retrievedAt": null,
+      "contentHash": null,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "legalReviewer": null,
+      "note": "The active hand-written deep question names authentication assurance. The instrument is not exercised by the six new signature controls. No primary text was read or hashed in this item; source locators and inherited register status do not establish a fresh read or legal interpretation."
+    }
+  ]
+}

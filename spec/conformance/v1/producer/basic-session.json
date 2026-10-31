@@ -1,0 +1,9 @@
+{
+  "scenario": "basic-session",
+  "role": "producer",
+  "sessionId": "conformance-session-1",
+  "actions": [
+    { "tool": "Bash", "input": "echo hello", "output": "hello" },
+    { "tool": "Read", "input": "README.md", "output": "# Example" }
+  ]
+}

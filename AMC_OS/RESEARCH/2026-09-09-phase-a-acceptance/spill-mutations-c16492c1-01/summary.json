@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "source": "c16492c10592112fe610bd2e59f216f8f7f310b4",
   "authoringBase": "d9d55034b1e856513eea1c68b09e50ecd433063e",
-  "repository": "/Users/sid/AgentMaturityCompass",
+  "repository": "~/AgentMaturityCompass",
   "clone": "/private/tmp/amc-c16492c1-spill-mutations-01/clone",
   "output": "/private/tmp/amc-c16492c1-spill-mutations-01",
   "status": "incomplete",

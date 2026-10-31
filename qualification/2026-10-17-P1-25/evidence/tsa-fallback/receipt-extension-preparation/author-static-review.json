@@ -1,0 +1,17 @@
+{
+  "schema": "p125f-extension-author-static-review/1",
+  "at": "2026-10-16T22:24:31.848527+00:00",
+  "independentReviewClaim": false,
+  "allHelperTextRead": true,
+  "boundOldPacketFiles": 613,
+  "oldArtifactIndexExact": true,
+  "oldCommands76AndOrderedPins676Required": true,
+  "actualControlsAndMasksUnfilled": true,
+  "readyForPrivateAssembly": false,
+  "codeInertAndLiteralGuardToolsHashOnly": true,
+  "all128BeforeAssemblyThenThreeSuccessorsAnd125ExactRequired": true,
+  "noExecutionParsingImportCompilation": true,
+  "sourceIndexQaWrites": false,
+  "rootReviewRequired": true,
+  "blockers": []
+}

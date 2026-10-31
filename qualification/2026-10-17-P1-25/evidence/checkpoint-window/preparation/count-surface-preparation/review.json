@@ -1,0 +1,28 @@
+{
+  "schema": "p125-checkpoint-count-surface-proposal-read-review/1",
+  "at": "2026-10-16T23:28:45.135771+00:00",
+  "blockers": [],
+  "allReadsFinished": true,
+  "sourceHead": "3468e29027c32209a5f794b7ffea3f1565de490e",
+  "branch": "codex/p1-25-checkpoint-qualification",
+  "prospectiveInventory": [
+    1694,
+    1695
+  ],
+  "pathCount": 10,
+  "numericSpans": 15,
+  "allOtherAuthoredBytesExactInCandidate": true,
+  "all1840PinsAnd184TargetedStatusesRead": true,
+  "all17DistinctFullHistoryAuthoritiesRead": true,
+  "all228GitChildrenNatural0": true,
+  "solePrimaryOuterScanYieldedThenNaturalExit0": true,
+  "all20Variants36HeldNineNativeAndR18Exact": true,
+  "initial142Other141ExactAndOwnGrantSuccessorExplicit": true,
+  "sourceStatusActualThreeAdmittedTestPathsOnlyAtRead": true,
+  "actualCountRed": null,
+  "generatorExecuted": false,
+  "lostOldScanAndFailedFilenameLookupExcluded": true,
+  "largeObservationsRawOriginalsPrivateOnly": true,
+  "noSourceIndexQaOrRuntimeWrites": true,
+  "rootNext": "Bind actual count RED and refreshed hosted/D15/freeze before separate count admission; root alone runs the unchanged generator and checks exact15-span/10-file output. No prospective output or plan completion credit."
+}

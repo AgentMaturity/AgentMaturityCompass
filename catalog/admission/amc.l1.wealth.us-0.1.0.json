@@ -1,0 +1,1035 @@
+{
+  "reportVersion": 1,
+  "checker": {
+    "name": "amc-catalog-check",
+    "version": "1.2.0"
+  },
+  "checkedAt": "2026-10-18T11:52:19.527Z",
+  "catalog": {
+    "id": "amc.catalog",
+    "version": "0.1.0",
+    "digest": "sha256:99a7cf3f9c9fde698da2f4a8845e5c417ab3d0116b04d6ecd99f682d9aa81fba"
+  },
+  "pack": {
+    "id": "amc.l1.wealth.us",
+    "version": "0.1.0",
+    "digest": "sha256:295f45afbcb1f0b896126c55d90da1ec2973f73f6e6ef3047b69f57b91f96d8f",
+    "declaredSupport": "experimental"
+  },
+  "criteria": [
+    {
+      "criterion": 1,
+      "title": "Manifest metadata and a reproducible digest",
+      "kind": "mechanical",
+      "status": "not_met",
+      "checked": 7,
+      "findings": [
+        {
+          "code": "ADM1_COMPILER_INCOMPATIBLE",
+          "severity": "error",
+          "controlId": null,
+          "path": "layers/l1-wealth-us/pack.yaml#/compilerCompat",
+          "message": "compilerCompat \"^0.1.0\" is not satisfied by the running compiler 1.2.0"
+        }
+      ],
+      "evidence": [
+        {
+          "kind": "lockfile",
+          "ref": "packs[amc.l1.wealth.us]",
+          "sha256": "295f45afbcb1f0b896126c55d90da1ec2973f73f6e6ef3047b69f57b91f96d8f"
+        }
+      ]
+    },
+    {
+      "criterion": 2,
+      "title": "Citations verified and legally reviewed",
+      "kind": "mixed",
+      "status": "not_met",
+      "checked": 15,
+      "findings": [
+        {
+          "code": "ADM2_CITATION_UNVERIFIED",
+          "severity": "error",
+          "controlId": "L1-WLT-US-01",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-01.yaml#/citations/0",
+          "message": "us-reg-e-1005-2-m: retrieval is not verified with a content hash"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L1-WLT-US-01",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-01.yaml#/citations/0",
+          "message": "us-reg-e-1005-2-m: no legal review is declared"
+        },
+        {
+          "code": "ADM2_CITATION_UNVERIFIED",
+          "severity": "error",
+          "controlId": "L1-WLT-US-01",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-01.yaml#/citations/1",
+          "message": "us-reg-e-comment-2-m-3: retrieval is not verified with a content hash"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L1-WLT-US-01",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-01.yaml#/citations/1",
+          "message": "us-reg-e-comment-2-m-3: no legal review is declared"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L1-WLT-US-04",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-04.yaml#/citations/0",
+          "message": "us-bsa-1020-320-e: no legal review is declared"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L1-WLT-US-05",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-05.yaml#/citations/0",
+          "message": "us-bsa-1020-320-b-3: no legal review is declared"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L1-WLT-US-05",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-05.yaml#/citations/1",
+          "message": "us-bsa-1020-320-d: no legal review is declared"
+        },
+        {
+          "code": "ADM2_CITATION_UNVERIFIED",
+          "severity": "error",
+          "controlId": "L1-WLT-US-06",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-06.yaml#/citations/0",
+          "message": "us-glba-314-4-c-8: retrieval is not verified with a content hash"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L1-WLT-US-06",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-06.yaml#/citations/0",
+          "message": "us-glba-314-4-c-8: no legal review is declared"
+        },
+        {
+          "code": "ADM2_CITATION_UNVERIFIED",
+          "severity": "error",
+          "controlId": "L1-WLT-US-07",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-07.yaml#/citations/0",
+          "message": "us-glba-314-4-c-5: retrieval is not verified with a content hash"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L1-WLT-US-07",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-07.yaml#/citations/0",
+          "message": "us-glba-314-4-c-5: no legal review is declared"
+        },
+        {
+          "code": "ADM2_CITATION_UNVERIFIED",
+          "severity": "error",
+          "controlId": "L1-WLT-US-07",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-07.yaml#/citations/1",
+          "message": "us-nydfs-500-13-inventory: retrieval is not verified with a content hash"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L1-WLT-US-07",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-07.yaml#/citations/1",
+          "message": "us-nydfs-500-13-inventory: no legal review is declared"
+        },
+        {
+          "code": "ADM2_CITATION_UNVERIFIED",
+          "severity": "error",
+          "controlId": "L1-WLT-US-07",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-07.yaml#/citations/2",
+          "message": "us-nydfs-500-12-mfa: retrieval is not verified with a content hash"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L1-WLT-US-07",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-07.yaml#/citations/2",
+          "message": "us-nydfs-500-12-mfa: no legal review is declared"
+        },
+        {
+          "code": "ADM2_CITATION_UNVERIFIED",
+          "severity": "error",
+          "controlId": "L1-WLT-US-08",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-08.yaml#/citations/0",
+          "message": "us-nydfs-ai-letter-extraction: retrieval is not verified with a content hash"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L1-WLT-US-08",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-08.yaml#/citations/0",
+          "message": "us-nydfs-ai-letter-extraction: no legal review is declared"
+        },
+        {
+          "code": "ADM2_CITATION_UNVERIFIED",
+          "severity": "error",
+          "controlId": "L1-WLT-US-09",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-09.yaml#/citations/0",
+          "message": "us-glba-314-4-f: retrieval is not verified with a content hash"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L1-WLT-US-09",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-09.yaml#/citations/0",
+          "message": "us-glba-314-4-f: no legal review is declared"
+        },
+        {
+          "code": "ADM2_CITATION_UNVERIFIED",
+          "severity": "error",
+          "controlId": "L1-WLT-US-09",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-09.yaml#/citations/1",
+          "message": "us-sr-23-4: retrieval is not verified with a content hash"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L1-WLT-US-09",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-09.yaml#/citations/1",
+          "message": "us-sr-23-4: no legal review is declared"
+        },
+        {
+          "code": "ADM2_CITATION_UNVERIFIED",
+          "severity": "error",
+          "controlId": "L1-WLT-US-09",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-09.yaml#/citations/2",
+          "message": "us-tprm-proposal-2026: retrieval is not verified with a content hash"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L1-WLT-US-09",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-09.yaml#/citations/2",
+          "message": "us-tprm-proposal-2026: no legal review is declared"
+        },
+        {
+          "code": "ADM2_CITATION_UNVERIFIED",
+          "severity": "error",
+          "controlId": "L1-WLT-US-10",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-10.yaml#/citations/0",
+          "message": "us-sr-26-2-models: retrieval is not verified with a content hash"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L1-WLT-US-10",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-10.yaml#/citations/0",
+          "message": "us-sr-26-2-models: no legal review is declared"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L1-WLT-US-11",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-11.yaml#/citations/0",
+          "message": "us-nydfs-500-17-a: no legal review is declared"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L1-WLT-US-11",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-11.yaml#/citations/1",
+          "message": "us-glba-314-4-j: no legal review is declared"
+        },
+        {
+          "code": "ADM2_CITATION_UNVERIFIED",
+          "severity": "error",
+          "controlId": "L1-WLT-US-13",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-13.yaml#/citations/0",
+          "message": "us-reg-b-1002-9: retrieval is not verified with a content hash"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L1-WLT-US-13",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-13.yaml#/citations/0",
+          "message": "us-reg-b-1002-9: no legal review is declared"
+        },
+        {
+          "code": "ADM2_CITATION_UNVERIFIED",
+          "severity": "error",
+          "controlId": "L1-WLT-US-13",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-13.yaml#/citations/1",
+          "message": "us-co-sb26-189-deployers: retrieval is not verified with a content hash"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L1-WLT-US-13",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-13.yaml#/citations/1",
+          "message": "us-co-sb26-189-deployers: no legal review is declared"
+        },
+        {
+          "code": "ADM2_CITATION_UNVERIFIED",
+          "severity": "error",
+          "controlId": "L1-WLT-US-14",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-14.yaml#/citations/0",
+          "message": "us-reg-b-1002-9: retrieval is not verified with a content hash"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L1-WLT-US-14",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-14.yaml#/citations/0",
+          "message": "us-reg-b-1002-9: no legal review is declared"
+        }
+      ],
+      "evidence": [
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-01]",
+          "sha256": "7eaa3108825103ff3dd185d5e53cd2825e4b09e59ab99a4bf51df2ba4a8a409a"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-04]",
+          "sha256": "7eb8f917c2f1407f04ab01659b15260f6f857007a1c8f81af780ea4b010ace4d"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-05]",
+          "sha256": "77b8a063042cf031f0ea8ff3a534592dd9930c388333cb80e91a7ef4eeaa930d"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-06]",
+          "sha256": "66a1e9d754f7c11e1d7b042d387b5228df788d69c0ea847823e730104ea7cc05"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-07]",
+          "sha256": "b334f45a99435ba4bf8cd05d8c6d3f00a60ccba7ad2de59fa96262c45c34f63d"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-08]",
+          "sha256": "21cd0891e48115c9648610c72dbd585b2d99516722bf2198b784d205804099d7"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-09]",
+          "sha256": "5536a9bdd2957945982f67cc9af1193467afa86fdba0bd710789a6d6d57eaf89"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-10]",
+          "sha256": "7f372f99cfe8a69d9fcd19b50ca2c924a11acacfe3d0874823f5dc51ddb78c4f"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-11]",
+          "sha256": "656e17115045809689e90224299a34e636c48188a95b49bb8fcf2664fad6a497"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-13]",
+          "sha256": "d9b0a53eecbbd4610cb48d15de788be8a7823311088314c62cf3da941f63dfc5"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-14]",
+          "sha256": "6c7fe90d87861de7c15f97338fa1a57b1cd2f496ad4c819afa768d97402ab1cc"
+        }
+      ]
+    },
+    {
+      "criterion": 3,
+      "title": "Applicability predicates, reasons and exclusions",
+      "kind": "mechanical",
+      "status": "met",
+      "checked": 15,
+      "findings": [],
+      "evidence": [
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-01]",
+          "sha256": "7eaa3108825103ff3dd185d5e53cd2825e4b09e59ab99a4bf51df2ba4a8a409a"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-02]",
+          "sha256": "ff8a117a1d57b22e030dd3103900441a5059f0fca0f0ec9dbf9ba612a5c762f1"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-03]",
+          "sha256": "d0c99dad5fb395c6dd79f418a704469245686b49430d983322d435db42325080"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-04]",
+          "sha256": "7eb8f917c2f1407f04ab01659b15260f6f857007a1c8f81af780ea4b010ace4d"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-05]",
+          "sha256": "77b8a063042cf031f0ea8ff3a534592dd9930c388333cb80e91a7ef4eeaa930d"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-06]",
+          "sha256": "66a1e9d754f7c11e1d7b042d387b5228df788d69c0ea847823e730104ea7cc05"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-07]",
+          "sha256": "b334f45a99435ba4bf8cd05d8c6d3f00a60ccba7ad2de59fa96262c45c34f63d"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-08]",
+          "sha256": "21cd0891e48115c9648610c72dbd585b2d99516722bf2198b784d205804099d7"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-09]",
+          "sha256": "5536a9bdd2957945982f67cc9af1193467afa86fdba0bd710789a6d6d57eaf89"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-10]",
+          "sha256": "7f372f99cfe8a69d9fcd19b50ca2c924a11acacfe3d0874823f5dc51ddb78c4f"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-11]",
+          "sha256": "656e17115045809689e90224299a34e636c48188a95b49bb8fcf2664fad6a497"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-12]",
+          "sha256": "5b1416bfb1baa9e3da0213ff9942bcf6230a92f4bbe513c5ca14ba26f7cfabf8"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-13]",
+          "sha256": "d9b0a53eecbbd4610cb48d15de788be8a7823311088314c62cf3da941f63dfc5"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-14]",
+          "sha256": "6c7fe90d87861de7c15f97338fa1a57b1cd2f496ad4c819afa768d97402ab1cc"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-15]",
+          "sha256": "3e6b09e56566da7be93cbd6f35c2a1e1e81f412e6856c8ce7e6528989689cb91"
+        }
+      ]
+    },
+    {
+      "criterion": 4,
+      "title": "Binding to an enforcement point or an owned manual duty",
+      "kind": "mechanical",
+      "status": "met",
+      "checked": 15,
+      "findings": [],
+      "evidence": [
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-01]",
+          "sha256": "7eaa3108825103ff3dd185d5e53cd2825e4b09e59ab99a4bf51df2ba4a8a409a"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-02]",
+          "sha256": "ff8a117a1d57b22e030dd3103900441a5059f0fca0f0ec9dbf9ba612a5c762f1"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-03]",
+          "sha256": "d0c99dad5fb395c6dd79f418a704469245686b49430d983322d435db42325080"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-04]",
+          "sha256": "7eb8f917c2f1407f04ab01659b15260f6f857007a1c8f81af780ea4b010ace4d"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-05]",
+          "sha256": "77b8a063042cf031f0ea8ff3a534592dd9930c388333cb80e91a7ef4eeaa930d"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-06]",
+          "sha256": "66a1e9d754f7c11e1d7b042d387b5228df788d69c0ea847823e730104ea7cc05"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-07]",
+          "sha256": "b334f45a99435ba4bf8cd05d8c6d3f00a60ccba7ad2de59fa96262c45c34f63d"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-08]",
+          "sha256": "21cd0891e48115c9648610c72dbd585b2d99516722bf2198b784d205804099d7"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-09]",
+          "sha256": "5536a9bdd2957945982f67cc9af1193467afa86fdba0bd710789a6d6d57eaf89"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-10]",
+          "sha256": "7f372f99cfe8a69d9fcd19b50ca2c924a11acacfe3d0874823f5dc51ddb78c4f"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-11]",
+          "sha256": "656e17115045809689e90224299a34e636c48188a95b49bb8fcf2664fad6a497"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-12]",
+          "sha256": "5b1416bfb1baa9e3da0213ff9942bcf6230a92f4bbe513c5ca14ba26f7cfabf8"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-13]",
+          "sha256": "d9b0a53eecbbd4610cb48d15de788be8a7823311088314c62cf3da941f63dfc5"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-14]",
+          "sha256": "6c7fe90d87861de7c15f97338fa1a57b1cd2f496ad4c819afa768d97402ab1cc"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-15]",
+          "sha256": "3e6b09e56566da7be93cbd6f35c2a1e1e81f412e6856c8ce7e6528989689cb91"
+        }
+      ]
+    },
+    {
+      "criterion": 5,
+      "title": "Tests with an oracle that observes the effect",
+      "kind": "mechanical",
+      "status": "not_met",
+      "checked": 15,
+      "findings": [
+        {
+          "code": "ADM5_ORACLE_MISMATCH",
+          "severity": "error",
+          "controlId": "L1-WLT-US-01",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-01.yaml#/tests/1/oracle/kind",
+          "message": "L1-WLT-US-01-T2: a drill test needs a ledger_state or system_of_record oracle, not enforcement_receipt"
+        },
+        {
+          "code": "ADM5_ORACLE_MISMATCH",
+          "severity": "error",
+          "controlId": "L1-WLT-US-03",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-03.yaml#/tests/0/oracle/kind",
+          "message": "L1-WLT-US-03-T1: a runtime_enforced test needs a enforcement_receipt or ledger_state oracle, not system_of_record"
+        },
+        {
+          "code": "ADM5_ORACLE_MISMATCH",
+          "severity": "error",
+          "controlId": "L1-WLT-US-12",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-12.yaml#/tests/0/oracle/kind",
+          "message": "L1-WLT-US-12-T1: a drill test needs a ledger_state or system_of_record oracle, not enforcement_receipt"
+        },
+        {
+          "code": "ADM5_ORACLE_MISMATCH",
+          "severity": "error",
+          "controlId": "L1-WLT-US-13",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-13.yaml#/tests/0/oracle/kind",
+          "message": "L1-WLT-US-13-T1: a runtime_enforced test needs a enforcement_receipt or ledger_state oracle, not system_of_record"
+        }
+      ],
+      "evidence": [
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-01]",
+          "sha256": "7eaa3108825103ff3dd185d5e53cd2825e4b09e59ab99a4bf51df2ba4a8a409a"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-02]",
+          "sha256": "ff8a117a1d57b22e030dd3103900441a5059f0fca0f0ec9dbf9ba612a5c762f1"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-03]",
+          "sha256": "d0c99dad5fb395c6dd79f418a704469245686b49430d983322d435db42325080"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-04]",
+          "sha256": "7eb8f917c2f1407f04ab01659b15260f6f857007a1c8f81af780ea4b010ace4d"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-05]",
+          "sha256": "77b8a063042cf031f0ea8ff3a534592dd9930c388333cb80e91a7ef4eeaa930d"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-06]",
+          "sha256": "66a1e9d754f7c11e1d7b042d387b5228df788d69c0ea847823e730104ea7cc05"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-07]",
+          "sha256": "b334f45a99435ba4bf8cd05d8c6d3f00a60ccba7ad2de59fa96262c45c34f63d"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-08]",
+          "sha256": "21cd0891e48115c9648610c72dbd585b2d99516722bf2198b784d205804099d7"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-09]",
+          "sha256": "5536a9bdd2957945982f67cc9af1193467afa86fdba0bd710789a6d6d57eaf89"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-10]",
+          "sha256": "7f372f99cfe8a69d9fcd19b50ca2c924a11acacfe3d0874823f5dc51ddb78c4f"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-11]",
+          "sha256": "656e17115045809689e90224299a34e636c48188a95b49bb8fcf2664fad6a497"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-12]",
+          "sha256": "5b1416bfb1baa9e3da0213ff9942bcf6230a92f4bbe513c5ca14ba26f7cfabf8"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-13]",
+          "sha256": "d9b0a53eecbbd4610cb48d15de788be8a7823311088314c62cf3da941f63dfc5"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-14]",
+          "sha256": "6c7fe90d87861de7c15f97338fa1a57b1cd2f496ad4c819afa768d97402ab1cc"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-15]",
+          "sha256": "3e6b09e56566da7be93cbd6f35c2a1e1e81f412e6856c8ce7e6528989689cb91"
+        }
+      ]
+    },
+    {
+      "criterion": 6,
+      "title": "Negative fixtures run with no false mandatory pass",
+      "kind": "mechanical",
+      "status": "not_evaluated",
+      "checked": 127,
+      "findings": [
+        {
+          "code": "ADM6_HARNESS_NOT_REGISTERED",
+          "severity": "warning",
+          "controlId": null,
+          "path": "layers/l1-wealth-us/pack.yaml",
+          "message": "22 fixture(s) name guard harnesses this process has not registered (agent_config, bound_approval, incident_clocks, lease, lease_revocation_drill, tool_allowlist); they run in the test suite, not here"
+        }
+      ],
+      "evidence": [
+        {
+          "kind": "fixture_run",
+          "ref": "fixtureRun",
+          "sha256": "7d69eeeaa22769007394dca7042807bfed813853ebc1f1fcff470bb659bdcb8b"
+        }
+      ]
+    },
+    {
+      "criterion": 7,
+      "title": "Evidence contracts with an available producer",
+      "kind": "mechanical",
+      "status": "not_met",
+      "checked": 15,
+      "findings": [
+        {
+          "code": "ADM7_PRODUCER_NOT_AVAILABLE",
+          "severity": "error",
+          "controlId": "L1-WLT-US-04",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-04.yaml#/evidence/0/producer",
+          "message": "L1-WLT-US-04-E1: producer amc.adversarial.observer is planned (P1-48)"
+        },
+        {
+          "code": "ADM7_PRODUCER_NOT_AVAILABLE",
+          "severity": "error",
+          "controlId": "L1-WLT-US-08",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-08.yaml#/evidence/1/producer",
+          "message": "L1-WLT-US-08-E2: producer amc.dataflow.extractionMonitor is planned (P1-80)"
+        },
+        {
+          "code": "ADM7_PRODUCER_NOT_AVAILABLE",
+          "severity": "error",
+          "controlId": "L1-WLT-US-09",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-09.yaml#/evidence/0/producer",
+          "message": "L1-WLT-US-09-E1: producer amc.manualDuty.record is planned (P1-76)"
+        },
+        {
+          "code": "ADM7_PRODUCER_NOT_AVAILABLE",
+          "severity": "error",
+          "controlId": "L1-WLT-US-09",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-09.yaml#/evidence/1/producer",
+          "message": "L1-WLT-US-09-E2: producer amc.versionManifest is planned (P1-75)"
+        },
+        {
+          "code": "ADM7_PRODUCER_NOT_AVAILABLE",
+          "severity": "error",
+          "controlId": "L1-WLT-US-10",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-10.yaml#/evidence/0/producer",
+          "message": "L1-WLT-US-10-E1: producer amc.versionManifest is planned (P1-75)"
+        },
+        {
+          "code": "ADM7_PRODUCER_NOT_AVAILABLE",
+          "severity": "error",
+          "controlId": "L1-WLT-US-11",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-11.yaml#/evidence/1/producer",
+          "message": "L1-WLT-US-11-E2: producer amc.incidents.notices is planned (P2-26)"
+        },
+        {
+          "code": "ADM7_PRODUCER_NOT_AVAILABLE",
+          "severity": "error",
+          "controlId": "L1-WLT-US-12",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-12.yaml#/evidence/0/producer",
+          "message": "L1-WLT-US-12-E1: producer amc.killSwitch is planned (P2-26)"
+        },
+        {
+          "code": "ADM7_PRODUCER_NOT_AVAILABLE",
+          "severity": "error",
+          "controlId": "L1-WLT-US-13",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-13.yaml#/evidence/0/producer",
+          "message": "L1-WLT-US-13-E1: producer amc.explanation.lineage is planned (P1-73)"
+        },
+        {
+          "code": "ADM7_PRODUCER_NOT_AVAILABLE",
+          "severity": "error",
+          "controlId": "L1-WLT-US-14",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-14.yaml#/evidence/0/producer",
+          "message": "L1-WLT-US-14-E1: producer amc.explanation.lineage is planned (P1-73)"
+        },
+        {
+          "code": "ADM7_PRODUCER_NOT_AVAILABLE",
+          "severity": "error",
+          "controlId": "L1-WLT-US-15",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-15.yaml#/evidence/0/producer",
+          "message": "L1-WLT-US-15-E1: producer amc.fairness.harness is planned (P1-74)"
+        }
+      ],
+      "evidence": [
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-01]",
+          "sha256": "7eaa3108825103ff3dd185d5e53cd2825e4b09e59ab99a4bf51df2ba4a8a409a"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-02]",
+          "sha256": "ff8a117a1d57b22e030dd3103900441a5059f0fca0f0ec9dbf9ba612a5c762f1"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-03]",
+          "sha256": "d0c99dad5fb395c6dd79f418a704469245686b49430d983322d435db42325080"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-04]",
+          "sha256": "7eb8f917c2f1407f04ab01659b15260f6f857007a1c8f81af780ea4b010ace4d"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-05]",
+          "sha256": "77b8a063042cf031f0ea8ff3a534592dd9930c388333cb80e91a7ef4eeaa930d"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-06]",
+          "sha256": "66a1e9d754f7c11e1d7b042d387b5228df788d69c0ea847823e730104ea7cc05"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-07]",
+          "sha256": "b334f45a99435ba4bf8cd05d8c6d3f00a60ccba7ad2de59fa96262c45c34f63d"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-08]",
+          "sha256": "21cd0891e48115c9648610c72dbd585b2d99516722bf2198b784d205804099d7"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-09]",
+          "sha256": "5536a9bdd2957945982f67cc9af1193467afa86fdba0bd710789a6d6d57eaf89"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-10]",
+          "sha256": "7f372f99cfe8a69d9fcd19b50ca2c924a11acacfe3d0874823f5dc51ddb78c4f"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-11]",
+          "sha256": "656e17115045809689e90224299a34e636c48188a95b49bb8fcf2664fad6a497"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-12]",
+          "sha256": "5b1416bfb1baa9e3da0213ff9942bcf6230a92f4bbe513c5ca14ba26f7cfabf8"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-13]",
+          "sha256": "d9b0a53eecbbd4610cb48d15de788be8a7823311088314c62cf3da941f63dfc5"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-14]",
+          "sha256": "6c7fe90d87861de7c15f97338fa1a57b1cd2f496ad4c819afa768d97402ab1cc"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L1-WLT-US-15]",
+          "sha256": "3e6b09e56566da7be93cbd6f35c2a1e1e81f412e6856c8ce7e6528989689cb91"
+        }
+      ]
+    },
+    {
+      "criterion": 8,
+      "title": "Unknown facts fail closed",
+      "kind": "mechanical",
+      "status": "not_met",
+      "checked": 15,
+      "findings": [
+        {
+          "code": "ADM8_UNKNOWN_FIXTURE_MISSING",
+          "severity": "error",
+          "controlId": "L1-WLT-US-02",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-02.yaml#/tests",
+          "message": "bound to approvals, tool_pipeline but has no unknown_authority fixture"
+        },
+        {
+          "code": "ADM8_UNKNOWN_FIXTURE_MISSING",
+          "severity": "error",
+          "controlId": "L1-WLT-US-08",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-08.yaml#/tests",
+          "message": "bound to tool_pipeline, egress but has no unknown_residency fixture"
+        }
+      ],
+      "evidence": [
+        {
+          "kind": "fixture_run",
+          "ref": "fixtureRun",
+          "sha256": "7d69eeeaa22769007394dca7042807bfed813853ebc1f1fcff470bb659bdcb8b"
+        }
+      ]
+    },
+    {
+      "criterion": 9,
+      "title": "Signed human sign-offs; AI drafts approved by a human",
+      "kind": "record",
+      "status": "not_met",
+      "checked": 16,
+      "findings": [
+        {
+          "code": "ADM9_SIGNOFF_MISSING",
+          "severity": "error",
+          "controlId": null,
+          "path": "layers/l1-wealth-us/pack.yaml",
+          "message": "no verified domain lead sign-off credentialed for the pack's stations"
+        },
+        {
+          "code": "ADM9_SIGNOFF_MISSING",
+          "severity": "error",
+          "controlId": null,
+          "path": "layers/l1-wealth-us/pack.yaml",
+          "message": "no verified legal reviewer sign-off"
+        },
+        {
+          "code": "ADM9_SIGNOFF_MISSING",
+          "severity": "error",
+          "controlId": null,
+          "path": "layers/l1-wealth-us/pack.yaml",
+          "message": "no verified risk owner sign-off"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L1-WLT-US-01",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-01.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L1-WLT-US-02",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-02.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L1-WLT-US-03",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-03.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L1-WLT-US-04",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-04.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L1-WLT-US-05",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-05.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L1-WLT-US-06",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-06.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L1-WLT-US-07",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-07.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L1-WLT-US-08",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-08.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L1-WLT-US-09",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-09.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L1-WLT-US-10",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-10.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L1-WLT-US-11",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-11.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L1-WLT-US-12",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-12.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L1-WLT-US-13",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-13.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L1-WLT-US-14",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-14.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L1-WLT-US-15",
+          "path": "layers/l1-wealth-us/controls/L1-WLT-US-15.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        }
+      ],
+      "evidence": []
+    },
+    {
+      "criterion": 10,
+      "title": "Stewardship and coverage document",
+      "kind": "record",
+      "status": "not_met",
+      "checked": 4,
+      "findings": [
+        {
+          "code": "ADM10_COVERAGE_SECTION_MISSING",
+          "severity": "error",
+          "controlId": null,
+          "path": "layers/l1-wealth-us/pack.yaml#/stewardship/coverageDoc",
+          "message": "docs/catalog/WEALTH_US.md has no section titled \"Unsupported behaviour\""
+        },
+        {
+          "code": "ADM10_PARTNER_MISSING",
+          "severity": "error",
+          "controlId": null,
+          "path": "layers/l1-wealth-us/pack.yaml#/stewardship/partner",
+          "message": "no stewardship partner"
+        },
+        {
+          "code": "ADM10_TRIAGE_TARGET_MISSING",
+          "severity": "error",
+          "controlId": null,
+          "path": "layers/l1-wealth-us/pack.yaml#/stewardship/triageTargetDays",
+          "message": "no triage target"
+        },
+        {
+          "code": "ADM10_UPDATE_PLAN_INCOMPLETE",
+          "severity": "error",
+          "controlId": null,
+          "path": "layers/l1-wealth-us/pack.yaml#/stewardship/updatePlan",
+          "message": "the update plan must name an owner and funding (\"owner: ...; funding: ...\")"
+        }
+      ],
+      "evidence": [
+        {
+          "kind": "file",
+          "ref": "docs/catalog/WEALTH_US.md",
+          "sha256": "6c4cde3e1f769f5bac74db517a22389caa60ac714c90470f24f867cfc1f123fd"
+        }
+      ]
+    }
+  ],
+  "fixtureRun": {
+    "mandatoryControls": 15,
+    "fixtures": 105,
+    "falseMandatoryPasses": 0,
+    "failures": []
+  },
+  "maxAdmissibleSupport": "experimental",
+  "decision": "admit",
+  "support": "experimental",
+  "reasons": [
+    "experimental, unreviewed: not admitted as reviewed or qualified",
+    "not admissible as reviewed: criterion 1 not met: ADM1_COMPILER_INCOMPATIBLE",
+    "not admissible as reviewed: criterion 2 not met: ADM2_CITATION_UNVERIFIED, ADM2_LEGAL_REVIEW_MISSING",
+    "not admissible as reviewed: criterion 5 not met: ADM5_ORACLE_MISMATCH",
+    "not admissible as reviewed: criterion 6 not evaluated: ADM6_HARNESS_NOT_REGISTERED",
+    "not admissible as reviewed: criterion 7 not met: ADM7_PRODUCER_NOT_AVAILABLE",
+    "not admissible as reviewed: criterion 8 not met: ADM8_UNKNOWN_FIXTURE_MISSING",
+    "not admissible as reviewed: criterion 9 not met: ADM9_SIGNOFF_MISSING, ADM9_CONTROL_UNREVIEWED",
+    "not admissible as reviewed: criterion 10 not met: ADM10_COVERAGE_SECTION_MISSING, ADM10_PARTNER_MISSING, ADM10_TRIAGE_TARGET_MISSING, ADM10_UPDATE_PLAN_INCOMPLETE"
+  ],
+  "digest": "sha256:bf0e3ca88d95ac03af657627717d03135e5e7e477aceeb6cc37fbeb42ca87a5d"
+}

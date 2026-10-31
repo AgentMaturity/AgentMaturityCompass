@@ -36,7 +36,7 @@
         "--no-local",
         "--no-hardlinks",
         "--no-checkout",
-        "/Users/sid/AgentMaturityCompass",
+        "~/AgentMaturityCompass",
         "/private/tmp/amc-phase-a-acceptance-20260909-bz3ld3j9/checkout"
       ],
       "startedAt": "2026-09-09T11:11:51.157937+00:00",
@@ -242,7 +242,7 @@
         "/opt/homebrew/lib/node_modules/pnpm/bin/pnpm.cjs",
         "release:gate",
         "--out",
-        "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/attempt-2/release-gate.json"
+        "~/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/attempt-2/release-gate.json"
       ],
       "startedAt": "2026-09-09T11:12:01.126635+00:00",
       "timeoutSeconds": 3600,

@@ -11,6 +11,11 @@ export interface AdapterEnvAssembleInput {
   model: string;
   workOrderId?: string | null;
   includeProxyEnv: boolean;
+  /**
+   * Start from AMC's own environment (less provider keys and AMC secrets): a host process needs PATH, HOME and the
+   * like. False for a container, which must receive only the adapter's variables (WP36, AXR-04).
+   */
+  inheritHostEnv?: boolean;
 }
 
 function replaceTemplate(template: string, vars: Record<string, string>): string {
@@ -29,7 +34,7 @@ export function redactSecretsInText(input: string, secrets: string[]): string {
 }
 
 export function assembleAdapterEnv(input: AdapterEnvAssembleInput): NodeJS.ProcessEnv {
-  const base = stripProviderKeys(process.env);
+  const base = input.inheritHostEnv === false ? {} : stripProviderKeys(process.env);
   const vars = {
     agentId: input.agentId,
     workOrderId: input.workOrderId ?? "",

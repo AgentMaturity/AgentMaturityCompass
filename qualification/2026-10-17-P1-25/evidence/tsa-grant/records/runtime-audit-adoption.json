@@ -1,0 +1,18 @@
+{
+  "at": "2026-10-16T22:51:09.930939+00:00",
+  "rootFullCodeRead": true,
+  "sealedOutputsVerified": true,
+  "installedExactCopies": [
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/audit-observed.py",
+      "bytes": 1799,
+      "sha256": "0671f636048bb159b449362c00ad1949174be12160421b3f0ed81eadc93db359"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/capture-quality.mjs",
+      "bytes": 913,
+      "sha256": "771f83b3dd6578c45791a556f2d4768b9b6eb74f7b515882588e99b6c2e43005"
+    }
+  ],
+  "admission": "Read-only actual raw/observer audit and unchanged diagnostic scanner adapter only; no product run or key/public-file read from path extraction. Control helpers remain unexecuted pending later actual source/fresh binding and peer review."
+}

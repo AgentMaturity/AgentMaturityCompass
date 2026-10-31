@@ -18,7 +18,13 @@ export const ACP_ERROR = {
    * and telling a client otherwise would send it looking for a capability
    * negotiation problem it does not have.
    */
-  notInitialized: -32002
+  notInitialized: -32002,
+  /**
+   * `amc acp` refused its own launch configuration (an unreviewed, tampered,
+   * duplicate or unpaired MCP config, a grant class mismatch, ...). Sent once,
+   * as the reply to the client's first request, with `data.reason`; then exit 2.
+   */
+  startupRefused: -32003
 } as const;
 
 export type AcpErrorCode = (typeof ACP_ERROR)[keyof typeof ACP_ERROR];

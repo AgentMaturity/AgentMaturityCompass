@@ -4,12 +4,12 @@ import { createHash } from "node:crypto";
 import { constants } from "node:fs";
 import { lstat, open, opendir, realpath, mkdir } from "node:fs/promises";
 import { isAbsolute, join, relative, resolve, sep } from "node:path";
-import { fileURLToPath } from "node:url";
 import {
   COMMON_PROTOCOL, COMMON_TASK, SCHEMA_VERSION, CREDENTIAL_SCHEMA_VERSION, CREDENTIAL_CONTRACT_VERSION, isRecordingPath,
   MODEL_REVISION_SCHEMA_VERSION, validateModelRevisionIdentity,
   validateSession, validateStudy, inspectRecording, parseStudyJson
 } from "./human-first-use-intake.mjs";
+import { isEntrypoint } from "./lib/entrypoint.mjs";
 
 export const CAPTURE_VERSION = "2026-09-09.1";
 export const CREDENTIAL_CAPTURE_VERSION = "2026-09-10.1";
@@ -846,6 +846,6 @@ export async function runCli(args = process.argv.slice(2), io = process) {
   }
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (isEntrypoint(import.meta.url)) {
   process.exitCode = await runCli();
 }

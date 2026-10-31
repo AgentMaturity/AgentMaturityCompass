@@ -1,3 +1,4 @@
+import { signatureEnvelopeSchema } from "../crypto/signing/signatureEnvelope.js";
 import { z } from "zod";
 import { MERKLE_ALGORITHMS } from "./merkle.js";
 
@@ -17,6 +18,12 @@ import { MERKLE_ALGORITHMS } from "./merkle.js";
  * record in the hash chain, so the move cannot be undone by deleting a file.
  *
  * `a4-binder` (P1-63) records the signed manifest of an A4 binder slice (src/a4/a4Binder.ts).
+ *
+ * `a4-package` (P1-62) records the signed manifest of an A4 agent package (src/a4/a4Package.ts).
+ *
+ * `revocation-list`, `key-rotation` and `key-history` (P1-08) anchor each signed revocation list, rotation statement
+ * and key-history revision, with `id` = `<list or chain id>#<sequence>`, so an older file can be refused even after the
+ * per-machine high-water mark is lost (src/keys/anchors.ts).
  */
 export const TRANSPARENCY_ARTIFACT_KINDS = [
   "amccert",
@@ -32,7 +39,11 @@ export const TRANSPARENCY_ARTIFACT_KINDS = [
   "vulnerability-scan-report",
   "session-root",
   "merkle-migration",
-  "a4-binder"
+  "a4-binder",
+  "a4-package",
+  "revocation-list",
+  "key-rotation",
+  "key-history"
 ] as const;
 
 export type TransparencyArtifactKind = (typeof TRANSPARENCY_ARTIFACT_KINDS)[number];
@@ -65,21 +76,7 @@ export const transparencySealSignatureSchema = z.object({
   signature: z.string().min(1),
   signedTs: z.number().int(),
   signer: z.literal("auditor"),
-  envelope: z
-    .object({
-      v: z.literal(1),
-      alg: z.literal("ed25519"),
-      pubkeyB64: z.string().min(1),
-      fingerprint: z.string().length(64),
-      sigB64: z.string().min(1),
-      signedTs: z.number().int(),
-      signer: z.object({
-        type: z.enum(["VAULT", "NOTARY"]),
-        attestationLevel: z.enum(["SOFTWARE", "HARDWARE"]),
-        notaryFingerprint: z.string().length(64).optional()
-      })
-    })
-    .optional()
+  envelope: signatureEnvelopeSchema.optional()
 });
 
 export type TransparencyEntry = z.infer<typeof transparencyEntrySchema>;

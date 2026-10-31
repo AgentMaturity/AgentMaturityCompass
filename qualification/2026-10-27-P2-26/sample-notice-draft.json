@@ -1,0 +1,65 @@
+{
+  "v": 1,
+  "banner": "Draft for human review. AMC does not file notices.",
+  "incidentId": "inc_sample_p226",
+  "clockId": "nydfs-500-17-notice",
+  "instrument": "23 NYCRR Part 500 (NYDFS Cybersecurity Regulation)",
+  "article": "500.17(a)(1)",
+  "authority": "Superintendent of Financial Services, New York State Department of Financial Services",
+  "status": "PENDING",
+  "deadline": "2026-10-30T11:00:00.000Z",
+  "recipients": [
+    "The superintendent, electronically in the form set forth on the department's website (500.17(a)(1), (c))"
+  ],
+  "checklist": [
+    {
+      "item": "Notice of the cybersecurity incident on the department's electronic form; Part 500 does not list the form's fields (500.17(a)(1))",
+      "done": false
+    },
+    {
+      "item": "Any information the superintendent requests regarding the incident, provided promptly (500.17(a)(2))",
+      "done": false
+    },
+    {
+      "item": "Continuing updates on material changes or new information previously unavailable (500.17(a)(2))",
+      "done": false
+    }
+  ],
+  "missing": [
+    {
+      "item": "human-oversight-record",
+      "reason": "no human oversight record supplied for this incident"
+    },
+    {
+      "item": "ledger-receipts",
+      "reason": "no ledger receipt references supplied for the incident window"
+    },
+    {
+      "item": "state-transitions",
+      "reason": "no state transitions supplied; incident state is OPEN"
+    },
+    {
+      "item": "causal-edges",
+      "reason": "no causal edges recorded or supplied"
+    },
+    {
+      "item": "timeline-events",
+      "reason": "no timeline events supplied (incident references 0 event id(s))"
+    },
+    {
+      "item": "root-cause-claims",
+      "reason": "incident has no root-cause claim ids"
+    },
+    {
+      "item": "postmortem",
+      "reason": "incident has no postmortem reference"
+    },
+    {
+      "item": "resolution-timestamp",
+      "reason": "incident is not resolved (state OPEN)"
+    }
+  ],
+  "review": "experimental: agent-drafted, expert review pending (D-08)",
+  "sourceUrl": "https://www.dfs.ny.gov/system/files/documents/2023/10/rf_fs_2amend23NYCRR500_text_20231101.pdf",
+  "sourceVerified": true
+}

@@ -11,6 +11,7 @@ import { z } from "zod";
 import { DEFAULT_COMPACTION } from "../agent/compaction/promptPressure.js";
 import type { CompactionConfig } from "../agent/loopTypes.js";
 import { getAgentPaths } from "../fleet/paths.js";
+import { regimeFloor } from "../ops/retention/regimeRetention.js";
 import type { ReasoningMemoryConsumer, ReasoningMemoryPrivacyClass } from "../learning/reasoningMemory.js";
 import { sessionSpillCap } from "../session/sessionPayloadCap.js";
 import { ensureDir, writeFileAtomic } from "../utils/fs.js";
@@ -19,7 +20,7 @@ import { A4StoreError } from "./a4Store.js";
 import { errorCodeOf } from "./aspireUnderstand.js";
 import { listValue, textValue } from "./spec/aspire.js";
 
-export const MEMORY_POLICY_SCHEMA = "amc.a4-memory-policy/v1";
+const MEMORY_POLICY_SCHEMA = "amc.a4-memory-policy/v1";
 export const MEMORY_ENFORCEMENT_NOTE = "advisory: the reasoning-memory writer does not read this policy yet, so it limits nothing AMC stores";
 const PRIVACY: readonly ReasoningMemoryPrivacyClass[] = ["public", "internal", "restricted"];
 const CONSUMERS: readonly ReasoningMemoryConsumer[] = ["score", "recommendation", "fixer", "studio"];
@@ -28,10 +29,11 @@ const DEFAULTS = { privacyClass: "restricted", expiresAfterDays: 90, reviewAfter
 const MAX_DAYS = 3650;
 
 const compactionSchema = z.strictObject({
+  reserveTokens: z.number().int().nonnegative().safe().nullable().optional(),
   contextWindowTokens: z.number().int().positive().nullable(), threshold: z.number(), keepRecentSteps: z.number().int(), pruneMinBytes: z.number().int(),
   summarize: z.boolean(), maxPerTurn: z.number().int()
 });
-export const a4MemoryPolicySchema = z.strictObject({
+const a4MemoryPolicySchema = z.strictObject({
   schema: z.literal(MEMORY_POLICY_SCHEMA),
   agentId: z.string().min(1),
   /** a4:<projectId>@r<n>: the revision whose answers this policy was built from. */
@@ -90,6 +92,19 @@ export function memoryPolicyFields(values: ReadonlyMap<string, unknown>): { fiel
   const privacy = privacyClass ?? DEFAULTS.privacyClass;
   return { invalid, fields: { privacyClass: privacy, allowedConsumers, retentionTag: `reasoning-memory:${privacy}:ttl-${expiresAfterDays}d:review-${reviewAfterDays}d`,
     expiresAfterDays, reviewAfterDays, sources } };
+}
+
+/**
+ * The regime retention floor the memory policy's retention is held to (P2-34): P2-26's largest `logs` minimum for the
+ * active plan's regimes (the reasoning memory an agent keeps is among the automatically generated records those regimes
+ * name), `floor: null` when no regime sets one, and null when the plan cannot be read (fail closed: not evaluated).
+ */
+export function memoryRetentionFloor(workspace: string): { floor: { days: number; regimeIds: string[] } | null } | null {
+  try {
+    return { floor: regimeFloor(workspace, "logs") };
+  } catch {
+    return null;
+  }
 }
 
 /** `<agent>/memory/policy.json`: inside the agent's `memory` Enforce resource (src/enforce/resourceManifest.ts). */

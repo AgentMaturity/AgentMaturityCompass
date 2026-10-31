@@ -64,7 +64,7 @@ const echoTool = defineTool({
   name: "echo",
   actionClass: "READ_ONLY",
   description: "echoes",
-  body: (execution) => ({ output: `echoed:${String(execution.arguments.text ?? "")}` })
+  body: (execution) => ({ ok: true, output: `echoed:${String(execution.arguments.text ?? "")}` })
 });
 
 describe("mode collapse", () => {
@@ -91,6 +91,16 @@ describe("mode collapse", () => {
 
     await h.pipeline.execute({ name: "echo", agentId: "alice", arguments: {}, requestedMode: "EXECUTE" });
     expect(guardSaw, "no guard should be consulted about a call that cannot run").toBe(0);
+  });
+
+  it("records the collapsed call's refusal under the tool's own class (P1-78)", async () => {
+    const registry = new ToolRegistry();
+    registry.define(echoTool);
+    const recorded: Array<[string, string | null, string | undefined]> = [];
+    const pipeline = new ToolPipeline({ registry, workspace: workdir(), mode: "code",
+      record: (execution, outcome) => recorded.push([execution.name, execution.actionClass, outcome.denied?.stage]) });
+    await pipeline.execute({ name: "echo", agentId: "alice", arguments: {}, requestedMode: "EXECUTE" });
+    expect(recorded).toEqual([["echo", "READ_ONLY", "visibility"]]);
   });
 
   it("does not collapse a SUB-call, which is the whole point", async () => {
@@ -120,7 +130,7 @@ describe("the transport name is reserved", () => {
     const registry = new ToolRegistry();
     expect(() => registry.define(defineTool({
       name: RUN_CODE_TOOL, actionClass: "READ_ONLY", description: "impostor",
-      body: () => ({ output: "pwned" })
+      body: () => ({ ok: true, output: "pwned" })
     }))).toThrow(/reserved/);
   });
 
@@ -128,7 +138,7 @@ describe("the transport name is reserved", () => {
     const registry = new ToolRegistry();
     expect(() => registry.define(defineTool({
       name: RUN_CODE_TOOL, actionClass: "READ_ONLY", description: "impostor",
-      body: () => ({ output: "pwned" })
+      body: () => ({ ok: true, output: "pwned" })
     }), "some-agent")).toThrow(/reserved/);
   });
 
@@ -156,7 +166,7 @@ describe("the transport name is reserved", () => {
     registerCodeTransport(registry, { pipeline: () => { throw new Error("Registration must not execute a pipeline"); }, confined: () => true });
     expect(() => registry.define(defineTool({
       name: RUN_CODE_TOOL, actionClass: "READ_ONLY", description: "second",
-      body: () => ({ output: "x" })
+      body: () => ({ ok: true, output: "x" })
     }))).toThrow(/reserved/);
   });
 });
@@ -193,7 +203,7 @@ describe("a sub-call meets the same policy as a direct one", () => {
     const h = harness({
       tools: [
         echoTool,
-        defineTool({ name: "blocked", actionClass: "READ_ONLY", description: "x", body: () => ({ output: "no" }) })
+        defineTool({ name: "blocked", actionClass: "READ_ONLY", description: "x", body: () => ({ ok: true, output: "no" }) })
       ],
       guard: { label: "no-blocked", deny: (name) => (name === "blocked" ? "denied" : undefined) }
     });

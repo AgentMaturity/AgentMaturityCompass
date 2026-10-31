@@ -1,0 +1,204 @@
+# Experimental and unreviewed P3-15 content. JSON syntax is valid YAML; no production outcome is supplied.
+{
+  "id": "L1-EDU-04",
+  "version": "0.1.0",
+  "support": "experimental",
+  "layer": 1,
+  "family": "accessible-output",
+  "stations": [
+    "education"
+  ],
+  "title": "Check generated lessons and retain the manual accessibility assessment",
+  "statement": "Before publication, run automatable WCAG 2.1 Level A and AA checks on the generated lesson and retain a named assessor's evidence for the manual remainder.",
+  "riskRationale": "An automated HTML check covers only some accessibility criteria and cannot establish assistive-technology usability, contextual quality or legal scope.",
+  "mandatory": true,
+  "applicability": {
+    "predicate": {
+      "all": [
+        {
+          "fact": "stations",
+          "includesAny": [
+            "education"
+          ]
+        },
+        {
+          "fact": "domains",
+          "includesAny": [
+            "education.schools-skills"
+          ]
+        },
+        {
+          "fact": "jurisdictions",
+          "includesAny": [
+            "US",
+            "EU"
+          ]
+        },
+        {
+          "fact": "entityTypes",
+          "includesAny": [
+            "k12_institution",
+            "higher_education_institution",
+            "training_provider"
+          ]
+        },
+        {
+          "fact": "roles",
+          "includesAny": [
+            "deployer"
+          ]
+        },
+        {
+          "fact": "useCases",
+          "includesAny": [
+            "education_generated_lesson"
+          ]
+        }
+      ]
+    },
+    "reasons": [
+      "Experimental, unreviewed Education operator-policy draft. Declared institution and data facts select only a synthetic scope, not a legal applicability or high-risk finding.",
+      "No learner-age FactName exists. Exact age, funding, exception authority, entity deadlines and manual criteria remain unresolved until separate authorized evidence and human assessment."
+    ],
+    "exclusions": []
+  },
+  "citations": [
+    {
+      "key": "education-wcag21-operator-policy",
+      "registerId": null,
+      "instrument": "WCAG 2.1 Level A and AA operator-selected test target",
+      "clause": "Automatable WCAG 2.1 A/AA checks only; normative criteria and manual coverage need specialist verification",
+      "edition": "Unverified normative text; W3C overview is a discovery locator only",
+      "jurisdiction": "INT",
+      "statusType": "voluntary-standard",
+      "superseded": null,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "dateNote": "No legal effective or compliance date is inferred from this voluntary test target.",
+      "url": "https://www.w3.org/WAI/test-evaluate/",
+      "retrieval": {
+        "state": "unverified",
+        "reason": "Official W3C overview discovery locator inherited from scripts/write-accessibility-release-evidence.mjs:143 and tests/accessibilityReleaseEvidence.test.ts:56. It is not the WCAG 2.1 normative text; no primary text fetched, read or hashed for P3-15."
+      },
+      "appliesWhen": null,
+      "legalReview": null,
+      "note": "Re-verification required. The legacy w3c-wcag-21 URL points to WCAG 2.2; neither that URL, ISO/IEC 40500 nor Revised Section 508 establishes equivalence to this WCAG 2.1 operator-policy check."
+    }
+  ],
+  "binding": {
+    "kind": "manual",
+    "points": [],
+    "mechanism": "An operator-owned release duty combines the actual automated check with a named manual assessment. This draft installs no publication interceptor and no positive production result.",
+    "parameters": [],
+    "manualDuty": {
+      "duty": "Before publication, run the actual automated WCAG 2.1 A/AA check and obtain the named accessibility assessor's manual remainder, including contextual and assistive-technology criteria the tool cannot decide.",
+      "ownerRole": "head_of_qa",
+      "cadence": "Each relevant lesson release and after an artifact, interface, checker, model or accessibility requirement changes.",
+      "evidenceOfPerformance": "Artifact/version and HTML hash, actual checker/library/browser versions and executed rules, findings and remediation, plus assessor identity, criterion, outcome, rationale and signed manual review. No manual criterion passes by default."
+    }
+  },
+  "tests": [
+    {
+      "id": "L1-EDU-04-T1",
+      "type": "configuration_check",
+      "oracle": {
+        "kind": "external_observer",
+        "observes": "Actual Axe analysis of the captured synthetic HTML bytes, checker and browser versions, executed rules, violations and incomplete findings. The manual remainder is separately unperformed."
+      },
+      "fixtures": {
+        "positive": [
+          "L1-EDU-04/positive/evidence-valid.json",
+          "L1-EDU-04/positive/oracle-accessible-lesson.json"
+        ],
+        "negative": [
+          "L1-EDU-04/negative/evidence-stale.json",
+          "L1-EDU-04/negative/evidence-replayed.json",
+          "L1-EDU-04/negative/evidence-contradictory.json",
+          "L1-EDU-04/negative/evidence-cross-tenant.json",
+          "L1-EDU-04/negative/evidence-empty.json",
+          "L1-EDU-04/negative/evidence-violation.json",
+          "L1-EDU-04/negative/oracle-image-alt-missing.json",
+          "L1-EDU-04/negative/oracle-form-label-missing.json",
+          "L1-EDU-04/negative/oracle-checker-unavailable.json"
+        ]
+      },
+      "passCriteria": "A local automated pass means no automatable WCAG 2.1 A/AA violations or incomplete findings in that actual run. It is not a full control result or permission to omit the named manual assessment.",
+      "attempts": 1
+    },
+    {
+      "id": "L1-EDU-04-T2",
+      "type": "document_review",
+      "oracle": {
+        "kind": "human_assessor",
+        "observes": "The named accessibility assessor's criterion-by-criterion manual record for the artifact/version, including task flow, keyboard/focus, reading order, meaningful alternatives, captions and assistive-technology usability."
+      },
+      "fixtures": {
+        "positive": [
+          "L1-EDU-04/positive/evidence-valid.json"
+        ],
+        "negative": [
+          "L1-EDU-04/negative/evidence-empty.json",
+          "L1-EDU-04/negative/evidence-violation.json"
+        ]
+      },
+      "passCriteria": "A real named assessor supplies the manual record, rationale, defects and remediation. No assessor or manual result is provided by these fixtures; automated results never pass this duty by default.",
+      "attempts": 1
+    }
+  ],
+  "evidence": [
+    {
+      "id": "L1-EDU-04-E1",
+      "producer": "amc.questionnaire",
+      "bindingFields": [
+        "tenantId",
+        "workspaceId",
+        "deploymentId",
+        "agentId",
+        "controlId",
+        "controlVersion"
+      ],
+      "freshness": {
+        "maxAgeDays": 30
+      },
+      "sampling": {
+        "method": "all",
+        "ratePercent": null,
+        "minItems": 1
+      },
+      "retention": {
+        "mode": "regime_max"
+      },
+      "residency": {
+        "mode": "inherit_deployment"
+      }
+    }
+  ],
+  "invalidatedBy": [
+    "model_version",
+    "prompt_version",
+    "tool_version",
+    "corpus_version",
+    "policy_version",
+    "deployment_version"
+  ],
+  "owner": {
+    "role": "head_of_qa"
+  },
+  "clock": null,
+  "levels": [
+    "L1"
+  ],
+  "crosswalk": [],
+  "review": {
+    "status": "pending",
+    "expert": null,
+    "credential": null,
+    "reviewedAt": null,
+    "nextReview": null
+  },
+  "provenance": {
+    "draftedBy": "ai",
+    "draftedAt": "2026-10-19",
+    "approvedBy": null
+  }
+}

@@ -1,0 +1,5 @@
+---
+"agent-maturity-compass": major
+---
+
+Breaking: the package root no longer exports the unreviewed `globalRegulatory` module (D-12). `FEDRAMP_MODERATE_FAMILIES`, `GLOBAL_FRAMEWORKS`, `generateEvidencePackage`, `classifyEuAiActRisk`, `EU_AI_ACT_RISK_MATRIX` and `CONSTRUCT_VALIDITY_DATA`, and the types `FedRampProfile`, `FedRampControlFamily`, `ContinuousMonitoringConfig`, `SspSection`, `RegulatoryFramework`, `RegulatoryRequirement`, `AuditEvidencePackage`, `AuditSection`, `EuAiActRiskAssessment`, `ConstructValidityReport`, `DpiaAssessment`, `DataFlow`, `DpiaRisk` and `DpiaMitigation`, are gone from `agent-maturity-compass`. Nothing in AMC used them; they carried agent-drafted regulatory tables, a DPIA template and a construct-validity record for a study that was never run, none of it reviewed by an expert. There is no replacement export. For an EU AI Act risk classification use `amc compliance risk-classify`, and for framework evidence use `amc compliance report`, which reports "not evaluated" without control-bound evidence.

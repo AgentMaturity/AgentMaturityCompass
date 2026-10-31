@@ -1,0 +1,27 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-WLT-US-05",
+  "polarity": "positive",
+  "evidenceClass": "valid",
+  "setup": {
+    "harness": "incident_clocks",
+    "station": "wealth",
+    "events": [
+      {
+        "kind": "TRIGGER",
+        "clock": "INITIAL_DETECTION",
+        "atHours": 1
+      }
+    ],
+    "due": [
+      {
+        "clock": "bsa-1020-320-sar-filing",
+        "hoursAfterCreated": 721
+      }
+    ]
+  },
+  "expected": {
+    "result": "pass",
+    "reasonCode": null
+  }
+}

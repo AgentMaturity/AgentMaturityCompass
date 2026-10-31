@@ -1,0 +1,435 @@
+{
+  "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe",
+  "node": "v22.23.3",
+  "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+  "harnessSha256": "e55c58597693d46a4bddd5a3600ddfc32375dd956e237e19f8ab2ff727b5095d",
+  "evidence": "/private/tmp/p0-20-compiled-cli-NTQeYj",
+  "inputs": [
+    {
+      "path": "dist/cli.js",
+      "sha256": "0040e8108d1df88bf377cdab98966ce6130f6d6931cbc6c5b7fd6e27475c3d5f"
+    },
+    {
+      "path": "dist/domains/domainApplyCli.js",
+      "sha256": "6658e3c22f07f473ad3ae75407df8b67628d34843fa3ebc5b8e97e2962e5e113"
+    },
+    {
+      "path": "dist/domains/industryPackAudit.js",
+      "sha256": "11f9e3ce5a288d9f4aec08f9e0369369aa413552260c091a31be50dcff3c150f"
+    },
+    {
+      "path": "dist/audit/auditApi.js",
+      "sha256": "f01f81a60536c79ebda7648906c2d1fdbfab75080a0516ca53b82e7923d05304"
+    },
+    {
+      "path": "dist/audit/binderSigner.js",
+      "sha256": "1242f865d6c2a3a14dee9d6800e8d1b671a6691b68542efcec79ee4ceec425fd"
+    },
+    {
+      "path": "dist/crypto/signing/signerVault.js",
+      "sha256": "a34222d3d003d7246fc12f15e13d1b6e404aa44dc5d61658074e3953a29b820d"
+    },
+    {
+      "path": "dist/audit/auditCli.js",
+      "sha256": "4fddc288422744ccf20da719c29f5c12f215304c0ba1d4a38fde37fce682ca28"
+    },
+    {
+      "path": "dist/cli-trust-flags.js",
+      "sha256": "5c5b00d912c2dd73b52776b8fabd528265e253dd43482532d601e1ff1a677a71"
+    },
+    {
+      "path": "dist/cli/claimOutput.js",
+      "sha256": "be1ae5da76422488712f490ea8fc24698f785d4553eb2d871485f5e5abf3f89d"
+    }
+  ],
+  "unchangedInputs": true,
+  "operatorPins": {
+    "capturedBeforeAuditSigning": true,
+    "auditorPublicKeySha256": "49d70ae55bec943e8bd55ebeda75db85c5d9792b1c921d48189f3d6eaf12669b",
+    "foreignPublicKeySha256": "c760af2c8aeada29b94bc218d00762f8fce92c192989930b5480f8af9e4920db",
+    "independentPublicPinFile": "/private/tmp/p0-20-compiled-cli-NTQeYj/owned-state/independent-auditor.pub"
+  },
+  "paidGate": {
+    "genuineLocalEd25519License": true,
+    "issuerPublicKeySha256": "ae41c662877f3e1aecc11009a6b8c0b92385a49fe2508771eee96688ecc2dcdf",
+    "privateKeyPassedToChild": false,
+    "activation": false,
+    "transportDenied": true
+  },
+  "commands": [
+    {
+      "name": "paid-gate-refusal",
+      "args": [
+        "domain",
+        "apply",
+        "--agent",
+        "default",
+        "--pack",
+        "clinical-trials",
+        "--audit",
+        "--responses",
+        "/private/tmp/p0-20-compiled-cli-NTQeYj/owned-state/responses.json",
+        "--audit-bundle",
+        "/private/tmp/p0-20-compiled-cli-NTQeYj/owned-state/outputs/gate-refused.json",
+        "--json"
+      ],
+      "exit": 1,
+      "signal": null,
+      "error": null,
+      "expectedExit": 1,
+      "expectUnchanged": true,
+      "unchanged": true,
+      "checkError": null,
+      "actualTextClaimLine": false,
+      "durationMs": 918,
+      "stdout": "/private/tmp/p0-20-compiled-cli-NTQeYj/paid-gate-refusal.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "/private/tmp/p0-20-compiled-cli-NTQeYj/paid-gate-refusal.stderr",
+      "stderrSha256": "dd26db6c2c5acef02566f05f8973068392d8eb7be46c44c1dff1f961b953406b",
+      "effects": "/private/tmp/p0-20-compiled-cli-NTQeYj/paid-gate-refusal.effects.json",
+      "effectsSha256": "a8d751cd4da641c681e55691d2993e3acf3a828cf8e747fa4974e568ba547752"
+    },
+    {
+      "name": "signed-text-write",
+      "args": [
+        "domain",
+        "apply",
+        "--agent",
+        "default",
+        "--pack",
+        "clinical-trials",
+        "--audit",
+        "--responses",
+        "/private/tmp/p0-20-compiled-cli-NTQeYj/owned-state/responses.json",
+        "--audit-bundle",
+        "/private/tmp/p0-20-compiled-cli-NTQeYj/owned-state/outputs/signed.json"
+      ],
+      "exit": 0,
+      "signal": null,
+      "error": null,
+      "expectedExit": 0,
+      "expectUnchanged": false,
+      "unchanged": false,
+      "checkError": null,
+      "actualTextClaimLine": false,
+      "durationMs": 826,
+      "stdout": "/private/tmp/p0-20-compiled-cli-NTQeYj/signed-text-write.stdout",
+      "stdoutSha256": "b6bc33d13e5afe4f4810492cdc11237411a04562b1b3f7d3fe2a186cd3fdb540",
+      "stderr": "/private/tmp/p0-20-compiled-cli-NTQeYj/signed-text-write.stderr",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effects": "/private/tmp/p0-20-compiled-cli-NTQeYj/signed-text-write.effects.json",
+      "effectsSha256": "7f12dfcbeaf2c76739ebfb392108151ce5510e7385af101c7e403af800b2e851"
+    },
+    {
+      "name": "trusted-text-verify",
+      "args": [
+        "audit",
+        "binder",
+        "verify",
+        "/private/tmp/p0-20-compiled-cli-NTQeYj/owned-state/outputs/signed.json",
+        "--pubkey",
+        "/private/tmp/p0-20-compiled-cli-NTQeYj/owned-state/independent-auditor.pub"
+      ],
+      "exit": 70,
+      "signal": null,
+      "error": null,
+      "expectedExit": 0,
+      "expectUnchanged": true,
+      "unchanged": true,
+      "checkError": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n70 !== 0\n",
+      "actualTextClaimLine": false,
+      "durationMs": 860,
+      "stdout": "/private/tmp/p0-20-compiled-cli-NTQeYj/trusted-text-verify.stdout",
+      "stdoutSha256": "6c005a3d23122acc8b89cbb74b40e1b2c624cedff058e0103358cbe1325f445f",
+      "stderr": "/private/tmp/p0-20-compiled-cli-NTQeYj/trusted-text-verify.stderr",
+      "stderrSha256": "29ecbb28d33e7fd4cba2fc4d166f840f9afbdf48d6686e68af468ec8445beebb",
+      "effects": "/private/tmp/p0-20-compiled-cli-NTQeYj/trusted-text-verify.effects.json",
+      "effectsSha256": "182ef1fde5afec14c9107cb8230f6ab885fc79934697e8dddf6e1ceefc55de62"
+    },
+    {
+      "name": "trusted-json-verify",
+      "args": [
+        "audit",
+        "binder",
+        "verify",
+        "/private/tmp/p0-20-compiled-cli-NTQeYj/owned-state/outputs/signed.json",
+        "--pubkey",
+        "/private/tmp/p0-20-compiled-cli-NTQeYj/owned-state/independent-auditor.pub",
+        "--json"
+      ],
+      "exit": 70,
+      "signal": null,
+      "error": null,
+      "expectedExit": 0,
+      "expectUnchanged": true,
+      "unchanged": true,
+      "checkError": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n70 !== 0\n",
+      "actualTextClaimLine": false,
+      "durationMs": 892,
+      "stdout": "/private/tmp/p0-20-compiled-cli-NTQeYj/trusted-json-verify.stdout",
+      "stdoutSha256": "16d07af628a166c7155c6aeab05aede47572d713d0d856baa7fa30cc7b0a128c",
+      "stderr": "/private/tmp/p0-20-compiled-cli-NTQeYj/trusted-json-verify.stderr",
+      "stderrSha256": "29ecbb28d33e7fd4cba2fc4d166f840f9afbdf48d6686e68af468ec8445beebb",
+      "effects": "/private/tmp/p0-20-compiled-cli-NTQeYj/trusted-json-verify.effects.json",
+      "effectsSha256": "182ef1fde5afec14c9107cb8230f6ab885fc79934697e8dddf6e1ceefc55de62"
+    },
+    {
+      "name": "unpinned-refusal",
+      "args": [
+        "audit",
+        "binder",
+        "verify",
+        "/private/tmp/p0-20-compiled-cli-NTQeYj/owned-state/outputs/signed.json",
+        "--json"
+      ],
+      "exit": 1,
+      "signal": null,
+      "error": null,
+      "expectedExit": 1,
+      "expectUnchanged": true,
+      "unchanged": true,
+      "checkError": null,
+      "actualTextClaimLine": false,
+      "durationMs": 807,
+      "stdout": "/private/tmp/p0-20-compiled-cli-NTQeYj/unpinned-refusal.stdout",
+      "stdoutSha256": "b6094e9e306c51f20e2c4ab57e0541aadb8011ed3968acb7295c54ae15829636",
+      "stderr": "/private/tmp/p0-20-compiled-cli-NTQeYj/unpinned-refusal.stderr",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effects": "/private/tmp/p0-20-compiled-cli-NTQeYj/unpinned-refusal.effects.json",
+      "effectsSha256": "182ef1fde5afec14c9107cb8230f6ab885fc79934697e8dddf6e1ceefc55de62"
+    },
+    {
+      "name": "unsigned-text-write",
+      "args": [
+        "domain",
+        "apply",
+        "--agent",
+        "default",
+        "--pack",
+        "clinical-trials",
+        "--audit",
+        "--responses",
+        "/private/tmp/p0-20-compiled-cli-NTQeYj/owned-state/responses.json",
+        "--audit-bundle",
+        "/private/tmp/p0-20-compiled-cli-NTQeYj/owned-state/outputs/unsigned.json",
+        "--no-sign"
+      ],
+      "exit": 0,
+      "signal": null,
+      "error": null,
+      "expectedExit": 0,
+      "expectUnchanged": false,
+      "unchanged": false,
+      "checkError": null,
+      "actualTextClaimLine": false,
+      "durationMs": 809,
+      "stdout": "/private/tmp/p0-20-compiled-cli-NTQeYj/unsigned-text-write.stdout",
+      "stdoutSha256": "bbe770999b4ee6bf814fb3396cf102680a4e9821a6a87ea98158cba5e836700a",
+      "stderr": "/private/tmp/p0-20-compiled-cli-NTQeYj/unsigned-text-write.stderr",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effects": "/private/tmp/p0-20-compiled-cli-NTQeYj/unsigned-text-write.effects.json",
+      "effectsSha256": "d237a0a1454bfff980596fbbbe60eb9d6891464a784b4c237d839872e4f63e3a"
+    },
+    {
+      "name": "unsigned-verify-refusal",
+      "args": [
+        "audit",
+        "binder",
+        "verify",
+        "/private/tmp/p0-20-compiled-cli-NTQeYj/owned-state/outputs/unsigned.json",
+        "--pubkey",
+        "/private/tmp/p0-20-compiled-cli-NTQeYj/owned-state/independent-auditor.pub",
+        "--json"
+      ],
+      "exit": 1,
+      "signal": null,
+      "error": null,
+      "expectedExit": 1,
+      "expectUnchanged": true,
+      "unchanged": true,
+      "checkError": null,
+      "actualTextClaimLine": false,
+      "durationMs": 847,
+      "stdout": "/private/tmp/p0-20-compiled-cli-NTQeYj/unsigned-verify-refusal.stdout",
+      "stdoutSha256": "b3114ec7498b180c4bac678fabb33958c77bc2522dde81117bde210bb8338857",
+      "stderr": "/private/tmp/p0-20-compiled-cli-NTQeYj/unsigned-verify-refusal.stderr",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effects": "/private/tmp/p0-20-compiled-cli-NTQeYj/unsigned-verify-refusal.effects.json",
+      "effectsSha256": "bab6e782833361c9ad387ad523307ded020ccbdb2e535c88b9753a873ffb0212"
+    },
+    {
+      "name": "baseline-checksum-json",
+      "args": [
+        "domain",
+        "apply",
+        "--agent",
+        "default",
+        "--pack",
+        "clinical-trials",
+        "--audit",
+        "--audit-bundle",
+        "/private/tmp/p0-20-compiled-cli-NTQeYj/owned-state/outputs/baseline.json",
+        "--no-sign",
+        "--json"
+      ],
+      "exit": 0,
+      "signal": null,
+      "error": null,
+      "expectedExit": 0,
+      "expectUnchanged": false,
+      "unchanged": false,
+      "checkError": null,
+      "actualTextClaimLine": false,
+      "durationMs": 825,
+      "stdout": "/private/tmp/p0-20-compiled-cli-NTQeYj/baseline-checksum-json.stdout",
+      "stdoutSha256": "114c7c39ac824ff686f0fbb525de5cb9561534de612067b65c8e58aa5ab326f7",
+      "stderr": "/private/tmp/p0-20-compiled-cli-NTQeYj/baseline-checksum-json.stderr",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effects": "/private/tmp/p0-20-compiled-cli-NTQeYj/baseline-checksum-json.effects.json",
+      "effectsSha256": "d371a324ebea129bd627babf7475c2cbe71315ec4e7e5a7efd965d0ee2f2347e"
+    },
+    {
+      "name": "baseline-sign-refusal",
+      "args": [
+        "domain",
+        "apply",
+        "--agent",
+        "default",
+        "--pack",
+        "clinical-trials",
+        "--audit",
+        "--audit-bundle",
+        "/private/tmp/p0-20-compiled-cli-NTQeYj/owned-state/outputs/baseline-refused.json",
+        "--json"
+      ],
+      "exit": 1,
+      "signal": null,
+      "error": null,
+      "expectedExit": 1,
+      "expectUnchanged": true,
+      "unchanged": true,
+      "checkError": null,
+      "actualTextClaimLine": false,
+      "durationMs": 777,
+      "stdout": "/private/tmp/p0-20-compiled-cli-NTQeYj/baseline-sign-refusal.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "/private/tmp/p0-20-compiled-cli-NTQeYj/baseline-sign-refusal.stderr",
+      "stderrSha256": "e453fb0f2a9a81147efb088e1792637498fc722945223ea9687c8a088252e8a5",
+      "effects": "/private/tmp/p0-20-compiled-cli-NTQeYj/baseline-sign-refusal.effects.json",
+      "effectsSha256": "c2807ea0bbfb6bed0f5802166e2a976e346f193930247aa51c39e91f7c9e3050"
+    },
+    {
+      "name": "locked-sign-refusal",
+      "args": [
+        "domain",
+        "apply",
+        "--agent",
+        "default",
+        "--pack",
+        "clinical-trials",
+        "--audit",
+        "--responses",
+        "/private/tmp/p0-20-compiled-cli-NTQeYj/owned-state/responses.json",
+        "--audit-bundle",
+        "/private/tmp/p0-20-compiled-cli-NTQeYj/owned-state/outputs/locked-refused.json",
+        "--json"
+      ],
+      "exit": 1,
+      "signal": null,
+      "error": null,
+      "expectedExit": 1,
+      "expectUnchanged": true,
+      "unchanged": true,
+      "checkError": null,
+      "actualTextClaimLine": false,
+      "durationMs": 1010,
+      "stdout": "/private/tmp/p0-20-compiled-cli-NTQeYj/locked-sign-refusal.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "/private/tmp/p0-20-compiled-cli-NTQeYj/locked-sign-refusal.stderr",
+      "stderrSha256": "1396c3557f68695ad1ffa597f293817d18999ab0a89ee1232fd06d32eb5b112d",
+      "effects": "/private/tmp/p0-20-compiled-cli-NTQeYj/locked-sign-refusal.effects.json",
+      "effectsSha256": "c2807ea0bbfb6bed0f5802166e2a976e346f193930247aa51c39e91f7c9e3050"
+    },
+    {
+      "name": "tamper-rechecksum-refusal",
+      "args": [
+        "audit",
+        "binder",
+        "verify",
+        "/private/tmp/p0-20-compiled-cli-NTQeYj/owned-state/outputs/tampered-rechecksummed.json",
+        "--pubkey",
+        "/private/tmp/p0-20-compiled-cli-NTQeYj/owned-state/independent-auditor.pub",
+        "--json"
+      ],
+      "exit": 1,
+      "signal": null,
+      "error": null,
+      "expectedExit": 1,
+      "expectUnchanged": true,
+      "unchanged": true,
+      "checkError": null,
+      "actualTextClaimLine": false,
+      "durationMs": 880,
+      "stdout": "/private/tmp/p0-20-compiled-cli-NTQeYj/tamper-rechecksum-refusal.stdout",
+      "stdoutSha256": "c8453b85abb54072e2492d202805ada786dc7e65dc9506cd051c17103e7510cc",
+      "stderr": "/private/tmp/p0-20-compiled-cli-NTQeYj/tamper-rechecksum-refusal.stderr",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effects": "/private/tmp/p0-20-compiled-cli-NTQeYj/tamper-rechecksum-refusal.effects.json",
+      "effectsSha256": "2c20cea9049bc7ede903e90d493d8f671a621bb133e6bea25311573119e6ce2f"
+    },
+    {
+      "name": "foreign-signer-refusal",
+      "args": [
+        "audit",
+        "binder",
+        "verify",
+        "/private/tmp/p0-20-compiled-cli-NTQeYj/owned-state/outputs/foreign-signed.json",
+        "--pubkey",
+        "/private/tmp/p0-20-compiled-cli-NTQeYj/owned-state/independent-auditor.pub",
+        "--json"
+      ],
+      "exit": 1,
+      "signal": null,
+      "error": null,
+      "expectedExit": 1,
+      "expectUnchanged": true,
+      "unchanged": true,
+      "checkError": null,
+      "actualTextClaimLine": false,
+      "durationMs": 757,
+      "stdout": "/private/tmp/p0-20-compiled-cli-NTQeYj/foreign-signer-refusal.stdout",
+      "stdoutSha256": "771b2eb8800e7e4738f9d71c13fc1574e38d8734b2b75b155f07dfff520e2c91",
+      "stderr": "/private/tmp/p0-20-compiled-cli-NTQeYj/foreign-signer-refusal.stderr",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "effects": "/private/tmp/p0-20-compiled-cli-NTQeYj/foreign-signer-refusal.effects.json",
+      "effectsSha256": "5fa914adc9010dea62133d7811042a5f9aa9907ca04f52bbab6defa89f55f190"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "/private/tmp/p0-20-compiled-cli-NTQeYj/owned-state/outputs/signed.json",
+      "sha256": "67181a5b654b199c91a8cc3f3c4b8cb640ea5654ad0fa454e4340eea46ccb770"
+    },
+    {
+      "path": "/private/tmp/p0-20-compiled-cli-NTQeYj/owned-state/outputs/unsigned.json",
+      "sha256": "3e9cb69b510a122688b30d1195f55aeaa3ef9620c0134592b85069bc3c175a02"
+    },
+    {
+      "path": "/private/tmp/p0-20-compiled-cli-NTQeYj/owned-state/outputs/baseline.json",
+      "sha256": "0f0264e8c8cc21e255db7305f02f8cbf3895fd4cd71569926791440a54922a4c"
+    },
+    {
+      "path": "/private/tmp/p0-20-compiled-cli-NTQeYj/owned-state/outputs/tampered-rechecksummed.json",
+      "sha256": "1aabc58495001fbccc42b1bdb737c455eb23d1c0e60dc7f813f4dd02108a4ff5"
+    },
+    {
+      "path": "/private/tmp/p0-20-compiled-cli-NTQeYj/owned-state/outputs/foreign-signed.json",
+      "sha256": "2bcb59cd3ad4aba8e9c9983d500a3dd41f2d17b17496502b76bf0e858458b97f"
+    },
+    {
+      "path": "/private/tmp/p0-20-compiled-cli-NTQeYj/owned-state/responses.json",
+      "sha256": "1dcaadc51d4896e88a0e04c18935daad7b650673a9e3fcbf99f6491eb6b49ffc"
+    }
+  ],
+  "limits": "Actual compiled local CLI with private HOME/workspaces and genuine fixture license. No activation, live provider, authenticated HTTP, notary/HSM, whole-suite/coverage/hosted/release claim."
+}

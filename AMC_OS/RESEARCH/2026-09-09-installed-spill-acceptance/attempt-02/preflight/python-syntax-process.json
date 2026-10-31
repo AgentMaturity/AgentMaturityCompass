@@ -4,7 +4,7 @@
     "/Library/Developer/CommandLineTools/usr/bin/python3",
     "-c",
     "import ast,pathlib,sys;ast.parse(pathlib.Path(sys.argv[1]).read_text());print('Python source parsed; not imported or executed')",
-    "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-09-installed-spill-acceptance/run.py"
+    "~/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-09-installed-spill-acceptance/run.py"
   ],
   "startedAt": "2026-09-09T15:34:12.866738+00:00",
   "timeoutSeconds": 30,

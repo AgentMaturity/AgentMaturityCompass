@@ -1,5 +1,5 @@
 
- RUN  v4.1.11 /Users/sid/AgentMaturityCompass
+ RUN  v4.1.11 ~/AgentMaturityCompass
 
 
  Test Files  4 passed (4)

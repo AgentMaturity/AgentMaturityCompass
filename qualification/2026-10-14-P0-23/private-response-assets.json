@@ -1,0 +1,162 @@
+[
+  {
+    "path": "/private/tmp/p0-23-api-claim-responses-refined-red-20261014/current-sealed-api.json",
+    "sha256": "1b1f55c71aa7b2bfae5d13ec3909ef7adc82039d012276cd63bcda497c90e50b",
+    "bytes": 1764115
+  },
+  {
+    "path": "/private/tmp/p0-23-api-claim-responses-refined-red-20261014/current-tampered-api.json",
+    "sha256": "3b060c73668c43499a9a2fa089b40c71ab394b3eef74716d132ed303d9e81d5e",
+    "bytes": 1764291
+  },
+  {
+    "path": "/private/tmp/p0-23-api-claim-responses-refined-red-20261014/current-unsealed-api.json",
+    "sha256": "24a96b893e403f7b2685c844d19edd2a68257d8cf49aa8616bf6e21d6c0b4f29",
+    "bytes": 1763987
+  },
+  {
+    "path": "/private/tmp/p0-23-api-claim-responses-refined-red-20261014/generated-openapi-accounting.json",
+    "sha256": "c9a251fe8f44bbcba80b9aea8303273921e4b9d67370a58a1786e2e640dbf3a7",
+    "bytes": 28304
+  },
+  {
+    "path": "/private/tmp/p0-23-api-claim-responses-refined-red-20261014/legacy-1-1-1-api.json",
+    "sha256": "182ca52cef6a1cf3d188317cf6120bc89a46b9dbfeeb61c57145c258d05dc589",
+    "bytes": 1764111
+  },
+  {
+    "path": "/private/tmp/p0-23-api-claim-responses-refined-red-20261014/missing-api-run.json",
+    "sha256": "d172a747d214966a71ebf723a6bc694aa1fc3d89d6c43952e87d32c23f5a6ecc",
+    "bytes": 217
+  },
+  {
+    "path": "/private/tmp/p0-23-api-claim-responses-refined-red-20261014/saved-openapi-accounting.json",
+    "sha256": "ad0c631275d1e22f0c00742ec89da1641def586eb22e65746a6058f64ffd9695",
+    "bytes": 34436
+  },
+  {
+    "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-auth-control-stored.json",
+    "sha256": "e224d7cd705137261b6ad8f62dde437990fb20bc93e59dbff62aad4129f80a85",
+    "bytes": 897307
+  },
+  {
+    "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-auth-invalid.json",
+    "sha256": "ec1679227e3a97f600ce8821e64d1b5522545439c85a006e31043f08646b6a72",
+    "bytes": 259
+  },
+  {
+    "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-auth-missing.json",
+    "sha256": "ec1679227e3a97f600ce8821e64d1b5522545439c85a006e31043f08646b6a72",
+    "bytes": 259
+  },
+  {
+    "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-catalog-paid.json",
+    "sha256": "2a744443294ef431f3960de1ae92f2414af4bb6d758eb30f35c76d914e64e5fe",
+    "bytes": 123061
+  },
+  {
+    "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-catalog-unpaid.json",
+    "sha256": "d55b8c2acc9e8b24bd7f532fdac741290f28b669566d1b6bb84ae0509be1ff31",
+    "bytes": 69512
+  },
+  {
+    "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-current-no-readiness-stored.json",
+    "sha256": "65dde20d639b105d62545eeffa8a884f37269d947bf024f6ed4e4e8dee44e66c",
+    "bytes": 896661
+  },
+  {
+    "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-current-no-readiness.json",
+    "sha256": "9eb39e5141ce16cdc12085a63fe70a2919ce4a5340de1fbf19a2336b6ec71169",
+    "bytes": 1756433
+  },
+  {
+    "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-current-sealed-stored.json",
+    "sha256": "7e2225a1c035996339d546241314b1b24c74018abab5feec2023a823f522b1cd",
+    "bytes": 897309
+  },
+  {
+    "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-current-sealed.json",
+    "sha256": "21606bc64ea9339f4db3a19187defd16a084f8c66c656bf515dfc6601c813081",
+    "bytes": 1756243
+  },
+  {
+    "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-current-tampered-stored.json",
+    "sha256": "4c655bfc26388d614e6516569e60954647903661068cc227ad428cc8bac271f0",
+    "bytes": 897311
+  },
+  {
+    "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-current-tampered.json",
+    "sha256": "37960a2b13255707513e35530453b8d50f10eaa8607cc56cc5bb43409cc3ec53",
+    "bytes": 1756421
+  },
+  {
+    "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-current-unsealed-stored.json",
+    "sha256": "7e013f80733a055b33af4d3ff101667a1fa1411a83123ecd996110aaa858db52",
+    "bytes": 897160
+  },
+  {
+    "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-current-unsealed.json",
+    "sha256": "f92109f7cdd8245b5ddab2b3f627491ad567914a9a904786dab457b686f97b72",
+    "bytes": 1756117
+  },
+  {
+    "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-legacy-1-1-1-stored.json",
+    "sha256": "6d9c8b541719db383157a13b7dfe08e38870d86f591ec8930b1125c81ae4d84b",
+    "bytes": 896653
+  },
+  {
+    "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-legacy-1-1-1.json",
+    "sha256": "1ae8d431e05bcafb0c5fcb090ec1fa900c0862b984170de472d816bcb2e54dc5",
+    "bytes": 1756409
+  },
+  {
+    "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-legacy-with-readiness-stored.json",
+    "sha256": "ed7af9f29cc787cc36a00184f0f09fa655d21ae42b5fe57fce6d8597b0dcb044",
+    "bytes": 897316
+  },
+  {
+    "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-legacy-with-readiness.json",
+    "sha256": "c8cd0172997aa547cc23c878d03ddc564b72b48983d250a0eccc0df0a0265bbb",
+    "bytes": 1756264
+  },
+  {
+    "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-missing-run.json",
+    "sha256": "842a8d7338bc9f7025dcafb9d7cf91113c691ef631575dabc02f85352c9c4485",
+    "bytes": 251
+  },
+  {
+    "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-pack-inherited-__proto__.json",
+    "sha256": "65768781ffec0ba66a22684dbdde8b976f2cb611d9163e90aedce16aeaf98a34",
+    "bytes": 249
+  },
+  {
+    "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-pack-inherited-constructor.json",
+    "sha256": "6aa565ffc4cd61f35eb3262259f6e13dd75ef9f5da633abe2857e2715d880551",
+    "bytes": 251
+  },
+  {
+    "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-pack-inherited-hasOwnProperty.json",
+    "sha256": "479b88f19b7ed8dca819db3016e38a38ff341315b9c7ca30135e851963009f5a",
+    "bytes": 254
+  },
+  {
+    "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-pack-inherited-toString.json",
+    "sha256": "97d0eebef8242f2dc9ed012bf914a6f487be70814d4aacfa6333d26a3ac228f5",
+    "bytes": 248
+  },
+  {
+    "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-pack-paid.json",
+    "sha256": "7d54fcb4d1ab6e5a8dc29b78f8c9b13e0f6586487e7368fe00b4bf2f586ed8c0",
+    "bytes": 40034
+  },
+  {
+    "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-pack-unpaid-refusal.json",
+    "sha256": "8d7a6786d5f3950ac6571c3081948729b436a27e7970101e693deb333b50edfd",
+    "bytes": 1780
+  },
+  {
+    "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-unknown-route.json",
+    "sha256": "ff777c1b4609a7811ec5e5ffd78e892696b07f968531f3672f7e09849144541e",
+    "bytes": 222
+  }
+]

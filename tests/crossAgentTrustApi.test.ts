@@ -18,6 +18,9 @@ import {
   type TemporalDecayConfig,
   type DelegationPolicy,
   type TrustVerificationResult,
+  ClaimReplayCache,
+  claimHmacKeyId,
+  type ClaimExpectation,
 } from '../src/score/crossAgentTrust.js';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -30,8 +33,14 @@ function makeValidClaim(opts?: { score?: number; level?: string }): AgentIdentit
     'abc123publickeyhash',
     'workspace-test',
     SECRET,
-    { amcScore: opts?.score ?? 75, amcLevel: opts?.level ?? 'L4' },
+    { audience: 'agent-peer', amcScore: opts?.score ?? 75, amcLevel: opts?.level ?? 'L4' },
   );
+}
+
+// P1-08: verification needs the verifier's expectation (audience, issuer, scope, grants, replay cache).
+function expected(issuer = 'agent-test-001'): ClaimExpectation {
+  return { audience: 'agent-peer', issuer, requestedScope: 'read',
+    grants: { [issuer]: ['read', 'write', 'execute', 'delegate'] }, issuerKeyIds: { [issuer]: [claimHmacKeyId(SECRET)] }, replay: new ClaimReplayCache() };
 }
 
 function makePolicy(overrides: Partial<TrustPolicyRule> = {}): TrustPolicyRule {
@@ -45,39 +54,37 @@ function makePolicy(overrides: Partial<TrustPolicyRule> = {}): TrustPolicyRule {
 // ── Route: POST /api/v1/score/trust/verify-claim ───────────────────────────
 
 describe('Trust API — verify-claim', () => {
-  it('returns trusted:true for a valid, fresh claim with matching policy', () => {
+  it('reports a valid shared-secret claim as SELF_REPORTED: never trusted, at most limited, no scopes (P1-08)', () => {
     const claim = makeValidClaim({ score: 80, level: 'L4' });
     const policy = makePolicy({ minAmcScore: 70, minAmcLevel: 'L3' });
-    const result = verifyAgentClaim(claim, policy, SECRET);
-    expect(result.trusted).toBe(true);
-    expect(result.trustLevel).toBe('full');
-    expect(result.grantedScopes).toContain('read');
+    const result = verifyAgentClaim(claim, policy, SECRET, expected());
+    expect(result).toMatchObject({ trusted: false, trustLevel: 'limited', trustTier: 'SELF_REPORTED', integrity: 'shared-secret', grantedScopes: [] });
   });
 
   it('returns trusted:false when score is below minimum', () => {
     const claim = makeValidClaim({ score: 30 });
     const policy = makePolicy({ minAmcScore: 70 });
-    const result = verifyAgentClaim(claim, policy, SECRET);
+    const result = verifyAgentClaim(claim, policy, SECRET, expected());
     expect(result.reasons.some(r => r.includes('below required'))).toBe(true);
   });
 
   it('returns untrusted when signature is invalid', () => {
     const claim = makeValidClaim();
-    const result = verifyAgentClaim(claim, makePolicy(), 'wrong-secret');
+    const result = verifyAgentClaim(claim, makePolicy(), 'wrong-secret', expected());
     expect(result.trusted).toBe(false);
     expect(result.trustLevel).toBe('untrusted');
   });
 
   it('includes reasons array with at least one entry', () => {
     const claim = makeValidClaim();
-    const result = verifyAgentClaim(claim, makePolicy(), SECRET);
+    const result = verifyAgentClaim(claim, makePolicy(), SECRET, expected());
     expect(Array.isArray(result.reasons)).toBe(true);
     expect(result.reasons.length).toBeGreaterThan(0);
   });
 
   it('score field is a number on the display scale (0-100)', () => {
     const claim = makeValidClaim();
-    const result = verifyAgentClaim(claim, makePolicy(), SECRET);
+    const result = verifyAgentClaim(claim, makePolicy(), SECRET, expected());
     expect(typeof result.score).toBe('number');
     expect(result.score).toBeGreaterThanOrEqual(0);
     expect(result.score).toBeLessThanOrEqual(100);
@@ -85,14 +92,14 @@ describe('Trust API — verify-claim', () => {
 
   it('grantedScopes is empty for untrusted claims', () => {
     const claim = makeValidClaim();
-    const result = verifyAgentClaim(claim, makePolicy(), 'bad-secret');
+    const result = verifyAgentClaim(claim, makePolicy(), 'bad-secret', expected());
     expect(result.grantedScopes).toHaveLength(0);
   });
 
   it('rejects claim from workspace not in allowedWorkspaces', () => {
     const claim = makeValidClaim();
     const policy = makePolicy({ allowedWorkspaces: ['workspace-other'] });
-    const result = verifyAgentClaim(claim, policy, SECRET);
+    const result = verifyAgentClaim(claim, policy, SECRET, expected());
     expect(result.reasons.some(r => r.includes('not in trusted workspace list'))).toBe(true);
   });
 });
@@ -101,20 +108,20 @@ describe('Trust API — verify-claim', () => {
 
 describe('Trust API — create-claim', () => {
   it('creates a claim with the correct agentId', () => {
-    const claim = createAgentClaim('agent-42', 'pubhash-xyz', 'ws-123', SECRET);
+    const claim = createAgentClaim('agent-42', 'pubhash-xyz', 'ws-123', SECRET, { audience: 'agent-peer' });
     expect(claim.agentId).toBe('agent-42');
     expect(claim.issuingWorkspace).toBe('ws-123');
   });
 
   it('signature is a non-empty hex string', () => {
-    const claim = createAgentClaim('agent-1', 'pubhash-abc', 'ws-1', SECRET);
+    const claim = createAgentClaim('agent-1', 'pubhash-abc', 'ws-1', SECRET, { audience: 'agent-peer' });
     expect(typeof claim.signature).toBe('string');
     expect(claim.signature.length).toBe(64); // SHA-256 hex
   });
 
   it('issuedAt is a Date close to now', () => {
     const before = Date.now();
-    const claim = createAgentClaim('agent-1', 'pubhash-abc', 'ws-1', SECRET);
+    const claim = createAgentClaim('agent-1', 'pubhash-abc', 'ws-1', SECRET, { audience: 'agent-peer' });
     const after = Date.now();
     expect(claim.issuedAt).toBeInstanceOf(Date);
     expect(claim.issuedAt.getTime()).toBeGreaterThanOrEqual(before);
@@ -123,6 +130,7 @@ describe('Trust API — create-claim', () => {
 
   it('stores optional amcScore and amcLevel', () => {
     const claim = createAgentClaim('agent-1', 'pubhash', 'ws-1', SECRET, {
+      audience: 'agent-peer',
       amcScore: 85,
       amcLevel: 'L4',
       amcPassportId: 'passport-999',
@@ -133,14 +141,14 @@ describe('Trust API — create-claim', () => {
   });
 
   it('sets expiresAt when ttlHours is provided', () => {
-    const claim = createAgentClaim('agent-1', 'pubhash', 'ws-1', SECRET, { ttlHours: 24 });
+    const claim = createAgentClaim('agent-1', 'pubhash', 'ws-1', SECRET, { audience: 'agent-peer', ttlHours: 24 });
     expect(claim.expiresAt).toBeDefined();
     expect(claim.expiresAt!.getTime()).toBeGreaterThan(Date.now());
   });
 
   it('created claim passes verify-claim with correct secret', () => {
-    const claim = createAgentClaim('agent-1', 'pubhash', 'ws-1', SECRET, { amcScore: 75 });
-    const result = verifyAgentClaim(claim, makePolicy(), SECRET);
+    const claim = createAgentClaim('agent-1', 'pubhash', 'ws-1', SECRET, { audience: 'agent-peer', amcScore: 75 });
+    const result = verifyAgentClaim(claim, makePolicy(), SECRET, expected('agent-1'));
     expect(result.reasons).toContain('Signature valid');
   });
 });
@@ -254,6 +262,8 @@ describe('Trust API — inherited trust', () => {
     score: 80,
     level: 'L4',
     grantedScopes: ['read', 'write', 'execute', 'delegate'],
+    integrity: 'ed25519',
+    trustTier: 'ATTESTED',
   };
 
   const policy: DelegationPolicy = {

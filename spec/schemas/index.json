@@ -13,7 +13,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-deployment-receipt.schema.json",
       "name": "a4-deployment-receipt.schema.json",
-      "sha256": "c0b830ffdc0148e07d3b867bb06d9a52835e437ff94bb3c65d70eeb56189a225"
+      "sha256": "c7765de85338735567dc0244e1d9b325790462bb5a224732d1cc1b7b886f5cbb"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-gate-policy.schema.json",
@@ -23,12 +23,12 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-gate.schema.json",
       "name": "a4-gate.schema.json",
-      "sha256": "8b4bebab787e3b58d3abf770746f7b2652bd43158950b1819abd227975276bd0"
+      "sha256": "ad8466afdb87b4f0d3160feb0f876c0a043cff59a6b48eaacad8ecf3de298da8"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-integration-claim.schema.json",
       "name": "a4-integration-claim.schema.json",
-      "sha256": "7240b74fc3fa61020ad6f0042157f905a967c32567767e36647df7012909e821"
+      "sha256": "02618dcc091573a6e5d818e7bfeb0e725ae09ef34286dcdef4cfa187fe9f97c1"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-intent.schema.json",
@@ -38,7 +38,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-package.schema.json",
       "name": "a4-package.schema.json",
-      "sha256": "1aaf90d632990850801b3e4ce1e480506d1627f7626e11762a5e69d718870616"
+      "sha256": "e7e55ad156dde1c1e5ca57f5c2633e2e9a175f7e4d98fb655cc5b2af72d114b4"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-project.schema.json",
@@ -48,7 +48,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-readiness.schema.json",
       "name": "a4-readiness.schema.json",
-      "sha256": "f4ce96bbd89cdd690d4ec3aaa7b6f35e2463418284e5e5b8d0e56ec110092616"
+      "sha256": "76e746c93cc71c9684c81bb063675e42bc85b56f33a3af19083a13eca9f22162"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-record.schema.json",
@@ -58,7 +58,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-release.schema.json",
       "name": "a4-release.schema.json",
-      "sha256": "1e2ef794a7d80ac73c78d0026ff97fe4e73964e2a8aec6846ce18262d21bffcd"
+      "sha256": "a3bb26a7df9af122a4f5898f0d8e32c814519eecade6d01ea6fff39518ff9e19"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-revision.schema.json",
@@ -68,17 +68,17 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-rollback-receipt.schema.json",
       "name": "a4-rollback-receipt.schema.json",
-      "sha256": "7200a1e318ecf2b8521bce0c18d8bde8cddc61aaf0cb6c94fb6c1e3e3ec74bf7"
+      "sha256": "ae6e72c19c3a4b7b54627f984ca16b49e0a28cd4c02cd5bd7bbacb3af996a16c"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-transition.schema.json",
       "name": "a4-transition.schema.json",
-      "sha256": "81f41c4c6321efa8ac8a17abc2a4690e76da83a52f07e31a8eb8a3b33b06323c"
+      "sha256": "81dbd0c044ba80a8745b0449408ef212f50c13628eb6361ca7b799c40958f094"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-value-claim.schema.json",
       "name": "a4-value-claim.schema.json",
-      "sha256": "5158210381faa741d114937c1c5d226e124e0fd5ae9eb1752a07d98f3cbc7c86"
+      "sha256": "e944438c981b06e190b062e4242cb2b38e7b3d9fc8ccb868a86881e08a8af17a"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/amcaudit.schema.json",
@@ -88,7 +88,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/amcbench.schema.json",
       "name": "amcbench.schema.json",
-      "sha256": "5a55092f837c8cb29b8eef4df6c79dff81e9cbce0c39c40685349989131c1127"
+      "sha256": "d23fbd24919626e3f8a18497ee77b6e71957a6de4c78b53880caa2c6ddcff382"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/amccert.schema.json",
@@ -113,7 +113,12 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/authorization-record.schema.json",
       "name": "authorization-record.schema.json",
-      "sha256": "93c50b8e80c49a8d831f990c6899be765be1f66066df3673797a01f730f5e36f"
+      "sha256": "da1f3725f614aeca52c974781042c99bbd1c25cbcc21167199365d878a478ef3"
+    },
+    {
+      "$id": "https://agentmaturity.co/spec/schemas/v1/break-glass.schema.json",
+      "name": "break-glass.schema.json",
+      "sha256": "1434e3b23d162ba0d0666917359e24c6f7cf8b4a65ae7f9bc1a3ab8d6057325f"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/catalog-lock.schema.json",
@@ -126,6 +131,11 @@
       "sha256": "4f6e86e990419e882a984e1da270180a7f98b18b59d4de362a6222a498201567"
     },
     {
+      "$id": "https://agentmaturity.co/spec/schemas/v1/conformance-results.schema.json",
+      "name": "conformance-results.schema.json",
+      "sha256": "171a5b371d6b89156d8c430ff93800671546f10ede456bc3c5b7cc600ec32137"
+    },
+    {
       "$id": "https://agentmaturity.co/spec/schemas/v1/control-record.schema.json",
       "name": "control-record.schema.json",
       "sha256": "bb8a3a363a8091b3c0cf9283d3bafc39ff43a908818ff08d8da6de8ff83da0d2"
@@ -136,14 +146,19 @@
       "sha256": "f0c65d000622ab671c15a00f348e6d62e668b3e178a8c6529522fb46620e75b6"
     },
     {
+      "$id": "https://agentmaturity.co/spec/schemas/v1/detokenization-receipt.schema.json",
+      "name": "detokenization-receipt.schema.json",
+      "sha256": "ebfd5f33e4bf5ddc1fdfec95398a18d30d964063765a47434aac3a295377ec74"
+    },
+    {
       "$id": "https://agentmaturity.co/spec/schemas/v1/evidence-event.schema.json",
       "name": "evidence-event.schema.json",
-      "sha256": "b3f2e333528cde2e54a3e3d68e8f0691da122b688dab396d175d46aa5460100a"
+      "sha256": "267b80b1afb9841da55e6b833b4fe384604a634207e7036802c01c9b44de56bd"
     },
     {
       "$id": "https://agentmaturity.co/standards/external-evidence/v1/schema.json",
       "name": "external-evidence.schema.json",
-      "sha256": "62a9620f9b866cae338399e1388e46a24ff62cfc7c8d00789a47a64aaab6e023"
+      "sha256": "2b5bdd7e4bc8b788173d33871b1cfa485b2d616a6645dbb9be1d1d51a777f297"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/legacy-receipt.schema.json",
@@ -161,6 +176,16 @@
       "sha256": "858bb4712a4edb484538c82fdf6dcb58b3dae4364c9e519f33524cdd6cec52c6"
     },
     {
+      "$id": "https://agentmaturity.co/spec/schemas/v1/redaction-receipt.schema.json",
+      "name": "redaction-receipt.schema.json",
+      "sha256": "a3816ed3a5cb446095d5e96439860663326485bf1dddd89a1333ca6a2df2a84e"
+    },
+    {
+      "$id": "https://agentmaturity.co/spec/schemas/v1/register-entry.schema.json",
+      "name": "register-entry.schema.json",
+      "sha256": "8ed84f448fb30b99a92a41f5149740bf07e20214fc123eaa979ae72ea7b3345c"
+    },
+    {
       "$id": "https://agentmaturity.co/spec/schemas/v1/registry.bench.schema.json",
       "name": "registry.bench.schema.json",
       "sha256": "29de696c9b0e7386cccaa3444d3ed8c6a78ead43ce62c891b46b4b6a1df8aaf0"
@@ -171,24 +196,39 @@
       "sha256": "14c67aa3f3c81ca4dc1d8460b305e4997bbaaa35cedb231e279756972b4770b9"
     },
     {
+      "$id": "https://agentmaturity.co/spec/schemas/v1/review-record.schema.json",
+      "name": "review-record.schema.json",
+      "sha256": "d30159671e045f308103dca63416d2bd81690f1c7d7ef2648f34f05543bae7d0"
+    },
+    {
       "$id": "https://agentmaturity.co/spec/schemas/v1/scoped-attestation.schema.json",
       "name": "scoped-attestation.schema.json",
-      "sha256": "dcfbf0beade62578c1fe69e83d5ad241e443bcaed1513c43196d6bed2c6da5df"
+      "sha256": "9365091cf1edac8e1ad2ac567cf432df9768f5d78a6e64cc43495c46235dce6a"
+    },
+    {
+      "$id": "https://agentmaturity.co/spec/schemas/v1/scoped-exception.schema.json",
+      "name": "scoped-exception.schema.json",
+      "sha256": "6ba398ddb192b09edfde185a48643ab81b0da1e5c74b5bbf04ab4e67f6802bc7"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/signature-envelope.schema.json",
       "name": "signature-envelope.schema.json",
-      "sha256": "52a074984a9c3aff81c3ded09929b1095479027e202c96660ca9ec74a4eb28b8"
+      "sha256": "ada6c11750f1cedf7d0fafe5ab3c98946ff3c6f822e2175a0d80cdb2f75cd650"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/trust-list.schema.json",
       "name": "trust-list.schema.json",
-      "sha256": "2b6af58b33879b08373990e9fc3d0b9144d81758557df2641d8a626c7be165d5"
+      "sha256": "d3bab0847a8bc6502485821483ba386017eb247c0b3228fd1e120bda15d644a3"
+    },
+    {
+      "$id": "https://agentmaturity.co/spec/schemas/v2/scoped-attestation.schema.json",
+      "name": "v2/scoped-attestation.schema.json",
+      "sha256": "80addf58bded1f216fc57d8d621fe0190795abe90675bdb17f839225603f4b24"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/verifier-report.schema.json",
       "name": "verifier-report.schema.json",
-      "sha256": "2078d2ca3175b36aabe92b1fb5163c4fb1c7b0b39ceb0aa4f57fad9a6b972927"
+      "sha256": "755d0a741dffc44b3aa04a5f8381950ccac6ed4964d64d34790e65b2d526eaf5"
     }
   ],
   "version": 1

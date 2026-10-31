@@ -1,0 +1,27 @@
+{
+  "schema": "p125-next-fallback-independent-review-seal/1",
+  "at": "2026-10-16T22:03:48.787780+00:00",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/next-fallback-candidate-review/README.md",
+      "bytes": 2045,
+      "sha256": "494bc5f210fbfd1806e1df1f917fcea301dd1f0631676f502cae4cd670b10260"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/next-fallback-candidate-review/input-pins.json",
+      "bytes": 17986,
+      "sha256": "189cfa7262ee27d4b73e58e63c3676a6b815e75cb9b71b40394f7d0a7fd23dbe"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/next-fallback-candidate-review/review.json",
+      "bytes": 9413,
+      "sha256": "76455309fe4dbdc932a26c6f85bcb714d986acbdaae367611c7e94666ec67bdc"
+    }
+  ],
+  "inputPinCount": 54,
+  "blockers": [],
+  "allReadsFinished": true,
+  "sourceAllocation": false,
+  "executed": false,
+  "checkoutIndexQaWrites": false
+}

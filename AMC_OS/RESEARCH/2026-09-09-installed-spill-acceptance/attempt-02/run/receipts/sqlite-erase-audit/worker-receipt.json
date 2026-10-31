@@ -38,12 +38,12 @@
     "sha256": "ffc2e45b8634d59a3ce7cc5b800054150b881335f0669c0d62d3f6643538b43e"
   },
   "cli": {
-    "path": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+    "path": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
     "sha256": "d009af626174b806e283e78a80c654fbbbc16e8c9d3a521169917c256ab2fb4b"
   },
   "publicExports": {
     "agent-maturity-compass": {
-      "resolved": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/index.js",
+      "resolved": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/index.js",
       "sha256": "71fd011afca17c6074a56ca2f2aaa35fff2981c0118ef088712fc87d9a5c99f0"
     }
   },

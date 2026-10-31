@@ -1,0 +1,95 @@
+{
+  "source": "8c16a9044ddea43923e3ed49bc36a9aada485855",
+  "base": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4",
+  "capturedUtc": "2026-10-14T20:45:46.335200+00:00",
+  "files": {
+    "CONTRIBUTING.md": {
+      "sha256": "ff063ec361cfff09d6582e96c5852c42ce34ff3133873b36f98fa25e7f49aa7e",
+      "bytes": 16220
+    },
+    "README.md": {
+      "sha256": "df1e553d76fb991627d0296de2c3ce96fc665cf9faf33f44fbdd4a94d393b621",
+      "bytes": 59828
+    },
+    "docs/content/reddit-launch-drafts.md": {
+      "sha256": "56d793982d4a827bbf88fb0b9c34980212526f5174a6a755a5614eaffa5e566e",
+      "bytes": 3075
+    },
+    "docs/content/show-hn-draft.md": {
+      "sha256": "6c493dc7e1f688903eff70742ef28e12b1bc60a233501c3432710e7da165b567",
+      "bytes": 1951
+    },
+    "docs/internal/competitive-landscape.md": {
+      "sha256": "856ee0c5e4cc1a72161ce8e6a35bf1a3659c4265d09fd1c3243db16a713fc20a",
+      "bytes": 3880
+    },
+    "docs/internal/mirofish-simulation-council.md": {
+      "sha256": "bd7620beca4be55924ee5cc5ff5e5d27bba02a5908217da07ad101a18dcbdbd9",
+      "bytes": 2489
+    },
+    "tests/assuranceSessionQualification.test.ts": {
+      "sha256": "b5187c328592a4d71ae78db53116f168a2bff58d3d645f80930241b1daba7608",
+      "bytes": 16295
+    },
+    "tests/budgetIntegrityQualification.test.ts": {
+      "sha256": "1e3eae62d2c49bccafd36f9ae0a6a3e442cfa57c27f8be217a08b1c1f55dfff8",
+      "bytes": 10458
+    },
+    "tests/controlCheckpointQualification.test.ts": {
+      "sha256": "7569ac285ff36b9e8cb1e4f8878d2b71be614ab4f752c444d6ebb0d98686dbcd",
+      "bytes": 6935
+    },
+    "tests/evidenceAgentFilterQualification.test.ts": {
+      "sha256": "33ee082ab1d053fd7821c2936ea8cd9fcc0324273c2fe1e1778214786d889c79",
+      "bytes": 12485
+    },
+    "website/i18n.js": {
+      "sha256": "224ab8f5f6584e5c83108c51d54c61e3a97cd867e20dfa52d86c509b8758c974",
+      "bytes": 44169
+    },
+    "website/index.html": {
+      "sha256": "a606a5654d65be54f640ed7cfc39bb229d81e72615d1037696b94ed13d01fd18",
+      "bytes": 43520
+    },
+    "website/lite.html": {
+      "sha256": "9df558092f04d3025775038291347ef243fa4d3e0ded0522cd0ac7ef45062a2c",
+      "bytes": 11197
+    },
+    "whitepaper/AMC_WHITEPAPER_v1.md": {
+      "sha256": "7d12da377e009cbc38b6f47d0df01102c631c98ea1c0ea692c5c5bec4e235bf7",
+      "bytes": 107509
+    }
+  },
+  "protectedEqualBase": {
+    "src/assurance/assuranceRunner.ts": "50bc232fa9f6eaeee5d52745854cd1d4658481492c7024b102ab515cd2197766",
+    "src/assurance/evidenceWriters.ts": "49b8dd03393dd801303c176859b3f5a8f1900f1fe3692912d1a8d2c6673f6c7b",
+    "src/assurance/agentResponder.ts": "2ecae97e66119ce66902c8d93d0edd8ab2e750b795658046bd5c0e8048f9d807",
+    "src/ledger/ledger.ts": "67128b560786c6df45e0145f02964d855cc41174521f50c493c487a4bce6fb14",
+    "src/ledger/ledgerConnection.ts": "49a4aec4b727055760717a4edc2360cb2267491922e7788dabf0cc43e0ec6854",
+    "src/ledger/ledgerSchema.ts": "8375975c42861af68a69ba33e367f8f03a9b691155a9e974152916da90c0df25",
+    "src/storage/sqlitePool.ts": "021dfe8f275c90273d1821d36431f182bbde538a3417f2375e96013c91867bfc",
+    "src/budgets/nativeBudgetUsage.ts": "45f561f1116d0f55f98439508a573b0a586ed060b3c6948d86b1240a50d5e980",
+    "src/llm/adapter/llmRuntime.ts": "6ffc6892a8ed3e94ac931fe7472a6268ddaad9f665fd365e68972b2e6edebf1c",
+    "src/agent/nativeFailureGuidance.ts": "e797ef59196351467b5fd8e41e0ce2fc81936e19ffda50f6afef4a0c05f0b01b",
+    "src/lifecycle/signedControlJournal.ts": "d17bd55ff75bfe3918a8d01aae3b2ff09cf3176235afb445fffebe3d7a13a0c7",
+    "src/utils/pathSafety.ts": "e5cece43a2dcdf2640f39180aaedf1d29f6e87ac00b4fe326244bb4d8ebdf768",
+    "src/evidence/exporter.ts": "30837bbe636fcae29331041f6cb4f7aa314687034d7f0416f0dde55bed31041a",
+    "src/cli.ts": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+    "src/cli-agent-commands.ts": "616e0c6888f8a50b3a0bb82269a29f370e74d58f3bfbb53fd97b528fa9b76582",
+    "src/studio/studioServer.ts": "d66f0174521b03f92414f837423fa8d242b2be82af1d83f425b47796276134bf",
+    "src/cli/resultCommandRegistry.ts": "f6b13a9f99a3df16a41bc260b99c9130f8d3d3d0bbc3ef9c6e28bfb9ab2ff406",
+    "tests/nativeBudgets.test.ts": "62f8aa98b6dd62d0b699107a7794ff906245e964d8d954963dae49bafdbb64c0",
+    "tests/cliAgentLoopCommands.test.ts": "e80e6f8bfee373a97a02330f63d8c9f5cfc30d86e3603ac32ee7a0a4cf02d1ef",
+    "tests/assuranceRunNoSign.test.ts": "c3b703dc4cc4ba9d432514af313d6265c10876abf1ca275d540335d008a40e31",
+    "scripts/check-freeze.mjs": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1",
+    "scripts/freeze-baseline.json": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+    "scripts/check-qualification-receipts.mjs": "1517cc5a1cba408bd8eafe7e693c1a408fd8fd0b9de4acd9bbb7de85e3d17b48",
+    "scripts/line-budgets.json": "6e27020a2c1aeafbbd55121f03e94c6af5654ce16ea15929d21bbcee68d94bfe",
+    "package.json": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+    "pnpm-lock.yaml": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+    "docs/program/metrics.json": "541373a8e5ddb8ba1dfe4581f72d371afa7cdc4885ad25077def2ed85e8955ed"
+  },
+  "productionScriptsOldTestsArchivesDependenciesUnchanged": true,
+  "archiveTreeSha256": "bce3cf2432cdc5cb375a6b1511ecd81679befc06b945042255a3b19fed79a882",
+  "bounds": "Four new qualification tests plus ten factual inventory markers1629\u21921633. Strict tagged-system/spec conflict remainsunresolved; no producer/helper/shared/held/guard/floor/line-budget/archive/metric repair or waiver. Prior phaseHEADs retainedasexecuted; source and core compiledinputs correspondence checkedseparately."
+}

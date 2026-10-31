@@ -21,7 +21,7 @@ import sys
 import time
 
 AUTHORING_BASE = "d9d55034b1e856513eea1c68b09e50ecd433063e"
-SHARED_ROOT = Path("/Users/sid/AgentMaturityCompass").resolve()
+SHARED_ROOT = Path("~/AgentMaturityCompass").resolve()
 SESSION = "tests/sessionSpillCommitment.test.ts"
 EVIDENCE = "tests/sessionSpill.test.ts"
 ENCRYPTION = "tests/spillEncryption.test.ts"

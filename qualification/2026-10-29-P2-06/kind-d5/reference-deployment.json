@@ -1,0 +1,161 @@
+{
+  "kind": "amc.reference-deployment/1",
+  "kubeContext": "kind-amc-p206",
+  "namespace": "default",
+  "release": "amc-rd",
+  "images": {
+    "a": "amc-studio@sha256:53d81cb1be147ee3fa4a74d302313696b5ebf5b86731534acda9d8acbb659b8f",
+    "b": "amc-studio@sha256:53d81cb1be147ee3fa4a74d302313696b5ebf5b86731534acda9d8acbb659b8f"
+  },
+  "ha": false,
+  "targets": {
+    "schema": "amc.recovery-targets/1",
+    "rpoSeconds": 3600,
+    "rtoSeconds": 1800,
+    "backupCadenceSeconds": 3600,
+    "agreedBy": "engineering placeholder, not agreed",
+    "partner": "none (P2-03 partner pending)",
+    "agreedOn": "2026-10-29",
+    "status": "engineering-placeholder"
+  },
+  "targetsSha256": "87ea5d6b0c21cecd94819966c1cc60a9357e31cee0c6286423ff0232012004bd",
+  "matrixSha256": "28987bce8c3b7a47fcfc9eff9bf1c622d4733f8e38790a88e25c5b50b07cd314",
+  "verdict": {
+    "pass": false,
+    "failures": [],
+    "notRun": [
+      "UPG-1",
+      "UPG-2",
+      "RB-1",
+      "RB-2",
+      "BR-2",
+      "BR-3",
+      "CR-1",
+      "CR-2",
+      "CR-3",
+      "CR-4",
+      "CR-5",
+      "CR-6",
+      "OV-1",
+      "OV-2",
+      "TS-1",
+      "TS-2",
+      "TS-3",
+      "TS-4",
+      "TS-5"
+    ],
+    "unknown": []
+  },
+  "results": [
+    {
+      "id": "INS-1",
+      "status": "passed",
+      "reason": null
+    },
+    {
+      "id": "INS-2",
+      "status": "passed",
+      "reason": null
+    },
+    {
+      "id": "UPG-1",
+      "status": "not_run",
+      "reason": "not selected (--only)"
+    },
+    {
+      "id": "UPG-2",
+      "status": "not_run",
+      "reason": "not selected (--only)"
+    },
+    {
+      "id": "RB-1",
+      "status": "not_run",
+      "reason": "not selected (--only)"
+    },
+    {
+      "id": "RB-2",
+      "status": "not_run",
+      "reason": "not selected (--only)"
+    },
+    {
+      "id": "BR-1",
+      "status": "passed",
+      "reason": null
+    },
+    {
+      "id": "BR-2",
+      "status": "not_run",
+      "reason": "not selected (--only)"
+    },
+    {
+      "id": "BR-3",
+      "status": "not_run",
+      "reason": "not selected (--only)"
+    },
+    {
+      "id": "CR-1",
+      "status": "not_run",
+      "reason": "not selected (--only)"
+    },
+    {
+      "id": "CR-2",
+      "status": "not_run",
+      "reason": "not selected (--only)"
+    },
+    {
+      "id": "CR-3",
+      "status": "not_run",
+      "reason": "not selected (--only)"
+    },
+    {
+      "id": "CR-4",
+      "status": "not_run",
+      "reason": "not selected (--only)"
+    },
+    {
+      "id": "CR-5",
+      "status": "not_run",
+      "reason": "not selected (--only)"
+    },
+    {
+      "id": "CR-6",
+      "status": "not_run",
+      "reason": "not selected (--only)"
+    },
+    {
+      "id": "OV-1",
+      "status": "not_run",
+      "reason": "not selected (--only)"
+    },
+    {
+      "id": "OV-2",
+      "status": "not_run",
+      "reason": "not selected (--only)"
+    },
+    {
+      "id": "TS-1",
+      "status": "not_run",
+      "reason": "not selected (--only)"
+    },
+    {
+      "id": "TS-2",
+      "status": "not_run",
+      "reason": "not selected (--only)"
+    },
+    {
+      "id": "TS-3",
+      "status": "not_run",
+      "reason": "not selected (--only)"
+    },
+    {
+      "id": "TS-4",
+      "status": "not_run",
+      "reason": "not selected (--only)"
+    },
+    {
+      "id": "TS-5",
+      "status": "not_run",
+      "reason": "not selected (--only)"
+    }
+  ]
+}

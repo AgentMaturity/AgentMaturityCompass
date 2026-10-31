@@ -1,0 +1,28 @@
+{
+  "schema": "p125ec-root-prose-inventory-wording-correction/1",
+  "at": "2026-10-17T01:28:36.716764+00:00",
+  "beforeSentence": "Resource counts and cases are never summed across runs.",
+  "afterSentence": "Canonical acceptance totals remain separate for each run. Per-run resource counts remain explicit; labelled cross-run resource totals are inventory only.",
+  "onlyOneSentencePerDocumentChanged": true,
+  "originalDocumentsPreserved": true,
+  "priorReadmeAndReceiptNotesExact": true,
+  "actualCuratorResourceTotalsAreExplicitInventoryOnly": true,
+  "noAcceptanceCohortSum": true,
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/final-notes-v2.txt",
+      "bytes": 5694,
+      "sha256": "7432916e681ee0ca0dcd92537f18c67124a0cf4f5348b84577385af4e46739fa"
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/final-README-v2.md",
+      "bytes": 39139,
+      "sha256": "aba7856d4dd7af0f69ef520cc3c0acb801c4d49c93ab4fe680573fe97483a80b"
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/final-receipt-notes-v2.txt",
+      "bytes": 16639,
+      "sha256": "a626de8cd936935736b7404e79502b34f2957f44e7c61d6ecb0115b75c1cdcfe"
+    }
+  ]
+}

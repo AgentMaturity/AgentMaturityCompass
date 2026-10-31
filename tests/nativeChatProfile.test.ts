@@ -78,6 +78,24 @@ function chatResumeArguments(profile: NativeChatProfile, sessionId: string): str
 }
 
 describe("signed native chat composition admission", () => {
+  it("forwards --lease-file unchanged to child runs and printed chat resume commands", async () => {
+    const root = workspace();
+    const leaseFile = join(root, "private lease.token");
+    const options = { workspace: root, leaseFile };
+    const profile = resolveNativeChatProfile(options);
+    expect(profile.effectiveOptions).toMatchObject({ leaseFile });
+    for (const surface of ["run", "chat"] as const) {
+      expect(nativeChatProfileArgv(profile, surface)).toContain(`--lease-file=${leaseFile}`);
+    }
+    tty(false);
+    const { program, fail } = registry(root);
+    await program.parseAsync(["agent-loop", "chat", "--lease-file", leaseFile], { from: "user" });
+    const chat = program.commands.find(command => command.name() === "agent-loop")!.commands.find(command => command.name() === "chat")!;
+    expect(chat.opts().leaseFile).toBe(leaseFile);
+    expect(fail).toHaveBeenCalledOnce();
+    expect(ioEdges.spawn).not.toHaveBeenCalled();
+  });
+
   it("pins disabled delegation instead of letting the child re-enable a signed preset", () => {
     const root = workspace();
     savePresets(root, [reviewer({ delegate: { enabled: true, provider: "in-process", scope: ["READ_ONLY"], maxDepth: 2, stopConditions: ["max-turns:3"] } })]);

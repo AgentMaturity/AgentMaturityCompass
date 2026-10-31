@@ -1,5 +1,5 @@
 
- RUN  v4.1.11 /Users/sid/AgentMaturityCompass
+ RUN  v4.1.11 ~/AgentMaturityCompass
 
  ❯ tests/deepseekNativeWire.test.ts (134 tests | 1 failed) 46ms
      × refuses 'audio' at its actual encoding boundary 4ms

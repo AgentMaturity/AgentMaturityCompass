@@ -1,0 +1,18 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L0-TOOL-04",
+  "polarity": "positive",
+  "evidenceClass": "valid",
+  "setup": {
+    "harness": "egress_guard",
+    "tool": "fixture.fetch",
+    "allowHosts": [
+      "api.allowed.example"
+    ],
+    "url": "https://api.allowed.example/v1/data"
+  },
+  "expected": {
+    "result": "allow",
+    "reasonCode": null
+  }
+}

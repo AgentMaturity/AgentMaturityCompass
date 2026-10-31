@@ -59,7 +59,7 @@ describe("quickstart non-interactive guard", () => {
   });
 
   test("keeps the UX audit aligned with the current quickstart guard", () => {
-    const audit = readFileSync(resolve(process.cwd(), "docs/UX_AUDIT_REPORT.md"), "utf8");
+    const audit = readFileSync(resolve(process.cwd(), "docs/archive/UX_AUDIT_REPORT.md"), "utf8");
 
     expect(audit).toContain("R16 — non-interactive quickstart fails closed instead of producing placeholder L0 results");
     expect(audit).not.toContain("Non-interactive quickstart still useless");

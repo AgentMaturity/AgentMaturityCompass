@@ -1,0 +1,119 @@
+{
+  "kind": "amc.p206-mutations/1",
+  "commit": "e2d913412 (each mutation applied to the working tree, its test run, then the file restored with git checkout)",
+  "mutations": [
+    {
+      "id": "M1",
+      "mutation": "schema: pkcs11 no longer requires a PIN Secret",
+      "file": "deploy/helm/amc/values.schema.json",
+      "test": "tests/helmChartKeyProvider.test.ts",
+      "result": "killed: a missing or partial Secret reference, or a secret in a value, fails the schema"
+    },
+    {
+      "id": "M2",
+      "mutation": "schema: a Secret name without a key is accepted",
+      "file": "deploy/helm/amc/values.schema.json",
+      "test": "tests/helmChartKeyProvider.test.ts",
+      "result": "killed: a missing or partial Secret reference, or a secret in a value, fails the schema"
+    },
+    {
+      "id": "M3",
+      "mutation": "schema: keyProvider.env admits any variable name",
+      "file": "deploy/helm/amc/values.schema.json",
+      "test": "tests/helmChartKeyProvider.test.ts",
+      "result": "killed: a missing or partial Secret reference, or a secret in a value, fails the schema"
+    },
+    {
+      "id": "M4",
+      "mutation": "deployment: the encryption step runs without its guard (default render changes)",
+      "file": "deploy/helm/amc/templates/deployment.yaml",
+      "test": "tests/helmChartKeyProvider.test.ts",
+      "result": "killed: defaults leave an existing install unchanged: file provider, no credential, encryption off; encryption on runs the chart's step before Studio and stops the pod when it fails"
+    },
+    {
+      "id": "M5",
+      "mutation": "deployment: a failing encryption step no longer stops the pod",
+      "file": "deploy/helm/amc/templates/deployment.yaml",
+      "test": "tests/helmChartKeyProvider.test.ts",
+      "result": "killed: encryption on runs the chart's step before Studio and stops the pod when it fails"
+    },
+    {
+      "id": "M6",
+      "mutation": "deployment: the credential is no longer projected from its Secret",
+      "file": "deploy/helm/amc/templates/deployment.yaml",
+      "test": "tests/helmChartKeyProvider.test.ts",
+      "result": "killed: a selected provider gets its credential file through its own variable, from a Secret reference only"
+    },
+    {
+      "id": "M7",
+      "mutation": "script: the signed ops policy is not verified before re-signing",
+      "file": "deploy/helm/amc/files/ledger-encryption.sh",
+      "test": "tests/helmChartKeyProvider.test.ts",
+      "result": "killed: refuses, and re-signs nothing, when the ops policy was edited without a signature"
+    },
+    {
+      "id": "M8",
+      "mutation": "script: the data key step runs on every start",
+      "file": "deploy/helm/amc/files/ledger-encryption.sh",
+      "test": "tests/helmChartKeyProvider.test.ts",
+      "result": "killed: switches the signed policy on, creates the file-wrapped data key, and is a no-op on the next start"
+    },
+    {
+      "id": "M9",
+      "mutation": "script: the policy flag is never set",
+      "file": "deploy/helm/amc/files/ledger-encryption.sh",
+      "test": "tests/helmChartKeyProvider.test.ts",
+      "result": "killed: switches the signed policy on, creates the file-wrapped data key, and is a no-op on the next start"
+    },
+    {
+      "id": "M10",
+      "mutation": "harness: INS-1 ignores plaintext rows",
+      "file": "qualification/reference-deployment/checks/install.mjs",
+      "test": "tests/referenceDeploymentHarness.test.ts",
+      "result": "killed: holds only when the workspace's signed policy, data key and rows all say so"
+    },
+    {
+      "id": "M11",
+      "mutation": "harness: INS-1 ignores the wrapping provider",
+      "file": "qualification/reference-deployment/checks/install.mjs",
+      "test": "tests/referenceDeploymentHarness.test.ts",
+      "result": "killed: holds only when the workspace's signed policy, data key and rows all say so"
+    },
+    {
+      "id": "M12",
+      "mutation": "harness: INS-1 installs without the keyed values",
+      "file": "qualification/reference-deployment/checks/install.mjs",
+      "test": "tests/referenceDeploymentHarness.test.ts",
+      "result": "killed: INS-1 switches on the file KeyProvider and ledger encryption; UPG-1 keeps the chart defaults (P2-06 D5)"
+    },
+    {
+      "id": "M13",
+      "mutation": "harness: --only no longer filters",
+      "file": "scripts/qualify-reference-deployment.mjs",
+      "test": "tests/referenceDeploymentHarness.test.ts",
+      "result": "killed: --only runs the named checks and records every other one as not run, so a partial rerun never passes"
+    },
+    {
+      "id": "M14",
+      "mutation": "file provider: no unlock from AMC_VAULT_PASSPHRASE before creating the wrap key",
+      "file": "src/keys/providers/file.ts",
+      "test": "tests/ledgerEncryptionMigration.test.ts",
+      "result": "killed: creates the first data key in a fresh process whose vault is locked, from AMC_VAULT_PASSPHRASE (P2-06 D5)"
+    },
+    {
+      "id": "M15",
+      "mutation": "file provider: unlock even without a passphrase (fail-open attempt)",
+      "file": "src/keys/providers/file.ts",
+      "test": "tests/ledgerEncryptionMigration.test.ts",
+      "result": "killed: still refuses to create a data key with the vault locked and no passphrase"
+    }
+  ],
+  "redGreen": [
+    {
+      "id": "R1",
+      "guard": "file provider opens the vault from AMC_VAULT_PASSPHRASE before creating the ledger wrap key",
+      "red": "tests/ledgerEncryptionMigration.test.ts 'creates the first data key in a fresh process whose vault is locked' failed with 'Vault locked' at src/keys/providers/file.ts wrapSecret before the fix",
+      "green": "17/17 in tests/ledgerEncryption*.test.ts after it"
+    }
+  ]
+}

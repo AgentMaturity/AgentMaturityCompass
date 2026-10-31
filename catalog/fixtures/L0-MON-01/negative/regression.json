@@ -1,0 +1,33 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L0-MON-01",
+  "polarity": "negative",
+  "evidenceClass": "violation",
+  "setup": {
+    "harness": "drift",
+    "thresholds": {
+      "overallDropGteHundredths": 50,
+      "layerDropGteHundredths": 70,
+      "integrityDropGtePercent": 15,
+      "correlationBelowPercent": 90
+    },
+    "previous": {
+      "overallHundredths": 480,
+      "integrityPercent": 95,
+      "correlationPercent": 99
+    },
+    "current": {
+      "overallHundredths": 400,
+      "integrityPercent": 70,
+      "correlationPercent": 50
+    },
+    "thenCall": {
+      "tool": "fixture.deploy",
+      "actionClass": "WRITE_HIGH"
+    }
+  },
+  "expected": {
+    "result": "deny",
+    "reasonCode": "recheck_failed:action_class_frozen"
+  }
+}

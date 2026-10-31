@@ -1,0 +1,42 @@
+{
+  "schema": "p125g-count-surface-independent-preferred-seal/1",
+  "at": "2026-10-16T22:52:21.874086+00:00",
+  "blockers": [],
+  "allReadsFinished": true,
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/count-surface-review/review-v3.json",
+      "bytes": 2547,
+      "sha256": "72706fe7304cbd9860decd26dc1d49228dd167077dcf20c590733e8bd5a1b011"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/count-surface-review/README-v3.md",
+      "bytes": 1690,
+      "sha256": "ddadabbfe4bdca346811f58fa38e3ec6bf2f1637abe1544badccdf934ede1bb2"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/count-surface-review/proposed-admission-v3.json",
+      "bytes": 21007,
+      "sha256": "61605cf3a30deb76d77ce510f490b82f284735b8665057bba7c18378482cce47"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/count-surface-review/pins-v3.json",
+      "bytes": 711434,
+      "sha256": "b984a173f40f6e4454d4bfd7b8ffb1fc7725b3719085f502c60a2ad24f37419d"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/count-surface-review/closed-read-observations.json",
+      "bytes": 3325962,
+      "sha256": "f64caecb76f1e6d60c868a95522346a469d04369cc4432c5daa84f3f1060d25e"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/count-surface-review/lost-session-limitation.json",
+      "bytes": 1243,
+      "sha256": "200805ac3c855952a4406bc52815f26b63c7fa7d80ac9fa3c224af2c17e6e561"
+    }
+  ],
+  "lostInitialScanExcluded": true,
+  "currentReadPassComplete": true,
+  "sourceGeneratorProductRuntimeOrNativeExecution": false,
+  "sourceIndexQaWrites": false
+}

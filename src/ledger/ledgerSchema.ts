@@ -530,7 +530,80 @@ const migrations: Migration[] = [
     `
   },
   // P1-56 A4 Forge project record; the DDL and its rules are in ledgerSchemaA4.ts.
-  { version: 13, sql: A4_MIGRATION_SQL }
+  { version: 13, sql: A4_MIGRATION_SQL },
+  {
+    // P2-09 `amc evidence-stores encrypt`: canonical_payload_inline may change once, from plaintext to an `amcenc:v1:`
+    // ciphertext of it (checked by decryption and the event hash, ADR 018). Every other immutable field stays as it was.
+    version: 14,
+    sql: `
+      DROP TRIGGER IF EXISTS protect_evidence_immutable;
+      CREATE TRIGGER protect_evidence_immutable
+      BEFORE UPDATE ON evidence_events
+      WHEN
+        OLD.id != NEW.id OR
+        OLD.ts != NEW.ts OR
+        OLD.session_id != NEW.session_id OR
+        OLD.runtime != NEW.runtime OR
+        OLD.event_type != NEW.event_type OR
+        COALESCE(OLD.payload_sha256, '') != COALESCE(NEW.payload_sha256, '') OR
+        COALESCE(OLD.meta_json, '') != COALESCE(NEW.meta_json, '') OR
+        COALESCE(OLD.prev_event_hash, '') != COALESCE(NEW.prev_event_hash, '') OR
+        COALESCE(OLD.event_hash, '') != COALESCE(NEW.event_hash, '') OR
+        COALESCE(OLD.writer_sig, '') != COALESCE(NEW.writer_sig, '') OR
+        COALESCE(OLD.canonical_payload_path, '') != COALESCE(NEW.canonical_payload_path, '') OR
+        (COALESCE(OLD.canonical_payload_inline, '') != COALESCE(NEW.canonical_payload_inline, '') AND NOT (
+          OLD.canonical_payload_inline IS NOT NULL AND substr(OLD.canonical_payload_inline, 1, 10) != 'amcenc:v1:' AND
+          NEW.canonical_payload_inline IS NOT NULL AND substr(NEW.canonical_payload_inline, 1, 10) = 'amcenc:v1:'
+        )) OR
+        COALESCE(OLD.blob_ref, '') != COALESCE(NEW.blob_ref, '')
+      BEGIN
+        SELECT RAISE(ABORT, 'evidence immutable fields changed');
+      END;
+    `
+  },
+  {
+    // P2-23 agent lifecycle: each row is materialized from the signed LIFECYCLE_* audit rows (rebuildable from them, see
+    // src/lifecycle/governanceLifecycle.ts) so admission reads one row per action. The index serves the per-agent reads.
+    version: 15,
+    sql: `
+      CREATE TABLE IF NOT EXISTS agent_lifecycle_state (
+        agent_id TEXT PRIMARY KEY,
+        state TEXT NOT NULL CHECK (state IN ('proposed','approved','active','suspended','retired')),
+        reason TEXT NOT NULL,
+        claim_kind TEXT NOT NULL CHECK (claim_kind IN ('self_reported','observed')),
+        approval_id TEXT,
+        bound_manifest_json TEXT,
+        plan_digest TEXT,
+        review_due_ts INTEGER,
+        review_advisory INTEGER NOT NULL DEFAULT 0,
+        observed_manifest_json TEXT,
+        last_event_id TEXT NOT NULL,
+        updated_ts INTEGER NOT NULL
+      );
+      CREATE INDEX IF NOT EXISTS idx_evidence_lifecycle_audit
+        ON evidence_events(json_extract(meta_json, '$.auditType'), json_extract(meta_json, '$.agentId'))
+        WHERE event_type = 'audit' AND json_valid(meta_json);
+    `
+  },
+  {
+    // P2-26 clock runtime: the signed applicability decision startIncidentClocks records once per incident (clockRuntime.ts).
+    version: 16,
+    sql: `
+      CREATE TABLE IF NOT EXISTS incident_clock_runs (
+        incident_id TEXT PRIMARY KEY,
+        status TEXT NOT NULL CHECK (status IN ('started', 'not_evaluated')),
+        reason TEXT,
+        plan_digest TEXT,
+        decisions_json TEXT NOT NULL,
+        decided_ts INTEGER NOT NULL,
+        signature TEXT NOT NULL
+      );
+      CREATE TRIGGER IF NOT EXISTS incident_clock_runs_append_only BEFORE UPDATE ON incident_clock_runs
+      BEGIN SELECT RAISE(ABORT, 'incident_clock_runs is append-only'); END;
+      CREATE TRIGGER IF NOT EXISTS incident_clock_runs_no_delete BEFORE DELETE ON incident_clock_runs
+      BEGIN SELECT RAISE(ABORT, 'incident_clock_runs is append-only'); END;
+    `
+  }
 ];
 
 export function reconcileLegacyMigrationState(db: Database.Database): void {
@@ -558,6 +631,15 @@ export function reconcileLegacyMigrationState(db: Database.Database): void {
   }
 }
 
+/** P2-09 downgrade guard: an older AMC never opens (or migrates) a ledger a newer AMC has migrated. */
+function assertSchemaNotNewer(db: Database.Database): void {
+  const known = Math.max(...migrations.map((migration) => migration.version));
+  const row = db.prepare("SELECT MAX(version) AS version FROM schema_migrations").get() as { version: number | null };
+  if (row.version !== null && row.version > known) {
+    throw new Error(`ledger schema version ${row.version} is newer than this AMC; restore the pre-upgrade backup or upgrade AMC`);
+  }
+}
+
 export function runMigrations(db: Database.Database): void {
   db.exec(`
     CREATE TABLE IF NOT EXISTS schema_migrations (
@@ -566,6 +648,7 @@ export function runMigrations(db: Database.Database): void {
     );
   `);
 
+  assertSchemaNotNewer(db);
   reconcileLegacyMigrationState(db);
 
   for (const migration of migrations) {

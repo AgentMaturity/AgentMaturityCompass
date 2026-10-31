@@ -67,6 +67,16 @@ describe("P0-01 qualification receipts", () => {
     expect(validateQualificationDir(root)).toEqual({ ok: true, receipts: [], errors: [] });
   });
 
+  test("the P2-06 harness definition folder is not a receipt, but its files still face the secret and size rules", () => {
+    write("reference-deployment/matrix.json", "{}\n");
+    expect(validateQualificationDir(root)).toEqual({ ok: true, receipts: [], errors: [] });
+    write("reference-deployment/checks/leak.pem", "x");
+    expect(errorsFor()).toContain("leak.pem");
+    rmSync(join(root, "reference-deployment"), { recursive: true });
+    write("other-definitions/matrix.json", "{}\n");
+    expect(errorsFor()).toContain("folder name must be <YYYY-MM-DD>-<KEY>");
+  });
+
   test("a missing README fails", () => {
     write(`${folder}/receipt.json`, JSON.stringify(receipt()));
     expect(errorsFor()).toContain("README.md");
@@ -75,6 +85,21 @@ describe("P0-01 qualification receipts", () => {
   test("a folder key that differs from the receipt key fails", () => {
     writeReceipt(receipt({ key: "P0-02" }));
     expect(errorsFor()).toMatch(/key/);
+  });
+
+  test("a second receipt for the same key and day may add a lowercase variant to the folder key", () => {
+    writeReceipt(receipt(), `${folder}-node-runtime`);
+    expect(validateQualificationDir(root).errors).toEqual([]);
+    rmSync(join(root, `${folder}-node-runtime`), { recursive: true });
+    // An uppercase suffix reads as another key, and a different key is still a mismatch.
+    writeReceipt(receipt(), `${folder}-NODE`);
+    expect(errorsFor()).toMatch(/folder key P0-01-NODE differs/);
+  });
+
+  test("a gap work package (WP32) is a receipt key; a malformed one is not", () => {
+    writeReceipt(receipt({ key: "WP32", date: "2026-10-30" }), "2026-10-30-WP32");
+    writeReceipt(receipt({ key: "WP3", date: "2026-10-30" }), "2026-10-30-WP3");
+    expect(validateQualificationDir(root).errors).toEqual([expect.stringMatching(/^2026-10-30-WP3: receipt.json\/key must match pattern/)]);
   });
 
   test("a folder date that differs from the receipt date fails", () => {

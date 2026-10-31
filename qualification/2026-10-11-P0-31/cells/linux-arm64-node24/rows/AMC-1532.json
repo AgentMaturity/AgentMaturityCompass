@@ -1,0 +1,187 @@
+{
+  "schema": "p031-installed-rows/v1",
+  "startedAt": "2026-10-11T11:20:21.352Z",
+  "node": "v24.21.0",
+  "npm": "11.19.0",
+  "platform": "linux",
+  "arch": "arm64",
+  "osRelease": "6.8.0-117-generic",
+  "tarballSha256": "21190c7da41e9fc5bf87e168416b34085f223df8cf80425e420557011ebc0340",
+  "installedCliSha256": "8b9ec22158bcb23a0f0123e1b12abfce1d9cd1675ba9c9f3aad6b54019ac9165",
+  "harnessSha256": {
+    "run-rows.mjs": "8f03a3eed09ccaaf19e34f3a27c3dff27f8dba0ba4041e82166bab1a5fb95768",
+    "fixtures.mjs": "2974ff6ee103808feb216166b251269601cba6bf8aaeef217cf1b2c06766c9bd",
+    "mcp-stdio-fixture.mjs": "a09692f75c229a1c793b6c9300cabba416a5b57f1fa2733ce5f2c5a8cc5b00dc",
+    "chat-pty.py": "4eb8cba86c742044a2463ba8ccc9e2c9cef816d4f7517baf743117d27fbeb819"
+  },
+  "row": "AMC-1532",
+  "status": "passed",
+  "checks": [
+    {
+      "name": "cli: approval gates the same tool and the approved turn completes",
+      "ok": true,
+      "toolName": "fs.read",
+      "approved": {
+        "exit": 0,
+        "sessionId": "d0d14ba6-d3a6-4354-ab4c-4c8ae0124149",
+        "state": "completed",
+        "detail": "d4f947c3fdf44cd38f32db19885afc20\nThe command revalidates the authenticated actor, exact request digest, current policy and quorum. A stale request must be reviewed again, not force-approved. Recording a decision is separate from its delivery and from tool execution. Ctrl-C cancels the waiting turn.\n"
+      }
+    },
+    {
+      "name": "cli: a turn held at approval is cancelled",
+      "ok": true,
+      "pendingBeforeCancel": "apprreq_66da08373dbd45f69130997520eaf0ea",
+      "cancelled": {
+        "exit": 0,
+        "sessionId": "d0b413e8-2460-443a-95c9-9105472dc5c0",
+        "state": "cancelled",
+        "detail": " command revalidates the authenticated actor, exact request digest, current policy and quorum. A stale request must be reviewed again, not force-approved. Recording a decision is separate from its delivery and from tool execution. Ctrl-C cancels the waiting turn.\n\ncancelling the turn (cause: user)…\n"
+      }
+    },
+    {
+      "name": "cli: the daily request quota refuses the next request before dispatch",
+      "ok": true,
+      "quota": {
+        "exit": 1,
+        "sessionId": "f66900da-1a15-422b-95c1-7fbeb8be1903",
+        "state": "refused",
+        "detail": "nset) and this process created and removed /work/out/rows/w/r1532-cli/tmp/.amc-confinement-probe-1162-663f75c2744a outside any workspace root; AMC does not re-exec itself under a sandbox profile, and a worker thread cannot be confined by a subprocess sandbox); tool writes are bounded by policy only\n"
+      },
+      "ledgerFailure": {
+        "message": "native model request budget exhausted",
+        "code": "QUOTA",
+        "dispatchAttempted": false
+      }
+    },
+    {
+      "name": "cli: sessions verify cold",
+      "ok": true,
+      "cold": [
+        {
+          "sessionId": "d0d14ba6-d3a6-4354-ab4c-4c8ae0124149",
+          "exit": 0,
+          "ok": true
+        },
+        {
+          "sessionId": "d0b413e8-2460-443a-95c9-9105472dc5c0",
+          "exit": 0,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "name": "sdk: approval gates the same tool and the approved turn completes",
+      "ok": true,
+      "toolName": "fs.read",
+      "approved": {
+        "state": "completed",
+        "sessionId": "58ce3b73-5a00-4842-95e6-15716d958c85",
+        "detail": "stub provider: 3 message(s) in view; you last said \"parity approval turn\"."
+      }
+    },
+    {
+      "name": "sdk: a turn held at approval is cancelled",
+      "ok": true,
+      "pendingBeforeCancel": "apprreq_5cf3036f60a54f5c80c7ad52af35a460",
+      "cancelled": {
+        "state": "cancelled",
+        "sessionId": "4805bd67-bf7c-4329-ae01-a24138adeb34",
+        "detail": ""
+      }
+    },
+    {
+      "name": "sdk: the daily request quota refuses the next request before dispatch",
+      "ok": true,
+      "quota": {
+        "state": "refused",
+        "sessionId": "2336c706-7253-467b-b633-aacc0c7a20ef",
+        "detail": "-32603 the turn did not complete {\"reason\":\"signed turn 1 ended error; idle is not successful completion\"}"
+      },
+      "ledgerFailure": {
+        "message": "native model request budget exhausted",
+        "code": "QUOTA",
+        "dispatchAttempted": false
+      }
+    },
+    {
+      "name": "sdk: sessions verify cold",
+      "ok": true,
+      "cold": [
+        {
+          "sessionId": "58ce3b73-5a00-4842-95e6-15716d958c85",
+          "exit": 0,
+          "ok": true
+        },
+        {
+          "sessionId": "4805bd67-bf7c-4329-ae01-a24138adeb34",
+          "exit": 0,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "name": "acp: approval gates the same tool and the approved turn completes",
+      "ok": true,
+      "toolName": "fs.read",
+      "approved": {
+        "state": "completed",
+        "sessionId": "88ce2042-61e1-4ce7-b8de-829ea5e6853d",
+        "detail": "{\"stopReason\":\"end_turn\",\"_meta\":{\"dev.agentmaturity.amc\":{\"validation\":{\"status\":\"not-requested\",\"turn\":1,\"configSha256\":null,\"checks\":[]}}}}"
+      }
+    },
+    {
+      "name": "acp: a turn held at approval is cancelled",
+      "ok": true,
+      "pendingBeforeCancel": "apprreq_e3ae5739420c41c99914b2eddf7138c6",
+      "cancelled": {
+        "state": "cancelled",
+        "sessionId": "b3c6a289-83f5-4c30-9f5b-3418b15dd9f2",
+        "detail": "{\"stopReason\":\"cancelled\",\"_meta\":{\"dev.agentmaturity.amc\":{\"validation\":{\"status\":\"not-requested\",\"turn\":1,\"configSha256\":null,\"checks\":[]}}}}"
+      }
+    },
+    {
+      "name": "acp: the daily request quota refuses the next request before dispatch",
+      "ok": true,
+      "quota": {
+        "state": "refused",
+        "sessionId": "67d37951-d167-486e-b007-5b494622a613",
+        "detail": "{\"code\":-32603,\"message\":\"the turn did not complete\",\"data\":{\"reason\":\"signed turn 1 ended error; idle is not successful completion\"}}"
+      },
+      "ledgerFailure": {
+        "message": "native model request budget exhausted",
+        "code": "QUOTA",
+        "dispatchAttempted": false
+      }
+    },
+    {
+      "name": "acp: sessions verify cold",
+      "ok": true,
+      "cold": [
+        {
+          "sessionId": "88ce2042-61e1-4ce7-b8de-829ea5e6853d",
+          "exit": 0,
+          "ok": true
+        },
+        {
+          "sessionId": "b3c6a289-83f5-4c30-9f5b-3418b15dd9f2",
+          "exit": 0,
+          "ok": true
+        }
+      ]
+    }
+  ],
+  "probes": {
+    "jsonlSecondAcpSession": {
+      "firstSession": true,
+      "firstTurn": "end_turn",
+      "secondSessionError": {
+        "code": -32603,
+        "message": "the method failed"
+      },
+      "diagnostic": "amc acp: session/new failed: session event store is locked by another writer: database is locked"
+    }
+  },
+  "note": "Surfaces run on the default SQLite session store. SDK results always carry state \"completed\"; the turn ending is the ACP stopReason.",
+  "durationMs": 175816
+}

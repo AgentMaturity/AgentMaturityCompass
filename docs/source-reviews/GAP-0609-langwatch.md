@@ -1,7 +1,7 @@
 # GAP-0609 source review: LangWatch
 
 Date: 2026-06-20
-Worktree: `/Users/sid/AgentMaturityCompass-worktrees/gap-0609`
+Worktree: `~/AgentMaturityCompass-worktrees/gap-0609`
 Branch: `agent/gap-0609`
 
 ## Gap

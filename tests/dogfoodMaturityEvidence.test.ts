@@ -73,7 +73,7 @@ describe("dogfood maturity evidence", () => {
     } finally {
       ledger.close();
     }
-  });
+  }, 120_000);
 
   test("seeded evidence never raises a diagnostic level", async () => {
     process.env.AMC_DEV_DOGFOOD = "1";

@@ -1,0 +1,23 @@
+[
+  {
+    "path": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/cmd/proofgen/main.go",
+    "upstreamPath": "cmd/proofgen/main.go",
+    "bytes": 33874,
+    "sha256": "8a8792670f67a1453970824b4385d22f13c186766f985a1f02efbd3bffa06585",
+    "gitBlobSha": "44f9fdb49f6bd7455fdbc5eba34595fbd98425c2"
+  },
+  {
+    "path": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/proof/verify_test.go",
+    "upstreamPath": "proof/verify_test.go",
+    "bytes": 7410,
+    "sha256": "ee9aafcb201119b92b4e45db4bc048ebc054be428e54f0822047a6c399bcc97a",
+    "gitBlobSha": "fd848aa0fbfb45d4dc3fccf64162037b92ef6e58"
+  },
+  {
+    "path": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/testonly/constants.go",
+    "upstreamPath": "testonly/constants.go",
+    "bytes": 4201,
+    "sha256": "6faf1957b5727c99593412ca0375f7e1f90ba10d7747dc42624585f948da32a8",
+    "gitBlobSha": "364768643dc584cc4613d681e5082933d840fb4c"
+  }
+]

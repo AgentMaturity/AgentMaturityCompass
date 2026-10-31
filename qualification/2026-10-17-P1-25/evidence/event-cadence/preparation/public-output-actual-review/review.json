@@ -1,0 +1,204 @@
+{
+  "schema": "p125ec-independent-actual-public-output-review/1",
+  "at": "2026-10-17T01:25:43.511973+00:00",
+  "blockers": [],
+  "actualAllowlistPin": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-output-allowlist.json",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-output-allowlist.json",
+    "bytes": 214801,
+    "sha256": "821bdc341a6e7c953c25b114e777ed10fc26cfb81612a65186bd63950991afe7",
+    "dev": 16777231,
+    "inode": 543909539,
+    "nlink": 1
+  },
+  "actualMaterializedCounts": {
+    "entries": 178,
+    "roles": {
+      "public-lifecycle": 36,
+      "public-certificates": 36,
+      "public-query": 41,
+      "public-response": 41,
+      "public-checkpoint": 24
+    },
+    "certificateBundles": 36,
+    "publicDerRecordsIndependentlyDecodedAndHashed": 72,
+    "actualJsonFilesRehashed": 96,
+    "queryResponseBinaryPinsComparedAsMetadataOnly": 82,
+    "cadenceVerifiedRequests": 10,
+    "cadenceUnverifiedRequests": 1
+  },
+  "allSixSelectorsInputsEmittedPublicRecordsAndDestinationsExactlyAccountedFor": true,
+  "all36BundlePinsAnd72CanonicalBase64DerLengthsSha256Recomputed": true,
+  "allSourcePemPinsMatchExactlyNamedCorrespondingRootAndTsaMetadata": true,
+  "cadenceBindings": [
+    {
+      "phase": "p125ec-source-combined",
+      "statuses": [
+        "independently-verified",
+        "independently-verified"
+      ],
+      "leafDerSha256": "c931b7880cee4ca319051968745e5442694159a3d938519512702a83c14013f1",
+      "sharedReplyOnlyLastIndependentProof": true
+    },
+    {
+      "phase": "p125ec-fresh-canonical",
+      "statuses": [
+        "independently-verified",
+        "independently-verified"
+      ],
+      "leafDerSha256": "7972c28a0bf655eb6d946044bc371cedff79bd23c07b8508fb12e9d41a972b03",
+      "sharedReplyOnlyLastIndependentProof": true
+    },
+    {
+      "phase": "p125ec-m1",
+      "statuses": [
+        "independently-verified",
+        "observational-unverified"
+      ],
+      "leafDerSha256": "ce2eb958503984aad9ab23b9c54664b5f64f6cd476319210e63795f705f38728",
+      "sharedReplyOnlyLastIndependentProof": true
+    },
+    {
+      "phase": "p125ec-restore1",
+      "statuses": [
+        "independently-verified",
+        "independently-verified"
+      ],
+      "leafDerSha256": "83ab211a56dca14d0579be38e13350de70405c2e27735854f8bda330ad0f2469",
+      "sharedReplyOnlyLastIndependentProof": true
+    },
+    {
+      "phase": "p125ec-m2",
+      "statuses": [
+        "independently-verified"
+      ],
+      "leafDerSha256": "fb24835233dcb068d6546ac677f7a81c1a7ca1b3f2e1902ebd0cfb09e01468e9",
+      "sharedReplyOnlyLastIndependentProof": true
+    },
+    {
+      "phase": "p125ec-restore2",
+      "statuses": [
+        "independently-verified",
+        "independently-verified"
+      ],
+      "leafDerSha256": "50a84dd1f7d22dc82e5ef943725b2a00af00824a9182640baa24622f7373aad5",
+      "sharedReplyOnlyLastIndependentProof": true
+    }
+  ],
+  "windowBindings": [
+    {
+      "phase": "p125ec-source-combined",
+      "independentProofs": 2,
+      "semanticAuditPresent": true,
+      "leafDerSha256": "9dbf8e160d62813ed5896af78aa98f453b6dff6cdd9a50a8ca2763d95a75d352"
+    },
+    {
+      "phase": "p125ec-fresh-canonical",
+      "independentProofs": 2,
+      "semanticAuditPresent": true,
+      "leafDerSha256": "660977c9a7412814a6ee8c4f383c384a08d8a01b5f674215680601d2d1065264"
+    },
+    {
+      "phase": "p125ec-m1",
+      "independentProofs": 2,
+      "semanticAuditPresent": false,
+      "leafDerSha256": "3b53c5800bf7780259a9eeefbde4773460ed893eecfc6fcc088450c06460af95"
+    },
+    {
+      "phase": "p125ec-restore1",
+      "independentProofs": 2,
+      "semanticAuditPresent": true,
+      "leafDerSha256": "8bb0839935453ba106687bc401495806e4b86ee9a48758cfec1074595fbdd367"
+    },
+    {
+      "phase": "p125ec-m2",
+      "independentProofs": 2,
+      "semanticAuditPresent": false,
+      "leafDerSha256": "418d155ed860a92634c5d4838b697c05e60c72df6ee429ea67c339c0449040d3"
+    },
+    {
+      "phase": "p125ec-restore2",
+      "independentProofs": 2,
+      "semanticAuditPresent": true,
+      "leafDerSha256": "b0ad145ebaad1a80c6138a49f55dfba903b6b851b57c5d5704598e8b76d847d9"
+    }
+  ],
+  "nonwindowLastReplyBindingsRetained": true,
+  "actualResourceInventories": [
+    {
+      "phase": "p125ec-source-combined",
+      "grantPublicCount": 6,
+      "checkpointPublicCount": 4,
+      "children": 38,
+      "explicitChildStreamHashCount": 76,
+      "closedSockets": 10,
+      "closedLedgerOwners": 28
+    },
+    {
+      "phase": "p125ec-fresh-canonical",
+      "grantPublicCount": 6,
+      "checkpointPublicCount": 4,
+      "children": 38,
+      "explicitChildStreamHashCount": 76,
+      "closedSockets": 10,
+      "closedLedgerOwners": 28
+    },
+    {
+      "phase": "p125ec-m1",
+      "grantPublicCount": 6,
+      "checkpointPublicCount": 4,
+      "children": 37,
+      "explicitChildStreamHashCount": 74,
+      "closedSockets": 10,
+      "closedLedgerOwners": 24
+    },
+    {
+      "phase": "p125ec-restore1",
+      "grantPublicCount": 6,
+      "checkpointPublicCount": 4,
+      "children": 38,
+      "explicitChildStreamHashCount": 76,
+      "closedSockets": 10,
+      "closedLedgerOwners": 28
+    },
+    {
+      "phase": "p125ec-m2",
+      "grantPublicCount": 6,
+      "checkpointPublicCount": 4,
+      "children": 36,
+      "explicitChildStreamHashCount": 72,
+      "closedSockets": 9,
+      "closedLedgerOwners": 27
+    },
+    {
+      "phase": "p125ec-restore2",
+      "grantPublicCount": 6,
+      "checkpointPublicCount": 4,
+      "children": 38,
+      "explicitChildStreamHashCount": 76,
+      "closedSockets": 10,
+      "closedLedgerOwners": 28
+    }
+  ],
+  "actualResourceTotalsAcrossActualPhases": {
+    "grantPublicCount": 36,
+    "checkpointPublicCount": 24,
+    "children": 225,
+    "explicitChildStreamHashCount": 450,
+    "closedSockets": 59,
+    "closedLedgerOwners": 163
+  },
+  "canonicalCasesNotSummed": 23,
+  "noDefaultHomeTrustJsonSelected": true,
+  "reviewerInspectionDiagnosis": {
+    "initialFailure": "A reviewer-only metadata projection indexed the control-phase windowSemanticAudit as non-null. The curator intentionally permits null there. The read-only check stopped before output files were written.",
+    "correction": "Window proof records were compared directly to their own named children, independent grants and decoded leaf DER hash. Exact semantic equality is required only where the existing audit is populated. No input changed and no product reran."
+  },
+  "limitations": [
+    "The96 actual JSON files were independently rehashed. The82 query/response binary pins were compared to selected request/reply/proof metadata; those binaries were not reopened. Root separately reports rehashing all178.",
+    "Public DER was decoded from actual JSON using strict canonical base64 and checked for byte length and SHA256. No X509 parser, cryptographic verification, OpenSSL, PEM conversion, key or stream operation ran. Source PEM pins are metadata comparisons.",
+    "This is actual allowlist/bundle review, distinct from prior prospective static counts. It supplies no full packet, source admission, receipt assembly/publication, whole P1-25 or plan completion credit."
+  ],
+  "allOldReportsHeldDecisionsClaudeWorkF37SkipD15HoldFreezeQualityRedIntact": true,
+  "noSourceIndexQaNetworkOrReservationAction": true
+}

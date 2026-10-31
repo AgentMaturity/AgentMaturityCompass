@@ -119,6 +119,14 @@ schema cannot express (docs/RECEIPTS.md):
 - From `authorized` on, `authorizationRecordDigest` must equal the digest of the execution's authorization record.
 - `enforcement.level: "enforced"` names the boundary that held; it is AMC's statement and is checked against the
   deployment's declared boundaries, never taken on trust.
+- Issuer admission: the signer is admitted for purpose `receipt`. The receipt names no key, so a verifier searches the
+  keys of its pinned trust lists. It is anchored only by the exported ledger row (`evidence-event`) whose `eventHash` is
+  `event_hash` and whose `payloadSha256` is `body_sha256`, with a `writerSignature` by a key admitted for `ledger-row`;
+  otherwise `UNANCHORED`. Only `eventHash` is signed, so the row's other fields are unauthenticated until the export
+  carries a portable pre-image. Completeness needs the body `body_sha256` names, naming the same execution, state and
+  agent.
+  A receipt proves that a row was written, not the work's outcome: satisfaction is `NOT_RECOMPUTABLE`
+  (docs/STANDALONE_VERIFIER.md).
 
 ## authorization-record
 
@@ -130,6 +138,62 @@ Contract only: P1-02 builds it at the enforcement point and defines its digest
 - `delegation.depth` is 0 exactly when `delegation.parentExecutionId` is null.
 - `agentSuppliedMetadata` is what the agent said. It is untrusted and no rule may read it.
 - Freshness: the record is valid only while `asOf` < `expiresAt`.
+- `authority.exceptions` and `authority.breakGlassId` (P2-24) name scoped-exception and break-glass records that
+  verified and covered the call when it was bound; the recheck re-verifies them before the call runs.
+
+## scoped-exception, break-glass and review-record
+
+P2-24 records under `.amc/governor/`, each with a domain-separated artifact signature (`.sig`, artifact kinds
+`scoped-exception`, `break-glass`, `review-record`) by the workspace auditor key. Rules the schema cannot express:
+
+- `approval` names an approval request, under the signed policy's `SECURITY` rule, whose intent is
+  `{ kind, digest }`: the kind and the SHA-256 of the canonical record without `approval`. Only decisions bound to
+  `approval.requestBindingDigest` count; the requester never does. A scoped exception and a review need the quorum; a
+  break-glass record needs one bound decision from an allowed role.
+- No scope name contains `*`. A scoped exception's window is positive and at most 30 days; a break-glass window at
+  most 24 hours, and `postHocReviewDueAt` is 48 hours after it ends. `scope.workspaceId` is the reading workspace.
+- A break-glass record's `prevBreakGlassDigest` is the SHA-256 of the previous record's bytes, or `GENESIS`; the
+  register is one chain. Its actions are `BREAK_GLASS_ACTION` ledger rows (`breakGlassId`, `executionId`,
+  `authorizationDigest`, `at`), and its review subject is the packet: the record's SHA-256 plus every action digest.
+- A review's `reviewer.userId` differs from `requesterId`. A review counts only for its exact `subject.sha256`: any
+  rejection of that digest gives `rejected`, an unexpired approval gives `approved`, a lapsed one `expired`, and
+  anything else `pending`.
+- A scoped exception is revoked by any file `revocations/<exceptionId>.json`, signed or not.
+- These records are recorded deviations and human decisions. A signature shows who recorded them, not that a
+  deviation was justified, and none is a compliance verdict.
+
+## redaction-receipt
+
+Emitted in workspaces that opted in to protected-data redaction (P2-02): the payload of one `PROTECTED_DATA_REDACTED`
+audit row in a native session, written before the row it describes. It is local enforcement bookkeeping and is never
+maturity evidence. Rules the schema cannot express:
+
+- `sessionId` equals the session of the audit row that carries the receipt.
+- `callId` is non-null exactly when `source` is `tool/result`.
+- `redactedDigest` is the SHA-256 of the redacted text: a message, queued input, a tool result, native-validation
+  output, operator compaction text, or an attachment's content or file name (each redacted separately). For a tool
+  result above the spill cap it equals the spill's `contentSha256`. It is never a digest of a raw value.
+- `gateway` and `bridge` are reserved sources: gateway and bridge redactions emit no receipt yet, and their markers are
+  not tokens.
+- `findings` are heuristic detections and declared-field matches. They do not show that nothing was missed, and a
+  token in the redacted text is a pseudonym, not de-identified or anonymized data.
+
+## detokenization-receipt
+
+Emitted in workspaces that opted in to protected-data redaction (P2-02): the `receipt` member of one
+`PROTECTED_DATA_DETOKENIZED` ops audit row, written by the detokenization gate when a sending tool body (`http.fetch`,
+native MCP over HTTP) restores tokens. It is local enforcement bookkeeping and is never maturity evidence. Rules the
+schema cannot express:
+
+- It is written before the send. It records a release, not a delivery; the action journal records the outcome.
+- `executionId` names the execution of a journaled or bound call: restoration requires a bound authorization record.
+- `registryDigest` is the SHA-256 of the signed `.amc/dataflow/processors.yaml` bytes that decided the release, and
+  `purposeId` is that registry's `runPurpose` and the bound record's `resource.purpose`.
+- `destinationId` is the P2-01 destination the egress check matched, and the processor lists it in `destinationIds`.
+- `contractReferences` lists every in-force contract of that processor covering a released class (for `phi`, BAAs
+  only). They are operator declarations: neither the receipt nor its signature shows that a contract exists, is in
+  force or is legally sufficient.
+- It never holds a value, a token, a URL or a hash of one. `tokenCount` counts distinct tokens restored.
 
 ## control-result
 
@@ -160,6 +224,36 @@ sha256 digest of the canonical form of the attestation without `signature`. Rule
   own keys are never admitted for it.
 - Scope: `deployment` and `snapshotDigest` match what the verifier is checking. Freshness: `asOf` < `expiresAt`.
 - `controlResultsDigest` equals the digest of the control results the verifier holds; otherwise completeness fails.
+- P1-06 left v1 as published and defined the verifiable record as `scoped-attestation` v2 (below). The standalone
+  verifier refuses v1 as `UNSUPPORTED_VERSION`: it names no tenant, subject or sequence to judge scope or replay by.
+
+## scoped-attestation v2
+
+`spec/schemas/v2/scoped-attestation.schema.json` (`version: 2`): a signed statement about one tenant, workspace,
+subject, deployment snapshot, profile and window. No AMC command emits it yet; the registry (P3-04) issues it and the
+standalone verifier (`amc-verify`, docs/STANDALONE_VERIFIER.md) checks it. P1-06 defined it as v2 so that v1 keeps its
+meaning: it adds `tenantId`, `workspaceId`, `subjectId` and `sequence`, its signature envelope refuses unknown members,
+and its signed bytes are fixed. The envelope's `sigB64` is Ed25519 over the 32 bytes of
+sha256(`"AMC_SCOPED_ATTESTATION_V2"` (ASCII), one `0x00` byte, the canonical form of the attestation without
+`signature`). Rules the schema cannot express:
+
+- `window.start` < `window.end` ≤ `issuedAt` < `expiresAt`, and `signature.signedTs` is `issuedAt` in epoch
+  milliseconds.
+- `signature.pubkeyB64` is base64 of a canonical Ed25519 SPKI PEM whose sha256 is `signature.fingerprint`, which equals
+  `issuerKeyId` (and `notaryFingerprint` when present). The carried key only locates the signer: `issuerKeyId` is
+  admitted for purpose `independent-attestation` by a pinned trust list. The workspace's own keys are never admitted for
+  it.
+- Scope: `tenantId`, `deployment.deploymentId`, `subjectId` and `profile.id` match what the verifier is checking, and
+  every cited receipt names `workspaceId` and `subjectId` (else `FOREIGN_EVIDENCE`). Freshness: `issuedAt` ≤ `asOf` <
+  `expiresAt`; `sequence` is not below the highest one known for `subjectId`; `issuedAt` is not before the key's
+  `validFrom`.
+- Completeness: `controlResultsDigest` is the sha256 of a JSON array of control results the verifier holds; every
+  control result not listed in `exclusions` cites at least one item, was evaluated no later than `issuedAt`, claims
+  `independently_reviewed` only with an `approved` review, and every cited item is present; the cited
+  `amc.action-receipt/v1` records of one execution agree, end in a terminal state and are marked complete.
+- Satisfaction: the attestation's result is the conjunction of its control results. A declared `fail`, or a `pass` that
+  is `synthetic_example` or whose review is `rejected` or `expired`, fails it; a declared `not_evaluated`, a `self_reported` pass or evidence of an unknown kind
+  is not evaluated (`NOT_RECOMPUTABLE`).
 
 ## trust-list
 
@@ -181,9 +275,11 @@ express, all enforced by AMC (`src/trust/trustList.ts`):
 
 ## verifier-report
 
-What AMC's verify commands return with `--json` (docs/TRUST_LIST.md). `integrity`, `issuerAdmission`, `scope`,
-`freshness`, `completeness` and `satisfaction` are separate results; the last four stay `not-evaluated` until P1-06,
-except where a record's own section fills them (A4 project record).
+What AMC's verify commands and the standalone verifier return with `--json` (docs/TRUST_LIST.md,
+docs/STANDALONE_VERIFIER.md). `integrity`, `issuerAdmission`, `scope`, `freshness`, `completeness` and `satisfaction`
+are separate results. AMC's verify commands leave the last four `not-evaluated`, except where a record's own section
+fills them (A4 project record); `amc-verify` evaluates all six and lists the normative codes behind each status in
+`reasonCodes` (P1-06). `verifier.name` names the implementation (`agent-maturity-compass`, `amc-verify` or another).
 `trusted` is AMC's summary (integrity and issuer admission pass and the ledger is not unanchored); a consumer must
 read the separate results and not `trusted` alone. Status values are spelled `pass`, `fail` and `not-evaluated`
 (hyphen). `overrides` lists any allow flag used; an override never makes a report trusted. The optional `time`
@@ -193,6 +289,23 @@ pinned TSA anchor); `basis` is `claimed`, `attested-upper-bound` or `attested-wi
 tolerance (5 minutes). The optional `anchoring.public` (P1-26) says whether the artifact's transparency checkpoint is
 held by a public log the verifier pinned: `anchored` (with `backend` and `logIndex`), `not-anchored`, or `invalid`,
 which is also an integrity error (docs/PUBLIC_ANCHORING.md).
+
+## conformance-results
+
+What one run of the conformance suite (`packages/amc-conformance`, P1-32) found for one implementation and one class
+(spec/conformance/v1/README.md). It is the implementer's own record of a run: self-reported evidence of conformity for
+the named `suiteVersion` and `fixtureSetDigest`, never a certificate. Rules the schema cannot express:
+
+1. `summary.normativeTotal` is the number of cases with `normative: true` and `summary.normativePassed` the number of
+   those whose `outcome` is `pass`.
+2. `conformant` is true exactly when `summary.normativeTotal` is above 0 and every normative case passed. A skipped,
+   failed or errored normative case, or a class with no normative case, makes it false.
+3. Case `id`s are unique. `diff` is null on a pass.
+4. Two results files are comparable only when they name the same `suiteVersion` and `fixtureSetDigest`. The digest is
+   sha256 over the lines `<sha256 of file>  <path from the repository root>\n`, sorted by path, for the class manifest
+   and every input file its run read.
+5. `signature` is optional and the runner does not sign. Until a signer defines what the envelope covers, a reader
+   treats a results file as unsigned: it proves nothing about who ran it.
 
 ## signature-envelope
 
@@ -224,6 +337,18 @@ express, all listed in docs/catalog/CONTROL_RECORD.md:
 - A lock verifies only against a rebuild from the same tree: every digest, source row and the register digest must
   match. A matching lock shows the content is unchanged, not that it is true.
 
+## register-entry
+
+One clause of a jurisdiction register (P1-18; docs/catalog/REGISTER.md). Rules the schema cannot express:
+
+- `sourceKind` is `official` exactly when the url host is on the S5 register's official hosts; a secondary entry names
+  no legal reviewer.
+- A null date has `dateNotes`; an entry without `contentHash` has a `sourceNote`; a hash has its `retrievedAt`.
+- `s5RegisterId` exists and its stations include the entry's; a register's litigation rule flags every matching
+  jurisdiction unless a legal reviewer cleared it with a rationale.
+- A control citation keyed by an entry id restates the entry, and a control citing an unreviewed entry cannot report an
+  approved review.
+
 ## A4 project record
 
 One A4 Forge project (docs/A4_FORGE.md) as the ledger stores it: the head row `a4_projects`, the transition chain
@@ -245,7 +370,9 @@ whose head row, `CREATED` body and receipt name different agents refuses the bun
 and `a4_effects` (liveness) are bookkeeping no transition names and are never exported. Inside a workspace,
 `verifyA4Chain` and `amc verify all` (check `a4-projects`) apply the integrity rules; `verifyA4Bundle`
 (`src/a4/a4Verify.ts`) applies all of them to an export. Normative fixtures, each with its expected verdict:
-`tests/fixtures/contracts/a4-record/` (moving to `spec/fixtures/v1/a4-record/` with P1-06).
+`tests/fixtures/contracts/a4-record/` (to move to `spec/fixtures/v1/a4-record/` in one coordinated commit; P1-06 left
+them in place). The conformance suite runs them as their own class, `a4-record`, never inside `verifier`
+(spec/conformance/v1/README.md, P3-24).
 
 Canonical form. Every digest below is sha256 over the UTF-8 bytes of the canonical form above: sorted keys with
 integer-like keys first, ECMAScript number text, **not RFC 8785**. Every JSON column (`body_json`, `spec_json`,
@@ -385,7 +512,8 @@ Satisfaction (`satisfaction`), evaluated only when integrity and completeness pa
 - Every counted APPROVE passes separation of duties as of its own seq (`SOD_VIOLATION`, `src/a4/a4SoD.ts`): never the
   gate's requester or an excluded key, never the revision's author (except on a `policy` gate, whose proposal the
   requester authored), and on a completion gate never a principal with a build transition on the revision (a `STEP` to
-  `built` or an `EFFECT_STARTED`; fixture `builder-approved-own-revision`). A gate's counted decisions share one
+  `built`, a build-work evidence ref, an Activate `DEPLOYMENT` deploy receipt they recorded, or an `EFFECT_STARTED`;
+  fixture `builder-approved-own-revision`). A gate's counted decisions share one
   `auth_source` (`one_plane`).
 - `not-evaluated` with `SINGLE_USER_WORKSPACE` when a decision has `self_approved = 1`, or the project was created in a
   single-user workspace and never ratcheted; with `SYNTHETIC_VALUES` when a gate binds a `synthetic_example` ref. Such

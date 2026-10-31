@@ -1,0 +1,121 @@
+{
+  "schema": "p112-root-actual-helper-control-chain/1",
+  "at": "2026-10-16T20:11:56.526964+00:00",
+  "sourceCommit": "305aba3d0cbd7a5dc84a2b96425c3cd0236bcf71",
+  "runs": [
+    {
+      "phase": "p112-fresh-canonical",
+      "tests": {
+        "total": 35,
+        "passed": 35,
+        "failed": 0,
+        "skipped": 0
+      },
+      "exit": 0,
+      "durationMs": 4457,
+      "hooks": 3,
+      "samePerFileOrdered35Names": true,
+      "rawObserverJoined": true,
+      "naturalOwnedGroupClosure": true
+    },
+    {
+      "phase": "p112-m1",
+      "tests": {
+        "total": 35,
+        "passed": 34,
+        "failed": 1,
+        "skipped": 0
+      },
+      "exit": 1,
+      "durationMs": 3746,
+      "hooks": 3,
+      "samePerFileOrdered35Names": true,
+      "rawObserverJoined": true,
+      "naturalOwnedGroupClosure": true
+    },
+    {
+      "phase": "p112-restore1",
+      "tests": {
+        "total": 35,
+        "passed": 35,
+        "failed": 0,
+        "skipped": 0
+      },
+      "exit": 0,
+      "durationMs": 3712,
+      "hooks": 3,
+      "samePerFileOrdered35Names": true,
+      "rawObserverJoined": true,
+      "naturalOwnedGroupClosure": true
+    },
+    {
+      "phase": "p112-m2",
+      "tests": {
+        "total": 35,
+        "passed": 33,
+        "failed": 2,
+        "skipped": 0
+      },
+      "exit": 1,
+      "durationMs": 3723,
+      "hooks": 3,
+      "samePerFileOrdered35Names": true,
+      "rawObserverJoined": true,
+      "naturalOwnedGroupClosure": true
+    },
+    {
+      "phase": "p112-restore2",
+      "tests": {
+        "total": 35,
+        "passed": 35,
+        "failed": 0,
+        "skipped": 0
+      },
+      "exit": 0,
+      "durationMs": 3803,
+      "hooks": 3,
+      "samePerFileOrdered35Names": true,
+      "rawObserverJoined": true,
+      "naturalOwnedGroupClosure": true
+    },
+    {
+      "phase": "p112-m3",
+      "tests": {
+        "total": 35,
+        "passed": 33,
+        "failed": 2,
+        "skipped": 0
+      },
+      "exit": 1,
+      "durationMs": 3699,
+      "hooks": 3,
+      "samePerFileOrdered35Names": true,
+      "rawObserverJoined": true,
+      "naturalOwnedGroupClosure": true
+    },
+    {
+      "phase": "p112-restore3",
+      "tests": {
+        "total": 35,
+        "passed": 35,
+        "failed": 0,
+        "skipped": 0
+      },
+      "exit": 0,
+      "durationMs": 3673,
+      "hooks": 3,
+      "samePerFileOrdered35Names": true,
+      "rawObserverJoined": true,
+      "naturalOwnedGroupClosure": true
+    }
+  ],
+  "same35PerFileOrderedNames": true,
+  "passingHookEntriesAcrossSevenFreshRuns": 21,
+  "controls": 3,
+  "eachExactManualRestore": true,
+  "laterAssertionsCredit": "Only actual first failed assertions in each test body have mutant witness credit; exact masks recorded per classification.",
+  "sourceOnlyControls": true,
+  "fullSpecMutationSuiteProven": false,
+  "continuousIsolationClaim": false,
+  "allHoldsRetained": true
+}

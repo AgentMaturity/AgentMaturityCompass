@@ -1,0 +1,89 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-GOV-03",
+  "polarity": "negative",
+  "evidenceClass": "empty",
+  "setup": {
+    "harness": "evidence",
+    "window": {
+      "start": "2026-01-01T00:00:00.000Z",
+      "end": "2026-10-18T12:00:00.000Z"
+    },
+    "subject": {
+      "tenantId": "governance-fixture-tenant",
+      "workspaceId": "governance-fixture-workspace",
+      "deploymentId": "governance-benefits-caseworker-fixture",
+      "agentId": "governance-fixture-agent",
+      "subjectId": null
+    },
+    "plan": {
+      "applicability": "applicable",
+      "policyDigest": "sha256:fixture-policy",
+      "mode": "enforce"
+    },
+    "items": [],
+    "priorUses": [],
+    "governanceOracle": {
+      "kind": "canary",
+      "input": {
+        "context": {
+          "tenantId": "governance-fixture-tenant",
+          "workspaceId": "governance-fixture-workspace",
+          "agentId": "governance-fixture-agent",
+          "deploymentId": "governance-benefits-caseworker-fixture",
+          "controlId": "L1-GOV-03",
+          "controlVersion": "0.1.0",
+          "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+        },
+        "at": "2026-10-18T12:00:00.000Z",
+        "captureAvailable": false,
+        "canaries": [
+          "SYNTHETIC-AGENCY-CANARY-01"
+        ],
+        "endpoints": [
+          {
+            "url": "https://inference.fixture.invalid/v1",
+            "noTraining": {
+              "binding": {
+                "tenantId": "governance-fixture-tenant",
+                "workspaceId": "governance-fixture-workspace",
+                "agentId": "governance-fixture-agent",
+                "deploymentId": "governance-benefits-caseworker-fixture",
+                "controlId": "L1-GOV-03",
+                "controlVersion": "0.1.0",
+                "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+              },
+              "contractId": "contract-1",
+              "startsAt": "2026-10-18T00:00:00.000Z",
+              "endsAt": "2026-10-19T00:00:00.000Z"
+            }
+          }
+        ],
+        "requests": [
+          {
+            "binding": {
+              "tenantId": "governance-fixture-tenant",
+              "workspaceId": "governance-fixture-workspace",
+              "agentId": "governance-fixture-agent",
+              "deploymentId": "governance-benefits-caseworker-fixture",
+              "controlId": "L1-GOV-03",
+              "controlVersion": "0.1.0",
+              "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+            },
+            "endpoint": "https://inference.fixture.invalid/v1",
+            "purpose": "inference",
+            "body": "input SYNTHETIC-AGENCY-CANARY-01"
+          }
+        ]
+      },
+      "expected": {
+        "result": "not_evaluated",
+        "reasonCode": "egress_capture_unavailable"
+      }
+    }
+  },
+  "expected": {
+    "result": "not_evaluated",
+    "reasonCode": "incomplete"
+  }
+}

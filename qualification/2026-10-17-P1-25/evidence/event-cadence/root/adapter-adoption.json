@@ -1,0 +1,27 @@
+{
+  "at": "2026-10-17T01:00:08.384512+00:00",
+  "rootReadFullBaseAdditionsAndExactV2AndRebindDeltas": true,
+  "independentRebindBlockers": [],
+  "activePins": [
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/audit-observed.py",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/audit-observed.py",
+      "bytes": 2197,
+      "sha256": "1d72bdb7d77cbff0251219cf33884e51c24bff5862cffeb052c1bf24124a58be",
+      "dev": 16777231,
+      "inode": 543829389,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/audit-public.py",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/audit-public.py",
+      "bytes": 27508,
+      "sha256": "dc346333754ba26c06233ba94719b271645513ecb12856c3a14dd5c1bb27f0eb",
+      "dev": 16777231,
+      "inode": 543829391,
+      "nlink": 1
+    }
+  ],
+  "noGuardOrSemanticChangeInRebind": true,
+  "noRuntimeResultFromStaticReviews": true
+}

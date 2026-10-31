@@ -1,0 +1,68 @@
+{
+  "schema": "p125-next-window-private-two-file-proposal-seal/1",
+  "at": "2026-10-16T23:41:11.813916+00:00",
+  "preferredCandidates": [
+    "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/tsaTestFixture.ts.source.txt",
+    "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/checkpointWindow.test.ts.source.txt"
+  ],
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/tsaTestFixture.ts.source.txt",
+      "bytes": 25255,
+      "sha256": "72cff741f404bf83e49816be2141dad55042f037bf086b165381e344d47dddf1"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/checkpointWindow.test.ts.source.txt",
+      "bytes": 34549,
+      "sha256": "1b14338d3978f83cd6518f99f3f12aebbc4a3624fc0416464c84bf4868d82cd7"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/tsaTestFixture.before.ts.source.txt",
+      "bytes": 24967,
+      "sha256": "f6140366e2f7c4e28a03e5bc3ef6fe372cee81b985357b0921c3df245b5e250c"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/checkpointWindow.before.ts.source.txt",
+      "bytes": 22649,
+      "sha256": "fc91661c759c7f46d1450d17cd237a1b848c7cc10ca9742e2b7e6b5ec272ade7"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/tsaTestFixture.ts.patch.txt",
+      "bytes": 1792,
+      "sha256": "60fbc7b7180be672d2753932adf869b94630eb95cc46ed8e8f6f90ef4c649921"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/checkpointWindow.test.ts.patch.txt",
+      "bytes": 14719,
+      "sha256": "3b9533355c15a350158b4919bdb9d02a601e8e4f29b405b840170deec348e93f"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/body-mapping.json",
+      "bytes": 2283,
+      "sha256": "240340fa2e927b3ac0eb9e01ccdbec4b07f38bcc97243c68388593cba74de616"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/matrix.json",
+      "bytes": 4138,
+      "sha256": "b06211705c317ad84cbe07707b9f5141f20c737dcf5f61bbbdd11232c5314286"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/README.md",
+      "bytes": 4294,
+      "sha256": "df44429f93ab0071cd7edeabf1ec34164e9133b5b0682eca868e59188fc69f18"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/input-pins.json",
+      "bytes": 8610,
+      "sha256": "8f34b26e87b444431ffc43707c53b4774ebfa8d3159f5d45d06feadea8f13865"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/author-static-review.json",
+      "bytes": 780,
+      "sha256": "af6b24c037715a776da4465984550682a8b2d3d5817edca9ba3145cd1d0a2635"
+    }
+  ],
+  "constructionFragmentsNotPreferredOrForPublication": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/construction",
+  "executedOrSourceWrites": false,
+  "newSourceCommitOrFreshRootOrResults": null
+}

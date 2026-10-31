@@ -13,9 +13,9 @@ createInterface({ input: process.stdin, crlfDelay: Infinity }).on("line", line =
   if (request.method === "session/cancel") { if (active !== undefined) { send(reply(active, { stopReason: "cancelled" })); active = undefined; } return; }
   if (request.id === undefined) return;
   if (request.method === "initialize") {
-    send(reply(request.id, { protocolVersion: 1, agentInfo: { name: "agent-maturity-compass", version: "untrusted-fixture" }, agentCapabilities: {
+    send(reply(request.id, { protocolVersion: 1, agentInfo: { name: "agent-maturity-compass", version: "1.2.0" }, agentCapabilities: {
       loadSession: true, promptCapabilities: { image: mode !== "no-image", audio: false, embeddedContext: false },
-      _meta: { "dev.agentmaturity.amc": { releaseSession: true,
+      _meta: { "dev.agentmaturity.amc": { releaseSession: true, executionApi: 1,
         ...(mode === "missing" ? {} : { orderedImageInput: mode === "truthy" ? true : mode === "future" ? "amc-image-input@3" : format }) } }
     } }));
   } else if (request.method === "session/new") send(reply(request.id, { sessionId }));

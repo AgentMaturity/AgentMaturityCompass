@@ -1,0 +1,73 @@
+{
+  "atUtc": "2026-10-14T15:41:32.028532+00:00",
+  "sourceRef": "07125b76cb17ecf063f19b914085a5bfc968df35",
+  "acceptedBase": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+  "mode": "Owned sequential P0-22 qualification from already reviewed P047/P048 source integration; no held Claude overlay",
+  "inputs": [
+    {
+      "path": "src/cli.ts",
+      "sha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+      "sameAsAcceptedMain": true
+    },
+    {
+      "path": "src/cli/resultCommandRegistry.ts",
+      "sha256": "f6b13a9f99a3df16a41bc260b99c9130f8d3d3d0bbc3ef9c6e28bfb9ab2ff406",
+      "sameAsAcceptedMain": true
+    },
+    {
+      "path": "src/repl/replParser.ts",
+      "sha256": "58109e8e8aa5eb706ba19a617571bdb9c6da572a5378f9c4533fd7008c77b805",
+      "sameAsAcceptedMain": true
+    },
+    {
+      "path": "src/cli/claimOutput.ts",
+      "sha256": "1abdc50016d1b45d4cfc1b50217e715194133256cb4427823a89793045437686",
+      "sameAsAcceptedMain": true
+    },
+    {
+      "path": "src/cli/claimLabelHooks.ts",
+      "sha256": "d139a1fa4cf327e82f9e97c45ba1474d4dde6fd89aeb177cbc62d1fbbec7d03d",
+      "sameAsAcceptedMain": true
+    },
+    {
+      "path": "src/fleet/fleetScoring.ts",
+      "sha256": "e541449179c7ed82a9edf936461ae9a39623817766f0c59e51be3ee336572896",
+      "sameAsAcceptedMain": true
+    },
+    {
+      "path": "scripts/check-freeze.mjs",
+      "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1",
+      "sameAsAcceptedMain": true
+    },
+    {
+      "path": "scripts/freeze-baseline.json",
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+      "sameAsAcceptedMain": true
+    },
+    {
+      "path": "scripts/line-budgets.json",
+      "sha256": "6e27020a2c1aeafbbd55121f03e94c6af5654ce16ea15929d21bbcee68d94bfe",
+      "sameAsAcceptedMain": true
+    },
+    {
+      "path": "vitest.config.ts",
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+      "sameAsAcceptedMain": true
+    },
+    {
+      "path": "scripts/quality/coverage-baseline.json",
+      "sha256": "a70844ba9e1f234e3aaf5576ad511d3bc35bb6bc6657e20c13ba7e06cfb7c6da",
+      "sameAsAcceptedMain": true
+    },
+    {
+      "path": "package.json",
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+      "sameAsAcceptedMain": true
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+      "sameAsAcceptedMain": true
+    }
+  ]
+}

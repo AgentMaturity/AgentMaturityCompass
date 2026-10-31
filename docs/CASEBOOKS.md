@@ -3,10 +3,10 @@
 Casebooks are signed, deterministic sets of realistic test cases for value/safety validation.
 
 Per agent layout:
-- `/Users/sid/AgentMaturityCompass/.amc/agents/<agentId>/casebooks/<casebookId>/casebook.yaml`
-- `/Users/sid/AgentMaturityCompass/.amc/agents/<agentId>/casebooks/<casebookId>/casebook.yaml.sig`
-- `/Users/sid/AgentMaturityCompass/.amc/agents/<agentId>/casebooks/<casebookId>/cases/<caseId>.json`
-- `/Users/sid/AgentMaturityCompass/.amc/agents/<agentId>/casebooks/<casebookId>/cases/<caseId>.json.sig`
+- `~/AgentMaturityCompass/.amc/agents/<agentId>/casebooks/<casebookId>/casebook.yaml`
+- `~/AgentMaturityCompass/.amc/agents/<agentId>/casebooks/<casebookId>/casebook.yaml.sig`
+- `~/AgentMaturityCompass/.amc/agents/<agentId>/casebooks/<casebookId>/cases/<caseId>.json`
+- `~/AgentMaturityCompass/.amc/agents/<agentId>/casebooks/<casebookId>/cases/<caseId>.json.sig`
 
 ## Create Casebooks From Real Work Orders
 

@@ -1,107 +1,27 @@
 import { randomUUID } from "node:crypto";
-import { linkSync, lstatSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { linkSync, lstatSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { z } from "zod";
-import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import type { ActionClass, ExecutionMode } from "../types.js";
-import { USER_ROLES, type UserRole } from "../auth/roles.js";
+import type { UserRole } from "../auth/roles.js";
+import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
+import { signatureSchema, approvalRequestSchema, approvalDecisionSchema, approvalConsumedSchema } from "./approvalSchemas.js";
+import { inCheckPass, readFileInPass } from "../utils/checkPass.js";
+export { approvalRequestSchema, approvalDecisionSchema, approvalConsumedSchema } from "./approvalSchemas.js";
+import type { ApprovalRequestRecord, ApprovalDecisionRecord, ApprovalConsumedRecord, ApprovalRequestStatus, ApprovalDecisionKind } from "./approvalSchemas.js";
+export type { ApprovalRequestRecord, ApprovalDecisionRecord, ApprovalConsumedRecord, ApprovalRequestStatus, ApprovalDecisionKind } from "./approvalSchemas.js";
 
-const riskTierSchema = z.enum(["low", "medium", "high", "critical"]);
-const modeSchema = z.enum(["SIMULATE", "EXECUTE"]);
-const actionClassSchema = z.enum([
-  "READ_ONLY",
-  "WRITE_LOW",
-  "WRITE_HIGH",
-  "DEPLOY",
-  "SECURITY",
-  "FINANCIAL",
-  "NETWORK_EXTERNAL",
-  "DATA_EXPORT",
-  "IDENTITY"
-]);
-const roleSchema = z.enum(USER_ROLES);
-
-const approvalRequestStatusSchema = z.enum(["PENDING", "QUORUM_MET", "DENIED", "EXPIRED", "CANCELLED", "CONSUMED"]);
-const approvalDecisionKindSchema = z.enum(["APPROVE_EXECUTE", "APPROVE_SIMULATE", "DENY"]);
-
-const signatureSchema = z.object({
-  digestSha256: z.string().length(64),
-  signature: z.string().min(1),
-  signedTs: z.number().int(),
-  signer: z.literal("auditor")
-});
-
-export const approvalRequestSchema = z.object({
-  v: z.literal(1),
-  approvalRequestId: z.string().min(1),
-  agentId: z.string().min(1),
-  intentId: z.string().min(1),
-  toolName: z.string().min(1),
-  actionClass: actionClassSchema,
-  workOrderId: z.string().min(1).nullable().optional(),
-  requestedMode: modeSchema,
-  effectiveMode: modeSchema,
-  riskTier: riskTierSchema,
-  createdTs: z.number().int(),
-  expiresTs: z.number().int(),
-  status: approvalRequestStatusSchema,
-  requiredApprovals: z.number().int().min(0),
-  requireDistinctUsers: z.boolean(),
-  rolesAllowed: z.array(roleSchema),
-  requiredAssurancePacks: z.record(z.string().min(1), z.object({
-    minScore: z.number().min(0).max(100),
-    maxSucceeded: z.number().int().min(0)
-  })).optional(),
-  boundHashes: z.object({
-    intentHash: z.string().length(64),
-    workOrderHash: z.string().length(64).nullable().optional(),
-    policyHash: z.string().length(64),
-    toolsHash: z.string().length(64),
-    budgetsHash: z.string().length(64),
-    leaseConstraintsHash: z.string().length(64)
-  }),
-  // The authorization intent an approver reviewed (P1-02): protected facts and digests, never raw arguments.
-  // Its hash is `boundHashes.intentHash`, so a recheck can name which fact changed.
-  authorizationIntent: z.record(z.string(), z.unknown()).optional()
-});
-
-export const approvalDecisionSchema = z.object({
-  v: z.literal(1),
-  approvalDecisionId: z.string().min(1),
-  approvalRequestId: z.string().min(1),
-  agentId: z.string().min(1),
-  userId: z.string().min(1),
-  username: z.string().min(1),
-  roles: z.array(roleSchema),
-  decision: approvalDecisionKindSchema,
-  reason: z.string().min(1),
-  // Optional for legacy compatibility. Bound decisions cannot move to changed requests.
-  requestDigestSha256: z.string().regex(/^[a-f0-9]{64}$/).optional(),
-  decisionTs: z.number().int()
-});
-
-export const approvalConsumedSchema = z.object({
-  v: z.literal(1),
-  approvalRequestId: z.string().min(1),
-  agentId: z.string().min(1),
-  consumedTs: z.number().int(),
-  executionId: z.string().min(1).nullable().optional(),
-  reason: z.string().min(1)
-});
-
-export type ApprovalRequestRecord = z.infer<typeof approvalRequestSchema>;
-export type ApprovalDecisionRecord = z.infer<typeof approvalDecisionSchema>;
-export type ApprovalConsumedRecord = z.infer<typeof approvalConsumedSchema>;
-export type ApprovalRequestStatus = z.infer<typeof approvalRequestStatusSchema>;
-export type ApprovalDecisionKind = z.infer<typeof approvalDecisionKindSchema>;
-
-/** Status evolves; every other request field is part of the reviewed authority. */
+/**
+ * Status evolves; every other request field is part of the reviewed authority, except `initiator` (P1-78): it is kept out
+ * so every record digests the same under every AMC version, including verifiers that predate it (a4Verify recomputes this
+ * offline). The request file's signature still covers it.
+ */
 export function approvalRequestBindingDigest(request: ApprovalRequestRecord): string {
-  return sha256Hex(canonicalize({ ...request, status: "PENDING" }));
+  return sha256Hex(canonicalize({ ...request, status: "PENDING", initiator: undefined }));
 }
 
 export interface ApprovalChainIntegrity {
@@ -151,11 +71,19 @@ function sigPathFor(path: string): string {
   return `${path}.sig`;
 }
 
+/** Fixed consumption paths; this projection supplies names, never positive authority or acknowledgment. */
+export function approvalConsumptionPaths(params: { workspace: string; agentId: string; approvalRequestId: string }) {
+  const agentId = resolveAgentId(params.workspace, params.agentId), root = approvalsRoot(params.workspace, agentId);
+  return Object.freeze({ agentId, root, requests: requestsDir(params.workspace, agentId), decisions: decisionsDir(params.workspace, agentId),
+    consumed: consumedDir(params.workspace, agentId), request: requestPath(params.workspace, agentId, params.approvalRequestId),
+    consumption: consumedPath(params.workspace, agentId, params.approvalRequestId) });
+}
+
 function signArtifact(workspace: string, path: string): string {
   const digest = sha256Hex(readFileSync(path));
   const sig = signatureSchema.parse({
     digestSha256: digest,
-    signature: signHexDigest(digest, getPrivateKeyPem(workspace, "auditor")),
+    signature: signHexDigest(digest, getSigningKey(workspace, "artifact-seal")),
     signedTs: Date.now(),
     signer: "auditor"
   });
@@ -174,17 +102,25 @@ function verifyArtifact(workspace: string, path: string, bytes?: Buffer): { vali
     return { valid: false, reason: "signature missing" };
   }
   try {
-    const sig = signatureSchema.parse(JSON.parse(readUtf8(sigPath)) as unknown);
-    const digest = sha256Hex(bytes ?? readFileSync(path));
-    if (digest !== sig.digestSha256) {
-      return { valid: false, reason: "digest mismatch" };
-    }
-    const valid = verifyHexDigestAny(digest, sig.signature, getPublicKeyHistory(workspace, "auditor"));
-    return valid ? { valid: true } : { valid: false, reason: "signature verification failed" };
+    const sidecar = readFileInPass(sigPath);
+    return verifyArtifactBytes(workspace, bytes ?? readFileInPass(path), sidecar);
   } catch (error) {
     return { valid: false, reason: String(error) };
   }
 }
+/** The signature check over bytes just read; within one check pass the same bytes are verified once. */
+const verifyArtifactBytes = inCheckPass((workspace: string, body: Buffer, sidecar: Buffer): { valid: boolean; reason?: string } => {
+  const sig = signatureSchema.parse(JSON.parse(sidecar.toString("utf8")) as unknown);
+  const digest = sha256Hex(body);
+  if (digest !== sig.digestSha256) {
+    return { valid: false, reason: "digest mismatch" };
+  }
+  const valid = sig.envelope === undefined
+    ? verifyHexDigestAny(digest, sig.signature, getPublicKeyHistory(workspace, "auditor"))
+    : sig.envelope.signer.type === "VAULT" && sig.signature === sig.envelope.sigB64
+      && verifyAuditorSignatureBytes(workspace, "BUNDLE", body, sidecar).valid;
+  return valid ? { valid: true } : { valid: false, reason: "signature verification failed" };
+});
 
 /**
  * Publish complete bytes at `path` only if nothing is there; false when something already was.
@@ -234,9 +170,26 @@ export function createApprovalRequestRecord(input: {
     leaseConstraintsHash: string;
   };
   authorizationIntent?: Record<string, unknown>;
+  initiator?: string;
 }): { request: ApprovalRequestRecord; path: string; sigPath: string } {
+  const { request, path } = prepareApprovalRequestRecord(input);
+  writeFileAtomic(path, JSON.stringify(request, null, 2), 0o644);
+  const sigPath = signArtifact(input.workspace, path);
+  return {
+    request,
+    path,
+    sigPath
+  };
+}
+
+export type ApprovalRequestRecordInput = Parameters<typeof createApprovalRequestRecord>[0];
+
+/** Shared native directory prefix and actual UUID/two-clock payload recipe; no signing or member write. */
+export function prepareApprovalRequestRecord(input: ApprovalRequestRecordInput, directories?: (phase: "attempted" | "returned") => void) {
   const agentId = resolveAgentId(input.workspace, input.agentId);
+  directories?.("attempted");
   ensureDirs(input.workspace, agentId);
+  directories?.("returned");
   const request = approvalRequestSchema.parse({
     v: 1,
     approvalRequestId: `apprreq_${randomUUID().replace(/-/g, "")}`,
@@ -263,17 +216,17 @@ export function createApprovalRequestRecord(input: {
       budgetsHash: input.boundHashes.budgetsHash,
       leaseConstraintsHash: input.boundHashes.leaseConstraintsHash
     },
-    ...(input.authorizationIntent === undefined ? {} : { authorizationIntent: input.authorizationIntent })
+    ...(input.authorizationIntent === undefined ? {} : { authorizationIntent: input.authorizationIntent }),
+    ...(input.initiator === undefined ? {} : { initiator: input.initiator })
   });
   const path = requestPath(input.workspace, agentId, request.approvalRequestId);
-  writeFileAtomic(path, JSON.stringify(request, null, 2), 0o644);
-  const sigPath = signArtifact(input.workspace, path);
-  return {
-    request,
-    path,
-    sigPath
-  };
+  return { request, path };
 }
+
+/** At most 500 ms of re-reads, spent only on a digest mismatch whose body was written within TORN_READ_FRESH_MS. */
+const TORN_READ_RETRIES = 25, TORN_READ_WAIT_MS = 20, TORN_READ_FRESH_MS = 2_000;
+/** A write in progress: the body was replaced moments ago. An older mismatch (tampering) is refused without waiting. */
+const freshlyWritten = (path: string): boolean => { try { return Date.now() - statSync(path).mtimeMs < TORN_READ_FRESH_MS; } catch { return false; } };
 
 export function loadApprovalRequestRecord(params: {
   workspace: string;
@@ -286,9 +239,16 @@ export function loadApprovalRequestRecord(params: {
   if (!pathExists(path)) {
     throw new Error(`approval request not found: ${path}`);
   }
-  const bytes = readFileSync(path);
+  let bytes = readFileInPass(path);
   if (params.requireValidSignature !== false) {
-    const verification = verifyArtifact(params.workspace, path, bytes);
+    let verification = verifyArtifact(params.workspace, path, bytes);
+    // updateApprovalRequestStatus replaces the body, then its sidecar: a reader in another process between the two
+    // renames sees a torn pair. Re-read both while the writer finishes; a mismatch that outlasts this is still refused.
+    for (let retry = 0; !verification.valid && verification.reason === "digest mismatch" && retry < TORN_READ_RETRIES && freshlyWritten(path); ++retry) {
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, TORN_READ_WAIT_MS);
+      bytes = readFileInPass(path);
+      verification = verifyArtifact(params.workspace, path, bytes);
+    }
     if (!verification.valid) {
       throw new Error(`invalid approval request signature: ${verification.reason ?? "unknown"}`);
     }
@@ -380,7 +340,7 @@ export function listApprovalDecisions(params: {
       continue;
     }
     try {
-      const row = approvalDecisionSchema.parse(JSON.parse(readUtf8(path)) as unknown);
+      const row = approvalDecisionSchema.parse(JSON.parse(readFileInPass(path).toString("utf8")) as unknown);
       if (params.approvalRequestId && row.approvalRequestId !== params.approvalRequestId) {
         continue;
       }
@@ -447,7 +407,7 @@ export function loadApprovalConsumed(params: {
   if (!pathExists(path)) {
     return null;
   }
-  const bytes = readFileSync(path);
+  const bytes = readFileInPass(path);
   const verification = verifyArtifact(params.workspace, path, bytes);
   if (!verification.valid) {
     throw new Error(`invalid approval consumed signature: ${verification.reason ?? "unknown"}`);
@@ -474,11 +434,18 @@ export function listApprovalRequests(params: {
       continue;
     }
     const path = join(dir, file);
-    if (!verifyArtifact(params.workspace, path).valid) {
+    // One read: the bytes verified are the bytes parsed (P1-78; this list feeds quorum decisions).
+    let bytes: Buffer;
+    try {
+      bytes = readFileSync(path);
+    } catch {
+      continue;
+    }
+    if (!verifyArtifact(params.workspace, path, bytes).valid) {
       continue;
     }
     try {
-      out.push(approvalRequestSchema.parse(JSON.parse(readUtf8(path)) as unknown));
+      out.push(approvalRequestSchema.parse(JSON.parse(bytes.toString("utf8")) as unknown));
     } catch {
       continue;
     }
@@ -652,7 +619,7 @@ export function inspectApprovalActivityInventory(params: {
   };
 }
 
-export function inspectApprovalChainIntegrity(params: {
+export const inspectApprovalChainIntegrity = inCheckPass(function inspectApprovalChainIntegrity(params: {
   workspace: string;
   agentId?: string;
   approvalRequestId: string;
@@ -680,7 +647,7 @@ export function inspectApprovalChainIntegrity(params: {
       const path = join(decisionRoot, file);
       let decision: ApprovalDecisionRecord;
       try {
-        decision = approvalDecisionSchema.parse(JSON.parse(readUtf8(path)) as unknown);
+        decision = approvalDecisionSchema.parse(JSON.parse(readFileInPass(path).toString("utf8")) as unknown);
       } catch {
         reasonCodes.push("DECISION_ARTIFACT_UNPARSEABLE");
         continue;
@@ -699,7 +666,7 @@ export function inspectApprovalChainIntegrity(params: {
       reasonCodes.push("CONSUMPTION_INTEGRITY_INVALID");
     } else {
       try {
-        const record = approvalConsumedSchema.parse(JSON.parse(readUtf8(consumed)) as unknown);
+        const record = approvalConsumedSchema.parse(JSON.parse(readFileInPass(consumed).toString("utf8")) as unknown);
         if (record.approvalRequestId !== params.approvalRequestId || record.agentId !== agentId) {
           reasonCodes.push("CONSUMPTION_BINDING_INVALID");
         }
@@ -714,7 +681,7 @@ export function inspectApprovalChainIntegrity(params: {
     valid: unique.length === 0,
     reasonCodes: unique
   };
-}
+});
 
 export function cancelApprovalRequest(params: {
   workspace: string;

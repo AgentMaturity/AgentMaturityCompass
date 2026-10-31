@@ -7,6 +7,7 @@ import { REGULATORY_CLOCK_TABLE } from "../incidents/regulatoryClocksTable.js";
 import { validateCitation } from "./citations.js";
 import type { LoadedCatalog } from "./loader.js";
 import { validatePredicate } from "./predicate.js";
+import { validateJurisdictionProfiles, validateRegister, type RegisterEntry } from "./register.js";
 import type { CatalogIssue, Vocabulary } from "./schema.js";
 import type { ControlRecord, Level, Predicate } from "./types.js";
 
@@ -70,6 +71,36 @@ function checkLevels(cat: LoadedCatalog, r: ControlRecord, add: (code: string, p
   }
 }
 
+/**
+ * A citation whose key names a register entry (P1-18) restates that entry: same S5 id, url, status type, jurisdiction
+ * and retrieval. A control citing an entry no legal reviewer has signed never reports an approved review.
+ */
+function checkRegisterCitations(cat: LoadedCatalog, r: ControlRecord, add: (code: string, path: string, message: string) => void): void {
+  const entries = new Map([...(cat.registers?.values() ?? [])].flatMap((g) => g.entries.map((e): [string, RegisterEntry] => [e.id, e])));
+  r.citations.forEach((c, i) => {
+    const e = entries.get(c.key);
+    if (!e) return;
+    const hash = e.citation.contentHash?.slice("sha256:".length) ?? null;
+    const differs = [
+      c.registerId !== e.s5RegisterId && "registerId", c.url !== e.citation.url && "url", c.statusType !== e.citation.statusType && "statusType",
+      c.jurisdiction !== e.citation.jurisdiction && "jurisdiction", (c.retrieval.state === "verified" ? c.retrieval.contentSha256 : null) !== hash && "retrieval",
+      (c.legalReview === null) !== (e.citation.legalReviewer === null) && "legalReview"
+    ].filter(Boolean);
+    if (differs.length) add("CAT_CITATION_REGISTER_MISMATCH", `citations.${i}`, `${c.key} differs from register entry ${e.id} in ${differs.join(", ")}`);
+    if (e.citation.legalReviewer === null && r.review.status === "approved") {
+      add("CAT_SUPPORT_GATE", "review.status", `cites ${e.id}, which awaits a legal reviewer, so its review cannot be approved`);
+    }
+  });
+}
+
+function checkRegisters(cat: LoadedCatalog, asOf: string): CatalogIssue[] {
+  const registers = [...(cat.registers?.values() ?? [])];
+  return [
+    ...registers.flatMap((g) => validateRegister(g, { file: `registers/${g.id}.json`, asOf, vocabulary: cat.vocabulary })),
+    ...[...(cat.jurisdictionProfiles ?? [])].flatMap(([folder, profiles]) => validateJurisdictionProfiles(profiles, registers, `jurisdictions/${folder}/profiles.json`))
+  ];
+}
+
 function checkControl(cat: LoadedCatalog, r: ControlRecord, asOf: string): CatalogIssue[] {
   const file = cat.controlFiles.get(r.id) ?? "";
   const out: CatalogIssue[] = [];
@@ -92,6 +123,7 @@ function checkControl(cat: LoadedCatalog, r: ControlRecord, asOf: string): Catal
       add("CAT_CLOCK_MISMATCH", "clock.deadline", `deadline differs from ${clock.clockId} (${clock.deadline.amount} ${clock.deadline.unit})`);
     }
   }
+  checkRegisterCitations(cat, r, add);
   r.citations.forEach((c, i) => out.push(...validateCitation(c, {
     file, controlId: r.id, support: r.support, path: `citations.${i}`, asOf, publisherHosts: cat.publisherHosts
   })));
@@ -117,12 +149,22 @@ function checkPacksAndFixtures(cat: LoadedCatalog): CatalogIssue[] {
   return out;
 }
 
+/** A questionnaire item maps only to controls that exist (P1-53); the mapping never makes an answer evidence of more than L1. */
+function checkQuestionnaires(cat: LoadedCatalog): CatalogIssue[] {
+  return [...(cat.questionnaires?.values() ?? [])].flatMap((q) => q.items.flatMap((item, i) => item.mapsTo
+    .filter((id) => !cat.controls.has(id))
+    .map((id): CatalogIssue => ({ code: "CAT_QUESTIONNAIRE_MAPPING", severity: "error", file: `questionnaires/${q.id}.yaml`, controlId: null,
+      path: `items.${i}.mapsTo`, message: `${item.id} maps to ${id}, which is not a catalog control` }))));
+}
+
 export function validateCatalog(cat: LoadedCatalog, opts: { asOf?: Date } = {}): CatalogValidation {
   const asOf = (opts.asOf ?? new Date()).toISOString().slice(0, 10);
   const all = [
     ...cat.issues,
     ...[...cat.controls.values()].flatMap((r) => checkControl(cat, r, asOf)),
-    ...checkPacksAndFixtures(cat)
+    ...checkPacksAndFixtures(cat),
+    ...checkRegisters(cat, asOf),
+    ...checkQuestionnaires(cat)
   ];
   const errors = all.filter((i) => i.severity === "error");
   return { ok: errors.length === 0, errors, warnings: all.filter((i) => i.severity === "warning") };

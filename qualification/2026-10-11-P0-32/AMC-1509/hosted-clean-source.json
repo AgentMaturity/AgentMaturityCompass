@@ -1,0 +1,257 @@
+{
+  "command": "gh run view 38132701944 --repo AgentMaturity/AgentMaturityCompass --json jobs,headSha,headBranch,event,conclusion,url",
+  "runUrl": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/38132701944",
+  "runId": 38132701944,
+  "headSha": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+  "headBranch": "main",
+  "event": "push",
+  "runConclusion": "failure",
+  "jobs": [
+    {
+      "name": "clean-source",
+      "conclusion": "success",
+      "id": 114450140347,
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/38132701944/job/114450140347",
+      "startedAt": "2026-10-11T10:39:04Z",
+      "completedAt": "2026-10-11T10:40:20Z"
+    },
+    {
+      "name": "docker-smoke",
+      "conclusion": "success",
+      "id": 114450140404,
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/38132701944/job/114450140404",
+      "startedAt": "2026-10-11T10:39:04Z",
+      "completedAt": "2026-10-11T10:41:58Z"
+    },
+    {
+      "name": "e2e-smoke-local",
+      "conclusion": "success",
+      "id": 114450140421,
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/38132701944/job/114450140421",
+      "startedAt": "2026-10-11T10:39:04Z",
+      "completedAt": "2026-10-11T10:40:28Z"
+    },
+    {
+      "name": "build-test (22)",
+      "conclusion": "failure",
+      "id": 114450140435,
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/38132701944/job/114450140435",
+      "startedAt": "2026-10-11T10:39:05Z",
+      "completedAt": "2026-10-11T11:10:55Z"
+    },
+    {
+      "name": "security-scan-lite",
+      "conclusion": "success",
+      "id": 114450140446,
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/38132701944/job/114450140446",
+      "startedAt": "2026-10-11T10:39:04Z",
+      "completedAt": "2026-10-11T10:40:29Z"
+    },
+    {
+      "name": "packed-install",
+      "conclusion": "success",
+      "id": 114450140498,
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/38132701944/job/114450140498",
+      "startedAt": "2026-10-11T10:39:05Z",
+      "completedAt": "2026-10-11T10:40:53Z"
+    },
+    {
+      "name": "build-test (24)",
+      "conclusion": "cancelled",
+      "id": 114450140505,
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/38132701944/job/114450140505",
+      "startedAt": "2026-10-11T10:39:04Z",
+      "completedAt": "2026-10-11T11:11:12Z"
+    },
+    {
+      "name": "helm-lint-template",
+      "conclusion": "success",
+      "id": 114450140506,
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/38132701944/job/114450140506",
+      "startedAt": "2026-10-11T10:39:04Z",
+      "completedAt": "2026-10-11T10:39:14Z"
+    },
+    {
+      "name": "changeset",
+      "conclusion": "skipped",
+      "id": 114450141380,
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/38132701944/job/114450141380",
+      "startedAt": "2026-10-11T10:39:03Z",
+      "completedAt": "2026-10-11T10:39:03Z"
+    }
+  ],
+  "buildTest22Steps": [
+    {
+      "name": "Set up job",
+      "conclusion": "success"
+    },
+    {
+      "name": "Run actions/checkout@v6",
+      "conclusion": "success"
+    },
+    {
+      "name": "Set up Node",
+      "conclusion": "success"
+    },
+    {
+      "name": "Set up Node",
+      "conclusion": "success"
+    },
+    {
+      "name": "Install dependencies",
+      "conclusion": "success"
+    },
+    {
+      "name": "Lint",
+      "conclusion": "success"
+    },
+    {
+      "name": "Typecheck",
+      "conclusion": "success"
+    },
+    {
+      "name": "Typecheck tests",
+      "conclusion": "success"
+    },
+    {
+      "name": "No fabricated results",
+      "conclusion": "success"
+    },
+    {
+      "name": "Threat model channel map",
+      "conclusion": "success"
+    },
+    {
+      "name": "Acceptance runner process cleanup",
+      "conclusion": "success"
+    },
+    {
+      "name": "Build",
+      "conclusion": "success"
+    },
+    {
+      "name": "Published schemas match the enforced schemas (P1-01)",
+      "conclusion": "success"
+    },
+    {
+      "name": "Regulatory register currency",
+      "conclusion": "success"
+    },
+    {
+      "name": "Citation lint (P0-25)",
+      "conclusion": "success"
+    },
+    {
+      "name": "Published package lint",
+      "conclusion": "success"
+    },
+    {
+      "name": "Source duplication and reachability",
+      "conclusion": "success"
+    },
+    {
+      "name": "Policy fixture regression",
+      "conclusion": "skipped"
+    },
+    {
+      "name": "Upload policy fixture report",
+      "conclusion": "skipped"
+    },
+    {
+      "name": "Architecture boundary compatibility",
+      "conclusion": "success"
+    },
+    {
+      "name": "Published counts match reality",
+      "conclusion": "success"
+    },
+    {
+      "name": "Freeze guard (until Gate G0)",
+      "conclusion": "success"
+    },
+    {
+      "name": "Qualification receipts",
+      "conclusion": "success"
+    },
+    {
+      "name": "Generated docs are current",
+      "conclusion": "success"
+    },
+    {
+      "name": "Diagnostic gate reachability",
+      "conclusion": "success"
+    },
+    {
+      "name": "Full suite and coverage thresholds",
+      "conclusion": "failure"
+    },
+    {
+      "name": "Performance floors (no coverage, one file at a time)",
+      "conclusion": "skipped"
+    },
+    {
+      "name": "Tests left the checkout clean",
+      "conclusion": "skipped"
+    },
+    {
+      "name": "Per-file coverage floors",
+      "conclusion": "skipped"
+    },
+    {
+      "name": "Upload coverage diagnostics",
+      "conclusion": "success"
+    },
+    {
+      "name": "Docs drift",
+      "conclusion": "skipped"
+    },
+    {
+      "name": "Incident readiness",
+      "conclusion": "skipped"
+    },
+    {
+      "name": "Compliance artifact freshness",
+      "conclusion": "skipped"
+    },
+    {
+      "name": "Evidence path check",
+      "conclusion": "skipped"
+    },
+    {
+      "name": "API reference drift",
+      "conclusion": "skipped"
+    },
+    {
+      "name": "Changelog page drift",
+      "conclusion": "skipped"
+    },
+    {
+      "name": "Vendored kernel integrity",
+      "conclusion": "skipped"
+    },
+    {
+      "name": "Release smoke checks",
+      "conclusion": "skipped"
+    },
+    {
+      "name": "Tests left the checkout clean (end of job)",
+      "conclusion": "success"
+    },
+    {
+      "name": "Post Set up Node",
+      "conclusion": "skipped"
+    },
+    {
+      "name": "Post Set up Node",
+      "conclusion": "success"
+    },
+    {
+      "name": "Post Run actions/checkout@v6",
+      "conclusion": "success"
+    },
+    {
+      "name": "Complete job",
+      "conclusion": "success"
+    }
+  ]
+}

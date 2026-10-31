@@ -2,7 +2,7 @@
  * Industry Pack Audit — the paid, auditor-ready deliverable for an Industry Pack.
  *
  * For each control in a pack this produces: a level score, a PASS/ADEQUATE/GAP
- * verdict, an indicative multi-framework crosswalk (EU AI Act, NIST AI RMF,
+ * verdict (NOT_EVALUATED, with no level, for an unanswered control), an indicative multi-framework crosswalk (EU AI Act, NIST AI RMF,
  * ISO/IEC 42001, SOC 2) plus the sector regulation, the evidence an auditor
  * would expect, and — for anything short of PASS — a concrete generated
  * remediation (policy / guardrail / evidence recipe). The bundle carries an
@@ -24,30 +24,34 @@ import { envelopeForAggregate } from "../claims/eligibility/adapters/results.js"
 import { formatClaimLabel, renderClaimLabel, renderClaimLegend } from "../claims/eligibility/render.js";
 import type { ClaimEnvelope, ClaimKind } from "../claims/eligibility/types.js";
 import { binderSignatureSchema } from "../audit/binderSchema.js";
+import { signingKeyId } from "../keys/algorithmPolicy.js";
 import { signIndustryPackAuditJson } from "../audit/binderSigner.js";
 import { assertNotExample } from "../claims/eligibility/exampleMode.js";
 import {
-  buildVerifierReport, checkDigestSignature, ed25519KeyId, envelopePublicKey,
+  buildVerifierReport, checkDigestSignature, envelopePublicKey,
   type IssuerAdmission, type TrustContext, type VerifierReportV1
 } from "../trust/index.js";
 import type { IndustryPack, IndustryPackQuestion } from "./industryPacks.js";
 import { selfAssessPack, type PackSelfAssessment } from "./packSelfAssessment.js";
+import { QUESTIONNAIRE_CONTENT_STATUS, QUESTIONNAIRE_NOTICE } from "./questionnaireLabel.js";
 
 /**
  * /2 (P0-21): the overall pass flag and its threshold gave way to the self-assessment fields.
  * /3 (P0-20): a `signature` field; `receiptHash` now excludes it, so a /2 reader recomputing over
  * everything but `receiptHash` would fail on a /3 file, and a no-answer baseline is `synthetic_example`.
+ * /5 (P1-42, S4): a `currency` section inside the hashed body.
  */
-export const INDUSTRY_PACK_AUDIT_SCHEMA_VERSION = "amc.industry-pack-audit/3";
+export const INDUSTRY_PACK_AUDIT_SCHEMA_VERSION = "amc.industry-pack-audit/5";
 
 export const AUDIT_FRAMEWORKS = ["EU AI Act", "NIST AI RMF", "ISO 42001", "SOC 2", "Sector"] as const;
 export type AuditFramework = (typeof AUDIT_FRAMEWORKS)[number];
 
-export type ControlStatus = "PASS" | "ADEQUATE" | "GAP";
+export type ControlStatus = "PASS" | "ADEQUATE" | "GAP" | "NOT_EVALUATED";
 
 /** Markdown wording for a status computed from a self-declared level: never a bare PASS (truth rule). */
 const CONTROL_STATUS_TEXT: Record<ControlStatus, string> = {
-  PASS: "at target (self-reported)", ADEQUATE: "adequate (self-reported)", GAP: "gap (self-reported)"
+  PASS: "at target (self-reported)", ADEQUATE: "adequate (self-reported)", GAP: "gap (self-reported)",
+  NOT_EVALUATED: "not evaluated (no answer)"
 };
 
 export interface CrosswalkEntry {
@@ -72,11 +76,110 @@ export interface AuditControl {
   text: string;
   regulatoryRef: string;
   weight: number;
-  level: number;
+  /** The self-declared level; null when the question has no answer (not evaluated). */
+  level: number | null;
   status: ControlStatus;
   crosswalk: CrosswalkEntry[];
   evidenceExpected: string[];
   remediation: AuditRemediation | null;
+}
+
+/* ── Regulatory currency ───────────────────────────────────────────────────
+ * PackCurrencyFields v1 is the contract with the pack-schema track: optional
+ * fields a pack MAY carry. They are declared structurally here (not imported)
+ * and read defensively, so packs without them compile and audit as "undated".
+ */
+interface PackRegulatoryReference {
+  citation: string;
+  jurisdiction?: string;
+  url?: string;
+  effectiveDate?: string;
+  lastReviewed?: string;
+  status?: "in-force" | "applies-from" | "proposed" | "repealed" | "unverified";
+}
+
+export interface PackCurrencyFields {
+  version?: string;
+  lastReviewed?: string;
+  regulatoryReferences?: readonly PackRegulatoryReference[];
+}
+
+type CurrencyStatus = "current" | "stale" | "undated" | "unverified";
+
+export interface AuditCurrency {
+  /** Worst finding wins: undated > stale > unverified > current. */
+  status: CurrencyStatus;
+  staleAfterDays: number;
+  packVersion: string | null;
+  packLastReviewed: string | null;
+  packAgeDays: number | null;
+  /** Currency fields absent, unparseable, or dated after `now`. */
+  missing: Array<"version" | "lastReviewed" | "regulatoryReferences">;
+  referenceCount: number;
+  staleReferences: Array<{ citation: string; lastReviewed: string; ageDays: number }>;
+  undatedReferences: string[];
+  unverifiedReferences: string[];
+}
+
+const DEFAULT_STALE_AFTER_DAYS = 365;
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/** Whole days from an ISO date to `now`; null when unparseable or in the future. */
+function ageInDays(date: unknown, now: number): number | null {
+  if (typeof date !== "string") return null;
+  const parsed = Date.parse(date);
+  if (!Number.isFinite(parsed) || parsed > now) return null;
+  return Math.floor((now - parsed) / DAY_MS);
+}
+
+/** A pack with the currency fields typed structurally, so a registry type that declares them (mutable or readonly) fits. */
+export type PackWithCurrency = Omit<IndustryPack, keyof PackCurrencyFields> & PackCurrencyFields;
+
+export function computePackCurrency(
+  pack: PackWithCurrency,
+  now: number,
+  options: { staleAfterDays?: number } = {},
+): AuditCurrency {
+  const staleAfterDays = options.staleAfterDays ?? DEFAULT_STALE_AFTER_DAYS;
+  if (!Number.isFinite(staleAfterDays) || staleAfterDays <= 0) {
+    throw new RangeError(`staleAfterDays must be a positive number of days, got ${staleAfterDays}`);
+  }
+  const missing: AuditCurrency["missing"] = [];
+  const packVersion = typeof pack.version === "string" && pack.version.trim() ? pack.version : null;
+  if (packVersion === null) missing.push("version");
+  const packAgeDays = ageInDays(pack.lastReviewed, now);
+  if (packAgeDays === null) missing.push("lastReviewed");
+  const references = Array.isArray(pack.regulatoryReferences) ? pack.regulatoryReferences : [];
+  if (references.length === 0) missing.push("regulatoryReferences");
+
+  const staleReferences: AuditCurrency["staleReferences"] = [];
+  const undatedReferences: string[] = [];
+  const unverifiedReferences: string[] = [];
+  for (const ref of references) {
+    const citation = String(ref?.citation ?? "(uncited reference)");
+    if (ref?.status === "unverified") unverifiedReferences.push(citation);
+    const ageDays = ageInDays(ref?.lastReviewed, now);
+    if (ageDays === null) undatedReferences.push(citation);
+    else if (ageDays > staleAfterDays) staleReferences.push({ citation, lastReviewed: ref.lastReviewed as string, ageDays });
+  }
+
+  const status: CurrencyStatus =
+    packAgeDays === null || references.length === 0 ? "undated"
+      : packAgeDays > staleAfterDays || staleReferences.length > 0 ? "stale"
+        : unverifiedReferences.length > 0 ? "unverified"
+          : "current";
+  return {
+    status,
+    staleAfterDays,
+    packVersion,
+    packLastReviewed: packAgeDays === null ? null : (pack.lastReviewed as string),
+    packAgeDays,
+    missing,
+    referenceCount: references.length,
+    staleReferences,
+    undatedReferences,
+    unverifiedReferences,
+  };
 }
 
 export interface IndustryPackAudit {
@@ -88,9 +191,10 @@ export interface IndustryPackAudit {
   euAIActClassification: string;
   generatedAt: string;
   overall: {
-    /** Self-reported score. */
-    percentage: number;
-    level: number;
+    /** Self-reported score; null until every control is answered. */
+    percentage: number | null;
+    level: number | null;
+    notEvaluatedQuestionIds: string[];
     selfAssessment: PackSelfAssessment;
     claimKind: ClaimKind;
     eligibleLevel: number | null;
@@ -101,6 +205,10 @@ export interface IndustryPackAudit {
     gapCount: number;
   };
   frameworkCoverage: Array<{ framework: AuditFramework; controls: number }>;
+  /** Absent from receipts older than /5. */
+  currency: AuditCurrency;
+  /** /5 (P1-42): the pack's questions are AI-drafted, experimental content; absent from older receipts. */
+  contentStatus?: typeof QUESTIONNAIRE_CONTENT_STATUS;
   controls: AuditControl[];
   /** Unkeyed sha256 over the canonical audit without `receiptHash` and `signature`: a checksum, not a signature. */
   receiptHash: string;
@@ -196,7 +304,7 @@ function evidenceForDimension(dimension: string): string[] {
  * policy stub, a guardrail, or an evidence-collection recipe, with the pack's
  * own L3 descriptor as the acceptance criterion the agent must meet.
  */
-function generateRemediation(q: IndustryPackQuestion, level: number, packId: string): AuditRemediation {
+function generateRemediation(q: IndustryPackQuestion, level: number | null, packId: string): AuditRemediation {
   const evidence = evidenceForDimension(q.dimension);
   const targetLevel = 3;
   const acceptance = (q.l3 || "").replace(/\s+/g, " ").trim();
@@ -208,7 +316,7 @@ function generateRemediation(q: IndustryPackQuestion, level: number, packId: str
     `# amc industry-pack remediation — ${q.id} (${packId})`,
     `control: "${q.dimension}"`,
     `regulation: "${q.regulatoryRef}"`,
-    `current_level: ${level}`,
+    `current_level: ${level ?? "not_evaluated"}`,
     `target_level: ${targetLevel}`,
     `acceptance_criterion: >`,
     `  ${acceptance || `Meet the L${targetLevel} bar for ${q.dimension}.`}`,
@@ -220,7 +328,9 @@ function generateRemediation(q: IndustryPackQuestion, level: number, packId: str
   return {
     title: `Close ${q.dimension} gap for ${q.regulatoryRef}`,
     artifactType,
-    summary: `Raise control ${q.id} from L${level} to L${targetLevel} (${q.regulatoryRef}).`,
+    summary: level === null
+      ? `Answer and evidence control ${q.id} (not evaluated) to reach L${targetLevel} (${q.regulatoryRef}).`
+      : `Raise control ${q.id} from L${level} to L${targetLevel} (${q.regulatoryRef}).`,
     targetLevel,
     acceptanceCriterion: acceptance,
     generatedArtifact,
@@ -229,7 +339,8 @@ function generateRemediation(q: IndustryPackQuestion, level: number, packId: str
   };
 }
 
-function levelStatus(level: number): ControlStatus {
+function levelStatus(level: number | null): ControlStatus {
+  if (level === null) return "NOT_EVALUATED";
   if (level >= 4) return "PASS";
   if (level === 3) return "ADEQUATE";
   return "GAP";
@@ -253,10 +364,13 @@ export interface BuildIndustryPackAuditInput {
   responses: Record<string, number>;
   now: number;
   frameworkFilter?: AuditFramework;
+  /** Age in days after which a review date counts as stale (default 365). */
+  staleAfterDays?: number;
 }
 
 export function buildIndustryPackAudit(input: BuildIndustryPackAuditInput): IndustryPackAudit {
   const { pack, responses, now, frameworkFilter } = input;
+  const currency = computePackCurrency(pack, now, { staleAfterDays: input.staleAfterDays });
   const controls: AuditControl[] = [];
   const { answers, ...assessed } = selfAssessPack(pack, responses, now);
   let passCount = 0;
@@ -264,11 +378,11 @@ export function buildIndustryPackAudit(input: BuildIndustryPackAuditInput): Indu
   let gapCount = 0;
 
   for (const [index, q] of pack.questions.entries()) {
-    const level: number = answers[index]!;
+    const level = answers[index] ?? null;
     const status = levelStatus(level);
     if (status === "PASS") passCount += 1;
     else if (status === "ADEQUATE") adequateCount += 1;
-    else gapCount += 1;
+    else if (status === "GAP") gapCount += 1;
 
     let crosswalk = crosswalkForQuestion(q);
     if (frameworkFilter) {
@@ -309,7 +423,7 @@ export function buildIndustryPackAudit(input: BuildIndustryPackAuditInput): Indu
     generatedAt: new Date(now).toISOString(),
     overall: {
       ...assessed,
-      // No answer at all: every level is the L1 default, an example rather than a self-report (P0-20).
+      // No answer at all: no control is evaluated, so the audit is an example roadmap, not a self-report (P0-20).
       claimKind: assessed.selfAssessment.answered === 0 ? "synthetic_example" as const : assessed.claimKind,
       selfAssessmentTarget: pack.certificationThreshold,
       controlCount: controls.length,
@@ -318,6 +432,8 @@ export function buildIndustryPackAudit(input: BuildIndustryPackAuditInput): Indu
       gapCount,
     },
     frameworkCoverage,
+    currency,
+    contentStatus: QUESTIONNAIRE_CONTENT_STATUS,
     controls,
   };
   const receiptHash = sha256Hex(canonicalize(body));
@@ -333,7 +449,7 @@ export function verifyIndustryPackAuditChecksum(audit: IndustryPackAudit): boole
 /** Each control's level is a self-answer about a regulated control: self-reported, never a pass. */
 function controlClaim(audit: IndustryPackAudit, control: AuditControl): ClaimEnvelope {
   return envelopeForSelfAssessment({ producer: `industry-pack:${audit.packId}:${control.id}`, regulated: true,
-    answers: [control.level], now: Date.parse(audit.generatedAt) });
+    answers: control.level === null ? [] : [control.level], now: Date.parse(audit.generatedAt) });
 }
 
 /** The audit as a whole claims no more than its weakest control. */
@@ -351,8 +467,8 @@ export function signIndustryPackAudit(workspace: string, audit: IndustryPackAudi
   if (!verifyIndustryPackAuditChecksum(audit)) throw new Error("the audit checksum does not match its body");
   const { signature: _previous, ...unsigned } = audit;
   const signed = signIndustryPackAuditJson(workspace, unsigned);
-  const keyId = ed25519KeyId(envelopePublicKey(signed.envelope) ?? "");
-  if (keyId === null) throw new Error("the signer returned no Ed25519 public key");
+  const keyId = signingKeyId(envelopePublicKey(signed.envelope) ?? "");
+  if (keyId === null) throw new Error("the signer returned no supported public key");
   return { ...unsigned, signature: { ...signed, keyFingerprint: `sha256:${keyId}` } };
 }
 
@@ -401,7 +517,7 @@ export function verifyIndustryPackAuditSignature(audit: IndustryPackAudit, opts:
     const digest = sha256Hex(canonicalize(unsigned));
     if (digest !== signature.digestSha256) fail("DIGEST_MISMATCH", "the audit does not match the signed digest");
     const check = checkDigestSignature({ signature: "industry-pack audit signature", purpose: "artifact-seal", digestHex: digest,
-      signatureB64: signature.signature, candidates: [opts.publicKeyPem, envelopePublicKey(signature.envelope)],
+      signatureB64: signature.signature, envelope: signature.envelope, candidates: [opts.publicKeyPem, envelopePublicKey(signature.envelope)],
       context: opts.trust, claimedSignedAt: signature.signedTs });
     admission = check.admission;
     keyFingerprint = check.verified ? `sha256:${check.admission.keyId}` : null;
@@ -477,10 +593,13 @@ export function renderIndustryPackAuditMarkdown(audit: IndustryPackAudit): strin
   lines.push(`- Pack: \`${audit.packId}\` · Station: ${audit.stationId} · Risk tier: ${audit.riskTier}`);
   lines.push(`- EU AI Act classification: ${audit.euAIActClassification}`);
   lines.push(`- Generated: ${audit.generatedAt}`);
+  if (audit.contentStatus) lines.push(`- Content: ${audit.contentStatus}. ${QUESTIONNAIRE_NOTICE}`);
   const overall = audit.overall;
-  lines.push(`- Overall (self-reported): ${overall.percentage}% · self-assessment complete: ${overall.selfAssessment.complete ? "yes" : "no"} · claim kind: ${overall.claimKind.replace("_", "-")}`);
-  lines.push(`- Self-reported level L${overall.level}; eligible level ${overall.eligibleLevel === null ? "none" : `L${overall.eligibleLevel}`} · self-assessment target ${overall.selfAssessmentTarget}%`);
-  lines.push(`- Controls (self-reported answers): ${audit.overall.controlCount} — at target ${audit.overall.passCount} · adequate ${audit.overall.adequateCount} · gap ${audit.overall.gapCount}`);
+  const score = overall.percentage === null
+    ? `not evaluated (${overall.notEvaluatedQuestionIds.length} of ${overall.controlCount} controls unanswered)` : `${overall.percentage}%`;
+  lines.push(`- Overall (self-reported): ${score} · self-assessment complete: ${overall.selfAssessment.complete ? "yes" : "no"} · claim kind: ${overall.claimKind.replace("_", "-")}`);
+  lines.push(`- Self-reported level ${overall.level === null ? "not evaluated" : `L${overall.level}`}; eligible level ${overall.eligibleLevel === null ? "none" : `L${overall.eligibleLevel}`} · self-assessment target ${overall.selfAssessmentTarget}%`);
+  lines.push(`- Controls (self-reported answers): ${audit.overall.controlCount} — at target ${audit.overall.passCount} · adequate ${audit.overall.adequateCount} · gap ${audit.overall.gapCount} · not evaluated ${overall.notEvaluatedQuestionIds.length}`);
   lines.push(audit.signature
     ? `- Signature: auditor key ${audit.signature.keyFingerprint}. Verify with: \`amc audit binder verify <file> --pubkey <recorded-auditor.pub>\``
     : `- Checksum only — not signed (\`sha256:${audit.receiptHash}\`)`);
@@ -493,10 +612,13 @@ export function renderIndustryPackAuditMarkdown(audit: IndustryPackAudit): strin
     lines.push(`| ${f.framework} | ${f.controls} |`);
   }
   lines.push("");
+  // A receipt older than /5 has no currency section; it still renders (P1-42 review).
+  lines.push(...(audit.currency ? renderCurrencyMarkdown(audit.currency)
+    : ["## Regulatory currency", "", "- not recorded: this audit predates the currency section (schema /5)", ""]));
   lines.push("## Controls");
   for (const c of audit.controls) {
     lines.push("");
-    lines.push(`### ${c.id} — ${c.dimension} · ${CONTROL_STATUS_TEXT[c.status]} (L${c.level})`);
+    lines.push(`### ${c.id} — ${c.dimension} · ${CONTROL_STATUS_TEXT[c.status]}${c.level === null ? "" : ` (L${c.level})`}`);
     lines.push(formatClaimLabel(renderClaimLabel(controlClaim(audit, c)), "report"));
     lines.push("");
     lines.push(c.text);
@@ -513,4 +635,17 @@ export function renderIndustryPackAuditMarkdown(audit: IndustryPackAudit): strin
   }
   lines.push("", "## How to read claim kinds", "", renderClaimLegend("markdown"), "");
   return lines.join("\n");
+}
+
+function renderCurrencyMarkdown(c: AuditCurrency): string[] {
+  const lines = ["## Regulatory currency", ""];
+  lines.push(`- Status: **${c.status}** (stale after ${c.staleAfterDays} days)`);
+  lines.push(`- Pack version: ${c.packVersion ?? "none"} · last reviewed: ${c.packLastReviewed ?? "none"}${c.packAgeDays === null ? "" : ` (${c.packAgeDays} days ago)`}`);
+  lines.push(`- Missing: ${c.missing.length > 0 ? c.missing.join(", ") : "none"}`);
+  lines.push(`- References: ${c.referenceCount} · stale ${c.staleReferences.length} · undated ${c.undatedReferences.length} · unverified ${c.unverifiedReferences.length}`);
+  for (const ref of c.staleReferences) lines.push(`  - stale: ${ref.citation} (last reviewed ${ref.lastReviewed}, ${ref.ageDays} days)`);
+  for (const citation of c.undatedReferences) lines.push(`  - undated: ${citation}`);
+  for (const citation of c.unverifiedReferences) lines.push(`  - unverified: ${citation}`);
+  lines.push("");
+  return lines;
 }

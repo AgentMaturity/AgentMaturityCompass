@@ -1,0 +1,154 @@
+{
+  "int": "3c23d1c504f3b0b8b9b2defc668ab39611bf8074",
+  "source": "src/domains/industryPacks.ts",
+  "sourceSha256": "ecd96a308a442af09d5b61bc5419be56d1075323b081ce0442d1e643df14c7e7",
+  "packQuestions": {
+    "specExpected": 77,
+    "actual": 75,
+    "packs": [
+      {
+        "id": "cognition-to-intelligence",
+        "count": 15
+      },
+      {
+        "id": "networked-ecosystems",
+        "count": 15
+      },
+      {
+        "id": "os-sustainable-outcomes",
+        "count": 15
+      },
+      {
+        "id": "infotainment",
+        "count": 15
+      },
+      {
+        "id": "partnerships-prosperity",
+        "count": 15
+      }
+    ]
+  },
+  "deepQuestions": {
+    "specExpected": 16,
+    "actual": 0,
+    "note": "0 on int; spec expected 16. No Technology deep questions are invented.",
+    "absentIds": [
+      "technology-deep-01",
+      "technology-deep-02",
+      "technology-deep-03",
+      "technology-deep-04",
+      "technology-deep-05",
+      "technology-deep-06",
+      "technology-deep-07",
+      "technology-deep-08",
+      "technology-deep-09",
+      "technology-deep-10",
+      "technology-deep-11",
+      "technology-deep-12",
+      "technology-deep-13",
+      "technology-deep-14",
+      "technology-deep-15",
+      "technology-deep-16"
+    ]
+  },
+  "absentIds": [
+    {
+      "id": "TECH-CI-16",
+      "status": "absent on int 3c23d1c504f3b0b8b9b2defc668ab39611bf8074",
+      "specSaid": "Document review"
+    },
+    {
+      "id": "TECH-CI-17",
+      "status": "absent on int 3c23d1c504f3b0b8b9b2defc668ab39611bf8074",
+      "specSaid": "CCPA opt-out test"
+    },
+    {
+      "id": "TECH-CI-18",
+      "status": "absent on int 3c23d1c504f3b0b8b9b2defc668ab39611bf8074",
+      "specSaid": "Layer 0 adversarial testing"
+    },
+    {
+      "id": "TECH-OS-16",
+      "status": "absent on int 3c23d1c504f3b0b8b9b2defc668ab39611bf8074",
+      "specSaid": "P2-11 DORA"
+    },
+    {
+      "id": "TECH-OS-17",
+      "status": "absent on int 3c23d1c504f3b0b8b9b2defc668ab39611bf8074",
+      "specSaid": "NIS2 drill"
+    },
+    {
+      "id": "TECH-OS-18",
+      "status": "absent on int 3c23d1c504f3b0b8b9b2defc668ab39611bf8074",
+      "specSaid": "P2-11 DORA"
+    },
+    {
+      "id": "TECH-OS-20",
+      "status": "absent on int 3c23d1c504f3b0b8b9b2defc668ab39611bf8074",
+      "specSaid": "P2-11 AI Act Article 73"
+    },
+    {
+      "id": "TECH-INF-17",
+      "status": "absent on int 3c23d1c504f3b0b8b9b2defc668ab39611bf8074",
+      "specSaid": "COPPA consent test"
+    },
+    {
+      "id": "TECH-PP-16",
+      "status": "absent on int 3c23d1c504f3b0b8b9b2defc668ab39611bf8074",
+      "specSaid": "CRA packet test"
+    },
+    {
+      "id": "TECH-PP-20",
+      "status": "absent on int 3c23d1c504f3b0b8b9b2defc668ab39611bf8074",
+      "specSaid": "AIBOM precondition"
+    }
+  ],
+  "labelMismatches": [
+    {
+      "id": "TECH-CI-15",
+      "specSaid": "Synthetic-media marking",
+      "actual": "GPAI documentation under AI Act Article 53(1)(b)",
+      "disposition": "document_review",
+      "target": "L1-TECH-06"
+    },
+    {
+      "id": "TECH-PP-15",
+      "specSaid": "AIBOM precondition",
+      "actual": "Data Act Article 13 fair contracting",
+      "disposition": "questionnaire",
+      "target": "L1"
+    }
+  ],
+  "restorations": [
+    {
+      "id": "TECH-OS-4",
+      "presentOnInt": true,
+      "note": "Disposition retained as requested; tighten the temporary absence tolerance after the integrator announces P1-42 landed."
+    },
+    {
+      "id": "TECH-OS-15",
+      "presentOnInt": true,
+      "note": "Disposition retained as requested; tighten the temporary absence tolerance after the integrator announces P1-42 landed."
+    },
+    {
+      "id": "TECH-INF-15",
+      "presentOnInt": true,
+      "note": "Disposition retained as requested; tighten the temporary absence tolerance after the integrator announces P1-42 landed."
+    },
+    {
+      "id": "TECH-PP-7",
+      "presentOnInt": true,
+      "note": "Disposition retained as requested; tighten the temporary absence tolerance after the integrator announces P1-42 landed."
+    },
+    {
+      "id": "TECH-PP-13",
+      "presentOnInt": true,
+      "note": "Disposition retained as requested; tighten the temporary absence tolerance after the integrator announces P1-42 landed."
+    },
+    {
+      "id": "TECH-PP-14",
+      "presentOnInt": true,
+      "note": "Disposition retained as requested; tighten the temporary absence tolerance after the integrator announces P1-42 landed."
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "schema": "p125pc-inert-fresh-binder-input-pins/1",
+  "files": [
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/bind-fresh.py",
+      "bytes": 8794,
+      "sha256": "bda011325cac08d92fcb56ac5314754075920e78d21e7b7a9999df724273fa6a"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/runtime-protected-inputs.json",
+      "bytes": 90612,
+      "sha256": "42bfd4e5565b5d3757d8c14d39b504188ab8a30ec2b19c1bfe71750a47194c59"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/protected-inputs-v3.json",
+      "bytes": 88277,
+      "sha256": "ba4495dc366f2e2051cc29679815f540f4159c7f205c6b25c22cba2fdc5a5aac"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/source-selection.json",
+      "bytes": 7899,
+      "sha256": "40618cf6cd152f4a56319124eb44aa967ae939b1dbdb454f2277634c30cf7431"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/source-checkpoint.json",
+      "bytes": 453,
+      "sha256": "6173074e96a07158d14eea016d3c0d55e1b704d564bb76aed9f159c7f92b8b6f"
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/source-selection.json",
+      "bytes": 8137,
+      "sha256": "02552fd970f0aff01496e9d954da4f554275a0aec076a461087c156662ce6083"
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-source-binding.json",
+      "bytes": 122294,
+      "sha256": "48baa36cfc416eac9c71d6af072eeac7847cd2516c7e48a5cfc777f4fa3ec935"
+    },
+    {
+      "path": "/private/tmp/p1-39-mcp-qualification-20261016/post-typecheck-run-prepared.py",
+      "bytes": 14874,
+      "sha256": "abbda23f645d38e643133ebbb4a9b19dc4f9bad5cab20d098c02449c6d3885e6"
+    }
+  ],
+  "count": 8,
+  "scope": "Existing preparation/source-checkpoint metadata and exact parent helper text only; no future clean-source/Q/native result or active source-file sweep."
+}

@@ -1,0 +1,6 @@
+     × replaying the older validly signed list keeps lease-x revoked 276ms
+     × deleting both files keeps lease-x revoked 187ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+AssertionError: expected [Function] to throw error matching /ROLLBACK/ but got 'un-revoked'
+AssertionError: expected [Function] to throw an error
+      Tests  2 failed (2)

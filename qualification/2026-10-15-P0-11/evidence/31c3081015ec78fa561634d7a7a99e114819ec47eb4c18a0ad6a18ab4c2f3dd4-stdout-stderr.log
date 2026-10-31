@@ -1,0 +1,11 @@
+
+ RUN  v4.1.11 /private/tmp/p0-11-causal-qualification-20261015/closure
+
+ ✓ tests/threatModelMap.test.ts (7 tests) 566ms
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+   Start at  12:13:01
+   Duration  701ms (transform 12ms, setup 22ms, import 5ms, tests 566ms, environment 0ms)
+
+JSON report written to /private/tmp/p0-11-causal-qualification-20261015/phases/C1-map-missing-path-fail-open--baseline/raw.json

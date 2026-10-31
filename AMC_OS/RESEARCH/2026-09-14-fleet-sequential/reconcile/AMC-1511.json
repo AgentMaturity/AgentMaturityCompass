@@ -68,7 +68,7 @@
    },
    {
     "claim": "Linear comment and Obsidian evidence note exist for this work",
-    "evidence": "Linear: 8 comments on AMC-1511 up to 2026-09-09T21:38Z; the latest is a 'STOP / instructionNeeded' checkpoint stating candidate02 (8d09ddd4) acceptance was never promoted, security mutations not executed, installed qualification not started. Obsidian: read-only ls confirms /Users/sid/Documents/AMC/Evidence/2026-09-10 Native JSONL Writer Resume.md (6524 B) and 2026-09-10 Native Recovery Control Gap.md (4209 B) exist; contents not read",
+    "evidence": "Linear: 8 comments on AMC-1511 up to 2026-09-09T21:38Z; the latest is a 'STOP / instructionNeeded' checkpoint stating candidate02 (8d09ddd4) acceptance was never promoted, security mutations not executed, installed qualification not started. Obsidian: read-only ls confirms ~/Documents/AMC/Evidence/2026-09-10 Native JSONL Writer Resume.md (6524 B) and 2026-09-10 Native Recovery Control Gap.md (4209 B) exist; contents not read",
     "holds": true,
     "note": "No comment or note yet records a reconciliation at 6e7875f2; the recovery-control-gap batch disposition.json states batchFullyAccepted=false."
    }

@@ -1,0 +1,26 @@
+{
+  "schema": "p125f-builder-author-static-review/1",
+  "independentReviewClaim": false,
+  "builderExecutedImportedParsedOrCompiled": false,
+  "assemblerExecuted": false,
+  "actualManifestWritten": false,
+  "actualRootAdmissionWritten": false,
+  "commandSnapshot": 34,
+  "cutoffUtc": "2026-10-16T22:28:47.354878+00:00",
+  "allSixNonzeroRowsRetained": true,
+  "actualPeerReviewsReadBeforeProse": true,
+  "actualNodeJsonContractUsed": true,
+  "oldReadmeSuffix15980ByteExact": true,
+  "oldNotesPrefixPreservedByBuilder": true,
+  "curatedArtifactRecipes": 282,
+  "noRecursivePrivateAdoption": true,
+  "sourceScriptsInertAndGuardToolsHashOnly": true,
+  "rootGapsUnchanged": {
+    "path": "/private/tmp/p1-25-fallback-qualification-20261017/whole-issue-gaps.json",
+    "bytes": 2436,
+    "sha256": "a6fb6cb52d296fd50a9a2ea4c85bbbddb23d01e76fd2f1affb2aef5c9158cc83"
+  },
+  "allFutureValidationPublicationAndQualityCreditExcluded": true,
+  "sourceIndexQaWrites": false,
+  "blockers": []
+}

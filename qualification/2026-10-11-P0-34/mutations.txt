@@ -1,0 +1,23 @@
+# Mutations: each guard broken once, its test failed, then restored
+scripts/release-record.mjs :: else if (sha256(path) !== digest) =>       Tests  1 failed | 3 passed (4)
+scripts/release-record.mjs :: return named === commit ? [] =>       Tests  1 failed | 3 passed (4)
+scripts/check-pack-contents.mjs :: PRIVATE_ROOT.test(path) ||  =>       Tests  1 failed | 1 passed (2)
+scripts/check-release-candidate.mjs :: if (count > 1) =>       Tests  1 failed | 4 passed (5)
+scripts/release-prepare.mjs :: if (plan.version !== target) { =>       Tests  1 failed | 4 passed (5)
+scripts/release-notes.mjs :: ...uncoveredBreaking(after, changesets) =>       Tests  1 failed | 4 passed (5)
+src/release/releaseBundle.ts :: if (options.npmTarball && pack.fileName !== expectedTgz) =>       Tests  1 failed | 12 passed (13)
+src/cli-native-schedule-commands.ts :: program.command("native-schedule", { hidden: true }) =>       Tests  1 failed | 7 passed (8)
+     × builds a deterministic allowlisted artifact with source, renderer, and font hashes 75993ms
+ Failed Tests 1 
+AssertionError: expected true to be false // Object.is equality
+      Tests  1 failed | 3 passed (4)
+mutation duplicate-heading guard:  Failed Tests 1 
+mutation duplicate-heading guard:       Tests  1 failed | 5 passed (6)
+mutation page-line command check:  Failed Tests 1 
+mutation page-line command check:       Tests  1 failed | 5 passed (6)
+scripts/build-pages-site.mjs (in a fresh clone, real .git): default apiReference = true => publicDocsArtifact 1 failed | 3 passed
+.github/workflows/release.yml: exit 0 branch for a missing NPM_TOKEN restored => releaseWorkflowContract failed: exit 0 under: if [ -z "$NODE_AUTH_TOKEN" ]
+.github/workflows/release.yml: npm publish from the checkout instead of the gated tarball => releaseWorkflowContract failed: publish does not use the gated tarball
+.github/workflows/release.yml: npm install -g npm@latest in the publish step => releaseWorkflowContract failed: release installs or builds: npm install
+.github/workflows/release.yml: pull_request_target trigger added => releaseWorkflowContract failed: triggers are not a v*.*.* tag push only
+tests/releaseWorkflowContract.test.ts also mutates 28 cases in memory on every run.

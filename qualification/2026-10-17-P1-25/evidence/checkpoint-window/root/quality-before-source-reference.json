@@ -1,0 +1,16 @@
+{
+  "at": "2026-10-16T23:33:49.209258+00:00",
+  "role": "before-source-reference",
+  "baseline": {
+    "path": "/private/tmp/p1-25-grant-qualification-20261017/after-metadata-full.json",
+    "bytes": 247823,
+    "sha256": "36b9e659ca601d24982ccc8f4d7bf2d54779bbddb2f84ada1a35b174a0356182"
+  },
+  "sourceParent": "3468e29027c32209a5f794b7ffea3f1565de490e",
+  "actualPriorPhase": "p125g-metadata-quality-diagnostic",
+  "priorFindingCount": 2719,
+  "newScanClaim": false,
+  "copiedOrRelabelledBaseline": false,
+  "qualityGatePassed": false,
+  "boundary": "Exact prior completed metadata diagnostic snapshot; new changes are only admitted test-side3 and15 count spans. Global RED unwaived."
+}

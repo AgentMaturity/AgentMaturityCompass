@@ -9,7 +9,8 @@ import { AsyncLocalStorage } from 'node:async_hooks';
 import { dirname, join, resolve } from 'node:path';
 import { mkdirSync } from 'node:fs';
 import { activeControlPlanHead, loadActiveCompiledPolicy } from '../catalog/compiler/activate.js';
-import { ensureSigningKeys, getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from '../crypto/keys.js';
+import { ensureSigningKeys, getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from '../crypto/keys.js';
+import { ROLE_PRIMARY_PURPOSE } from '../vault/vaultPayload.js';
 import { canonicalize } from '../utils/json.js';
 import { sha256Hex } from '../utils/hash.js';
 import Database from 'better-sqlite3';
@@ -70,7 +71,7 @@ function resolveGuardWorkspace(workspace?: string, receiptWorkspace?: string): G
 }
 
 function databasePath(target: GuardWorkspace): string {
-  return currentStage() === 'CUTOVER' ? join(dirname(target.legacyDbPath), 'evidence.sqlite') : target.legacyDbPath;
+  return currentStage(target.workspace) === 'CUTOVER' ? join(dirname(target.legacyDbPath), 'evidence.sqlite') : target.legacyDbPath;
 }
 
 export interface GuardEventInput {
@@ -209,7 +210,7 @@ export function buildGuardDecisionReceipt(input: EmitGuardDecisionReceiptInput):
     metaHash: input.meta ? sha256Hex(canonicalize(input.meta)) : null,
   };
   const payloadHash = sha256Hex(canonicalize(payload));
-  const signature = signHexDigest(payloadHash, getPrivateKeyPem(workspace, signer));
+  const signature = signHexDigest(payloadHash, getSigningKey(workspace, ROLE_PRIMARY_PURPOSE[signer]));
   const receiptWithoutHash = { payload, payloadHash, signature };
   return {
     ...receiptWithoutHash,
@@ -382,7 +383,7 @@ export function emitGuardEvent(input: GuardEventInput): void {
     // reads until parity has been verified and cutover is switched on, so this
     // stage cannot change any answer — it can only make the second store
     // complete enough to be compared against the first.
-    if (currentStage() !== 'CUTOVER') writeConsolidatedGuardEvent(target.workspace, {
+    if (currentStage(target.workspace) !== 'CUTOVER') writeConsolidatedGuardEvent(target.workspace, {
       id,
       agent_id: input.agentId,
       module_code: input.moduleCode,

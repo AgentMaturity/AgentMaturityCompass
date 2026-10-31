@@ -12,9 +12,9 @@ Usage:
 
     guard = ExecGuard(profile="safe_exec")
     decision = guard.assess(
-        command="ls -la /Users/sid/.openclaw/workspace",
-        args=["-la", "/Users/sid/.openclaw/workspace"],
-        workdir="/Users/sid/.openclaw/workspace",
+        command="ls -la ~/.openclaw/workspace",
+        args=["-la", "~/.openclaw/workspace"],
+        workdir="~/.openclaw/workspace",
         stdout="listing...",
     )
 
@@ -101,7 +101,7 @@ _PRESET_RULES: dict[str, ExecGuardConfig] = {
         profile="no_exec",
         allowlist_commands={"ls", "pwd", "cat", "head", "tail", "grep", "find", "git", "python", "python3", "node", "npm", "pip"},
         allowlist_prefixes={"/usr/bin", "/bin", "/usr/local/bin", "/opt/homebrew/bin"},
-        allowlist_cwd_prefixes={"/Users/sid/.openclaw/workspace", "/tmp/amc"},
+        allowlist_cwd_prefixes={"~/.openclaw/workspace", "/tmp/amc"},
         forbidden_substrings={"rm", "mkfs", "dd", "> ", ">>", "mkfs", ":(){", "sudo", "su", "chmod +s", "setuid"},
         suspicious_threshold=999,
         max_chain_ops=1,
@@ -111,7 +111,7 @@ _PRESET_RULES: dict[str, ExecGuardConfig] = {
         profile="safe_exec",
         allowlist_commands={"ls", "pwd", "cat", "sed", "awk", "grep", "find", "git", "python", "python3", "node", "npm", "pip", "npm", "rg", "jq", "awk", "echo"},
         allowlist_prefixes={"/usr/bin", "/bin", "/usr/local/bin", "/opt/homebrew/bin"},
-        allowlist_cwd_prefixes={"/Users/sid/.openclaw/workspace", "/tmp/amc"},
+        allowlist_cwd_prefixes={"~/.openclaw/workspace", "/tmp/amc"},
         forbidden_substrings={"rm -rf", "sudo", "curl", "wget", "knife", "ssh", "nc ", "nc\t", "chown", "chmod", "chgrp", "mkfs", "dd", "nohup", "reboot", "shutdown", "systemctl"},
         suspicious_threshold=2,
         max_chain_ops=2,
@@ -121,7 +121,7 @@ _PRESET_RULES: dict[str, ExecGuardConfig] = {
         profile="operator_exec",
         allowlist_commands={"ls", "pwd", "cat", "sed", "awk", "grep", "find", "git", "python", "python3", "node", "npm", "pip", "pip3", "du", "df", "cp", "mv", "mkdir", "touch", "chmod", "chown", "systemctl", "docker", "kubectl", "helm", "terraform"},
         allowlist_prefixes={"/usr/bin", "/bin", "/usr/local/bin", "/opt/homebrew/bin", "/usr/sbin", "/sbin", "/usr/local/sbin"},
-        allowlist_cwd_prefixes={"/Users/sid/.openclaw/workspace", "/tmp/amc", "/var/tmp"},
+        allowlist_cwd_prefixes={"~/.openclaw/workspace", "/tmp/amc", "/var/tmp"},
         forbidden_substrings={"rm -rf /", "rm -r /", "dd if=", ":(){", "mkfs", "reboot", "shutdown", r"curl .*\|.*sh"},
         suspicious_threshold=4,
         max_chain_ops=4,

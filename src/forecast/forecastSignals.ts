@@ -4,10 +4,15 @@ import YAML from "yaml";
 import type { DiagnosticReport, OutcomeReport } from "../types.js";
 import type { OrgScorecard } from "../org/orgSchema.js";
 import { getAgentPaths } from "../fleet/paths.js";
+import { listTrustedRuns } from "../governor/runTrust.js";
 import { listAgents } from "../fleet/registry.js";
 import { pathExists, readUtf8 } from "../utils/fs.js";
 import { computeFailureRiskIndices } from "../assurance/indices.js";
 import { loadTransformMap } from "../transformation/transformPlanner.js";
+import { canonicalize } from "../utils/json.js";
+import { ratioOrNull } from "../utils/ratio.js";
+import { loadForecastTransformPlan, type ForecastTransformPlanInput } from "./forecastTransformPlan.js";
+import type { TransformPlan } from "../transformation/transformTasks.js";
 import { FOUR_CS } from "../transformation/fourCs.js";
 import { listValueReports } from "../value/valueStore.js";
 import type { ValueReport } from "../value/valueSchema.js";
@@ -37,6 +42,7 @@ export interface ForecastSignalBundle {
     latestCorrelationRatio: number;
   };
   runRefs: string[];
+  transformPlanInput: ForecastTransformPlanInput;
   targetProgress: {
     gapPoints: number;
     remainingEffort: number;
@@ -114,11 +120,10 @@ function listAgentIds(workspace: string): string[] {
   return [...new Set(ids)].sort((a, b) => a.localeCompare(b));
 }
 
+/** Trusted runs only: a signed forecast refuses to project from an edited, copied or unanchored run or a thinned history. */
 function loadAgentRuns(workspace: string, agentId: string, earliestTs: number): DiagnosticReport[] {
-  const files = listJsonFiles(getAgentPaths(workspace, agentId).runsDir);
-  return files
-    .map((file) => parseJsonFile<DiagnosticReport>(file))
-    .filter((row): row is DiagnosticReport => row !== null && Number(row.ts) >= earliestTs)
+  return listTrustedRuns(workspace, agentId)
+    .filter((row) => Number(row.ts) >= earliestTs)
     .sort((a, b) => a.ts - b.ts);
 }
 
@@ -276,7 +281,7 @@ function valueFromOutcome(report: OutcomeReport | null): Record<(typeof FORECAST
   };
 }
 
-function computeTargetProgress(workspace: string, agentId: string, runs: DiagnosticReport[]): {
+function computeTargetProgress(workspace: string, agentId: string, runs: DiagnosticReport[], latestPlan: TransformPlan | null): {
   gapPoints: number;
   remainingEffort: number;
   throughputHistoryPerDay: number[];
@@ -285,10 +290,6 @@ function computeTargetProgress(workspace: string, agentId: string, runs: Diagnos
   const gapPoints = latestRun
     ? Number(latestRun.targetDiff.reduce((sum, row) => sum + Math.max(0, row.gap), 0).toFixed(6))
     : 0;
-  const latestPlanPath = join(workspace, ".amc", "agents", agentId, "transform", "latest.json");
-  const latestPlan = parseJsonFile<{
-    tasks?: Array<{ effort: number; status: string }>;
-  }>(latestPlanPath);
   const remainingEffort = latestPlan?.tasks
     ? Number(
         latestPlan.tasks
@@ -341,13 +342,14 @@ function computeTargetProgress(workspace: string, agentId: string, runs: Diagnos
   };
 }
 
-export function collectForecastSignals(params: {
+function collectForecastSignalsAt(params: {
   workspace: string;
   scope: ForecastScope;
   lookbackDays?: number;
-}): ForecastSignalBundle {
+}, selectionTs: number): ForecastSignalBundle {
   const lookbackDays = Math.max(14, params.lookbackDays ?? 90);
-  const earliestTs = Date.now() - lookbackDays * 86_400_000;
+  const earliestTs = selectionTs - lookbackDays * 86_400_000;
+  const { plan: transformPlan, ...transformPlanInput } = loadForecastTransformPlan(params.workspace, params.scope);
   const points = zeroSeriesInput();
   const runRefs: string[] = [];
   let observedAccumulator = 0;
@@ -373,7 +375,7 @@ export function collectForecastSignals(params: {
     })
       .filter((report) => report.generatedTs >= earliestTs)
       .sort((a, b) => a.generatedTs - b.generatedTs);
-    targetProgress = computeTargetProgress(params.workspace, params.scope.id, runs);
+    targetProgress = computeTargetProgress(params.workspace, params.scope.id, runs, transformPlan);
 
     for (const run of runs) {
       const trustTier = runTrustTier(run);
@@ -387,13 +389,8 @@ export function collectForecastSignals(params: {
         valueFromValueReport(latestValueReportBeforeTs(valueReports, run.ts)) ??
         valueFromOutcome(latestOutcomeBeforeTs(outcomes, run.ts));
       const backlog = Math.max(0, (run.approvalHygiene?.requested ?? 0) - (run.approvalHygiene?.consumed ?? 0));
-      const denialRate = (() => {
-        const usage = run.toolHubUsage;
-        if (!usage || usage.toolActionCount <= 0) {
-          return 0;
-        }
-        return usage.deniedActionCount / Math.max(1, usage.toolActionCount);
-      })();
+      // A run with no ToolHub actions did not measure a denial rate; it adds no point rather than a clean 0.
+      const denialRate = ratioOrNull(run.toolHubUsage?.deniedActionCount ?? 0, run.toolHubUsage?.toolActionCount ?? 0);
 
       points.maturityOverall.push({ ts: run.ts, value: Number(overall.toFixed(6)), runId: run.runId, trustTier });
       points.integrityIndex.push({ ts: run.ts, value: Number(run.integrityIndex.toFixed(6)), runId: run.runId, trustTier });
@@ -425,7 +422,7 @@ export function collectForecastSignals(params: {
         points.operating.toolhub_denial_rate = [];
       }
       points.operating.approval_backlog_size.push({ ts: run.ts, value: backlog, runId: run.runId, trustTier });
-      points.operating.toolhub_denial_rate.push({ ts: run.ts, value: denialRate, runId: run.runId, trustTier });
+      if (denialRate !== null) points.operating.toolhub_denial_rate.push({ ts: run.ts, value: denialRate, runId: run.runId, trustTier });
 
       runRefs.push(run.runId);
       observedAccumulator += run.evidenceTrustCoverage?.observed ?? 0;
@@ -579,6 +576,20 @@ export function collectForecastSignals(params: {
       latestCorrelationRatio: Number((latestCorrelationRatio ?? 0).toFixed(6))
     },
     runRefs: [...new Set(runRefs)],
+    transformPlanInput,
     targetProgress
   };
+}
+
+/** Existing calculation clock stays private; a final reread uses the original selector boundary. */
+export function collectForecastSignals(params: { workspace: string; scope: ForecastScope; lookbackDays?: number }): ForecastSignalBundle {
+  return collectForecastSignalsAt(params, Date.now());
+}
+export function captureForecastSignals(input: { workspace: string; scope: ForecastScope; lookbackDays?: number }) {
+  const params = { ...input, scope: { ...input.scope } }, selectionTs = Date.now(), signals = collectForecastSignalsAt(params, selectionTs);
+  const project = (value: ForecastSignalBundle) => canonicalize({ ...value, generatedTs: 0 });
+  const original = project(signals);
+  return { signals, readCurrent() { return collectForecastSignalsAt(params, selectionTs); }, assertCurrent() {
+    if (project(collectForecastSignalsAt(params, selectionTs)) !== original) throw new Error("selected forecast signal inputs changed while signing");
+  } };
 }

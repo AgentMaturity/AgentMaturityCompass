@@ -1,0 +1,15 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L0-LOG-02",
+  "polarity": "positive",
+  "evidenceClass": "valid",
+  "setup": {
+    "harness": "ledger_tamper",
+    "events": 4,
+    "tamper": "none"
+  },
+  "expected": {
+    "result": "pass",
+    "reasonCode": null
+  }
+}

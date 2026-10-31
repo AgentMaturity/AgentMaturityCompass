@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, symlinkSync, unlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { basename, dirname, join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { openLedger } from "../src/ledger/ledger.js";
@@ -14,6 +14,7 @@ import * as storage from "../src/session/spill/spillStore.js";
 import { formatSpillLocator, type SpillRef, type SpillRefV2 } from "../src/session/spill/spillTypes.js";
 import { eraseSessionSpills, exportSessionSpills, inventorySessionSpills, restoreSessionSpills, type SpillExportIndex } from "../src/session/spill/spillLifecycle.js";
 import type { EvidenceEvent } from "../src/types.js";
+import { nativeMeta } from "./helpers/nativeEnvelope.js";
 
 // Synthetic ciphertext and signed local ledger fixtures exercise the lifecycle,
 // not a model, measured maturity, installed package, or deployed service.
@@ -36,7 +37,7 @@ function appendReference(sessionId: string, ref: SpillRef, eventType: EvidenceEv
       ledger.startSession({ sessionId, runtime: "unknown", binaryPath: "synthetic-lifecycle-fixture", binarySha256: sha256Hex("fixture") });
     }
     const result = ledger.appendEvidenceDetailed({ sessionId, runtime: "unknown", eventType,
-      meta: { spilled: ref, fixtureKind: "SYNTHETIC_LIFECYCLE_CONTROL_INPUT", agentId: "default" } });
+      meta: nativeMeta(ledger.getAllEvents(), sessionId, { spilled: ref, fixtureKind: "SYNTHETIC_LIFECYCLE_CONTROL_INPUT", agentId: "default" }) });
     return ledger.getAllEvents().find(row => row.id === result.id)!;
   } finally { ledger.close(); }
 }
@@ -167,6 +168,32 @@ describe("explicit local spill erasure", () => {
     expect(readdirSync(join(destination, "objects"))).toEqual([]);
     expect(eraseSessionSpills({ ...input(), scope: { eventIds: [row.id] }, reason: "explicit legacy fixture purge" }).entries[0]?.status).toBe("removed");
     expect(existsSync(path)).toBe(false);
+  });
+});
+
+describe("P0-30 spill guard coverage", () => {
+  it("export refuses conflicting or unauthentic rows instead of writing an empty index", () => {
+    const fixture = object(), destination = join(workspace, "refused-export");
+    appendReference(fixture.sessionId, { ...fixture.ref, encodedSha256: "0".repeat(64) });
+    expect(() => exportSessionSpills({ ...input(), destination })).toThrow(/Spill lifecycle refused: .*conflicting signed spill/);
+    expect(existsSync(destination)).toBe(false);
+    const tampered = events().map(row => row.id === fixture.result.id
+      ? { ...row, meta_json: JSON.stringify({ spilled: { ...fixture.ref, contentSha256: "0".repeat(64) } }) } : row);
+    expect(() => exportSessionSpills({ workspace, events: tampered, destination })).toThrow(/Spill lifecycle refused/);
+    expect(existsSync(destination)).toBe(false);
+  });
+
+  it.each(["parent", "sibling", "workspace itself"] as const)("a spill root that is the %s of the workspace is refused", (kind) => {
+    const fixture = object(undefined, false);
+    const root = kind === "parent" ? dirname(workspace)
+      : kind === "sibling" ? join(workspace, "..", `${basename(workspace)}-sibling`) : workspace;
+    const session = join(root, `session-${sha256Hex(fixture.sessionId)}`);
+    expect(() => storage.restoreSpillObject(workspace, fixture.ref, fixture.encoded, root)).toThrow(/spill root must be a descendant of the workspace/);
+    expect(existsSync(session)).toBe(false);
+    const inventory = inventorySessionSpills({ ...input(), options: { root } });
+    expect(inventory.ok).toBe(false);
+    expect(inventory.errors.join(" ")).toContain("spill root must be a descendant of the workspace");
+    expect(existsSync(session)).toBe(false);
   });
 });
 

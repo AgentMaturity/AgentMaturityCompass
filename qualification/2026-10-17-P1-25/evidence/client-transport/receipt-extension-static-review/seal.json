@@ -1,0 +1,26 @@
+{
+  "schema": "p125c-receipt-extension-static-review-seal/1",
+  "at": "2026-10-16T21:56:02.406587+00:00",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/receipt-extension-static-review/README.md",
+      "bytes": 2162,
+      "sha256": "d555e16f1062ef5c32c6904c77a8c3bc257af80aa42de090356d64c98c1c15e1"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/receipt-extension-static-review/input-pins.json",
+      "bytes": 139852,
+      "sha256": "07fdf67830de6aa929e7dc5333f471050eba0cc07263b2f4f61de07284d3863c"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/receipt-extension-static-review/review.json",
+      "bytes": 5138,
+      "sha256": "9d4c534ef69235882df060aeaa24c131ae254c71fdca72f92683e912643881c2"
+    }
+  ],
+  "blockers": [],
+  "inputPinCount": 378,
+  "allReadsFinished": true,
+  "executed": false,
+  "checkoutIndexQaWrites": false
+}

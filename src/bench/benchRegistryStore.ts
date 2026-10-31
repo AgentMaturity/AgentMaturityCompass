@@ -1,3 +1,4 @@
+import { withBenchImportLock } from "./benchImportLock.js";
 import { copyFileSync, readFileSync, readdirSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 import { z } from "zod";
@@ -5,7 +6,7 @@ import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { containedPath } from "../utils/pathSafety.js";
-import { benchArtifactSchema } from "./benchSchema.js";
+import { benchArtifactSchema, type BenchArtifact } from "./benchSchema.js";
 import {
   benchImportsBenchesDir,
   benchImportsCacheDir
@@ -29,36 +30,17 @@ const importedBenchMetaSchema = z.object({
 
 export type ImportedBenchMeta = z.infer<typeof importedBenchMetaSchema>;
 
-function benchRegistryCachePath(workspace: string, registryId: string): {
+export function benchRegistryCachePath(workspace: string, registryId: string): {
   indexPath: string;
   sigPath: string;
   pubPath: string;
 } {
-  const root = join(benchImportsCacheDir(workspace), registryId);
+  const root = containedPath(benchImportsCacheDir(workspace), "the bench registry cache directory", registryId);
   return {
     indexPath: join(root, "index.json"),
     sigPath: join(root, "index.sig"),
     pubPath: join(root, "registry.pub")
   };
-}
-
-export function cacheRegistryIndex(params: {
-  workspace: string;
-  registryId: string;
-  indexRaw: string;
-  sigRaw: string;
-  pubRaw: string;
-}): {
-  indexPath: string;
-  sigPath: string;
-  pubPath: string;
-} {
-  const paths = benchRegistryCachePath(params.workspace, params.registryId);
-  ensureDir(dirname(paths.indexPath));
-  writeFileAtomic(paths.indexPath, params.indexRaw, 0o644);
-  writeFileAtomic(paths.sigPath, params.sigRaw, 0o644);
-  writeFileAtomic(paths.pubPath, params.pubRaw, 0o644);
-  return paths;
 }
 
 export function importedBenchPath(workspace: string, benchId: string, version: string): {
@@ -79,32 +61,10 @@ export function importedBenchPath(workspace: string, benchId: string, version: s
   };
 }
 
-export function storeImportedBench(params: {
-  workspace: string;
-  registryId: string;
-  registryFingerprint: string;
-  signerFingerprint: string;
-  sourceUrl: string;
-  version: string;
-  file: string;
-  trust: TrustContext;
-}): {
-  meta: ImportedBenchMeta;
-  artifactPath: string;
-  metaPath: string;
-} {
-  const verified = verifyBenchArtifactFile({ file: params.file, trust: params.trust });
-  if (!verified.ok || !verified.bench) {
-    throw new Error(`cannot store imported bench; verification failed: ${verified.errors.map((e) => e.message).join("; ")}`);
-  }
-  const bench = benchArtifactSchema.parse(verified.bench);
-  const target = importedBenchPath(params.workspace, bench.benchId, params.version);
-  ensureDir(target.dir);
-  copyFileSync(resolve(params.file), target.artifactPath);
-  const digest = sha256Hex(readFileSync(target.artifactPath));
-  writeFileAtomic(target.shaPath, `${digest}\n`, 0o644);
-  writeFileAtomic(target.benchJsonPath, JSON.stringify(bench, null, 2), 0o644);
-  const meta = importedBenchMetaSchema.parse({
+/** Existing metadata recipe shared by the actual cache importer; it does not admit or sign keys. */
+export function buildImportedBenchMeta(params: { registryId: string; registryFingerprint: string; signerFingerprint: string; sourceUrl: string; version: string },
+  bench: BenchArtifact, digest: string): ImportedBenchMeta {
+  return importedBenchMetaSchema.parse({
     v: 1,
     benchId: bench.benchId,
     version: params.version,
@@ -117,15 +77,9 @@ export function storeImportedBench(params: {
     sha256: digest,
     sourceUrl: params.sourceUrl
   });
-  writeFileAtomic(target.metaPath, `${canonicalize(meta)}\n`, 0o644);
-  return {
-    meta,
-    artifactPath: target.artifactPath,
-    metaPath: target.metaPath
-  };
 }
 
-export function listImportedBenches(workspace: string): ImportedBenchMeta[] {
+export function listImportedBenches(workspace: string, options: { strict?: boolean } = {}): ImportedBenchMeta[] {
   const root = benchImportsBenchesDir(workspace);
   if (!pathExists(root)) {
     return [];
@@ -137,11 +91,19 @@ export function listImportedBenches(workspace: string): ImportedBenchMeta[] {
     for (const versionEntry of readdirSync(benchDir, { withFileTypes: true })) {
       if (!versionEntry.isDirectory()) continue;
       const metaPath = join(benchDir, versionEntry.name, "meta.json");
-      if (!pathExists(metaPath)) continue;
+      if (!pathExists(metaPath)) {
+        if (options.strict) throw new Error(`bench import metadata missing: ${metaPath}`);
+        continue;
+      }
       try {
-        out.push(importedBenchMetaSchema.parse(JSON.parse(readUtf8(metaPath)) as unknown));
-      } catch {
-        // skip malformed import metadata
+        const meta = importedBenchMetaSchema.parse(JSON.parse(readUtf8(metaPath)) as unknown);
+        if (options.strict && (meta.benchId !== benchIdEntry.name || meta.version !== versionEntry.name)) {
+          throw new Error("import metadata does not match its directory");
+        }
+        out.push(meta);
+      } catch (cause) {
+        if (options.strict) throw new Error(`invalid bench import metadata: ${metaPath}`, { cause });
+        // Legacy listing remains best effort; scoring uses strict admission.
       }
     }
   }

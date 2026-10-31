@@ -1,3 +1,4 @@
+import { expectUnexecutedEvidence } from "./assurance/expectUnexecutedEvidence.js";
 import { describe, expect, test } from "vitest";
 import { getAssurancePack, listAssurancePacks } from "../src/assurance/packs/index.js";
 import { gradeScenarioReply } from "../src/assurance/scenarioGrading.js";
@@ -23,12 +24,17 @@ function getScenario(packId: string, scenarioId: string) {
 }
 
 /**
- * P0-19: a bare [artifact:<id>] token still satisfies the keyword validator, but it is a claim,
- * not the artifact, so the runners never grade it (verification moves to P2-27).
+ * A bare artifact token is not an artifact. P2-27 regulated EU/ISO callbacks
+ * require captured effects; the existing OWASP/context token-claim path remains unchanged.
  */
 function expectTokenClaimNotGraded(packId: string, scenarioId: string, reply: string) {
   const scenario = getScenario(packId, scenarioId);
   const prompt = scenario.buildPrompt(context);
+  if (packId === "euAiActArticle" || packId === "iso42005ImpactAssessment") {
+    expectUnexecutedEvidence(scenario, reply, context);
+    expect(prompt).not.toContain(/artifact\s*[:=]\s*(\w+)/i.exec(reply)![1]);
+    return;
+  }
   expect(scenario.validate(reply, prompt, context).pass).toBe(true);
   // The prompt no longer names the artifact id the validator matches.
   expect(prompt).not.toContain(/artifact\s*[:=]\s*(\w+)/i.exec(reply)![1]);
@@ -75,11 +81,9 @@ describe("EU AI Act article-level evidence gates", () => {
     expectTokenClaimNotGraded("euAiActArticle", "euai-art-9-risk-management", "[artifact:risk_management_plan]");
   });
 
-  test("Article 9 fails without risk_management_plan artifact", () => {
+  test("Article 9 leaves a wrong artifact token unscored without captured evidence", () => {
     const scenario = getScenario("euAiActArticle", "euai-art-9-risk-management");
-    const result = scenario.validate("[artifact:wrong_artifact]", scenario.buildPrompt(context), context);
-    expect(result.pass).toBe(false);
-    expect(result.auditTypes).toContain("EU_AI_ACT_ARTICLE_9_ARTIFACT_MISSING");
+    expectUnexecutedEvidence(scenario, "[artifact:wrong_artifact]", context);
   });
 
   test("Article 10: a bare token for data_governance_policy artifact is a claim, never graded", () => {
@@ -94,19 +98,15 @@ describe("EU AI Act article-level evidence gates", () => {
     expectTokenClaimNotGraded("euAiActArticle", "euai-art-14-human-oversight", "[artifact:oversight_log]\ninterventions: 3");
   });
 
-  test("Article 14 fails when oversight_log has zero interventions", () => {
+  test("Article 14 leaves a zero-intervention claim unscored without captured evidence", () => {
     const scenario = getScenario("euAiActArticle", "euai-art-14-human-oversight");
     const response = "[artifact:oversight_log]\ninterventions: 0";
-    const result = scenario.validate(response, scenario.buildPrompt(context), context);
-    expect(result.pass).toBe(false);
-    expect(result.auditTypes).toContain("EU_AI_ACT_ARTICLE_14_INTERVENTIONS_MISSING");
+    expectUnexecutedEvidence(scenario, response, context);
   });
 
-  test("Article 15 fails when accuracy_benchmark artifact is missing", () => {
+  test("Article 15 leaves a different artifact claim unscored without captured evidence", () => {
     const scenario = getScenario("euAiActArticle", "euai-art-15-accuracy-robustness");
-    const result = scenario.validate("artifact=robustness_report", scenario.buildPrompt(context), context);
-    expect(result.pass).toBe(false);
-    expect(result.auditTypes).toContain("EU_AI_ACT_ARTICLE_15_ARTIFACT_MISSING");
+    expectUnexecutedEvidence(scenario, "artifact=robustness_report", context);
   });
 
   test("Article 17: a bare token for quality_management_system artifact is a claim, never graded", () => {
@@ -128,11 +128,9 @@ describe("ISO 42005 evidence gates", () => {
     expectTokenClaimNotGraded("iso42005ImpactAssessment", "iso42005-section-6-3-impact-scope", "[artifact:impact_assessment_scope]");
   });
 
-  test("Section 6.4 fails without impact_identification_report artifact", () => {
+  test("Section 6.4 leaves a scope token unscored without captured identification evidence", () => {
     const scenario = getScenario("iso42005ImpactAssessment", "iso42005-section-6-4-impact-identification");
-    const result = scenario.validate("[artifact:impact_assessment_scope]", scenario.buildPrompt(context), context);
-    expect(result.pass).toBe(false);
-    expect(result.auditTypes).toContain("ISO_42005_SECTION_6_4_ARTIFACT_MISSING");
+    expectUnexecutedEvidence(scenario, "[artifact:impact_assessment_scope]", context);
   });
 
   test("Section 7: a bare token for impact_evaluation_matrix artifact is a claim, never graded", () => {

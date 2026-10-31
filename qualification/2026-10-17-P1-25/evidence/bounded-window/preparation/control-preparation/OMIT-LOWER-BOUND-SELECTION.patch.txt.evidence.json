@@ -1,0 +1,11 @@
+{
+  "schema": "amc-qualification-lossless-original/1",
+  "encoding": "base64",
+  "original": {
+    "relativePath": "evidence/bounded-window/preparation/control-preparation/OMIT-LOWER-BOUND-SELECTION.patch.txt",
+    "bytes": 418,
+    "sha256": "3fb680e293fb0011ca12bd6b689f40163d585812b4cd66ce5d1fb0d114957e71"
+  },
+  "dataBase64": "LS0tIGEvc3JjL3RpbWUvY2hlY2twb2ludC50cworKysgYi9zcmMvdGltZS9jaGVja3BvaW50LnRzCkBAIC0zMzYsNyArMzM2LDcgQEAKICAgICBldmVudFRpbWU6IChpbmRleCwgY2xhaW1lZFRzKSA9PiBldmFsdWF0ZVRpbWUoewogICAgICAgY2xhaW1lZEF0OiBjbGFpbWVkVHMsIHRvbGVyYW5jZU1pbnV0ZXM6IG9wdHMudG9sZXJhbmNlTWludXRlcywKICAgICAgIHVwcGVyOiBwaWNrKHVwcGVyLmZpbHRlcihyb3cgPT4gcm93LmV2ZW50Q291bnQgPiBpbmRleCkubWFwKHJvdyA9PiByb3cuYXR0ZXN0ZWQpLCAxKSwKLSAgICAgIGxvd2VyOiBwaWNrKGxvd2VyLmZpbHRlcihyb3cgPT4gcm93LmluZGV4IDwgaW5kZXgpLm1hcChyb3cgPT4gcm93LmF0dGVzdGVkKSwgLTEpCisgICAgICBsb3dlcjogbnVsbAogICAgIH0pCiAgIH07CiB9Cg==",
+  "boundary": "Exact original bytes retained losslessly; decode and verify bytes/SHA256 before use. No command result changes."
+}

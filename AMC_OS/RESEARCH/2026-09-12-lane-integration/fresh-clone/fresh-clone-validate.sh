@@ -6,7 +6,7 @@ COMMIT="$1"; DEST="$2"; OUT="$3"
 mkdir -p "$OUT"
 step() { local id="$1"; shift; echo "=== $id: $* ===" | tee -a "$OUT/steps.log"; local start=$(date +%s); "$@" > "$OUT/$id.log" 2>&1; local code=$?; local end=$(date +%s); echo "$id exit=$code seconds=$((end-start))" | tee -a "$OUT/steps.log"; return $code; }
 rm -rf "$DEST"
-step clone git clone -q /Users/sid/AgentMaturityCompass "$DEST" --branch amc/gap-register-execution || exit 1
+step clone git clone -q ~/AgentMaturityCompass "$DEST" --branch amc/gap-register-execution || exit 1
 cd "$DEST" || exit 1
 step checkout git checkout -q "$COMMIT" || exit 1
 git rev-parse HEAD > "$OUT/commit.txt"; git status --porcelain > "$OUT/status-after-checkout.txt"

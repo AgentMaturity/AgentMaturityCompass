@@ -1,0 +1,193 @@
+{
+  "schema": "p125-next-independent-test-routing/1",
+  "at": "2026-10-16T21:52:19.799198+00:00",
+  "sourceCommitAtReview": "5beb3eae69b08f2e895520c7f459e1465780beeb",
+  "currentBranch": "codex/p1-25-client-qualification",
+  "sourceCleanAtObservation": true,
+  "state": "FUTURE_ONLY_AFTER_BOUNDED_CLIENT_CLOSURE_AND_FINAL_SOURCE_METADATA_FRESH_ROOT_REBIND",
+  "next": "tests/time/tsaFallback.test.ts",
+  "evidencePrefix": "qualification/2026-10-17-P1-25/evidence/tsa-fallback",
+  "priority": "Finish this independent P1-25 remainder before later P1-54/P1-28. P1-25 High/G1/due2026-12-11; formal P1-01/full acceptance remains open, while this already-present public component can be qualified independently.",
+  "minimumFirstCohort": "Plan four semantic bodies in the one new test file: no-config offline result, no-anchor skip with listener positive, finite ordered refusals, and actual unchanged-default timeout continuation. This is a future design, not an authored or executed case count.",
+  "seams": [
+    {
+      "id": "client-failure-fallback",
+      "priority": "next",
+      "source": [
+        "src/time/tsaClient.ts:143",
+        "src/time/tsaClient.ts:151",
+        "src/time/tsaClient.ts:156",
+        "src/time/tsaClient.ts:165",
+        "src/time/tsaClient.ts:170",
+        "src/time/tsaClient.ts:184"
+      ],
+      "status": "Existing unqualified public API; independent test-only lane.",
+      "flow": "Capture TSA/name/URL/anchorId arrays; skip entries with no matching supplied anchor before URL/build/wire; construct fresh request; await real transport; verify returned token; preserve per-TSA failures and continue; return grant only on actual successful verification, otherwise null. timestampDigest returns the normal default config/null/empty failures immediately with no configured TSA.",
+      "proposedPath": "tests/time/tsaFallback.test.ts",
+      "evidencePrefix": "qualification/2026-10-17-P1-25/evidence/tsa-fallback",
+      "resources": "Fresh owned mode0700 unregulated temp workspace plus one exact127.0.0.1 standard-library HTTP fixture and public corpus reads. Reuse admitted local lifecycle/error ordering in the new self-contained file; no cross-file helper or source export.",
+      "noNativeFixture": "No initWorkspace, private key import, vault, ledger, registry, active-policy or malformed-workspace fixture. Existing worker setup owns its separate guard environment/resources.",
+      "limits": "Configured-anchor input is already supplied at this seam; no signed trust-list admission claim. All-refusal continuation is not successful fallback, genuine fresh-nonce grant, required-time sealing/issuance or public authority."
+    },
+    {
+      "id": "matching-nonce-grant",
+      "priority": "later within P1-25",
+      "status": "Technical fixture capability gap, not a human approval hold.",
+      "source": [
+        "src/time/tsaClient.ts:158",
+        "src/time/tsaClient.ts:166",
+        "src/time/verifyTimestamp.ts:214"
+      ],
+      "reason": "The public builder generates a new unpredictable nonce for each attempt. Existing genuine tokens bind fixed nonce8899aabbccddeeff and fixed digest; neither a probabilistic inequality assertion nor a relabelled AttestedTime can make them a positive fresh response. A real owned responder must sign the captured request digest/nonce under a genuine test chain; root needs a separate exact fixture/resource allocation, not a package or source shortcut."
+    },
+    {
+      "id": "required-time-callers",
+      "priority": "later within P1-25",
+      "status": "Broader owned runtime/resource scope, not an invented hold.",
+      "source": [
+        "src/time/tsaClient.ts:143",
+        "src/time/checkpoint.ts:128",
+        "src/time/checkpoint.ts:152",
+        "src/assurance/certificate.ts:370",
+        "src/session/sessionService.ts:769"
+      ],
+      "reason": "requestTimestamp has no required flag and correctly returns null after failures. Required-time refusal belongs to checkpointLedger and certificate issuance. CheckpointLedger signs/writes the pending checkpoint before its required-time refusal; the test must preserve that actual pending artifact and not assume rollback. Genuine ledger/key/vault/session lifecycle and gate-policy ownership are needed. SessionService.close itself seals and closes its store without a named trusted-time call in the inspected source; session-seal acceptance stays unestablished.",
+      "noIntegrationClaim": "No source fix, injected ledgerCheck, forced cert policy, mock grant or private key borrowing is granted."
+    },
+    {
+      "id": "checkpoint-chain-and-windows",
+      "priority": "later independent lane in P1-25",
+      "status": "Unqualified public chain/timeline seams; parser-only/pure window work is possible with narrower explicit claims.",
+      "proposedPath": "tests/time/checkpointWindow.test.ts",
+      "source": [
+        "src/time/checkpoint.ts:60",
+        "src/time/checkpoint.ts:67",
+        "src/time/checkpoint.ts:96",
+        "src/time/checkpoint.ts:158",
+        "src/time/checkpoint.ts:274",
+        "src/time/checkpoint.ts:307"
+      ],
+      "flow": "readCheckpointChain checks strict schema, bounded files, contiguous sequences, digest/monitor signature and previous link. Production checkpoint creation additionally verifies real ledger head, signs with monitor vault key, records token-derived event and token file. ledgerTimeline verifies tokens against actual checkpoint digests/head identities, and only validated token hashes become lower bounds.",
+      "resourceImplications": "Full pending-to-timestamped integration needs a real matching-digest signer and owned monitor/vault/native ledger with explicit closure/preservation. Never fabricate VerifiedCheckpoint, a ledger verification result or token authority. timeCheckpointTick can enter P1-26 public anchoring if configured; exclude it from the initial lane and preserve the permanent-public-entry boundary."
+    },
+    {
+      "id": "pure-time-intervals",
+      "priority": "independent fallback if next transport is actually refused by an unchanged guard",
+      "status": "Small unqualified pure evaluateTime boundary lane.",
+      "proposedPath": "tests/time/timeEvidence.test.ts",
+      "source": [
+        "src/time/timeEvidence.ts:47",
+        "src/time/timeEvidence.ts:54",
+        "src/time/timeEvidence.ts:58"
+      ],
+      "scope": "Use actual verifyTimestampToken output from the existing genuine pinned public fixture as the already-derived bound. New credit is lower-bound/window/tolerance-boundary arithmetic and invalid claimed time; the already-qualified claimed/upper-bound artifact-time behavior is only an adjacent prerequisite. The same genuine bound can supply both sides for a zero-width interval; do not alter signed genTime or fabricate a wider signed interval.",
+      "limits": "No actual ledger/checkpoint window, signed trust-list, report/CLI, stored TTL or PKI issuance claim."
+    },
+    {
+      "id": "report-and-expiry",
+      "priority": "later ownership/dependency-specific lane",
+      "status": "Source gaps/contract boundaries recorded; no new source ownership granted.",
+      "source": [
+        "src/trust/verifierReport.ts:66",
+        "src/trust/verifierReport.ts:74",
+        "src/time/verifyTimestamp.ts:188",
+        "src/time/verifyTimestamp.ts:220",
+        "src/time/checkpoint.ts:167"
+      ],
+      "reason": "The actual token verifier has no asOf/TTL input; it checks each certificate at signed genTime. Checkpoint everyMinutes is scheduling cadence, not token TTL. The report labels freshness fail for findings and otherwise not-evaluated while retaining basis; that is not a TTL guarantee. No separate P1-25 token/checkpoint TTL contract appears in the inspected spec/APIs. Do not invent an expiry rule or silently expand held P1-06/report ownership. Direct named source search found ledgerTimeline only at its definition; consumer integration remains unestablished."
+    }
+  ],
+  "acceptance": [
+    {
+      "id": "OFFLINE",
+      "expectation": "An explicit valid new unregulated workspace with no amc time config yields the exact default TimeConfig, grant:null and failures:[] through timestampDigest. No package, trust bootstrap or signer is supplied or fabricated.",
+      "creditLimit": "Returned public contract plus source early-return path; no universal no-I/O isolation claim."
+    },
+    {
+      "id": "NO-ANCHOR",
+      "expectation": "An entry whose anchorIds select no supplied genuine anchor is skipped with the exact named failure and zero requests at its owned listener. Place a matching-anchor concrete refusal beside it, so all-zero peer observations cannot hide setup failure.",
+      "creditLimit": "Anchor selection before this client request, not authenticated signed trust-list admission."
+    },
+    {
+      "id": "ORDER",
+      "expectation": "Use fixed distinct names and routes on one owned literalIP listener: first finiteHTTP500, then finite malformed timestamp body, then the unchanged genuine fixed token for a deliberately different digest. Assert literal route order, null grant and per-TSA failure order/codes. Independently verify that genuine token with its original digest/nonce/root before using it as the deterministic wrong-digest refusal prerequisite.",
+      "creditLimit": "The source checks the CMS signature before imprint. The future body must retain the actual genuine-token positive prerequisite; no future result, random-nonce inequality or successful grant is claimed."
+    },
+    {
+      "id": "TIMEOUT-CONTINUE",
+      "expectation": "After the finite order case, a separate first route withholds all response bytes until the actual default10000ms client abort; the next finite configured route must really be reached and then refused. Keep undefined timeout arguments and the unchanged30000ms Vitest default; record actual category/duration and natural peer closure.",
+      "creditLimit": "Timeout continuation to the next attempt, not a successful matching-nonce fallback. If this additional body is deferred for the smallest first cohort, record that exact acceptance gap."
+    },
+    {
+      "id": "OWNERSHIP",
+      "expectation": "Track listener/request/response/socket terminal events and errors from acquisition, ordinary close and natural abort closure, remove only the owned temp root, preserve sole primary assertion object or primary-first AggregateError for additional real cleanup failures. Keep current guard, inherited environment and frozen wrapper unchanged.",
+      "creditLimit": "No hidden-client-handle, worker native/environment, OS/network or detached-descendant isolation claim."
+    }
+  ],
+  "futureCausalControls": [
+    {
+      "id": "F1-order",
+      "futureTarget": "src/time/tsaClient.ts",
+      "reachability": "requestTimestamp captured tsas loop",
+      "operator": "Reverse the captured iteration order only, in a later bound owned Q after actual canonical qualification. No mutant or patch is authored here.",
+      "firstIntendedWitness": "After a single-TSA finite refusal positive, literal observed route order for the multi-TSA refusal body.",
+      "limits": "Earlier setup/refusal/fixture prerequisite failures mask this witness. All actual failures and cleanup need classification."
+    },
+    {
+      "id": "F2-no-continue",
+      "futureTarget": "src/time/tsaClient.ts",
+      "reachability": "catch block after its failures.push for the actual first HTTP500/default-abort",
+      "operator": "Stop iteration only after that caught first error, leaving all preflight and verifier paths unchanged. Future recipe only.",
+      "firstIntendedWitness": "Actual second-route dispatch in the literal request-order assertion after the real first refusal.",
+      "limits": "No promised failure count, no success grant expectation, no compiled/control credit before actual RED and exact restoration."
+    },
+    {
+      "id": "F3-unpinned-dispatch",
+      "futureTarget": "src/time/tsaClient.ts",
+      "reachability": "no matching supplied anchor branch before the current continue",
+      "operator": "Remove only that skip in a later bound owned Q; preserve real preflight and transport. Future recipe only.",
+      "firstIntendedWitness": "Unmatched anchorId entry must create zero wire requests after the matching-anchor listener positive.",
+      "limits": "This protects the configured selection barrier, not trusted-list/key admission or a raw TCP/F37 bypass. An unchanged guard refusal remains a failure and is never weakened."
+    }
+  ],
+  "ownershipSummary": {
+    "sourceHead": "5beb3eae69b08f2e895520c7f459e1465780beeb",
+    "sourceBranch": "codex/p1-25-client-qualification",
+    "sourceStatus": "",
+    "sourceIndex": "",
+    "roots": 181,
+    "targetChecks": 724,
+    "primaryNextLaneChecks": 362,
+    "presentTargets": [],
+    "targetStatusesNonempty": [],
+    "selectedSourceStatusesNonempty": [],
+    "historyAuthorities": 14,
+    "historiesNonempty": [],
+    "sourceVariants": {
+      "src/time/tsaClient.ts": 2,
+      "src/time/checkpoint.ts": 3,
+      "src/time/timeEvidence.ts": 1,
+      "src/time/verifyTimestamp.ts": 1,
+      "src/trust/verifierReport.ts": 3,
+      "src/assurance/certificate.ts": 6,
+      "src/session/sessionService.ts": 8,
+      "docs/TRUSTED_TIME.md": 2,
+      "tests/time/tsaClient.test.ts": 1,
+      "tests/time/verifyTimestamp.test.ts": 1
+    },
+    "presentSourcePins": 817,
+    "all36HeldPinsExact": true,
+    "heldRunnerExact": true,
+    "gitFailures": []
+  },
+  "blockedVersusUnqualified": {
+    "humanHolds": "All explicit earlier user holds, P1-01 remaining gaps, P1-06/report ownership, F37 skip, ignored provider archive/D15, source-only variants, runtime-package approval and permanent-public-entry boundaries remain unchanged.",
+    "technicalGaps": "A genuine nonce-matching signer, checkpoint/native ownership, session-seal/issuance/report wiring and full checks are unqualified requirements, not automatically human approval holds. No new approval is requested.",
+    "packageBoundary": "Do not add a dependency: the first lane uses installed code and standard Node HTTP/crypto plus existing public fixture bytes. The spec runtime-dependency approval criterion remains open."
+  },
+  "newClientFreshRoot": "Root helper is still in progress at assignment; its actual new Q is not guessed, searched or included in181. Before allocation, append/rebind the actual fresh checkout and final source+metadata HEAD/date.",
+  "noSourceFixOrAllocation": true,
+  "noWholeP125OrPlanCompletion": true,
+  "noProductRuntimeOrNetworkExecution": true,
+  "allHeldDecisionsPreserved": true
+}

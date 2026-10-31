@@ -13,6 +13,7 @@ import subprocess
 import pytest
 import amc_sdk
 from amc_sdk import AmcAgent, AmcError, AmcProtocolError, AmcRefusedError, NativeImageInput, NATIVE_ORDERED_INPUT_FORMAT
+from test_gemini_protocol import without_context_snapshot
 
 REPO = Path(__file__).resolve().parents[3]
 PEER = REPO / "tests/fixtures/nativeOrderedImageClientPeer.mjs"
@@ -220,7 +221,7 @@ def test_real_canonical_python_ordered_native_lifecycle_and_independent_cold_byt
                     if "cache_control" in part:
                         assert part["cache_control"] == {"type": "ephemeral"}
                 content = [{key: value for key, value in part.items() if key != "cache_control"} for part in content]
-            assert content == expected_wire(provider)
+            assert without_context_snapshot(content) == expected_wire(provider)
         cold = subprocess.run([node, "--import", loader, str(COLD), str(root), session_id],
                               env={**os.environ, **env}, capture_output=True, text=True, timeout=30, check=True)
         derived = json.loads(cold.stdout)

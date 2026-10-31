@@ -1,0 +1,57 @@
+{
+  "schema": "p125pc-preservation-adapter-independent-static-review/1",
+  "at": "2026-10-17T02:16:05.124741+00:00",
+  "blockers": [
+    {
+      "id": "READONLY_GIT_OPTIONAL_LOCKS",
+      "priority": 2,
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/check-preservation.py.source.txt",
+      "line": 25,
+      "observation": "The inherited git() argv is [git, -C, root, ...] without the global --no-optional-locks option. Status may refresh index stat data while this helper is intended to observe S/Q/held R.",
+      "scope": "Potential read-side optional index refresh only. No helper execution, actual index/content mutation or resulting preservation failure was observed or assumed.",
+      "requestedNarrowCorrection": "Preserve V1 and add the global --no-optional-locks option in a separately sealed V2; retain all other bytes and guards.",
+      "rootDisposition": "Root agreed before execution and will obtain the narrow successor. No user hold or broader source change is required."
+    }
+  ],
+  "verdict": "V1 requires the bounded read-only Git option correction before adoption. No other concrete blocker found in the reviewed scope.",
+  "reviewerDidNotAuthorHelper": true,
+  "candidate": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/check-preservation.py.source.txt",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/check-preservation.py.source.txt",
+    "bytes": 7187,
+    "sha256": "c4ae4e33e4182fa2e540fb55f58bcd4af6c648841651468d55096fc978db4aa0",
+    "dev": 16777231,
+    "inode": 544002325,
+    "nlink": 1
+  },
+  "fullHelperDeltaReadmeAuthorReviewSealAndUnreadyTemplateRead": true,
+  "allNineAuthorInputsAndSevenOutputsBytePhysicalPinsExact": true,
+  "exactBaseAndFullDeltaReproducedAsTextWithoutParsingCode": true,
+  "guards": {
+    "actualSourceRuntimeBindingSnapshotHashesAndSchemasMatch": true,
+    "original2378PinsetRootSourceParentAndPriorSemanticBindingsMatch": true,
+    "savedOriginalThreeBytesMatchRuntimeAndSnapshot": true,
+    "templateFalseWithNewThreeAndExpectationsPinNull": true,
+    "beforeModeSourceCommitCleanIndexAndCurrentBranchRequired": true,
+    "afterModeRequiresSeparateActualReadyFullOldNewThreePinAdmission": true,
+    "fullPathPhysicalPathDevInodeNlinkSameAcrossEachThreeSuccessors": true,
+    "newBytesHashesMatchActualPinnedPublicationExpectations": true,
+    "other172ProtectedRowsStayExact": true,
+    "all175ActualRowsAndThirteenDistinctNativePinsRecheckedByFutureHelper": true,
+    "unchanged102PairLoopExcludesAllThreeActiveReceiptIndices": true,
+    "onlyQualificationSelectionIsReceiptSchema": true,
+    "all204SelectedPhysicalIdentitiesStayDistinctAndDisjointFromNatives": true,
+    "QRemainsCleanAtSemanticSourceCommitAndHeldR18HeadIndexExact": true,
+    "allFourActiveHaltedMarkersAbsentStartAndEnd": true,
+    "missingReservationFlagCheckedAsMetadataOnlyNoPathProbe": true,
+    "exclusivePrivateOutputOnlyUnderC2": true
+  },
+  "limits": [
+    "This static review executed no helper, parser, import, compiler, Git, product, native, SQL, OpenSSL, network, key or child-stream operation.",
+    "The after-metadata mode intentionally does not claim source cleanliness during staged metadata transition; its actual supplied HEAD and branch still must match. Later complete publication/index/whitespace checks remain root-owned.",
+    "Only the three saved receipt index files were inspected here; this is not a second full 2378-file/Git preservation audit.",
+    "Underlying completed-runtime peer reports were pinned as author context, not reaudited as runtime or cryptographic evidence.",
+    "No future metadata pins, publication expectations, admission, execution result, release, whole P1-25 or plan completion is credited. All holds and F37 remain unchanged."
+  ],
+  "noSourceIndexQaEvidencePriorArtifactOrReservationWrites": true
+}

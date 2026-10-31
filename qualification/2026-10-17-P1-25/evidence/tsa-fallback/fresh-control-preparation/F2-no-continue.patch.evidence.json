@@ -1,0 +1,11 @@
+{
+  "schema": "amc-qualification-lossless-original/1",
+  "encoding": "base64",
+  "original": {
+    "relativePath": "evidence/tsa-fallback/fresh-control-preparation/F2-no-continue.patch",
+    "bytes": 372,
+    "sha256": "acf155f0784b44bc37b6b86df4457d132519c21e02c363b6b60bb99f5fe67d15"
+  },
+  "dataBase64": "LS0tIGEvc3JjL3RpbWUvdHNhQ2xpZW50LnRzCisrKyBiL3NyYy90aW1lL3RzYUNsaWVudC50cwpAQCAtMTcwLDYgKzE3MCw3IEBACiAgICAgfSBjYXRjaCAoZXJyb3IpIHsKICAgICAgIGlmIChlcnJvciBpbnN0YW5jZW9mIEVncmVzc0Jsb2NrZWQpIHsgZmlyc3RCbG9ja2VkID8/PSBlcnJvcjsgZGVuaWVkICs9IDE7IH0KICAgICAgIGZhaWx1cmVzLnB1c2goYCR7dHNhLm5hbWV9OiAke2Vycm9yIGluc3RhbmNlb2YgRXJyb3IgPyBlcnJvci5tZXNzYWdlIDogU3RyaW5nKGVycm9yKX1gKTsKKyAgICAgIGJyZWFrOwogICAgIH0KICAgfQogICBpZiAoZmlyc3RCbG9ja2VkICYmIGRlbmllZCA9PT0gdHNhcy5sZW5ndGgpIHRocm93IGZpcnN0QmxvY2tlZDsK",
+  "boundary": "Exact original bytes retained losslessly; decode and verify bytes/SHA256 before use. No command result changes."
+}

@@ -48,7 +48,7 @@
   ],
   "finalSourceChecks": {
     "sourceCommit": "130c2d0087cf574016411fdc7d91067d3eddd637",
-    "clone": "/Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source",
+    "clone": "~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source",
     "platform": "macOS-26.6.2-arm64-arm-64bit",
     "machine": "arm64",
     "node": "v25.5.0",
@@ -147,7 +147,7 @@
           "--no-file-parallelism",
           "--reporter=default",
           "--reporter=json",
-          "--outputFile.json=/Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/focused-results.json"
+          "--outputFile.json=~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/focused-results.json"
         ],
         "pid": 63292,
         "processGroup": 63292,
@@ -186,7 +186,7 @@
           "--no-file-parallelism",
           "--reporter=default",
           "--reporter=json",
-          "--outputFile.json=/Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/mutations/verification-result.json",
+          "--outputFile.json=~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/mutations/verification-result.json",
           "-t",
           "selected session cannot conceal"
         ],
@@ -202,7 +202,7 @@
           {
             "name": "public complete persisted session history the selected session cannot conceal corrupted evidence in another session",
             "messages": [
-              "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/chai/index.js:1700:25)\n    at /Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/tests/sessionEventHistory.test.ts:127:77\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+              "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file://~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file://~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file://~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/chai/index.js:1700:25)\n    at ~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/tests/sessionEventHistory.test.ts:127:77\n    at file://~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file://~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file://~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file://~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file://~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
             ]
           }
         ],
@@ -220,7 +220,7 @@
           "--no-file-parallelism",
           "--reporter=default",
           "--reporter=json",
-          "--outputFile.json=/Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/mutations/agent-identity.json",
+          "--outputFile.json=~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/mutations/agent-identity.json",
           "-t",
           "wrong agent, wrong pin"
         ],
@@ -236,7 +236,7 @@
           {
             "name": "public complete persisted session history wrong agent, wrong pin and empty pin are refused; unpinned consistency is not anchored",
             "messages": [
-              "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/chai/index.js:1700:25)\n    at /Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/tests/sessionEventHistory.test.ts:184:95\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+              "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file://~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file://~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file://~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/chai/index.js:1700:25)\n    at ~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/tests/sessionEventHistory.test.ts:184:95\n    at file://~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file://~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file://~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file://~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file://~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
             ]
           }
         ],
@@ -254,7 +254,7 @@
           "--no-file-parallelism",
           "--reporter=default",
           "--reporter=json",
-          "--outputFile.json=/Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/mutations/sealed-required.json",
+          "--outputFile.json=~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/mutations/sealed-required.json",
           "-t",
           "an unsealed signed prefix"
         ],
@@ -270,7 +270,7 @@
           {
             "name": "public complete persisted session history an unsealed signed prefix is explicit and can be bound to an independently saved head",
             "messages": [
-              "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/chai/index.js:1700:25)\n    at /Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/tests/sessionEventHistory.test.ts:109:79\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+              "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file://~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file://~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file://~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/chai/index.js:1700:25)\n    at ~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/tests/sessionEventHistory.test.ts:109:79\n    at file://~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file://~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file://~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file://~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file://~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
             ]
           }
         ],
@@ -288,7 +288,7 @@
           "--no-file-parallelism",
           "--reporter=default",
           "--reporter=json",
-          "--outputFile.json=/Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/mutations/external-head.json",
+          "--outputFile.json=~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/mutations/external-head.json",
           "-t",
           "an unsealed signed prefix"
         ],
@@ -304,7 +304,7 @@
           {
             "name": "public complete persisted session history an unsealed signed prefix is explicit and can be bound to an independently saved head",
             "messages": [
-              "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/chai/index.js:1700:25)\n    at /Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/tests/sessionEventHistory.test.ts:112:104\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+              "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file://~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file://~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file://~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/chai/index.js:1700:25)\n    at ~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/tests/sessionEventHistory.test.ts:112:104\n    at file://~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file://~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file://~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file://~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file://~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
             ]
           }
         ],
@@ -322,7 +322,7 @@
           "--no-file-parallelism",
           "--reporter=default",
           "--reporter=json",
-          "--outputFile.json=/Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/mutations/snapshot-fence.json",
+          "--outputFile.json=~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/mutations/snapshot-fence.json",
           "-t",
           "observed history changes"
         ],
@@ -338,7 +338,7 @@
           {
             "name": "public complete persisted session history observed history changes return no stale snapshot or partial rows",
             "messages": [
-              "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/chai/index.js:1700:25)\n    at /Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/tests/sessionEventHistory.test.ts:201:58\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+              "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file://~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file://~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file://~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/chai/index.js:1700:25)\n    at ~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/tests/sessionEventHistory.test.ts:201:58\n    at file://~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file://~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file://~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file://~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file://~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
             ]
           }
         ],
@@ -356,7 +356,7 @@
           "--no-file-parallelism",
           "--reporter=default",
           "--reporter=json",
-          "--outputFile.json=/Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/mutations/restored.json"
+          "--outputFile.json=~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/mutations/restored.json"
         ],
         "pid": 63803,
         "exitCode": 0,
@@ -404,9 +404,9 @@
           "--ignore-scripts",
           "--json",
           "--pack-destination",
-          "/Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/installed-history/package"
+          "~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/installed-history/package"
         ],
-        "cwd": "/Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source",
+        "cwd": "~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source",
         "pid": 63816,
         "processGroup": 63816,
         "timeoutSeconds": 120,
@@ -423,9 +423,9 @@
           "--omit=dev",
           "--no-audit",
           "--no-fund",
-          "/Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/installed-history/package/agent-maturity-compass-1.2.0.tgz"
+          "~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/installed-history/package/agent-maturity-compass-1.2.0.tgz"
         ],
-        "cwd": "/Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/installed-history/consumer",
+        "cwd": "~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/installed-history/consumer",
         "pid": 63820,
         "processGroup": 63820,
         "timeoutSeconds": 300,
@@ -442,7 +442,7 @@
           "--all",
           "--json"
         ],
-        "cwd": "/Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/installed-history/consumer",
+        "cwd": "~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/installed-history/consumer",
         "pid": 63877,
         "processGroup": 63877,
         "timeoutSeconds": 120,
@@ -457,9 +457,9 @@
           "node",
           "history.mjs",
           "produce",
-          "/Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/installed-history"
+          "~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/installed-history"
         ],
-        "cwd": "/Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/installed-history/consumer",
+        "cwd": "~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/installed-history/consumer",
         "pid": 63878,
         "processGroup": 63878,
         "timeoutSeconds": 90,
@@ -474,9 +474,9 @@
           "node",
           "history.mjs",
           "cold-read",
-          "/Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/installed-history"
+          "~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/installed-history"
         ],
-        "cwd": "/Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/installed-history/consumer",
+        "cwd": "~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/installed-history/consumer",
         "pid": 63886,
         "processGroup": 63886,
         "timeoutSeconds": 60,
@@ -490,7 +490,7 @@
     "package": {
       "name": "agent-maturity-compass",
       "version": "1.2.0",
-      "tarball": "/Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/installed-history/package/agent-maturity-compass-1.2.0.tgz",
+      "tarball": "~/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/installed-history/package/agent-maturity-compass-1.2.0.tgz",
       "sha256": "3ce7c636ec4fc8fbb38caa567ada1587752dd2ffd26635ecc45dca4ca5ebf730",
       "npmIntegrity": "sha512-cZymUCfFWp4i6MT5F3lE2xLQSGIOVCOvWil4tDhfhB3u7cE6GMLeUwT1gM078y7jreLZUCzHOLcX4wOzGftkCA=="
     },

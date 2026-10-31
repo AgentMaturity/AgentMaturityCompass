@@ -1,0 +1,13 @@
+M1 no copy proof -> ['      Tests  6 failed | 8 passed | 36 skipped (50)'] KILLED
+M2 commit instead of rollback -> ['      Tests  3 failed | 11 passed | 36 skipped (50)'] KILLED
+M3 resume any chain -> ['      Tests  3 failed | 11 passed | 36 skipped (50)'] KILLED
+M4 chain id before copy -> ['      Tests  3 failed | 11 passed | 36 skipped (50)'] KILLED
+M5 chain id first after commit -> ['      Tests  1 failed | 13 passed | 36 skipped (50)'] KILLED
+M6 no mirror parity -> ['      Tests  1 failed | 13 passed | 36 skipped (50)'] KILLED
+M7 head row check off -> ['      Tests  1 failed | 13 passed | 36 skipped (50)'] KILLED
+M8 chain never holds rows -> ['      Tests  4 failed | 10 passed | 36 skipped (50)'] KILLED
+M9 table compare off -> ['      Tests  2 failed | 12 passed | 36 skipped (50)'] KILLED
+ src/persistence/postgres/postgresMigration.ts | 247 +++++++++++++-------------
+ 1 file changed, 123 insertions(+), 124 deletions(-)
+
+[exited with code 0]

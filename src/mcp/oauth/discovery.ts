@@ -2,9 +2,13 @@
  * Authorization-server discovery for MCP HTTP (spec 2026-07-28,
  * basic/authorization/authorization-server-discovery). Every fetch here is
  * unauthenticated, refuses redirects and is bounded; no response text is echoed.
+ * Each request meets checkScopedEgress (residency and the kill switch) on the
+ * `mcp-http` channel for the operator's workspace right before it is sent; its
+ * typed refusal propagates, never becoming a NativeMcpOAuthRefused.
  */
 import { lookup } from "node:dns/promises";
 import { isNonPublicAddress } from "../../enforce/egressAllowlist.js";
+import { checkScopedEgress } from "../../residency/checkEgress.js";
 import { MCP_STATELESS_PROTOCOL_VERSION, statelessRequestMeta } from "../protocol/version.js";
 
 export const NATIVE_MCP_OAUTH_LIMITS = Object.freeze({ bodyBytes: 64 * 1024, timeoutMs: 10_000, scopes: 32 });
@@ -23,7 +27,12 @@ const refuse = (message: string, code?: "AUTH_REQUIRED" | "REFUSED"): never => {
  * literal loopback HTTP (development) or when the operator set `auth.allowPrivateNetwork` in the signed config. The
  * remote endpoint's own DNS never decides this.
  */
-export interface NativeMcpOAuthNetwork { readonly development: boolean; readonly allowNonPublic: boolean }
+export interface NativeMcpOAuthNetwork {
+  readonly development: boolean;
+  readonly allowNonPublic: boolean;
+  /** The trusted workspace whose residency registry and kill switch govern these requests; absent uses the scoped fallback. */
+  readonly workspace?: string;
+}
 
 /** True when a target must be refused: any non-public address, no address, or a failed lookup (fail closed). */
 async function resolvesNonPublic(hostname: string): Promise<boolean> {
@@ -36,9 +45,10 @@ async function resolvesNonPublic(hostname: string): Promise<boolean> {
   }
 }
 
-export function nativeMcpOAuthNetwork(endpoint: URL, options: { readonly allowPrivateNetwork?: boolean } = {}): NativeMcpOAuthNetwork {
+export function nativeMcpOAuthNetwork(endpoint: URL, options: { readonly allowPrivateNetwork?: boolean; readonly workspace?: string } = {}): NativeMcpOAuthNetwork {
   const development = isLoopbackHttp(endpoint);
-  return { development, allowNonPublic: development || options.allowPrivateNetwork === true };
+  return { development, allowNonPublic: development || options.allowPrivateNetwork === true,
+    ...(options.workspace === undefined ? {} : { workspace: options.workspace }) };
 }
 
 export interface NativeMcpOAuthChallenge {
@@ -106,6 +116,7 @@ export async function nativeMcpOAuthFetch(url: URL, init: RequestInit, timeoutMs
   if (!network.allowNonPublic && await resolvesNonPublic(url.hostname)) {
     return refuse("MCP OAuth metadata named a host on a private or non-public address (or one that does not resolve); it was refused. Set auth.allowPrivateNetwork for an internal deployment.");
   }
+  checkScopedEgress(network.workspace, "mcp-http", url.href, { dataClasses: null, purpose: "mcp-oauth" });
   let response: Response;
   try {
     response = await fetch(url, { ...init, redirect: "manual", credentials: "omit", cache: "no-store",
@@ -129,7 +140,9 @@ export async function nativeMcpOAuthFetch(url: URL, init: RequestInit, timeoutMs
 }
 
 /** authorization §Flow Steps: an unauthenticated request reveals the server's Bearer challenge. */
-export async function nativeMcpOAuthChallenge(endpoint: URL, timeoutMs: number): Promise<NativeMcpOAuthChallenge> {
+export async function nativeMcpOAuthChallenge(endpoint: URL, timeoutMs: number,
+  network: NativeMcpOAuthNetwork = nativeMcpOAuthNetwork(endpoint)): Promise<NativeMcpOAuthChallenge> {
+  checkScopedEgress(network.workspace, "mcp-http", endpoint.href, { dataClasses: null, purpose: "mcp-oauth" });
   let response: Response;
   try {
     response = await fetch(endpoint, { method: "POST", redirect: "manual", credentials: "omit", cache: "no-store", referrerPolicy: "no-referrer",

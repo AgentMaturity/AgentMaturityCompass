@@ -1,0 +1,22 @@
+{
+  "phase": "baseline-schemas",
+  "argv": [
+    "/opt/homebrew/opt/node@22/bin/node",
+    "scripts/gen-spec-schemas.mjs",
+    "--check"
+  ],
+  "cwd": "/private/tmp/p1-01-source-strip-control-20261015/copy",
+  "pid": 39983,
+  "exit": 0,
+  "expectedExit": 0,
+  "durationMs": 435,
+  "ownedGroupProbes": [
+    {
+      "utc": "2026-10-15T08:39:12.115773+00:00",
+      "signal": 0,
+      "errno": 3,
+      "absentByESRCH": true
+    }
+  ],
+  "signalsOtherThanZeroSent": false
+}

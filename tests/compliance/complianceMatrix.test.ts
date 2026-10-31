@@ -3,9 +3,10 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { initWorkspace } from "../../src/workspace.js";
+import { formatClaimLabel, renderClaimLabel, renderClaimLegend } from "../../src/claims/eligibility/render.js";
 import { openLedger } from "../../src/ledger/ledger.js";
 import { initComplianceMaps } from "../../src/compliance/complianceEngine.js";
-import type { ComplianceEvidenceRequirement, ComplianceMapsFile } from "../../src/compliance/mappingSchema.js";
+import type { ComplianceEvidenceRequirement, ComplianceMapsFileInput } from "../../src/compliance/mappingSchema.js";
 import {
   generateCoverageMatrix,
   renderCoverageMatrixMarkdown,
@@ -43,7 +44,10 @@ describe("generateCoverageMatrix", () => {
     expect(matrix.overallScore).toBeNull();
     expect(matrix.gaps).toEqual([]);
     const total = matrix.frameworks.reduce((sum, fw) => sum + fw.total, 0);
-    expect(matrix.notEvaluated.length).toBe(total);
+    // P1-45: the descoped ISO/IEC 42005 categories are listed as not evaluated but not counted in a framework's total.
+    const descoped = matrix.frameworks.reduce((sum, fw) => sum + fw.categories.filter((cat) => cat.descoped !== undefined).length, 0);
+    expect(descoped).toBe(3);
+    expect(matrix.notEvaluated.length).toBe(total + descoped);
     expect(matrix.ts).toBeGreaterThan(0);
 
     const fwNames = matrix.frameworks.map((f) => f.framework);
@@ -99,7 +103,7 @@ describe("gaps and not-evaluated categories (P0-17)", () => {
         mapping("fx_eu_missing", "EU_AI_ACT", [NO_AUDIT])
       ]
     }
-  } as ComplianceMapsFile;
+  } as ComplianceMapsFileInput;
 
   function audit(ws: string, auditType: string, controlIds: string[]): void {
     const ledger = openLedger(ws);
@@ -141,6 +145,14 @@ describe("gaps and not-evaluated categories (P0-17)", () => {
     expect(md).toContain("| SOC 2");
     expect(md).toContain("## Framework Claims");
     expect(md).toContain("**Applicability:** unresolved");
+    expect(md).toContain(renderClaimLegend("markdown"));
+    for (const framework of matrix.frameworks) {
+      expect(md).toContain(`- ${framework.displayName}: ${formatClaimLabel(renderClaimLabel(framework.claim), "report")}`);
+      const row = md.split("\n").find((line) => line.startsWith(`| ${framework.displayName} |`));
+      expect(row).toMatch(new RegExp(`\\| ${framework.claim.claimKind} \\|$`));
+    }
+    expect(md.split("\n").filter((line) => line.includes("**Claim:**"))).toHaveLength(matrix.frameworks.length + 1);
+    expect(md.split("\n").filter((line) => line.includes("**Claim:**"))).toMatchSnapshot();
     const heatmap = renderCoverageHeatmap(matrix);
     for (const line of ["? fx_ok", "░ fx_partial", "░ fx_missing", "? fx_none", "Overall: 0.0%"]) {
       expect(heatmap).toContain(line);
@@ -152,7 +164,7 @@ describe("gaps and not-evaluated categories (P0-17)", () => {
     const ws = newWorkspace();
     initComplianceMaps(ws, {
       complianceMaps: { version: 1, mappings: [mapping("fx_ok", "SOC2", [EVENT]), mapping("fx_eu_none", "EU_AI_ACT", [PACK])] }
-    } as ComplianceMapsFile);
+    } as ComplianceMapsFileInput);
     audit(ws, "FIXTURE_SIGNAL", ["fx_ok"]);
     const matrix = generateCoverageMatrix({ workspace: ws, window: "14d", frameworks: ["SOC2", "EU_AI_ACT"] });
     expect(matrix.frameworks.map((fw) => fw.score)).toEqual([null, null]);

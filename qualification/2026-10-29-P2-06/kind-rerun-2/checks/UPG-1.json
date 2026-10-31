@@ -1,0 +1,17 @@
+{
+  "id": "UPG-1",
+  "scenario": "Upgrade with data",
+  "status": "failed",
+  "reason": "failed criteria: N-1 installed and Ready within 300 s",
+  "criteria": [
+    {
+      "name": "N-1 installed and Ready within 300 s",
+      "ok": false,
+      "detail": {
+        "readyMs": 300279,
+        "exit": 1
+      }
+    }
+  ],
+  "durationMs": 300318
+}

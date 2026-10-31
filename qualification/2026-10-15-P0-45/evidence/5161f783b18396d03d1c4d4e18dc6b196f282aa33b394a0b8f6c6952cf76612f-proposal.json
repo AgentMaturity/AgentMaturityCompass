@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-45",
+  "parentSource": "2024f25c79973987b44a4a1298488d55ee0d6227",
+  "productionSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "causalPlan": {
+    "path": "/private/tmp/p0-45-causal-readonly-plan-20261015.json",
+    "bytes": 28546,
+    "sha256": "b67310ddfde9a75c550cb563386caa43967530e6412561888d176ae66ae8bab4"
+  },
+  "corpus": [
+    "tests/verifyRepair.test.ts"
+  ],
+  "staticExpectedCases": 12,
+  "recipes": [
+    {
+      "id": "P045-C1-fail-closed-hold-admission",
+      "title": "Remove unknown and active legal-hold refusals as one current admission control",
+      "file": "src/ledger/verifyRepair.ts",
+      "baselineSha256": "5ba4d59b5293e5e498d3cec3d58635133c75bc8d31db518a0d6b49d65f9164bb",
+      "anchors": [
+        {
+          "find": "  if (hold.state === \"unknown\") throw new RepairRefused(`legal hold state unknown: ${hold.reason}`);",
+          "replace": "",
+          "occurrences": 1,
+          "line": 180
+        },
+        {
+          "find": "  if (hold.state === \"active\") throw new RepairRefused(`legal hold active: ${hold.holdIds.join(\", \")}`);",
+          "replace": "",
+          "occurrences": 1,
+          "line": 181
+        }
+      ],
+      "proposedMutantSha256": "75bf1ce550fd79842e17816935939b4edc046317ae49d9a463ef8d0275861bfe",
+      "meaning": "Potential fail-closed admission sensitivity under injected legalHolds callbacks and a stub signer. Source permits proceeding after callback unknown/active when both refusals are removed; original case bodies may stop before all state assertions. The returned receipt uses literal legalHold.state none at source:208, but these original failed cases do not independently retain/assert that receipt.",
+      "notEstablished": [
+        "Actual signed registry active/unknown behavior",
+        "A built CLI hold bypass from a TS-only mutation",
+        "Every post-failure filesystem/receipt fact unless separately retained before cleanup",
+        "Deletion or irrecoverable byte loss",
+        "Independent trusted-time or issuer proof"
+      ]
+    },
+    {
+      "id": "P045-C2-forward-copy-then-unlink",
+      "title": "Replace only the single forward quarantine rename with faithful copy plus unlink",
+      "file": "src/ledger/verifyRepair.ts",
+      "baselineSha256": "5ba4d59b5293e5e498d3cec3d58635133c75bc8d31db518a0d6b49d65f9164bb",
+      "anchors": [
+        {
+          "find": "      fs.renameSync(join(workspace, file.path), target);",
+          "replace": "      fs.copyFileSync(join(workspace, file.path), target);\n      fs.unlinkSync(join(workspace, file.path));",
+          "occurrences": 1,
+          "line": 149
+        }
+      ],
+      "proposedMutantSha256": "062cbc9bb2be83c47f3550fa3c2ad6f970150b41c603f0e63b587eb61dc34145",
+      "meaning": "If the rename-fault case alone detects the mutant, report call-path/fault-injection sensitivity and a changed repair mechanism. Do not call it an observed lost-byte kill, proof of copy-delete crash danger, or complete satisfaction of the spec invariant mutation criterion.",
+      "notEstablished": [
+        "Atomicity across copy/unlink or multi-file move",
+        "Loss on crash, interrupted copy, unlink failure or active writer/WAL race",
+        "Copy destination permission/inode/mode equivalence",
+        "Rollback-after-copy-failure correctness",
+        "Full CLI mutation propagation with dist unchanged"
+      ],
+      "protectedAnchor": {
+        "find": "      fs.renameSync(join(workspace, row.to), join(workspace, row.from));",
+        "occurrences": 1,
+        "line": 124,
+        "meaning": "Rollback rename must remain byte-identical. Receipt atomic-write helper and every guard stay unchanged."
+      }
+    }
+  ],
+  "noMutantWritten": true
+}

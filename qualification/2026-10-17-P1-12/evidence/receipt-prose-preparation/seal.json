@@ -1,0 +1,37 @@
+{
+  "schema": "p112-receipt-prose-preparation-seal/1",
+  "at": "2026-10-16T20:11:57.388261+00:00",
+  "inputCount": 33,
+  "inputsPin": {
+    "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/receipt-prose-preparation/input-pins.json",
+    "bytes": 7675,
+    "sha256": "7c625c11c704531cf129c7d001fe80d35eb860b4a8d231aaf2fad3584c061a2d"
+  },
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/receipt-prose-preparation/whole-issue-gaps.json",
+      "bytes": 9665,
+      "sha256": "9f21402f746814d5d56ab7ccca911d4536e00333bd57e8bb08efaa398f87afa3"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/receipt-prose-preparation/README.proposal.md",
+      "bytes": 2546,
+      "sha256": "ce34d0ecd3de8bfa742f0583ec8f387d9fa530651c430e167003323a5bd7a6c9"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/receipt-prose-preparation/README.md",
+      "bytes": 423,
+      "sha256": "3c4319fd91c316710b2d92fc6873346ca0c861577417d7759f0c5f0c08b81ecc"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/receipt-prose-preparation/input-pins.json",
+      "bytes": 7675,
+      "sha256": "7c625c11c704531cf129c7d001fe80d35eb860b4a8d231aaf2fad3584c061a2d"
+    }
+  ],
+  "allInputOutputPinsRechecked": true,
+  "blockersForUsingAsBoundedDraft": [],
+  "runtimeExecution": false,
+  "sourceWrites": false,
+  "controlsNotPredicted": true
+}

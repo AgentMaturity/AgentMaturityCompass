@@ -1,0 +1,11 @@
+# P0-51 explicit-pin precedence conflict — 14 October 2026
+
+The conflict remains unresolved. P0-09’s goal at line44 says that an admitted issuer key is neither revoked nor distrusted. Its ordered step6 at159–163 checks distrust first, then admits a matching explicit pin, then evaluates trust-list revocation; the key-compromise sentence also says every signature. Both requirements cannot hold for the same matching explicit pin and loaded compromise revocation.
+
+Current admission.ts:116–130 implements the detailed order and is byte-identical to accepted main. A matching explicit pin returns admitted before compromiseOf; distrust still beats all pins and allow flags. TRUST_LIST.md repeats the broad goal at3 and ordered rules at126–130, and its new paragraph136 explicitly preserves this unresolved conflict. No precedence change or waiver was approved.
+
+Existing accepted tests deliberately check purpose-scoped pins and distrust overriding pins. List-revocation tests do not add a matching explicit pin. The workspace-self test converts operator compromise revocations into distrust before admission, so it does not settle the portable explicit-pin rule. No accepted direct matching-pin-plus-compromise test was recovered.
+
+The actual 84-case compiled CLI run passed81 and failed3, with zero pending/todo. The retained license-revoked-pinned, imports-revoked and session-revoked cases each expected exit1 and received exit0. Their reports have integritypass, trustedtrue and an admitted explicit-key issuer. The genuine matching issuer inputs, independent authority file and fingerprint pins passed their integrity controls. Exact stdout/stderr hashes were independently rechecked against the existing observer receipt; no runtime was rerun for this note.
+
+These three strict refusal expectations remain RED. Current behavior can be described and qualified against step6 while retaining the goal conflict. A whole-issue pass, reversing precedence, or relaxing those cases requires authoritative clarification. Existing behavior or historical status labels supply no design approval. The JSON companion pins the full specification, current source, accepted tests, actual raw report and stream hashes. No source, tests, specification, original reports, compiled modules or trackers were changed.

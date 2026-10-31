@@ -1,0 +1,48 @@
+{
+  "suiteVersion": "1.0.0",
+  "specVersion": "1.0",
+  "class": "verifier",
+  "fixtureSetDigest": "4a57aae5ac72e6a96c15ee6fc05ae00f4000a86c10fff7fe19b8abc8ffee24af",
+  "implementation": {
+    "name": "amc-verify",
+    "version": "0.1.0",
+    "vendor": null,
+    "repository": null,
+    "language": null
+  },
+  "environment": {
+    "os": "linux 6.8.0",
+    "runtime": "node v22.11.0"
+  },
+  "runAt": "2026-10-27T00:00:00.000Z",
+  "cases": [
+    {
+      "id": "VER-001",
+      "normative": true,
+      "durationMs": 84,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-002",
+      "normative": true,
+      "durationMs": 77,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-900",
+      "normative": false,
+      "outcome": "skipped",
+      "durationMs": 0,
+      "diff": {
+        "skipped": "informative"
+      }
+    }
+  ],
+  "summary": {
+    "normativePassed": 2,
+    "normativeTotal": 2
+  },
+  "conformant": true
+}

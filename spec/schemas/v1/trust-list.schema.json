@@ -63,7 +63,10 @@
             "additionalProperties": false,
             "properties": {
               "algorithm": {
-                "const": "ed25519",
+                "enum": [
+                  "ed25519",
+                  "ecdsa-p256-sha256"
+                ],
                 "type": "string"
               },
               "allowKeyHistory": {
@@ -129,7 +132,8 @@
                     "notary",
                     "evidence-authority",
                     "independent-attestation",
-                    "trust-list-root"
+                    "trust-list-root",
+                    "catalog-review"
                   ],
                   "type": "string"
                 },
@@ -204,6 +208,11 @@
         "listId": {
           "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$",
           "type": "string"
+        },
+        "rootThreshold": {
+          "exclusiveMinimum": 0,
+          "maximum": 64,
+          "type": "integer"
         },
         "sequence": {
           "exclusiveMinimum": 0,
@@ -301,6 +310,10 @@
       ],
       "type": "object"
     },
+    "signatureVersion": {
+      "const": 2,
+      "type": "number"
+    },
     "signatures": {
       "items": {
         "additionalProperties": false,
@@ -315,7 +328,6 @@
             "type": "string"
           },
           "signature": {
-            "minLength": 1,
             "type": "string"
           }
         },
@@ -326,6 +338,7 @@
         ],
         "type": "object"
       },
+      "maxItems": 64,
       "type": "array"
     }
   },

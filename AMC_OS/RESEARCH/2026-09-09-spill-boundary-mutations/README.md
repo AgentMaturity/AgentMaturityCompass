@@ -25,7 +25,7 @@ Use an existing trusted Python 3.10+ interpreter on a POSIX host with the review
 The following is a future execution command, **not a command executed during authoring**. Replace the clean input checkout, unused output name and supervisor digest deliberately. The supervisor digest must be the actual independently reviewed file's complete lowercase SHA-256, not the placeholder or a digest silently recomputed by this helper as a substitute for review.
 
 ```sh
-python3 /Users/sid/AgentMaturityCompass/tmp/cos-spill-boundaries/AMC_OS/RESEARCH/2026-09-09-spill-boundary-mutations/run.py \
+python3 ~/AgentMaturityCompass/tmp/cos-spill-boundaries/AMC_OS/RESEARCH/2026-09-09-spill-boundary-mutations/run.py \
   --execute \
   --repository /absolute/path/to/existing-clean-source-checkout \
   --source a5987643ef6c26b01f687226fbc6a6709fc182cb \
@@ -33,7 +33,7 @@ python3 /Users/sid/AgentMaturityCompass/tmp/cos-spill-boundaries/AMC_OS/RESEARCH
   --node /opt/homebrew/opt/node@22/bin/node \
   --pnpm /opt/homebrew/lib/node_modules/pnpm/bin/pnpm.cjs \
   --git /usr/bin/git \
-  --supervisor /Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/attempt-3/runner.py \
+  --supervisor ~/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/attempt-3/runner.py \
   --supervisor-sha256 REPLACE_WITH_REVIEWED_64_LOWERCASE_HEX_SHA256
 ```
 

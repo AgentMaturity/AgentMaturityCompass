@@ -1,0 +1,700 @@
+{
+  "schema": "amc-p107-native-evidence/1",
+  "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout",
+  "retainedRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s",
+  "noModelLoop": true,
+  "noClockOrGateEdits": true,
+  "backend": "sqlite",
+  "nativeCalls": [
+    {
+      "sessionId": "f67e281b-4af6-4cbb-af2e-691beeff15d4",
+      "callId": "p107-session-1-allowed",
+      "allowed": true,
+      "outcome": "OK",
+      "denied": false,
+      "timedOut": false,
+      "outputMatchesAllowed": true,
+      "deniedCanaryAbsent": true
+    },
+    {
+      "sessionId": "f67e281b-4af6-4cbb-af2e-691beeff15d4",
+      "callId": "p107-session-1-denied",
+      "allowed": false,
+      "outcome": "DENIED",
+      "denied": true,
+      "timedOut": false,
+      "outputMatchesAllowed": false,
+      "deniedCanaryAbsent": true
+    },
+    {
+      "sessionId": "ff8475ef-2c42-47ab-991b-9986a537eb85",
+      "callId": "p107-session-2-allowed",
+      "allowed": true,
+      "outcome": "OK",
+      "denied": false,
+      "timedOut": false,
+      "outputMatchesAllowed": true,
+      "deniedCanaryAbsent": true
+    },
+    {
+      "sessionId": "ff8475ef-2c42-47ab-991b-9986a537eb85",
+      "callId": "p107-session-2-denied",
+      "allowed": false,
+      "outcome": "DENIED",
+      "denied": true,
+      "timedOut": false,
+      "outputMatchesAllowed": false,
+      "deniedCanaryAbsent": true
+    }
+  ],
+  "sessions": [
+    {
+      "sessionId": "f67e281b-4af6-4cbb-af2e-691beeff15d4",
+      "ended": true,
+      "sealPresent": true,
+      "sealSignatureValid": true
+    },
+    {
+      "sessionId": "ff8475ef-2c42-47ab-991b-9986a537eb85",
+      "ended": true,
+      "sealPresent": true,
+      "sealSignatureValid": true
+    }
+  ],
+  "auditRows": [
+    {
+      "id": "8da3382b-68bd-4f8a-9023-04732e7ede84",
+      "sessionId": "f67e281b-4af6-4cbb-af2e-691beeff15d4",
+      "callId": "p107-session-1-allowed",
+      "ts": 1792174648591,
+      "eventHash": "bce41b25dde7dcd5cbb8472852fb177e6b25d5c1095f1bd5f599af3446b5d9d0",
+      "auditType": "TOOL_CALL_ALLOWED",
+      "emitterId": "tool-call-allowed",
+      "writerSignatureValid": true,
+      "envelopePresent": true,
+      "envelopeSessionMatches": true,
+      "envelopeSynthetic": false,
+      "effectiveTrustTier": "OBSERVED",
+      "projectedToQuestion": true,
+      "projectionVersionMatches": true,
+      "allowlistRulePresent": true,
+      "denialGuard": null,
+      "denialStage": null,
+      "emitterAdmitted": true,
+      "registered": true
+    },
+    {
+      "id": "56c3c2c1-6830-4281-bd00-496bc3dc1656",
+      "sessionId": "f67e281b-4af6-4cbb-af2e-691beeff15d4",
+      "callId": "p107-session-1-denied",
+      "ts": 1792174648610,
+      "eventHash": "7ac99f6ad7e4459de0b90f1853f48cb8831a10610bb913915a0c9cfb1acaaf53",
+      "auditType": "TOOL_CALL_DENIED",
+      "emitterId": "tool-call-denied",
+      "writerSignatureValid": true,
+      "envelopePresent": true,
+      "envelopeSessionMatches": true,
+      "envelopeSynthetic": false,
+      "effectiveTrustTier": "OBSERVED",
+      "projectedToQuestion": true,
+      "projectionVersionMatches": true,
+      "allowlistRulePresent": true,
+      "denialGuard": "tool-allowlist",
+      "denialStage": "guard",
+      "emitterAdmitted": true,
+      "registered": true
+    },
+    {
+      "id": "2bf21516-a46c-4cdf-a105-beebf07f2f52",
+      "sessionId": "ff8475ef-2c42-47ab-991b-9986a537eb85",
+      "callId": "p107-session-2-allowed",
+      "ts": 1792174648643,
+      "eventHash": "d1f66571672b21e28be80a1d20ed4c546db42dbf5c413647581b77fa86d9453c",
+      "auditType": "TOOL_CALL_ALLOWED",
+      "emitterId": "tool-call-allowed",
+      "writerSignatureValid": true,
+      "envelopePresent": true,
+      "envelopeSessionMatches": true,
+      "envelopeSynthetic": false,
+      "effectiveTrustTier": "OBSERVED",
+      "projectedToQuestion": true,
+      "projectionVersionMatches": true,
+      "allowlistRulePresent": true,
+      "denialGuard": null,
+      "denialStage": null,
+      "emitterAdmitted": true,
+      "registered": true
+    },
+    {
+      "id": "10bd1406-384a-48bd-b59f-1bd5c131b3e4",
+      "sessionId": "ff8475ef-2c42-47ab-991b-9986a537eb85",
+      "callId": "p107-session-2-denied",
+      "ts": 1792174648658,
+      "eventHash": "44de03fe0568f663acef3047b785c5a8bee71f074d067c81c9d1c2d62a40a8b4",
+      "auditType": "TOOL_CALL_DENIED",
+      "emitterId": "tool-call-denied",
+      "writerSignatureValid": true,
+      "envelopePresent": true,
+      "envelopeSessionMatches": true,
+      "envelopeSynthetic": false,
+      "effectiveTrustTier": "OBSERVED",
+      "projectedToQuestion": true,
+      "projectionVersionMatches": true,
+      "allowlistRulePresent": true,
+      "denialGuard": "tool-allowlist",
+      "denialStage": "guard",
+      "emitterAdmitted": true,
+      "registered": true
+    }
+  ],
+  "roots": [
+    {
+      "v": 1,
+      "sessionId": "f67e281b-4af6-4cbb-af2e-691beeff15d4",
+      "lifecycle": "closed",
+      "runtime": "amc",
+      "agentId": "default",
+      "startedTs": 1792174648555,
+      "endedTs": 1792174648619,
+      "eventCount": 12,
+      "turnCount": 1,
+      "sealCount": 1,
+      "sealEventHashes": [
+        "012c44433e559a9f1c8cf4ed1275470e1fa0d6862d011b2b3d573479f9d3bcab"
+      ],
+      "sessionMerkleRoot": "de94b2da2642fa1410e4997b1c59dfe6c400e888224c3fec874b26024c7580a5",
+      "openEventHash": "ca0ec1542101aeb573590e2b1156ee7ba2788bbecb3f69d8f1fcf7ef66f4a35a",
+      "closeEventHash": "6af5440fb1b3c87c6b9b4e5f2b010b9f74a9c1c6f08c39e65ce3a635d0a671eb",
+      "monitorKeyFingerprint": "9326734c0582bae398c4e9212d585ae55dfee31fba0aedf77611516c3086d67b"
+    },
+    {
+      "v": 1,
+      "sessionId": "ff8475ef-2c42-47ab-991b-9986a537eb85",
+      "lifecycle": "closed",
+      "runtime": "amc",
+      "agentId": "default",
+      "startedTs": 1792174648620,
+      "endedTs": 1792174648666,
+      "eventCount": 12,
+      "turnCount": 1,
+      "sealCount": 1,
+      "sealEventHashes": [
+        "79fad4b1a361d8b7a78b2593a181194fc6c03e9b1d2e33815755e5f0d66218dc"
+      ],
+      "sessionMerkleRoot": "45529efc43fd3e68806cfcbe9afc87442175ce4e78be68f0c683355b585d7457",
+      "openEventHash": "58d9831f3f2cf7c154acf77ce154f9e2fb665786171091b7864fa4d457140614",
+      "closeEventHash": "d9de0efc6524956e19286b89f4b7c416d7a13b3759b709e8faf1ed6d6b29e1f9",
+      "monitorKeyFingerprint": "9326734c0582bae398c4e9212d585ae55dfee31fba0aedf77611516c3086d67b"
+    }
+  ],
+  "trustBoundary": "monitor public key captured before calls in this owned fixture; no external identity attestation",
+  "limitation": "two real sessions establish mapped native evidence; actual UTC-day continuity controls the earned level",
+  "environment": {
+    "helper": "scripts/clean-source-check.mjs#cleanSourceRuntimeEnvironment",
+    "privateHome": true,
+    "signingEnabled": true,
+    "storageOverrideAbsent": true,
+    "trustOverridesAbsent": true,
+    "loaderOverridesAbsent": true
+  },
+  "nativeBefore": {
+    "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "bytes": 1931552,
+    "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+    "dev": 16777231,
+    "inode": 543031862,
+    "nlink": 1
+  },
+  "blobKeySetup": {
+    "keyVersion": 1,
+    "algorithm": "AES-256-GCM",
+    "signatureValid": true
+  },
+  "beforePins": [
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/workspace/allowed.txt",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/workspace/allowed.txt",
+      "bytes": 40,
+      "sha256": "490f37e4cb23e0a481ee9bcd7f2c6d47033b776666efca3b3c3bbdb7bbd74cab",
+      "dev": 16777231,
+      "inode": 543053230,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/workspace/denied.txt",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/workspace/denied.txt",
+      "bytes": 38,
+      "sha256": "512661706f674e96b22c55630f761fc268e0f1930da00587c85b583ba5668b84",
+      "dev": 16777231,
+      "inode": 543053232,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/tools.yaml",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/tools.yaml",
+      "bytes": 348,
+      "sha256": "f1c2bc923947fd515f763172e0015adce317ca4a570c3ffdf83111dc4e6b9475",
+      "dev": 16777231,
+      "inode": 543053235,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/tools.yaml.sig",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/tools.yaml.sig",
+      "bytes": 247,
+      "sha256": "1df872574d3bc5b0a82ef55aa7a08efbdb6798931721f19cd88aa8103f71af43",
+      "dev": 16777231,
+      "inode": 543053240,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/firewall/policy.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/firewall/policy.json",
+      "bytes": 476,
+      "sha256": "efbc4270ea48471865af70c7b0ba2e1e9fa04c84a5216b2f697347441f7fd1e5",
+      "dev": 16777231,
+      "inode": 543053256,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/firewall/policy.json.sig",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/firewall/policy.json.sig",
+      "bytes": 862,
+      "sha256": "eeab800380e602f420b0b27556bd5180eedeed6fbf9f1660149db1951c700150",
+      "dev": 16777231,
+      "inode": 543053257,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/blob-keys/current.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/blob-keys/current.json",
+      "bytes": 91,
+      "sha256": "9e8362b3eb6eef8a5e4bc84cc52b607720fd4a0a9e46d120234f4164e8ea5b2a",
+      "dev": 16777231,
+      "inode": 543053225,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/blob-keys/current.json.sig",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/blob-keys/current.json.sig",
+      "bytes": 247,
+      "sha256": "da25f9326908dd3f61d7af7fabba8a8279ef9597eafe3c57b312ff0866ca7592",
+      "dev": 16777231,
+      "inode": 543053226,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/keys/monitor_ed25519.pub",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/keys/monitor_ed25519.pub",
+      "bytes": 113,
+      "sha256": "9326734c0582bae398c4e9212d585ae55dfee31fba0aedf77611516c3086d67b",
+      "dev": 16777231,
+      "inode": 543053210,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/keys/auditor_ed25519.pub",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/keys/auditor_ed25519.pub",
+      "bytes": 113,
+      "sha256": "b5439465204a605c081ceae04facad98e4584d5c323cd8b5acb47003b1c66d1d",
+      "dev": 16777231,
+      "inode": 543053211,
+      "nlink": 1
+    }
+  ],
+  "policy": {
+    "signatureValid": true,
+    "digest": "f1c2bc923947fd515f763172e0015adce317ca4a570c3ffdf83111dc4e6b9475",
+    "firewallMode": "block",
+    "firewallMirrorTrusted": true
+  },
+  "monitorFingerprint": "9326734c0582bae398c4e9212d585ae55dfee31fba0aedf77611516c3086d67b",
+  "readiness": [
+    {
+      "ready": true,
+      "blockerCount": 0,
+      "confined": false,
+      "confinementVerdict": "unconfined",
+      "actualProbeResult": "permitted",
+      "sandboxBackendAvailable": true
+    },
+    {
+      "ready": true,
+      "blockerCount": 0,
+      "confined": false,
+      "confinementVerdict": "unconfined",
+      "actualProbeResult": "permitted",
+      "sandboxBackendAvailable": true
+    }
+  ],
+  "ledgerReadOnly": true,
+  "ledger": {
+    "ok": true,
+    "errorCount": 0,
+    "errors": [],
+    "chainOk": true,
+    "governanceOk": true,
+    "anchored": true,
+    "expectedFingerprintMatches": true,
+    "monitorFingerprintMatches": true,
+    "closedSessionIds": [
+      "f67e281b-4af6-4cbb-af2e-691beeff15d4",
+      "ff8475ef-2c42-47ab-991b-9986a537eb85"
+    ],
+    "openSessionCount": 0,
+    "releasedSessionCount": 0,
+    "interruptedSessionCount": 0
+  },
+  "rowCount": 24,
+  "allWriterSignaturesValid": true,
+  "evaluation": {
+    "level": 1,
+    "perLevel": [
+      {
+        "pass": true,
+        "matchedEventIds": [
+          "8da3382b-68bd-4f8a-9023-04732e7ede84",
+          "ba21ca43-b0c0-4280-9924-fa2b10510646",
+          "c978cdb1-6906-4e50-a634-187ee8f985ef",
+          "56c3c2c1-6830-4281-bd00-496bc3dc1656",
+          "6ffac950-c5a1-42b2-93df-64297df23365",
+          "2bf21516-a46c-4cdf-a105-beebf07f2f52",
+          "5f36bb93-aaf3-49c8-a2e8-b37f67a7d6b5",
+          "da9f2577-dd2e-4f8f-9fbb-e9520e774bfe",
+          "10bd1406-384a-48bd-b59f-1bd5c131b3e4",
+          "091b117f-210b-4c2c-8436-80e9695f5e1b"
+        ],
+        "reason": "gate level 0 satisfied",
+        "distinctSessions": 2,
+        "distinctDays": 1,
+        "level": 0,
+        "status": "pass"
+      },
+      {
+        "pass": true,
+        "matchedEventIds": [
+          "8da3382b-68bd-4f8a-9023-04732e7ede84",
+          "ba21ca43-b0c0-4280-9924-fa2b10510646",
+          "c978cdb1-6906-4e50-a634-187ee8f985ef",
+          "56c3c2c1-6830-4281-bd00-496bc3dc1656",
+          "6ffac950-c5a1-42b2-93df-64297df23365",
+          "2bf21516-a46c-4cdf-a105-beebf07f2f52",
+          "5f36bb93-aaf3-49c8-a2e8-b37f67a7d6b5",
+          "da9f2577-dd2e-4f8f-9fbb-e9520e774bfe",
+          "10bd1406-384a-48bd-b59f-1bd5c131b3e4",
+          "091b117f-210b-4c2c-8436-80e9695f5e1b"
+        ],
+        "reason": "gate level 1 satisfied",
+        "distinctSessions": 2,
+        "distinctDays": 1,
+        "level": 1,
+        "status": "pass"
+      },
+      {
+        "pass": false,
+        "matchedEventIds": [
+          "8da3382b-68bd-4f8a-9023-04732e7ede84",
+          "56c3c2c1-6830-4281-bd00-496bc3dc1656",
+          "2bf21516-a46c-4cdf-a105-beebf07f2f52",
+          "10bd1406-384a-48bd-b59f-1bd5c131b3e4"
+        ],
+        "reason": "failed gate 2: events=4/4, sessions=2/2, days=1/2",
+        "distinctSessions": 2,
+        "distinctDays": 1,
+        "level": 2,
+        "status": "fail"
+      },
+      {
+        "pass": false,
+        "matchedEventIds": [],
+        "reason": "not evaluated at gate 3: L3 not evaluable on runtime evidence: needs tool-interface reconstruction, per-step scope decisions and status-aware validation metrics",
+        "distinctSessions": 0,
+        "distinctDays": 0,
+        "level": 3,
+        "status": "not_evaluated"
+      },
+      {
+        "pass": false,
+        "matchedEventIds": [],
+        "reason": "not evaluated at gate 4: L4 needs continuity, anchoring (P1-25, P1-26) and a sampling record; no registered emitter produces them yet",
+        "distinctSessions": 0,
+        "distinctDays": 0,
+        "level": 4,
+        "status": "not_evaluated"
+      },
+      {
+        "pass": false,
+        "matchedEventIds": [],
+        "reason": "not evaluated at gate 5: L5 needs a scoped attestation signed by a key with purpose attestation in the pinned trust list (P0-09, P3-04); no registry issues one yet",
+        "distinctSessions": 0,
+        "distinctDays": 0,
+        "level": 5,
+        "status": "not_evaluated"
+      }
+    ],
+    "actualUtcDays": 1,
+    "actualSessions": 2,
+    "minima": {
+      "events": 4,
+      "sessions": 2,
+      "days": 2
+    },
+    "expectedLevelFromActualContinuity": 1
+  },
+  "afterPins": [
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/workspace/allowed.txt",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/workspace/allowed.txt",
+      "bytes": 40,
+      "sha256": "490f37e4cb23e0a481ee9bcd7f2c6d47033b776666efca3b3c3bbdb7bbd74cab",
+      "dev": 16777231,
+      "inode": 543053230,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/workspace/denied.txt",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/workspace/denied.txt",
+      "bytes": 38,
+      "sha256": "512661706f674e96b22c55630f761fc268e0f1930da00587c85b583ba5668b84",
+      "dev": 16777231,
+      "inode": 543053232,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/tools.yaml",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/tools.yaml",
+      "bytes": 348,
+      "sha256": "f1c2bc923947fd515f763172e0015adce317ca4a570c3ffdf83111dc4e6b9475",
+      "dev": 16777231,
+      "inode": 543053235,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/tools.yaml.sig",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/tools.yaml.sig",
+      "bytes": 247,
+      "sha256": "1df872574d3bc5b0a82ef55aa7a08efbdb6798931721f19cd88aa8103f71af43",
+      "dev": 16777231,
+      "inode": 543053240,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/firewall/policy.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/firewall/policy.json",
+      "bytes": 476,
+      "sha256": "efbc4270ea48471865af70c7b0ba2e1e9fa04c84a5216b2f697347441f7fd1e5",
+      "dev": 16777231,
+      "inode": 543053256,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/firewall/policy.json.sig",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/firewall/policy.json.sig",
+      "bytes": 862,
+      "sha256": "eeab800380e602f420b0b27556bd5180eedeed6fbf9f1660149db1951c700150",
+      "dev": 16777231,
+      "inode": 543053257,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/blob-keys/current.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/blob-keys/current.json",
+      "bytes": 91,
+      "sha256": "9e8362b3eb6eef8a5e4bc84cc52b607720fd4a0a9e46d120234f4164e8ea5b2a",
+      "dev": 16777231,
+      "inode": 543053225,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/blob-keys/current.json.sig",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/blob-keys/current.json.sig",
+      "bytes": 247,
+      "sha256": "da25f9326908dd3f61d7af7fabba8a8279ef9597eafe3c57b312ff0866ca7592",
+      "dev": 16777231,
+      "inode": 543053226,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/keys/monitor_ed25519.pub",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/keys/monitor_ed25519.pub",
+      "bytes": 113,
+      "sha256": "9326734c0582bae398c4e9212d585ae55dfee31fba0aedf77611516c3086d67b",
+      "dev": 16777231,
+      "inode": 543053210,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/keys/auditor_ed25519.pub",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/keys/auditor_ed25519.pub",
+      "bytes": 113,
+      "sha256": "b5439465204a605c081ceae04facad98e4584d5c323cd8b5acb47003b1c66d1d",
+      "dev": 16777231,
+      "inode": 543053211,
+      "nlink": 1
+    }
+  ],
+  "nativeAfter": {
+    "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "bytes": 1931552,
+    "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+    "dev": 16777231,
+    "inode": 543031862,
+    "nlink": 1
+  },
+  "guardEmitterCloseInvoked": true,
+  "poolBeforeClose": {
+    "key": "ledger:/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace:/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/evidence.sqlite",
+    "dbPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/evidence.sqlite",
+    "maxSize": 4,
+    "idle": 3,
+    "active": 0,
+    "pooledConnections": 3,
+    "initialized": true
+  },
+  "protectedInputCount": 10,
+  "finalProtectedPins": [
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/workspace/allowed.txt",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/workspace/allowed.txt",
+      "bytes": 40,
+      "sha256": "490f37e4cb23e0a481ee9bcd7f2c6d47033b776666efca3b3c3bbdb7bbd74cab",
+      "dev": 16777231,
+      "inode": 543053230,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/workspace/denied.txt",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/workspace/denied.txt",
+      "bytes": 38,
+      "sha256": "512661706f674e96b22c55630f761fc268e0f1930da00587c85b583ba5668b84",
+      "dev": 16777231,
+      "inode": 543053232,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/tools.yaml",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/tools.yaml",
+      "bytes": 348,
+      "sha256": "f1c2bc923947fd515f763172e0015adce317ca4a570c3ffdf83111dc4e6b9475",
+      "dev": 16777231,
+      "inode": 543053235,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/tools.yaml.sig",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/tools.yaml.sig",
+      "bytes": 247,
+      "sha256": "1df872574d3bc5b0a82ef55aa7a08efbdb6798931721f19cd88aa8103f71af43",
+      "dev": 16777231,
+      "inode": 543053240,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/firewall/policy.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/firewall/policy.json",
+      "bytes": 476,
+      "sha256": "efbc4270ea48471865af70c7b0ba2e1e9fa04c84a5216b2f697347441f7fd1e5",
+      "dev": 16777231,
+      "inode": 543053256,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/firewall/policy.json.sig",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/firewall/policy.json.sig",
+      "bytes": 862,
+      "sha256": "eeab800380e602f420b0b27556bd5180eedeed6fbf9f1660149db1951c700150",
+      "dev": 16777231,
+      "inode": 543053257,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/blob-keys/current.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/blob-keys/current.json",
+      "bytes": 91,
+      "sha256": "9e8362b3eb6eef8a5e4bc84cc52b607720fd4a0a9e46d120234f4164e8ea5b2a",
+      "dev": 16777231,
+      "inode": 543053225,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/blob-keys/current.json.sig",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/blob-keys/current.json.sig",
+      "bytes": 247,
+      "sha256": "da25f9326908dd3f61d7af7fabba8a8279ef9597eafe3c57b312ff0866ca7592",
+      "dev": 16777231,
+      "inode": 543053226,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/keys/monitor_ed25519.pub",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/keys/monitor_ed25519.pub",
+      "bytes": 113,
+      "sha256": "9326734c0582bae398c4e9212d585ae55dfee31fba0aedf77611516c3086d67b",
+      "dev": 16777231,
+      "inode": 543053210,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/keys/auditor_ed25519.pub",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/workspace/.amc/keys/auditor_ed25519.pub",
+      "bytes": 113,
+      "sha256": "b5439465204a605c081ceae04facad98e4584d5c323cd8b5acb47003b1c66d1d",
+      "dev": 16777231,
+      "inode": 543053211,
+      "nlink": 1
+    }
+  ],
+  "protectedInputsUnchanged": true,
+  "finalNativePin": {
+    "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "bytes": 1931552,
+    "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+    "dev": 16777231,
+    "inode": 543031862,
+    "nlink": 1
+  },
+  "nativeUnchanged": true,
+  "ownership": [
+    {
+      "sessionId": "f67e281b-4af6-4cbb-af2e-691beeff15d4",
+      "opened": true,
+      "turnOpen": false,
+      "turnEndAttempted": true,
+      "turnEnded": true,
+      "turnSealAttempted": true,
+      "turnSealed": true,
+      "toolsetAcquired": true,
+      "toolsetCloseAttempted": true,
+      "toolsetClosed": true,
+      "sessionCloseAttempted": true,
+      "sessionClosed": true,
+      "storeClosed": true,
+      "fallbackStoreCloseAttempted": false
+    },
+    {
+      "sessionId": "ff8475ef-2c42-47ab-991b-9986a537eb85",
+      "opened": true,
+      "turnOpen": false,
+      "turnEndAttempted": true,
+      "turnEnded": true,
+      "turnSealAttempted": true,
+      "turnSealed": true,
+      "toolsetAcquired": true,
+      "toolsetCloseAttempted": true,
+      "toolsetClosed": true,
+      "sessionCloseAttempted": true,
+      "sessionClosed": true,
+      "storeClosed": true,
+      "fallbackStoreCloseAttempted": false
+    }
+  ],
+  "bodyFailed": false,
+  "bodyError": null,
+  "cleanupErrors": [],
+  "environmentRestored": true,
+  "vaultLocked": true,
+  "poolClosed": true
+}

@@ -5,6 +5,7 @@
  * macro-averaged F1, and bootstrap confidence intervals for classification metrics.
  */
 
+import { mean } from "../../experiments/stats.js";
 import { classifySteerContext } from "../autotune.js";
 import type { SteerContextType } from "../autotune.js";
 
@@ -225,6 +226,9 @@ function createRng(seed: number) {
   };
 }
 
+// Unlike stats.ts mean-difference bootstrap, resample labeled rows and recompute
+// the nonlinear macro-F1 statistic. Keep its xoshiro stream, floor(n*p) endpoints
+// and four-decimal class rounding for reproducible historical reports.
 export function bootstrapMacroF1CI(
   samples: LabeledSample[],
   classifyFn: (prompt: string) => SteerContextType = (p) =>
@@ -245,7 +249,7 @@ export function bootstrapMacroF1CI(
     const confusion = buildConfusionMatrix(resampled, classifyFn);
     const metrics = computeClassMetrics(confusion);
     const macroF1 =
-      metrics.reduce((sum, m) => sum + m.f1, 0) / metrics.length;
+      mean(metrics.map((m) => m.f1));
     f1s.push(macroF1);
   }
 
@@ -268,7 +272,7 @@ export function evaluateAutotuneClassification(
   const perClass = computeClassMetrics(confusion);
 
   const macroF1 =
-    perClass.reduce((sum, m) => sum + m.f1, 0) / perClass.length;
+    mean(perClass.map((m) => m.f1));
 
   let correct = 0;
   for (const label of ALL_LABELS) {

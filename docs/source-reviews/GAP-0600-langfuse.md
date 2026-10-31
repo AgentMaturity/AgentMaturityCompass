@@ -1,7 +1,7 @@
 # GAP-0600 source review: Langfuse
 
 Date: 2026-06-20
-Worktree: `/Users/sid/AgentMaturityCompass-worktrees/gap-0600`
+Worktree: `~/AgentMaturityCompass-worktrees/gap-0600`
 Branch: `agent/gap-0600`
 
 ## Gap

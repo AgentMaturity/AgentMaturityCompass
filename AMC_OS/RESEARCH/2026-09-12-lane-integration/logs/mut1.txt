@@ -1,5 +1,5 @@
 
- RUN  v4.1.11 /Users/sid/AgentMaturityCompass
+ RUN  v4.1.11 ~/AgentMaturityCompass
 
  ❯ tests/sessionPayloadCap.test.ts (3 tests | 1 failed) 934ms
      × an oversize queued input is refused before the inbox row exists, and the lane stays empty 280ms

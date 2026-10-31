@@ -1,9 +1,8 @@
-import { join } from "node:path";
 import {
   forecastPolicyPath,
-  forecastScopeLatestPath,
-  loadLatestForecastArtifact,
-  verifyForecastPolicySignature
+  captureVerifiedForecastArtifact,
+  verifyForecastPolicySignature,
+  verifyForecastSchedulerSignature
 } from "./forecastStore.js";
 import type { ForecastScope } from "./forecastSchema.js";
 import { verifySignedFileWithAuditor } from "../org/orgSigner.js";
@@ -17,7 +16,7 @@ export function verifyLatestForecast(workspace: string, scope: ForecastScope): {
   parseOk: boolean;
   parseError: string | null;
 } {
-  const file = verifySignedFileWithAuditor(workspace, forecastScopeLatestPath(workspace, scope));
+  const captured = captureVerifiedForecastArtifact(workspace, scope), file = captured.file;
   if (!file.valid) {
     return {
       file,
@@ -26,7 +25,7 @@ export function verifyLatestForecast(workspace: string, scope: ForecastScope): {
     };
   }
   try {
-    loadLatestForecastArtifact(workspace, scope);
+    captured.parse();
     return {
       file,
       parseOk: true,
@@ -47,7 +46,7 @@ export function verifyForecastWorkspaceArtifacts(workspace: string): {
 } {
   return {
     policy: verifyForecastPolicySignature(workspace),
-    scheduler: verifySignedFileWithAuditor(workspace, join(workspace, ".amc", "forecast", "scheduler.json"))
+    scheduler: verifyForecastSchedulerSignature(workspace)
   };
 }
 

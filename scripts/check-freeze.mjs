@@ -131,7 +131,7 @@ function pushBaseRef(root) {
   return usable ? before : "HEAD^1";
 }
 
-function defaultBaseRef(root) {
+export function defaultBaseRef(root) {
   if (process.env.GITHUB_BASE_REF) return `origin/${process.env.GITHUB_BASE_REF}`;
   if (process.env.GITHUB_EVENT_NAME === "push") return pushBaseRef(root);
   return "origin/main";

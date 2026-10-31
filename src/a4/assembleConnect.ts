@@ -10,7 +10,9 @@
  *   record commits (a refused record writes nothing).
  * - connect: `buildConnectInstructions` with `mode` always passed (without one it prompts on a terminal). The lease token
  *   is in this response only and is never stored; the record keeps the leaseId, and a replay answers token: null. A lease
- *   whose record is refused was never delivered and is revoked.
+ *   whose record is refused was never delivered and is revoked. The lease names the owner who asked for it (P1-78,
+ *   issueLeaseForPrincipal with the A4 principal's key, never a body field): under a plan whose identity-binding requires
+ *   a principal, an owner who is not an active local users.yaml user is refused 409 PRINCIPAL_UNRESOLVED and nothing is minted.
  * - import: the neutral importer over a workspace file or directory reached with no symbolic link on the way, originals
  *   retained (P1-24): imported traces stay self_reported. The record binds the import's manifest; a refused record rolls
  *   the import back. A source already imported is 409 IMPORT_EXISTS: an existing import is never rewritten or rolled back.
@@ -25,6 +27,7 @@ import { z } from "zod";
 import { apiSuccess } from "../api/apiHelpers.js";
 import { exportPolicyPack } from "../exports/policyExport.js";
 import { rollbackNeutralImport, runNeutralImport, type NeutralImportResult } from "../importers/neutralImporter.js";
+import { LeasePrincipalRefused } from "../leases/leasePrincipal.js";
 import { revokeLease } from "../leases/leaseStore.js";
 import { verifyLeaseToken } from "../leases/leaseVerifier.js";
 import { assertOwnerMode } from "../mode/mode.js";
@@ -223,8 +226,13 @@ async function connect(route: A4Route, projectId: string): Promise<true> {
   try {
     // `mode` is always passed: buildConnectInstructions prompts with inquirer without one (loaded only here, never at Studio start).
     const { buildConnectInstructions } = await import("../studio/connectWizard.js");
-    output = await buildConnectInstructions({ workspace: route.workspace, agentId, mode: body.mode, ...(body.adapterId ? { adapterId: body.adapterId } : {}) });
+    // The lease names the owner asking (P1-78), resolved before anything is minted.
+    output = await buildConnectInstructions({ workspace: route.workspace, agentId, mode: body.mode, ...(body.adapterId ? { adapterId: body.adapterId } : {}),
+      principalKey: principal.key });
   } catch (error) {
+    if (error instanceof LeasePrincipalRefused) {
+      throw a4Fail(409, "PRINCIPAL_UNRESOLVED", `${error.message.replace(/^PRINCIPAL_UNRESOLVED: /, "")}. Nothing was recorded; sign in as an active local users.yaml user.`);
+    }
     throw a4Fail(409, "A4_NOT_READY", "Connect instructions could not be built for this agent; check its adapter and gateway configuration.",
       { reasonCodes: [errorCodeOf(error, "CONNECT_FAILED")] });
   }

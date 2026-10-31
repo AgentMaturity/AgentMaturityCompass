@@ -8,9 +8,11 @@
  * from, authenticates to, or verifies anything with that vendor, so a receipt
  * attests only to the data the caller provided.
  */
+import type { EvidenceOutcome } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import {
+  guardedDrop,
   runLiveScoreBehaviorDrift,
   type LiveDriftAlert,
   type LiveDriftMetricId,
@@ -144,6 +146,7 @@ export interface RunDarwinGodelMachineLiveDriftInput {
 
 export interface DarwinGodelMachineDistribution {
   rowCount: number;
+  evidenceOutcome: EvidenceOutcome;
   receiptScoreMean0to1: number;
   parentScoreMean0to1: number;
   candidateScoreMean0to1: number;
@@ -151,9 +154,9 @@ export interface DarwinGodelMachineDistribution {
   passRateMean0to1: number;
   mutationAcceptanceRate0to1: number;
   regressionFailureRate0to1: number;
-  lineageCoverage0to1: number;
-  sandboxCoverage0to1: number;
-  evidenceCoverage0to1: number;
+  lineageCoverage0to1: number | null;
+  sandboxCoverage0to1: number | null;
+  evidenceCoverage0to1: number | null;
   agentStepCountMean: number;
   latencyP95Ms: number;
   costUsdMean: number;
@@ -171,9 +174,9 @@ export interface DarwinGodelMachineScoreDrift {
   passRateDrop0to1: number;
   mutationAcceptanceDrop0to1: number;
   regressionFailureRateIncrease0to1: number;
-  lineageCoverageDrop0to1: number;
-  sandboxCoverageDrop0to1: number;
-  evidenceCoverageDrop0to1: number;
+  lineageCoverageDrop0to1: number | null;
+  sandboxCoverageDrop0to1: number | null;
+  evidenceCoverageDrop0to1: number | null;
   latencyP95IncreaseRatio: number;
   costIncreaseRatio: number;
 }
@@ -399,9 +402,9 @@ function distribution(rows: DarwinGodelMachineReceiptRow[]): DarwinGodelMachineD
     passRateMean0to1: mean(rows.map((row) => row.passRate0to1)),
     mutationAcceptanceRate0to1: boolMean(rows.map((row) => row.mutationAccepted)),
     regressionFailureRate0to1: mean(rows.map((row) => row.regressionFailureRate0to1)),
-    lineageCoverage0to1: mean(rows.map((row) => row.lineageCoverage0to1), rows.length === 0 ? 1 : 0),
-    sandboxCoverage0to1: mean(rows.map((row) => row.sandboxCoverage0to1), rows.length === 0 ? 1 : 0),
-    evidenceCoverage0to1: mean(rows.map((row) => row.evidenceCoverage0to1), rows.length === 0 ? 1 : 0),
+    lineageCoverage0to1: mean(rows.map((row) => row.lineageCoverage0to1), null),
+    sandboxCoverage0to1: mean(rows.map((row) => row.sandboxCoverage0to1), null),
+    evidenceCoverage0to1: mean(rows.map((row) => row.evidenceCoverage0to1), null),
     agentStepCountMean: mean(rows.map((row) => row.agentStepCount)),
     latencyP95Ms: percentile(rows.map((row) => row.latencyMs), 95),
     costUsdMean: mean(rows.map((row) => row.costUsd)),
@@ -411,6 +414,7 @@ function distribution(rows: DarwinGodelMachineReceiptRow[]): DarwinGodelMachineD
     benchmarkFamilyDistribution: labelDistribution(rows, (row) => row.benchmarkFamily || "unknown"),
     sandboxModeDistribution: labelDistribution(rows, (row) => row.sandboxMode || "unknown"),
     contextDistribution: labelDistribution(rows, contextLabel),
+    evidenceOutcome: rows.length > 0 ? "measured" : "not_evaluated",
   };
 }
 
@@ -434,9 +438,9 @@ export function runDarwinGodelMachineLiveDrift(
     passRateDrop0to1: round(Math.max(0, baselineDistribution.passRateMean0to1 - liveDistribution.passRateMean0to1)),
     mutationAcceptanceDrop0to1: round(Math.max(0, baselineDistribution.mutationAcceptanceRate0to1 - liveDistribution.mutationAcceptanceRate0to1)),
     regressionFailureRateIncrease0to1: round(Math.max(0, liveDistribution.regressionFailureRate0to1 - baselineDistribution.regressionFailureRate0to1)),
-    lineageCoverageDrop0to1: round(Math.max(0, baselineDistribution.lineageCoverage0to1 - liveDistribution.lineageCoverage0to1)),
-    sandboxCoverageDrop0to1: round(Math.max(0, baselineDistribution.sandboxCoverage0to1 - liveDistribution.sandboxCoverage0to1)),
-    evidenceCoverageDrop0to1: round(Math.max(0, baselineDistribution.evidenceCoverage0to1 - liveDistribution.evidenceCoverage0to1)),
+    lineageCoverageDrop0to1: guardedDrop(true, baselineDistribution.lineageCoverage0to1, liveDistribution.lineageCoverage0to1),
+    sandboxCoverageDrop0to1: guardedDrop(true, baselineDistribution.sandboxCoverage0to1, liveDistribution.sandboxCoverage0to1),
+    evidenceCoverageDrop0to1: guardedDrop(true, baselineDistribution.evidenceCoverage0to1, liveDistribution.evidenceCoverage0to1),
     latencyP95IncreaseRatio: ratioIncrease(baselineDistribution.latencyP95Ms, liveDistribution.latencyP95Ms),
     costIncreaseRatio: ratioIncrease(baselineDistribution.costUsdMean, liveDistribution.costUsdMean),
   };
@@ -464,14 +468,14 @@ export function runDarwinGodelMachineLiveDrift(
   if (scoreDrift.regressionFailureRateIncrease0to1 > thresholds.maxRegressionFailureRateIncrease0to1) {
     additionalAlerts.push(buildAlert(input, "darwinGodelRegressionFailureRate0to1", scoreDrift.regressionFailureRateIncrease0to1, thresholds.maxRegressionFailureRateIncrease0to1, "Live Darwin Godel Machine regression failure rate increased beyond threshold.", "critical"));
   }
-  if (liveDistribution.lineageCoverage0to1 < thresholds.minLineageCoverage0to1) {
-    additionalAlerts.push(buildAlert(input, "darwinGodelLineageCoverage0to1", liveDistribution.lineageCoverage0to1, thresholds.minLineageCoverage0to1, "Live Darwin Godel Machine rows are missing parent, candidate, or lineage graph proof.", "critical"));
+  if (liveDistribution.lineageCoverage0to1 === null || liveDistribution.lineageCoverage0to1 < thresholds.minLineageCoverage0to1) {
+    additionalAlerts.push(buildAlert(input, "darwinGodelLineageCoverage0to1", liveDistribution.lineageCoverage0to1, thresholds.minLineageCoverage0to1, liveDistribution.lineageCoverage0to1 === null ? "Live evidence missing; coverage is not evaluated." : "Live Darwin Godel Machine rows are missing parent, candidate, or lineage graph proof.", "critical"));
   }
-  if (liveDistribution.sandboxCoverage0to1 < thresholds.minSandboxCoverage0to1) {
-    additionalAlerts.push(buildAlert(input, "darwinGodelSandboxCoverage0to1", liveDistribution.sandboxCoverage0to1, thresholds.minSandboxCoverage0to1, "Live Darwin Godel Machine rows are missing Docker, sandbox manager, live-plan verifier, sandbox verifier, full-process runner, or sandbox mode proof.", "critical"));
+  if (liveDistribution.sandboxCoverage0to1 === null || liveDistribution.sandboxCoverage0to1 < thresholds.minSandboxCoverage0to1) {
+    additionalAlerts.push(buildAlert(input, "darwinGodelSandboxCoverage0to1", liveDistribution.sandboxCoverage0to1, thresholds.minSandboxCoverage0to1, liveDistribution.sandboxCoverage0to1 === null ? "Live evidence missing; coverage is not evaluated." : "Live Darwin Godel Machine rows are missing Docker, sandbox manager, live-plan verifier, sandbox verifier, full-process runner, or sandbox mode proof.", "critical"));
   }
-  if (liveDistribution.evidenceCoverage0to1 < thresholds.minEvidenceCoverage0to1) {
-    additionalAlerts.push(buildAlert(input, "darwinGodelEvidenceCoverage0to1", liveDistribution.evidenceCoverage0to1, thresholds.minEvidenceCoverage0to1, "Live Darwin Godel Machine rows are missing source snapshot, no-license boundary, README, security, CI, controller, archive, self-modification, evaluation, sandbox, benchmark, baseline/live result, drift statistic, alert receipt, evidence, or signed evidence proof.", "critical"));
+  if (liveDistribution.evidenceCoverage0to1 === null || liveDistribution.evidenceCoverage0to1 < thresholds.minEvidenceCoverage0to1) {
+    additionalAlerts.push(buildAlert(input, "darwinGodelEvidenceCoverage0to1", liveDistribution.evidenceCoverage0to1, thresholds.minEvidenceCoverage0to1, liveDistribution.evidenceCoverage0to1 === null ? "Live evidence missing; coverage is not evaluated." : "Live Darwin Godel Machine rows are missing source snapshot, no-license boundary, README, security, CI, controller, archive, self-modification, evaluation, sandbox, benchmark, baseline/live result, drift statistic, alert receipt, evidence, or signed evidence proof.", "critical"));
   }
   if (behaviorDrift.generationDivergence0to1 > thresholds.maxGenerationDivergence0to1) {
     additionalAlerts.push(buildAlert(input, "darwinGodelGenerationDistribution", behaviorDrift.generationDivergence0to1, thresholds.maxGenerationDivergence0to1, "Live Darwin Godel Machine generation distribution diverged beyond threshold.", "medium"));

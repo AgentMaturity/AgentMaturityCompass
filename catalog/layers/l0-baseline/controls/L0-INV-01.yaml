@@ -1,0 +1,74 @@
+# Draft (P1-14): experimental, agent-drafted and not independently reviewed. Expert sign-off waits for D-08;
+# citations are unverified until fetched and hashed. A result under this control is evidence of conformity, never proof of compliance.
+id: L0-INV-01
+version: "0.1.0"
+support: experimental
+layer: 0
+family: inventory-and-classification
+stations: [education, environment, health, wealth, technology, mobility, governance]
+title: Agent registry entry
+statement: >-
+  Every running agent has a signed registry entry naming its owner, purpose, stations, deployment and
+  version, and an agent without a verifying entry cannot start a session.
+riskRationale: >-
+  An agent nobody registered has no accountable owner, scope or version, so its effects cannot be
+  attributed, examined or recalled.
+mandatory: true
+applicability:
+  predicate: { always: true }
+  reasons: [Layer 0 applies to every agent deployment in every station.]
+  exclusions: []
+citations: []
+binding:
+  kind: enforcement_point
+  points: [tool_pipeline]
+  mechanism: >-
+    The agent's agent.config.yaml carries an auditor signature; a session whose agent entry is missing
+    or does not verify is refused before its first tool call.
+  parameters: []
+  manualDuty: null
+tests:
+  - id: L0-INV-01-T1
+    type: configuration_check
+    oracle:
+      kind: signed_config
+      observes: >-
+        The verification result of the agent's signed registry entry; the agent's reply is never read.
+    fixtures:
+      positive: [L0-INV-01/positive/evidence-valid.json, L0-INV-01/positive/signed-entry.json]
+      negative:
+        - L0-INV-01/negative/edited-entry.json
+        - L0-INV-01/negative/evidence-contradictory.json
+        - L0-INV-01/negative/evidence-cross-tenant.json
+        - L0-INV-01/negative/evidence-empty.json
+        - L0-INV-01/negative/evidence-replayed.json
+        - L0-INV-01/negative/evidence-stale.json
+        - L0-INV-01/negative/evidence-violation.json
+        - L0-INV-01/negative/foreign-signer-entry.json
+        - L0-INV-01/negative/unregistered-agent.json
+        - L0-INV-01/negative/unsigned-entry.json
+    passCriteria: >-
+      A signed entry verifies; an unsigned, edited or foreign-signed entry does not. Session refusal is
+      not built yet (proposed follow-up P1-70).
+    attempts: 1
+evidence:
+  - id: L0-INV-01-E1
+    producer: amc.signedConfig.agent
+    bindingFields: [workspaceId, agentId, controlId]
+    freshness: { maxAgeDays: 90 }
+    sampling: { method: all, ratePercent: null, minItems: 1 }
+    retention: { mode: regime_max }
+    residency: { mode: inherit_deployment }
+invalidatedBy: [model_version, prompt_version, tool_version, deployment_version]
+owner: { role: senior_manager }
+clock: null
+levels: [L2, L3]
+crosswalk:
+  - framework: amc-audit-map-v1
+    clause: CHANGE_MANAGEMENT.POLICY_SIGNING
+    relation: partial
+    rationale: >-
+      The audit map checks that policies are signed; it does not check a per-agent registry entry or
+      session refusal.
+review: { status: pending, expert: null, credential: null, reviewedAt: null, nextReview: null }
+provenance: { draftedBy: ai, draftedAt: "2026-10-11", approvedBy: null }

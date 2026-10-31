@@ -2,16 +2,16 @@
   "schemaVersion": 1,
   "mode": "ranges",
   "source": "a5987643ef6c26b01f687226fbc6a6709fc182cb",
-  "ownedRoot": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run",
-  "workspace": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
-  "output": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/receipts/sqlite-api-ranges",
+  "ownedRoot": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run",
+  "workspace": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+  "output": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/receipts/sqlite-api-ranges",
   "backend": "sqlite",
   "node": {
     "path": "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
     "sha256": "ffc2e45b8634d59a3ce7cc5b800054150b881335f0669c0d62d3f6643538b43e",
     "version": "v22.22.0"
   },
-  "cli": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+  "cli": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
   "cliSha256": "d009af626174b806e283e78a80c654fbbbc16e8c9d3a521169917c256ab2fb4b",
   "nodePlatform": "darwin",
   "nodeArch": "arm64",
@@ -19,7 +19,7 @@
   "subjects": [
     {
       "name": "A",
-      "fixturePath": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace/workspace/allowed/A.txt",
+      "fixturePath": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace/workspace/allowed/A.txt",
       "fixtureRelative": "workspace/allowed/A.txt",
       "fixtureBytes": 98304,
       "fixtureSha256": "8aad1d6792e5fde41714e501dafea616064d7d9619fa83a64a1320678b028aad",
@@ -41,7 +41,7 @@
     },
     {
       "name": "B",
-      "fixturePath": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace/workspace/allowed/B.txt",
+      "fixturePath": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace/workspace/allowed/B.txt",
       "fixtureRelative": "workspace/allowed/B.txt",
       "fixtureBytes": 98304,
       "fixtureSha256": "5f87a6b38dc9b2027bfd5eb59bee639b58e614d09212c67ab238bce76b8f3cff",

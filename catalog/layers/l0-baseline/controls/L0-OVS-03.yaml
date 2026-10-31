@@ -1,0 +1,76 @@
+# Draft (P1-14): experimental, agent-drafted and not independently reviewed. Expert sign-off waits for D-08;
+# citations are unverified until fetched and hashed. A result under this control is evidence of conformity, never proof of compliance.
+id: L0-OVS-03
+version: "0.1.0"
+support: experimental
+layer: 0
+family: decision-authority-and-oversight
+stations: [education, environment, health, wealth, technology, mobility, governance]
+title: Separation of duties
+statement: >-
+  Where the approval policy requires it, initiate, approve and execute use distinct identities, and a
+  self-approval is refused.
+riskRationale: >-
+  One identity that can initiate and approve its own action defeats dual control.
+mandatory: true
+applicability:
+  predicate: { always: true }
+  reasons: [Layer 0 applies to every agent deployment in every station.]
+  exclusions: []
+citations: []
+binding:
+  kind: enforcement_point
+  points: [approvals]
+  mechanism: >-
+    The approval engine refuses a second decision by the same user when the signed policy requires
+    distinct users, and then also refuses an approval by the request's recorded initiator; the quorum
+    counts only distinct approvers other than that initiator.
+  parameters: []
+  manualDuty: null
+tests:
+  - id: L0-OVS-03-T1
+    type: runtime_enforced
+    oracle: { kind: enforcement_receipt, observes: The approval engine's refusal and the quorum state. }
+    fixtures:
+      positive:
+        - L0-OVS-03/positive/distinct-approvers.json
+        - L0-OVS-03/positive/evidence-valid.json
+        - L0-OVS-03/positive/initiator-approves-single-user-class.json
+        - L0-OVS-03/positive/initiator-excluded-distinct-approvers.json
+      negative:
+        - L0-OVS-03/negative/evidence-contradictory.json
+        - L0-OVS-03/negative/evidence-cross-tenant.json
+        - L0-OVS-03/negative/evidence-empty.json
+        - L0-OVS-03/negative/evidence-replayed.json
+        - L0-OVS-03/negative/evidence-stale.json
+        - L0-OVS-03/negative/evidence-violation.json
+        - L0-OVS-03/negative/initiator-approves.json
+        - L0-OVS-03/negative/initiator-decision-written-directly.json
+        - L0-OVS-03/negative/same-user-twice.json
+        - L0-OVS-03/negative/single-approver.json
+    passCriteria: >-
+      Two distinct approvers meet the quorum; the same user deciding twice is refused. Where the class
+      requires distinct users, a request's recorded initiator cannot approve it, and an approval by the
+      initiator written past the engine's refusal is not counted; where it does not (a single-user
+      class), the initiator's approval counts and the initiator stays recorded.
+    attempts: 1
+evidence:
+  - id: L0-OVS-03-E1
+    producer: amc.approvals.engine
+    bindingFields: [workspaceId, agentId, controlId]
+    freshness: { maxAgeDays: 30 }
+    sampling: { method: all, ratePercent: null, minItems: 1 }
+    retention: { mode: regime_max }
+    residency: { mode: inherit_deployment }
+invalidatedBy: [policy_version, deployment_version]
+owner: { role: senior_manager }
+clock: null
+levels: [L2, L3]
+crosswalk:
+  - framework: amc-audit-map-v1
+    clause: ACCESS_CONTROL.APPROVALS
+    relation: partial
+    rationale: >-
+      Dual-control approvals protect high-risk actions; the audit map does not check initiator separation.
+review: { status: pending, expert: null, credential: null, reviewedAt: null, nextReview: null }
+provenance: { draftedBy: ai, draftedAt: "2026-10-11", approvedBy: null }

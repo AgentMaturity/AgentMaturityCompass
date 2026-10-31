@@ -1,17 +1,65 @@
+import chalk from "chalk";
+import type { ExperimentReport } from "../types.js";
 import {
   analyzeExperiment,
   createExperiment,
+  ExperimentInputError,
   gateExperiment,
   listExperiments,
-  runExperiment,
+  loadLatestExperimentRun,
+  runExperiment, runExperimentAsync,
   setExperimentBaseline,
   setExperimentCandidate
 } from "./experimentRunner.js";
+import { resolveAgentId } from "../fleet/paths.js";
+import { runExecutedExperimentAsync } from "./executedExperiment.js";
+import { providerTrialRunner, type TrialProviderSelection } from "./nativeTrialRunner.js";
+import type { TrialLimits } from "./trialExecutor.js";
 import {
   listGovernedOptimizerRuns,
   loadGovernedOptimizerRun,
   writeGovernedOptimizerRun
 } from "./governedOptimizer.js";
+
+/** Task outcomes only; promotion still requires the experiment gate's separate policy checks. */
+export function experimentReportExitCode(report: Pick<ExperimentReport, "cases">): 0 | 1 | 3 {
+  if (report.cases.some(row => row.candidateStatus === "failed" || (row.candidateStatus === undefined && row.candidateSuccess === false))) return 1;
+  if (report.cases.length === 0 || report.cases.some(row => row.candidateSuccess !== true || typeof row.baselineSuccess !== "boolean" ||
+      row.candidateStatus === "unavailable" || row.baselineStatus === "unavailable" || row.paired === false)) return 3;
+  return 0;
+}
+
+function printExperimentReportOutcome(operation: "run" | "analysis", report: ExperimentReport): 0 | 1 | 3 {
+  const exitCode = experimentReportExitCode(report);
+  const verdict = { 0: chalk.green(`Experiment ${operation} PASSED`), 1: chalk.red(`Experiment ${operation} FAILED`), 3: chalk.yellow(`Experiment ${operation} INCONCLUSIVE`) };
+  console.log(verdict[exitCode]);
+  return exitCode;
+}
+
+/** Terminal presentation stays separate from the API/Studio runner wrapper. */
+export async function experimentRunCommandCli(params: Parameters<typeof experimentRunCliAsync>[0], normalizeError: (error: unknown) => string): Promise<void> {
+  const out = await experimentRunCliAsync(params).catch((error: unknown) => {
+    throw new Error(`Experiment run ERROR: ${normalizeError(error)}`, { cause: error });
+  });
+  const exitCode = printExperimentReportOutcome("run", out.report);
+  console.log(`Experiment run recorded: ${out.report.runId}`);
+  console.log(`json=${out.jsonPath}`);
+  console.log(`md=${out.mdPath}`);
+  process.exitCode = exitCode;
+}
+
+/** Analyze the same verified report and render task outcomes without changing the core return contract. */
+export function experimentAnalyzeCommandCli(params: Parameters<typeof experimentAnalyzeCli>[0], normalizeError: (error: unknown) => string): void {
+  let out: ReturnType<typeof experimentAnalyzeCli>;
+  try {
+    out = experimentAnalyzeCli(params);
+  } catch (error: unknown) {
+    throw new Error(`Experiment analysis ERROR: ${normalizeError(error)}`, { cause: error });
+  }
+  const exitCode = printExperimentReportOutcome("analysis", out.report);
+  console.log(`Experiment analysis written: ${out.outFile ?? "none"}`);
+  process.exitCode = exitCode;
+}
 
 export function experimentCreateCli(params: {
   workspace: string;
@@ -52,11 +100,26 @@ export function experimentRunCli(params: {
   return runExperiment(params);
 }
 
+/** `executeTrials`: run both configurations here over the held-out cases (GAP-WP04) instead of reading a candidate window. */
+export async function experimentRunCliAsync(params: Parameters<typeof experimentRunCli>[0] & { executeTrials?: TrialProviderSelection & { limits?: Partial<TrialLimits> } },
+  options: { beforePublish?: () => void } = {}): Promise<ReturnType<typeof experimentRunCli>> {
+  const { executeTrials, ...run } = params;
+  if (executeTrials === undefined) return await runExperimentAsync(run, options);
+  if (run.candidateWindow !== undefined || run.candidateAgentId !== undefined) throw new ExperimentInputError("executed trials read their own evidence; omit the candidate window and agent");
+  const agentId = resolveAgentId(run.workspace, run.agentId);
+  let runner: ReturnType<typeof providerTrialRunner>;
+  try { runner = providerTrialRunner(run.workspace, agentId, executeTrials); }
+  catch (error) { throw new ExperimentInputError(error instanceof Error ? error.message : String(error)); }
+  return await runExecutedExperimentAsync({ workspace: run.workspace, agentId, experimentId: run.experimentId, mode: run.mode,
+    trials: { ...runner, ...(executeTrials.limits === undefined ? {} : { limits: executeTrials.limits }) } }, options);
+}
+
 export function experimentAnalyzeCli(params: {
   workspace: string;
   agentId?: string;
   experimentId: string;
   outFile?: string;
+  all?: boolean;
 }) {
   return analyzeExperiment(params);
 }
@@ -72,6 +135,12 @@ export function experimentGateCli(params: {
 
 export function experimentListCli(params: { workspace: string; agentId?: string }) {
   return listExperiments(params);
+}
+
+export { ExperimentInputError };
+
+export function experimentLatestRunCli(params: { workspace: string; agentId?: string; experimentId: string }) {
+  return loadLatestExperimentRun(params);
 }
 
 export function experimentOptimizeCli(params: {

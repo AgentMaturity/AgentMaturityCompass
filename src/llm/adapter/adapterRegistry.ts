@@ -25,8 +25,16 @@
 import type { CredentialRef } from "../../credentials/credentialRef.js";
 import type { ResolvedRetryPolicy, RetryPolicyConfig } from "../retryPolicy.js";
 import { resolveRetryPolicy } from "../retryPolicy.js";
+import { resolveStreamTimeouts, type LlmStreamTimeouts } from "./streamTimeouts.js";
 import type { LlmAdapter } from "./adapterTypes.js";
 import { snapshotCapabilities, type ProviderCapabilities } from "./providerCapabilities.js";
+import { cacheRetentionEncoderVersion, isCacheRetention, type CacheRetention } from "../request/cacheRetentionEncoders.js";
+import { catalogProtocolForEncoder, createModelMetadataSnapshot, parseModelMetadataSnapshot, type ModelMetadataSnapshot } from "../modelCatalog.js";
+import { parsePhysicalRouteIdentity, parseVirtualRoutingDecision, physicalRouteDigest,
+  type PhysicalRouteIdentity, type VirtualRoutingDecision } from "../request/routeIdentity.js";
+import type { RoutingDecision } from "../../ops/modelRouter.js";
+import { sha256Hex } from "../../utils/hash.js";
+import { canonicalize } from "../../utils/json.js";
 
 /** Thrown when a route cannot be registered, or cannot be resolved. */
 export class LlmRouteError extends Error {
@@ -40,7 +48,9 @@ export class LlmRouteError extends Error {
 }
 
 /** One provider, as an operator configures it. */
-export interface LlmRouteConfig {
+export interface LlmRouteConfig extends Partial<LlmStreamTimeouts> {
+  /** Explicit operator-reviewed facts. Discovery results never install themselves. */
+  readonly reviewedModels?: readonly ModelMetadataSnapshot[];
   /** Stable provider id. Recorded verbatim in every `request/header` row. */
   readonly providerId: string;
   readonly adapter: LlmAdapter;
@@ -67,6 +77,8 @@ export interface LlmRouteConfig {
   readonly retry?: RetryPolicyConfig;
   /** Static headers every request on this route carries. */
   readonly headers?: Readonly<Record<string, string>>;
+  /** Prompt-cache retention (PXA-15), committed in each request header and encoded by the adapter's retention encoder version. */
+  readonly cacheRetention?: CacheRetention;
 }
 
 /**
@@ -75,6 +87,9 @@ export interface LlmRouteConfig {
  * Frozen, and holding the adapter instance itself. Nothing here is re-read.
  */
 export interface PinnedRoute {
+  readonly modelMetadata: ModelMetadataSnapshot | null;
+  readonly physicalRoute: PhysicalRouteIdentity;
+  readonly routingDecision: VirtualRoutingDecision | null;
   readonly capabilities: ProviderCapabilities | null;
   /** Unique per `register` call — distinguishes a replacement from the original. */
   readonly registrationId: string;
@@ -88,8 +103,11 @@ export interface PinnedRoute {
   readonly baseUrl: string;
   readonly credentialRef: CredentialRef | null;
   /** Frozen when the route registered, so a policy edit cannot reach this call. */
+  readonly timeouts: LlmStreamTimeouts;
   readonly retryPolicy: ResolvedRetryPolicy;
   readonly headers: Readonly<Record<string, string>>;
+  /** Frozen at registration; prepare adds it to the request params, and callers cannot override it. */
+  readonly cacheRetention?: CacheRetention;
   /** Registry generation at pin time. */
   readonly generation: number;
 }
@@ -104,12 +122,16 @@ export interface ProviderDescription {
 }
 
 interface Registration {
+  readonly routeConfigDigest: string;
+  readonly reviewedModels: ReadonlyMap<string, ModelMetadataSnapshot>;
   readonly capabilities: ProviderCapabilities | null;
   readonly registrationId: string;
   readonly config: LlmRouteConfig;
   readonly baseUrl: string;
+  readonly timeouts: LlmStreamTimeouts;
   readonly retryPolicy: ResolvedRetryPolicy;
   readonly headers: Readonly<Record<string, string>>;
+  readonly cacheRetention?: { readonly value: CacheRetention; readonly encoderVersion: number };
 }
 
 function normalizeBaseUrl(baseUrl: string, providerId: string): string {
@@ -128,7 +150,28 @@ function normalizeBaseUrl(baseUrl: string, providerId: string): string {
       `route ${providerId} baseUrl must be http or https, got ${parsed.protocol}`
     );
   }
-  return baseUrl.replace(/\/+$/, "");
+  if (parsed.username || parsed.password || parsed.search || parsed.hash) {
+    throw new LlmRouteError("AMC_LLM_ROUTE_INVALID", `route ${providerId} baseUrl must not contain credentials, query or fragment; use credentialRef or headers`);
+  }
+  return parsed.toString().replace(/\/+$/, "");
+}
+
+/** Existing ops selection, deliberately applied to an already configured native route. */
+export interface VirtualRouteSelection {
+  readonly intent: string;
+  readonly decision: Pick<RoutingDecision, "strategy" | "reason" | "selectedModel" | "selectedProvider">;
+}
+
+/** The route's retention and the encoder version that carries it; refused when the adapter's encoder has none. */
+function routeCacheRetention(config: LlmRouteConfig): Registration["cacheRetention"] {
+  const value: unknown = config.cacheRetention;
+  if (value === undefined) return undefined;
+  if (!isCacheRetention(value)) throw new LlmRouteError("AMC_LLM_ROUTE_INVALID", `route ${config.providerId}: cacheRetention must be short or long`);
+  const encoderVersion = cacheRetentionEncoderVersion(config.adapter.encoderId, config.adapter.encoderVersion);
+  if (encoderVersion === null) {
+    throw new LlmRouteError("AMC_LLM_ROUTE_INVALID", `route ${config.providerId}: cacheRetention is unsupported by encoder ${config.adapter.encoderId}@${config.adapter.encoderVersion}`);
+  }
+  return Object.freeze({ value, encoderVersion });
 }
 
 /** Lowercased header names, so a route cannot shadow an adapter header by case. */
@@ -224,7 +267,18 @@ export class AdapterRegistry {
       );
     }
     const adapter = registration.config.adapter;
+    const protocol = catalogProtocolForEncoder(adapter.encoderId) ?? registration.capabilities?.protocol ?? null;
+    // The physical route names the encoder that actually encodes: a retention route's, not the adapter's base version.
+    const encoderVersion = registration.cacheRetention?.encoderVersion ?? adapter.encoderVersion;
+    const physicalRoute = parsePhysicalRouteIdentity({ schemaVersion: 1, providerId: input.providerId, model: input.model,
+      protocol, baseUrl: registration.baseUrl, adapterId: adapter.id, adapterVersion: adapter.version,
+      encoderId: adapter.encoderId, encoderVersion, routeConfigDigest: registration.routeConfigDigest });
+    if (physicalRoute === null) throw new LlmRouteError("AMC_LLM_ROUTE_INVALID", "route identity is invalid");
     return Object.freeze({
+      physicalRoute,
+      routingDecision: null,
+      modelMetadata: registration.reviewedModels.get(input.model)
+        ?? (protocol === null ? null : createModelMetadataSnapshot(input.providerId, protocol, input.model)),
       capabilities: registration.capabilities,
       registrationId: registration.registrationId,
       providerId: registration.config.providerId,
@@ -233,13 +287,31 @@ export class AdapterRegistry {
       adapterId: adapter.id,
       adapterVersion: adapter.version,
       encoderId: adapter.encoderId,
-      encoderVersion: adapter.encoderVersion,
+      encoderVersion,
       baseUrl: registration.baseUrl,
       credentialRef: registration.config.credentialRef,
+      timeouts: registration.timeouts,
       retryPolicy: registration.retryPolicy,
       headers: registration.headers,
+      ...(registration.cacheRetention === undefined ? {} : { cacheRetention: registration.cacheRetention.value }),
       generation: this.generationCounter
     });
+  }
+
+  /** No fallback dispatch: retries reuse this exact pin, including its credential reference. */
+  pinVirtual(selection: VirtualRouteSelection): PinnedRoute {
+    const { decision } = selection;
+    if (decision.selectedModel.provider !== decision.selectedProvider.id) {
+      throw new LlmRouteError("AMC_LLM_ROUTE_INVALID", "routing decision model/provider disagree");
+    }
+    const pinned = this.pin({ providerId: decision.selectedProvider.id, model: decision.selectedModel.id });
+    if (normalizeBaseUrl(decision.selectedProvider.baseUrl, pinned.providerId) !== pinned.baseUrl) {
+      throw new LlmRouteError("AMC_LLM_ROUTE_INVALID", "routing decision endpoint does not match the configured native route");
+    }
+    const routingDecision = parseVirtualRoutingDecision({ schemaVersion: 1, intent: selection.intent,
+      strategy: decision.strategy, reason: decision.reason, physicalRouteDigest: physicalRouteDigest(pinned.physicalRoute) }, pinned.physicalRoute);
+    if (routingDecision === null) throw new LlmRouteError("AMC_LLM_ROUTE_INVALID", "virtual routing intent or decision is invalid");
+    return Object.freeze({ ...pinned, routingDecision });
   }
 
   private install(config: LlmRouteConfig): string {
@@ -252,19 +324,48 @@ export class AdapterRegistry {
         `route ${config.providerId} declares an empty model list; use null to serve any model`
       );
     }
+    const baseUrl = normalizeBaseUrl(config.baseUrl, config.providerId);
+    const protocol = catalogProtocolForEncoder(config.adapter.encoderId) ?? config.adapter.capabilities?.protocol ?? null;
+    const reviewedModels = new Map<string, ModelMetadataSnapshot>();
+    for (const value of config.reviewedModels ?? []) {
+      const snapshot = parseModelMetadataSnapshot(value);
+      if (snapshot === null || snapshot.providerId !== config.providerId || snapshot.protocol !== protocol
+        || (config.models !== null && !config.models.includes(snapshot.model)) || reviewedModels.has(snapshot.model)) {
+        throw new LlmRouteError("AMC_LLM_ROUTE_INVALID", "reviewed model metadata is invalid, duplicate or incompatible with the configured route");
+      }
+      reviewedModels.set(snapshot.model, snapshot);
+    }
+    let timeouts: LlmStreamTimeouts;
+    try { timeouts = resolveStreamTimeouts(config); } catch (error) {
+      throw new LlmRouteError("AMC_LLM_ROUTE_INVALID", `route ${config.providerId}: ${error instanceof Error ? error.message : "invalid stream timeouts"}`);
+    }
+    const cacheRetention = routeCacheRetention(config);
+    const retryPolicy = resolveRetryPolicy(config.retry, `llm.routes.${config.providerId}.retry`);
+    const headers = normalizeHeaders(config.headers);
+    const capabilities = snapshotCapabilities(config.adapter.capabilities);
+    // Commit configuration changes across restarts without persisting auth references or header values.
+    const routeConfigDigest = sha256Hex(canonicalize({ providerId: config.providerId, baseUrl,
+      adapterId: config.adapter.id, adapterVersion: config.adapter.version, encoderId: config.adapter.encoderId,
+      encoderVersion: config.adapter.encoderVersion, credentialRef: config.credentialRef,
+      headers, retryPolicy, timeouts, models: config.models, capabilities,
+      ...(cacheRetention === undefined ? {} : { cacheRetention }) }));
     this.registrationCounter += 1;
     this.generationCounter += 1;
     const registrationId = `${config.providerId}#${this.registrationCounter}`;
     this.routes.set(config.providerId, {
-      capabilities: snapshotCapabilities(config.adapter.capabilities),
+      routeConfigDigest,
+      reviewedModels,
+      capabilities,
       registrationId,
-      config,
-      baseUrl: normalizeBaseUrl(config.baseUrl, config.providerId),
+      config: Object.freeze({ ...config, models: config.models === null ? null : Object.freeze([...config.models]) }),
+      baseUrl,
       // Resolved and frozen HERE, not at dispatch: an in-flight failure must be
       // judged by the policy in force when its request was sent, not by whatever
       // a later edit put in the registry.
-      retryPolicy: resolveRetryPolicy(config.retry, `llm.routes.${config.providerId}.retry`),
-      headers: normalizeHeaders(config.headers)
+      timeouts,
+      retryPolicy,
+      headers,
+      ...(cacheRetention === undefined ? {} : { cacheRetention })
     });
     return registrationId;
   }

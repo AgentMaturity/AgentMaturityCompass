@@ -1,0 +1,259 @@
+{
+ "schemaVersion": 1,
+ "key": "P2-23",
+ "date": "2026-10-28",
+ "commit": "6efebd13e6d45b551fbb9683b3ce1bc4ae4b57d5",
+ "branch": "rtd/p2-23-lifecycle",
+ "base": "18b7ead85",
+ "node": "v22.23.3",
+ "pnpm": "10.33.0",
+ "os": "macOS 26.6.2",
+ "arch": "arm64",
+ "commands": [
+  {
+   "cmd": "npm run -s build",
+   "exit": 0
+  },
+  {
+   "cmd": "npm run -s typecheck",
+   "exit": 0
+  },
+  {
+   "cmd": "npm run -s typecheck:tests",
+   "exit": 0
+  },
+  {
+   "cmd": "npm run -s lint",
+   "exit": 0
+  },
+  {
+   "cmd": "npm run -s check:gates",
+   "exit": 0
+  },
+  {
+   "cmd": "npm run -s check:dead-code",
+   "exit": 0
+  },
+  {
+   "cmd": "npm run -s check:duplicates",
+   "exit": 0
+  },
+  {
+   "cmd": "npm run -s check:counts",
+   "exit": 0
+  },
+  {
+   "cmd": "npm run -s check:api-ref",
+   "exit": 0
+  },
+  {
+   "cmd": "npm run -s check:docs-drift",
+   "exit": 0
+  },
+  {
+   "cmd": "npm run -s check:architecture-boundaries",
+   "exit": 0
+  },
+  {
+   "cmd": "node scripts/gen-counts.mjs --write && node scripts/check-freeze.mjs --write-baseline",
+   "exit": 0
+  },
+  {
+   "cmd": "npx vitest run --maxWorkers=2 <146 related test files: every test importing a changed module, plus tests/lifecycle and tests/api/lifecycleRouter.test.ts>",
+   "exit": 0,
+   "testFiles": 146,
+   "tests": 2277,
+   "failed": 0
+  },
+  {
+   "cmd": "npx vitest run tests/lifecycle tests/api/lifecycleRouter.test.ts --maxWorkers=2 (new P2-23 tests)",
+   "exit": 0
+  }
+ ],
+ "newTests": {
+  "tests/lifecycle/governanceLifecycle.test.ts": 6,
+  "tests/lifecycle/reassessmentTriggers.test.ts": 8,
+  "tests/lifecycle/admission.test.ts": 5,
+  "tests/lifecycle/retirement.test.ts": 2,
+  "tests/lifecycle/legacyMigration.test.ts": 3,
+  "tests/api/lifecycleRouter.test.ts": 2
+ },
+ "artifacts": {
+  "mutations.json": "eaacd97b591e2049eebd50d06f38c62e5b463acaec23c094367ab493d4561438",
+  "sample-event-trail.json": "8fe828cee80e191f83ab8b3c1c45ed2aea560130496182ce8de6723c5a0bc1db"
+ },
+ "pending": [
+  "full suite run (integrator)",
+  "freeze allowedExceptionKeys entry for P2-23 (integrator)",
+  "Sid decision: hold never-migrated agents under an enforcing plan, or keep the migration opt-in"
+ ],
+ "securityReview": {
+  "commit": "51ab20745",
+  "checks": [
+   {
+    "cmd": "npm run -s typecheck",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s typecheck:tests",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s lint",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s check:gates",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s check:dead-code",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s check:duplicates",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s check:counts",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s check:api-ref",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s check:docs-drift",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s check:architecture-boundaries",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s build",
+    "exit": 0
+   }
+  ],
+  "relatedTests": {
+   "testFiles": 159,
+   "tests": 2419,
+   "failed": 0
+  },
+  "mutations": "mutations-security-review.json",
+  "red": "red-before-security-fixes.txt"
+ },
+ "heldAgents": {
+  "commit": "db74b9cef",
+  "checks": [
+   {
+    "cmd": "npm run -s typecheck",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s typecheck:tests",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s lint",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s check:gates",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s check:dead-code",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s check:duplicates",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s check:counts",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s check:api-ref",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s check:docs-drift",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s check:architecture-boundaries",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s build",
+    "exit": 0
+   }
+  ],
+  "relatedTests": {
+   "testFiles": 181,
+   "tests": 2575,
+   "failedBeforeImportOrderFix": 3,
+   "note": "the 3 entryPoints failures were the test's mock import order (fixed); tests/lifecycle + lifecycleRouter rerun 15 files / 56 tests passed"
+  },
+  "mutations": "mutations-held-agents.json",
+  "red": "red-before-held-agents.txt"
+ },
+ "advisoryHold": {
+  "commit": "0981eff04",
+  "checks": [
+   {
+    "cmd": "npm run -s build",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s typecheck",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s typecheck:tests",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s lint",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s check:gates",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s check:dead-code",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s check:duplicates",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s check:counts",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s check:api-ref",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s check:docs-drift",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s check:architecture-boundaries",
+    "exit": 0
+   }
+  ],
+  "relatedTests": {
+   "testFiles": 181,
+   "tests": 2576,
+   "failed": 0
+  },
+  "mutations": "mutations-advisory-hold.json",
+  "red": "red-before-advisory-hold.txt"
+ }
+}

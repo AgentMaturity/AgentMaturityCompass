@@ -1,0 +1,324 @@
+{
+  "commit": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+  "report": "/private/tmp/p0-47-accepted-main-parity-baseline-20261014.json",
+  "reportSha256": "edf01d678127d5d80a12b9b27d7496c6b3bfbbd896a2e8c10d4191c1415593fd",
+  "tests": {
+    "total": 7113,
+    "passed": 7051,
+    "failed": 62,
+    "pending": 0
+  },
+  "success": false,
+  "failures": [
+    {
+      "file": "archiveFilesParity.test.ts",
+      "name": "archive file utility parity: src/audit/binderArtifact.ts preserves extraction bounds, all verifiers, domain errors and public APIs",
+      "message": "AssertionError: expected 'import { mkdtempSync, readFileSync, r\u2026' to be 'import { mkdtempSync, readFileSync, r\u2026' // Object.is equality"
+    },
+    {
+      "file": "explainabilityContractParity.test.ts",
+      "name": "explainability shared contracts retain complete original exported flows uses existing literal report inputs and exercises every changed domain with a ready original receipt",
+      "message": "AssertionError: expected '{\"generatedAt\":\"2026-06-13T00:00:00.0\u2026' to be '{\"generatedAt\":\"2026-06-13T00:00:00.0\u2026' // Object.is equality"
+    },
+    {
+      "file": "explainabilityContractParity.test.ts",
+      "name": "explainability shared contracts retain complete original exported flows ragFlowDiagnostics: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "message": "AssertionError: expected '{\"generatedAt\":\"2026-06-13T00:00:00.0\u2026' to be '{\"generatedAt\":\"2026-06-13T00:00:00.0\u2026' // Object.is equality"
+    },
+    {
+      "file": "explainabilityContractParity.test.ts",
+      "name": "explainability shared contracts retain complete original exported flows incidentTriageLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "message": "AssertionError: expected '{\"generatedAt\":\"2026-06-14T00:00:00.0\u2026' to be '{\"generatedAt\":\"2026-06-14T00:00:00.0\u2026' // Object.is equality"
+    },
+    {
+      "file": "explainabilityContractParity.test.ts",
+      "name": "explainability shared contracts retain complete original exported flows benchmarkSubmissionLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "message": "AssertionError: expected '{\"generatedAt\":\"2026-06-14T00:00:00.0\u2026' to be '{\"generatedAt\":\"2026-06-14T00:00:00.0\u2026' // Object.is equality"
+    },
+    {
+      "file": "explainabilityContractParity.test.ts",
+      "name": "explainability shared contracts retain complete original exported flows testSuiteEvaluationLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "message": "AssertionError: expected '{\"generatedAt\":\"2026-06-20T00:00:00.0\u2026' to be '{\"generatedAt\":\"2026-06-20T00:00:00.0\u2026' // Object.is equality"
+    },
+    {
+      "file": "explainabilityContractParity.test.ts",
+      "name": "explainability shared contracts retain complete original exported flows evalAiLibraryQuestionLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "message": "AssertionError: expected '{\"generatedAt\":\"2026-06-20T00:00:00.0\u2026' to be '{\"generatedAt\":\"2026-06-20T00:00:00.0\u2026' // Object.is equality"
+    },
+    {
+      "file": "explainabilityContractParity.test.ts",
+      "name": "explainability shared contracts retain complete original exported flows openModelRagQuestionLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "message": "AssertionError: expected '{\"generatedAt\":\"2026-06-20T00:00:00.0\u2026' to be '{\"generatedAt\":\"2026-06-20T00:00:00.0\u2026' // Object.is equality"
+    },
+    {
+      "file": "explainabilityContractParity.test.ts",
+      "name": "explainability shared contracts retain complete original exported flows opikEvaluationQuestionLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "message": "AssertionError: expected '{\"generatedAt\":\"2026-06-20T00:00:00.0\u2026' to be '{\"generatedAt\":\"2026-06-20T00:00:00.0\u2026' // Object.is equality"
+    },
+    {
+      "file": "explainabilityContractParity.test.ts",
+      "name": "explainability shared contracts retain complete original exported flows deepEvalQuestionLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "message": "AssertionError: expected '{\"generatedAt\":\"2026-06-20T00:00:00.0\u2026' to be '{\"generatedAt\":\"2026-06-20T00:00:00.0\u2026' // Object.is equality"
+    },
+    {
+      "file": "explainabilityContractParity.test.ts",
+      "name": "explainability shared contracts retain complete original exported flows statisticalAgentTrialLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "message": "AssertionError: expected '{\"generatedAt\":\"2026-06-19T00:00:00.0\u2026' to be '{\"generatedAt\":\"2026-06-19T00:00:00.0\u2026' // Object.is equality"
+    },
+    {
+      "file": "explainabilityContractParity.test.ts",
+      "name": "explainability shared contracts retain complete original exported flows codeQuestQualityLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "message": "AssertionError: expected '{\"generatedAt\":\"2026-06-19T00:00:00.0\u2026' to be '{\"generatedAt\":\"2026-06-19T00:00:00.0\u2026' // Object.is equality"
+    },
+    {
+      "file": "explainabilityContractParity.test.ts",
+      "name": "explainability shared contracts retain complete original exported flows multiUserBenchmarkLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "message": "AssertionError: expected '{\"generatedAt\":\"2026-06-16T00:00:00.0\u2026' to be '{\"generatedAt\":\"2026-06-16T00:00:00.0\u2026' // Object.is equality"
+    },
+    {
+      "file": "explainabilityContractParity.test.ts",
+      "name": "explainability shared contracts retain complete original exported flows professionalTaskLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "message": "AssertionError: expected '{\"generatedAt\":\"2026-06-16T00:00:00.0\u2026' to be '{\"generatedAt\":\"2026-06-16T00:00:00.0\u2026' // Object.is equality"
+    },
+    {
+      "file": "explainabilityContractParity.test.ts",
+      "name": "explainability shared contracts retain complete original exported flows iotFirmwareQuestionLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "message": "AssertionError: expected '{\"generatedAt\":\"2026-06-17T00:00:00.0\u2026' to be '{\"generatedAt\":\"2026-06-17T00:00:00.0\u2026' // Object.is equality"
+    },
+    {
+      "file": "explainabilityContractParity.test.ts",
+      "name": "explainability shared contracts retain complete original exported flows retailSalesQuestionLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "message": "AssertionError: expected '{\"generatedAt\":\"2026-06-17T00:00:00.0\u2026' to be '{\"generatedAt\":\"2026-06-17T00:00:00.0\u2026' // Object.is equality"
+    },
+    {
+      "file": "explainabilityContractParity.test.ts",
+      "name": "explainability shared contracts retain complete original exported flows continualLearningBenchmarkLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "message": "AssertionError: expected '{\"generatedAt\":\"2026-06-17T00:00:00.0\u2026' to be '{\"generatedAt\":\"2026-06-17T00:00:00.0\u2026' // Object.is equality"
+    },
+    {
+      "file": "explainabilityContractParity.test.ts",
+      "name": "explainability shared contracts retain complete original exported flows hermesTurboPerformanceLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "message": "AssertionError: expected '{\"generatedAt\":\"2026-06-19T00:00:00.0\u2026' to be '{\"generatedAt\":\"2026-06-19T00:00:00.0\u2026' // Object.is equality"
+    },
+    {
+      "file": "explainabilityContractParity.test.ts",
+      "name": "explainability shared contracts retain complete original exported flows obsStudioDrilldownLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "message": "AssertionError: expected '{\"generatedAt\":\"2026-06-13T00:00:00.0\u2026' to be '{\"generatedAt\":\"2026-06-13T00:00:00.0\u2026' // Object.is equality"
+    },
+    {
+      "file": "explainabilityContractParity.test.ts",
+      "name": "explainability shared contracts retain complete original exported flows scorableStudioDrilldownLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "message": "AssertionError: expected '{\"generatedAt\":\"2026-06-20T00:00:00.0\u2026' to be '{\"generatedAt\":\"2026-06-20T00:00:00.0\u2026' // Object.is equality"
+    },
+    {
+      "file": "explainabilityContractParity.test.ts",
+      "name": "explainability shared contracts retain complete original exported flows incidentTriageProofHashes: each omitted or malformed proof retains original refusal",
+      "message": "AssertionError: expected '{\"generatedAt\":\"2026-06-14T00:00:00.0\u2026' to be '{\"generatedAt\":\"2026-06-14T00:00:00.0\u2026' // Object.is equality"
+    },
+    {
+      "file": "explainabilityContractParity.test.ts",
+      "name": "explainability shared contracts retain complete original exported flows benchmarkSubmissionProofHashes: each omitted or malformed proof retains original refusal",
+      "message": "AssertionError: expected '{\"generatedAt\":\"2026-06-14T00:00:00.0\u2026' to be '{\"generatedAt\":\"2026-06-14T00:00:00.0\u2026' // Object.is equality"
+    },
+    {
+      "file": "explainabilityContractParity.test.ts",
+      "name": "explainability shared contracts retain complete original exported flows multiUserBenchmarkProofHashes: each omitted or malformed proof retains original refusal",
+      "message": "AssertionError: expected '{\"generatedAt\":\"2026-06-16T00:00:00.0\u2026' to be '{\"generatedAt\":\"2026-06-16T00:00:00.0\u2026' // Object.is equality"
+    },
+    {
+      "file": "explainabilityContractParity.test.ts",
+      "name": "explainability shared contracts retain complete original exported flows continualLearningBenchmarkProofHashes: each omitted or malformed proof retains original refusal",
+      "message": "AssertionError: expected '{\"generatedAt\":\"2026-06-17T00:00:00.0\u2026' to be '{\"generatedAt\":\"2026-06-17T00:00:00.0\u2026' // Object.is equality"
+    },
+    {
+      "file": "explainabilityContractParity.test.ts",
+      "name": "explainability shared contracts retain complete original exported flows hermesTurboPerformanceProofHashes: each omitted or malformed proof retains original refusal",
+      "message": "AssertionError: expected '{\"generatedAt\":\"2026-06-19T00:00:00.0\u2026' to be '{\"generatedAt\":\"2026-06-19T00:00:00.0\u2026' // Object.is equality"
+    },
+    {
+      "file": "explainabilityContractParity.test.ts",
+      "name": "explainability shared contracts retain complete original exported flows iotFirmwareQuestionProofHashes: each omitted or malformed proof retains original refusal",
+      "message": "AssertionError: expected '{\"generatedAt\":\"2026-06-17T00:00:00.0\u2026' to be '{\"generatedAt\":\"2026-06-17T00:00:00.0\u2026' // Object.is equality"
+    },
+    {
+      "file": "explainabilityContractParity.test.ts",
+      "name": "explainability shared contracts retain complete original exported flows retailSalesQuestionProofHashes: each omitted or malformed proof retains original refusal",
+      "message": "AssertionError: expected '{\"generatedAt\":\"2026-06-17T00:00:00.0\u2026' to be '{\"generatedAt\":\"2026-06-17T00:00:00.0\u2026' // Object.is equality"
+    },
+    {
+      "file": "explainabilityContractParity.test.ts",
+      "name": "explainability shared contracts retain complete original exported flows scorableStudioDrilldownProofHashes: each omitted or malformed proof retains original refusal",
+      "message": "AssertionError: expected '{\"generatedAt\":\"2026-06-20T00:00:00.0\u2026' to be '{\"generatedAt\":\"2026-06-20T00:00:00.0\u2026' // Object.is equality"
+    },
+    {
+      "file": "explainabilityContractParity.test.ts",
+      "name": "explainability shared contracts retain complete original exported flows obsStudioDrilldownProofHashes: each omitted or malformed proof retains original refusal",
+      "message": "AssertionError: expected '{\"generatedAt\":\"2026-06-13T00:00:00.0\u2026' to be '{\"generatedAt\":\"2026-06-13T00:00:00.0\u2026' // Object.is equality"
+    },
+    {
+      "file": "privateModuleHelperVisibility.test.ts",
+      "name": "individually reviewed module-private helper visibility retains the exact finite declaration manifest and supported package entries",
+      "message": "AssertionError: expected '1351dd56270ba66159a5b5fd3747e5969b2d2\u2026' to be 'de1469cf447c9ccf8a22fef1ebcce716b3af7\u2026' // Object.is equality"
+    },
+    {
+      "file": "signedArtifactVerificationParity.test.ts",
+      "name": "entire archived signed artifact workflows against real local signatures binder real signatures verify through embedded, explicit and workspace trust paths",
+      "message": "AssertionError: expected '{\"ok\":true,\"binder\":{\"v\":1,\"binderId\"\u2026' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId\u2026' // Object.is equality"
+    },
+    {
+      "file": "signedArtifactVerificationParity.test.ts",
+      "name": "entire archived signed artifact workflows against real local signatures binder public argument getters keep the original access order",
+      "message": "AssertionError: expected { ok: true, \u2026(3) } to deeply equal Object{ ok: false, \u2026(3) }"
+    },
+    {
+      "file": "signedArtifactVerificationParity.test.ts",
+      "name": "entire archived signed artifact workflows against real local signatures binder preserves renamed child root discovery",
+      "message": "AssertionError: expected '{\"ok\":true,\"binder\":{\"v\":1,\"binderId\"\u2026' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId\u2026' // Object.is equality"
+    },
+    {
+      "file": "signedArtifactVerificationParity.test.ts",
+      "name": "entire archived signed artifact workflows against real local signatures binder preserves flat root root discovery",
+      "message": "AssertionError: expected '{\"ok\":true,\"binder\":{\"v\":1,\"binderId\"\u2026' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId\u2026' // Object.is equality"
+    },
+    {
+      "file": "signedArtifactVerificationParity.test.ts",
+      "name": "entire archived signed artifact workflows against real local signatures binder tampered digest refuses",
+      "message": "AssertionError: expected '{\"ok\":false,\"binder\":{\"v\":1,\"binderId\u2026' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId\u2026' // Object.is equality"
+    },
+    {
+      "file": "signedArtifactVerificationParity.test.ts",
+      "name": "entire archived signed artifact workflows against real local signatures binder tampered signature refuses",
+      "message": "AssertionError: expected '{\"ok\":false,\"binder\":{\"v\":1,\"binderId\u2026' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId\u2026' // Object.is equality"
+    },
+    {
+      "file": "signedArtifactVerificationParity.test.ts",
+      "name": "entire archived signed artifact workflows against real local signatures binder tampered envelope mismatch refuses",
+      "message": "AssertionError: expected '{\"ok\":false,\"binder\":{\"v\":1,\"binderId\u2026' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId\u2026' // Object.is equality"
+    },
+    {
+      "file": "signedArtifactVerificationParity.test.ts",
+      "name": "entire archived signed artifact workflows against real local signatures binder privacy missing scan retains the domain policy",
+      "message": "AssertionError: expected '{\"ok\":false,\"binder\":{\"v\":1,\"binderId\u2026' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId\u2026' // Object.is equality"
+    },
+    {
+      "file": "signedArtifactVerificationParity.test.ts",
+      "name": "entire archived signed artifact workflows against real local signatures binder privacy failed scan retains the domain policy",
+      "message": "AssertionError: expected '{\"ok\":false,\"binder\":{\"v\":1,\"binderId\u2026' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId\u2026' // Object.is equality"
+    },
+    {
+      "file": "signedArtifactVerificationParity.test.ts",
+      "name": "entire archived signed artifact workflows against real local signatures binder privacy checksum mismatch retains the domain policy",
+      "message": "AssertionError: expected '{\"ok\":false,\"binder\":{\"v\":1,\"binderId\u2026' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId\u2026' // Object.is equality"
+    },
+    {
+      "file": "signedArtifactVerificationParity.test.ts",
+      "name": "entire archived signed artifact workflows against real local signatures binder privacy missing checksum retains the domain policy",
+      "message": "AssertionError: expected '{\"ok\":false,\"binder\":{\"v\":1,\"binderId\u2026' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId\u2026' // Object.is equality"
+    },
+    {
+      "file": "signedArtifactVerificationParity.test.ts",
+      "name": "entire archived signed artifact workflows against real local signatures binder absent inclusion directory and ignored suffixes preserve existing proof admission",
+      "message": "AssertionError: expected '{\"ok\":true,\"binder\":{\"v\":1,\"binderId\"\u2026' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId\u2026' // Object.is equality"
+    },
+    {
+      "file": "signedArtifactVerificationParity.test.ts",
+      "name": "entire archived signed artifact workflows against real local signatures binder multiple privacy failures retain error order and checksum whitespace behavior",
+      "message": "AssertionError: expected '{\"ok\":false,\"binder\":{\"v\":1,\"binderId\u2026' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId\u2026' // Object.is equality"
+    },
+    {
+      "file": "signedArtifactVerificationParity.test.ts",
+      "name": "entire archived signed artifact workflows against real local signatures binder root and calculation-manifest hash tampering refuses",
+      "message": "AssertionError: expected '{\"ok\":false,\"binder\":{\"v\":1,\"binderId\u2026' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId\u2026' // Object.is equality"
+    },
+    {
+      "file": "signedArtifactVerificationParity.test.ts",
+      "name": "entire archived signed artifact workflows against real local signatures passport real signatures verify through embedded, explicit and workspace trust paths",
+      "message": "AssertionError: expected '{\"ok\":true,\"passport\":{\"v\":1,\"passpor\u2026' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo\u2026' // Object.is equality"
+    },
+    {
+      "file": "signedArtifactVerificationParity.test.ts",
+      "name": "entire archived signed artifact workflows against real local signatures passport public argument getters keep the original access order",
+      "message": "AssertionError: expected { ok: true, \u2026(3) } to deeply equal Object{ ok: false, \u2026(3) }"
+    },
+    {
+      "file": "signedArtifactVerificationParity.test.ts",
+      "name": "entire archived signed artifact workflows against real local signatures passport preserves renamed child root discovery",
+      "message": "AssertionError: expected '{\"ok\":true,\"passport\":{\"v\":1,\"passpor\u2026' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo\u2026' // Object.is equality"
+    },
+    {
+      "file": "signedArtifactVerificationParity.test.ts",
+      "name": "entire archived signed artifact workflows against real local signatures passport preserves flat root root discovery",
+      "message": "AssertionError: expected '{\"ok\":true,\"passport\":{\"v\":1,\"passpor\u2026' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo\u2026' // Object.is equality"
+    },
+    {
+      "file": "signedArtifactVerificationParity.test.ts",
+      "name": "entire archived signed artifact workflows against real local signatures passport tampered digest refuses",
+      "message": "AssertionError: expected '{\"ok\":false,\"passport\":{\"v\":1,\"passpo\u2026' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo\u2026' // Object.is equality"
+    },
+    {
+      "file": "signedArtifactVerificationParity.test.ts",
+      "name": "entire archived signed artifact workflows against real local signatures passport tampered signature refuses",
+      "message": "AssertionError: expected '{\"ok\":false,\"passport\":{\"v\":1,\"passpo\u2026' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo\u2026' // Object.is equality"
+    },
+    {
+      "file": "signedArtifactVerificationParity.test.ts",
+      "name": "entire archived signed artifact workflows against real local signatures passport tampered envelope mismatch refuses",
+      "message": "AssertionError: expected '{\"ok\":false,\"passport\":{\"v\":1,\"passpo\u2026' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo\u2026' // Object.is equality"
+    },
+    {
+      "file": "signedArtifactVerificationParity.test.ts",
+      "name": "entire archived signed artifact workflows against real local signatures passport privacy missing scan retains the domain policy",
+      "message": "AssertionError: expected '{\"ok\":false,\"passport\":{\"v\":1,\"passpo\u2026' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo\u2026' // Object.is equality"
+    },
+    {
+      "file": "signedArtifactVerificationParity.test.ts",
+      "name": "entire archived signed artifact workflows against real local signatures passport privacy failed scan retains the domain policy",
+      "message": "AssertionError: expected '{\"ok\":false,\"passport\":{\"v\":1,\"passpo\u2026' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo\u2026' // Object.is equality"
+    },
+    {
+      "file": "signedArtifactVerificationParity.test.ts",
+      "name": "entire archived signed artifact workflows against real local signatures passport privacy checksum mismatch retains the domain policy",
+      "message": "AssertionError: expected '{\"ok\":false,\"passport\":{\"v\":1,\"passpo\u2026' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo\u2026' // Object.is equality"
+    },
+    {
+      "file": "signedArtifactVerificationParity.test.ts",
+      "name": "entire archived signed artifact workflows against real local signatures passport privacy missing checksum retains the domain policy",
+      "message": "AssertionError: expected '{\"ok\":true,\"passport\":{\"v\":1,\"passpor\u2026' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo\u2026' // Object.is equality"
+    },
+    {
+      "file": "signedArtifactVerificationParity.test.ts",
+      "name": "entire archived signed artifact workflows against real local signatures passport absent inclusion directory and ignored suffixes preserve existing proof admission",
+      "message": "AssertionError: expected '{\"ok\":true,\"passport\":{\"v\":1,\"passpor\u2026' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo\u2026' // Object.is equality"
+    },
+    {
+      "file": "signedArtifactVerificationParity.test.ts",
+      "name": "entire archived signed artifact workflows against real local signatures passport multiple privacy failures retain error order and checksum whitespace behavior",
+      "message": "AssertionError: expected '{\"ok\":false,\"passport\":{\"v\":1,\"passpo\u2026' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo\u2026' // Object.is equality"
+    },
+    {
+      "file": "signedArtifactVerificationParity.test.ts",
+      "name": "entire archived signed artifact workflows against real local signatures passport root and calculation-manifest hash tampering refuses",
+      "message": "AssertionError: expected '{\"ok\":false,\"passport\":{\"v\":1,\"passpo\u2026' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo\u2026' // Object.is equality"
+    },
+    {
+      "file": "signedArtifactVerificationParity.test.ts",
+      "name": "entire archived signed artifact workflows against real local signatures multiple unbound expected proof ids refuse even when their input order differs",
+      "message": "AssertionError: expected '{\"ok\":false,\"binder\":{\"v\":1,\"binderId\u2026' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId\u2026' // Object.is equality"
+    },
+    {
+      "file": "signedArtifactVerificationParity.test.ts",
+      "name": "entire archived signed artifact workflows against real local signatures workspace verification reports every refusal from a tampered registered binder",
+      "message": "AssertionError: expected '{\"ok\":false,\"binder\":{\"v\":1,\"binderId\u2026' to be '{\"ok\":false,\"binder\":{\"v\":1,\"binderId\u2026' // Object.is equality"
+    },
+    {
+      "file": "signedArtifactVerificationParity.test.ts",
+      "name": "entire archived signed artifact workflows against real local signatures passport revocation remains enforced with workspace trust",
+      "message": "AssertionError: expected '{\"ok\":false,\"passport\":{\"v\":1,\"passpo\u2026' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo\u2026' // Object.is equality"
+    },
+    {
+      "file": "signedArtifactVerificationParity.test.ts",
+      "name": "entire archived signed artifact workflows against real local signatures passport expiry is enforced without changing the signed document",
+      "message": "AssertionError: expected '{\"ok\":false,\"passport\":{\"v\":1,\"passpo\u2026' to be '{\"ok\":false,\"passport\":{\"v\":1,\"passpo\u2026' // Object.is equality"
+    }
+  ]
+}

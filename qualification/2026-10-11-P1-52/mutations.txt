@@ -1,0 +1,43 @@
+P1-52 mutation checks, local macOS arm64, Node v25.5.0, 2026-10-11.
+Each mutation was applied to scripts/source-quality.mjs (or the committed baseline), then
+`npx vitest run tests/sourceQualityRatchet.test.ts` was run, then the file was restored
+byte-for-byte from a copy (cmp confirmed).
+
+1. ignore-newIds (spec mutation 1): compareToBaseline returns `newIds: []`.
+   Result: 6 failed | 8 passed (14), including
+   "fails on one new duplicate pair and names both paths".
+
+2. shrink-adds (spec mutation 2): --shrink also appends the current new findings to the baseline.
+   Result: 1 failed | 13 passed (14):
+   "--shrink with new and stale findings removes the stale ids and adds nothing".
+
+3. reason-min: the `reason.trim().length < MIN_REASON` refusal is disabled.
+   Result: 1 failed | 13 passed (14):
+   "accepts a new finding only with a recorded reason of at least 20 characters".
+
+4. drift-off: the tool-version/config-hash drift test is disabled.
+   Result: 1 failed | 13 passed (14):
+   "fails with the drift message when .jscpd.json or a tool version changes".
+
+5. Committed-baseline pin (test added after the baseline commit; 15 tests in the file):
+   a. jscpdSha256 in scripts/quality/source-quality-baseline.json changed by one hex digit
+      -> "commits a valid baseline under 1 MB for the current configs" fails.
+   b. an accepted entry with reason "ok" added by hand
+      -> the same test fails with "has no valid recorded reason".
+   The baseline was restored from a copy; `git status` showed it unchanged.
+
+6. Base-branch subset check (added after the coordinator's review; 16 tests in the file):
+   a. baseCheck ignores additions (`filter(() => false)`)
+      -> "refuses baseline entries missing from the base branch's baseline unless accepted (temp git repo)" fails.
+   b. an unreadable base returns exit 0 instead of failing closed
+      -> the same test fails.
+   The script was restored from a copy (cmp confirmed).
+
+7. Rebaseline-record rule (coordinator decision; the temp-git-repo test asserts each failure path:
+   no record, a record from other values, a wrong count, a short reason or empty author (parse),
+   no real version/hash change, an added entry not produced by the scan):
+   a. the record match ignores toolFrom/toolTo (`scan === scan || ...`)
+      -> "refuses baseline entries missing from the base branch's baseline unless accepted (temp git repo)" fails.
+   b. the real-change requirement is disabled (`if (false)`)
+      -> the same test fails.
+   The script was restored from a copy (cmp confirmed).

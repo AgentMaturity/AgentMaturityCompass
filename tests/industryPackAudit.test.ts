@@ -1,15 +1,29 @@
-import { describe, expect, test } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { initWorkspace } from "../src/workspace.js";
+import { renderClaimLegend } from "../src/claims/eligibility/render.js";
 import { getPackById } from "../src/domains/industryPacks.js";
 import {
   buildIndustryPackAudit,
+  signIndustryPackAudit,
   verifyIndustryPackAuditChecksum,
   renderIndustryPackAuditMarkdown,
   normalizeAuditFramework,
+  computePackCurrency,
   AUDIT_FRAMEWORKS,
+  INDUSTRY_PACK_AUDIT_SCHEMA_VERSION,
   type IndustryPackAudit,
+  type PackCurrencyFields,
 } from "../src/domains/industryPackAudit.js";
 
 const NOW = 1_700_000_000_000;
+const roots: string[] = [];
+afterEach(() => {
+  for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true });
+  vi.unstubAllEnvs();
+});
 
 function pack() {
   const p = getPackById("clinical-trials");
@@ -74,7 +88,7 @@ describe("industry pack audit", () => {
       expect(c.status).toBe("PASS");
       expect(c.remediation).toBeNull();
     }
-    expect(clean.overall.percentage).toBeGreaterThanOrEqual(gaps.overall.percentage);
+    expect(clean.overall.percentage!).toBeGreaterThanOrEqual(gaps.overall.percentage!); // both answer every control
   });
 
   test("status thresholds: L5 PASS, L3 ADEQUATE, L1 GAP", () => {
@@ -102,11 +116,127 @@ describe("industry pack audit", () => {
   });
 
   test("renders an auditor-ready markdown report", () => {
-    const md = renderIndustryPackAuditMarkdown(buildIndustryPackAudit({ pack: pack(), responses: responsesAll(1), now: NOW }));
+    const audit = buildIndustryPackAudit({ pack: pack(), responses: responsesAll(1), now: NOW });
+    const md = renderIndustryPackAuditMarkdown(audit);
     expect(md).toContain("# Industry Pack Audit — ");
     expect(md).toContain("## Framework coverage");
     expect(md).toContain("## Controls");
     expect(md).toContain("Checksum only — not signed (`sha256:");
     expect(md).toContain("```yaml");
+    expect(md).toContain(renderClaimLegend("markdown"));
+    for (const control of audit.controls) {
+      const section = md.split(`### ${control.id} —`)[1]!.split("\n\n")[0];
+      expect(section, control.id).toContain("**Claim:** Self-reported · **Result:** not evaluated");
+    }
+    expect(md.split("\n").filter((line) => line.startsWith("**Claim:**"))).toHaveLength(audit.controls.length + 1);
+    expect(md.split("\n").filter((line) => line.startsWith("**Claim:**"))).toMatchSnapshot();
+  });
+
+  test("a real auditor signature never promotes self-assessment report claims", () => {
+    const workspace = mkdtempSync(join(tmpdir(), "amc-pack-report-claims-"));
+    roots.push(workspace);
+    vi.stubEnv("AMC_VAULT_PASSPHRASE", "industry-report-claims-test");
+    initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+    const signed = signIndustryPackAudit(workspace, buildIndustryPackAudit({ pack: pack(), responses: responsesAll(5), now: NOW }));
+    expect(signed.signature).not.toBeNull();
+    const md = renderIndustryPackAuditMarkdown(signed);
+    expect(md).toContain("Signature: auditor key");
+    const claims = md.split("\n").filter((line) => line.startsWith("**Claim:**"));
+    expect(claims).toHaveLength(signed.controls.length + 1);
+    for (const line of claims) expect(line).toContain("**Claim:** Self-reported · **Result:** not evaluated");
+    expect(claims).toMatchSnapshot();
+    expect(md).toContain(renderClaimLegend("markdown"));
+  });
+});
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+const isoDaysBefore = (days: number) => new Date(NOW - days * DAY_MS).toISOString().slice(0, 10);
+
+/**
+ * The pack as it ships at 8f57ce63: no version, lastReviewed or regulatoryReferences. Built by stripping
+ * those fields so these tests keep meaning the same thing once the registry packs carry them (track S3).
+ */
+function headShapePack() {
+  const { version: _version, lastReviewed: _lastReviewed, regulatoryReferences: _refs, ...rest } = pack() as ReturnType<typeof pack> & PackCurrencyFields;
+  return rest;
+}
+
+function withCurrency(fields: PackCurrencyFields) {
+  return { ...headShapePack(), ...fields };
+}
+
+const FRESH_REF = { citation: "EU AI Act Annex III point 5(a)", jurisdiction: "EU", url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj", lastReviewed: isoDaysBefore(10), status: "in-force" as const };
+
+describe("industry pack audit — regulatory currency", () => {
+  test("a pack without currency fields (HEAD shape) is undated, never current", () => {
+    const c = computePackCurrency(headShapePack(), NOW);
+    expect(c.status).toBe("undated");
+    expect(c.missing).toEqual(["version", "lastReviewed", "regulatoryReferences"]);
+    expect(c.packLastReviewed).toBeNull();
+    expect(c.referenceCount).toBe(0);
+  });
+
+  test("a missing lastReviewed is reported even when references are present", () => {
+    const c = computePackCurrency(withCurrency({ version: "2026.10", regulatoryReferences: [FRESH_REF] }), NOW);
+    expect(c.status).toBe("undated");
+    expect(c.missing).toEqual(["lastReviewed"]);
+  });
+
+  test("an unparseable or future lastReviewed counts as missing", () => {
+    expect(computePackCurrency(withCurrency({ version: "1", lastReviewed: "not-a-date", regulatoryReferences: [FRESH_REF] }), NOW).missing).toEqual(["lastReviewed"]);
+    expect(computePackCurrency(withCurrency({ version: "1", lastReviewed: isoDaysBefore(-30), regulatoryReferences: [FRESH_REF] }), NOW).missing).toEqual(["lastReviewed"]);
+  });
+
+  test("a pack reviewed longer ago than staleAfterDays is stale, age measured from now", () => {
+    const c = computePackCurrency(withCurrency({ version: "1", lastReviewed: isoDaysBefore(400), regulatoryReferences: [FRESH_REF] }), NOW);
+    expect(c.status).toBe("stale");
+    expect(c.packAgeDays).toBe(400);
+    expect(c.staleAfterDays).toBe(365);
+    expect(computePackCurrency(withCurrency({ version: "1", lastReviewed: isoDaysBefore(400), regulatoryReferences: [FRESH_REF] }), NOW, { staleAfterDays: 500 }).status).toBe("current");
+  });
+
+  test("stale and undated references are listed by citation", () => {
+    const c = computePackCurrency(withCurrency({
+      version: "1",
+      lastReviewed: isoDaysBefore(5),
+      regulatoryReferences: [
+        FRESH_REF,
+        { ...FRESH_REF, citation: "HIPAA 45 CFR 164.312", lastReviewed: isoDaysBefore(500) },
+        { citation: "GDPR Art. 9", status: "in-force" },
+      ],
+    }), NOW);
+    expect(c.status).toBe("stale");
+    expect(c.staleReferences).toEqual([{ citation: "HIPAA 45 CFR 164.312", lastReviewed: isoDaysBefore(500), ageDays: 500 }]);
+    expect(c.undatedReferences).toEqual(["GDPR Art. 9"]);
+  });
+
+  test("an unverified reference makes an otherwise fresh pack 'unverified'; all fresh is 'current'", () => {
+    const unverified = computePackCurrency(withCurrency({
+      version: "1", lastReviewed: isoDaysBefore(5),
+      regulatoryReferences: [FRESH_REF, { citation: "State AI law (draft)", lastReviewed: isoDaysBefore(5), status: "unverified" }],
+    }), NOW);
+    expect(unverified.status).toBe("unverified");
+    expect(unverified.unverifiedReferences).toEqual(["State AI law (draft)"]);
+    const current = computePackCurrency(withCurrency({ version: "1", lastReviewed: isoDaysBefore(5), regulatoryReferences: [FRESH_REF] }), NOW);
+    expect(current.status).toBe("current");
+    expect(current.missing).toEqual([]);
+  });
+
+  test("rejects a non-positive staleAfterDays instead of silently widening it", () => {
+    expect(() => computePackCurrency(pack(), NOW, { staleAfterDays: 0 })).toThrow(RangeError);
+    expect(() => buildIndustryPackAudit({ pack: pack(), responses: responsesAll(3), now: NOW, staleAfterDays: Number.NaN })).toThrow(RangeError);
+  });
+
+  test("currency is inside the signed receipt and rendered for the auditor", () => {
+    const audit = buildIndustryPackAudit({ pack: headShapePack(), responses: responsesAll(3), now: NOW });
+    expect(INDUSTRY_PACK_AUDIT_SCHEMA_VERSION).toBe("amc.industry-pack-audit/5");
+    expect(audit.schemaVersion).toBe("amc.industry-pack-audit/5");
+    expect(audit.currency.status).toBe("undated");
+    expect(verifyIndustryPackAuditChecksum(audit)).toBe(true);
+    expect(verifyIndustryPackAuditChecksum({ ...audit, currency: { ...audit.currency, status: "current" } })).toBe(false);
+    const md = renderIndustryPackAuditMarkdown(audit);
+    expect(md).toContain("## Regulatory currency");
+    expect(md).toContain("Status: **undated**");
+    expect(md).toContain("Missing: version, lastReviewed, regulatoryReferences");
   });
 });

@@ -1,0 +1,107 @@
+{
+  "schema": "p126-five-phase-after-execution-audit-plan/1",
+  "at": "2026-10-16T20:41:38.377609+00:00",
+  "rootSoleRunnerWriter": true,
+  "allReadsFinishedForDeclaredScope": true,
+  "blockers": [],
+  "actualSourceObservation": {
+    "outcome": {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/p126-source-combined-outcome.json",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/p126-source-combined-outcome.json",
+      "bytes": 11051,
+      "sha256": "b81c1584f4bf9364ce154ce36e45e37dbe8c866a093abd82366c03f075a9c35b",
+      "dev": 16777231,
+      "inode": 543338558,
+      "nlink": 1,
+      "readScope": "full source summary/inventory"
+    },
+    "tests": {
+      "total": 54,
+      "passed": 54,
+      "failed": 0,
+      "skipped": 0
+    },
+    "hookTaskEntries": 46,
+    "individualHookValues": 46,
+    "durationMs": 8348,
+    "meaning": "Actual root-retained source summary:13new+41unchanged in one54-case corpus. Not a fresh/control observation or independent product rerun."
+  },
+  "futurePhases": [
+    "p126-fresh-canonical",
+    "p126-m1",
+    "p126-m1-restored",
+    "p126-m2",
+    "p126-m2-restored"
+  ],
+  "phaseNamesBoundary": "Bind actual chosen phase names in final manifest; names imply no outcomes.",
+  "expectedInventory": "expected-inventory.json",
+  "pinset": "source-pinset.json",
+  "phaseAudit": [
+    "Read complete raw producer/exclusive snapshot, observer, outerlog, command, owned-process/group-after-exit and actual outcome. Verify recorded pins and byte-identical producer/snapshot.",
+    "Check actual argv has explicit sameQroot and exact five-file corpus; Rcwd/head is disclosed execution authority, actual bound S/Qcommit is source authority.",
+    "Within each run join exact54relativefile/fullName/occurrence/state identities. Read every task/file/suite/test error and hook state, actual skipped/todo/omitted/extra identities, unhandled and late diagnostics.",
+    "Keep hook task entries separate from hook values. Source has46ofeach; later values must be read from actual phase artifacts, never assumed.",
+    "Across five phases compare identical file set and per-file ordered names, allowing file-completion-order changes. Count one canonical54 corpus, never sum runs.",
+    "Read post-exit streams and actual natural closure/ownedPGID ESRCH/no nonzero signals. Pure newtests own no resources; unchanged hooks retain only actual cleanup scope, not universal environment/native/process isolation."
+  ],
+  "operators": [
+    {
+      "id": "M1-prefix-swap",
+      "recipe": {
+        "path": "/private/tmp/p1-26-tree-qualification-20261017/contract-review/controls.json",
+        "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/contract-review/controls.json",
+        "bytes": 5628,
+        "sha256": "ab18653c468145664a58bcb7e5ea80d9e9579fad72280e0ef2ece5d96ce2945b",
+        "dev": 16777231,
+        "inode": 543324984,
+        "nlink": 1,
+        "readScope": "sealed exact two-operator recipes"
+      },
+      "target": "src/transparency/rfc9162.ts",
+      "change": "Only sealed leaf/node prefix byte swap in exact once-matching block.",
+      "primary": {
+        "file": "tests/transparency/rfc9162.test.ts",
+        "case": "RFC 9162 offline tree empty, leaf and node hashes preserve byte domains and child order",
+        "unchangedPositiveLine": 240,
+        "sensitiveAssertionLine": 241
+      },
+      "otherFailures": "Other vector/reference/proof/frontier/legacy-RFC assertions may be sensitive; classify actual firstframes/masked later statements.",
+      "actualFailureCount": null
+    },
+    {
+      "id": "M2-inclusion-terminal-size",
+      "recipe": {
+        "path": "/private/tmp/p1-26-tree-qualification-20261017/contract-review/controls.json",
+        "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/contract-review/controls.json",
+        "bytes": 5628,
+        "sha256": "ab18653c468145664a58bcb7e5ea80d9e9579fad72280e0ef2ece5d96ce2945b",
+        "dev": 16777231,
+        "inode": 543324984,
+        "nlink": 1,
+        "readScope": "sealed exact two-operator recipes"
+      },
+      "target": "src/transparency/rfc9162.ts",
+      "change": "Only sealed terminal sncompleteness refusal\u2192return sides; all input/range/extra-step guards retained.",
+      "primary": {
+        "file": "tests/transparency/rfc9162.test.ts",
+        "case": "RFC 9162 offline tree refuses the exact size-2 inclusion witness when only declared size changes to 3",
+        "proofShapeLine": 335,
+        "validPositiveLine": 336,
+        "sensitiveAssertionLine": 337
+      },
+      "otherFailures": "Missing-path/caller assertions may also be sensitive; no direct inclusionSides assertion precedes the dedicated verifier witness. No universal alternate-size refusal claim.",
+      "actualFailureCount": null
+    }
+  ],
+  "manualRestoreProtocol": [
+    "One operator at a time, owned futureQsourceTS only. Immediate exact physical/byte guards and exclusive immutable original/livepatch; no compiled rebuild/native/config/deadline change.",
+    "Actual RED must close with complete54inventory and semantic assertions. Setup/body/hook/cleanup errors remain errors; never relabel infrastructure failure as sensitivity.",
+    "Root reads every failure, first frame and later masked assertion; source-bound classification links actual commit/operator/binding/original/apply/mutant/outcomehash before explicit manual restore. No auto restore/retry.",
+    "Restore exact original, verify selected/protected/native/runner/harness pins and actual source/Qhead/index/status, then rerun identical corpus. Only actual restoredGREEN supports next operator.",
+    "Final selected-time preservation/status/native/compiled checks are separate records; no retrospective or continuous isolation inferred."
+  ],
+  "remaining": "Pure tree sensitivity only. Full migration/signed authority/C2SP/public anchors/TSA/library/public-entry decisions/full suite/global quality/wholeissue and plan remain open. All holds/F37/Claude variants preserved.",
+  "receiptRepresentation": "Copied tests must be inert source-text or existing lossless-original JSON, with exact original name/bytes/hash; never executable.test.ts under qualification.",
+  "noProductOrSourceIndexExecution": true,
+  "initialPreparationStop": "preparation-note.json"
+}

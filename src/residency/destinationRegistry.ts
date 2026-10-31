@@ -5,7 +5,7 @@ import { isAbsolute, join, relative, resolve } from "node:path";
 import YAML from "yaml";
 import { z } from "zod";
 import { parseDeploymentProfile } from "../catalog/compiler/compile.js";
-import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import { writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -66,7 +66,8 @@ function parse(bytes: Buffer): DestinationRegistryV1 {
   return freeze(destinationRegistrySchema.parse(YAML.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes), { maxAliasCount: 0, uniqueKeys: true })));
 }
 /** Loads no duplicate facts: the strict, normalized profile must match the active plan's exact profile digest. */
-export function loadPinnedResidencyProfile(workspace: string, registry: DestinationRegistryV1, expectedSha256: string) {
+/** The deployment profile the signed registry names, only when its canonical digest is the one the active plan pins (P2-26 reads its facts). */
+export function loadPinnedDeploymentProfile(workspace: string, registry: DestinationRegistryV1, expectedSha256: string) {
   if (!registry.profile || !/^[a-f0-9]{64}$/.test(expectedSha256)) throw new Error("profile_unverifiable");
   try {
     const root = realpathSync(resolve(workspace)), path = realpathSync(resolve(root, registry.profile.path)), within = relative(root, path);
@@ -74,9 +75,13 @@ export function loadPinnedResidencyProfile(workspace: string, registry: Destinat
     const bytes = readBounded(path, MAX_REGISTRY_BYTES);
     const profile = parseDeploymentProfile(YAML.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes), { maxAliasCount: 0, uniqueKeys: true }));
     if (sha256Hex(canonicalize(profile)) !== expectedSha256) throw new Error();
-    return freeze({ dataClasses: profile.dataClasses.value, jurisdictions: profile.jurisdictions.value, storageUrl: registry.profile.storageUrl,
-      tenantId: profile.deployment.tenantId, workspaceId: profile.deployment.workspaceId });
+    return profile;
   } catch { throw new Error("profile_unverifiable"); }
+}
+export function loadPinnedResidencyProfile(workspace: string, registry: DestinationRegistryV1, expectedSha256: string) {
+  const profile = loadPinnedDeploymentProfile(workspace, registry, expectedSha256);
+  return freeze({ dataClasses: profile.dataClasses.value, jurisdictions: profile.jurisdictions.value, storageUrl: registry.profile!.storageUrl,
+    tenantId: profile.deployment.tenantId, workspaceId: profile.deployment.workspaceId });
 }
 /** Verifies and parses one bounded byte snapshot. A present broken registry never becomes a missing registry. */
 export function loadDestinationRegistrySnapshot(workspace: string): DestinationRegistrySnapshot {
@@ -100,7 +105,7 @@ export function signDestinationRegistry(workspace: string): string {
   assertOwnerMode(workspace, "residency sign");
   const bytes = readBounded(destinationRegistryPath(workspace), MAX_REGISTRY_BYTES); parse(bytes);
   const digestSha256 = sha256Hex(bytes), path = destinationRegistrySigPath(workspace);
-  writeFileAtomic(path, JSON.stringify({ digestSha256, signature: signHexDigest(digestSha256, getPrivateKeyPem(workspace, "auditor")),
+  writeFileAtomic(path, JSON.stringify({ digestSha256, signature: signHexDigest(digestSha256, getSigningKey(workspace, "config-signature")),
     signedTs: Date.now(), signer: "auditor" }), 0o600);
   return path;
 }

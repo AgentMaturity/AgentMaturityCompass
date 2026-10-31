@@ -1,0 +1,40 @@
+{
+  "schema": "p125f-root-control-classification/1",
+  "at": "2026-10-16T22:25:57.966079+00:00",
+  "phase": "p125f-m3",
+  "sourceCommit": "d8b5c3250138a10078c21886642595f669c4a73c",
+  "operator": "F3-unpinned-dispatch",
+  "outcomeSha256": "3e7c4afecdc5b62f6daea7236505be6d1a6d12b9cc7cbc4eab20703abf596b14",
+  "rootAllFailuresRead": true,
+  "allFailuresClassified": true,
+  "firstSensitiveAssertionRead": true,
+  "noHookOrEnvironmentFailure": true,
+  "firstSensitiveAssertion": "Actual NO-ANCHOR zero-wire assertion tsaFallback.test.ts:237:86 expected0 but saw1 request to /missing-anchor. Actual matching-anchor positive231 already passed on /anchor-positive500; log records /anchor-positive,/missing-anchor,/after-skip.",
+  "masking": [
+    "NO-ANCHOR237 fails before238 route list and239-241 exact failure/result assertion; those later assertions receive no independent sensitivity credit.",
+    "Actual missing-anchor dispatch is configured-anchor selection evidence only, not F37 bypass, signed trust-list admission or successful grant.",
+    "Other three fallback bodies and all17 verifier bodies pass."
+  ],
+  "actualFirstFailureLines": [
+    237
+  ],
+  "actualTests": {
+    "total": 21,
+    "passed": 20,
+    "failed": 1,
+    "skipped": 0
+  },
+  "lifecycle": {
+    "allFourRecordsRead": true,
+    "cleanupErrorCounts": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "ownedErrors": [],
+    "allNineSocketsClosed": true,
+    "bodyFailuresOnlyOneIntendedAssertion": true
+  },
+  "restoreAdmission": "Restore exact captured original in owned fresh source only; all production/source checkout, compiled/native, fixture, timeout, guard and held boundaries remain unchanged."
+}

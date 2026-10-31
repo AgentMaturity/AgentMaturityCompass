@@ -1,0 +1,21 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-WLT-US-11",
+  "polarity": "positive",
+  "evidenceClass": "valid",
+  "setup": {
+    "harness": "incident_clocks",
+    "station": "wealth",
+    "events": [],
+    "due": [
+      {
+        "clock": "glba-314-4j-ftc-notice",
+        "hoursAfterCreated": 720
+      }
+    ]
+  },
+  "expected": {
+    "result": "pass",
+    "reasonCode": null
+  }
+}

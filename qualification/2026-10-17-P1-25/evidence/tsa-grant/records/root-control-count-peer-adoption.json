@@ -1,0 +1,34 @@
+{
+  "at": "2026-10-16T22:57:05.458514+00:00",
+  "preferredSeals": [
+    {
+      "seal": {
+        "path": "/private/tmp/p1-25-grant-qualification-20261017/fresh-control-preparation/seal-v2.json",
+        "bytes": 3448,
+        "sha256": "4407f3ef6911bd11afc87f5c9d1ba4b078f17c558a902b5e28a7e50d0cf1561f"
+      },
+      "outputsVerified": 12
+    },
+    {
+      "seal": {
+        "path": "/private/tmp/p1-25-grant-qualification-20261017/runtime-control-helper-static-review/seal.json",
+        "bytes": 1939,
+        "sha256": "fd01bc6c97836c0475b4f0e905991b4d4e2131b8d284efface2635ca48539447"
+      },
+      "outputsVerified": 4
+    },
+    {
+      "seal": {
+        "path": "/private/tmp/p1-25-grant-qualification-20261017/count-surface-review/seal-v3.json",
+        "bytes": 1688,
+        "sha256": "b9db9fb191669cba255e86f447422bd9cdfa3832933acae3ec602b90f614d52c"
+      },
+      "outputsVerified": 6
+    }
+  ],
+  "rootFullHelperSourceAndControlsAndNamePinsetRead": true,
+  "independentReviewBlockers": [],
+  "countLostScanAndV1V2Excluded": true,
+  "futureBindingAndControlsNotExecutedYet": true,
+  "allHoldsRetained": true
+}

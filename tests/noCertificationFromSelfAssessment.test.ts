@@ -10,6 +10,8 @@ import { listIndustryPacks, scoreIndustryPack, type IndustryPack } from "../src/
 import { getDomainPackQuestions } from "../src/score/domainPacks.js";
 import { level, likert } from "../src/score/units.js";
 import { generateTransparencyReport, renderTransparencyReportMarkdown } from "../src/transparency/transparencyReport.js";
+import { envelopeForSyntheticExample } from "../src/claims/eligibility/adapters.js";
+import { renderClaimLegend } from "../src/claims/eligibility/render.js";
 
 type ToolHandler = (args: Record<string, unknown>) => Promise<{ content: Array<{ text: string }>; isError?: boolean }>;
 const mcpTools = vi.hoisted(() => new Map<string, ToolHandler>());
@@ -17,6 +19,7 @@ const mcpTools = vi.hoisted(() => new Map<string, ToolHandler>());
 vi.mock("@modelcontextprotocol/sdk/server/mcp.js", () => ({
   McpServer: class {
     tool(name: string, _description: string, _schema: unknown, handler: ToolHandler) { mcpTools.set(name, handler); }
+    registerTool(name: string, _config: unknown, handler: ToolHandler) { mcpTools.set(name, handler); }
     resource() {}
     async connect() {}
     async close() {}
@@ -93,7 +96,7 @@ describe("no certification from self-assessment (P0-21)", () => {
   test("the pack audit reports a self-reported overall with no certified field", () => {
     for (const pack of listIndustryPacks()) {
       const audit = buildIndustryPackAudit({ pack, responses: allFives(pack), now: 1_700_000_000_000 });
-      expect(audit.schemaVersion).toBe("amc.industry-pack-audit/3");
+      expect(audit.schemaVersion).toBe("amc.industry-pack-audit/5");
       expect("certified" in audit.overall, pack.id).toBe(false);
       expect(audit.overall.claimKind).toBe("self_reported");
       expect(audit.overall.eligibleLevel!).toBeLessThanOrEqual(1);
@@ -107,13 +110,20 @@ describe("no certification from self-assessment (P0-21)", () => {
   });
 
   test("the domain report carries no certification field or wording", () => {
-    const report = buildDomainReport(assessDomain({
+    const assessment = assessDomain({
       agentId: "agent-tech",
       domain: "technology",
       baseScores: { "AMC-1.1": level(5), "AMC-1.2": level(5) },
       domainQuestionScores: Object.fromEntries(getDomainPackQuestions("technology").map((q) => [q.id, likert(5)]))
-    }));
+    });
+    const report = buildDomainReport(assessment);
     expect(certificationWords(JSON.stringify(report))).toEqual([]);
+    expect(report.markdown).toContain("**Claim:** Self-reported · **Result:** not evaluated");
+    expect(report.markdown).toContain(renderClaimLegend("markdown"));
+    const example = buildDomainReport(assessment, envelopeForSyntheticExample({ producer: "domain:example", now: 1_700_000_000_000 }));
+    expect(example.markdown).toContain("**Claim:** Synthetic example (not evidence) · **Result:** not evaluated");
+    expect(example.markdown).toContain(renderClaimLegend("markdown"));
+    expect([report.markdown, example.markdown].map((markdown) => markdown.split("\n").find((line) => line.startsWith("**Claim:**")))).toMatchSnapshot();
   });
 
   test("the transparency report shows evidence standing, never certification", () => {

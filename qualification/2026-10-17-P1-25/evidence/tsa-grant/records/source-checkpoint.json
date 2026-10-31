@@ -1,0 +1,70 @@
+{
+  "schema": "p125g-actual-source-checkpoint/1",
+  "at": "2026-10-16T22:56:27.758325+00:00",
+  "commit": "188681b32dc472983404dce19e7833cd76ee7576",
+  "parent": "da61205c0817267133451bac11e57bd0318fe44f",
+  "branch": "codex/p1-25-grant-qualification",
+  "paths": [
+    {
+      "relativePath": "README.md",
+      "bytes": 59828,
+      "sha256": "3fae755d626825e532af828157829450ef124062df279c7c822ad9d8a7ee3e5f"
+    },
+    {
+      "relativePath": "CONTRIBUTING.md",
+      "bytes": 16220,
+      "sha256": "34bf446c16cfdee4812eb5622cf153baad344fce179befb98c2f606a27a9a08b"
+    },
+    {
+      "relativePath": "website/index.html",
+      "bytes": 43520,
+      "sha256": "557d3c7bf5b151e9bcb2c321295fd21e4494703b4c198c47c9bacad329de8871"
+    },
+    {
+      "relativePath": "website/lite.html",
+      "bytes": 11197,
+      "sha256": "43bcc499c40ec937ae58eb841559bfdee59c529eda0253263f07f34acd760e4e"
+    },
+    {
+      "relativePath": "website/i18n.js",
+      "bytes": 44169,
+      "sha256": "bd55631b79e23f5ec9b25d48e00b072c1ff464f7bc9c43affb8e914c747325f1"
+    },
+    {
+      "relativePath": "docs/content/show-hn-draft.md",
+      "bytes": 1951,
+      "sha256": "46407030cf8d7fb764fa5135c57409bfdd5827913f795ad4e2ede7c1acad53f3"
+    },
+    {
+      "relativePath": "docs/content/reddit-launch-drafts.md",
+      "bytes": 3075,
+      "sha256": "8080c44268913f9c1ee5aab995686ebb50d1cfcbc3cdd518536d12cb0a4f59ce"
+    },
+    {
+      "relativePath": "docs/internal/competitive-landscape.md",
+      "bytes": 3880,
+      "sha256": "39038febb8a7f72c514582397df294fd57c2dd113d2811940f9dafd541c0d992"
+    },
+    {
+      "relativePath": "docs/internal/mirofish-simulation-council.md",
+      "bytes": 2489,
+      "sha256": "8bd704d810761009e5b9a0a2649743ddc73509dcb316675dea06fdc3ef0d0a35"
+    },
+    {
+      "relativePath": "whitepaper/AMC_WHITEPAPER_v1.md",
+      "bytes": 107509,
+      "sha256": "86c7c720a78b1450af3ef7a15c2c7c9ee16b1f46576d479fe8732fc42b44fe35"
+    },
+    {
+      "relativePath": "tests/time/tsaGrant.test.ts",
+      "bytes": 27505,
+      "sha256": "9f9bd30790094ea2c8172a31ff2f9de69a2212fe2e46fee133e123349e8b63fc"
+    }
+  ],
+  "clean": true,
+  "indexEmpty": true,
+  "actualGitBlobsExact": true,
+  "qualityStillRed": true,
+  "allHoldsRetained": true,
+  "noPushPrMergeRelease": true
+}

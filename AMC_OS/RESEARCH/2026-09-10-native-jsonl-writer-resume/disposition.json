@@ -15,7 +15,7 @@
       "machine": "arm64",
       "node": "v25.5.0",
       "pnpm": "10.33.0",
-      "browserExecutable": "/Users/sid/Library/Caches/ms-playwright/chromium_headless_shell-1217/chrome-headless-shell-mac-arm64/chrome-headless-shell",
+      "browserExecutable": "~/Library/Caches/ms-playwright/chromium_headless_shell-1217/chrome-headless-shell-mac-arm64/chrome-headless-shell",
       "browserSha256": "a8a0ac2829aeaa132389b001640fb835bdc93a49fb7f26af0c3de0df3ee4d66f",
       "browserVersion": "Google Chrome for Testing 147.0.7727.15"
     },
@@ -38,7 +38,7 @@
       "admin-authenticated HTTP"
     ],
     "artifact": {
-      "path": "/Users/sid/AgentMaturityCompass/tmp/cos-native-jsonl-writer-resume-01/shipping03/artifact/agent-maturity-compass-1.2.0.tgz",
+      "path": "~/AgentMaturityCompass/tmp/cos-native-jsonl-writer-resume-01/shipping03/artifact/agent-maturity-compass-1.2.0.tgz",
       "sha256": "28990ad17b8b7f1b8d0fc6c6f5e47795ceb4dde8a5308be740b17a4186249ec8",
       "bytes": 6023292,
       "packMode": "--ignore-scripts; prepack/release deliberately not run"
@@ -83,7 +83,7 @@
     "pendingNewBatchBody": null,
     "oldPendingBodies": "Preserved unchanged at paths in TRACKER_PENDING.md; no uncertain AMC-1547 repost or old body replay."
   },
-  "vaultNote": "/Users/sid/Documents/AMC/Evidence/2026-09-10 Native JSONL Writer Resume.md",
+  "vaultNote": "~/Documents/AMC/Evidence/2026-09-10 Native JSONL Writer Resume.md",
   "centralStatusUpdated": false,
   "centralStatusReason": "Both later central update proposals blocked by normal review. Old central timestamp is not current; exact bodies retained in REVIEW_BLOCKERS.md and not replayed.",
   "scopeLimits": [

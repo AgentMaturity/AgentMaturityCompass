@@ -5,7 +5,7 @@
   "parentIssue": "AMC-1505",
   "completionMeaning": "The finite documentation assignment is complete, not Phase A acceptance, issue closure or release authorization.",
   "assignment": {
-    "worktree": "/Users/sid/AgentMaturityCompass/tmp/cos-closure-map",
+    "worktree": "~/AgentMaturityCompass/tmp/cos-closure-map",
     "branch": "codex/cos-closure-map",
     "pinnedSource": "68458818799d1db7826d67d1b604d6ad77ac4432",
     "branchInspection": "Read the worktree .git pointer, .git/worktrees/cos-closure-map/HEAD and .git/refs/heads/codex/cos-closure-map as text. No Git command or ancestry verification was executed.",
@@ -48,8 +48,8 @@
   "method": {
     "inspectionMode": "Repository text reads and authoring of the three assigned documentation files only.",
     "evidenceRoots": {
-      "repository": "/Users/sid/AgentMaturityCompass",
-      "assigned-worktree": "/Users/sid/AgentMaturityCompass/tmp/cos-closure-map"
+      "repository": "~/AgentMaturityCompass",
+      "assigned-worktree": "~/AgentMaturityCompass/tmp/cos-closure-map"
     },
     "pathResolution": "Resolve every evidence path under its named root. Root research notes were inspected independently of the pinned worktree; their presence or later content is not evidence that those bytes were committed at the assigned pin.",
     "registryRule": "Evidence registry entries name files actually opened. A test, log, artifact or source path mentioned inside one of those files is not independently inspected unless it has its own registry entry. A directory listing is not artifact verification.",

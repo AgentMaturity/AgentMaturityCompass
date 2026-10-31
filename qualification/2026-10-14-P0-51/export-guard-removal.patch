@@ -1,0 +1,13 @@
+--- guarded/src/transparency/merkleIndexStore.ts
++++ fixture-mutant/src/transparency/merkleIndexStore.ts
+@@ -545,7 +545,9 @@
+       0o644
+     );
+     const outFile = resolve(params.workspace, params.outFile);
+-    tarCreate(params.workspace, tmp, outFile);
++    ensureDir(dirname(outFile));
++    const unguarded = spawnSync("tar", ["-czf", outFile, "-C", tmp, "."], { encoding: "utf8" });
++    if (unguarded.status !== 0) throw new Error("fixture mutation archive creation failed");
+     return {
+       outFile,
+       proof

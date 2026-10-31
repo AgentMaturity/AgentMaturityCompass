@@ -1,0 +1,74 @@
+{
+  "schema": "p125-fallback-private-extension-input/1",
+  "readyForPrivateAssembly": false,
+  "sourceCommit": "d8b5c3250138a10078c21886642595f669c4a73c",
+  "branch": "codex/p1-25-fallback-qualification",
+  "environment": null,
+  "basePacket": "/private/tmp/p1-25-fallback-qualification-20261017/original-p125-packet",
+  "baseReceipt": {
+    "path": "/private/tmp/p1-25-fallback-qualification-20261017/original-p125-packet/receipt.json",
+    "bytes": 126991,
+    "sha256": "1fcef2ee2271e19e5f39aff0d97052c432bb7f923955d18d41d36749c774d7e9"
+  },
+  "baseReadme": {
+    "path": "/private/tmp/p1-25-fallback-qualification-20261017/original-p125-packet/README.md",
+    "bytes": 15980,
+    "sha256": "14ff4c7747694485db980c0041a210ccf1335271641d22f3ec1df40215438a7e"
+  },
+  "baseAssembly": {
+    "path": "/private/tmp/p1-25-fallback-qualification-20261017/original-p125-packet/assembly-inputs.json",
+    "bytes": 150409,
+    "sha256": "6261cf6f1fd22ab71cbb5f9ec611809f6d96b00ae20013cb673b099247ec3b72"
+  },
+  "requiredPins": {
+    "sourceCheckpoint": {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/source-checkpoint.json",
+      "bytes": 2294,
+      "sha256": "137d1f277bc2565791fd6311694623b444912d99ea07b2f23bf9660aa8ae60c6"
+    },
+    "sourceOutcome": {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/p125f-source-combined-outcome.json",
+      "bytes": 4249,
+      "sha256": "dc9f1e951177a6eb15ba853f65ef35afd94f9b6f9be75b5dceab637543b55cdd"
+    },
+    "freshBinding": {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-source-binding.json",
+      "bytes": 88422,
+      "sha256": "2d45e6ae6c0632762ca7bc358744d4ba44686f913bc0a696eacb3c079df3d86f"
+    },
+    "canonicalOutcome": null,
+    "independentChainReview": null,
+    "finalPreservation": null,
+    "wholeIssueGaps": null,
+    "protectedInputs": {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/protected-inputs.json",
+      "bytes": 35693,
+      "sha256": "ec3c07063b0334bea701ca69a880c1399f46ffe4d859a1aa3181f5002428b897"
+    }
+  },
+  "newCommandPins": [],
+  "newArtifacts": [],
+  "readmePin": null,
+  "notes": "Bounded offline verifier/configured-anchor artifactTime qualification only. Canonical47/47 is not a sum of cohorts. Initial count check1 was repaired by the unchanged generator/check0; source-only controls failed1/2 bodies and exact restorations passed47. Global duplicate/dead-code checks remain RED1268/2724, unwaived. OpenSSL expected tampered-CMS child exit4 is deliberate negative proof, not a PKI acceptance result. Full P1-25/P1-01/package/client/checkpoint/issuance/source-generator/full-suite/CI/release and all held decisions remain open. Missing live reservations retains last-known binding/shared append pending. Optional read-only metadata scan natural closure is unestablished and excluded from all evidence credit. Ordinary Git staging warned about ignored docs/internal, but all22 staged blobs were verified and ordinary commit0 used noforce/no-verify; held provider archive unchanged. Source/fresh controls restored; no compiled sensitivity or plan completion. Metadata staging whitespace check exited2 on18 intrinsic log/patch files; exact original bytes are preserved in existing-format lossless JSON envelopes with round-trip hashes, without changing whitespace policy or command outcomes. Historical verifier paragraph retained verbatim. Current client extension source5beb3eae69b08f2e895520c7f459e1465780beeb selects one actual28/28 fresh canonical cohort (11new request/rawHTTP +17unchanged verifier), not the earlier47 or phase sums. Actual source28; C1fails2at193/201 and C2fails1at280 with masked194/282, explicit byte-exact restores and28/28reruns, hook2entries/3values, raw/observer joins/naturalESRCH/no signals/no late errors. Clean-source0/47892ms supplies no Vitest credit. All71source/fresh paths/eight compiledpairs/121protected/seven native physicalpins and heldR18 rows preserved. Source counts15spans/tenfiles1691to1692; ordinaryadd1 stopped beforecommit, trackedadd--update0 and complete11blob/default-fullrange re-admission preceded sourcecommit0. Global quality remains RED1268/2720, no waiver/baseline; three removed findings are test export reachability. This extends the original338payloads/41commands/359inputpins through only three active indexes and client-transport prefix; code inert, logs/patches lossless, raw count originals/large observations private. No CMS grant from five raw bytes, successful matching-nonce fallback, required-time/checkpoint/session/issuance/report, F37, fullsuite/CI/release/wholeP125/P101/plan completion credit. All held decisions and missingRES binding retained. Later actual publication/committed-file/quality/QA closure records are separate.",
+  "rootReviewedActualControlsAndMasks": false,
+  "rootReadFullReadmeAndWholeIssueGaps": false,
+  "noAggregateCohortTotal": true,
+  "boundary": "Unready template. This author has not copied the private base. Null or empty future fields are missing actual evidence, not outcomes. Root must fill, read and admit all actual inputs before executing private assembly.",
+  "executionToolPins": [
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/receipt-extension-preparation/v2/assemble-extension.py",
+      "bytes": 11264,
+      "sha256": "4dc62ec23720263b7d40c3cd9b9a7af3e35e4c711e502f38bd2d64f81bb45579"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/receipt-extension-preparation/assemble-extension.py",
+      "bytes": 14973,
+      "sha256": "42b220c161ba7945537b680fe496ecc90e69e422c2b608ebc2652bfd9c9eb9eb"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/receipt-extension-preparation/b34-v2-adaptation.patch",
+      "bytes": 14427,
+      "sha256": "c230e58d2f33acb9aab1eb0160382eb2c8c58e48f9dc3b8890febc4cc88ebdc9"
+    }
+  ]
+}

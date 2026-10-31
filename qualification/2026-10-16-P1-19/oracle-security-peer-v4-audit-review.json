@@ -1,0 +1,133 @@
+{
+  "schema": "p119-oracle-v4-independent-reader-lifecycle-review/1",
+  "capturedUtc": "2026-10-15T22:50:56.571149+00:00",
+  "scope": "Static closed v2-to-v3 and v3-to-v4 lifecycle deltas, existing snapshot helper and closed root diagnosis metadata. No product imports/runtime, syntax parser, SQL, tests, network, R/source-proposal writes or active draft reads.",
+  "conclusion": "No additional blocking static finding. V4 addresses both previously reported V3 pre-admission issues while retaining the original active-interval snapshot and all oracle authority checks. Actual resulting behavior remains for the sole root runner.",
+  "exactDelta": {
+    "v2ToV3TextPatchMatches": true,
+    "v3ToV4TextPatchMatches": true,
+    "allSuppliedV3V4HashesMatch": true,
+    "v3AndEarlierFilesPreserved": true,
+    "admissionBoundary": "Root requested direct admission of reviewed v4 over current v2; this reviewer did not apply any version or independently inspect mutable R oracle sources."
+  },
+  "closedFindings": [
+    {
+      "id": "reader-preparation-provenance",
+      "originalIssue": "V3 held its read view before defining the baseline but did not reject a DB/key/history or nonempty-WAL change during that preparation gap.",
+      "locations": [
+        "oracle.mjs:176-194",
+        "oracleEvidence.mjs:44-53,318-331"
+      ],
+      "assessment": "V4 captures the full actual pre-preparation snapshot, opens a fileMustExist readonly connection, starts BEGIN and executes a real sqlite_master table SELECT. Before the cold CLI it requires all non-WAL pins to remain canonically identical, including DB and every discovered key/history identity, presence, byte count and digest. The WAL pin must also remain exact, except a previously absent WAL may become a regular zero-byte file with the SHA-256 of empty bytes. Existing snapshot/regular helpers enforce bounded actual regular-file reads; the exception does not admit a prior nonempty WAL being replaced or any nonempty new WAL. The preparation guard throws before cold CLI if it fails."
+    },
+    {
+      "id": "reader-preparation-cleanup",
+      "originalIssue": "V3 preparation catch could skip db.close if rollback threw.",
+      "locations": [
+        "oracleEvidence.mjs:310-317,325-330",
+        "oracle.mjs:260-266"
+      ],
+      "assessment": "The shared closeEvidenceDatabase independently attempts rollback when inTransaction and then close, collects both failures, and preserves the original preparation error. A single error is rethrown; multiple errors become AggregateError. The outer finally also uses the closer, and any failure sets inputs false before the final all-checks verdict. Nested AggregateError messages are rendered with their component messages rather than silently masking them."
+    }
+  ],
+  "unchangedProtectedInterval": {
+    "locations": [
+      "oracle.mjs:194-205",
+      "oracleEvidence.mjs:332-355"
+    ],
+    "assessment": "The same open readonly connection/read transaction is used for the actual action SELECTs. It remains held through the separate cold CLI, independent action queries, signed auxiliary file checks and after snapshot. Baseline-to-after equality still includes exact DB/WAL/key/history identity, presence, size and bytes. SHM remains recorded coordination only, as in the already reviewed design. No ignored WAL, database copy, restoration, grace, changed test expectation or policy floor is introduced."
+  },
+  "diagnosisBoundary": {
+    "input": "root-empty-wal-diagnosis.json",
+    "assessment": "The closed root metadata reconstructs the first failed positive snapshot by changing only absent WAL to an actual zero-byte WAL, while all DB/key pins match. This reviewer separately audited the initial run reports earlier; no new retained database/secret files or SQL were read for this static review. The root stated all five failed roots have the same cause; this narrow review does not independently repeat that five-root filesystem audit."
+  },
+  "limits": [
+    "Strict endpoint file snapshots plus a held read transaction do not prove absence of same-UID ABA writes or an adversarial atomic multi-file history. Existing quiescent owned-fixture and operator-anchor boundaries remain.",
+    "V4 preparation can legitimately refuse unexpected SQLite/version behavior or physical source changes. No failure is converted to a pass and no runtime result is predicted.",
+    "The read transaction is released only after the authenticated interval; successful rollback/close can subsequently alter coordination-file lifetime. This does not claim an after-close filesystem pin interval.",
+    "Root remains the sole executor. No actual v4 positive pass, mutation result, full F01-F38 corpus, external credential isolation or formal P1-19 completion is claimed."
+  ],
+  "inputPins": [
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v2/examples/lighthouse-finance/oracle.mjs",
+      "bytes": 19441,
+      "sha256": "90a24dd18f8695efb2bdcee5ece5605c507690d3fe940edb3e7a4911e3eb43a8",
+      "device": 16777231,
+      "inode": 541767456,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v2/examples/lighthouse-finance/oracleEvidence.mjs",
+      "bytes": 28475,
+      "sha256": "4df67b11e019797c5b485bc91ed428d7f8c3f38b9da3f3cad08ba7c8a9e6526b",
+      "device": 16777231,
+      "inode": 541767457,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v3/examples/lighthouse-finance/oracle.mjs",
+      "bytes": 20151,
+      "sha256": "3b1ba99969949ebf2bcde9a25718216f362993272527f0828121b667d730c021",
+      "device": 16777231,
+      "inode": 541769862,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v3/examples/lighthouse-finance/oracleEvidence.mjs",
+      "bytes": 29506,
+      "sha256": "d7c2bf58e7cac21e36bf12117c237e840903d1aa0316a44b15f9a9671e31c921",
+      "device": 16777231,
+      "inode": 541769863,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v4/examples/lighthouse-finance/oracle.mjs",
+      "bytes": 21328,
+      "sha256": "cd745ddae7cce98a5285be95d4cce815f542d3c9f218e976be5c374d3b5f858f",
+      "device": 16777231,
+      "inode": 541769998,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v4/examples/lighthouse-finance/oracleEvidence.mjs",
+      "bytes": 29832,
+      "sha256": "92b25937b06aef01367007961944d479cf6febad3e8b3da5d52094d8741ae869",
+      "device": 16777231,
+      "inode": 541769999,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v3/v2-to-v3.patch",
+      "bytes": 6422,
+      "sha256": "fe8ad3cc7c730a45d942638e1b8e3a26a8cf87c4b3e6d859cd2879d3342ccd8e",
+      "device": 16777231,
+      "inode": 541769864,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v4/v3-to-v4.patch",
+      "bytes": 5736,
+      "sha256": "e05c950558f03fab54e8a443e1be59724c1d2bf1c818403b3caed0ec94c4ded8",
+      "device": 16777231,
+      "inode": 541770000,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/root-empty-wal-diagnosis.json",
+      "bytes": 3870,
+      "sha256": "1a6f9dada0deea88e01074046ac5345b91766fa81a3a923a14441170cfb96231",
+      "device": 16777231,
+      "inode": 541769787,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/security-peer-v2-audit/review.json",
+      "bytes": 9651,
+      "sha256": "6911176ec93dccdbe1919f0a076128d07a6c745b992da73ec2d3a1df1d196ecb",
+      "device": 16777231,
+      "inode": 541767574,
+      "nlink": 1
+    }
+  ],
+  "allReadsAndWritesFinished": true
+}

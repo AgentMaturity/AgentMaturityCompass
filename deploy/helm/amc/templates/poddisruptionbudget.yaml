@@ -1,4 +1,8 @@
 {{- if .Values.podDisruptionBudget.enabled }}
+{{- $pdb := .Values.podDisruptionBudget }}
+{{- if eq (kindIs "invalid" $pdb.minAvailable) (kindIs "invalid" $pdb.maxUnavailable) }}
+{{- fail "podDisruptionBudget: set exactly one of minAvailable and maxUnavailable (the other null)" }}
+{{- end }}
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
@@ -6,7 +10,11 @@ metadata:
   labels:
     {{- include "amc.labels" . | nindent 4 }}
 spec:
-  minAvailable: {{ .Values.podDisruptionBudget.minAvailable }}
+  {{- if kindIs "invalid" $pdb.minAvailable }}
+  maxUnavailable: {{ $pdb.maxUnavailable }}
+  {{- else }}
+  minAvailable: {{ $pdb.minAvailable }}
+  {{- end }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ include "amc.name" . }}

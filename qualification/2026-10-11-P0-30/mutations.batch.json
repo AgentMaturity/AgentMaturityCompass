@@ -1,0 +1,986 @@
+[
+  {
+    "id": "P30-1525-envelope-signature",
+    "oldIssue": "AMC-1525",
+    "file": "src/crypto/keyHistoryEnvelope.ts",
+    "find": "if (!verify(null, payloadBytes(base), currentPublicKeyPem, Buffer.from(signature, \"base64\"))) return fail(\"history admission signature is invalid\");",
+    "replace": "if (false && !verify(null, payloadBytes(base), currentPublicKeyPem, Buffer.from(signature, \"base64\"))) return fail(\"history admission signature is invalid\");",
+    "tests": [
+      "tests/crypto/keyHistoryMutationGuards.test.ts",
+      "tests/crypto/keyHistoryAdmission.test.ts",
+      "tests/crypto/keyHistoryForgery.test.ts"
+    ],
+    "expect": "killed",
+    "note": "Skip the envelope signature check."
+  },
+  {
+    "id": "P30-1525-unsigned-migration",
+    "oldIssue": "AMC-1525",
+    "file": "src/vault/vault.ts",
+    "find": "    } else if (!existingVault || !pathExists(historyFile)) {\n      // Only a private-key-derived current key is admitted at initialization.\n      // Existing unsigned arrays are never imported into a fresh envelope.\n      history = JSON.stringify(sealKeyHistory(kind, [buildKeyHistoryEntry(publicPem, [])], params[`${kind}PrivateKeyPem`]), null, 2);\n    }",
+    "replace": "    } else {\n      let planted: Parameters<typeof buildKeyHistoryEntry>[1] = [];\n      try { const disk: unknown = JSON.parse(readUtf8(historyFile)); if (Array.isArray(disk)) planted = disk; } catch { /* no legacy list */ }\n      if (!existingVault || !pathExists(historyFile) || planted.length > 0) {\n        const entries = planted.some((entry) => entry.publicKeyPem === publicPem) ? [...planted] : [...planted, buildKeyHistoryEntry(publicPem, planted)];\n        history = JSON.stringify(sealKeyHistory(kind, entries, params[`${kind}PrivateKeyPem`]), null, 2);\n      }\n    }",
+    "tests": [
+      "tests/crypto/keyHistoryMutationGuards.test.ts",
+      "tests/crypto/keyHistoryAdmission.test.ts"
+    ],
+    "expect": "killed",
+    "note": "Accept unsigned migration: restores the pre-fix vault behaviour that sealed a planted bare-array history on any vault create or rewrite."
+  },
+  {
+    "id": "P30-1525-bundle-raw-history",
+    "oldIssue": "AMC-1525",
+    "file": "src/bundles/bundle.ts",
+    "find": "const history = authenticatedHistoryFromBundle(root, kind);\n  return",
+    "replace": "const raw: unknown = bundleKeyHistory(root, kind);\n  const history = { entries: (Array.isArray(raw) ? raw : (raw as { entries?: unknown[] } | null | undefined)?.entries ?? []) as Array<{ publicKeyPem: string }> };\n  return",
+    "tests": [
+      "tests/crypto/keyHistoryMutationGuards.test.ts",
+      "tests/keyHistoryBundleCertificate.test.ts"
+    ],
+    "expect": "killed",
+    "note": "Read the raw history file in bundle verification. Issuer admission refuses independently, so the kill is the manifest-signature error, not ok:false."
+  },
+  {
+    "id": "P30-1525-certificate-raw-history",
+    "oldIssue": "AMC-1525",
+    "file": "src/assurance/certificate.ts",
+    "find": "const history = authenticatedHistoryFromCert(root, kind);\n  return",
+    "replace": "const raw: unknown = certKeyHistory(root, kind);\n  const history = { entries: (Array.isArray(raw) ? raw : (raw as { entries?: unknown[] } | null | undefined)?.entries ?? []) as Array<{ publicKeyPem: string }> };\n  return",
+    "tests": [
+      "tests/crypto/keyHistoryMutationGuards.test.ts",
+      "tests/keyHistoryBundleCertificate.test.ts"
+    ],
+    "expect": "killed",
+    "note": "Read the raw history file in certificate verification (same caveat as the bundle entry)."
+  },
+  {
+    "id": "P30-1525-cold-vault-initializes",
+    "oldIssue": "AMC-1525",
+    "file": "src/ledger/ledgerVerification.ts",
+    "find": "ledger = openLedger(workspacePath, { readonly: true });",
+    "replace": "ledger = openLedger(workspacePath);",
+    "tests": [
+      "tests/crypto/keyHistoryMutationGuards.test.ts",
+      "tests/ledgerVerificationReadOnly.test.ts"
+    ],
+    "expect": "killed",
+    "note": "Let a cold vault initialize trust: verification opens the ledger writable, which mints a vault and keys."
+  },
+  {
+    "id": "P30-1542-empty-set",
+    "oldIssue": "AMC-1542",
+    "file": "src/leases/leaseStore.ts",
+    "find": "  if (!read.ok) throw new Error(`lease revocation store unverifiable (${read.reason}); refusing to treat it as empty`);",
+    "replace": "  if (!read.ok) return new Set<string>();",
+    "tests": [
+      "tests/leaseRevocationConsumers.test.ts",
+      "tests/leaseRevocationFailClosed.test.ts",
+      "tests/leaseRevocationWriterIntegrity.test.ts"
+    ],
+    "expect": "killed",
+    "note": "Return an empty set from revokedLeaseIdSet."
+  },
+  {
+    "id": "P30-1542-revoke-snapshot",
+    "oldIssue": "AMC-1542",
+    "file": "src/leases/leaseStore.ts",
+    "find": "current = readVerifiedRevocations(workspace);",
+    "replace": "current = loadLeaseRevocations(workspace);",
+    "tests": [
+      "tests/leaseRevocationWriterIntegrity.test.ts"
+    ],
+    "expect": "killed",
+    "note": "Skip the snapshot check in revokeLease."
+  },
+  {
+    "id": "P30-1542-publish-verify",
+    "oldIssue": "AMC-1542",
+    "file": "src/leases/leaseStore.ts",
+    "find": "if (!verifyHexDigestAny(digest, signed.signature, getPublicKeyHistory(workspace, \"auditor\"))) {",
+    "replace": "if (false) {",
+    "tests": [
+      "tests/leaseRevocationWriterIntegrity.test.ts"
+    ],
+    "expect": "killed",
+    "note": "Publish a revocation pair without verifying the prepared signature (the P0-30 publish fix)."
+  },
+  {
+    "id": "P30-1542-consumer-bridge",
+    "oldIssue": "AMC-1542",
+    "file": "src/bridge/bridgeAuth.ts",
+    "find": "= readRevokedLeaseIds(params.workspace);",
+    "replace": "= ((r) => r.ok ? r : { ok: true as const, ids: new Set<string>() })(readRevokedLeaseIds(params.workspace));",
+    "tests": [
+      "tests/leaseRevocationConsumers.test.ts",
+      "tests/leaseRevocationFailClosed.test.ts"
+    ],
+    "expect": "killed",
+    "note": "bridgeAuth treats an unverifiable list as empty (fail open)."
+  },
+  {
+    "id": "P30-1542-consumer-gateway",
+    "oldIssue": "AMC-1542",
+    "file": "src/gateway/server.ts",
+    "find": "= readRevokedLeaseIds(input.workspace);",
+    "replace": "= ((r) => r.ok ? r : { ok: true as const, ids: new Set<string>() })(readRevokedLeaseIds(input.workspace));",
+    "tests": [
+      "tests/leaseRevocationConsumers.test.ts",
+      "tests/leaseRevocationFailClosed.test.ts"
+    ],
+    "expect": "killed",
+    "note": "gateway treats an unverifiable list as empty (fail open)."
+  },
+  {
+    "id": "P30-1542-consumer-router",
+    "oldIssue": "AMC-1542",
+    "file": "src/workspaces/workspaceRouter.ts",
+    "find": "= readRevokedLeaseIds(context.workspaceDir);",
+    "replace": "= ((r) => r.ok ? r : { ok: true as const, ids: new Set<string>() })(readRevokedLeaseIds(context.workspaceDir));",
+    "tests": [
+      "tests/leaseRevocationConsumers.test.ts",
+      "tests/leaseRevocationFailClosed.test.ts"
+    ],
+    "expect": "killed",
+    "note": "workspaceRouter treats an unverifiable list as empty (fail open) (the workspace's own agent auth still refuses: defence in depth)."
+  },
+  {
+    "id": "P30-1542-consumer-studio",
+    "oldIssue": "AMC-1542",
+    "file": "src/studio/studioServer.ts",
+    "find": "= readRevokedLeaseIds(params.workspace);",
+    "replace": "= ((r) => r.ok ? r : { ok: true as const, ids: new Set<string>() })(readRevokedLeaseIds(params.workspace));",
+    "tests": [
+      "tests/leaseRevocationConsumers.test.ts"
+    ],
+    "expect": "killed",
+    "note": "studioServer verifyLeaseForScope treats an unverifiable list as empty (fail open)."
+  },
+  {
+    "id": "P30-1542-consumer-wire",
+    "oldIssue": "AMC-1542",
+    "file": "src/wire/wireDispatcher.ts",
+    "find": "= readRevokedLeaseIds(workspace);",
+    "replace": "= ((r) => r.ok ? r : { ok: true as const, ids: new Set<string>() })(readRevokedLeaseIds(workspace));",
+    "tests": [
+      "tests/leaseRevocationConsumers.test.ts",
+      "tests/wireDispatcher.test.ts"
+    ],
+    "expect": "killed",
+    "note": "wireDispatcher treats an unverifiable list as empty (fail open)."
+  },
+  {
+    "id": "P30-1546-mixed-credentials",
+    "oldIssue": "AMC-1546",
+    "file": "src/studio/agentCredentialAuth.ts",
+    "find": "if (first === undefined || grants.some(grant => grant.agentId !== first.agentId)) return null;",
+    "replace": "if (first === undefined) return null;",
+    "tests": [
+      "tests/studioCredentialBindingHttp.test.ts",
+      "tests/studioAgentCredentialBinding.test.ts"
+    ],
+    "expect": "killed",
+    "note": "Accept mixed credentials (grants from different agents)."
+  },
+  {
+    "id": "P30-1546-lease-narrowing",
+    "oldIssue": "AMC-1546",
+    "file": "src/studio/agentCredentialAuth.ts",
+    "find": "for (const grant of grants.slice(1)) {",
+    "replace": "for (const grant of grants.slice(grants.length)) {",
+    "tests": [
+      "tests/studioCredentialBindingHttp.test.ts",
+      "tests/studioAgentCredentialBinding.test.ts"
+    ],
+    "expect": "killed",
+    "note": "Ignore lease narrowing (no scope intersection)."
+  },
+  {
+    "id": "P30-1508-submittedby-from-body",
+    "oldIssue": "AMC-1508",
+    "file": "src/api/productRouter.ts",
+    "find": "const body = await bodyJsonSchema(req, submitPortalBodySchema);",
+    "replace": "const body = await bodyJsonSchema(req, submitPortalBodySchema.extend({ submittedBy: z.string().nullish() })); const submitter = body.submittedBy || context!.principal!.trim();",
+    "tests": [
+      "tests/portalAttribution.test.ts"
+    ],
+    "expect": "killed",
+    "note": "Take submittedBy from the body. The route refuses a body submittedBy with 400 rather than ignoring it."
+  },
+  {
+    "id": "P30-1534-budget-compare",
+    "oldIssue": "AMC-1534",
+    "file": "src/budgets/nativeBudgetAdmission.ts",
+    "find": "if (limit !== undefined && usage.daily.toolExecutes[spend.actionClass] + usage.daily.toolPending[spend.actionClass] >= limit) {",
+    "replace": "if (limit !== undefined && usage.daily.toolExecutes[spend.actionClass] + usage.daily.toolPending[spend.actionClass] >= Infinity) {",
+    "tests": [
+      "tests/nativeBudgets.test.ts"
+    ],
+    "expect": "killed",
+    "note": "Drop the budget compare in reserveNativeToolBudget."
+  },
+  {
+    "id": "P30-1529-replay-bytes-binding",
+    "oldIssue": "AMC-1529",
+    "file": "src/notary/notaryAuth.ts",
+    "find": ":${Math.trunc(ts)}:${expected}`,",
+    "replace": ":${Math.trunc(ts)}:${sigHeader}`,",
+    "tests": [
+      "tests/notaryAuthReplay.test.ts",
+      "tests/notaryComposeIntegration.test.ts"
+    ],
+    "expect": "killed",
+    "note": "Drop the replay guard's binding to the canonical signature bytes (key on the raw header)."
+  },
+  {
+    "id": "P30-1529-replay-lifetime",
+    "oldIssue": "AMC-1529",
+    "file": "src/notary/notaryAuth.ts",
+    "find": "    if (request.replayExpiresTs < now) return { ok: false, reason: \"authentication expired\" };\n",
+    "replace": "",
+    "tests": [
+      "tests/notaryAuthReplay.test.ts"
+    ],
+    "expect": "killed",
+    "note": "Drop the replay guard's lifetime check."
+  },
+  {
+    "id": "P30-1537-reviewed-pin",
+    "oldIssue": "AMC-1537",
+    "file": "src/agent/agentToolset.ts",
+    "find": "\n        || snapshot.digestSha256 !== options.expectedToolsDigest)) {",
+    "replace": ")) {",
+    "tests": [
+      "tests/nativePinnedToolSchemas.test.ts"
+    ],
+    "expect": "killed",
+    "note": "Skip the reviewed-pin digest comparison before schema admission (agentToolset.ts schemas())."
+  },
+  {
+    "id": "P30-1547-write-before-commit",
+    "oldIssue": "AMC-1547",
+    "file": "src/session/spill/spillStore.ts",
+    "find": "    let attempted = false;\n    return Object.freeze({\n      object,\n      persist: (): SpillObject => {\n        if (attempted) throw new Error(\"prepared spill publication already attempted\");\n        attempted = true;\n        publishObject(this.workspace, locator, encoded, this.root);\n        return object;",
+    "replace": "    publishObject(this.workspace, locator, encoded, this.root);\n    let attempted = false;\n    return Object.freeze({\n      object,\n      persist: (): SpillObject => {\n        if (attempted) throw new Error(\"prepared spill publication already attempted\");\n        attempted = true;\n        return object;",
+    "tests": [
+      "tests/spillEncryption.test.ts",
+      "tests/sessionSpillCommitment.test.ts",
+      "tests/sessionAttachmentSpill.test.ts",
+      "tests/sessionInboxSpill.test.ts"
+    ],
+    "expect": "killed",
+    "note": "Write spill content before its commitment."
+  },
+  {
+    "id": "P30-1547-default-key",
+    "oldIssue": "AMC-1547",
+    "file": "src/session/spill/spillEncryption.ts",
+    "find": "  const { keyVersion, key } = writerKey(workspace);",
+    "replace": "  const { keyVersion, key } = (() => { try { return writerKey(workspace); } catch { return { keyVersion: 1, key: Buffer.alloc(32, 0x41) }; } })();",
+    "tests": [
+      "tests/spillEncryption.test.ts",
+      "tests/sessionSpillCommitment.test.ts",
+      "tests/sessionAttachmentSpill.test.ts"
+    ],
+    "expect": "killed",
+    "note": "Fall back to a default spill key."
+  },
+  {
+    "id": "P30-1547-skip-verify",
+    "oldIssue": "AMC-1547",
+    "file": "src/session/spill/spillEvidence.ts",
+    "find": "    const result = inspectWithContext(workspace, event, context);",
+    "replace": "    const result = authenticateWithContext(workspace, event, context);",
+    "tests": [
+      "tests/sessionSpill.test.ts",
+      "tests/sessionAttachmentSpill.test.ts"
+    ],
+    "expect": "killed",
+    "note": "Skip verifySpilledContent in the sweep (authenticate rows only)."
+  },
+  {
+    "id": "P30-1547-dotdot-path",
+    "oldIssue": "AMC-1547",
+    "file": "src/session/spill/spillTypes.ts",
+    "find": "      !OBJECT_NAME_RE.test(objectName) || /[^A-Za-z0-9._-]/.test(objectName)) {",
+    "replace": "      (!OBJECT_NAME_RE.test(objectName) && !objectName.includes(\"..\")) || /[^A-Za-z0-9._\\/-]/.test(objectName)) {",
+    "tests": [
+      "tests/sessionSpill.test.ts"
+    ],
+    "expect": "killed",
+    "note": "Allow .. in a spill locator path."
+  },
+  {
+    "id": "P30-1547-export-unauthenticated",
+    "oldIssue": "AMC-1547",
+    "file": "src/session/spill/spillLifecycle.ts",
+    "find": "  const inventory = requireInventory(input), selected = resolve(input.destination);",
+    "replace": "  const inventory = inventorySessionSpills(input), selected = resolve(input.destination);",
+    "tests": [
+      "tests/spillLifecycle.test.ts"
+    ],
+    "expect": "killed",
+    "note": "Export without the authenticated inventory."
+  },
+  {
+    "id": "P30-1547-erase-scope",
+    "oldIssue": "AMC-1547",
+    "file": "src/session/spill/spillLifecycle.ts",
+    "find": "  const selected = (id: string) => eventIds.has(id) || sessionIds.has(rows.get(id)!.session_id);",
+    "replace": "  const selected = (_id: string) => true;",
+    "tests": [
+      "tests/spillLifecycle.test.ts",
+      "tests/retentionSpill.test.ts",
+      "tests/cliSpillCommands.test.ts"
+    ],
+    "expect": "killed",
+    "note": "Erase outside the requested scope."
+  },
+  {
+    "id": "P30-1542-reread-after-verify",
+    "oldIssue": "AMC-1542",
+    "file": "src/leases/leaseStore.ts",
+    "find": "    return { ok: true, ids: new Set(readVerifiedRevocations(workspace).revocations.map((row) => row.leaseId)) };",
+    "replace": "    readVerifiedRevocations(workspace);\n    return { ok: true, ids: new Set(loadLeaseRevocations(workspace).revocations.map((row) => row.leaseId)) };",
+    "tests": [
+      "tests/leaseRevocationConsumers.test.ts"
+    ],
+    "expect": "killed",
+    "note": "Verify the list, then build the revoked set from a second read of the file (the TOCTOU fixed in 8d9077a4)."
+  },
+  {
+    "id": "P30-1525-vault-unlock-partial",
+    "oldIssue": "AMC-1525",
+    "file": "src/vault/vault.ts",
+    "find": "      // A failed upgrade leaves no session behind: not this partial payload, not one from an older envelope.\n      lockVault(workspace);\n",
+    "replace": "",
+    "tests": [
+      "tests/vaultUnlockCaching.test.ts"
+    ],
+    "expect": "killed",
+    "note": "A failed legacy key upgrade in unlockVault leaves the session unlocked (fixed in 34e7dbb7)."
+  },
+  {
+    "id": "P30-1525-vault-unlock-publish-early",
+    "oldIssue": "AMC-1525",
+    "file": "src/vault/vault.ts",
+    "find": "  let openedDigest: string | null = envelopeDigest;\n",
+    "replace": "  let openedDigest: string | null = envelopeDigest;\n  session.unlocked = true;\n  session.payload = payload;\n",
+    "tests": [
+      "tests/vaultUnlockCaching.test.ts"
+    ],
+    "expect": "equivalent",
+    "note": "Publish the session before the upgrade. Equivalent: the upgrade's catch locks the vault, so a throw still leaves it locked; the late publish is defence in depth."
+  },
+  {
+    "id": "P30-1547-store-root",
+    "oldIssue": "AMC-1547",
+    "file": "src/session/spill/spillStore.ts",
+    "find": "  if (!suffix || suffix === \"..\" || suffix.startsWith(`..${sep}`) || suffix.startsWith(sep)) {",
+    "replace": "  if (!suffix) {",
+    "tests": [
+      "tests/spillLifecycle.test.ts"
+    ],
+    "expect": "killed",
+    "note": "Allow a spill root outside the workspace (spillStore.ts storageRoot)."
+  },
+  {
+    "id": "P30-1547-transport-dotdot",
+    "oldIssue": "AMC-1547",
+    "file": "src/session/spill/spillLifecycle.ts",
+    "find": "  if (isAbsolute(suffix) || suffix === \"..\" || suffix.startsWith(`..${sep}`)) throw new Error(\"Spill transport path escaped its selected root\");",
+    "replace": "  if (false) throw new Error(\"Spill transport path escaped its selected root\");",
+    "tests": [
+      "tests/spillLifecycle.test.ts",
+      "tests/sessionSpill.test.ts"
+    ],
+    "expect": "equivalent",
+    "note": "Drop the transport `..` check in spillLifecycle.ts transportDirectory. Equivalent through the public API: parseIndex pins every exported object file to objects/<sha256>.blob before any transport read, and the root is the realpath of the selected directory."
+  },
+  {
+    "id": "P30-1534-no-transaction",
+    "oldIssue": "AMC-1534",
+    "file": "src/budgets/nativeBudgetAdmission.ts",
+    "find": "    ledger.db.transaction(() => {",
+    "replace": "    ((body: () => void) => Object.assign(body, { immediate: body }))(() => {",
+    "tests": [
+      "tests/nativeBudgets.test.ts"
+    ],
+    "expect": "killed",
+    "note": "Drop the IMMEDIATE transaction around read/check/reserve (the race): one edit replaces the wrapper with a function whose .immediate() runs the body bare. Killed only by the two-process barrier case."
+  },
+  {
+    "id": "S7-M01-bwrap-child-guard",
+    "oldIssue": "AMC-1513",
+    "file": "src/sandbox/bwrapBackend.ts",
+    "find": "if (child !== null || !Number.isSafeInteger",
+    "replace": "if (false && !Number.isSafeInteger",
+    "tests": [
+      "tests/sandboxConfinement.test.ts",
+      "tests/bwrapBackendPure.test.ts"
+    ],
+    "expect": "killed",
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests). tests/nativeSandboxPolicyBinding.test.ts is left out: two of its cases fail on main without any mutation (stale since P1-02's authorization recheck; see the README), and S7 recorded every kill in bwrapBackendPure."
+  },
+  {
+    "id": "S7-M02-bwrap-exit-before-child",
+    "oldIssue": "AMC-1513",
+    "file": "src/sandbox/bwrapBackend.ts",
+    "find": "if (child === null || exit !== null ||",
+    "replace": "if (exit !== null ||",
+    "tests": [
+      "tests/sandboxConfinement.test.ts",
+      "tests/bwrapBackendPure.test.ts"
+    ],
+    "expect": "killed",
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests). tests/nativeSandboxPolicyBinding.test.ts is left out: two of its cases fail on main without any mutation (stale since P1-02's authorization recheck; see the README), and S7 recorded every kill in bwrapBackendPure."
+  },
+  {
+    "id": "S7-M03-bwrap-exit-dup",
+    "oldIssue": "AMC-1513",
+    "file": "src/sandbox/bwrapBackend.ts",
+    "find": "if (child === null || exit !== null ||",
+    "replace": "if (child === null ||",
+    "tests": [
+      "tests/sandboxConfinement.test.ts",
+      "tests/bwrapBackendPure.test.ts"
+    ],
+    "expect": "killed",
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests). tests/nativeSandboxPolicyBinding.test.ts is left out: two of its cases fail on main without any mutation (stale since P1-02's authorization recheck; see the README), and S7 recorded every kill in bwrapBackendPure."
+  },
+  {
+    "id": "S7-M04-bwrap-exit-range",
+    "oldIssue": "AMC-1513",
+    "file": "src/sandbox/bwrapBackend.ts",
+    "find": " || Number(object[\"exit-code\"]) > 255) return null;",
+    "replace": ") return null;",
+    "tests": [
+      "tests/sandboxConfinement.test.ts",
+      "tests/bwrapBackendPure.test.ts"
+    ],
+    "expect": "killed",
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests). tests/nativeSandboxPolicyBinding.test.ts is left out: two of its cases fail on main without any mutation (stale since P1-02's authorization recheck; see the README), and S7 recorded every kill in bwrapBackendPure."
+  },
+  {
+    "id": "S7-M05-bwrap-nonobject-row",
+    "oldIssue": "AMC-1513",
+    "file": "src/sandbox/bwrapBackend.ts",
+    "find": "if (!row || typeof row !== \"object\" || Array.isArray(row)) return null;",
+    "replace": "if (!row) return null;",
+    "tests": [
+      "tests/sandboxConfinement.test.ts",
+      "tests/bwrapBackendPure.test.ts"
+    ],
+    "expect": "killed",
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests). tests/nativeSandboxPolicyBinding.test.ts is left out: two of its cases fail on main without any mutation (stale since P1-02's authorization recheck; see the README), and S7 recorded every kill in bwrapBackendPure."
+  },
+  {
+    "id": "S7-M06-bwrap-child-positive",
+    "oldIssue": "AMC-1513",
+    "file": "src/sandbox/bwrapBackend.ts",
+    "find": " || Number(object[\"child-pid\"]) <= 0) return null;",
+    "replace": ") return null;",
+    "tests": [
+      "tests/sandboxConfinement.test.ts",
+      "tests/bwrapBackendPure.test.ts"
+    ],
+    "expect": "killed",
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests). tests/nativeSandboxPolicyBinding.test.ts is left out: two of its cases fail on main without any mutation (stale since P1-02's authorization recheck; see the README), and S7 recorded every kill in bwrapBackendPure."
+  },
+  {
+    "id": "S7-M07-bpf-arch-check",
+    "oldIssue": "AMC-1513",
+    "file": "src/sandbox/bwrapBackend.ts",
+    "find": "[0x15, 1, 0, arch === \"x64\"",
+    "replace": "[0x15, 1, 1, arch === \"x64\"",
+    "tests": [
+      "tests/sandboxConfinement.test.ts",
+      "tests/bwrapBackendPure.test.ts"
+    ],
+    "expect": "killed",
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests). tests/nativeSandboxPolicyBinding.test.ts is left out: two of its cases fail on main without any mutation (stale since P1-02's authorization recheck; see the README), and S7 recorded every kill in bwrapBackendPure."
+  },
+  {
+    "id": "S7-M08-bpf-x32-rule",
+    "oldIssue": "AMC-1513",
+    "file": "src/sandbox/bwrapBackend.ts",
+    "find": "if (arch === \"x64\") instructions.push([0x35",
+    "replace": "if (false) instructions.push([0x35",
+    "tests": [
+      "tests/sandboxConfinement.test.ts",
+      "tests/bwrapBackendPure.test.ts"
+    ],
+    "expect": "killed",
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests). tests/nativeSandboxPolicyBinding.test.ts is left out: two of its cases fail on main without any mutation (stale since P1-02's authorization recheck; see the README), and S7 recorded every kill in bwrapBackendPure."
+  },
+  {
+    "id": "S7-M09-bpf-io-uring",
+    "oldIssue": "AMC-1513",
+    "file": "src/sandbox/bwrapBackend.ts",
+    "find": ", 425, 426, 427]) {",
+    "replace": "]) {",
+    "tests": [
+      "tests/sandboxConfinement.test.ts",
+      "tests/bwrapBackendPure.test.ts"
+    ],
+    "expect": "killed",
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests). tests/nativeSandboxPolicyBinding.test.ts is left out: two of its cases fail on main without any mutation (stale since P1-02's authorization recheck; see the README), and S7 recorded every kill in bwrapBackendPure."
+  },
+  {
+    "id": "S7-M10-bpf-connect",
+    "oldIssue": "AMC-1513",
+    "file": "src/sandbox/bwrapBackend.ts",
+    "find": "[41, 53, 42]",
+    "replace": "[41, 53]",
+    "tests": [
+      "tests/sandboxConfinement.test.ts",
+      "tests/bwrapBackendPure.test.ts"
+    ],
+    "expect": "killed",
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests). tests/nativeSandboxPolicyBinding.test.ts is left out: two of its cases fail on main without any mutation (stale since P1-02's authorization recheck; see the README), and S7 recorded every kill in bwrapBackendPure."
+  },
+  {
+    "id": "S7-M11-profile-import-gate-221",
+    "oldIssue": "AMC-1516",
+    "file": "src/standard/externalEvidenceProfile.ts",
+    "find": "if (signatureVerified && profile.provenance.captureMethod !== \"import\"\n        && authority",
+    "replace": "if (signatureVerified\n        && authority",
+    "tests": [
+      "tests/externalEvidenceProfile.test.ts",
+      "tests/importProvenance.test.ts"
+    ],
+    "expect": "killed",
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests)."
+  },
+  {
+    "id": "S7-M12-profile-lower-clamp-230",
+    "oldIssue": "AMC-1516",
+    "file": "src/standard/externalEvidenceProfile.ts",
+    "find": "if (ranks[profile.provenance.trustTier] < ranks[trustTier]) trustTier = profile.provenance.trustTier;",
+    "replace": "if (false) trustTier = profile.provenance.trustTier;",
+    "tests": [
+      "tests/externalEvidenceProfile.test.ts",
+      "tests/importProvenance.test.ts"
+    ],
+    "expect": "killed",
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests)."
+  },
+  {
+    "id": "S7-M13-export-chunk-bound",
+    "oldIssue": "AMC-1516",
+    "file": "src/importers/externalEvidenceExport.ts",
+    "find": "Math.ceil(input.traces.length / 1000)",
+    "replace": "Math.ceil(input.traces.length / 2000)",
+    "tests": [
+      "tests/neutralImporter.test.ts",
+      "tests/neutralImportMapping.test.ts",
+      "tests/externalEvidenceExport.test.ts"
+    ],
+    "expect": "killed",
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests)."
+  },
+  {
+    "id": "S7-M14-export-callback-cancel",
+    "oldIssue": "AMC-1516",
+    "file": "src/importers/externalEvidenceExport.ts",
+    "find": "callback.cancelled === true || ",
+    "replace": "",
+    "tests": [
+      "tests/neutralImporter.test.ts",
+      "tests/neutralImportMapping.test.ts",
+      "tests/externalEvidenceExport.test.ts"
+    ],
+    "expect": "killed",
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests)."
+  },
+  {
+    "id": "S7-M15-export-unicode-replace",
+    "oldIssue": "AMC-1516",
+    "file": "src/importers/externalEvidenceExport.ts",
+    "find": "Array.from(value.replace(/[\\uD800-\\uDBFF](?![\\uDC00-\\uDFFF])|(?<![\\uD800-\\uDBFF])[\\uDC00-\\uDFFF]/gu, \"\\uFFFD\"))",
+    "replace": "Array.from(value)",
+    "tests": [
+      "tests/neutralImporter.test.ts",
+      "tests/neutralImportMapping.test.ts",
+      "tests/externalEvidenceExport.test.ts"
+    ],
+    "expect": "killed",
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests)."
+  },
+  {
+    "id": "S7-M16-export-time-range",
+    "oldIssue": "AMC-1516",
+    "file": "src/importers/externalEvidenceExport.ts",
+    "find": " && time <= 253402300799999 ?",
+    "replace": " ?",
+    "tests": [
+      "tests/neutralImporter.test.ts",
+      "tests/neutralImportMapping.test.ts",
+      "tests/externalEvidenceExport.test.ts"
+    ],
+    "expect": "killed",
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests)."
+  },
+  {
+    "id": "S7-M17-export-duration-loss",
+    "oldIssue": "AMC-1516",
+    "file": "src/importers/externalEvidenceExport.ts",
+    "find": "if (ns !== null && durationNs === null) precisionLoss = true;",
+    "replace": "",
+    "tests": [
+      "tests/neutralImporter.test.ts",
+      "tests/neutralImportMapping.test.ts",
+      "tests/externalEvidenceExport.test.ts"
+    ],
+    "expect": "killed",
+    "note": "S7 ran this before splitting the test (survived); re-run on main, where the split test (M17b) exists."
+  },
+  {
+    "id": "S7-M18-export-redaction-loss",
+    "oldIssue": "AMC-1516",
+    "file": "src/importers/externalEvidenceExport.ts",
+    "find": "if (candidate.redactionCount > 0) losses.push",
+    "replace": "if (false) losses.push",
+    "tests": [
+      "tests/neutralImporter.test.ts",
+      "tests/neutralImportMapping.test.ts",
+      "tests/externalEvidenceExport.test.ts"
+    ],
+    "expect": "killed",
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests)."
+  },
+  {
+    "id": "S7-M17b-export-duration-loss",
+    "oldIssue": "AMC-1516",
+    "file": "src/importers/externalEvidenceExport.ts",
+    "find": "if (ns !== null && durationNs === null) precisionLoss = true;",
+    "replace": "",
+    "tests": [
+      "tests/neutralImporter.test.ts",
+      "tests/neutralImportMapping.test.ts",
+      "tests/externalEvidenceExport.test.ts"
+    ],
+    "expect": "killed",
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests)."
+  },
+  {
+    "id": "S7-M19-export-time-loss",
+    "oldIssue": "AMC-1516",
+    "file": "src/importers/externalEvidenceExport.ts",
+    "find": "if (time !== null && time !== undefined && date === null) precisionLoss = true;",
+    "replace": "",
+    "tests": [
+      "tests/neutralImporter.test.ts",
+      "tests/neutralImportMapping.test.ts",
+      "tests/externalEvidenceExport.test.ts"
+    ],
+    "expect": "killed",
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests)."
+  },
+  {
+    "id": "S7-M20-callback-allowlist-66",
+    "oldIssue": "AMC-1517",
+    "file": "src/importers/callbackTelemetryCapture.ts",
+    "find": "if (!this.allowed.has(key) || (SENSITIVE_KEY",
+    "replace": "if ((SENSITIVE_KEY",
+    "tests": [
+      "tests/neutralImportMapping.test.ts",
+      "tests/callbackTelemetryCapture.test.ts"
+    ],
+    "expect": "killed",
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests)."
+  },
+  {
+    "id": "S7-M21-callback-sensitive-extension-66",
+    "oldIssue": "AMC-1517",
+    "file": "src/importers/callbackTelemetryCapture.ts",
+    "find": "|| (SENSITIVE_KEY.test(key) && !DEFAULT_CALLBACK_ATTRIBUTES.includes(key))) { filtered++",
+    "replace": ") { filtered++",
+    "tests": [
+      "tests/neutralImportMapping.test.ts",
+      "tests/callbackTelemetryCapture.test.ts"
+    ],
+    "expect": "killed",
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests)."
+  },
+  {
+    "id": "S7-M22-callback-token-counter-exemption-66",
+    "oldIssue": "AMC-1517",
+    "file": "src/importers/callbackTelemetryCapture.ts",
+    "find": "(SENSITIVE_KEY.test(key) && !DEFAULT_CALLBACK_ATTRIBUTES.includes(key))",
+    "replace": "SENSITIVE_KEY.test(key)",
+    "tests": [
+      "tests/neutralImportMapping.test.ts",
+      "tests/callbackTelemetryCapture.test.ts"
+    ],
+    "expect": "killed",
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests)."
+  },
+  {
+    "id": "S7-M23-callback-closed-113-equivalent",
+    "oldIssue": "AMC-1517",
+    "file": "src/importers/callbackTelemetryCapture.ts",
+    "find": "      if (this.closed || entry.ended) return;\n      try { operation(); }",
+    "replace": "      if (entry.ended) return;\n      try { operation(); }",
+    "tests": [
+      "tests/neutralImportMapping.test.ts",
+      "tests/callbackTelemetryCapture.test.ts"
+    ],
+    "expect": "equivalent",
+    "note": "Equivalent by design: close() sets closed and ends every entry, so `entry.ended` already covers `this.closed` (S7, callbackTelemetryCapture.ts:113)."
+  },
+  {
+    "id": "S7-M24-harness-secret-manifest-112",
+    "oldIssue": "AMC-1518",
+    "file": "src/benchmarks/harnessComparison.ts",
+    "find": "if (redactComparisonText(bytes.toString(\"utf8\"), secrets) !== bytes.toString(\"utf8\")) throw",
+    "replace": "if (false) throw",
+    "tests": [
+      "tests/harnessComparison.test.ts",
+      "tests/harnessComparisonOutputOwnership.test.ts"
+    ],
+    "expect": "killed",
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests)."
+  },
+  {
+    "id": "S7-M25-harness-fixture-tamper-248",
+    "oldIssue": "AMC-1518",
+    "file": "src/benchmarks/harnessComparison.ts",
+    "find": "if (comparisonSha256(readComparisonFile(fixturePath)) !== task.fixture.sha256) throw",
+    "replace": "if (false) throw",
+    "tests": [
+      "tests/harnessComparison.test.ts",
+      "tests/harnessComparisonOutputOwnership.test.ts"
+    ],
+    "expect": "killed",
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests)."
+  },
+  {
+    "id": "S7-M26-sdk-close-before-verify-753",
+    "oldIssue": "AMC-1519",
+    "file": "src/sdk/nativeAgentClient.ts",
+    "find": "if (!this.closed) throw new Error(\"Close the native client before cold verification\");",
+    "replace": "if (false) throw new Error(\"Close the native client before cold verification\");",
+    "tests": [
+      "tests/cosProduct07NativeSdk.test.ts",
+      "tests/cosProduct07NativeSdkProcess.test.ts",
+      "tests/nativeAgentClientVerify.test.ts"
+    ],
+    "expect": "killed",
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests)."
+  },
+  {
+    "id": "S7-M27-sdk-trust-anchor-789",
+    "oldIssue": "AMC-1519",
+    "file": "src/sdk/nativeAgentClient.ts",
+    "find": "if (report.trustRoot.anchored && (!report.trustRoot.expectedFingerprint\n      || report.trustRoot.expectedFingerprint !== report.trustRoot.monitorFingerprint)) {",
+    "replace": "if (false) {",
+    "tests": [
+      "tests/cosProduct07NativeSdk.test.ts",
+      "tests/cosProduct07NativeSdkProcess.test.ts",
+      "tests/nativeAgentClientVerify.test.ts"
+    ],
+    "expect": "killed",
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests)."
+  },
+  {
+    "id": "S7-M28-sdk-trust-anchor-mismatch-only-789",
+    "oldIssue": "AMC-1519",
+    "file": "src/sdk/nativeAgentClient.ts",
+    "find": "(!report.trustRoot.expectedFingerprint\n      || report.trustRoot.expectedFingerprint !== report.trustRoot.monitorFingerprint)",
+    "replace": "(!report.trustRoot.expectedFingerprint)",
+    "tests": [
+      "tests/cosProduct07NativeSdk.test.ts",
+      "tests/cosProduct07NativeSdkProcess.test.ts",
+      "tests/nativeAgentClientVerify.test.ts"
+    ],
+    "expect": "killed",
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests)."
+  },
+  {
+    "id": "S7-M29-sdk-trust-anchor-missing-only-789",
+    "oldIssue": "AMC-1519",
+    "file": "src/sdk/nativeAgentClient.ts",
+    "find": "(!report.trustRoot.expectedFingerprint\n      || report.trustRoot.expectedFingerprint !== report.trustRoot.monitorFingerprint)",
+    "replace": "(report.trustRoot.expectedFingerprint !== null && report.trustRoot.expectedFingerprint !== report.trustRoot.monitorFingerprint)",
+    "tests": [
+      "tests/cosProduct07NativeSdk.test.ts",
+      "tests/cosProduct07NativeSdkProcess.test.ts",
+      "tests/nativeAgentClientVerify.test.ts"
+    ],
+    "expect": "killed",
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests)."
+  },
+  {
+    "id": "S7-M30-dsh-hash-compare-34",
+    "oldIssue": "AMC-1520",
+    "file": "src/adapters/deepseekHarnessLaunch.ts",
+    "find": "if (!statSync(file.path).isFile() || createHash(\"sha256\").update(readFileSync(file.path)).digest(\"hex\") !== file.sha256) {",
+    "replace": "if (!statSync(file.path).isFile()) {",
+    "tests": [
+      "tests/deepseekPublicSurface.test.ts",
+      "tests/dshCaptureInterruption.test.ts",
+      "tests/deepseekHarnessLaunch.test.ts"
+    ],
+    "expect": "killed",
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests)."
+  },
+  {
+    "id": "S7-M31-dsh-isfile-34",
+    "oldIssue": "AMC-1520",
+    "file": "src/adapters/deepseekHarnessLaunch.ts",
+    "find": "if (!statSync(file.path).isFile() || createHash",
+    "replace": "if (createHash",
+    "tests": [
+      "tests/deepseekPublicSurface.test.ts",
+      "tests/deepseekHarnessLaunch.test.ts"
+    ],
+    "expect": "killed",
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests)."
+  },
+  {
+    "id": "S7-M32-dsh-prepare-reverify-59",
+    "oldIssue": "AMC-1520",
+    "file": "src/adapters/deepseekHarnessLaunch.ts",
+    "find": "  verifyDeepseekHarnessLaunch(input.launch);\n  const root = mkdtempSync",
+    "replace": "  const root = mkdtempSync",
+    "tests": [
+      "tests/deepseekPublicSurface.test.ts",
+      "tests/dshCaptureInterruption.test.ts",
+      "tests/deepseekHarnessLaunch.test.ts"
+    ],
+    "expect": "killed",
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests)."
+  },
+  {
+    "id": "S7-M33-dsh-launchpin-boundary",
+    "oldIssue": "AMC-1520",
+    "file": "src/adapters/deepseekHarnessLaunch.ts",
+    "find": "so a write to those paths after the last hash and before exec is not detected.\" },",
+    "replace": "\" },",
+    "tests": [
+      "tests/deepseekPublicSurface.test.ts",
+      "tests/deepseekHarnessLaunch.test.ts"
+    ],
+    "expect": "killed",
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests)."
+  },
+  {
+    "id": "S7-M34-cli-format-name-version-15",
+    "oldIssue": "AMC-1523",
+    "file": "src/cli-import-commands.ts",
+    "find": "const format = candidate.sourceFormat ? `${candidate.sourceFormat.name} v${candidate.sourceFormat.version} (${candidate.format})` : candidate.format;",
+    "replace": "const format = candidate.sourceFormat?.version ?? candidate.format;",
+    "tests": [
+      "tests/cliImportCommands.test.ts"
+    ],
+    "expect": "killed",
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests)."
+  },
+  {
+    "id": "S7-M35-cli-next-actions-16",
+    "oldIssue": "AMC-1523",
+    "file": "src/cli-import-commands.ts",
+    "find": "if (next === \"actions\") for",
+    "replace": "if (false) for",
+    "tests": [
+      "tests/cliImportCommands.test.ts"
+    ],
+    "expect": "killed",
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests)."
+  },
+  {
+    "id": "S7-M36-cli-record-counts",
+    "oldIssue": "AMC-1523",
+    "file": "src/cli-import-commands.ts",
+    "find": "  if (records) console.log(",
+    "replace": "  if (false) console.log(",
+    "tests": [
+      "tests/cliImportCommands.test.ts"
+    ],
+    "expect": "killed",
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests)."
+  },
+  {
+    "id": "S7-M37-cli-applied-no-reapply",
+    "oldIssue": "AMC-1523",
+    "file": "src/cli-import-commands.ts",
+    "find": "result.applied ? \"inspect\" : \"actions\"",
+    "replace": "\"actions\"",
+    "tests": [
+      "tests/cliImportCommands.test.ts"
+    ],
+    "expect": "killed",
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests)."
+  },
+  {
+    "id": "S7-M38-cli-json-byte-identical",
+    "oldIssue": "AMC-1523",
+    "file": "src/cli/claimOutput.ts",
+    "find": "console.log(JSON.stringify(withClaimFields(result, claim), null, 2));",
+    "replace": "console.log(JSON.stringify(result, null, 2));",
+    "tests": [
+      "tests/cliImportCommands.test.ts"
+    ],
+    "expect": "killed",
+    "note": "Re-pointed: the import JSON output moved into emitClaimResult (src/cli/claimOutput.ts, P0-22) and the test now pins 'receipt plus claim fields', so the mutation drops the claim fields."
+  },
+  {
+    "id": "S7-M39-cli-shell-quoting",
+    "oldIssue": "AMC-1523",
+    "file": "src/cli-import-commands.ts",
+    "find": "action.argv.map(shellWord).join(\" \")",
+    "replace": "action.argv.join(\" \")",
+    "tests": [
+      "tests/cliImportCommands.test.ts"
+    ],
+    "expect": "killed",
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests)."
+  },
+  {
+    "id": "S7-M40-gate-drop-typecheck-tests-step",
+    "oldIssue": "AMC-1521",
+    "file": "scripts/release-gate.mjs",
+    "find": "    add(\"typecheck-tests\", () => step(\"typecheck-tests\", \"npm\", [\"run\", \"typecheck:tests\"], {\n      timeoutMs: 600_000, remediation: \"Fix test TypeScript contracts without bypassing assertions or suppressing type errors.\"\n    }));\n",
+    "replace": "",
+    "tests": [
+      "tests/reconciliationDefectsReleaseGate.test.ts"
+    ],
+    "expect": "killed",
+    "note": "S7 mutated a copy (AMC_RECONCILE_ROOT); this batch mutates in place and restores the bytes. Re-pointed: the step is now registered through add(...)."
+  },
+  {
+    "id": "S7-M41-gate-substitute-step-command",
+    "oldIssue": "AMC-1521",
+    "file": "scripts/release-gate.mjs",
+    "find": "step(\"typecheck-tests\", \"npm\", [\"run\", \"typecheck:tests\"]",
+    "replace": "step(\"typecheck-tests\", \"npm\", [\"run\", \"typecheck\"]",
+    "tests": [
+      "tests/reconciliationDefectsReleaseGate.test.ts"
+    ],
+    "expect": "killed",
+    "note": "S7 mutated a copy (AMC_RECONCILE_ROOT); this batch mutates in place and restores the bytes."
+  },
+  {
+    "id": "S7-M42-ci-drop-typecheck-tests",
+    "oldIssue": "AMC-1521",
+    "file": ".github/workflows/ci.yml",
+    "find": "      - name: Typecheck tests\n        run: npm run typecheck:tests\n",
+    "replace": "",
+    "tests": [
+      "tests/reconciliationDefectsReleaseGate.test.ts"
+    ],
+    "expect": "killed",
+    "note": "S7 mutated a copy (AMC_RECONCILE_ROOT); this batch mutates in place and restores the bytes."
+  },
+  {
+    "id": "S7-M43-publish-drop-typecheck-tests",
+    "oldIssue": "AMC-1521",
+    "file": ".github/workflows/npm-publish.yml",
+    "find": "      - name: Typecheck tests\n        run: npm run typecheck:tests\n",
+    "replace": "",
+    "tests": [
+      "tests/reconciliationDefectsReleaseGate.test.ts"
+    ],
+    "expect": "killed",
+    "note": "S7 mutated a copy (AMC_RECONCILE_ROOT); this batch mutates in place and restores the bytes."
+  }
+]

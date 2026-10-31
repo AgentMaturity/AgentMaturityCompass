@@ -1,0 +1,26 @@
+{
+  "at": "2026-10-16T17:15:23.829083+00:00",
+  "ordinaryGitAddExit": 1,
+  "warning": "Tracked docs/internal paths matched .gitignore:144 internal/; all17 intended index blobs nevertheless staged and each exactly matched admitted bytes.",
+  "forceUsed": false,
+  "indexBlobHashesVerified": true,
+  "paths": [
+    "scripts/make-legacy-fixtures.mjs",
+    "tests/fixtures/legacy-1.1.1/README.md",
+    "tests/fixtures/legacy-1.1.1/generation.log",
+    "tests/fixtures/legacy-1.1.1/originals.tar.gz",
+    "tests/fixtures/legacy-1.1.1/provenance.json",
+    "tests/migration/legacyRelabel.test.ts",
+    "CONTRIBUTING.md",
+    "README.md",
+    "docs/content/reddit-launch-drafts.md",
+    "docs/content/show-hn-draft.md",
+    "docs/internal/competitive-landscape.md",
+    "docs/internal/mirofish-simulation-council.md",
+    "src/migration/legacy/classify.ts",
+    "website/i18n.js",
+    "website/index.html",
+    "website/lite.html",
+    "whitepaper/AMC_WHITEPAPER_v1.md"
+  ]
+}

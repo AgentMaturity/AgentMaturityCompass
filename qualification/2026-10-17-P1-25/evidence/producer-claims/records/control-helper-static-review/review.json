@@ -1,0 +1,105 @@
+{
+  "schema": "p125pc-independent-inert-source-control-helper-review/1",
+  "at": "2026-10-17T01:54:47.584678+00:00",
+  "blockers": [],
+  "preferredHelper": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/v3/source-control.py.source.txt",
+    "bytes": 28698,
+    "sha256": "44f1f8e540f111b8dd3a72202930a1a21fcbbf191096424e38cc6a8443c2d2a5"
+  },
+  "preferredSeal": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/v3/seal.json",
+    "bytes": 4870,
+    "sha256": "f3e9c73239e5671f8f115ed8dd3810a8deeb4aa7dd3d07bf431e6dd5238fb771"
+  },
+  "authorReview": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/v3/author-review.json",
+    "bytes": 5720,
+    "sha256": "4d12945441aff1acdb129315547cac7e4088110ab01d0133697e2f224194cab0"
+  },
+  "readScope": "Full preferred helper, complete C39 delta, V2-to-V3 delta, V2 template/input pins/instructions, recipes/patches, author review, actual static selection and target function.",
+  "checks": {
+    "twentyOneUniquePhysicalPreparationPinsExact": true,
+    "fullC39DeltaAndV2ToV3DeltaReproducedExactly": true,
+    "preservedBaseEqualsActualC39ActiveHelper": true,
+    "elevenBaseGuardFunctionsByteExact": [
+      "sha",
+      "load",
+      "pin",
+      "verify",
+      "git",
+      "inactive",
+      "closed",
+      "green",
+      "action_closed",
+      "write_json",
+      "guarded_write"
+    ],
+    "completeRestoreClassificationAndMainEntryTailByteExact": true,
+    "bothRecipeFunctionWholeFileAndPatchHashesReconstructedInMemoryOnly": true,
+    "appendEvidenceDetailedBoundariesUniqueAndFullPrefixSuffixUnchanged": true,
+    "allOtherFunctionsAndRepeatedTimestampAssignmentsUnchanged": true,
+    "fiveTemplateAdmissionFlagsFalse": true,
+    "futureCommitRootRuntimeOutcomeSuccessorPhaseAndActionFieldsNull": true,
+    "actualPrior98Paths21PairsRetainedInOrderAndOnlyTwoNamedPairsAppended": true,
+    "actualStaticSelection102Paths23Pairs175Protected12PriorNatives": true,
+    "prebuildCompiledObservationsNotAdoptedAsActiveHashes": true,
+    "futureFreshNativeRequiredSeparatelyAndAllPhysicalFilesDistinctRegularSingleLink": true,
+    "oneSourceSuccessorAndOther174ExactWithOriginalGitBytesRequired": true,
+    "allFourCurrentActiveHaltedMarkersCheckedBeforeContextAndWrite": true,
+    "sourceFreshGreenSameOrderedCorpusAndHooksRequiredBeforeMutation": true,
+    "directApplyNaturalClosureBeforeMutantAndRestoreClosureBeforeNextGreenGated": true,
+    "fullActualFailureMessagesFramesMasksAndCleanupClassificationRequiredBeforeExplicitRestore": true,
+    "exclusiveOriginalPreparedLivePatchApplyRestoreRecordsAndO_NOFOLLOWSameInodeRestorationRetained": true,
+    "sourceOnlyFreshLedgerTargetNoCompiledOrNativeMutation": true
+  },
+  "operators": [
+    {
+      "id": "DROP-PRODUCER-TS",
+      "scope": "Only appendEvidenceDetailed const ts assignment",
+      "deltaBytes": -12,
+      "prospectiveWitness": 698,
+      "laterMaskedScope": "If the backdated stored-row equality fails, no later postdated append, second grant, reader or final credit is available.",
+      "actualFailureCount": null
+    },
+    {
+      "id": "CLAMP-FUTURE-PRODUCER-TS",
+      "scope": "Only appendEvidenceDetailed const ts assignment; undefined fallback and supplied past timestamps preserved",
+      "deltaBytes": 46,
+      "prospectiveWitness": 707,
+      "laterMaskedScope": "If the future stored-row equality fails, no later second grant, reader or final credit is available.",
+      "actualFailureCount": null
+    }
+  ],
+  "versionHistory": {
+    "v1AndV2PreservedAndUnexecutedByAuthor": true,
+    "v2Errors": "loadBASE_PROTECTED and pinBASE_PROTECTED[0] were accidental identifier substitutions.",
+    "v3Delta": "Only restores the two intended call parentheses.",
+    "sealFullAuthorReadPending": "The immutable seal predates the adjacent author-review.json; that later exact-pinned record explicitly resolves the author full-read pending field.",
+    "noNewExecutionOrAllocationByReviewer": true
+  },
+  "limits": [
+    "Static text, metadata and in-memory byte projection only. No helper/product import, syntax parser, compiler, test, native, OpenSSL, SQL or network execution. No mutant source was stored.",
+    "The 175/102/23/12 contracts are actual static input shapes. Future fresh-root/native/runtime binding, semantic commit, GREEN outcomes and control results are not adopted by this review.",
+    "Prospective assertion locations and expected sensitivity are hypotheses only; actual failure totals, complete errors/masks, action chronology, explicit restoration and same-cohort GREEN require root evidence.",
+    "No source/index/QA or reservation operation, key/private-stream/native payload read, guard/deadline change, quality waiver, full P1-25/plan/release or F37 credit."
+  ],
+  "readClosure": {
+    "allReadAndMetadataCallsNaturallyZero": true,
+    "chunks": [
+      "4c9e69",
+      "940c98",
+      "0334a8",
+      "a383ac",
+      "694b72",
+      "55a5d6",
+      "c7c777",
+      "704e80",
+      "4cab2f",
+      "f0b573",
+      "82f2ad"
+    ],
+    "combinedDisplayTruncation": "The initial combined recipe display was truncated; the complete recipe and both operator patches were subsequently read separately.",
+    "outstandingSessions": false
+  }
+}

@@ -1,6 +1,6 @@
 # Fresh-clone acceptance — candidate C `09d353f566ec0ed6ea5d655937179194744d95e0`
 
-Reproduced per the brief's receipt rule: `git clone /Users/sid/AgentMaturityCompass` into the session scratchpad
+Reproduced per the brief's receipt rule: `git clone ~/AgentMaturityCompass` into the session scratchpad
 (`clone-c`), `git checkout 09d353f5`, `pnpm install --frozen-lockfile --prefer-offline` from the local pnpm store,
 then every step below by `fresh-clone-validate.sh` (in this directory). Environment: Darwin 25.6.0 arm64, Node
 v25.5.0, pnpm 10.33.0 (`candidate-c/environment.txt`). Tracked tree clean after checkout

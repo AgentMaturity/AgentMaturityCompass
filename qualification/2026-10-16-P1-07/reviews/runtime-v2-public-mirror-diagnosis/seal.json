@@ -1,0 +1,27 @@
+{
+  "schema": "p107-mirror-diagnosis-seal/1",
+  "inputCount": 27,
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-v2-public-mirror-diagnosis/review.json",
+      "bytes": 11518,
+      "sha256": "bd914a92d366ee3d9579fbdc52b7516c710ae4830043df5edb27769235163208",
+      "readScope": "Exact private static diagnosis output."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-v2-public-mirror-diagnosis/README.md",
+      "bytes": 1831,
+      "sha256": "c4fe442d99cabfa6476b6181893113d1292282725fbcdaa84cf597ca987ee78f",
+      "readScope": "Exact private static diagnosis output."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-v2-public-mirror-diagnosis/pins.json",
+      "bytes": 9541,
+      "sha256": "5beae65c9b7758120272633729f7751e41f1be6fc3ed62aa3a297280cf3ac111",
+      "readScope": "Exact private static diagnosis output."
+    }
+  ],
+  "noExecution": true,
+  "checkoutIndexQaWrites": false,
+  "noProposalOrPatchAuthored": true
+}

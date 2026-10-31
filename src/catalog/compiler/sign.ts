@@ -45,10 +45,13 @@ export function assertSignedPlan(workspace: string, signed: Pick<SignedPlan, "pl
 
 const RUNTIME_RULES: Rules = [
   [/(^|\.|\])controlIds$/, { kind: "ignore" }],
+  // Names the tools.yaml the plan was compiled from (P1-10F). A new digest is judged by what it changes (visibleTools and
+  // the tools fragment); dropping it is checked in planWeakenings.
+  [/^toolPipeline\.toolsConfigSha256$/, { kind: "ignore" }],
   [/^(toolPipeline\.visibleTools|egress\.allowHosts|egress\.processorAllowlist)$|\.rolesAllowed$/, { kind: "addedIsWeaker" }],
   [/^toolPipeline\.approvalRequiredFor$|^toolPipeline\.guards\[[^\]]+\]$|^approvals\.[A-Z_]+$/, { kind: "removedIsWeaker" }],
   [/\.requiredApprovals$/, { kind: "floor", absent: -Infinity }],
-  [/\.ttlMinutes$/, { kind: "ceiling", absent: Infinity }],
+  [/\.(ttlMinutes|maxLeaseTtlMinutes)$/, { kind: "ceiling", absent: Infinity }],
   [/\.(requireDistinctUsers|requireAgentLease|requirePrincipal)$/, { kind: "falseIsWeaker" }]
 ];
 const EVIDENCE_RULES: Rules = [
@@ -89,6 +92,10 @@ export function planWeakenings(prev: CompiledPlan | null, next: CompiledPlan): s
     return [];
   });
   const fragments = (p: CompiledPlan) => p.runtimePolicy.proposedSignedConfigs as OperatingProfile["proposedSignedConfigs"];
+  // A plan that no longer binds tools.yaml (one compiled without it) would let it change unseen (P1-10F).
+  const pinned = prev.runtimePolicy.toolPipeline.toolsConfigSha256;
+  const unpinned = pinned !== undefined && next.runtimePolicy.toolPipeline.toolsConfigSha256 === undefined
+    ? [`runtimePolicy: toolPipeline.toolsConfigSha256 ${JSON.stringify(pinned)} -> absent`] : [];
   const mergeRules: Rules = [
     [/\.(controlIds|exceptionId)$/, { kind: "ignore" }],
     [/^\[[^\]]+\]$/, { kind: "removedIsWeaker" }]
@@ -96,6 +103,7 @@ export function planWeakenings(prev: CompiledPlan | null, next: CompiledPlan): s
   return [
     ...waived,
     ...dropped,
+    ...unpinned,
     ...weakenings("runtimePolicy", RUNTIME_RULES, policyView(prev.runtimePolicy), policyView(next.runtimePolicy)),
     ...fragmentWeakenings(fragments(prev), fragments(next)),
     ...weakenings("evidencePlan", EVIDENCE_RULES, evidenceView(prev.evidencePlan), evidenceView(next.evidencePlan)),
@@ -113,6 +121,8 @@ export interface SignPlanInput {
   reviewAgentId?: string | null;
   /** Passed to that request; it may only raise the signed rule (A4 regulated plan activation, design §5.3). */
   quorumFloor?: ApprovalRequestInput["quorumFloor"];
+  /** Who raises that request (P1-78); `amc catalog compile` passes the CLI's OS user. Optional: A4 names none. */
+  initiator?: string;
 }
 
 export function signPlan(input: SignPlanInput): { signed: SignedPlan; weakenings: string[] } {
@@ -134,7 +144,7 @@ export function signPlan(input: SignPlanInput): { signed: SignedPlan; weakenings
   const signature = signDigestWithPolicy({ workspace, kind: "CONTROL_PLAN", digestHex: hexOf(input.plan.digest) });
   const approvalRequestId = input.reviewAgentId
     ? createApprovalForIntent({
-      workspace, agentId: input.reviewAgentId, ...planReviewIntent(input.plan),
+      workspace, agentId: input.reviewAgentId, ...planReviewIntent(input.plan), ...(input.initiator === undefined ? {} : { initiator: input.initiator }),
       requestedMode: "EXECUTE", effectiveMode: "EXECUTE", riskTier: "high",
       leaseConstraints: { scopes: [], routeAllowlist: [], modelAllowlist: [] }, quorumFloor: input.quorumFloor
     }).approval.approvalRequestId

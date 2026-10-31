@@ -52,8 +52,11 @@ export interface VerifyAllCheck {
 }
 
 export interface VerifyAllReport {
-  status: "PASS" | "FAIL";
+  /** INCOMPLETE: nothing failed, but a critical check was skipped, so the headline is withheld rather than PASS (WP37). */
+  status: "PASS" | "FAIL" | "INCOMPLETE";
   criticalFail: boolean;
+  /** Ids of critical checks recorded as SKIP (never performed). */
+  skippedCritical: string[];
   generatedTs: number;
   checks: VerifyAllCheck[];
 }
@@ -504,10 +507,12 @@ export async function verifyAll(params: {
 
   const criticalFail = checks.some((check) => check.critical && check.status === "FAIL");
   const anyFail = checks.some((check) => check.status === "FAIL");
+  const skippedCritical = checks.filter((check) => check.critical && check.status === "SKIP").map((check) => check.id);
 
   return {
-    status: anyFail ? "FAIL" : "PASS",
+    status: anyFail ? "FAIL" : skippedCritical.length > 0 ? "INCOMPLETE" : "PASS",
     criticalFail,
+    skippedCritical,
     generatedTs: Date.now(),
     checks
   };

@@ -1,0 +1,16 @@
+[
+  {
+    "id": "source-duplicates",
+    "command": "npm run check:duplicates",
+    "status": "passed",
+    "timeoutMs": 180000,
+    "summary": "{\"scan\":\"duplicates\",\"baseline\":1254,\"current\":1254,\"new\":0,\"stale\":0,\"accepted\":0}"
+  },
+  {
+    "id": "source-dead-code",
+    "command": "npm run check:dead-code",
+    "status": "passed",
+    "timeoutMs": 180000,
+    "summary": "{\"scan\":\"dead-code\",\"baseline\":2787,\"current\":2787,\"new\":0,\"stale\":0,\"accepted\":0}"
+  }
+]

@@ -1,0 +1,12 @@
+{
+  "model": "gpt-x",
+  "temperature": 0.2,
+  "tools": [
+    "bash",
+    "read"
+  ],
+  "provider": {
+    "name": "openai",
+    "timeoutMs": 30000
+  }
+}

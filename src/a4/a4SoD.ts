@@ -40,14 +40,16 @@ const BUILD_REF_PURPOSES: ReadonlySet<unknown> = new Set(["assemble_scaffold", "
 /**
  * Principals who built up to this revision since the stage's direction gate (cycleStart, the range authorsOf uses for a
  * completion gate): STEP actors whose body moves `to: "built"` (the STEP body records from/to, design §9.1), the actors
- * of build-work evidence refs (BUILD_REF_PURPOSES: scaffold, connect, import, the context probe), and EFFECT_STARTED actors of this
- * revision (the build manifest's author is amc-runtime).
+ * of build-work evidence refs (BUILD_REF_PURPOSES: scaffold, connect, import, the context probe), the recorders of
+ * Activate's deploy receipts (the deployment approval rests on their self_reported statement), and EFFECT_STARTED actors
+ * of this revision (the build manifest's author is amc-runtime).
  */
 export function buildersOf(transitions: readonly A4ChainLink[], revisionNo: number): string[] {
   const from = cycleStart(transitions, revisionNo);
   const inCycle = (link: A4ChainLink): boolean => link.revisionNo >= from && link.revisionNo <= revisionNo;
   return [...new Set(transitions.filter((link) => (link.kind === "EFFECT_STARTED" && link.revisionNo === revisionNo)
-    || (inCycle(link) && ((link.kind === "STEP" && link.body.to === "built") || (link.kind === "EVIDENCE_REF" && BUILD_REF_PURPOSES.has(link.body.purpose)))))
+    || (inCycle(link) && ((link.kind === "STEP" && link.body.to === "built") || (link.kind === "EVIDENCE_REF" && BUILD_REF_PURPOSES.has(link.body.purpose))
+      || (link.kind === "DEPLOYMENT" && link.body.deploymentKind === "deploy"))))
     .map((link) => link.body.actorKey).filter((key): key is string => typeof key === "string" && key !== "amc-runtime"))];
 }
 

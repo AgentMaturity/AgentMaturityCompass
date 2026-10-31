@@ -1,0 +1,78 @@
+{
+  "schema": "p125-next-window-private-acceptance-matrix/1",
+  "newLiteralBodies": 1,
+  "caseId": "CHECKPOINT-TWO-BOUND-WINDOW",
+  "existingTwoCheckpointAndTwoGrantBodiesExact": true,
+  "runtimeResults": null,
+  "realFixtureFlow": [
+    "unchanged own root/signer/listener/privateHOME/environment and native/vault ownership",
+    "same actual signed trust-list loader and auditor-signed config",
+    "genuine checkpoint1 queried and independently OpenSSL+AMC-verified under its actual digest/nonce/pinned root",
+    "real owned middle audit appended and session sealed through retained useLedger handle",
+    "genuine checkpoint2 queried and independently verified by explicit second same-path occurrence",
+    "same contiguous monitor-signed checkpoint chain, previous digest link, both head bindings, stored rawCMS and actual checkpoint-token metadata",
+    "real signed ledger verified before and after all offline reader calls",
+    "no row/clock/date edit, artificial token, forged success, new key set, new network or sleep"
+  ],
+  "windowAcceptance": {
+    "firstSemanticWitnessLine": 445,
+    "assertion": "expect(actualMiddle.time.basis).toBe(\"attested-window\");",
+    "then": [
+      "exact token1 lower/token2 upper",
+      "upper attestation matches second independent grant",
+      "actual stored middle claimedAt preserved",
+      "seed remains upper-bound only; last checkpoint row remains claimed"
+    ],
+    "equalSecondGenTimesAccepted": true
+  },
+  "defaultTolerance": {
+    "minutes": 5,
+    "sourceConstantNotUsedAsOracle": true,
+    "boundary": "earliest/latest integer-millisecond Date claim inside each actual accuracy+five-minute cutoff, then exactlyone integer millisecond outside",
+    "readerRows": [
+      "lower inclusive accepts",
+      "lower beyond gives BACKDATED_CLAIM",
+      "upper inclusive accepts",
+      "upper beyond gives POSTDATED_CLAIM"
+    ],
+    "firstLoopWitnessLine": 452,
+    "caseMessageIdentifiesRow": true
+  },
+  "explicitZeroTolerance": {
+    "loopLine": 458,
+    "readerRows": [
+      "accuracy-only lower/upper inclusive",
+      "one millisecond outside accuracy-only lower/upper",
+      "same five-minute default edges now refused"
+    ],
+    "doesNotAssertActualStoredRowPassesZeroTolerance": true
+  },
+  "causalControlDesignOnly": [
+    {
+      "target": "src/time/checkpoint.ts",
+      "operator": "drop lower selection only",
+      "firstExpectedSensitiveLocation": 445,
+      "masking": "Later exact window/bounds/default/zero finding assertions are masked if the earlier middle basis fails; no actual RED or failure count predicted."
+    },
+    {
+      "target": "src/time/timeEvidence.ts",
+      "operator": "omit tolerance contribution only",
+      "firstExpectedSensitiveLocation": 452,
+      "masking": "All reader results are gathered in public facts first. Default-lower-inclusive is asserted before the actual-stored-row finding diagnostic and before other default/zero rows; actual first frames still require root review."
+    }
+  ],
+  "publicRecords": [
+    "shared fixture retains every signing/verification child record and both request/query/response paths with natural cleanup",
+    "new checkpoint facts retain both actual attestation summaries/token hashes, checkpoint signatures/head metadata/ledger hashes, all ten reader observations and before/after row+ledger verification facts",
+    "shared replyObservation remains last reply; both independent children and new per-grant facts retain first and second evidence",
+    "no private keys/vault/raw environment/raw payload bodies/private child streams in public facts"
+  ],
+  "remainingGaps": [
+    "persisted backdated/postdated rows and real caller/report integration",
+    "nonzero accuracy branch if actual TSA omits it",
+    "cadence/minute/Studio scheduling",
+    "sealing/certificate/attestation/publicentry/package/library/manualgenerator/fullsuite/globalquality",
+    "allhelddecisions/F37"
+  ],
+  "admission": "No source allocated. Root must finish current checkpoint lane, refresh exact2path ownership/history/hosted/freeze/D15 and preserve current own originals before any materialization."
+}

@@ -1,0 +1,80 @@
+{
+  "schema": "p125pc-inert-receipt-extension-preparation-seal/1",
+  "at": "2026-10-17T01:57:38.599007+00:00",
+  "base": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/assemble-extension.py",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/assemble-extension.py",
+    "bytes": 36929,
+    "sha256": "45fa2d76363c9c96da03ab857418049b141f2a18cb9979f18ba242601ea82468",
+    "dev": 16777231,
+    "inode": 543909596,
+    "nlink": 1
+  },
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-extension-preparation/assemble-extension.py.base.source.txt",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/receipt-extension-preparation/assemble-extension.py.base.source.txt",
+      "bytes": 36929,
+      "sha256": "45fa2d76363c9c96da03ab857418049b141f2a18cb9979f18ba242601ea82468",
+      "dev": 16777231,
+      "inode": 543990354,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-extension-preparation/assemble-extension.py.source.txt",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/receipt-extension-preparation/assemble-extension.py.source.txt",
+      "bytes": 40432,
+      "sha256": "27599c95b58a3af6a6719d43e29346538a6b1dc01f8321391f5631a71d7438b9",
+      "dev": 16777231,
+      "inode": 543990355,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-extension-preparation/c39-to-producer.patch.txt",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/receipt-extension-preparation/c39-to-producer.patch.txt",
+      "bytes": 27993,
+      "sha256": "c5974e498adab11f8590d9d0644502afe3f1f22cb599a7c966fb6eed4d222f50",
+      "dev": 16777231,
+      "inode": 543990356,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-extension-preparation/actual-inputs.template.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/receipt-extension-preparation/actual-inputs.template.json",
+      "bytes": 1728,
+      "sha256": "3e0afaeaa110119c14cb24ab57cac6ef268e32925a29a9a0878e22d7192b55cc",
+      "dev": 16777231,
+      "inode": 543990357,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-extension-preparation/input-pins.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/receipt-extension-preparation/input-pins.json",
+      "bytes": 5118,
+      "sha256": "0c80b2e80f20323ec4624b0a5f4bfb6b5bbd3f7a9cc4a9926dfdb5af75b98ee0",
+      "dev": 16777231,
+      "inode": 543990358,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-extension-preparation/README.md",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/receipt-extension-preparation/README.md",
+      "bytes": 5908,
+      "sha256": "864edce321d099dfc1fc703edab05b6a72f15e1ba188025abb9c8e99355e3e7b",
+      "dev": 16777231,
+      "inode": 543990359,
+      "nlink": 1
+    }
+  ],
+  "fiveAdmissionFlagsFalse": true,
+  "futureActualInputsNullAndSelectionsEmpty": true,
+  "onlyNewAssemblyInputsSerializationCompact": true,
+  "old877972AssemblyBytesAnd3864OrderedPrefixPreservedByContract": true,
+  "oneMiBValidatorMarkerFreezeAndQualityChecksUnchanged": true,
+  "noParserImportCompilerHelperProductTestOpenSslNativeNetworkKeyStreamOrReservationOperation": true,
+  "noSourceIndexQaPriorArtifactOrAllocationMutation": true,
+  "noFutureOutputCountOrResultClaim": true,
+  "fullAuthorReadPending": true,
+  "requiresRootFullReadIndependentReviewAndActualInputsBeforeExecution": true,
+  "blockers": []
+}

@@ -1,0 +1,9 @@
+
+> agent-maturity-compass@1.2.0 check:counts
+> node scripts/gen-counts.mjs --check
+
+Published count check failed:
+  - README.md: unknown count key "assurancePacksRegistered"
+  - README.md: unknown count key "assurancePacksRegistered"
+  - README.md: unknown count key "diagnosticQuestions"
+  - README.md: unknown count key "assurancePacksRegistered"

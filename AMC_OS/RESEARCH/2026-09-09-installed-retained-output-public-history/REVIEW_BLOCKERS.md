@@ -60,7 +60,7 @@ python3 - <<'PY'
 import json,os
 from pathlib import Path
 p=Path('tmp/cos-installed-retained-output-public-history-01/run/jsonl/erase-approval.json')
-approval={'schemaVersion':1,'nonce':'d274b6e414e14a6a9787864c690ad159','source':'130c2d0087cf574016411fdc7d91067d3eddd637','backend':'jsonl','workspace':'/Users/sid/AgentMaturityCompass/tmp/cos-installed-retained-output-public-history-01/run/jsonl/workspace','sessionId':'c654c96c-02f5-4818-bb4b-38150dd5c112','reason':'Owned installed-spill acceptance fixture only','planSha256':'31eedcbae9f8c07439f5a59bee10509b5ff08abd3f662f3bc0fcbef4408c3469','decision':'apply-owned-fixture-only','statement':'I reviewed this exact owned-fixture erasure plan.'}
+approval={'schemaVersion':1,'nonce':'d274b6e414e14a6a9787864c690ad159','source':'130c2d0087cf574016411fdc7d91067d3eddd637','backend':'jsonl','workspace':'~/AgentMaturityCompass/tmp/cos-installed-retained-output-public-history-01/run/jsonl/workspace','sessionId':'c654c96c-02f5-4818-bb4b-38150dd5c112','reason':'Owned installed-spill acceptance fixture only','planSha256':'31eedcbae9f8c07439f5a59bee10509b5ff08abd3f662f3bc0fcbef4408c3469','decision':'apply-owned-fixture-only','statement':'I reviewed this exact owned-fixture erasure plan.'}
 fd=os.open(p,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600)
 with os.fdopen(fd,'w') as f:json.dump(approval,f,indent=2);f.write('\n');f.flush();os.fsync(f.fileno())
 print('Separate agent review recorded for exact JSONL fixture A; B, transports and signed history excluded.')

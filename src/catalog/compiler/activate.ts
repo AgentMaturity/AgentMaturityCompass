@@ -10,13 +10,15 @@
 import { join, resolve } from "node:path";
 import { consumeApprovedExecution, verifyApprovalForExecution } from "../../approvals/approvalEngine.js";
 import { withControlFileLock } from "../../lifecycle/controlFileLock.js";
-import { appendSignedControlJournal, readSignedControlJournal, type SignedControlJournalSnapshot } from "../../lifecycle/signedControlJournal.js";
+import { appendSignedControlJournal, controlCheckpointDir, readSignedControlJournal, SignedControlJournalError,
+  type SignedControlJournalSnapshot } from "../../lifecycle/signedControlJournal.js";
 import { assertOwnerMode } from "../../mode/mode.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { canonicalize } from "../../utils/json.js";
 import { digestOf } from "../digest.js";
-import { loadCatalog } from "../loader.js";
+import { loadAdmittedCatalog } from "../admission/gate.js";
 import { verifyCatalogLock } from "../lockfile.js";
+import { shownReviewStatus } from "../governance/support.js";
 import type { ControlRecord, EnforcementPoint } from "../types.js";
 import { PARAMETERS } from "./runtimePolicy.js";
 import { CONTROL_PLAN_REVIEW_TOOL, assertSignedPlan, planReviewIntent, planWeakenings } from "./sign.js";
@@ -56,6 +58,8 @@ export interface ActiveCompiledPolicy {
   readonly lockDigest: string;
   readonly runtimePolicy: EffectiveRuntimePolicy;
   readonly controls: readonly ActiveControl[];
+  /** The tenant and deployment the plan's profile names, from the verified plan; null for a plan compiled before P1-78. */
+  readonly deployment: { readonly tenantId: string; readonly deploymentId: string } | null;
 }
 
 /** Structure, then the plan's own digest and CONTROL_PLAN signature, over the payload the journal just verified. */
@@ -74,8 +78,37 @@ function readJournal(workspace: string, recover = false): SignedControlJournalSn
     parsePayload: (payload) => verifiedActivation(workspace, payload), recoverPendingPublication: recover });
 }
 
+/**
+ * P0-57: the workspace contains the host-local control checkpoint root (the default under HOME, when HOME is the
+ * workspace or inside it), so no plan in it can be verified. Its own refusal, never "restore the plan". The message names
+ * the variable and the condition but no host path: callers return it in API responses and model-visible tool denials.
+ */
+export class ControlCheckpointRootInWorkspaceError extends Error {
+  readonly code = "CONTROL_CHECKPOINT_ROOT_IN_WORKSPACE" as const;
+  constructor() {
+    super("The control checkpoint root (AMC_CONTROL_CHECKPOINT_DIR, default ~/.amc/control-checkpoints) is inside this workspace, "
+      + "so its compiled control plan cannot be verified. Set AMC_CONTROL_CHECKPOINT_DIR to a directory outside the workspace.");
+    this.name = "ControlCheckpointRootInWorkspaceError";
+  }
+}
+
+/** Whether the workspace contains the control checkpoint root, where no signed control journal can be read or written. */
+export function checkpointRootInWorkspace(workspace: string): boolean {
+  try { controlCheckpointDir(workspace, KIND); return false; } catch (error) { if (error instanceof SignedControlJournalError) return true; throw error; }
+}
+
+/**
+ * P0-57, fail closed: with the checkpoint root inside the workspace nothing anchors the journal outside it, so "no plan"
+ * cannot be told apart from a deleted one (a plan activated under an outside root, then the variable unset and
+ * `.amc/control-plan/` removed). Every read refuses by name until AMC_CONTROL_CHECKPOINT_DIR leaves the workspace.
+ */
+function assertCheckpointRootOutside(workspace: string): void {
+  if (checkpointRootInWorkspace(workspace)) throw new ControlCheckpointRootInWorkspaceError();
+}
+
 /** Identity of the active journal head, or null when no plan was ever activated. Throws on any integrity failure. */
 export function activeControlPlanHead(workspace: string): string | null {
+  assertCheckpointRootOutside(workspace);
   return readJournal(workspace).entrySha256;
 }
 
@@ -84,6 +117,7 @@ export function activeControlPlanHead(workspace: string): string | null {
  * the baseline activateControlPlan checks weakenings against. Throws on any integrity failure.
  */
 export function activeControlPlan(workspace: string): CompiledPlan | null {
+  assertCheckpointRootOutside(workspace);
   return readJournal(workspace).payload?.plan ?? null;
 }
 
@@ -92,10 +126,11 @@ export function activeControlPlan(workspace: string): CompiledPlan | null {
  * or digest, or the shipped catalog against the plan's lockfile does not verify: the caller refuses the session.
  */
 export function loadActiveCompiledPolicy(workspace: string): ActiveCompiledPolicy | null {
+  assertCheckpointRootOutside(workspace);
   const journal = readJournal(workspace);
   if (journal.integrity === "uninitialized" || !journal.payload) return null;
   const { plan } = journal.payload;
-  const catalog = loadCatalog();
+  const catalog = loadAdmittedCatalog();
   const lock = verifyCatalogLock(plan.lock, catalog);
   if (!lock.ok) {
     const first = lock.mismatches[0];
@@ -105,10 +140,11 @@ export function loadActiveCompiledPolicy(workspace: string): ActiveCompiledPolic
     const record = catalog.controls.get(r.controlId);
     if (!record || record.version !== r.controlVersion) throw new Error(`control ${r.controlId}@${r.controlVersion} is not in the shipped catalog`);
     const compiledPoints = [...new Set(record.binding.parameters.flatMap((p) => PARAMETERS.find((spec) => spec.pattern.test(p.name))?.point ?? []))];
-    return { controlId: r.controlId, controlVersion: r.controlVersion, points: record.binding.points, compiledPoints, review: record.review.status };
+    const compiled = r; // the plan row: its support is effectiveSupport's result, compiled into the plan (P1-34)
+    return { controlId: r.controlId, controlVersion: r.controlVersion, points: record.binding.points, compiledPoints, review: shownReviewStatus(record, compiled.support) };
   });
   return { revision: journal.revision, entrySha256: journal.entrySha256 ?? "", planDigest: plan.digest, profileSha256: plan.profile.sha256,
-    lockDigest: digestOf(plan.lock), runtimePolicy: plan.runtimePolicy, controls };
+    lockDigest: digestOf(plan.lock), runtimePolicy: plan.runtimePolicy, controls, deployment: plan.profile.deployment ?? null };
 }
 
 export interface ActivateInput {
@@ -131,7 +167,7 @@ export function activateControlPlan(input: ActivateInput): { revision: number; w
   const next: Activation = { schema: "amc.control-plan-activation/v1", plan: input.signed.plan, signature: input.signed.signature,
     compiledAt: input.signed.compiledAt, approvalRequestId: input.approvalRequestId };
   verifiedActivation(workspace, next);
-  const lock = verifyCatalogLock(next.plan.lock, loadCatalog());
+  const lock = verifyCatalogLock(next.plan.lock, loadAdmittedCatalog());
   if (!lock.ok) throw new Error("the shipped catalog differs from the plan's lockfile; recompile against this catalog");
   return withControlFileLock({ root: root(workspace), name: "activation", operation: () => {
     const previous = readJournal(workspace, true);

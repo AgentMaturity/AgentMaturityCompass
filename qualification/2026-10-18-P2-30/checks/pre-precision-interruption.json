@@ -1,0 +1,8 @@
+{
+  "head": "e4bbdb66c6ee99ab266a7aae86380665d270139f",
+  "timeUtc": "2026-10-18T10:09:02.717619+00:00",
+  "action": "SIGINT only verified own process group86697; outer Python exit2 with recorded KeyboardInterrupt, npm exit not captured",
+  "reason": "Independent review found NIS2 Date.parse truncation can admit submillisecond late packet; this source is no longer final. No full-suite totals were produced.",
+  "tests": null,
+  "generatedInputsPreserved": true
+}

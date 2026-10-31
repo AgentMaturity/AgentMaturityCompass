@@ -1,0 +1,362 @@
+{
+  "capturedUtc": "2026-10-14T22:20:45.512Z",
+  "scope": "Independent read-only review of the Python qualification receipt and retained evidence. No Python import, venv operation, install, runtime/rerun, source edit, canonical edit, or external request was performed. Only this private JSON/Markdown pair is written.",
+  "verdict": "No actionable findings in the bounded Python constructor/digest/registry qualification. This does not close full P0-24 acceptance or endorse current law/ATLAS/expert mappings.",
+  "findings": [],
+  "receipt": {
+    "path": "/private/tmp/p0-24-python-qualification-20261015.json",
+    "sha256": "5f35ba179af37cdd7fed09541886422cd9db052350bd0d70737e9b60787febc4",
+    "matchesProvidedSha256": true,
+    "markdown": "/private/tmp/p0-24-python-qualification-20261015.md",
+    "markdownSha256": "7dc0718b6556a6b5a50573dc4af75b445368c9f54f48f1d29b1973e2815debc1",
+    "artifactIndex": {
+      "path": "/private/tmp/p0-24-python-qualification-20261015/artifact-index.json",
+      "sha256": "691475b3cbf3bde5fefd8264564cad956573c01eb02a4664d6840e543a4a47f8",
+      "bytes": 19948
+    },
+    "artifactEntries": 85,
+    "allArtifactHashesAndByteSizesMatch": true
+  },
+  "source": {
+    "runtimeHead": "75cbdf8a1b83ed6b3851ecce3a069940352a40cd",
+    "alreadyLandedFix": "3b088c3c7ca1f10daf2b1576f9bd208a6605a7b5",
+    "fixIsAncestorOfRuntimeHead": true,
+    "sourcePins": 20,
+    "allCurrentPinsBeforeAfterMatch": true,
+    "livePackageFiles": 206,
+    "fullCurrentFileInventoryMatchesBeforeAfter": true,
+    "privatePackageFiles": 206,
+    "privateFullCurrentInventoryMatchesBaselineRestored": true,
+    "noExtraPackageFilesOrSymlinks": true,
+    "mutantChangedPaths": [
+      "watch/prebuilt_policy_packs.py"
+    ],
+    "privateExactOneValueMutation": {
+      "from": "\"id\": \"ATLAS_T0051_PROMPT_INJECTION\"",
+      "to": "\"id\": \"ATLAS_T0048_PROMPT_INJECTION\"",
+      "occurrences": 1,
+      "versionAndOtherRulesUnchanged": true
+    },
+    "allOtherPackageAndVersionBytesUnchanged": true,
+    "currentRootCheckpoint": {
+      "head": "072ccaaad2d4cd7890ed97dc830302d50ca91b31",
+      "parent": "75cbdf8a1b83ed6b3851ecce3a069940352a40cd",
+      "status": "clean",
+      "boundary": "Exactly tests/citationCorrections.test.ts and ten parent-authorized factual count-document paths.",
+      "newTypedTestSha256": "c184101b8dc302cfaf2980b6b2900cac26bbe9965d2f5ba3dbc68f2468bd0712",
+      "pythonSourceAndOldTestsUnchanged": true
+    }
+  },
+  "environment": {
+    "version": "3.12.14 (main, Aug 12 2026, 13:57:54) [Clang 21.0.0 (clang-2100.1.1.101)]",
+    "executable": "/private/tmp/p0-24-python-qualification-20261015/venv/bin/python",
+    "prefix": "/private/tmp/p0-24-python-qualification-20261015/venv",
+    "basePrefix": "/opt/homebrew/opt/python@3.12/Frameworks/Python.framework/Versions/3.12",
+    "venvSystemSitePackages": false,
+    "directRequirements": 7,
+    "installReportPackages": 18,
+    "actualDistributionMetadataIncludingPip": 19,
+    "installReportFreezeRuntimeAndActualDistInfoAllMatch": true,
+    "pipCheck": {
+      "exit": 0,
+      "text": "No broken requirements found."
+    },
+    "install": {
+      "exit": 0,
+      "durationMs": 4651,
+      "downloadMetadataRetained": true
+    },
+    "distributions": [
+      {
+        "name": "aiosqlite",
+        "version": "0.22.1"
+      },
+      {
+        "name": "annotated-types",
+        "version": "0.8.0"
+      },
+      {
+        "name": "cffi",
+        "version": "2.1.1"
+      },
+      {
+        "name": "cryptography",
+        "version": "50.0.2"
+      },
+      {
+        "name": "iniconfig",
+        "version": "2.3.1"
+      },
+      {
+        "name": "packaging",
+        "version": "26.3"
+      },
+      {
+        "name": "pip",
+        "version": "26.2.1"
+      },
+      {
+        "name": "pluggy",
+        "version": "1.6.0"
+      },
+      {
+        "name": "pycparser",
+        "version": "3.11"
+      },
+      {
+        "name": "pydantic",
+        "version": "2.14.1"
+      },
+      {
+        "name": "pydantic-settings",
+        "version": "2.16.0"
+      },
+      {
+        "name": "pydantic_core",
+        "version": "2.50.1"
+      },
+      {
+        "name": "Pygments",
+        "version": "2.21.0"
+      },
+      {
+        "name": "pytest",
+        "version": "9.1.1"
+      },
+      {
+        "name": "pytest-asyncio",
+        "version": "1.4.0"
+      },
+      {
+        "name": "python-dotenv",
+        "version": "1.2.4"
+      },
+      {
+        "name": "structlog",
+        "version": "26.1.0"
+      },
+      {
+        "name": "typing-inspection",
+        "version": "0.4.4"
+      },
+      {
+        "name": "typing_extensions",
+        "version": "4.16.0"
+      }
+    ],
+    "limits": "The fresh venv resolves the minimal tested runtime closure plus pytest/asyncio, not the whole pyproject/server/optional dependency set or an invented project lock. The receipt truthfully records real dependency downloads; no syscall network-denial mechanism was installed."
+  },
+  "counts": {
+    "existingJUnit": {
+      "cases": 12,
+      "passed": 12,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "allTwelveCaseNamesMatchReceipt": true
+    },
+    "currentWitness": {
+      "cases": 5,
+      "passed": 5,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "boundedCurrentTotal": {
+      "total": 17,
+      "passed": 17,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "pending": 0,
+      "todo": 0
+    },
+    "privateCausal": {
+      "baseline": {
+        "total": 5,
+        "passed": 5,
+        "failed": 0
+      },
+      "mutant": {
+        "total": 5,
+        "passed": 4,
+        "failed": 1
+      },
+      "restored": {
+        "total": 5,
+        "passed": 5,
+        "failed": 0
+      },
+      "exits": [
+        0,
+        1,
+        0
+      ],
+      "allNoErrorsSkipsPendingTodo": true,
+      "onlyFailedCase": "__main__.ConstructorQualification.test_current_atlas_constructor",
+      "actualDifference": "ATLAS_T0048_PROMPT_INJECTION appears instead of ATLAS_T0051_PROMPT_INJECTION.",
+      "sameFiveNames": [
+        "__main__.ConstructorQualification.test_actual_digest_round_trip",
+        "__main__.ConstructorQualification.test_current_atlas_constructor",
+        "__main__.ConstructorQualification.test_jailbreak_id_tamper_refused",
+        "__main__.ConstructorQualification.test_prompt_id_tamper_refused",
+        "__main__.ConstructorQualification.test_registry_positive"
+      ],
+      "sameUnmodifiedWitnessSha256": "dca7a0288147d4c0cf76a99046c4dd5688c256352f506daa1b4f4d8e16e4b748",
+      "actualPackageEntryChecksRetained": true
+    }
+  },
+  "digestAndRegistry": {
+    "actualConstructedPacksRead": 20,
+    "uniqueRecordedPackIds": 20,
+    "uniqueRecordedConstructorTimestamps": 20,
+    "allTwentyDigestsIndependentlyComputedAndValid": true,
+    "wrongIdProducerAlsoHasValidDigest": true,
+    "eightTamperRefusalsChecked": true,
+    "allEightNonemptySameRegistryBeforeAfterObjectsAndCanonicalByteHashesMatch": true,
+    "allEightTamperedCandidateDigestsIndependentlyInvalid": true,
+    "actualError": "Policy pack digest mismatch",
+    "originalPackIdentityAssertionsRemainInSameWitness": true,
+    "syntheticTamperIds": [
+      "ATLAS_T9999_P024_TAMPER",
+      "ATLAS_T9998_P024_TAMPER"
+    ],
+    "interpretation": "The same five cases distinguish current-ID assertion sensitivity from digest integrity. A genuine wrong-ID constructor still makes a valid self-consistent SHA256 digest and passes the positive registry case. Independently tampered candidates retain the original digest and fail admission without changing the already-populated registry. This is not issuer authentication, signed independent evidence, authoritative ATLAS inventory, or enforcement."
+  },
+  "settings": {
+    "actualAmcAndWatchEntryPointsInspected": true,
+    "unchangedConftestOnlyAddsSourcePath": true,
+    "realSettingsSingletonImportsRetained": true,
+    "createdDirectoriesOnly": [
+      "cache",
+      "exports",
+      "logs"
+    ],
+    "allCreatedDirectoriesEmpty": true,
+    "createdFilesOrDatabases": 0,
+    "privateCwdHasNoDotEnv": true,
+    "minimalRecordedChildEnvironmentHasNoCredentialOrInheritedUserKeys": true,
+    "pythonNoUserSiteAndNoBytecodeEnabled": true,
+    "witnessBeforeAfterSettingsSnapshotsEqual": true,
+    "limits": "Observed owned directory snapshots and same-instance in-memory registry comparisons cover this inspected canned path, not a universal no-effects/lifecycle/race guarantee. Settings env_file remains .env compatibility; the owned cwd is explicitly .env-free."
+  },
+  "commands": {
+    "count": 10,
+    "allJournalRecordsMatchReceipt": true,
+    "allStreamHashesMatch": true,
+    "allActualExitsEqualRecordedExpectedExits": true,
+    "executionErrors": 0,
+    "expectedPrivateMutationExitOneRetained": true,
+    "phases": [
+      {
+        "name": "create-owned-venv",
+        "exit": 0,
+        "expectedExit": 0,
+        "durationMs": 1417
+      },
+      {
+        "name": "install-seven-direct-dependencies",
+        "exit": 0,
+        "expectedExit": 0,
+        "durationMs": 4651
+      },
+      {
+        "name": "pip-check",
+        "exit": 0,
+        "expectedExit": 0,
+        "durationMs": 150
+      },
+      {
+        "name": "freeze-exact-resolution",
+        "exit": 0,
+        "expectedExit": 0,
+        "durationMs": 150
+      },
+      {
+        "name": "venv-interpreter-and-resolution",
+        "exit": 0,
+        "expectedExit": 0,
+        "durationMs": 90
+      },
+      {
+        "name": "unchanged-existing-twelve",
+        "exit": 0,
+        "expectedExit": 0,
+        "durationMs": 2241
+      },
+      {
+        "name": "actual-constructor-five",
+        "exit": 0,
+        "expectedExit": 0,
+        "durationMs": 211
+      },
+      {
+        "name": "private-baseline",
+        "exit": 0,
+        "expectedExit": 0,
+        "durationMs": 263
+      },
+      {
+        "name": "private-wrong-prompt-id",
+        "exit": 1,
+        "expectedExit": 1,
+        "durationMs": 265
+      },
+      {
+        "name": "private-restored",
+        "exit": 0,
+        "expectedExit": 0,
+        "durationMs": 208
+      }
+    ]
+  },
+  "businessImplementationEvidence": [
+    {
+      "file": "platform/python/amc/watch/prebuilt_policy_packs.py",
+      "line": 283,
+      "meaning": "Actual zero-argument constructor creates version 1.1 pack with current local source rule identifiers and calls with_digest."
+    },
+    {
+      "file": "platform/python/amc/watch/prebuilt_policy_packs.py",
+      "line": 301,
+      "meaning": "Current prompt rule ID remains T0051; the private one-value mutant is restored."
+    },
+    {
+      "file": "platform/python/amc/watch/prebuilt_policy_packs.py",
+      "line": 308,
+      "meaning": "Current jailbreak rule ID remains T0054."
+    },
+    {
+      "file": "platform/python/amc/watch/w10_policy_packs.py",
+      "line": 33,
+      "meaning": "with_digest hashes sorted canonical model fields excluding digest, without an issuer key."
+    },
+    {
+      "file": "platform/python/amc/watch/w10_policy_packs.py",
+      "line": 39,
+      "meaning": "verify_digest compares that same SHA256 self-consistency."
+    },
+    {
+      "file": "platform/python/amc/watch/w10_policy_packs.py",
+      "line": 56,
+      "meaning": "Registry checks digest/modules/rules before inserting the pack."
+    },
+    {
+      "file": "platform/python/amc/core/config.py",
+      "line": 104,
+      "meaning": "Real imported settings singleton creates configured cache/log/export parent directories."
+    }
+  ],
+  "reviewMethod": "Static source inspection, retained JSON/JUnit/stream comparisons, filesystem hash/inventory checks, actual installed dist-info text inspection, and independent Node built-in SHA computations over ASCII canonical pack and registry data. No Python code was imported or executed by the reviewer.",
+  "limits": [
+    "Local canned pack construction/digest/registry behavior only.",
+    "Digest integrity is not issuer authentication or signed independent proof.",
+    "No legal/current-ATLAS release verification, expert approval, certification, or enforcement capability proof.",
+    "No full Python/AMC suite, coverage, packaging/CLI/server, live transport, hostedCI, release, or Done acceptance.",
+    "No global network syscall denial was installed: processes used a credential-free environment and this inspected constructor/test path invokes no transport/provider. Dependency installation genuinely fetched packages.",
+    "Actual package import side effects were directed into a private .env-free cwd/HOME/settings fixture; this does not qualify unrelated modules.",
+    "Lower-bound dependency requirements were resolved for this owned run; exact current metadata is retained, not an invented project lock.",
+    "Existing historical pending/log notes were not rewritten."
+  ],
+  "completion": "All source/package/witness/stream reads are finished. No requested or inherited failure was waived, and no source, old test, baseline, guard, dependency, Node/native, shared environment, canonical artifact, tracker, or Claude work was edited by this review."
+}

@@ -17,21 +17,22 @@ describe("faithfulness scoring", () => {
 
   /* ── Empty / edge cases ─────────────────────────────────────── */
 
-  it("returns score 1 for empty output (vacuously faithful)", () => {
+  it("returns no score for empty output", () => {
     const result = scoreFaithfulness(makeInput({ output: "" }));
-    expect(result.score).toBe(1);
-    expect(result.explanation).toContain("vacuously");
+    expect(result.score).toBeNull();
+    expect(result.outcome).toBe("not_evaluated");
+    expect(result.explanation).toContain("not evaluated");
   });
 
-  it("returns score 0 for empty context", () => {
+  it("returns no score for empty context", () => {
     const result = scoreFaithfulness(makeInput({ context: "" }));
-    expect(result.score).toBe(0);
+    expect(result.score).toBeNull();
     expect(result.explanation).toContain("No context");
   });
 
-  it("returns score 0 when no claims extracted", () => {
+  it("returns no score when no claims extracted", () => {
     const result = scoreFaithfulness(makeInput({ output: "Hmm ok." }));
-    expect(result.score).toBe(0);
+    expect(result.score).toBeNull();
     expect(result.totalClaims).toBe(0);
   });
 
@@ -104,8 +105,12 @@ describe("faithfulness scoring", () => {
     ];
     for (const inp of inputs) {
       const result = scoreFaithfulness(inp);
-      expect(result.score).toBeGreaterThanOrEqual(0);
-      expect(result.score).toBeLessThanOrEqual(1);
+      if (result.score === null) {
+        expect(result.outcome).toBe("not_evaluated");
+      } else {
+        expect(result.score).toBeGreaterThanOrEqual(0);
+        expect(result.score).toBeLessThanOrEqual(1);
+      }
     }
   });
 
@@ -158,7 +163,7 @@ describe("faithfulness scoring", () => {
   });
 
   it("computeOverlap handles empty strings", () => {
-    expect(computeOverlap("", "some context")).toBe(1); // trivial claim
+    expect(computeOverlap("", "some context")).toBeNull();
     expect(computeOverlap("some claim", "")).toBe(0);
   });
 
@@ -170,6 +175,9 @@ describe("faithfulness scoring", () => {
     });
     const strict = scoreFaithfulness(input, { overlapThreshold: 0.8 });
     const lenient = scoreFaithfulness(input, { overlapThreshold: 0.2 });
+    expect(strict.outcome).toBe("measured");
+    expect(lenient.outcome).toBe("measured");
+    if (strict.score === null || lenient.score === null) throw new Error("Expected measured grounding scores");
     expect(lenient.score).toBeGreaterThanOrEqual(strict.score);
   });
 

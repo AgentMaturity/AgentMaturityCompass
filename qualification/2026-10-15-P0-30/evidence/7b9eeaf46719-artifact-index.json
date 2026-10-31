@@ -1,0 +1,755 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-30",
+  "oldIssue": "AMC-1542",
+  "scope": "Independent seven-consumer baseline supplement, not core mutations or future consumer mutants.",
+  "artifacts": [
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/commands-frozen.jsonl",
+      "bytes": 5540,
+      "sha256": "7f72e8609ee1d711bea4733b9113c783af1e25a3f4ba95760d30ac550f83d180"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/compiled-original.json",
+      "bytes": 462540,
+      "sha256": "82ff86751e49686db52385c53bac4a2c7ef010a2034745289731d4e6d4ac7598"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/core-preservation-after.json",
+      "bytes": 293,
+      "sha256": "899eb2761566ff9a4cfface513ab6db70e3c01f2297c928cf1c0445464d6348d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/core-preservation-before.json",
+      "bytes": 293,
+      "sha256": "899eb2761566ff9a4cfface513ab6db70e3c01f2297c928cf1c0445464d6348d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/core-reference-pins-after.json",
+      "bytes": 22267,
+      "sha256": "a3dfce086cfb3eee29505c8f096cb4af634502ccfb6e7f10443fee1b28b5dbac"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/core-reference-pins-before.json",
+      "bytes": 22267,
+      "sha256": "a3dfce086cfb3eee29505c8f096cb4af634502ccfb6e7f10443fee1b28b5dbac"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/dependency-links.json",
+      "bytes": 105595,
+      "sha256": "e4a88d899d81f87e26c19dbbec5f931ea6db1cf41defc6065280d8723d39fad2"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/driver-first-json-only.py",
+      "bytes": 10608,
+      "sha256": "8c3dc5929eec944c8f2c835e149d9791301ab53e984c1e0e013c5103d8986303"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/driver.py",
+      "bytes": 10985,
+      "sha256": "546de3f39a83f65e7a9fd32f0810c3de22a76459b02344f5ab2aadf9d1afb855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/finalize.py",
+      "bytes": 18727,
+      "sha256": "efc69806c1c2c62d3aeeb0ebb847428b5f060fcd7c5bfde677465729d02e86aa"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/full-closure-final.json",
+      "bytes": 1399901,
+      "sha256": "575442e7fb2ba4bd222eed18d0a7dd6b2cd3ac5823246fecfad58743860c52cf"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/native-after.json",
+      "bytes": 457,
+      "sha256": "2ecb3371892b7c627be792d3aadf31d3e138c657b834d73777be7d527406fb26"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/native-before.json",
+      "bytes": 457,
+      "sha256": "2ecb3371892b7c627be792d3aadf31d3e138c657b834d73777be7d527406fb26"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/phases/observation-reporters-rerun/command.json",
+      "bytes": 1745,
+      "sha256": "7c1295a5ad210493812e6660b0c19ffb6cf2b998cf43307b23a8cadf27dfedf2"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/phases/observation-reporters-rerun/observations.json",
+      "bytes": 429203,
+      "sha256": "8ee83998b80a8fa48b0c8674816c89bdb531fc77f9ec77db501917f7e39c8674"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/phases/observation-reporters-rerun/raw-tests.json",
+      "bytes": 2603,
+      "sha256": "d8b613bf9c0f557e23de9bab49d86140b986994c10381b751cc9f50f5462fa15"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/phases/observation-reporters-rerun/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/phases/observation-reporters-rerun/stdout.log",
+      "bytes": 278682,
+      "sha256": "728c1696d960325ed513efa8d7fc8a52a68e989f821acb14634ceff5cd913d46"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/phases/observation-reporters-rerun/summary.json",
+      "bytes": 3448,
+      "sha256": "a1eade14d4127838b9f0389067789acbb3bcc725d94377c0a9747bff66e0f319"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/phases/reviewed-seven-consumer-first-baseline/command.json",
+      "bytes": 1760,
+      "sha256": "21e1197ed32b094016b00c107bf75951a1faf9d4fdf9f13d87737accf36849fb"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/phases/reviewed-seven-consumer-first-baseline/observations.json",
+      "bytes": 3,
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/phases/reviewed-seven-consumer-first-baseline/raw-tests.json",
+      "bytes": 2596,
+      "sha256": "7aa7b7050359c7588c555b369d8c5665cf7bcfdd2f4b779a08225d4d54648bb6"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/phases/reviewed-seven-consumer-first-baseline/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/phases/reviewed-seven-consumer-first-baseline/stdout.log",
+      "bytes": 144,
+      "sha256": "b150508ed36fa1bd77f7bee5709a84c2c1b827a5f228e6b557e9f6bfee6ed232"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/phases/reviewed-seven-consumer-first-baseline/summary.json",
+      "bytes": 3457,
+      "sha256": "00396cd516e57d418f49d3b1bedf9018ea688abf905c5935241b0f2c44197d1a"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/phases/root-head-final/command.json",
+      "bytes": 1249,
+      "sha256": "1f3e4fb8e81bfe90e55544f3d73634375fbec6e8cd2c02bf6edd587ebcef927e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/phases/root-head-final/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/phases/root-head-final/stdout.log",
+      "bytes": 41,
+      "sha256": "4d6100c6870dbeb5ee06470bb88c465f6304ec0b7d1ef2684adc01718809997b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/phases/root-status-final/command.json",
+      "bytes": 1258,
+      "sha256": "a7eab16e0b5fdfb871089f9ece5ee2bf245e4c79b8e777f1819f954e7d6d18e3"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/phases/root-status-final/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/phases/root-status-final/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/prepared.json",
+      "bytes": 763,
+      "sha256": "556cb7d7effe21c39677bd24dcb6e6f11954cecea724b93015a8d608f1cc8d62"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/proposal-pins.json",
+      "bytes": 1044,
+      "sha256": "d32945039a12a6e81ab830bd26c143eb0f77389c43352c8808c905a34d28ba19"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/protected-pins-after.json",
+      "bytes": 28023,
+      "sha256": "2b9c4dd286d5ceb22c55c593fef4774a89ad1925c6ae6a3a66606eaef429d390"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/protected-pins-before.json",
+      "bytes": 28023,
+      "sha256": "2b9c4dd286d5ceb22c55c593fef4774a89ad1925c6ae6a3a66606eaef429d390"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/reporter-retention-correction.json",
+      "bytes": 1440,
+      "sha256": "d530366f4f1bebe3e755e5e29deafb8498b4677b3eaa58489bb3955a9131cf64"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/root-tracked-before.json",
+      "bytes": 914595,
+      "sha256": "93b780b8024ed47e494b7b8aad80bdb72664965f45b64c83755bcacebf6f74ef"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/semantic-observation-validation.json",
+      "bytes": 40395,
+      "sha256": "a5e6cb9036b7a9eafd35090db04f463b6fca87d1527506da0570a1c0c0073c99"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-proposal-20261015/leaseRevocationConsumerQualification.test.ts",
+      "bytes": 31014,
+      "sha256": "11c5ea168b78429fc1f2e34acc71fd350c0bed92af513cb54f234816a471329c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-proposal-20261015/proposal.json",
+      "bytes": 17583,
+      "sha256": "1d161af04a91df217a0f1a794fef0a8fb92803641a5445d7b91dccc38bb6c512"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-proposal-20261015/README.md",
+      "bytes": 5547,
+      "sha256": "bd86508f4c5840ce4d9211ea8b832b5f5bae2516703b56af9ca2b28337de7af4"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-static-review-20261015.json",
+      "bytes": 2875,
+      "sha256": "9dcc4bf5bf3d993bae5b3fd909dca07b97d9825ea22c5c084288b1c142078623"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/closure/tests/leaseRevocationConsumerQualification.test.ts",
+      "bytes": 31014,
+      "sha256": "11c5ea168b78429fc1f2e34acc71fd350c0bed92af513cb54f234816a471329c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/P30-1542-current-empty-set-after-preservation.json",
+      "bytes": 905,
+      "sha256": "fd7a2b14af862a0eef32528f75485730410f89f2dbbfdb3779de26088d357a3b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/P30-1542-current-empty-set-before-preservation.json",
+      "bytes": 905,
+      "sha256": "fd7a2b14af862a0eef32528f75485730410f89f2dbbfdb3779de26088d357a3b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/P30-1542-current-empty-set-matrix.json",
+      "bytes": 70818,
+      "sha256": "2741c0c34adb1a0fa2c49b385c3af4704fbef33c30233a99fc1de90839227c3e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/P30-1542-current-empty-set-restoration.json",
+      "bytes": 159,
+      "sha256": "a881e18633e03bd87c06ce7412e155c5f3b82e6df534bdd79a11fe8be7307792"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/P30-1542-current-empty-set-source-mutant.json",
+      "bytes": 1564,
+      "sha256": "50d2513ae8af32116ddf701f479c6e29fafda08c1d00a7c51ac9bf3cca73a1d3"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/P30-1542-current-empty-set.patch",
+      "bytes": 454,
+      "sha256": "6dd95be19abfc7808c671af8b80ca664b9774ea406f2f2beadf6569ecf319de7"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/P30-1542-revoke-snapshot-after-preservation.json",
+      "bytes": 905,
+      "sha256": "fd7a2b14af862a0eef32528f75485730410f89f2dbbfdb3779de26088d357a3b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/P30-1542-revoke-snapshot-before-preservation.json",
+      "bytes": 905,
+      "sha256": "fd7a2b14af862a0eef32528f75485730410f89f2dbbfdb3779de26088d357a3b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/P30-1542-revoke-snapshot-matrix.json",
+      "bytes": 22444,
+      "sha256": "01f12eb4910e04bb8d618f607cd242b78ea3d3dec71b3aed1a49c3b82a915c40"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/P30-1542-revoke-snapshot-restoration.json",
+      "bytes": 159,
+      "sha256": "a881e18633e03bd87c06ce7412e155c5f3b82e6df534bdd79a11fe8be7307792"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/P30-1542-revoke-snapshot-source-mutant.json",
+      "bytes": 1313,
+      "sha256": "7d6ac49dfef03ff2c1045258c7cc8974abe10b92b5a456a4772bee275635fb0f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/P30-1542-revoke-snapshot.patch",
+      "bytes": 619,
+      "sha256": "0c128a81c698ef4d91f8b9f25e8f8f7a9bc9c59a25bc5f885bbe3c045e903235"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/after-baseline-preservation.json",
+      "bytes": 905,
+      "sha256": "fd7a2b14af862a0eef32528f75485730410f89f2dbbfdb3779de26088d357a3b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/before-baseline-preservation.json",
+      "bytes": 905,
+      "sha256": "fd7a2b14af862a0eef32528f75485730410f89f2dbbfdb3779de26088d357a3b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/commands-frozen.jsonl",
+      "bytes": 15715,
+      "sha256": "d48ebdd7f43ff4adb6ce8467572b325b1db33cd0b961892f033fb8ccd6f3c9ee"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/compiled-live-after.json",
+      "bytes": 462540,
+      "sha256": "82ff86751e49686db52385c53bac4a2c7ef010a2034745289731d4e6d4ac7598"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/compiled-original.json",
+      "bytes": 462540,
+      "sha256": "82ff86751e49686db52385c53bac4a2c7ef010a2034745289731d4e6d4ac7598"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/compiled-private-after.json",
+      "bytes": 462540,
+      "sha256": "82ff86751e49686db52385c53bac4a2c7ef010a2034745289731d4e6d4ac7598"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/dependency-links.json",
+      "bytes": 102832,
+      "sha256": "85498fc5f9551ea08abea80a28263d81dd1daaa12fdbab3aa18f79b4b549355f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/drivers/source_controller.py",
+      "bytes": 10745,
+      "sha256": "b399f1e7f9d7576c9a5ed80a72ca07bbdda4574b86afb14d1a18f3e997c62ef5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/final-preservation.json",
+      "bytes": 905,
+      "sha256": "fd7a2b14af862a0eef32528f75485730410f89f2dbbfdb3779de26088d357a3b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/finalize.py",
+      "bytes": 13994,
+      "sha256": "a3176722bac0157c65dd884cc38568b0837aedb4ea2d328548e4e02b42c58870"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/full-closure-final.json",
+      "bytes": 1399777,
+      "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/index/setup-artifact-index.json",
+      "bytes": 3051,
+      "sha256": "4fe9ae84c883f02ec4f49ca27dba99f93e6257b53fcebec715d1a047f60c4864"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/native-before.json",
+      "bytes": 457,
+      "sha256": "2ecb3371892b7c627be792d3aadf31d3e138c657b834d73777be7d527406fb26"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/original-corpus.json",
+      "bytes": 1802,
+      "sha256": "0986c0a2b68e0a99ed330a64e288d4f543056e759ae845cdf95f72a06e5ba246"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-baseline/command.json",
+      "bytes": 1850,
+      "sha256": "5c28a4af559249facb0a774f1a2bb01fbfee3844095fb8fc1bec664550e9a162"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-baseline/raw-tests.json",
+      "bytes": 14131,
+      "sha256": "f461eb53a5188de4ca91587f8f1a0aa2244e89496986e194d358732c29754393"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-baseline/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-baseline/stdout.log",
+      "bytes": 132,
+      "sha256": "3db826e0b47b03632dd70943ff04be577a8fcde26802d8b9da548d05ec5482a9"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-baseline/summary.json",
+      "bytes": 12971,
+      "sha256": "8c68a98e6e2759c05cab25463d00b98894c6997fa6a3cdb68318b7292868f6cd"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-mutant/command.json",
+      "bytes": 1836,
+      "sha256": "c504afc56cb0e34ef241aa57fbbab4bd6cf493da70493b7cb39720858f130679"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-mutant/raw-tests.json",
+      "bytes": 42664,
+      "sha256": "2f08ae1a07cecbb93ab5b0656b041689c5590d329660a14e7035158b295f8365"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-mutant/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-mutant/stdout.log",
+      "bytes": 130,
+      "sha256": "b458d0f12ba801aed033a70caf174ab149f938e56c2a7e94d800be5788e6cac6"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-mutant/summary.json",
+      "bytes": 41892,
+      "sha256": "9deb4281f8633b550232ee18ddffcee4d141336b854d233a18000090c16ebd91"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-restored/command.json",
+      "bytes": 1850,
+      "sha256": "bebef1726ef99d11707a8d8789ec38912a3255c0754bc37a9d1b75dffcdfb3c3"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-restored/raw-tests.json",
+      "bytes": 14108,
+      "sha256": "75eaaaf04e93ee5535a49237894d298ef41452e68a6afdf71ba165468db7dea4"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-restored/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-restored/stdout.log",
+      "bytes": 132,
+      "sha256": "92f962110716e5e7238ef83e691221fe1094244c5d73f43f003f8a725095f1e8"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-current-empty-set-restored/summary.json",
+      "bytes": 12971,
+      "sha256": "124c329298e893b7dd1d5483fa1676dfd8506e47c34de84d5b867cfdd2415067"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-baseline/command.json",
+      "bytes": 1788,
+      "sha256": "362e103fec7c019d98a255c33ccba692b884ccfc52868f644468f344e98e9580"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-baseline/raw-tests.json",
+      "bytes": 4605,
+      "sha256": "6d1f4619e8bfd52e1ed3f1b50a07c34191e01af547e536a6db6f6d74e1aa6820"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-baseline/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-baseline/stdout.log",
+      "bytes": 130,
+      "sha256": "48576344666b85e70c10c0555db47118dd2ccbcaf7de8fb6b2a02dba40b1e8d2"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-baseline/summary.json",
+      "bytes": 4564,
+      "sha256": "73fc036af18b168fe1fc507839a65bff73bff8823e5d62b7ba6b6a730c84d905"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-mutant/command.json",
+      "bytes": 1774,
+      "sha256": "8991980da409d9d61175c6e43df93836aa584029164a1b3a10a072a8946da659"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-mutant/raw-tests.json",
+      "bytes": 11538,
+      "sha256": "3d8405b79b1012c4e4adfd9817b2871dfcfda283b4825045175db78e455b61cb"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-mutant/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-mutant/stdout.log",
+      "bytes": 128,
+      "sha256": "8fff9376a6eabd25853e8273973e5c171915c9f3e922ecf0760708a6cdce6cad"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-mutant/summary.json",
+      "bytes": 11573,
+      "sha256": "7d6e0b8da3ca0e16aec5611e33d88a4138684cd988bf19421691ecb7fd8cd0be"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-restored/command.json",
+      "bytes": 1788,
+      "sha256": "8588ffc81074e32175b3034f1da90fab18733ea74e4b3882d19c78907fda2817"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-restored/raw-tests.json",
+      "bytes": 4604,
+      "sha256": "a904ebae8fede6e90713e97c226044718a7515751baac581f6a88242ad98ef68"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-restored/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-restored/stdout.log",
+      "bytes": 130,
+      "sha256": "71d1da469e2905c5e8828b846990af1a5c897597ac3269c9effed61753f4e637"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/P30-1542-revoke-snapshot-restored/summary.json",
+      "bytes": 4564,
+      "sha256": "37dcf2b1cc4b544e49e04e9279f9aa6a994455900ce6c769cffc9ad4a6b4584b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/actual-runtime-fingerprint/command.json",
+      "bytes": 1499,
+      "sha256": "988d4093ab61775c16ea88a99dcab17af0b4d44782de0e2f1b7a28567f36cc09"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/actual-runtime-fingerprint/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/actual-runtime-fingerprint/stdout.log",
+      "bytes": 114,
+      "sha256": "6356112c023d338d4ce2eb165c4ea56d3e428ef958059d868a720d4b17a6639c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/root-head-after/command.json",
+      "bytes": 1369,
+      "sha256": "f1a5b7fd6c5c8dd9f67d59ac0ef8f69396ec6d203aea32668e3437e26b25d5a7"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/root-head-after/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/root-head-after/stdout.log",
+      "bytes": 41,
+      "sha256": "4d6100c6870dbeb5ee06470bb88c465f6304ec0b7d1ef2684adc01718809997b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/root-status-after/command.json",
+      "bytes": 1384,
+      "sha256": "c4f9e434764c4f3ebc4662e7021c4ecba9e5342b5aead0b5ae8e02db126766db"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/root-status-after/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/root-status-after/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/unchanged-original-two-file-baseline/command.json",
+      "bytes": 1857,
+      "sha256": "7648f379d050d83fae586eec09223a0d886e7d48b276093349b8ddaa414c267b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/unchanged-original-two-file-baseline/raw-tests.json",
+      "bytes": 14134,
+      "sha256": "eddd548007d030849c0574997e2d9ca0f14d5efdfa1e5d8e3b8ff9f155965b00"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/unchanged-original-two-file-baseline/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/unchanged-original-two-file-baseline/stdout.log",
+      "bytes": 133,
+      "sha256": "b768d8ab790b115f34d4f2b2885c1d41da60caa2ea3c1ece7f62f716008eaf48"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/phases/unchanged-original-two-file-baseline/summary.json",
+      "bytes": 12974,
+      "sha256": "eedd020c3d1f498b275509e0557443f422b930a0947bd503f4da79c549f7742c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/prepare.py",
+      "bytes": 6449,
+      "sha256": "8b065d6abacc28ef5c62b558ae9205ad7ff08f0eeb8f52b3d79b320478b7ced1"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/prepared-preservation.json",
+      "bytes": 2465,
+      "sha256": "fa6866474af22f7f8d75f362efb73c478f90c3c41c92b710264c0e6b2f61946f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/prior-package-pins-after.json",
+      "bytes": 2258,
+      "sha256": "726798ddec24e99c8bd2882ec7bcc229eb8cab7876e2b2ca4c0b6ff8da483793"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/prior-package-pins-before.json",
+      "bytes": 2258,
+      "sha256": "726798ddec24e99c8bd2882ec7bcc229eb8cab7876e2b2ca4c0b6ff8da483793"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/private-final-tracked.json",
+      "bytes": 914595,
+      "sha256": "93b780b8024ed47e494b7b8aad80bdb72664965f45b64c83755bcacebf6f74ef"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/private-original-tracked.json",
+      "bytes": 914595,
+      "sha256": "93b780b8024ed47e494b7b8aad80bdb72664965f45b64c83755bcacebf6f74ef"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/readiness-pins-before.json",
+      "bytes": 20083,
+      "sha256": "affa4f35b419e4dab4cc32e7ae96cfd1c6c8f7dcd3a507f025043a31c90fdf8a"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/recipes.json",
+      "bytes": 2051,
+      "sha256": "5028015a240aeae65370b6c56152a6daa0909ce0aea11be95ceb67979be6bfc4"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/root-protected-pins-before.json",
+      "bytes": 6857,
+      "sha256": "f16472958c623709b04de69d90ae6a1a3efb9b9b715ec59985e47d0568e03e22"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/root-runtime-release.json",
+      "bytes": 538,
+      "sha256": "5ae6327f85b81807db7c8f53ae1356001d205feafc2b111a4708b57744061aec"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/root-tracked-after.json",
+      "bytes": 914595,
+      "sha256": "93b780b8024ed47e494b7b8aad80bdb72664965f45b64c83755bcacebf6f74ef"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/root-tracked-before.json",
+      "bytes": 914595,
+      "sha256": "93b780b8024ed47e494b7b8aad80bdb72664965f45b64c83755bcacebf6f74ef"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/semantic-classification.json",
+      "bytes": 12549,
+      "sha256": "d1307460b0a516253fec20eed9974e8442e0bc87c22eb488720635961216f02a"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/setup-observer-history.json",
+      "bytes": 307,
+      "sha256": "5113edfc79fc1088b7919b36a9e966fb26298cf155e49af972d35dec3d1c2845"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/setup-receipt.json",
+      "bytes": 10954,
+      "sha256": "4db6c1143d69dabd490cc73d70e5870ff36b7c8332308d7826e8ff2facd64a8f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/setup-receipt.md",
+      "bytes": 2005,
+      "sha256": "34fbb3f4d39217ba8915a9587f5c2bd77cf18fcf9ff2153d8dd6a07fd602f670"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-readiness-20261015.json",
+      "bytes": 88597,
+      "sha256": "667481aa764a565553ff6bfb1bd7291a777e4bb7b940a06db50ce16dca1b7587"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-readiness-20261015.md",
+      "bytes": 5131,
+      "sha256": "e69b015f40c1974a482daba12994cfcee96ad0e17711ba04f8e634b4f5729746"
+    },
+    {
+      "path": "/private/tmp/p0-30-initial-tracked-manifest-20261015.json",
+      "bytes": 1449771,
+      "sha256": "a17289fed9769adb7e4985847b6698b013d2eb253928174f80a42839992ddfa0"
+    },
+    {
+      "path": "/private/tmp/p0-30-root-scope-preflight-20261015.json",
+      "bytes": 9648,
+      "sha256": "5a35eb722c60578da5f983e42d8dca457cbacc13bfab9d02cab2fe3cccbef88f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-unchanged-two-file-baseline-20261015.json",
+      "bytes": 14147,
+      "sha256": "3d85dbb79ec7f37a60640401950ce3c2f7fcdf4ddfb444a4c5f79ce4f3b2abc3"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015.json",
+      "bytes": 95234,
+      "sha256": "30117576890238946b4a001d6214c378dd8483cb737167a4982f27c4ebcc052d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015.md",
+      "bytes": 2742,
+      "sha256": "77d12b860e6747093ececf69f79f43e26988de7c2d0b55c69905235218391b6a"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/artifact-index.json",
+      "bytes": 80407,
+      "sha256": "88c47cfa764cab70825d6bf67ac3e23615bf6b95fbb7aee6ac6959b8d1f30339"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015.json",
+      "bytes": 21149,
+      "sha256": "e3bb16af1d94f4a6d8d7ba5c29710ca19dccd5b2de02b33fa397edb9469714ad"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015.md",
+      "bytes": 1464,
+      "sha256": "c325cea2e7f4c6c1284a4c937f8cba4fd32288dacde7c4352e541937ee618662"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/artifact-index.json",
+      "bytes": 15704,
+      "sha256": "861366240c5cf98002552bf3ce6820155af84125c12d10ef48aa08e9d74152c7"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015.json",
+      "bytes": 103946,
+      "sha256": "6c093e937c06c1c7a81161dfdbe32027424c29f483cd864c2d4cb177f7b31c5e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015.md",
+      "bytes": 2900,
+      "sha256": "b6032d4dbd002d22d3703bd91002b82b9fba0be1a708f4cce78bd0029851b1e6"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/artifact-index.json",
+      "bytes": 83180,
+      "sha256": "f814f7bca4271196598038dcb06da66e2ea2db4e928ae7297429bab8d3002903"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015.json",
+      "bytes": 189825,
+      "sha256": "300ef90a081ff8303ee74f760c5ccb2457a7d5c6e159d13a3b26107722f31c36"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015.md",
+      "bytes": 2153,
+      "sha256": "104ea6a122191bd06fe51425a703da59267efcfebdd6b66926f821fa9f13ad91"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/artifact-index.json",
+      "bytes": 45637,
+      "sha256": "ece9597aee903d7788f836a0610ece5bd3bf32c3c8b4fac99d22075fdd705331"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/artifact-index.json",
+      "bytes": 23209,
+      "sha256": "fdac085c74624c508572bdc469d3561583caa08d491bc7b048c66365461733a8"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015.json",
+      "bytes": 142868,
+      "sha256": "662259e4a654d757576bb3fe70c75a820bcc302469ef0b6f3cbb5776c8b8280f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015.md",
+      "bytes": 2759,
+      "sha256": "9f9287dab4ecad6a898b5a1a3cc51fe5e5072fff5b8abedf1657651960584710"
+    }
+  ],
+  "excludedMutableJournal": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/commands.jsonl",
+  "futureCanonicalLimit": "Code/native/complete closures stay private. Huge complete tracked/closure manifests are hash references only; select compact reports/logs as appropriate."
+}

@@ -20,6 +20,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync, existsSync
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { questionIds } from "../src/diagnostic/questionBank.js";
+import { writeAnchoredRun } from "./helpers/sealedRun.js";
 import { FOUR_CS, normalizeFourC, type FourC } from "../src/transformation/fourCs.js";
 import { defaultTransformMap } from "../src/transformation/builtInTransformMap.js";
 import { transformMapSchema } from "../src/transformation/transformMapSchema.js";
@@ -46,7 +47,7 @@ afterEach(() => {
   }
 });
 
-/** Writes the minimal diagnostic run that deriveAgentBaseline() reads. */
+/** Writes the minimal sealed diagnostic run that deriveAgentBaseline() reads. */
 function seedRun(
   workspace: string,
   agentId: string,
@@ -76,7 +77,8 @@ function seedRun(
     })),
     evidenceTrustCoverage: { observed: 0.9, attested: 0.1, selfReported: 0 }
   };
-  writeFileSync(join(runsDir, "run.json"), JSON.stringify(run));
+  // Planning reads only sealed, ledger-anchored runs, so the fixture publishes the run as the runner does.
+  writeAnchoredRun(workspace, runsDir, run as Parameters<typeof writeAnchoredRun>[2]);
 }
 
 /** A deep clone of the built-in map as loose JSON, so tests can corrupt individual fields. */

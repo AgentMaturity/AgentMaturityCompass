@@ -1,0 +1,138 @@
+[
+ {
+  "mutation": "M1 skip the manifest comparison",
+  "file": "src/lifecycle/reassessment.ts",
+  "test": "tests/lifecycle/reassessmentTriggers.test.ts",
+  "exit": 1,
+  "failing": [
+   "a model change that invalidates a mandatory control suspends the agent before the session starts",
+   "a prompt change covered by a stub change envelope stays active and cites the envelope",
+   "a change no mandatory control names is recorded as passed and the agent stays active",
+   "a null toolsDigest counts as changed (fail closed) and suspends"
+  ],
+  "restored": true
+ },
+ {
+  "mutation": "M2 let suspended agents pass admission",
+  "file": "src/lifecycle/reassessment.ts",
+  "test": "tests/lifecycle/admission.test.ts",
+  "exit": 1,
+  "failing": [
+   "a suspended agent's consequential call is denied with the reason, and the denial is a journal receipt",
+   "an advisory plan (no lifecycle control) lets the call run and writes a warning row"
+  ],
+  "restored": true
+ },
+ {
+  "mutation": "M3a delete evidence on retirement (ledger append-only trigger refuses the delete, retirement aborts)",
+  "file": "src/lifecycle/retirement.ts",
+  "test": "tests/lifecycle/retirement.test.ts",
+  "exit": 1,
+  "failing": [
+   "revokes leases and the static token, cancels pending approvals, refuses new sessions and keeps every evidence row",
+   "an open outcome_unknown receipt blocks retirement until an OWNER records an acceptance note"
+  ],
+  "restored": true
+ },
+ {
+  "mutation": "M3b delete evidence on retirement (append-only triggers dropped first, the delete lands)",
+  "file": "src/lifecycle/retirement.ts",
+  "test": "tests/lifecycle/retirement.test.ts",
+  "exit": 1,
+  "failing": [
+   "revokes leases and the static token, cancels pending approvals, refuses new sessions and keeps every evidence row"
+  ],
+  "restored": true
+ },
+ {
+  "mutation": "M4 skip the row/ledger cross-check",
+  "file": "src/lifecycle/governanceLifecycle.ts",
+  "test": "tests/lifecycle/governanceLifecycle.test.ts",
+  "exit": 1,
+  "failing": [
+   "the state table rebuilt from the ledger rows equals the live table; a tampered row refuses reads"
+  ],
+  "restored": true
+ },
+ {
+  "mutation": "M5 skip the bound-approval check",
+  "file": "src/lifecycle/governanceLifecycle.ts",
+  "test": "tests/lifecycle/governanceLifecycle.test.ts",
+  "exit": 1,
+  "failing": [
+   "an approval bound to manifest A cannot approve manifest B"
+  ],
+  "restored": true
+ },
+ {
+  "mutation": "M6 ignore the agent-wide lease revocation",
+  "file": "src/leases/leaseVerifier.ts",
+  "test": "tests/lifecycle/retirement.test.ts",
+  "exit": 1,
+  "failing": [
+   "revokes leases and the static token, cancels pending approvals, refuses new sessions and keeps every evidence row"
+  ],
+  "restored": true
+ },
+ {
+  "mutation": "M7 let a retired agent open a session",
+  "file": "src/lifecycle/reassessment.ts",
+  "test": "tests/lifecycle/retirement.test.ts",
+  "exit": 1,
+  "failing": [
+   "revokes leases and the static token, cancels pending approvals, refuses new sessions and keeps every evidence row"
+  ],
+  "restored": true
+ },
+ {
+  "mutation": "M8 drop the legacy-approval rule under an enforcing plan",
+  "file": "src/lifecycle/reassessment.ts",
+  "test": "tests/lifecycle/legacyMigration.test.ts",
+  "exit": 1,
+  "failing": [
+   "no outage: unmigrated agents keep running; once migrated, an enforcing plan needs a bound approval before the next consequential action"
+  ],
+  "restored": true
+ },
+ {
+  "mutation": "M9 accept any actor",
+  "file": "src/lifecycle/governanceLifecycle.ts",
+  "test": "tests/lifecycle/governanceLifecycle.test.ts",
+  "exit": 1,
+  "failing": [
+   "the actor comes from the authenticated session: a non-OWNER or a forged actor is refused"
+  ],
+  "restored": true
+ },
+ {
+  "mutation": "M10 remove the authorization-stage admission",
+  "file": "src/actions/authorize.ts",
+  "test": "tests/lifecycle/admission.test.ts",
+  "exit": 1,
+  "failing": [
+   "a suspended agent's consequential call is denied with the reason, and the denial is a journal receipt"
+  ],
+  "restored": true
+ },
+ {
+  "mutation": "M12 count a null toolsDigest as unchanged",
+  "file": "src/lifecycle/versionManifest.ts",
+  "test": "tests/lifecycle/reassessmentTriggers.test.ts",
+  "exit": 1,
+  "failing": [
+   "a null toolsDigest counts as changed (fail closed) and suspends"
+  ],
+  "restored": true
+ },
+ {
+  "mutation": "M11 drop the recheck admission (bind still checks)",
+  "file": "src/actions/authorize.ts",
+  "test": "tests/lifecycle/admission.test.ts",
+  "exit": 1,
+  "failing": [
+   "a suspension after the record bound (here, from inside a guard) is caught by the recheck before the body"
+  ],
+  "restored": true,
+  "note": "survived (exit 0) before the bind-then-suspend test was added; killed after"
+ }
+]

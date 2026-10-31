@@ -1,0 +1,171 @@
+
+ RUN  v4.1.11 /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout
+
+ ✓ tests/claims/claimAdapters.test.ts (39 tests) 11ms
+ ✓ tests/claims/claimLabels.test.ts (8 tests) 17ms
+ ✓ tests/sourceQuality.test.ts (5 tests) 1643ms
+     ✓ detects an orphaned source file and accepts its reachable counterpart  1010ms
+     ✓ keeps the explicitly invoked Playwright config reachable without hiding adjacent orphans  507ms
+stdout | tests/migration/legacyRelabel.test.ts > P1-35 synthetic migration source contracts > R2 reads unmarked dogfood metadata conservatively and preserves current marked rows
+AMC_P135_LEGACY_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-v5Rb9N/public-evidence.json
+
+stdout | tests/migration/legacyRelabel.test.ts > P1-35 synthetic migration source contracts > R4 never promotes operator-chosen ATTESTED legacy provenance
+AMC_P135_LEGACY_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-bLTKlD/public-evidence.json
+
+stdout | tests/migration/legacyRelabel.test.ts > P1-35 synthetic migration source contracts > current public claim envelopes bypass the legacy classifier
+AMC_P135_LEGACY_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-8fWZn4/public-evidence.json
+
+stdout | tests/migration/legacyRelabel.test.ts > P1-35 synthetic migration source contracts > post-fix assurance without an envelope classifies as R5 self-reported
+AMC_P135_LEGACY_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-6io8gA/public-evidence.json
+
+stdout | tests/migration/legacyRelabel.test.ts > P1-35 synthetic migration source contracts > post-fix assurance lazy claim stays self-reported instead of using current observed fallback
+AMC_P135_LEGACY_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-yqJfHp/public-evidence.json
+
+stdout | tests/migration/legacyRelabel.test.ts > P1-35 synthetic migration source contracts > dry-run and signed persistent relabel preserve synthetic originals and append no records on repeat
+AMC_P135_LEGACY_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-V5vu7t/public-evidence.json
+
+stdout | tests/migration/legacyRelabel.test.ts > P1-35 synthetic migration source contracts > an edited signed log line refuses further relabelling without changing originals
+AMC_P135_LEGACY_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-3G4n3n/public-evidence.json
+
+stdout | tests/migration/legacyRelabel.test.ts > P1-35 synthetic migration source contracts > a tampered migration receipt signature refuses its log and any further append
+AMC_P135_LEGACY_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-IqRLjI/public-evidence.json
+
+stdout | tests/migration/legacyRelabel.test.ts > P1-35 genuine v1.1.1 generated originals > actual old classifier inputs retain R1 to R5 labels and the genuine L3/certificate gaps
+AMC_P135_LEGACY_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-bYhOG9/public-evidence.json
+
+ ✓ tests/assuranceReportProvenance.test.ts (8 tests) 927ms
+stderr | tests/migration/legacyRelabel.test.ts > P1-35 genuine v1.1.1 generated originals > real relabelling preserves every decoded file and old SQLite bytes with explicit owned trust enrollment
+[amc] Explicit imported admission expanded the monitor signing role (61ee1b7a33aa0a87cfbd7c838b1be3f0d63f095d4ebed734d4687150b790d392).
+[amc] Explicit imported admission expanded the auditor signing role (5f24420aaadad3cffe4aa83f98e8b2044c3aadf60300485725fe1eb633bd2142).
+
+stdout | tests/migration/legacyRelabel.test.ts > P1-35 genuine v1.1.1 generated originals > real relabelling preserves every decoded file and old SQLite bytes with explicit owned trust enrollment
+AMC_P135_LEGACY_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-dtpg8B/public-evidence.json
+
+ ❯ tests/migration/legacyRelabel.test.ts (10 tests | 4 failed) 1209ms
+     ✓ R2 reads unmarked dogfood metadata conservatively and preserves current marked rows 5ms
+     ✓ R4 never promotes operator-chosen ATTESTED legacy provenance 3ms
+     ✓ current public claim envelopes bypass the legacy classifier 3ms
+     ✓ post-fix assurance without an envelope classifies as R5 self-reported 3ms
+     ✓ post-fix assurance lazy claim stays self-reported instead of using current observed fallback 3ms
+     × dry-run and signed persistent relabel preserve synthetic originals and append no records on repeat 245ms
+     × an edited signed log line refuses further relabelling without changing originals 181ms
+     × a tampered migration receipt signature refuses its log and any further append 175ms
+     ✓ actual old classifier inputs retain R1 to R5 labels and the genuine L3/certificate gaps 50ms
+     × real relabelling preserves every decoded file and old SQLite bytes with explicit owned trust enrollment 537ms
+ ✓ tests/assuranceRunnerInconclusiveQualification.test.ts (15 tests) 1950ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/migration/legacyRelabel.test.ts > P1-35 synthetic migration source contracts > dry-run and signed persistent relabel preserve synthetic originals and append no records on repeat
+AssertionError: expected [ Array(1) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   ".amc/runs/synthetic-legacy-diagnostic.json",
++ ]
+
+ ❯ tests/migration/legacyRelabel.test.ts:308:32
+    306|         dryWritesAbsent, receiptTimestampSource: "injected public now …
+    307|       // First original-rewrite control witness, ahead of counts/signa…
+    308|       expect(changedOriginals).toEqual([]);
+       |                                ^
+    309|       expect(changed(before, afterDry)).toEqual([]); expect(dryWritesA…
+    310|       expect(verification.ok).toBe(true);
+ ❯ owned tests/migration/legacyRelabel.test.ts:65:5
+ ❯ tests/migration/legacyRelabel.test.ts:297:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  tests/migration/legacyRelabel.test.ts > P1-35 synthetic migration source contracts > an edited signed log line refuses further relabelling without changing originals
+AssertionError: expected [ Array(1) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   ".amc/runs/synthetic-legacy-diagnostic.json",
++ ]
+
+ ❯ tests/migration/legacyRelabel.test.ts:374:56
+    372|       expect(negative.ok).toBe(false); if (!negative.ok) expect(negati…
+    373|       expect(refused).toBe(true); expect(f.facts.logUnchangedAfterRefu…
+    374|       expect(changed(before, snapshot(f.root, paths))).toEqual([]);
+       |                                                        ^
+    375|     });
+    376|   });
+ ❯ owned tests/migration/legacyRelabel.test.ts:65:5
+ ❯ tests/migration/legacyRelabel.test.ts:354:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  tests/migration/legacyRelabel.test.ts > P1-35 synthetic migration source contracts > a tampered migration receipt signature refuses its log and any further append
+AssertionError: expected [ Array(1) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   ".amc/runs/synthetic-legacy-diagnostic.json",
++ ]
+
+ ❯ tests/migration/legacyRelabel.test.ts:402:56
+    400|       expect(f.facts.attestedSignatureRefused).toBe(true); expect(refu…
+    401|       expect(f.facts.logUnchanged).toBe(true); expect(f.facts.receipts…
+    402|       expect(changed(before, snapshot(f.root, paths))).toEqual([]);
+       |                                                        ^
+    403|     });
+    404|   });
+ ❯ owned tests/migration/legacyRelabel.test.ts:65:5
+ ❯ tests/migration/legacyRelabel.test.ts:379:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  tests/migration/legacyRelabel.test.ts > P1-35 genuine v1.1.1 generated originals > real relabelling preserves every decoded file and old SQLite bytes with explicit owned trust enrollment
+AssertionError: expected [ Array(1) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   ".amc/runs/genuine-v1-1-1-diagnostic.json",
++ ]
+
+ ❯ tests/migration/legacyRelabel.test.ts:511:32
+    509|         relabelLogVerified: checked.ok, originalsDigestMatches: first.…
+    510|       // Original-rewrite control witness precedes signature, counts a…
+    511|       expect(changedOriginals).toEqual([]); expect(changed(installedBe…
+       |                                ^
+    512|       expect(dryWritesAbsent).toBe(true); expect(dry.receiptPath).toBe…
+    513|       expect(f.facts.fixtureTrustEnrollment).toMatchObject({ monitorHi…
+ ❯ owned tests/migration/legacyRelabel.test.ts:65:5
+ ❯ tests/migration/legacyRelabel.test.ts:457:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  tests/migration/legacyRelabel.test.ts > P1-35 genuine v1.1.1 generated originals > real relabelling preserves every decoded file and old SQLite bytes with explicit owned trust enrollment
+Error: Owned installed historical originals changed
+ ❯ tests/migration/legacyRelabel.test.ts:475:59
+    473|       f.checks.push(() => {
+    474|         const after = snapshot(f.root, installedPaths); f.facts.instal…
+    475|         if (changed(installedBefore, after).length) throw new Error("O…
+       |                                                           ^
+    476|       });
+    477|       const verification = verifyLedgerIntegrity(f.root, { trust });
+ ❯ owned tests/migration/legacyRelabel.test.ts:68:43
+ ❯ tests/migration/legacyRelabel.test.ts:457:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+
+
+ Test Files  1 failed | 5 passed (6)
+      Tests  4 failed | 81 passed (85)
+   Start at  22:48:55
+   Duration  4.39s (transform 4.97s, setup 131ms, import 7.23s, tests 5.76s, environment 0ms)
+
+JSON report written to /private/tmp/p1-39-post-typecheck-20261016/p135-m2.raw.json

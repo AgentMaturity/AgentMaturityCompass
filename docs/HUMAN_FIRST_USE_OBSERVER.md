@@ -281,7 +281,7 @@ pinned candidate, followed by the standing release/qualification process. Retain
 source/environment receipts, failures and platform limitations separately.
 
 The implementation handoff is `AMC_OS/INBOX/REV_IMPLEMENTATION_SPECIALIST.md`
-inside `/Users/sid/AgentMaturityCompass/tmp/cos-observer-guide`.
+inside `~/AgentMaturityCompass/tmp/cos-observer-guide`.
 
 ## 2026-09-10 addendum — guided credential observations
 

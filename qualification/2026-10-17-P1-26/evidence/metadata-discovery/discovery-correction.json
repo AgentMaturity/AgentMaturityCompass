@@ -1,0 +1,41 @@
+{
+  "schema": "qualification-inert-source-evidence-correction/1",
+  "at": "2026-10-16T20:29:34.016595+00:00",
+  "owner": "Current root authored and copied this P1-12 metadata candidate. No Claude source or artifact changes.",
+  "originalPacket": "/private/tmp/p1-12-compiled-guard-qualification-20261017/private-receipt-root-v2/2026-10-17-P1-12",
+  "originalManifest": "/private/tmp/p1-12-compiled-guard-qualification-20261017/actual-receipt-inputs-v2.json",
+  "sourceCandidateOriginal": {
+    "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/test-design/compiledPolicyGuard.test.ts",
+    "bytes": 11155,
+    "sha256": "0b045ee76d6136d72543b567f1345212d1284faee5259e1b2dc8ab3ddd988da0"
+  },
+  "oldArtifactRelativePath": "evidence/test-design/compiledPolicyGuard.test.ts",
+  "newArtifactRelativePath": "evidence/test-design/compiledPolicyGuard.test.ts.source.txt",
+  "representation": "Exact original text bytes, now with an inert filename suffix. No source content, import or test oracle changed.",
+  "actualBefore": {
+    "findingCount": 2728,
+    "report": {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/metadata-discovery/before-full.json",
+      "bytes": 248942,
+      "sha256": "6a80bacf2deaefbaeb28ef400cb0caf30ae472dcb8a5f1bc60d5952622088a0b"
+    },
+    "addedFindingsAgainstPriorSource": [
+      "[\"qualification/2026-10-17-P1-12/evidence/test-design/compiledPolicyGuard.test.ts\",\"unresolved\",{\"name\":\"../../src/actions/authorizationRecord.js\"}]",
+      "[\"qualification/2026-10-17-P1-12/evidence/test-design/compiledPolicyGuard.test.ts\",\"unresolved\",{\"name\":\"../../src/catalog/compiler/activate.js\"}]",
+      "[\"qualification/2026-10-17-P1-12/evidence/test-design/compiledPolicyGuard.test.ts\",\"unresolved\",{\"name\":\"../../src/catalog/compiler/types.js\"}]",
+      "[\"qualification/2026-10-17-P1-12/evidence/test-design/compiledPolicyGuard.test.ts\",\"unresolved\",{\"name\":\"../../src/tools/guards/compiledPolicyGuard.js\"}]",
+      "[\"qualification/2026-10-17-P1-12/evidence/test-design/compiledPolicyGuard.test.ts\",\"unresolved\",{\"name\":\"../../src/tools/toolTypes.js\"}]"
+    ],
+    "removedFindingsAgainstPriorSource": []
+  },
+  "priorSourceReference": {
+    "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/quality-current-full.json",
+    "bytes": 248137,
+    "sha256": "6b82381cb434c3f7d787815280a9fc4e7279ae64f5e5b48cf61603ca9495b7a3"
+  },
+  "vitestBoundary": "The unchanged normal Vitest include is tests/**/*.test.ts; this qualification copy is outside that include. No observed Vitest collection failure is claimed.",
+  "knipBoundary": "The unchanged installed Knip Vitest plugin discovers broad test entry patterns, producing these five actual unresolved imports in evidence outside the production project paths.",
+  "configsGatesBaselinesChanged": false,
+  "originalsPreserved": true,
+  "afterMaterializationChecks": "Pending; no predicted result or waiver."
+}

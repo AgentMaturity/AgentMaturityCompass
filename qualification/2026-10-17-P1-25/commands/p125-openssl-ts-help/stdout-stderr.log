@@ -1,0 +1,92 @@
+Usage: ts [options]
+
+General options:
+ -help                 Display this summary
+ -config infile        Configuration file
+ -section val          Section to use within config file
+ -engine val           Use engine, possibly a hardware device
+ -inkey val            File with private key for reply
+ -signer val           Signer certificate file
+ -chain infile         File with signer CA chain
+ -CAfile infile        File with trusted CA certs
+ -CApath dir           Path to trusted CA files
+ -CAstore uri          URI to trusted CA store
+ -untrusted infile     Extra untrusted certs
+ -token_in             Input is a PKCS#7 file
+ -token_out            Output is a PKCS#7 file
+ -passin val           Input file pass phrase source
+ -*                    Any supported digest
+
+Query options:
+ -query                Generate a TS query
+ -data infile          File to hash
+ -digest val           Digest (as a hex string)
+ -queryfile infile     File containing a TS query
+ -cert                 Put cert request into query
+ -in infile            Input file
+
+Verify options:
+ -verify               Verify a TS response
+ -reply                Generate a TS reply
+ -tspolicy val         Policy OID to use
+ -no_nonce             Do not include a nonce
+ -out outfile          Output file
+ -text                 Output text (not DER)
+
+Random state options:
+ -rand val             Load the given file(s) into the random number generator
+ -writerand outfile    Write random data to the specified file
+
+Validation options:
+ -policy val           adds policy to the acceptable policy set
+ -purpose val          certificate chain purpose
+ -verify_name val      verification policy name
+ -verify_depth int     chain depth limit
+ -auth_level int       chain authentication security level
+ -attime intmax        verification epoch time
+ -verify_hostname val  expected peer hostname
+ -verify_email val     expected peer email
+ -verify_ip val        expected peer IP address
+ -ignore_critical      permit unhandled critical extensions
+ -issuer_checks        (deprecated)
+ -crl_check            check leaf certificate revocation
+ -crl_check_all        check full chain revocation
+ -policy_check         perform rfc5280 policy checks
+ -explicit_policy      set policy variable require-explicit-policy
+ -inhibit_any          set policy variable inhibit-any-policy
+ -inhibit_map          set policy variable inhibit-policy-mapping
+ -x509_strict          disable certificate compatibility work-arounds
+ -extended_crl         enable extended CRL features
+ -use_deltas           use delta CRLs
+ -policy_print         print policy processing diagnostics
+ -check_ss_sig         check root CA self-signatures
+ -trusted_first        search trust store first (default)
+ -suiteB_128_only      Suite B 128-bit-only mode
+ -suiteB_128           Suite B 128-bit mode allowing 192-bit algorithms
+ -suiteB_192           Suite B 192-bit-only mode
+ -partial_chain        accept chains anchored by intermediate trust-store CAs
+ -no_alt_chains        (deprecated)
+ -no_check_time        ignore certificate validity time
+ -allow_proxy_certs    allow the use of proxy certificates
+
+Provider options:
+ -provider-path val    Provider load path (must be before 'provider' argument if required)
+ -provider val         Provider to load (can be specified multiple times)
+ -provparam val        Set a provider key-value parameter
+ -propquery val        Property query used when fetching algorithms
+
+Typical uses:
+ openssl ts -query [-rand file...] [-config file] [-data file]
+    [-digest hexstring] [-tspolicy oid] [-no_nonce] [-cert]
+    [-in file] [-out file] [-text]
+
+ openssl ts -reply [-config file] [-section tsa_section]
+    [-queryfile file] [-passin password]
+    [-signer tsa_cert.pem] [-inkey private_key.pem]
+    [-chain certs_file.pem] [-tspolicy oid]
+    [-in file] [-token_in] [-out file] [-token_out]
+    [-text] [-engine id]
+
+ openssl ts -verify -CApath dir -CAfile root-cert.pem -CAstore uri
+   -untrusted extra-certs.pem [-data file] [-digest hexstring]
+    [-queryfile request.tsq] -in response.tsr [-token_in] ...

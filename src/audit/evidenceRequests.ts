@@ -1,5 +1,9 @@
 import { randomUUID } from "node:crypto";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
+import { assertOrgPairsCurrent, captureOrgFiles, orgPairBytes } from "../org/preparedOrgPairs.js";
+import { safeIdSchema } from "../utils/pathSafety.js";
+import { captureAuditOutputAliases } from "./binderOutputAliases.js";
+import type { AuditPublicationOptions } from "./binderPublication.js";
 import { readdirSync, rmSync } from "node:fs";
 import { z } from "zod";
 import {
@@ -13,10 +17,10 @@ import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js
 import { sha256Hex } from "../utils/hash.js";
 import { type UserRole } from "../auth/roles.js";
 import {
-  createEvidenceRequest,
+  createEvidenceRequest, createEvidenceRequestAsync,
   listEvidenceRequests,
   loadEvidenceRequest,
-  updateEvidenceRequest
+  updateEvidenceRequest, rejectEvidenceRequestAsync
 } from "./evidenceRequestStore.js";
 import { evidenceRequestItemSchema, type EvidenceRequest } from "./evidenceRequestSchema.js";
 
@@ -171,6 +175,9 @@ export function requestAuditEvidenceApproval(params: {
   const intentId = `audit-request-${request.requestId}-${randomUUID().replace(/-/g, "").slice(0, 12)}`;
   const created = createApprovalForIntent({
     workspace: params.workspace,
+    // The auditor who filed the evidence request started it (P1-78); the request keeps them only as an id hash. The owner
+    // filing this approval is its first approver, as the dual-control flow below records.
+    initiator: `sha256-16:${request.requesterUserIdHash}`,
     agentId,
     intentId,
     toolName: "audit.request.fulfill",
@@ -242,72 +249,40 @@ export function rejectAuditEvidenceRequest(params: {
   return next;
 }
 
-export function markAuditEvidenceRequestFulfilled(params: {
-  workspace: string;
-  requestId: string;
-  binderSha256: string;
-  exportedAtTs?: number;
-}): {
-  request: EvidenceRequest;
-  approvalRequestId: string;
-  approvals: EvidenceRequest["approvals"];
-} {
-  const request = loadEvidenceRequest(params.workspace, params.requestId);
-  if (request.status !== "OPEN" && request.status !== "APPROVED") {
-    throw new Error(`request is not fulfillable from status ${request.status}`);
+/** A completed request mutation can precede a refused or partial pending-file removal. */
+class AuditEvidenceRequestExecutionError extends Error {
+  readonly code = "AUDIT_REQUEST_EXECUTION_INCOMPLETE";
+  constructor(readonly requestId: string, readonly completedRequest: Awaited<ReturnType<typeof rejectEvidenceRequestAsync>>["progress"],
+    readonly pendingRemoveAttempted: boolean, readonly pendingRemoveReturned: boolean, readonly pendingRemoveAcknowledged: boolean, cause: unknown) {
+    super("audit evidence request mutation completed but its pending-file continuation did not finish", { cause }); this.name = "AuditEvidenceRequestExecutionError";
   }
-  const pending = loadPendingApproval(params.workspace, request.requestId);
-  const verified = verifyApprovalForExecution({
-    workspace: params.workspace,
-    approvalId: pending.approvalRequestId,
-    expectedAgentId: pending.agentId,
-    expectedIntentId: pending.intentId,
-    expectedToolName: "audit.request.fulfill",
-    expectedActionClass: "SECURITY"
-  });
-  if (!verified.ok) {
-    throw new Error(`approval not executable: ${verified.error ?? verified.status ?? "unknown"}`);
-  }
-
-  const decisions = listApprovalDecisions({
-    workspace: params.workspace,
-    agentId: pending.agentId,
-    approvalRequestId: pending.approvalRequestId
-  });
-  const approvals = decisions
-    .filter((row) => row.decision === "APPROVE_EXECUTE" || row.decision === "APPROVE_SIMULATE")
-    .map((row) => ({
-      approvalEventHash: sha256Hex(row.approvalDecisionId),
-      userIdHash: sha256Hex(row.userId).slice(0, 16),
-      role: (row.roles.find((role) => role === "OWNER" || role === "AUDITOR" || role === "APPROVER" || role === "OPERATOR" || role === "VIEWER") ??
-        "APPROVER") as "OWNER" | "AUDITOR" | "APPROVER" | "OPERATOR" | "VIEWER"
-    }));
-
-  const next: EvidenceRequest = {
-    ...request,
-    status: "FULFILLED",
-    approvals,
-    fulfillment: {
-      binderSha256: params.binderSha256,
-      exportedAtTs: params.exportedAtTs ?? Date.now()
+}
+export async function createAuditEvidenceRequestAsync(params: Parameters<typeof createAuditEvidenceRequest>[0], options: AuditPublicationOptions = {}) {
+  const input = structuredClone(params), workspace = resolve(input.workspace), caller = { ...options };
+  const attempt = await createEvidenceRequestAsync({ workspace, scopeType: input.scopeType,
+    scopeId: input.scopeType === "WORKSPACE" ? "workspace" : input.scopeId, requestedItems: toRequestedItems(input.requestedItems),
+    requesterUserIdHash: sha256Hex(input.requesterUserId).slice(0, 16) }, caller);
+  attempt.assertCurrent(); return { request: attempt.request, path: attempt.path, sigPath: attempt.sigPath };
+}
+export async function rejectAuditEvidenceRequestAsync(params: Parameters<typeof rejectAuditEvidenceRequest>[0], options: AuditPublicationOptions = {}) {
+  const requestId = safeIdSchema.parse(params.requestId), workspace = resolve(params.workspace), caller = { ...options };
+  const path = pendingPath(workspace, requestId), original = captureOrgFiles([path]); let expected = original;
+  const beforePublish = () => { caller.beforePublish?.(); assertOrgPairsCurrent(expected); };
+  const originalOutputs = caller.assertOutputsSafe; let aliases: (() => void) | null = null, selectedPaths: string | null = null;
+  const attempt = await rejectEvidenceRequestAsync({ workspace, requestId }, { ...caller, beforePublish,
+    assertOutputsSafe(paths) { originalOutputs?.(paths); const key = JSON.stringify(paths);
+      if (selectedPaths !== null && selectedPaths !== key) throw new Error("audit request output selection changed");
+      if (aliases === null) { selectedPaths = key; aliases = captureAuditOutputAliases(paths, [path]); }
+      aliases(); assertOrgPairsCurrent(expected); } });
+  let pendingRemoveAttempted = false, pendingRemoveReturned = false, pendingRemoveAcknowledged = false;
+  try {
+    attempt.assertCurrent();
+    if (orgPairBytes(original, path) !== null) {
+      pendingRemoveAttempted = true; rmSync(path, { force: true }); pendingRemoveReturned = true;
+      const absent = captureOrgFiles([path]);
+      if (orgPairBytes(absent, path) !== null) throw new Error("removed audit request pending file is not absent");
+      expected = absent; pendingRemoveAcknowledged = true;
     }
-  };
-  updateEvidenceRequest({
-    workspace: params.workspace,
-    request: next
-  });
-
-  consumeApprovedExecution({
-    workspace: params.workspace,
-    approvalId: pending.approvalRequestId,
-    expectedAgentId: pending.agentId,
-    executionId: request.requestId
-  });
-  removePendingApproval(params.workspace, request.requestId);
-
-  return {
-    request: next,
-    approvalRequestId: pending.approvalRequestId,
-    approvals
-  };
+    attempt.assertCurrent(); return attempt.request;
+  } catch (cause) { throw new AuditEvidenceRequestExecutionError(requestId, attempt.progress, pendingRemoveAttempted, pendingRemoveReturned, pendingRemoveAcknowledged, cause); }
 }

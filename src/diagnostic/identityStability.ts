@@ -1,3 +1,4 @@
+import { mean as statsMean, standardDeviation } from "../experiments/stats.js";
 /**
  * Identity Stability Index
  *
@@ -137,15 +138,11 @@ function cosineDistance(a: number[], b: number[]): number {
 }
 
 function mean(values: number[]): number {
-  if (values.length === 0) return 0;
-  return values.reduce((s, v) => s + v, 0) / values.length;
+  return statsMean(values);
 }
 
 function stddev(values: number[]): number {
-  if (values.length < 2) return 0;
-  const m = mean(values);
-  const variance = values.reduce((s, v) => s + (v - m) ** 2, 0) / (values.length - 1);
-  return Math.sqrt(variance);
+  return standardDeviation(values);
 }
 
 function pairwiseDistances(traces: BehavioralTrace[], extract: (t: BehavioralTrace) => number[]): number[] {

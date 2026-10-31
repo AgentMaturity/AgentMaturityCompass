@@ -1,5 +1,5 @@
 
- RUN  v4.1.11 /Users/sid/AgentMaturityCompass
+ RUN  v4.1.11 ~/AgentMaturityCompass
 
  ❯ tests/performance/sessionSpine.performance.test.ts (2 tests | 1 failed) 14543ms
      × control-plane events (no blob) sustain a higher floor 6601ms
@@ -229,7 +229,7 @@ node:internal/modules/cjs/loader:1450
   throw err;
   ^
 
-Error: Cannot find module '/Users/sid/AgentMaturityCompass/node_modules/typedoc/dist/cli.js'
+Error: Cannot find module '~/AgentMaturityCompass/node_modules/typedoc/dist/cli.js'
     at Module._resolveFilename (node:internal/modules/cjs/loader:1447:15)
     at defaultResolveImpl (node:internal/modules/cjs/loader:1058:19)
     at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1063:22)
@@ -243,7 +243,7 @@ Error: Cannot find module '/Users/sid/AgentMaturityCompass/node_modules/typedoc/
 }
 
 Node.js v25.5.0
-Command failed: /opt/homebrew/Cellar/node/25.5.0/bin/node /Users/sid/AgentMaturityCompass/node_modules/typedoc/dist/cli.js --options /Users/sid/AgentMaturityCompass/typedoc.json --out /var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-pages-artifact-x9ffBe/api --json /var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-pages-artifact-x9ffBe/api/reflection.json --gitRevision 0123456789abcdef0123456789abcdef01234567
+Command failed: /opt/homebrew/Cellar/node/25.5.0/bin/node ~/AgentMaturityCompass/node_modules/typedoc/dist/cli.js --options ~/AgentMaturityCompass/typedoc.json --out /var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-pages-artifact-x9ffBe/api --json /var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-pages-artifact-x9ffBe/api/reflection.json --gitRevision 0123456789abcdef0123456789abcdef01234567
 : expected 1 to be +0 // Object.is equality
 
 - Expected

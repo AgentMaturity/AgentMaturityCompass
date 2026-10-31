@@ -1,3 +1,4 @@
+import { percentileRank } from "../experiments/stats.js";
 import type { BenchArtifact } from "./benchSchema.js";
 
 export interface BenchComparablePoint {
@@ -61,13 +62,10 @@ export function flattenBenchMetrics(bench: BenchArtifact): BenchComparablePoint 
   };
 }
 
+// Unlike experiments/stats.ts quantile, this is the empirical percentile rank (fraction <= value), in percent.
+/** @deprecated Use percentileRank from ../experiments/stats.js for unrounded ranks. */
 export function percentile(values: number[], value: number): number {
-  if (values.length === 0) {
-    return 0;
-  }
-  const sorted = values.slice().sort((a, b) => a - b);
-  const rank = sorted.filter((entry) => entry <= value).length;
-  return Number(((rank / sorted.length) * 100).toFixed(4));
+  return Number(percentileRank(values, value).toFixed(4));
 }
 
 export function percentileTable(

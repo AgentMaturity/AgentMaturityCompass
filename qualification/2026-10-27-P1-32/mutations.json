@@ -1,0 +1,23 @@
+{
+  "mutations": [
+    {
+      "guard": "packages/amc-conformance/lib/runner.mjs summarize(): only outcome \"pass\" counts towards normativePassed",
+      "mutation": "count outcome \"error\" as passed",
+      "failingTest": "tests/conformance/brokenVerifiers.test.ts > verifier class (P1-32) > crash-on-empty fails empty (error)",
+      "failure": "AssertionError: expected true to be false (results.conformant)",
+      "restored": true
+    },
+    {
+      "guard": "packages/amc-conformance/lib/classes.mjs PRODUCER_CHECKS[\"importer-enforcement\"]",
+      "mutation": "return PASS unconditionally",
+      "failingTest": "tests/conformance/producerImporterClaim.test.ts > producer class (P1-32) > an importer emitting enforcement: enforced fails PRD-004; the same records with none pass",
+      "restored": true
+    },
+    {
+      "guard": "packages/amc-conformance/lib/classes.mjs adapter.judge: observation-only receipt must not say enforced",
+      "mutation": "replace the `level === \"enforced\"` branch with `false`",
+      "failingTest": "tests/conformance/producerImporterClaim.test.ts > adapter class (P1-32) > observation-only mode that claims enforcement fails ADP-004",
+      "restored": true
+    }
+  ]
+}

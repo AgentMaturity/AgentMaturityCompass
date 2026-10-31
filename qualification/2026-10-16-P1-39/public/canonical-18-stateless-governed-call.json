@@ -1,0 +1,427 @@
+{
+  "schema": "amc-p139-stateless/2",
+  "label": "stateless-governed-call",
+  "synthetic": true,
+  "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout",
+  "retainedRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-kcp7dK",
+  "configuredProtocolVersion": "2026-07-28",
+  "loseFirstToolResponse": false,
+  "remoteEffects": 1,
+  "options": {},
+  "observations": [],
+  "requests": [
+    {
+      "ordinal": 1,
+      "httpMethod": "POST",
+      "path": "/mcp",
+      "rpc": "server/discover",
+      "id": 0,
+      "meta": {
+        "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+        "io.modelcontextprotocol/clientInfo": {
+          "name": "amc-governed-native-tools",
+          "version": "1.0.0"
+        },
+        "io.modelcontextprotocol/clientCapabilities": {}
+      },
+      "bodyBytes": 267,
+      "bodySha256": "5215aa4c2fcf84d0435055d27cfd85cd8847c3d496dfce89f4e0151e32dbeb66",
+      "query": null,
+      "protocolHeader": "2026-07-28",
+      "methodHeader": "server/discover",
+      "nameHeader": null,
+      "paramHeader": null,
+      "originMatches": true,
+      "acceptJson": true,
+      "acceptSse": true,
+      "requestSessionPresent": false,
+      "lastEventIdPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseStatus": 200,
+      "responseKind": "json",
+      "responseId": 0,
+      "responseResultType": "complete",
+      "responseSessionPresent": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "ordinal": 2,
+      "httpMethod": "POST",
+      "path": "/mcp",
+      "rpc": "tools/list",
+      "id": 1,
+      "meta": {
+        "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+        "io.modelcontextprotocol/clientInfo": {
+          "name": "amc-governed-native-tools",
+          "version": "1.0.0"
+        },
+        "io.modelcontextprotocol/clientCapabilities": {}
+      },
+      "bodyBytes": 262,
+      "bodySha256": "2895f7262d0eec0bb9146f2eba47348d721068319f947a48b05c5e5d9764cadd",
+      "query": null,
+      "protocolHeader": "2026-07-28",
+      "methodHeader": "tools/list",
+      "nameHeader": null,
+      "paramHeader": null,
+      "originMatches": true,
+      "acceptJson": true,
+      "acceptSse": true,
+      "requestSessionPresent": false,
+      "lastEventIdPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseStatus": 200,
+      "responseKind": "json",
+      "responseId": 1,
+      "responseResultType": "complete",
+      "responseSessionPresent": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "ordinal": 3,
+      "httpMethod": "POST",
+      "path": "/mcp",
+      "rpc": "server/discover",
+      "id": 0,
+      "meta": {
+        "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+        "io.modelcontextprotocol/clientInfo": {
+          "name": "amc-governed-native-tools",
+          "version": "1.0.0"
+        },
+        "io.modelcontextprotocol/clientCapabilities": {}
+      },
+      "bodyBytes": 267,
+      "bodySha256": "5215aa4c2fcf84d0435055d27cfd85cd8847c3d496dfce89f4e0151e32dbeb66",
+      "query": null,
+      "protocolHeader": "2026-07-28",
+      "methodHeader": "server/discover",
+      "nameHeader": null,
+      "paramHeader": null,
+      "originMatches": true,
+      "acceptJson": true,
+      "acceptSse": true,
+      "requestSessionPresent": false,
+      "lastEventIdPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseStatus": 200,
+      "responseKind": "json",
+      "responseId": 0,
+      "responseResultType": "complete",
+      "responseSessionPresent": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "ordinal": 4,
+      "httpMethod": "POST",
+      "path": "/mcp",
+      "rpc": "tools/list",
+      "id": 1,
+      "meta": {
+        "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+        "io.modelcontextprotocol/clientInfo": {
+          "name": "amc-governed-native-tools",
+          "version": "1.0.0"
+        },
+        "io.modelcontextprotocol/clientCapabilities": {}
+      },
+      "bodyBytes": 262,
+      "bodySha256": "2895f7262d0eec0bb9146f2eba47348d721068319f947a48b05c5e5d9764cadd",
+      "query": null,
+      "protocolHeader": "2026-07-28",
+      "methodHeader": "tools/list",
+      "nameHeader": null,
+      "paramHeader": null,
+      "originMatches": true,
+      "acceptJson": true,
+      "acceptSse": true,
+      "requestSessionPresent": false,
+      "lastEventIdPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseStatus": 200,
+      "responseKind": "json",
+      "responseId": 1,
+      "responseResultType": "complete",
+      "responseSessionPresent": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "ordinal": 5,
+      "httpMethod": "POST",
+      "path": "/mcp",
+      "rpc": "tools/list",
+      "id": 2,
+      "meta": {
+        "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+        "io.modelcontextprotocol/clientInfo": {
+          "name": "amc-governed-native-tools",
+          "version": "1.0.0"
+        },
+        "io.modelcontextprotocol/clientCapabilities": {}
+      },
+      "bodyBytes": 262,
+      "bodySha256": "2cf0cae5d2074c29de545e8f100f0775174f55dd2b5886b4f46f6d17775d2883",
+      "query": null,
+      "protocolHeader": "2026-07-28",
+      "methodHeader": "tools/list",
+      "nameHeader": null,
+      "paramHeader": null,
+      "originMatches": true,
+      "acceptJson": true,
+      "acceptSse": true,
+      "requestSessionPresent": false,
+      "lastEventIdPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseStatus": 200,
+      "responseKind": "json",
+      "responseId": 2,
+      "responseResultType": "complete",
+      "responseSessionPresent": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "ordinal": 6,
+      "httpMethod": "POST",
+      "path": "/mcp",
+      "rpc": "tools/call",
+      "id": 3,
+      "meta": {
+        "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+        "io.modelcontextprotocol/clientInfo": {
+          "name": "amc-governed-native-tools",
+          "version": "1.0.0"
+        },
+        "io.modelcontextprotocol/clientCapabilities": {}
+      },
+      "bodyBytes": 308,
+      "bodySha256": "a39d34892be659b0f3114eaf4f80a5330dd0931b2f307d69adc0aa141a0f9ff6",
+      "query": "café",
+      "protocolHeader": "2026-07-28",
+      "methodHeader": "tools/call",
+      "nameHeader": "lookup",
+      "paramHeader": "=?base64?Y2Fmw6k=?=",
+      "originMatches": true,
+      "acceptJson": true,
+      "acceptSse": true,
+      "requestSessionPresent": false,
+      "lastEventIdPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseStatus": 200,
+      "responseKind": "json",
+      "responseId": 3,
+      "responseResultType": "complete",
+      "responseSessionPresent": true,
+      "responseFinished": true,
+      "responseClosed": true
+    }
+  ],
+  "sockets": [
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    }
+  ],
+  "reviewed": {
+    "serverId": "stateless_fixture",
+    "protocol": {
+      "negotiatedVersion": "2026-07-28",
+      "mode": "stateless",
+      "serverInfo": {
+        "name": "synthetic-stateless-untrusted",
+        "version": "1"
+      }
+    },
+    "tools": [
+      {
+        "name": "lookup",
+        "description": "Synthetic stateless lookup",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "x-mcp-header": "Query"
+            }
+          },
+          "required": [
+            "query"
+          ],
+          "additionalProperties": false
+        },
+        "outputSchema": null,
+        "annotations": null,
+        "execution": null
+      }
+    ],
+    "digest": "64edffb1f8d20ebcf1e16a6cf19789c2ba9545786e4253610e2d1d0f7ec25719"
+  },
+  "receipt": {
+    "serverId": "stateless_fixture",
+    "catalogDigest": "64edffb1f8d20ebcf1e16a6cf19789c2ba9545786e4253610e2d1d0f7ec25719",
+    "protocol": {
+      "negotiatedVersion": "2026-07-28",
+      "mode": "stateless",
+      "serverInfo": {
+        "name": "synthetic-stateless-untrusted",
+        "version": "1"
+      }
+    },
+    "auth": null
+  },
+  "outcomes": [
+    {
+      "callId": "stateless-call-1",
+      "result": {
+        "outcome": "OK",
+        "content": "{\"content\":[{\"type\":\"text\",\"text\":\"synthetic lookup completed\"}],\"resultType\":\"complete\"}",
+        "exitCode": 0,
+        "timedOut": false,
+        "denied": false
+      }
+    }
+  ],
+  "toolEvidence": [
+    {
+      "id": "86776a94-f481-43da-abec-337a8ac36b11",
+      "eventType": "tool/call",
+      "signed": true,
+      "payloadSha256": "48cd4407dd19702c73fe81c0ecd14641a6fa51dbcd3ce2db056ffc381c48b3fa",
+      "meta": {
+        "amcSession": {
+          "v": 1,
+          "sessionId": "93f3d6fc-5a79-4af3-92a1-0454a50ef49b",
+          "seq": 3,
+          "prevSessionEventHash": "94bc8bf4ee82668c6cd5daebbe794ac2373e2189b79128b5427f7342f9fa7c79",
+          "turn": 1,
+          "step": 1,
+          "surface": {
+            "op": "append",
+            "slot": "tool_use:stateless-call-1",
+            "role": "assistant",
+            "part": {
+              "kind": "tool_use",
+              "sha256": "48cd4407dd19702c73fe81c0ecd14641a6fa51dbcd3ce2db056ffc381c48b3fa"
+            }
+          },
+          "synthetic": false
+        },
+        "trustTier": "OBSERVED",
+        "turn": 1,
+        "step": 1,
+        "toolCallId": "stateless-call-1",
+        "toolName": "mcp_stateless_fixture_29a1af58c1382740",
+        "argsSha256": "48cd4407dd19702c73fe81c0ecd14641a6fa51dbcd3ce2db056ffc381c48b3fa",
+        "dispatch": "native",
+        "parentToken": null,
+        "amcSessionWriter": {
+          "v": 1,
+          "token": "03dc4dba-0897-4c3b-9414-0d4018c1b9e6",
+          "pid": 83343,
+          "hostId": "Sids-MacBook-Pro.local",
+          "state": "active"
+        }
+      }
+    },
+    {
+      "id": "fc79753e-66cc-4fc4-a93e-e322952ab353",
+      "eventType": "tool/result",
+      "signed": true,
+      "payloadSha256": "ce1ce2e519646ef98063f74d963bebe22d67c8f93437413c0bbd6ddc40368a1f",
+      "meta": {
+        "amcSession": {
+          "v": 1,
+          "sessionId": "93f3d6fc-5a79-4af3-92a1-0454a50ef49b",
+          "seq": 8,
+          "prevSessionEventHash": "f5a6bc5ac68bf4495c9fa538985fab0e44a7b9a65bad941b1637ac4e2e0163f2",
+          "turn": 1,
+          "step": 1,
+          "surface": {
+            "op": "append",
+            "slot": "tool_result:stateless-call-1",
+            "role": "tool",
+            "part": {
+              "kind": "tool_result",
+              "sha256": "ce1ce2e519646ef98063f74d963bebe22d67c8f93437413c0bbd6ddc40368a1f"
+            }
+          },
+          "synthetic": false
+        },
+        "trustTier": "OBSERVED",
+        "turn": 1,
+        "step": 1,
+        "toolCallId": "stateless-call-1",
+        "outcome": "OK",
+        "exitCode": 0,
+        "timedOut": false,
+        "denied": false,
+        "spilled": null,
+        "amcSessionWriter": {
+          "v": 1,
+          "token": "03dc4dba-0897-4c3b-9414-0d4018c1b9e6",
+          "pid": 83343,
+          "hostId": "Sids-MacBook-Pro.local",
+          "state": "active"
+        }
+      }
+    }
+  ],
+  "lifecycle": {
+    "started": true,
+    "closed": true,
+    "listening": false,
+    "openSockets": 0,
+    "sessionOpened": true,
+    "stepEnded": true,
+    "turnEnded": true,
+    "turnSealed": true,
+    "sessionClosed": true,
+    "toolsetClosed": true
+  },
+  "errors": [],
+  "bodyFailed": false,
+  "bodyError": null,
+  "cleanupErrors": [],
+  "environmentMutated": true,
+  "environmentRestored": true,
+  "childProcessCreated": false,
+  "signalsSent": false,
+  "typedUnknownQualification": "not claimed by this case"
+}

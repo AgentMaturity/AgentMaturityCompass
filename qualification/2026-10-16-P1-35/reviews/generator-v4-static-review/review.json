@@ -1,0 +1,74 @@
+{
+  "schema": "p135-generator-v4-static-review/1",
+  "allReadsFinished": true,
+  "scope": "Exact private v4 source and embedded plain-JS driver, exact delta, preserved baseline and actual old/current source contracts; author adjacent metadata not consumed unless listed below",
+  "candidate": {
+    "path": "/private/tmp/p1-35-legacy-qualification-20261016/provenance-generator-design/make-legacy-fixtures-v4.mjs",
+    "bytes": 20953,
+    "sha256": "0d756ecec2b9f95520b38ac8a54a4fe22a26843aa0df338f4ef4ac426b6ba9cb"
+  },
+  "baseline": {
+    "path": "/private/tmp/p1-35-legacy-qualification-20261016/provenance-generator-design/make-legacy-fixtures-v3-input.mjs",
+    "bytes": 19575,
+    "sha256": "01c8bf8bccc34e3c20599e3ab5f8b818a58021fa356d56149d613aa340eb25d9"
+  },
+  "patch": {
+    "path": "/private/tmp/p1-35-legacy-qualification-20261016/provenance-generator-design/make-legacy-fixtures-v4.patch",
+    "bytes": 12204,
+    "sha256": "ef5ae79b98cc773ca2a4fdbd81bcf3042cf3677de8221a2cbbddce808d8a688e"
+  },
+  "patchExact": true,
+  "blockers": [],
+  "findings": [],
+  "conclusion": "No concrete static code blocker; source-supported inline-prefix snapshot retains original API/verification strictness. Runtime remains unproven.",
+  "fullCodeAndEmbeddedDriverRead": true,
+  "sequencing": [
+    "Old source HEAD/status/package/lock and selected source/compiled/native pins",
+    "await natural init closure",
+    "await natural operator-import closure",
+    "await natural seed, domain, ledger getter closures",
+    "getter guards all rows before observation output; finally releases ledger lease; process close precedes copy",
+    "require getter exit0 and absent WAL; no checkpoint/remove/repair",
+    "pin sourceAtClosure; COPYFILE_EXCL to new exports/evidence.sqlite; byte/SHA equality; candidate points to retained copy",
+    "later diagnostic/assurance/other old exports mutate only their normal own workspace; snapshot remains separate candidate source",
+    "recheck candidate source hashes before raw exclusive copy/storage; ordinary actual staging caps and source/runtime preservation retained"
+  ],
+  "inlineGuard": {
+    "recordsOnly": "session_id,event_hash,meta_json and non-content payloadInline/path/canonicalPath/blobRef projections",
+    "refuses": "any row without string inline content, non-null ordinary/canonical path, or non-null blob ref",
+    "payloadFileReadByNewDriver": false,
+    "blobDecryptOrReencryptByNewDriver": false,
+    "sqlAuthoredOrRowsMutated": false,
+    "limitation": "No universal cryptographic or product-internal lifecycle claim; actual strict current verifier still runs unchanged."
+  },
+  "provenance": {
+    "schemaUnchanged": 2,
+    "ledgerSnapshot": "sourceAtClosure historical physical pin and retained snapshot pin, explicit before-diagnostic-and-assurance boundary, WAL fact, actual observation command index/PID",
+    "candidateSourceStable": "exports/evidence.sqlite snapshot, not later final workspace DB path",
+    "sameWorkspaceKeys": true,
+    "finalWorkspaceRetained": true,
+    "originalV3AndFailingPublicPreserved": true,
+    "outputNamesConditionalOnActualGeneration": "Expected existing eight under actual refused diagnostic certificate; do not predict successful output count, compression size, mean level or verdict."
+  },
+  "testFit": {
+    "sealedTenCasePrivateSha256": "f0b88b76e48c55f979ac4c322a44ea32f70c687009d587e04983b664743db36b",
+    "materializedSha256": "f0b88b76e48c55f979ac4c322a44ea32f70c687009d587e04983b664743db36b",
+    "bodyEditsNeeded": false,
+    "conditions": "Actual same8names/schema2/fourstoredfiles, matching snapshot observation/key identity, bundle finite member allowlist. New actual hashes/docs must be reviewed by root."
+  },
+  "unchangedBoundaries": [
+    "Natural child result recorder; no added signal/kill/timeout/retry",
+    "No old source edit or reconstruction of old ledger rows",
+    "COPYFILE_DISABLE=1 retained for archive creation",
+    "Exact original bytes and embedded public keys remain raw authority",
+    "Stored archive/metadata cap; no truncated or omitted original",
+    "Root separately decodes/checks actual output links/content/hashes before materialization",
+    "Genuine L3 and diagnostic certificate current-acceptance gaps remain actual generation outcomes",
+    "No guard, test deadline, verifier, freeze, quality or held decision weakened"
+  ],
+  "authorMetadataRead": false,
+  "executionByReviewer": false,
+  "checkoutWritesByReviewer": false,
+  "parserCompilerHelperProductNativeSQLNetworkExecution": false,
+  "rootSoleRunnerAndWriter": true
+}

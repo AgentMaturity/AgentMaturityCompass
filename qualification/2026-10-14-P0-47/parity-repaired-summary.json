@@ -1,0 +1,13 @@
+{
+  "code": "7a81b5aa7316471e841f4ae0ea684a64c85ae4a1",
+  "node": "v22.23.3",
+  "success": true,
+  "total": 7118,
+  "passed": 7118,
+  "failed": 0,
+  "pending": 0,
+  "todo": 0,
+  "report": "/private/tmp/p0-47-parity-repaired-20261014.json",
+  "reportSha256": "c8417810e4e9853e06de4935bec01a529048349b2ba6b01d6ed99a9197c5a4e0",
+  "scope": "Exact26linkedparity/helperfiles; source identical before commit; current fullsuite remains outstanding."
+}

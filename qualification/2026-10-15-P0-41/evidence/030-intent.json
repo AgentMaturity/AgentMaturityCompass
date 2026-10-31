@@ -1,0 +1,48 @@
+{
+  "argv": [
+    "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+    "/private/tmp/p0-41-causal-qualification-v2-20261015/cli-artifacts/P041-M2-vacuous-file-pass--restored/Q13-render-p041-45J2Fw/fixture/scripts/program-metrics.mjs",
+    "--markdown"
+  ],
+  "cwd": "/private/tmp/p0-41-causal-qualification-v2-20261015/cli-artifacts/P041-M2-vacuous-file-pass--restored/Q13-render-p041-45J2Fw/fixture",
+  "envKeys": [
+    "GIT_CONFIG_GLOBAL",
+    "GIT_CONFIG_NOSYSTEM",
+    "GIT_TERMINAL_PROMPT",
+    "HOME",
+    "LANG",
+    "LC_ALL",
+    "PATH",
+    "TMPDIR"
+  ],
+  "commits": [
+    "bcdcaaf7b500a3ec11a913d92e9a6d80687f599a"
+  ],
+  "inputs": [
+    {
+      "path": "docs/program/gaps.json",
+      "exists": true,
+      "bytes": 16375,
+      "sha256": "bb7eded5387d9b4bb1782b23720042b7c5b26d7fbff119cefc9ceefe7095f006"
+    },
+    {
+      "path": "docs/program/metrics-manual.json",
+      "exists": true,
+      "bytes": 208,
+      "sha256": "1cc3f44d4a0027c8228ed1f6bfa7fda5627bc1d452b6fe7796e94c35732241d3"
+    },
+    {
+      "path": "docs/program/metrics.json",
+      "exists": true,
+      "bytes": 5915,
+      "sha256": "981273f26db9bc34a8cff2f05841a130a3632f56119d4ab8584818499657d5b7"
+    },
+    {
+      "path": "scripts/program-metrics.mjs",
+      "exists": true,
+      "bytes": 23978,
+      "sha256": "e7f77e3924d722b384cdd3cee169e83539eb83a3345c0e8fbcbe7228060bdbf9"
+    }
+  ],
+  "note": "No environment values retained; no command timeout/retry/termination added."
+}

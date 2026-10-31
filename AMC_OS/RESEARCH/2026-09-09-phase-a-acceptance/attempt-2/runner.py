@@ -13,7 +13,7 @@ import tempfile
 import time
 
 RECORD = pathlib.Path(__file__).resolve().parent
-ROOT = pathlib.Path('/Users/sid/AgentMaturityCompass')
+ROOT = pathlib.Path('~/AgentMaturityCompass')
 NODE = '/opt/homebrew/opt/node@22/bin/node'
 PNPM = '/opt/homebrew/lib/node_modules/pnpm/bin/pnpm.cjs'
 POLL_SECONDS = 0.2

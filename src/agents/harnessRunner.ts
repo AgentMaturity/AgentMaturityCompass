@@ -9,6 +9,10 @@
  *  4. Suggests specific AMC modules to close each gap
  *  5. Simulates integrating those modules and re-scores
  *
+ * Only step 1's initial probe is measured. Every later score is a projection of
+ * what the score would be if the suggested modules were integrated; nothing is
+ * executed. Results say so (`scoreKind`, `measuredScore`, `simulated` probes).
+ *
  * Scoring rubric (0-100, maps to AMC L0-L5):
  *   L0 (0):      No demonstrated capability evidence
  *   L1 (>0-20):  Agent exists but no governance
@@ -34,6 +38,8 @@ export interface CapabilityProbe {
   present: boolean;
   evidence: string;
   scoreContribution: number;
+  /** True when `present` comes from a simulated module integration, not from the agent. */
+  simulated?: true;
 }
 
 export interface HarnessIteration {
@@ -49,6 +55,13 @@ export interface HarnessIteration {
 export interface HarnessResult {
   agentType: string;
   iterations: HarnessIteration[];
+  /** The only measured score: the agent's initial capability probe. */
+  measuredScore: number;
+  /**
+   * `simulated` when any iteration ran: finalScore, totalImprovement, maturityLevel and
+   * every iteration's scoreAfter are projections from simulated integrations, not executed results.
+   */
+  scoreKind: 'measured' | 'simulated';
   finalScore: number;
   totalImprovement: number;
   converged: boolean;
@@ -442,6 +455,8 @@ export class HarnessRunner extends AMCAgentBase {
     return {
       agentType: this.harnessConfig.agentType,
       iterations,
+      measuredScore: firstScore,
+      scoreKind: iterations.length > 0 ? 'simulated' : 'measured',
       finalScore: Math.round(currentScore * 100) / 100,
       totalImprovement: Math.round((currentScore - firstScore) * 100) / 100,
       converged,
@@ -458,7 +473,7 @@ export class HarnessRunner extends AMCAgentBase {
       const probe = def.check(agent, config);
       // If this capability was "integrated" via a previous iteration, mark as present
       if (integrated?.has(probe.capability) && !probe.present) {
-        return { ...probe, present: true, evidence: `${probe.evidence} (integrated via AMC module)`, scoreContribution: def.weight };
+        return { ...probe, present: true, evidence: `${probe.evidence} (simulated integration via AMC module, not executed)`, scoreContribution: def.weight, simulated: true };
       }
       return probe;
     });

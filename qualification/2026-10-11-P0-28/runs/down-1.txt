@@ -1,0 +1,3 @@
+$ amc down
+# exit 0
+Sent SIGTERM to studio pid 19165

@@ -1,3 +1,4 @@
+import { nearestRank } from "../experiments/stats.js";
 /**
  * Cost & Latency Tracking Assertions
  *
@@ -113,10 +114,8 @@ export class TokenThresholdError extends Error {
 // ---------------------------------------------------------------------------
 
 function percentile(values: number[], p: number): number {
-  if (values.length === 0) return 0;
-  const sorted = [...values].sort((a, b) => a - b);
-  const idx = Math.ceil((p / 100) * sorted.length) - 1;
-  return sorted[Math.max(0, idx)] ?? 0;
+  // All callers request fixed 50th, 95th or 99th percentiles within the shared nearest-rank domain.
+  return nearestRank(values, p / 100);
 }
 
 function safeNum(v: number | undefined, fallback = 0): number {

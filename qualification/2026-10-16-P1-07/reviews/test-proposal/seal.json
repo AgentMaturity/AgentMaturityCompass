@@ -1,0 +1,40 @@
+{
+  "schema": "p107-private-two-test-candidate-seal/1",
+  "soleTargets": [
+    "tests/diagnostic/levelCumulative.test.ts",
+    "tests/diagnostic/evidenceEmitterRegistry.test.ts"
+  ],
+  "privateOnly": true,
+  "allCandidateBytesReadStatically": true,
+  "inputPinCount": 37,
+  "inputPinsVerified": true,
+  "testInventory": "Fixed literal test bodies; all mutable-data loops occur inside bodies",
+  "timestamps": "Recent Date.now-derived rows at most one day old; no global clock/environment mutation",
+  "productionRegistryMapProvenanceExistingTestsAndGuardsUntouched": true,
+  "candidateParserCompilerProductTestNativeSqlNetworkOrProbeExecuted": false,
+  "checkoutIndexOrQaWritten": false,
+  "futureRuntimeFitOrMutationCountsClaimed": false,
+  "rootOwnsFullReadMaterializationExecutionAndQualification": true,
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/test-proposal/levelCumulative.test.ts",
+      "bytes": 10722,
+      "sha256": "1265e5715bd3ceb3c342c44e3a65681f8d32d74dd962ede9e7f64c8227575c78"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/test-proposal/evidenceEmitterRegistry.test.ts",
+      "bytes": 10448,
+      "sha256": "01ba46f55bf1135306e8e55d9b8c41a4b106ced58aa3a9a5463557fede001061"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/test-proposal/README.md",
+      "bytes": 4298,
+      "sha256": "4bee2587f54827eadfd4fd3bba6489f464146d58fe3debe2ba6a7b0b244c3033"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/test-proposal/input-pins.json",
+      "bytes": 8673,
+      "sha256": "863614bffaf94c39c8e46a6a52ca7a1beef5fe3a80f79be7156a6d51cab400f6"
+    }
+  ]
+}

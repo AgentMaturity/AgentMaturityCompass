@@ -1,0 +1,103 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L0-DAT-03",
+  "polarity": "negative",
+  "evidenceClass": "violation",
+  "setup": {
+    "harness": "data_admission",
+    "registry": {
+      "schemaVersion": "amc.dataflow-processors/v1",
+      "experimental": true,
+      "processors": [
+        {
+          "processorId": "proc-general",
+          "legalName": "Fixture General Processor",
+          "contracts": [
+            {
+              "kind": "DPA",
+              "reference": "DPA-FIXTURE-1",
+              "effective": "2026-01-01",
+              "expires": null,
+              "dataClasses": [
+                "pii"
+              ]
+            }
+          ]
+        },
+        {
+          "processorId": "proc-health",
+          "legalName": "Fixture Health Processor",
+          "contracts": [
+            {
+              "kind": "DPA",
+              "reference": "DPA-FIXTURE-2",
+              "effective": "2026-01-01",
+              "expires": null,
+              "dataClasses": [
+                "phi",
+                "pii"
+              ]
+            }
+          ]
+        }
+      ],
+      "purposes": [
+        {
+          "purposeId": "support",
+          "allowedDataClasses": [
+            "pii"
+          ],
+          "allowedTools": [
+            "model.request"
+          ],
+          "allowedProcessors": [
+            "proc-general"
+          ]
+        },
+        {
+          "purposeId": "care",
+          "allowedDataClasses": [
+            "phi",
+            "pii"
+          ],
+          "allowedTools": [
+            "model.request"
+          ],
+          "allowedProcessors": [
+            "proc-health"
+          ]
+        }
+      ],
+      "bindings": [
+        {
+          "providerId": "fixture-provider",
+          "baseUrl": "https://llm.fixture.example/v1",
+          "processorId": "proc-general",
+          "purposeId": "support"
+        },
+        {
+          "providerId": "health-provider",
+          "baseUrl": "https://health.fixture.example/v1",
+          "processorId": "proc-health",
+          "purposeId": "care"
+        },
+        {
+          "providerId": "other-provider",
+          "baseUrl": "https://other.fixture.example/v1",
+          "processorId": "proc-health",
+          "purposeId": "support"
+        }
+      ]
+    },
+    "registryState": "signed",
+    "route": {
+      "providerId": "fixture-provider",
+      "baseUrl": "https://unlisted.fixture.example/v1"
+    },
+    "text": "Please update the account of jane.roe@example.com."
+  },
+  "expected": {
+    "result": "deny",
+    "reasonCode": "binding_missing"
+  }
+}

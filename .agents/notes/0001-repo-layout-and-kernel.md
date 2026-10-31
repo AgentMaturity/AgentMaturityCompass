@@ -66,7 +66,7 @@ kernel, which re-derives a formally-specified system validated by Koishi's
 ## Sourcing note — the patched tree is not currently reachable
 
 `plans/amc-superharness.md` P1.1 names
-`/Users/sid/Downloads/deepseek-harness-master/vendor/` as the source of truth.
+`~/Downloads/deepseek-harness-master/vendor/` as the source of truth.
 That directory exists with normal permissions but sits outside this session's
 sandbox, so it cannot be read from here. Until it is copied into the workspace,
 P1.1 cannot use the patched tree, and vendoring from upstream npm would silently

@@ -41,7 +41,7 @@ describe("tiered top-level help", () => {
   });
 
   test("keeps the UX audit aligned with tiered help output", () => {
-    const audit = readFileSync(resolve(process.cwd(), "docs/UX_AUDIT_REPORT.md"), "utf8");
+    const audit = readFileSync(resolve(process.cwd(), "docs/archive/UX_AUDIT_REPORT.md"), "utf8");
 
     expect(audit).toContain("R11 — top-level help is compact and full help moves behind --help --all");
     expect(audit).toContain("amc --help --all");

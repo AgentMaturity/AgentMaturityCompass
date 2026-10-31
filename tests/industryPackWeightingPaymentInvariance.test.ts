@@ -1,11 +1,13 @@
-import { generateKeyPairSync } from "node:crypto";
+import { spawnSync } from "node:child_process";
+import type { IncomingMessage, ServerResponse } from "node:http";
 import { mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
+import { Readable } from "node:stream";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import {
   activateIndustryPackAccess,
-  createIndustryPackLicenseKey
+  getIndustryPackEntitlement
 } from "../src/domains/industryPackEntitlement.js";
 import {
   INDUSTRY_PACK_WEIGHTING_REMOVED_MESSAGE,
@@ -13,10 +15,15 @@ import {
   getQuestionSet
 } from "../src/diagnostic/questionSets.js";
 import { runDiagnostic } from "../src/diagnostic/runner.js";
+import { loadRunReport } from "../src/diagnostic/runReportResolution.js";
+import { handleScoreRoute } from "../src/api/scoreRouter.js";
+import { unifiedRun } from "../src/unified/unifiedRun.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { initWorkspace } from "../src/workspace.js";
+import { testIndustryPackLicence, type TestIndustryPackLicence } from "./helpers/industryPackLicence.js";
 
 const LICENCE_ENV_KEYS = [
+  "AMC_HOME",
   "AMC_INDUSTRY_PACKS_LICENSE_KEY",
   "AMC_DOMAIN_PACKS_LICENSE_KEY",
   "AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY",
@@ -41,15 +48,19 @@ function tempDir(prefix: string): string {
   return dir;
 }
 
-function issueLicence(expiresAt = "2099-01-01T00:00:00.000Z"): { licenseKey: string; publicKeyPem: string } {
-  const { privateKey, publicKey } = generateKeyPairSync("ed25519");
-  const licenseKey = createIndustryPackLicenseKey({
-    expiresAt,
-    env: {
-      AMC_INDUSTRY_PACKS_LICENSE_PRIVATE_KEY: privateKey.export({ type: "pkcs8", format: "pem" }).toString()
-    } as NodeJS.ProcessEnv
-  });
-  return { licenseKey, publicKeyPem: publicKey.export({ type: "spki", format: "pem" }).toString() };
+/** A licence signed by a key pinned in a temp AMC home trust list: since P1-51 the only licence a gate accepts. */
+function issueLicence(expiresAt = "2099-01-01T00:00:00.000Z"): TestIndustryPackLicence {
+  const licence = testIndustryPackLicence({ expiresAt });
+  roots.push(licence.amcHome);
+  return licence;
+}
+
+/** Licence on: the pinned AMC home and the licence in the environment, checked to be really active. */
+function licenceOn(workspace = tempDir("amc-p151-probe-")): void {
+  const licence = issueLicence();
+  vi.stubEnv("AMC_HOME", licence.amcHome);
+  vi.stubEnv("AMC_INDUSTRY_PACKS_LICENSE_KEY", licence.licenseKey);
+  expect(getIndustryPackEntitlement(workspace).active).toBe(true);
 }
 
 // Lifts one core question above level 0 so its layer mixes unequal levels; any
@@ -111,9 +122,7 @@ describe("industry pack weighting never depends on payment", () => {
 
   test("A2: a valid licence changes nothing", () => {
     const baseline = weighted(tempDir("amc-p044-base-"));
-    const { licenseKey, publicKeyPem } = issueLicence();
-    vi.stubEnv("AMC_INDUSTRY_PACKS_LICENSE_KEY", licenseKey);
-    vi.stubEnv("AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY", publicKeyPem);
+    licenceOn();
     const licensed = weighted(tempDir("amc-p044-a2-"));
     expect(licensed.questions).toEqual(baseline.questions);
     expect(licensed.info).toEqual(baseline.info);
@@ -121,39 +130,38 @@ describe("industry pack weighting never depends on payment", () => {
   });
 
   test("A3: a valid licence in the legacy variable changes nothing", () => {
-    const { licenseKey, publicKeyPem } = issueLicence();
+    const { licenseKey, amcHome } = issueLicence();
+    vi.stubEnv("AMC_HOME", amcHome);
     vi.stubEnv("AMC_DOMAIN_PACKS_LICENSE_KEY", licenseKey);
-    vi.stubEnv("AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY", publicKeyPem);
+    expect(getIndustryPackEntitlement(tempDir("amc-p044-a3p-")).active).toBe(true);
     expectBaseline(weighted(tempDir("amc-p044-a3-")));
   });
 
   test("A4: a forged licence changes nothing", () => {
     const { licenseKey } = issueLicence();
-    const { publicKeyPem: otherPublicKey } = issueLicence();
+    const { amcHome: otherHome } = issueLicence();
+    vi.stubEnv("AMC_HOME", otherHome);
     vi.stubEnv("AMC_INDUSTRY_PACKS_LICENSE_KEY", licenseKey);
-    vi.stubEnv("AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY", otherPublicKey);
     expectBaseline(weighted(tempDir("amc-p044-a4-")));
   });
 
   test("A5: an expired licence changes nothing", () => {
-    const { licenseKey, publicKeyPem } = issueLicence("2000-01-01T00:00:00.000Z");
+    const { licenseKey, amcHome } = issueLicence("2000-01-01T00:00:00.000Z");
+    vi.stubEnv("AMC_HOME", amcHome);
     vi.stubEnv("AMC_INDUSTRY_PACKS_LICENSE_KEY", licenseKey);
-    vi.stubEnv("AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY", publicKeyPem);
     expectBaseline(weighted(tempDir("amc-p044-a5-")));
   });
 
   test("A6: a workspace activated with a valid key changes nothing", () => {
     const workspace = tempDir("amc-p044-a6-");
-    const { licenseKey, publicKeyPem } = issueLicence();
-    vi.stubEnv("AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY", publicKeyPem);
+    const { licenseKey, amcHome } = issueLicence();
+    vi.stubEnv("AMC_HOME", amcHome);
     expect(activateIndustryPackAccess({ workspace, licenseKey }).active).toBe(true);
     expectBaseline(weighted(workspace));
   });
 
   test("A7: a valid licence without the flag adds no weighting block", () => {
-    const { licenseKey, publicKeyPem } = issueLicence();
-    vi.stubEnv("AMC_INDUSTRY_PACKS_LICENSE_KEY", licenseKey);
-    vi.stubEnv("AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY", publicKeyPem);
+    licenceOn();
     const set = getQuestionSet({ version: LIFECYCLE_QUESTION_SET_VERSION, workspace: tempDir("amc-p044-a7-") });
     expect(set.info.domainPackWeighting).toBeUndefined();
     expect(set.questions).toEqual(unweighted);
@@ -175,9 +183,7 @@ describe("industry pack weighting never depends on payment", () => {
     }
 
     const unlicensed = await run(true);
-    const { licenseKey, publicKeyPem } = issueLicence();
-    vi.stubEnv("AMC_INDUSTRY_PACKS_LICENSE_KEY", licenseKey);
-    vi.stubEnv("AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY", publicKeyPem);
+    licenceOn();
     const licensed = await run(true);
     const flagOff = await run(false);
 
@@ -187,6 +193,60 @@ describe("industry pack weighting never depends on payment", () => {
     expect(unlicensed.questionSet?.domainPackWeighting?.applied).toBe(false);
     expect(licensed.questionSet?.domainPackWeighting?.applied).toBe(false);
   }, 60_000);
+
+  // P1-51: the same inputs give the same result with the licence on and off wherever a score is computed.
+  function seededWorkspace(prefix: string): string {
+    const workspace = tempDir(prefix);
+    initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+    seedCoreEvidence(workspace);
+    return workspace;
+  }
+
+  test("D1: the score API route gives identical layer scores with the licence on and off", async () => {
+    async function post() {
+      const body = JSON.stringify({ questionSetVersion: LIFECYCLE_QUESTION_SET_VERSION, applyIndustryPackWeights: true });
+      const req = Object.assign(Readable.from([Buffer.from(body)]), { method: "POST", url: "/api/v1/score/run", headers: {} }) as unknown as IncomingMessage;
+      let payload = "";
+      const res = { writeHead: () => res, end: (chunk?: string) => { payload += chunk ?? ""; } } as unknown as ServerResponse;
+      expect(await handleScoreRoute("/api/v1/score/run", "POST", req, res, seededWorkspace("amc-p151-d1-"))).toBe(true);
+      return (JSON.parse(payload) as { data: { layerScores: unknown; questionSet: { domainPackWeighting?: { applied: boolean } } } }).data;
+    }
+    const off = await post();
+    licenceOn();
+    const on = await post();
+    expect(on.layerScores).toEqual(off.layerScores);
+    expect(on.questionSet.domainPackWeighting?.applied).toBe(false);
+  }, 120_000);
+
+  test("D2: unified run gives identical module scores and overall grade with the licence on and off", async () => {
+    async function run() {
+      const report = await unifiedRun({ workspace: seededWorkspace("amc-p151-d2-"), agentId: "default", window: "14d",
+        questionSetVersion: LIFECYCLE_QUESTION_SET_VERSION, applyIndustryPackWeights: true });
+      return { overall: [report.overallScore, report.overallGrade],
+        modules: report.modules.map(({ name, score, grade, status }) => ({ name, score, grade, status })) };
+    }
+    const off = await run();
+    licenceOn();
+    expect(await run()).toEqual(off);
+  }, 240_000);
+
+  test("D3: amc run gives identical layer scores with the licence on and off", () => {
+    const cli = resolve("dist/cli.js");
+    function run(env: Record<string, string>) {
+      const workspace = seededWorkspace("amc-p151-d3-");
+      const result = spawnSync(process.execPath, [cli, "run", "--score-only", "--question-set", LIFECYCLE_QUESTION_SET_VERSION,
+        "--industry-pack-weights", "--json"], { cwd: workspace, encoding: "utf8", timeout: 120_000,
+        env: { ...process.env, AMC_HOME: tempDir("amc-p151-d3-home-"), NO_COLOR: "1", ...env } });
+      expect(result.status, result.stderr).toBe(0);
+      const { runId, questionSet } = JSON.parse(result.stdout) as { runId: string; questionSet: { domainPackWeighting?: { applied: boolean } } };
+      expect(questionSet.domainPackWeighting?.applied).toBe(false);
+      return loadRunReport(workspace, runId).layerScores;
+    }
+    const off = run({});
+    const licence = issueLicence();
+    expect(getIndustryPackEntitlement(tempDir("amc-p151-d3p-"), { ...licence.env } as NodeJS.ProcessEnv).active).toBe(true);
+    expect(run(licence.env)).toEqual(off);
+  }, 240_000);
 
   test("C1: scoring code never reads the Industry Packs entitlement", () => {
     const files = ["src/diagnostic", "src/score", "src/unified"].flatMap((dir) =>

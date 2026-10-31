@@ -1,0 +1,75 @@
+{
+  "scope": "Retained private immutable reports/proposals and process wrappers; referenced artifacts above1MiB are hashed, not copied. No credentials or fixture databases attached.",
+  "references": [
+    {
+      "path": "/private/tmp/p1-39-mcp-qualification-20261016/docs-proposal/ownership-observations.json",
+      "bytes": 1168995,
+      "sha256": "2be6d0e5c5d74dde56e6a7e62733b32d4b7d2b12b95ee38501c57c14302d9040"
+    },
+    {
+      "path": "/private/tmp/p1-39-mcp-qualification-20261016/pre-admission/observations.json",
+      "bytes": 241538,
+      "sha256": "0aaf159a8012ba4173159b23efd6837d2e4f6817fbb76faac6bd09ea6f7e64e4"
+    },
+    {
+      "path": "/private/tmp/p1-39-mcp-qualification-20261016/pre-admission/selected-source-ownership.json",
+      "bytes": 516888,
+      "sha256": "9d7b4f6cf365c68ccc588cbeecef670377de15e90e9ea222f472a68fe499fd18"
+    },
+    {
+      "path": "/private/tmp/p1-39-mcp-qualification-20261016/post-typecheck-run-prepared.py",
+      "bytes": 14874,
+      "sha256": "abbda23f645d38e643133ebbb4a9b19dc4f9bad5cab20d098c02449c6d3885e6"
+    },
+    {
+      "path": "/private/tmp/p1-39-mcp-qualification-20261016/post-typecheck-wrapper.patch",
+      "bytes": 2487,
+      "sha256": "caedc55381ff5098567b72449686c6ed4526d3896da7fb2d3b6f202fd83460aa"
+    },
+    {
+      "path": "/private/tmp/p1-39-mcp-qualification-20261016/source-control.py",
+      "bytes": 4695,
+      "sha256": "dd633747d4ca2e5d3d12f2e644c41cf95329a0f22711d2d5cdbcaea9681a1c3e"
+    },
+    {
+      "path": "/private/tmp/p1-39-mcp-qualification-20261016/root-peer-and-routing-adoption.json",
+      "bytes": 1859,
+      "sha256": "08bb6089d925a9e594f391a7b060fe83a11bfaec22a6db41cef8d09897260b67"
+    },
+    {
+      "path": "/private/tmp/p1-39-mcp-qualification-20261016/root-real-flow-peer-adoption.json",
+      "bytes": 271,
+      "sha256": "e239322a68566d3fb540f1df28f22d52bd451bb6f412d5fc5b5d3aa38edf7426"
+    },
+    {
+      "path": "/private/tmp/p1-39-mcp-qualification-20261016/next-plan-routing/routing.json",
+      "bytes": 11015,
+      "sha256": "5c9ffbf9d8164aea2b993c01dc767b80cc6157875e6bc5cdb512a149052f6a08"
+    },
+    {
+      "path": "/private/tmp/p1-39-mcp-qualification-20261016/next-plan-routing/seal.json",
+      "bytes": 1013,
+      "sha256": "bdb4a9b65a069a875d147409560ae79195a49a066fd97064621032ce0f27e230"
+    },
+    {
+      "path": "/private/tmp/p1-39-mcp-qualification-20261016/acceptance-map/review.json",
+      "bytes": 43160,
+      "sha256": "de96824fc70088efc54edbdee481f11020a160a5a4fe88bf4ea57dcca6b30294"
+    },
+    {
+      "path": "/private/tmp/p1-39-mcp-qualification-20261016/receipt-draft/seal.json",
+      "bytes": 1148,
+      "sha256": "86f389e065a00cc86760b73034a25aa93a28d0c3f5f8698eaa482a3ab5b85e5c"
+    },
+    {
+      "path": "/private/tmp/p1-39-mcp-qualification-20261016/compiler-closure-review/seal.json",
+      "bytes": 1047,
+      "sha256": "f0c8a7108871dbb38f5f63241acad93b83ce73b34c757bfbdef50a146099fbf9"
+    },
+    {
+      "path": "/private/tmp/p1-39-mcp-qualification-20261016/causal-controls-independent-review/seal.json",
+      "bytes": 1165,
+      "sha256": "9ab32417a4fe47a749740178342a89c499ad2dc58aadcccc9e314f5d53fb4134"
+    }
+  ]
+}

@@ -42,7 +42,7 @@ export interface A4MutationResult { projectId: string; seq: number; kind: string
 interface Control { readonly expectedHeadSeq: number; readonly clientRequestId?: string }
 interface Decision { readonly reason: string; readonly expectedGateSeq: number; readonly clientRequestId?: string }
 
-/** `timeoutMs` bounds each request, its answer included; a timeout throws `NETWORK_ERROR` whose cause is the `TimeoutError`. */
+/** `timeoutMs` bounds each request, its answer included; a timeout throws `NETWORK_ERROR` whose cause is the `TimeoutError`. @experimental A4 preview (AMC_A4_PREVIEW=1). */
 export function createA4Client(options: { baseUrl: string; session: A4Session; timeoutMs?: number }) {
   const origin = new URL(options.baseUrl).origin;
   const root = `${options.baseUrl.replace(/\/+$/, "")}/api/v1/a4`;

@@ -1,6 +1,6 @@
 # `amc-sdk`
 
-Drive an installed AMC native agent from Python. The client uses the standard library and launches one `amc acp` process with a fixed workspace, provider and credential reference. Select the executable explicitly with `amc_bin` or `AMC_BIN` when multiple AMC installations exist.
+Drive an installed AMC native agent from Python. The client uses the standard library and launches one `amc acp` process with a fixed workspace, provider and credential reference. Pin the executable explicitly with `amc_bin` or `AMC_BIN` when multiple AMC installations exist. This wrapper supports AMC runtimes `>=1.2.0,<1.3.0`; initialization refuses a missing, malformed, prerelease or incompatible `agentInfo.version` before opening any session. The Python package version is independent of the CLI version.
 
 ```python
 from amc_sdk import AmcAgent
@@ -37,6 +37,53 @@ with AmcAgent(workspace=".", provider="stub") as agent:
 ```
 
 `Turn` supports one iterator and retains its updates in `RunResult.updates`. The result is separate from the stream. Updates are completed blocks projected from committed session rows and may arrive while a turn is still running; they are not raw provider token deltas. A cancellation request does not prove cancellation occurred: inspect the final stop reason. Closing the client cancels and settles active work before sealing owned sessions; a forced termination remains an interrupted run requiring recovery.
+
+## Bounded committed history and reconnect
+
+```python
+with AmcAgent(workspace=".", provider="stub") as reader:
+    for page in reader.read_session_pages(session_id, limit=64):
+        for event in page.updates:
+            print(event.seq, event.update)
+        resume_cursor = page.resume_cursor
+    # Later, continue from the same verified prefix without replaying a prompt.
+    next_page = reader.read_session_page(session_id, cursor=resume_cursor, limit=64)
+```
+
+These APIs read the recorded session store through the negotiated native ACP
+extension. They do not load, resume or claim a session writer. Each page checks
+owner/session identity, authenticates the underlying history and contains only
+committed updates. `next_cursor` drains a fixed snapshot; `resume_cursor` follows
+later commits from the last delivered sequence. Keep the cursor opaque. Gaps,
+tampering, forged or foreign cursors raise an error instead of returning a
+silently shortened transcript. Page limits are integers from 1 through 256.
+A page reports runtime verification metadata, not a cold verification receipt.
+
+The live turn iterator retains its existing explicit overflow error by default.
+Opt in with `resync_on_overflow=True` and optionally lower retention through
+`event_buffer={"max_events": 8, "max_bytes": 1048576}`. This requires the negotiated
+page and `amc-committed-turn-v1` capabilities. The prompt reply pins its exact
+signed turn seal; recovery must include that completed seal and match the
+retained committed text prefix. A valid-prefix rollback refuses the result.
+Preflight, prompt execution and recovery share the total request deadline;
+cancellation during preflight prevents dispatch, and cancellation during
+read-only recovery stops reconstruction. Ordinary acknowledged model
+cancellation still reports its cancelled outcome. On overflow the iterator raises `AmcResyncRequiredError` with
+`recoverable=True`; keep awaiting the same `turn.result()`. The final result
+recovers committed text within the byte limit, sets `resynced=True`, and marks
+`recovery["updatesComplete"]=False`: `updates` and tool snapshots retain a bounded
+prefix. Use `recovery["cursor"]` for later page reads. Invalid recovery history or
+an oversized answer refuses the result. Never resubmit a prompt to recover output.
+Each page's `state` holds cumulative validation, usage, cancellation, approval and
+unknown-outcome snapshots; replace the prior snapshot instead of summing pages.
+Plan updates are display data and do not grant tool authority.
+
+Use `session.prompt(text, client_request_id="caller-request-1")` for a durable
+submission identity. A duplicate refuses with the existing submission receipt
+in `AmcRefusedError.data`, without another model turn. `session.withdraw(message_id)`
+withdraws one pending message; it does not cancel an active turn or clear a queue.
+Both operations require explicit runtime capabilities and refuse older runtimes
+before dispatch. Request IDs contain 1 through 128 visible ASCII characters.
 
 ## Explicit handoff and verified resume
 
@@ -160,6 +207,17 @@ approval gate, reviewed config/catalog digests and existing matching signed
 grants. No discovery or policy mutation happens automatically. Client-supplied
 ACP `mcpServers` remain refused; use the reviewed startup configuration.
 
+`mcp_config` and `mcp_config_sha256` also take lists: one reviewed config per
+server and, when pinning, one SHA-256 per config in the same order. An unpaired
+or malformed entry raises `ValueError` before anything is spawned.
+`agent.mcp_status(session_id)` returns each mounted server's status through the
+same projection chat's `/mcp` shows (server id, catalog digest, protocol, auth
+issuer/scopes/expiry, granted tool names, `state` and
+`execution: "not-evaluated"`); env values, headers, tokens and config content
+are never included. A refused startup (unreviewed, tampered, duplicate or
+unpaired config, or a grant class mismatch) raises `AmcStartupRefusedError`
+with the runtime's stable `reason` code and fixed message.
+
 `Session.start_prompt()` returns an iterable `Turn`. It now receives committed
 assistant/tool updates while the native prompt is still running, in completed
 response-block units. These are authenticated session rows, not raw provisional
@@ -194,3 +252,96 @@ signing or provider setup is performed by the test. Without those fixtures that
 lane is skipped, not passed. All new tests remain unexecuted in this authoring
 batch; clean candidate/package/platform, cold verification and release gates
 remain separate and must not reuse these descriptions as acceptance receipts.
+
+## Execution verbs and phases (P2-13)
+
+The wrapper has the same eight verbs as the CLI, the TypeScript SDK and Studio (docs/sdk/EXECUTION_API.md):
+`new_session`, `Turn.iter_updates`, `approve` and `pending_approvals`, `Turn.cancel`, `resume_session`,
+`fork_session`, `dispose` and `verify_session`. Every `RunResult` carries `execution`, the four phases the runtime
+reported (`admission`, `model-completion`, `side-effect-completion`, `evidence-verification`); evidence verification
+stays `pending` until `verify_session` runs the installed CLI's cold verifier. The wrapper refuses a runtime that does not
+advertise execution API v1. `approve` and `verify_session` run the same `amc` executable the agent was launched with.
+
+The `python-sdk` CI job installs the wheel into a fresh virtual environment and runs these tests against the CLI built
+from the same commit, on Python 3.10 and 3.12. `tests/test_parity.py` runs the shared parity scenario when `AMC_BIN`
+names a built CLI.
+
+## Industry packs and domains
+
+`amc_sdk.industry.AmcIndustry` wraps the industry pack and domain commands of the installed CLI. Like the proof helpers these are CLI calls: each method runs one `amc domain ... --json` command as an argv list (never a shell string) in the fixed `workspace`, with stdin closed so the CLI cannot prompt, and returns the CLI's JSON unchanged after checking it against the shapes below. `amc_bin`, `AMC_BIN` and `timeout` (default 120 s) behave as for `AmcAgent`.
+
+```python
+from amc_sdk.industry import AmcIndustry, AmcIndustryLockedError
+
+industry = AmcIndustry(workspace=".")
+for pack in industry.list_packs(domain="health")["packs"]:
+    print(pack["packId"], pack["locked"])
+try:
+    scored = industry.score_pack_baseline("clinical-trials")
+    print(scored["claimKind"], scored["statusDimensions"]["result"])  # self_reported not_evaluated
+except AmcIndustryLockedError as locked:
+    print(locked.message)
+```
+
+| Method | Command | Returns |
+| --- | --- | --- |
+| `list_domains()` | `amc domain list --json` | `list[DomainMetadata]` |
+| `list_packs(domain=None)` | `amc domain pack list [--domain D] --json` | `IndustryPackCatalog` |
+| `describe_pack(pack_id)` | `amc domain pack describe --pack P --json` | `IndustryPack` |
+| `score_pack_baseline(pack_id)` | `amc domain pack run --pack P --baseline --json` | `IndustryPackScoreResult` |
+| `apply(agent_id, *, domain=None, pack_id=None, dry_run=False, compliance=None, file=None)` | `amc domain apply --agent A [--domain D] [--pack P] [--dry-run] [--compliance F]... [--file PATH] --json` | `DomainApplyResult` |
+
+JSON shapes (`number` accepts integers; `?` marks a key the CLI omits when it has no value):
+
+```text
+DomainMetadata          {id, name, description, riskLevel, euAIActCategory: string,
+                         questionCount: number,
+                         aliases, sectorTags, recommendedIndustryPacks, regulatoryBasis,
+                         assurancePacks, primaryModules, complianceFrameworks: string[]}
+IndustryPackCatalog     {entitlement: IndustryPackEntitlement, packs: IndustryPackCatalogItem[]}
+IndustryPackEntitlement {active, checkoutAvailable, licenseVerificationConfigured: boolean, source,
+                         planId, priceUsdMonthly, message: string, checkoutUrl, expiresAt: string|null,
+                         customerId?, subscriptionId?, licenseStatus?: string}
+IndustryPackCatalogItem {packId, name, domain, riskLevel, description: string,
+                         questionCount: number, locked: boolean,
+                         regulatoryBasis, complianceFrameworks: string[]}   (with or without a licence)
+IndustryPack            {id, stationId, name, description, riskTier, euAIActClassification,
+                         certificationPath: string, certificationThreshold: number,
+                         regulatoryBasis, complianceFrameworks, sdgAlignment, keyRisks: string[],
+                         questions: [{id, dimension, text, regulatoryRef, l1, l3, l5: string,
+                                      weight: number}]}
+IndustryPackScoreResult {packId, packName, stationId, riskTier, claimKind, claimLabel: string,
+                         percentage, level, eligibleLevel: number|null,
+                         notEvaluatedQuestionIds: string[],
+                         selfAssessment: {complete: boolean, answered, total: number},
+                         statusDimensions: StatusDimensions, complianceGaps: string[],
+                         questionResults: [{id, dimension: string, score, weight, percentage: number}]}
+StatusDimensions        {evidence, result, review: string,
+                         applicability: {state: string, reason?, rationale?: string},
+                         enforcement: {state: string, boundary?: string}}
+DomainApplyResult       {agentId, domain: string, packsApplied, guardrailsProposed, guardrailsEnabled,
+                         complianceFrameworks: string[], guardrailsGenerated: number,
+                         configFileUpdated: string|null, dryRun: boolean,
+                         assessment: {status: string, reasons: string[]},
+                         operatingProfile: {station, riskTier, path: string, written: boolean,
+                                            consistency: {ok: boolean, violations: string[]}}}
+```
+
+Refusals and failures:
+
+- Pack ids must be one of `amc_sdk.industry.PACK_IDS` and domains one of `DOMAIN_IDS` (`health`, `education`, `environment`, `mobility`, `governance`, `technology`, `wealth`); anything else raises `ValueError` before the CLI runs. Domain aliases such as `healthcare` are refused here even though the CLI accepts them; read them from `list_domains()` and pass the canonical id. `agent_id`, `compliance` entries and `file` are passed through unchanged (the CLI normalizes agent ids) and are refused only when empty or containing NUL.
+- Industry Packs licence: `describe_pack`, `score_pack_baseline` and `apply` need a licence that verifies against a key pinned in the operator's AMC trust list (see `docs/PRICING.md`); nothing passed to this module unlocks them, and a licence changes access, never a result. `list_packs` and `list_domains` need none.
+- `describe_pack` and `score_pack_baseline` without an Industry Packs licence: the CLI prints `{"error": "industry_packs_locked", "message": ...}` and exits 1, raised as `AmcIndustryLockedError`. `apply` reports the same lock as text on stderr, raised as `AmcIndustryCommandError` (as is every other nonzero exit, with the CLI's own reason and `returncode`).
+- Output that is not one JSON document, or does not match its shape, raises `AmcProtocolError`; a CLI timeout raises `AmcTimeoutError`.
+- `score_pack_baseline` answers no question, so nothing is evaluated: `notEvaluatedQuestionIds` lists every question, `percentage`, `level` and `eligibleLevel` are `None`, `questionResults` and `complianceGaps` are empty, and `statusDimensions["result"]` is `not_evaluated`. An unanswered question never gets a default level. No result is a certification. The CLI accepts other responses only interactively, so this module offers no custom-response scoring. `apply` without `dry_run` writes guardrail files into the workspace. The signed audit form of `domain apply` (`--audit`) and the other `domain` subcommands are not wrapped.
+
+`tests/test_industry.py` checks argv, refusals and shapes with a stubbed runner, compares `PACK_IDS`/`DOMAIN_IDS` with the TypeScript source when the checkout is present, and runs the real `dist/cli.js` only when it exists (skipped otherwise). Against the real CLI it checks the locked refusals, or, when the environment carries a licence that verifies against a key pinned in `AMC_HOME`'s trust list, the unlocked describe, score and dry-run apply shapes. Run it against an installed wheel, offline:
+
+```bash
+python3 -m venv .venv-py
+.venv-py/bin/python -m pip wheel --no-deps sdk/python -w dist-py   # add --no-index --find-links <wheelhouse> offline
+.venv-py/bin/python -m pip install dist-py/*.whl pytest
+.venv-py/bin/python -I -m pytest sdk/python/tests/test_industry.py
+```
+
+P1-44 ran this lane on Python 3.10 and 3.12 (receipt `qualification/2026-10-18-P1-44/`).

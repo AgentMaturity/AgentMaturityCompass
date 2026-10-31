@@ -1,7 +1,7 @@
 {
   "reportId": "f0069167-7022-4eb6-bb4d-f94025312939",
   "ts": 1787322795552,
-  "workspace": "/Users/sid/AgentMaturityCompass",
+  "workspace": "~/AgentMaturityCompass",
   "framework": "NIST_AI_RMF",
   "agentId": "default",
   "windowStartTs": 1784730795552,

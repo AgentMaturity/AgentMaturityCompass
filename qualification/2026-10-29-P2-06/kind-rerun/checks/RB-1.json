@@ -1,0 +1,44 @@
+{
+  "id": "RB-1",
+  "scenario": "Helm rollback",
+  "status": "failed",
+  "reason": "failed criteria: values-only upgrade to revision N; helm rollback from N to N-1; governed turn passes after the rollback",
+  "criteria": [
+    {
+      "name": "values-only upgrade to revision N",
+      "ok": false,
+      "detail": {
+        "from": 1,
+        "exit": 1
+      }
+    },
+    {
+      "name": "helm rollback from N to N-1",
+      "ok": false,
+      "detail": {
+        "to": 1,
+        "exit": 1
+      }
+    },
+    {
+      "name": "governed turn passes after the rollback",
+      "ok": false,
+      "detail": {
+        "ok": false,
+        "status": "failed",
+        "taskId": null,
+        "exit": 1
+      }
+    },
+    {
+      "name": "events behind receipts issued before the rollback unchanged (chain prefix)",
+      "ok": true,
+      "detail": {
+        "receipts": [],
+        "before": 10,
+        "after": 17
+      }
+    }
+  ],
+  "durationMs": 1267388
+}

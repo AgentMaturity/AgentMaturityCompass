@@ -1,0 +1,32 @@
+P1-40 mutation checks (local macOS arm64, Node 22, not CI). Each guard was broken once, the named test run, then restored.
+
+M1 drop the regulated approval preset (savePresets skipped) -> tests/starterProfiles.test.ts 'blocks at the firewall, signs the regulated approval preset...'
+     × blocks at the firewall, signs the regulated approval preset, isolates the config and leaves egress denied 8265ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  tests/starterProfiles.test.ts > amc init --regulated (P1-40) > blocks at the firewall, signs the regulated approval preset, isolates the config and leaves egress denied
+      Tests  1 failed | 12 skipped (13)
+
+M2 let --skip-vault pass for --regulated -> 'refuses combinations before anything is written'
+     × refuses combinations before anything is written 4ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  tests/starterProfiles.test.ts > init flag refusals (P1-40) > refuses combinations before anything is written
+      Tests  1 failed | 12 skipped (13)
+
+M3 drop the config re-sign after saveAMCConfig -> 'signs fs.read, fs.write, fs.edit and a contained bash...'
+     × signs fs.read, fs.write, fs.edit and a contained bash with no egress, a warn firewall, profile dev and an active owner 7057ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  tests/starterProfiles.test.ts > amc init --coding (P1-40) > signs fs.read, fs.write, fs.edit and a contained bash with no egress, a warn firewall, profile dev and an active owner
+AssertionError: saveAMCConfig was followed by a re-sign: expected false to be true // Object.is equality
+      Tests  1 failed | 12 skipped (13)
+
+M4 stub ignores the scripted call (directedCall replaced by null) -> tests/sdkQuickstart.test.ts 'makes the call a prompt spells out...'
+     × makes the call a prompt spells out when it names an offered tool, and otherwise calls the first tool with the text 9ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  1 failed | 2 skipped (3)
+
+M5 drop the existing users.yaml guard -> 'never replaces an existing users.yaml'
+     × never replaces an existing users.yaml 13902ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  1 failed | 13 skipped (14)
+
+API check: removing the export of AMCNativeSession from the declarations makes evaluateSdkApi fail (tests/sdkPublicApi.test.ts, in-test mutation).

@@ -1,0 +1,11 @@
+--- a/src/migration/legacy/classify.ts
++++ b/src/migration/legacy/classify.ts
+@@ -120,7 +120,7 @@
+       // R1: AMC 1.x graded a canned reply for every scenario; fba5824e added evidenceStatus when it removed it.
+       if (typeof value.assuranceRunId !== "string") return null;
+       return value.evidenceStatus === undefined
+-        ? classification("R1-assurance-canned-reply", "synthetic_example", { trustTier: text(value.trustTier), label: text(value.trustLabel) })
++        ? null
+         : classification("R5-no-claim-envelope", "self_reported", { trustTier: text(value.trustTier), label: text(value.trustLabel) }, "L1");
+     case "diagnostic_report":
+     case "bundle":

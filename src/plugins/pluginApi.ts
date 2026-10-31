@@ -30,13 +30,13 @@ import {
   pluginsInstalledLockPath,
   pluginsRegistriesPath,
   saveInstalledPluginsLock,
-  savePluginRegistriesConfig,
   verifyInstalledPluginsLock,
   verifyPluginOverrides,
   verifyPluginRegistriesConfig
 } from "./pluginStore.js";
 import { pluginRiskCategorySchema } from "./pluginTypes.js";
 import { verifyInstalledPluginsIntegrity } from "./pluginVerifier.js";
+import { initializePluginFiles, initializePluginFilesAsync } from "./pluginPublication.js";
 
 const pendingPluginActionSchema = z.object({
   v: z.literal(1),
@@ -71,7 +71,6 @@ export function initPluginWorkspace(params: {
   lockPath: string;
   lockSigPath: string;
 } {
-  ensurePluginsStore(params.workspace);
   const registries = defaultPluginRegistriesConfig();
   if (params.includeDefaultRegistry) {
     registries.pluginRegistries.registries = [
@@ -83,18 +82,20 @@ export function initPluginWorkspace(params: {
       }
     ];
   }
-  const registriesSaved = savePluginRegistriesConfig(params.workspace, registries);
-  const lockSaved = saveInstalledPluginsLock(params.workspace, defaultInstalledPluginsLock(params.workspace));
-  return {
-    registriesPath: registriesSaved.path,
-    registriesSigPath: registriesSaved.sigPath,
-    lockPath: lockSaved.path,
-    lockSigPath: lockSaved.sigPath
-  };
+  return initializePluginFiles(params.workspace, registries, defaultInstalledPluginsLock(params.workspace));
+}
+
+/** Actual async initializer preserves authenticated existing files and fills only missing complete pairs. */
+export async function initPluginWorkspaceAsync(params: Parameters<typeof initPluginWorkspace>[0]): Promise<ReturnType<typeof initPluginWorkspace>> {
+  const registries = defaultPluginRegistriesConfig();
+  if (params.includeDefaultRegistry) registries.pluginRegistries.registries = [{ ...params.includeDefaultRegistry,
+    allowPluginPublishers: [], allowRiskCategories: ["LOW", "MEDIUM", "HIGH", "CRITICAL"], autoUpdate: false }];
+  return initializePluginFilesAsync(params.workspace, registries, defaultInstalledPluginsLock(params.workspace));
 }
 
 export function verifyPluginWorkspace(params: {
   workspace: string;
+  readonly?: boolean;
 }): {
   ok: boolean;
   errors: string[];
@@ -137,7 +138,7 @@ export function verifyPluginWorkspace(params: {
   const registries = verifyPluginRegistriesConfig(params.workspace);
   const overrides = verifyPluginOverrides(params.workspace);
   const lock = verifyInstalledPluginsLock(params.workspace);
-  const integrity = verifyInstalledPluginsIntegrity(params.workspace);
+  const integrity = verifyInstalledPluginsIntegrity(params.workspace, { readonly: params.readonly === true });
   const errors: string[] = [];
   if (!registries.valid) {
     errors.push(`registries signature invalid: ${registries.reason ?? "unknown"}`);
@@ -308,6 +309,8 @@ function writeInstalledPackage(params: {
 export async function requestPluginInstall(params: {
   workspace: string;
   agentId: string;
+  /** Who raises the approval request (P1-78): the authenticated principal, or the CLI's self-reported OS user. */
+  initiator: string;
   registryId: string;
   pluginRef: string;
   action?: "install" | "upgrade";
@@ -344,6 +347,7 @@ export async function requestPluginInstall(params: {
     const intentId = `plugin-${action}-${requestId}`;
     const approval = createApprovalForIntent({
       workspace,
+      initiator: params.initiator,
       agentId,
       intentId,
       toolName: `plugin.${action}`,
@@ -403,6 +407,8 @@ export async function requestPluginInstall(params: {
 export function requestPluginRemove(params: {
   workspace: string;
   agentId: string;
+  /** Who raises the approval request (P1-78): the authenticated principal, or the CLI's self-reported OS user. */
+  initiator: string;
   pluginId: string;
 }): {
   requestId: string;
@@ -420,6 +426,7 @@ export function requestPluginRemove(params: {
   const intentId = `plugin-remove-${requestId}`;
   const approval = createApprovalForIntent({
     workspace: params.workspace,
+    initiator: params.initiator,
     agentId: params.agentId,
     intentId,
     toolName: "plugin.remove",
@@ -476,6 +483,8 @@ export function executePluginRequest(params: {
   installedLockPath: string;
   installedLockSigPath: string;
   transparencyHash: string;
+  /** Disk publication only; this operation never reloads or stops a running plugin consumer. */
+  outcome: "installed-not-loaded" | "restart-required";
 } {
   const pending = loadPendingAction(params.workspace, params.approvalRequestId);
   const approvalCheck = verifyApprovalForExecution({
@@ -490,6 +499,19 @@ export function executePluginRequest(params: {
     throw new Error(`plugin action approval not executable: ${approvalCheck.error ?? approvalCheck.status ?? "unknown"}`);
   }
 
+  // DXA-19: the approval is consumed (single use) after every check and before any effect, so a replayed or concurrent
+  // execution is refused before it writes, and an effect that fails leaves a spent approval, never a reusable one.
+  const consumeApproval = (): void => {
+    const consume = consumeApprovedExecution({
+      workspace: params.workspace,
+      approvalId: pending.approvalRequestId,
+      expectedAgentId: pending.agentId,
+      executionId: pending.requestId
+    });
+    if (consume.replay) {
+      throw new Error("approval already consumed");
+    }
+  };
   const lock = loadInstalledPluginsLock(params.workspace);
   let artifactSha = sha256Hex(Buffer.from(JSON.stringify(pending), "utf8"));
   if (pending.action === "install" || pending.action === "upgrade") {
@@ -517,6 +539,7 @@ export function executePluginRequest(params: {
     if (!verified.ok) {
       throw new Error(`pending plugin package publisher not admitted: ${untrustedReasons(verified.report).join("; ")}`);
     }
+    consumeApproval();
     const installPath = writeInstalledPackage({
       workspace: params.workspace,
       pluginId: pending.pluginId,
@@ -535,6 +558,7 @@ export function executePluginRequest(params: {
     });
     lock.installed = retained.sort((a, b) => a.id.localeCompare(b.id) || a.version.localeCompare(b.version));
   } else {
+    consumeApproval();
     lock.installed = lock.installed.filter((row) => row.id !== pending.pluginId);
     const pluginDir = join(pluginsInstalledDir(params.workspace), pending.pluginId);
     if (pathExists(pluginDir)) {
@@ -544,15 +568,6 @@ export function executePluginRequest(params: {
   lock.updatedTs = Date.now();
   lock.policySnapshot = lockPolicySnapshot(params.workspace);
   const saved = saveInstalledPluginsLock(params.workspace, lock);
-  const consume = consumeApprovedExecution({
-    workspace: params.workspace,
-    approvalId: pending.approvalRequestId,
-    expectedAgentId: pending.agentId,
-    executionId: pending.requestId
-  });
-  if (consume.replay) {
-    throw new Error("approval already consumed");
-  }
   const transparency = appendTransparencyEntry({
     workspace: params.workspace,
     type:
@@ -575,7 +590,10 @@ export function executePluginRequest(params: {
     version: pending.version,
     installedLockPath: saved.path,
     installedLockSigPath: saved.sigPath,
-    transparencyHash: transparency.hash
+    transparencyHash: transparency.hash,
+    // Existing consumers may retain a previous snapshot after an upgrade/removal.
+    // No process-wide live-host registry exists, so never claim that runtime changed.
+    outcome: pending.action === "install" ? "installed-not-loaded" : "restart-required"
   };
 }
 

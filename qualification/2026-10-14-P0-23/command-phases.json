@@ -1,0 +1,290 @@
+[
+  {
+    "name": "frozen-install",
+    "cmd": "pnpm install --frozen-lockfile",
+    "exit": 0,
+    "durationMs": 1720,
+    "startedUtc": "2026-10-14T16:58:06.863670+00:00",
+    "log": "/private/tmp/p0-23-frozen-install-20261014.log",
+    "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+  },
+  {
+    "name": "mcp-sdk-first-red",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/mcpClaimLabels.test.ts --reporter=json --outputFile=/private/tmp/p0-23-mcp-sdk-first-red-20261014.actual.json",
+    "exit": 1,
+    "durationMs": 4959,
+    "startedUtc": "2026-10-14T17:00:55.251929+00:00",
+    "log": "/private/tmp/p0-23-mcp-sdk-first-red-20261014.log",
+    "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+  },
+  {
+    "name": "mcp-sdk-red-diff",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/mcpClaimLabels.test.ts --reporter=verbose --reporter=json --outputFile=/private/tmp/p0-23-mcp-sdk-red-diff-20261014.actual.json",
+    "exit": 0,
+    "durationMs": 4094,
+    "startedUtc": "2026-10-14T17:01:44.930772+00:00",
+    "log": "/private/tmp/p0-23-mcp-sdk-red-diff-20261014.log",
+    "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+  },
+  {
+    "name": "mcp-sdk-two-case-green",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/mcpClaimLabels.test.ts --reporter=verbose --reporter=json --outputFile=/private/tmp/p0-23-mcp-sdk-two-case-green-20261014.actual.json",
+    "exit": 0,
+    "durationMs": 3743,
+    "startedUtc": "2026-10-14T17:02:20.554029+00:00",
+    "log": "/private/tmp/p0-23-mcp-sdk-two-case-green-20261014.log",
+    "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+  },
+  {
+    "name": "api-claim-labels-red",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/apiClaimLabels.test.ts --reporter=default --reporter=json --outputFile.json=/private/tmp/p0-23-api-claim-labels-red-20261014.json",
+    "exit": 1,
+    "durationMs": 4652,
+    "startedUtc": "2026-10-14T17:06:17.605559+00:00",
+    "log": "/private/tmp/p0-23-api-claim-labels-red-20261014.log",
+    "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+  },
+  {
+    "name": "mcp-sdk-expanded-first",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/mcpClaimLabels.test.ts --reporter=verbose --reporter=json --outputFile=/private/tmp/p0-23-mcp-sdk-expanded-first-20261014.actual.json",
+    "exit": 1,
+    "durationMs": 7284,
+    "startedUtc": "2026-10-14T17:07:46.873391+00:00",
+    "log": "/private/tmp/p0-23-mcp-sdk-expanded-first-20261014.log",
+    "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+  },
+  {
+    "name": "api-claim-labels-refined-red",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/apiClaimLabels.test.ts --reporter=default --reporter=json --outputFile.json=/private/tmp/p0-23-api-claim-labels-refined-red-20261014.json",
+    "exit": 1,
+    "durationMs": 4688,
+    "startedUtc": "2026-10-14T17:09:23.669473+00:00",
+    "log": "/private/tmp/p0-23-api-claim-labels-refined-red-20261014.log",
+    "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+  },
+  {
+    "name": "badge-component-contracts",
+    "cmd": "pnpm exec vitest run tests/claimBadge.test.ts --reporter=default --reporter=json --outputFile.json=/private/tmp/p0-23-badge-component-contracts-20261014.json",
+    "exit": 0,
+    "durationMs": 1084,
+    "startedUtc": "2026-10-14T17:09:46.569351+00:00",
+    "log": "/private/tmp/p0-23-badge-component-contracts-20261014.log",
+    "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+  },
+  {
+    "name": "mcp-sdk-expanded-fixture-corrected",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/mcpClaimLabels.test.ts --reporter=verbose --reporter=json --outputFile=/private/tmp/p0-23-mcp-sdk-expanded-fixture-corrected-20261014.actual.json",
+    "exit": 0,
+    "durationMs": 7578,
+    "startedUtc": "2026-10-14T17:09:50.362711+00:00",
+    "log": "/private/tmp/p0-23-mcp-sdk-expanded-fixture-corrected-20261014.log",
+    "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+  },
+  {
+    "name": "mcp-actual-labels-removed-mutant",
+    "cmd": "pnpm exec vitest run tests/mcpClaimLabels.test.ts --reporter=default --reporter=json --outputFile.json=/private/tmp/p0-23-mcp-actual-labels-removed-mutant-20261014.json",
+    "exit": 1,
+    "durationMs": 7441,
+    "startedUtc": "2026-10-14T17:16:16.732610+00:00",
+    "log": "/private/tmp/p0-23-mcp-actual-labels-removed-mutant-20261014.log",
+    "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+  },
+  {
+    "name": "studio-claim-labels-red",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/studioClaimLabels.test.ts --reporter=default --reporter=json --outputFile.json=/private/tmp/p0-23-studio-claim-labels-red-20261014.json",
+    "exit": 1,
+    "durationMs": 6758,
+    "startedUtc": "2026-10-14T17:17:16.002160+00:00",
+    "log": "/private/tmp/p0-23-studio-claim-labels-red-20261014.log",
+    "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+  },
+  {
+    "name": "studio-claim-labels-final-red",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/studioClaimLabels.test.ts --reporter=default --reporter=json --outputFile.json=/private/tmp/p0-23-studio-claim-labels-final-red-20261014.json",
+    "exit": 1,
+    "durationMs": 6933,
+    "startedUtc": "2026-10-14T17:18:31.353147+00:00",
+    "log": "/private/tmp/p0-23-studio-claim-labels-final-red-20261014.log",
+    "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+  },
+  {
+    "name": "candidate-source-types",
+    "cmd": "npm run typecheck",
+    "exit": 0,
+    "durationMs": 27820,
+    "startedUtc": "2026-10-14T17:19:22.712331+00:00",
+    "log": "/private/tmp/p0-23-candidate-source-types-20261014.log",
+    "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+  },
+  {
+    "name": "candidate-test-types",
+    "cmd": "npm run typecheck:tests",
+    "exit": 2,
+    "durationMs": 37814,
+    "startedUtc": "2026-10-14T17:19:22.710244+00:00",
+    "log": "/private/tmp/p0-23-candidate-test-types-20261014.log",
+    "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+  },
+  {
+    "name": "mcp-sdk-standard-parser-green",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/mcpClaimLabels.test.ts --reporter=verbose --reporter=json --outputFile=/private/tmp/p0-23-mcp-sdk-standard-parser-green-20261014.actual.json",
+    "exit": 0,
+    "durationMs": 7706,
+    "startedUtc": "2026-10-14T17:23:30.041062+00:00",
+    "log": "/private/tmp/p0-23-mcp-sdk-standard-parser-green-20261014.log",
+    "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+  },
+  {
+    "name": "factual-count-update",
+    "cmd": "node scripts/gen-counts.mjs --write",
+    "exit": 1,
+    "durationMs": 263,
+    "startedUtc": "2026-10-14T17:25:40.974445+00:00",
+    "log": "/private/tmp/p0-23-factual-count-update-20261014.log",
+    "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+  },
+  {
+    "name": "final-source-build",
+    "cmd": "npm run build",
+    "exit": 0,
+    "durationMs": 29797,
+    "startedUtc": "2026-10-14T17:25:41.352426+00:00",
+    "log": "/private/tmp/p0-23-final-source-build-20261014.log",
+    "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+  },
+  {
+    "name": "factual-count-update-after-build",
+    "cmd": "node scripts/gen-counts.mjs --write",
+    "exit": 0,
+    "durationMs": 226,
+    "startedUtc": "2026-10-14T17:26:53.689952+00:00",
+    "log": "/private/tmp/p0-23-factual-count-update-after-build-20261014.log",
+    "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+  },
+  {
+    "name": "cli-industry-pack-ownkeys-first",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/industryPackCli.test.ts --reporter=verbose --reporter=json --outputFile=/private/tmp/p0-23-cli-industry-pack-ownkeys-first-20261014.actual.json",
+    "exit": 0,
+    "durationMs": 5701,
+    "startedUtc": "2026-10-14T17:28:24.047704+00:00",
+    "log": "/private/tmp/p0-23-cli-industry-pack-ownkeys-first-20261014.log",
+    "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+  },
+  {
+    "name": "committed-source-build",
+    "cmd": "npm run build",
+    "exit": 0,
+    "durationMs": 29199,
+    "startedUtc": "2026-10-14T17:29:58.844687+00:00",
+    "log": "/private/tmp/p0-23-committed-source-build-20261014.log",
+    "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+  },
+  {
+    "name": "mcp-final-labels-removed-mutant",
+    "cmd": "pnpm exec vitest run tests/mcpClaimLabels.test.ts --reporter=default --reporter=json --outputFile.json=/private/tmp/p0-23-mcp-final-labels-removed-mutant-20261014.json",
+    "exit": 1,
+    "durationMs": 7747,
+    "startedUtc": "2026-10-14T17:31:56.234547+00:00",
+    "log": "/private/tmp/p0-23-mcp-final-labels-removed-mutant-20261014.log",
+    "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+  },
+  {
+    "name": "final-bounded-node22",
+    "cmd": "pnpm exec vitest run tests/mcpClaimLabels.test.ts tests/apiClaimLabels.test.ts tests/studioClaimLabels.test.ts tests/industryPackCli.test.ts tests/claimBadge.test.ts tests/mcpServer.test.ts tests/mcpServerTools.test.ts tests/claims/claimEligibility.test.ts tests/claims/claimAdapters.test.ts tests/claims/claimLabels.test.ts tests/industryPackSchema.test.ts tests/industryPackEntitlement.test.ts tests/openapiContracts.test.ts --reporter=default --reporter=json --outputFile.json=tmp/p0-23-qualification/final-bounded-node22.json",
+    "exit": 1,
+    "durationMs": 10815,
+    "startedUtc": "2026-10-14T17:32:35.039332+00:00",
+    "log": "/private/tmp/p0-23-final-bounded-node22-20261014.log",
+    "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+  },
+  {
+    "name": "final-source-types",
+    "cmd": "npm run typecheck",
+    "exit": 0,
+    "durationMs": 28417,
+    "startedUtc": "2026-10-14T17:32:35.110988+00:00",
+    "log": "/private/tmp/p0-23-final-source-types-20261014.log",
+    "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+  },
+  {
+    "name": "final-test-types",
+    "cmd": "npm run typecheck:tests",
+    "exit": 0,
+    "durationMs": 34737,
+    "startedUtc": "2026-10-14T17:33:03.576934+00:00",
+    "log": "/private/tmp/p0-23-final-test-types-20261014.log",
+    "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+  },
+  {
+    "name": "final-lint",
+    "cmd": "npm run lint",
+    "exit": 0,
+    "durationMs": 3908,
+    "startedUtc": "2026-10-14T17:33:38.366121+00:00",
+    "log": "/private/tmp/p0-23-final-lint-20261014.log",
+    "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+  },
+  {
+    "name": "final-freeze",
+    "cmd": "npm run check:freeze",
+    "exit": 0,
+    "durationMs": 1446,
+    "startedUtc": "2026-10-14T17:33:42.313977+00:00",
+    "log": "/private/tmp/p0-23-final-freeze-20261014.log",
+    "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+  },
+  {
+    "name": "final-architecture",
+    "cmd": "npm run check:architecture-boundaries",
+    "exit": 0,
+    "durationMs": 1488,
+    "startedUtc": "2026-10-14T17:33:43.797997+00:00",
+    "log": "/private/tmp/p0-23-final-architecture-20261014.log",
+    "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+  },
+  {
+    "name": "final-counts",
+    "cmd": "npm run check:counts",
+    "exit": 0,
+    "durationMs": 316,
+    "startedUtc": "2026-10-14T17:33:45.326086+00:00",
+    "log": "/private/tmp/p0-23-final-counts-20261014.log",
+    "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+  },
+  {
+    "name": "final-docs-drift",
+    "cmd": "npm run check:docs-drift",
+    "exit": 0,
+    "durationMs": 268,
+    "startedUtc": "2026-10-14T17:33:45.681568+00:00",
+    "log": "/private/tmp/p0-23-final-docs-drift-20261014.log",
+    "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+  },
+  {
+    "name": "final-source-duplicates",
+    "cmd": "npm run check:duplicates",
+    "exit": 1,
+    "durationMs": 1363,
+    "startedUtc": "2026-10-14T17:33:45.989911+00:00",
+    "log": "/private/tmp/p0-23-final-source-duplicates-20261014.log",
+    "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+  },
+  {
+    "name": "final-source-dead-code",
+    "cmd": "npm run check:dead-code",
+    "exit": 1,
+    "durationMs": 3163,
+    "startedUtc": "2026-10-14T17:33:47.395745+00:00",
+    "log": "/private/tmp/p0-23-final-source-dead-code-20261014.log",
+    "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+  },
+  {
+    "name": "final-clean-source",
+    "cmd": "npm run check:clean-source",
+    "exit": 0,
+    "durationMs": 49913,
+    "startedUtc": "2026-10-14T17:33:50.599629+00:00",
+    "log": "/private/tmp/p0-23-final-clean-source-20261014.log",
+    "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+  }
+]

@@ -1,0 +1,3022 @@
+{
+  "schema": "p125ec-explicit-public-record-audit/1",
+  "at": "2026-10-17T01:05:51.063421+00:00",
+  "phase": "p125ec-fresh-canonical",
+  "sourceRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-XxtmV6/checkout",
+  "expectedPhaseState": "green",
+  "outcome": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/p125ec-fresh-canonical-outcome.json",
+    "bytes": 7287,
+    "sha256": "5918838b7ce27c61d646e41382f2e9c5d543a1e914cd42bf6fddb4179e6a8cef"
+  },
+  "grantPublicCount": 6,
+  "checkpointPublicCount": 4,
+  "children": 38,
+  "explicitChildStreamHashCount": 76,
+  "closedSockets": 10,
+  "closedLedgerOwners": 28,
+  "grantRows": [
+    {
+      "public": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-g69kav/public-evidence.json",
+        "bytes": 12998,
+        "sha256": "13f1e7a3b4cadba7703f92b722beb3a1912e1dda4e5cbdcafef8950c421a52a0"
+      },
+      "caseId": "FIRST-GRANT",
+      "bodyFailed": false,
+      "childCount": 6,
+      "requestPaths": [
+        "/good-first"
+      ],
+      "reply": {
+        "path": "/good-first",
+        "querySha256": "c325e44316eb260eb18d450750d78eaa866033ca5ad72646f99df1244d5a9f2f",
+        "responseSha256": "b96ed578c441346951594a77c15d4efadd0add9e5ba502c856923bce7d1573f7",
+        "queryBoundOpenSslVerified": true,
+        "amcVerified": true,
+        "refusalCode": null
+      },
+      "replyScope": "Last verifyReply observation only",
+      "childrenAndExplicitStreamPins": [
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-g69kav/child-1.stdout",
+          "bytes": 63,
+          "sha256": "50bc8ea637df53e57f6a77e21416ec9a320b8123447130cd1be83698a4863c29"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-g69kav/child-1.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-g69kav/child-2.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-g69kav/child-2.stderr",
+          "bytes": 2673,
+          "sha256": "e4a9534bf62ae0d46939b85944891002edc98077d0b1b1fce1af578bad5bfc12"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-g69kav/child-3.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-g69kav/child-3.stderr",
+          "bytes": 904,
+          "sha256": "62e30478179d3da4380721f1139c0e170f3d6851e5f5551b4414f9acf90f4153"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-g69kav/child-4.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-g69kav/child-4.stderr",
+          "bytes": 80,
+          "sha256": "3ec4f8e62fa9a3da3f39346845fafc0b553e6a7d82b0444bbddf87af3c881fc3"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-g69kav/child-5.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-g69kav/child-5.stderr",
+          "bytes": 354,
+          "sha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-g69kav/child-6.stdout",
+          "bytes": 17,
+          "sha256": "0fcf850642f4c89e2ef10aad49678b61d6c2fb60fd6ca9d7ab08b59627ebdc4f"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-g69kav/child-6.stderr",
+          "bytes": 120,
+          "sha256": "96c52abc70c42d8b5bc4cdec3f6f989b222629877323144cdd039da1b8b7cd13"
+        }
+      ],
+      "allChildrenNatural0AndClosed": true,
+      "socketCount": 1,
+      "cleanupErrors": 0
+    },
+    {
+      "public": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-3SCVnp/public-evidence.json",
+        "bytes": 13548,
+        "sha256": "8558b43dfb38b00c567891178333881cd006cfb7f2dcd9688c13972d7a9eacbb"
+      },
+      "caseId": "HTTP500-THEN-GRANT",
+      "bodyFailed": false,
+      "childCount": 6,
+      "requestPaths": [
+        "/http-first",
+        "/good-second"
+      ],
+      "reply": {
+        "path": "/good-second",
+        "querySha256": "a7ec7ff644016840382e125eb663f065f8a41e7bb96f3f1d168212801730c45b",
+        "responseSha256": "e5de175ea62e1d9b7d54ea70caee70cedc344004a9e773ac56ba53ef78adb328",
+        "queryBoundOpenSslVerified": true,
+        "amcVerified": true,
+        "refusalCode": null
+      },
+      "replyScope": "Last verifyReply observation only",
+      "childrenAndExplicitStreamPins": [
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-3SCVnp/child-1.stdout",
+          "bytes": 63,
+          "sha256": "50bc8ea637df53e57f6a77e21416ec9a320b8123447130cd1be83698a4863c29"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-3SCVnp/child-1.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-3SCVnp/child-2.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-3SCVnp/child-2.stderr",
+          "bytes": 294,
+          "sha256": "edf5f9eaad845fa20b01e81e48b7564185ad95de7a037ea1e612bd56fc18f165"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-3SCVnp/child-3.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-3SCVnp/child-3.stderr",
+          "bytes": 1211,
+          "sha256": "093cd9ce104400591d50e85d1871ca5d06c4be083eb6a665beec00292c8a47b0"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-3SCVnp/child-4.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-3SCVnp/child-4.stderr",
+          "bytes": 80,
+          "sha256": "3ec4f8e62fa9a3da3f39346845fafc0b553e6a7d82b0444bbddf87af3c881fc3"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-3SCVnp/child-5.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-3SCVnp/child-5.stderr",
+          "bytes": 354,
+          "sha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-3SCVnp/child-6.stdout",
+          "bytes": 17,
+          "sha256": "0fcf850642f4c89e2ef10aad49678b61d6c2fb60fd6ca9d7ab08b59627ebdc4f"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-3SCVnp/child-6.stderr",
+          "bytes": 120,
+          "sha256": "54e5bf67a2337799bb2a46b73ae03b62b35d42571978e920e9864dc8fe7b7b95"
+        }
+      ],
+      "allChildrenNatural0AndClosed": true,
+      "socketCount": 2,
+      "cleanupErrors": 0
+    },
+    {
+      "public": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-bCGEBQ/public-evidence.json",
+        "bytes": 12920,
+        "sha256": "f4284a10eb785394bcbe996692f067250dfec3ff08b927d88b8e85a008c3984b"
+      },
+      "caseId": "CHECKPOINT-PENDING-GRANT",
+      "bodyFailed": false,
+      "childCount": 6,
+      "requestPaths": [
+        "/http-first",
+        "/checkpoint-good"
+      ],
+      "reply": {
+        "path": "/checkpoint-good",
+        "querySha256": "d684189a196abad6187b57a89d25429455f13827c7fe7d85b7c57f7e91983b5d",
+        "responseSha256": "e46d7d6c92f1cfc3e39d693cbe6e39fbb6e0598db31c3a93d0532218fbfc1029",
+        "queryBoundOpenSslVerified": true,
+        "amcVerified": true,
+        "refusalCode": null
+      },
+      "replyScope": "Last verifyReply observation only",
+      "childrenAndExplicitStreamPins": [
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-bCGEBQ/child-1.stdout",
+          "bytes": 63,
+          "sha256": "50bc8ea637df53e57f6a77e21416ec9a320b8123447130cd1be83698a4863c29"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-bCGEBQ/child-1.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-bCGEBQ/child-2.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-bCGEBQ/child-2.stderr",
+          "bytes": 1255,
+          "sha256": "8477547066f4d6f51fca01ba0fb8b701f41a5ff3b11a015343fd474e32c29a08"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-bCGEBQ/child-3.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-bCGEBQ/child-3.stderr",
+          "bytes": 1502,
+          "sha256": "f6a5c42ff4d3c9ac358dfcfad14b02473d82752639e10fa5aaf5f1645668f75d"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-bCGEBQ/child-4.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-bCGEBQ/child-4.stderr",
+          "bytes": 80,
+          "sha256": "3ec4f8e62fa9a3da3f39346845fafc0b553e6a7d82b0444bbddf87af3c881fc3"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-bCGEBQ/child-5.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-bCGEBQ/child-5.stderr",
+          "bytes": 354,
+          "sha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-bCGEBQ/child-6.stdout",
+          "bytes": 17,
+          "sha256": "0fcf850642f4c89e2ef10aad49678b61d6c2fb60fd6ca9d7ab08b59627ebdc4f"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-bCGEBQ/child-6.stderr",
+          "bytes": 120,
+          "sha256": "af4617f31e0855d268e5a60e2bf596288a57a11cde70f5b94d78a93be2eadd0b"
+        }
+      ],
+      "allChildrenNatural0AndClosed": true,
+      "socketCount": 2,
+      "cleanupErrors": 0
+    },
+    {
+      "public": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-X99kiQ/public-evidence.json",
+        "bytes": 8250,
+        "sha256": "35f197ee17159ca534af1f64ed7312671117582779e5ddb27ca3a8b8172e01b5"
+      },
+      "caseId": "CHECKPOINT-REQUIRED-REFUSAL",
+      "bodyFailed": false,
+      "childCount": 4,
+      "requestPaths": [
+        "/http-first"
+      ],
+      "reply": null,
+      "replyScope": "Last verifyReply observation only",
+      "childrenAndExplicitStreamPins": [
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-X99kiQ/child-1.stdout",
+          "bytes": 63,
+          "sha256": "50bc8ea637df53e57f6a77e21416ec9a320b8123447130cd1be83698a4863c29"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-X99kiQ/child-1.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-X99kiQ/child-2.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-X99kiQ/child-2.stderr",
+          "bytes": 508,
+          "sha256": "0b0ae7cd0b5c16f3d5c6c5a2612ba8b448bc4b73a8598ef025a4273485f460fb"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-X99kiQ/child-3.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-X99kiQ/child-3.stderr",
+          "bytes": 2020,
+          "sha256": "9a7438caf74e2fbee5222be924cd4c1706586aab6d2002bad35e0a2dc8c9e484"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-X99kiQ/child-4.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-X99kiQ/child-4.stderr",
+          "bytes": 80,
+          "sha256": "3ec4f8e62fa9a3da3f39346845fafc0b553e6a7d82b0444bbddf87af3c881fc3"
+        }
+      ],
+      "allChildrenNatural0AndClosed": true,
+      "socketCount": 1,
+      "cleanupErrors": 0
+    },
+    {
+      "public": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-dAQqR8/public-evidence.json",
+        "bytes": 16765,
+        "sha256": "d68f64f04bbf90abc8697a92f38225153fb5e848c64ae45220a453bc9a9ff751"
+      },
+      "caseId": "CHECKPOINT-TWO-BOUND-WINDOW",
+      "bodyFailed": false,
+      "childCount": 8,
+      "requestPaths": [
+        "/window-good",
+        "/window-good"
+      ],
+      "reply": {
+        "path": "/window-good",
+        "querySha256": "97c0ccef1b8918e5e87ea6b0e983b00ffca0a677d27d851bfcf50be875120f0b",
+        "responseSha256": "32e8f2c94c34288a1cd6ae15272a6be8da14357b6bcd7b8dbe83f59d4e4032af",
+        "queryBoundOpenSslVerified": true,
+        "amcVerified": true,
+        "refusalCode": null
+      },
+      "replyScope": "Last verifyReply observation only",
+      "childrenAndExplicitStreamPins": [
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-dAQqR8/child-1.stdout",
+          "bytes": 63,
+          "sha256": "50bc8ea637df53e57f6a77e21416ec9a320b8123447130cd1be83698a4863c29"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-dAQqR8/child-1.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-dAQqR8/child-2.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-dAQqR8/child-2.stderr",
+          "bytes": 2193,
+          "sha256": "19c5d3cc29ae8321bd30088cfe306566968885fb5fde2d6852690213d3547087"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-dAQqR8/child-3.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-dAQqR8/child-3.stderr",
+          "bytes": 1535,
+          "sha256": "7f969a37e0066e001cd366aa0e1d6d0731fc0a1111013d580c083de00876a2cf"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-dAQqR8/child-4.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-dAQqR8/child-4.stderr",
+          "bytes": 80,
+          "sha256": "3ec4f8e62fa9a3da3f39346845fafc0b553e6a7d82b0444bbddf87af3c881fc3"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-dAQqR8/child-5.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-dAQqR8/child-5.stderr",
+          "bytes": 354,
+          "sha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-dAQqR8/child-6.stdout",
+          "bytes": 17,
+          "sha256": "0fcf850642f4c89e2ef10aad49678b61d6c2fb60fd6ca9d7ab08b59627ebdc4f"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-dAQqR8/child-6.stderr",
+          "bytes": 120,
+          "sha256": "41b0f8e630f99e92caedf05fe68ac13bb8318a62970e9e580f89eba1d37ad51a"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-dAQqR8/child-7.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-dAQqR8/child-7.stderr",
+          "bytes": 354,
+          "sha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-dAQqR8/child-8.stdout",
+          "bytes": 17,
+          "sha256": "0fcf850642f4c89e2ef10aad49678b61d6c2fb60fd6ca9d7ab08b59627ebdc4f"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-dAQqR8/child-8.stderr",
+          "bytes": 120,
+          "sha256": "41b0f8e630f99e92caedf05fe68ac13bb8318a62970e9e580f89eba1d37ad51a"
+        }
+      ],
+      "allChildrenNatural0AndClosed": true,
+      "socketCount": 2,
+      "cleanupErrors": 0
+    },
+    {
+      "public": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-lSzKef/public-evidence.json",
+        "bytes": 16772,
+        "sha256": "50212df61f6e6c411515d62de4a694e3e07fbc11337417c2b931d3d323093ea7"
+      },
+      "caseId": "CHECKPOINT-EVENT-CADENCE",
+      "bodyFailed": false,
+      "childCount": 8,
+      "requestPaths": [
+        "/cadence-good",
+        "/cadence-good"
+      ],
+      "reply": {
+        "path": "/cadence-good",
+        "querySha256": "4f08f51aee6eae27821e6b144c9a2ab7998fceb28176f6cf55d41b7d14cfd2e4",
+        "responseSha256": "67e5413485d2fdfb33a5f0f2cc129f025870adaa1aafcc2b17c34f853bed4066",
+        "queryBoundOpenSslVerified": true,
+        "amcVerified": true,
+        "refusalCode": null
+      },
+      "replyScope": "Last verifyReply observation only",
+      "childrenAndExplicitStreamPins": [
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-lSzKef/child-1.stdout",
+          "bytes": 63,
+          "sha256": "50bc8ea637df53e57f6a77e21416ec9a320b8123447130cd1be83698a4863c29"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-lSzKef/child-1.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-lSzKef/child-2.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-lSzKef/child-2.stderr",
+          "bytes": 1236,
+          "sha256": "fe79713a24eb7f954862521c7d1edd94cfcbac049970c2a8aecddfc67f4b6283"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-lSzKef/child-3.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-lSzKef/child-3.stderr",
+          "bytes": 1916,
+          "sha256": "eeb59536c94c9c50516a9a6045b338f715da0f639a89f1c6f9614d6c5ffacca5"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-lSzKef/child-4.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-lSzKef/child-4.stderr",
+          "bytes": 80,
+          "sha256": "3ec4f8e62fa9a3da3f39346845fafc0b553e6a7d82b0444bbddf87af3c881fc3"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-lSzKef/child-5.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-lSzKef/child-5.stderr",
+          "bytes": 354,
+          "sha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-lSzKef/child-6.stdout",
+          "bytes": 17,
+          "sha256": "0fcf850642f4c89e2ef10aad49678b61d6c2fb60fd6ca9d7ab08b59627ebdc4f"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-lSzKef/child-6.stderr",
+          "bytes": 120,
+          "sha256": "a8e6a3d316e4e15785b8319017f86d492edf0c0c76c13252807e5f9fc082008b"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-lSzKef/child-7.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-lSzKef/child-7.stderr",
+          "bytes": 354,
+          "sha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-lSzKef/child-8.stdout",
+          "bytes": 17,
+          "sha256": "0fcf850642f4c89e2ef10aad49678b61d6c2fb60fd6ca9d7ab08b59627ebdc4f"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-lSzKef/child-8.stderr",
+          "bytes": 120,
+          "sha256": "a8e6a3d316e4e15785b8319017f86d492edf0c0c76c13252807e5f9fc082008b"
+        }
+      ],
+      "allChildrenNatural0AndClosed": true,
+      "socketCount": 2,
+      "cleanupErrors": 0
+    }
+  ],
+  "checkpointRows": [
+    {
+      "public": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-iuKLjW/checkpoint-public-evidence.json",
+        "bytes": 10927,
+        "sha256": "f37e9b307182a1c742d18ac3e15d9bff84a1ac237319be0b6858c85f8e253c52"
+      },
+      "caseId": "CHECKPOINT-PENDING-GRANT",
+      "bodyFailed": false,
+      "bodyErrorName": null,
+      "ledgerOwners": 5,
+      "allCleanupEnvironmentNativeImmutableExact": true,
+      "trust": {
+        "mode": "pinned",
+        "signatureVerifiedListCount": 1,
+        "rootKeyId": "c5de2f34bd6a26d647ce848b60503e7202c2bedabee45225f7f77c11794b18cc",
+        "monitorFingerprint": "f09758a25eeb4ee41abe4193d34ed3e4c8722b0ce02cf365afa4f08cebf29f87",
+        "tsaLoaded": true,
+        "signedList": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-bCGEBQ/home/checkpoint-trust-list.json",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-bCGEBQ/home/checkpoint-trust-list.json",
+          "bytes": 1993,
+          "sha256": "0e3ee7ae4e93e32a23403e487d8cb6eed892638207cc2a56eb0993cb39d145d6",
+          "dev": 16777231,
+          "inode": 543899535,
+          "nlink": 1
+        }
+      },
+      "initialLedger": {
+        "ok": true,
+        "chain": true,
+        "governance": true,
+        "anchored": true,
+        "errors": 0,
+        "seedEventId": "4f54c917-7610-49c2-9c65-ca74c09ab4dd",
+        "sessionId": "b197f540-4c9f-4cd8-a0f3-983306c7f3d6",
+        "eventCount": 1
+      },
+      "checkpointFacts": {
+        "pending": {
+          "result": {
+            "sequence": 1,
+            "status": "pending",
+            "failures": [
+              "checkpoint-tsa: HTTP 500"
+            ]
+          },
+          "signedCheckpoint": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-iuKLjW/.amc/time/checkpoints/1.json",
+            "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-iuKLjW/.amc/time/checkpoints/1.json",
+            "bytes": 704,
+            "sha256": "58ca14c9f5e5b95f20f7fc48a09d46ff087450649d4fcea2dd51372574c38d0d",
+            "dev": 16777231,
+            "inode": 543899540,
+            "nlink": 1
+          },
+          "signatureValid": true,
+          "eventCount": 1,
+          "tokenAbsent": true,
+          "timeline": [
+            {
+              "sequence": 1,
+              "genTime": null,
+              "detail": null,
+              "status": "pending"
+            }
+          ]
+        },
+        "completed": {
+          "result": [
+            {
+              "sequence": 1,
+              "status": "timestamped",
+              "failures": []
+            }
+          ],
+          "sequenceCount": 1,
+          "checkpointBytesUnchanged": true,
+          "token": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-iuKLjW/.amc/time/checkpoints/1.tsr",
+            "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-iuKLjW/.amc/time/checkpoints/1.tsr",
+            "bytes": 2298,
+            "sha256": "faf1fdbcc6e3220cccba2a0bc526a1ec1722ae319a6dba276988ed7d31ec7d90",
+            "dev": 16777231,
+            "inode": 543899548,
+            "nlink": 1
+          },
+          "storedTokenMatchesIndependentGrant": true,
+          "attested": {
+            "genTime": "2026-10-17T01:05:29.000Z",
+            "anchorId": "amc-p125-grant-test-root",
+            "messageImprint": {
+              "hashAlgorithm": "sha256",
+              "digest": "dcbb3238e6a79796a0096af20dbe733c2b517c7c9867f79431d26abb80e28aac"
+            },
+            "revocationChecked": false
+          },
+          "checkpointRows": [
+            {
+              "id": "1f23ba91-8098-4b7b-b5a2-5478fdd02686",
+              "eventHash": "7b46d45d2506e882221206190f67d2794845bd97f506cc2cb9ac3d48fb06a61c",
+              "meta": {
+                "checkpointSequence": 1,
+                "checkpointSha256": "dcbb3238e6a79796a0096af20dbe733c2b517c7c9867f79431d26abb80e28aac",
+                "tokenSha256": "faf1fdbcc6e3220cccba2a0bc526a1ec1722ae319a6dba276988ed7d31ec7d90"
+              }
+            }
+          ],
+          "ledger": {
+            "ok": true,
+            "chain": true,
+            "governance": true,
+            "anchored": true,
+            "errors": 0
+          },
+          "timeline": [
+            {
+              "sequence": 1,
+              "genTime": "2026-10-17T01:05:29.000Z",
+              "detail": null,
+              "status": "timestamped"
+            }
+          ],
+          "seedIndex": 0,
+          "seedTime": {
+            "time": {
+              "claimedAt": "2026-10-17T01:05:29.280Z",
+              "attested": {
+                "kind": "rfc3161",
+                "tsa": {
+                  "subject": "CN=AMC TSA GRANT SIGNER TEST ONLY",
+                  "certSha256": "4661a555a2d82ab4c8f46ccd7e8731504003015baa05e9b4489bb5c24690013b",
+                  "anchorId": "amc-p125-grant-test-root"
+                },
+                "genTime": "2026-10-17T01:05:29.000Z",
+                "accuracyMs": null,
+                "policyOid": "1.2.3.4.1",
+                "serialNumber": "2",
+                "messageImprint": {
+                  "hashAlgorithm": "sha256",
+                  "digest": "dcbb3238e6a79796a0096af20dbe733c2b517c7c9867f79431d26abb80e28aac"
+                },
+                "tokenDerB64": "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",
+                "revocationChecked": false
+              },
+              "basis": "attested-upper-bound",
+              "window": {
+                "notBefore": null,
+                "notAfter": "2026-10-17T01:05:29.000Z"
+              }
+            },
+            "findings": []
+          }
+        }
+      },
+      "windowSemanticAudit": null
+    },
+    {
+      "public": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-6E5dib/checkpoint-public-evidence.json",
+        "bytes": 5178,
+        "sha256": "307d6491a2f8378c626b3417565322705a3cba7a301a5a76f34a03298c4d7928"
+      },
+      "caseId": "CHECKPOINT-REQUIRED-REFUSAL",
+      "bodyFailed": false,
+      "bodyErrorName": null,
+      "ledgerOwners": 4,
+      "allCleanupEnvironmentNativeImmutableExact": true,
+      "trust": {
+        "mode": "pinned",
+        "signatureVerifiedListCount": 1,
+        "rootKeyId": "f19a44e46ca3f43559a50c9fc4c5ca223ddecf4ab791ec3cd959e342ee582226",
+        "monitorFingerprint": "71e0d49470066f0f740516044c05bd2d652cf970ab7a3f6ee34ba9aaaaf2eb23",
+        "tsaLoaded": true,
+        "signedList": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-X99kiQ/home/checkpoint-trust-list.json",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-X99kiQ/home/checkpoint-trust-list.json",
+          "bytes": 1993,
+          "sha256": "b41ae9556d82950463c0ffa74ab881f6de07bd4b5d499f7cf7496af19a3f61b9",
+          "dev": 16777231,
+          "inode": 543899701,
+          "nlink": 1
+        }
+      },
+      "initialLedger": {
+        "ok": true,
+        "chain": true,
+        "governance": true,
+        "anchored": true,
+        "errors": 0,
+        "seedEventId": "881ee3eb-28e1-4bfb-bcd2-5207ced23e14",
+        "sessionId": "3172ba27-95e8-455f-9434-d245f2a74da3",
+        "eventCount": 1
+      },
+      "checkpointFacts": {
+        "required": {
+          "rejected": true,
+          "rejectionName": "Error",
+          "expectedRejection": true,
+          "signatureValid": true,
+          "tokenAbsent": true,
+          "sequenceCount": 1,
+          "signedCheckpoint": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-6E5dib/.amc/time/checkpoints/1.json",
+            "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-6E5dib/.amc/time/checkpoints/1.json",
+            "bytes": 704,
+            "sha256": "4a3223a52f917d08440609abc5de44ba213de3281e04edce3e3b8f040dced6ef",
+            "dev": 16777231,
+            "inode": 543899706,
+            "nlink": 1
+          },
+          "eventCount": 1,
+          "checkpointRowCount": 0,
+          "ledger": {
+            "ok": true,
+            "chain": true,
+            "governance": true,
+            "anchored": true,
+            "errors": 0
+          },
+          "timeline": [
+            {
+              "sequence": 1,
+              "genTime": null,
+              "detail": null,
+              "status": "pending"
+            }
+          ]
+        }
+      },
+      "windowSemanticAudit": null
+    },
+    {
+      "public": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-Jbm5q3/checkpoint-public-evidence.json",
+        "bytes": 62226,
+        "sha256": "033c56176cca3db89bd720d6997eece73a74960f3338bdd614da0e05008ba62e"
+      },
+      "caseId": "CHECKPOINT-TWO-BOUND-WINDOW",
+      "bodyFailed": false,
+      "bodyErrorName": null,
+      "ledgerOwners": 7,
+      "allCleanupEnvironmentNativeImmutableExact": true,
+      "trust": {
+        "mode": "pinned",
+        "signatureVerifiedListCount": 1,
+        "rootKeyId": "1755a40d6790281aa82c0024320288f6985d10a568400351c239ffb4055496b3",
+        "monitorFingerprint": "f11bd312fe24a0d9d0e7570906c7ab8ce254714d482e214a65221317593e35b8",
+        "tsaLoaded": true,
+        "signedList": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-dAQqR8/home/checkpoint-trust-list.json",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-dAQqR8/home/checkpoint-trust-list.json",
+          "bytes": 1993,
+          "sha256": "278dab8e6bc64230174f1d50aa2485cf6a9a5067327ec4ddf283a8754483b3b8",
+          "dev": 16777231,
+          "inode": 543899856,
+          "nlink": 1
+        }
+      },
+      "initialLedger": {
+        "ok": true,
+        "chain": true,
+        "governance": true,
+        "anchored": true,
+        "errors": 0,
+        "seedEventId": "9e3ea9e0-f9bf-4997-91d0-41edacc33834",
+        "sessionId": "97a59148-26ee-4fed-b2f5-8cb0faeedf4d",
+        "eventCount": 1
+      },
+      "checkpointFacts": {
+        "twoBoundWindow": {
+          "results": [
+            {
+              "sequence": 1,
+              "status": "timestamped",
+              "failures": []
+            },
+            {
+              "sequence": 2,
+              "status": "timestamped",
+              "failures": []
+            }
+          ],
+          "checkpoints": [
+            {
+              "checkpoint": {
+                "type": "amc.ledger-checkpoint",
+                "version": 1,
+                "workspaceId": "default",
+                "sequence": 1,
+                "claimedAt": "2026-10-17T01:05:29.888Z",
+                "ledger": {
+                  "headEventHash": "4b03bb128d932374e4680c046e1ace2f19e1aed474662b1258209c392e3e9bbb",
+                  "eventCount": 1
+                },
+                "transparency": {
+                  "root": "aa4ed673b5100923da9d117c767068527de0cc6860f1ca23d71690590a597651",
+                  "leafCount": 1,
+                  "algorithm": "rfc9162-sha256"
+                },
+                "previousCheckpointSha256": null
+              },
+              "sha256": "457ad34721e79c3d2f79ceb68719c84733c31d02a84f39dfd66b2d92f5707e17",
+              "tokenSha256": "ec954c4f1c2046a35f49b414af448dd521328ef7f20aef733a0c95d3baec1f84"
+            },
+            {
+              "checkpoint": {
+                "type": "amc.ledger-checkpoint",
+                "version": 1,
+                "workspaceId": "default",
+                "sequence": 2,
+                "claimedAt": "2026-10-17T01:05:29.907Z",
+                "ledger": {
+                  "headEventHash": "5f529a25314abbd8fd81f0ff5e1b1b0c04705778d66a598bda71ac6be86c59a4",
+                  "eventCount": 3
+                },
+                "transparency": {
+                  "root": "aa4ed673b5100923da9d117c767068527de0cc6860f1ca23d71690590a597651",
+                  "leafCount": 1,
+                  "algorithm": "rfc9162-sha256"
+                },
+                "previousCheckpointSha256": "457ad34721e79c3d2f79ceb68719c84733c31d02a84f39dfd66b2d92f5707e17"
+              },
+              "sha256": "1e56a4e6e99955afeda06186e1b16f7659779942839539378de08e4ff03bb0b8",
+              "tokenSha256": "cc319d34251e6556d0a62734293c4840b70e2a703fd4f4ef54bf12f85f543d94"
+            }
+          ],
+          "checkpointPins": [
+            {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-Jbm5q3/.amc/time/checkpoints/1.json",
+              "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-Jbm5q3/.amc/time/checkpoints/1.json",
+              "bytes": 704,
+              "sha256": "d9f466b7025a95cef231661ef46662586a3881103aaeecd4cc6d24b7b96957c6",
+              "dev": 16777231,
+              "inode": 543899861,
+              "nlink": 1
+            },
+            {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-Jbm5q3/.amc/time/checkpoints/2.json",
+              "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-Jbm5q3/.amc/time/checkpoints/2.json",
+              "bytes": 766,
+              "sha256": "349c8eb8a1d22d8390da9453a6036aaed10e031f564e87413f2ef5adea020a9e",
+              "dev": 16777231,
+              "inode": 543899871,
+              "nlink": 1
+            }
+          ],
+          "tokenPins": [
+            {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-Jbm5q3/.amc/time/checkpoints/1.tsr",
+              "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-Jbm5q3/.amc/time/checkpoints/1.tsr",
+              "bytes": 2298,
+              "sha256": "ec954c4f1c2046a35f49b414af448dd521328ef7f20aef733a0c95d3baec1f84",
+              "dev": 16777231,
+              "inode": 543899867,
+              "nlink": 1
+            },
+            {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-Jbm5q3/.amc/time/checkpoints/2.tsr",
+              "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-Jbm5q3/.amc/time/checkpoints/2.tsr",
+              "bytes": 2298,
+              "sha256": "cc319d34251e6556d0a62734293c4840b70e2a703fd4f4ef54bf12f85f543d94",
+              "dev": 16777231,
+              "inode": 543899877,
+              "nlink": 1
+            }
+          ],
+          "signaturesValid": true,
+          "firstCheckpointBytesUnchanged": true,
+          "independentGrants": [
+            {
+              "genTime": "2026-10-17T01:05:29.000Z",
+              "accuracyMs": null,
+              "digest": "457ad34721e79c3d2f79ceb68719c84733c31d02a84f39dfd66b2d92f5707e17",
+              "anchorId": "amc-p125-grant-test-root",
+              "signerCertSha256": "660977c9a7412814a6ee8c4f383c384a08d8a01b5f674215680601d2d1065264",
+              "tokenSha256": "ec954c4f1c2046a35f49b414af448dd521328ef7f20aef733a0c95d3baec1f84",
+              "revocationChecked": false
+            },
+            {
+              "genTime": "2026-10-17T01:05:29.000Z",
+              "accuracyMs": null,
+              "digest": "1e56a4e6e99955afeda06186e1b16f7659779942839539378de08e4ff03bb0b8",
+              "anchorId": "amc-p125-grant-test-root",
+              "signerCertSha256": "660977c9a7412814a6ee8c4f383c384a08d8a01b5f674215680601d2d1065264",
+              "tokenSha256": "cc319d34251e6556d0a62734293c4840b70e2a703fd4f4ef54bf12f85f543d94",
+              "revocationChecked": false
+            }
+          ],
+          "checkpointRows": [
+            {
+              "id": "3a8cb455-53bb-41fb-b037-c666f001bbc1",
+              "eventHash": "e3d2d89be27bb6a35ee962c714016ba5d1633820be09097ec4e0f6bba867d07d",
+              "meta": {
+                "checkpointSequence": 1,
+                "checkpointSha256": "457ad34721e79c3d2f79ceb68719c84733c31d02a84f39dfd66b2d92f5707e17",
+                "tokenSha256": "ec954c4f1c2046a35f49b414af448dd521328ef7f20aef733a0c95d3baec1f84"
+              }
+            },
+            {
+              "id": "3b2bfaa2-d12d-47d6-bc22-8d7d7d196992",
+              "eventHash": "1a5b77d6c0bdedde9473ca7e4f26fe6f01ee83402dfc100eb64055d434dbd7ac",
+              "meta": {
+                "checkpointSequence": 2,
+                "checkpointSha256": "1e56a4e6e99955afeda06186e1b16f7659779942839539378de08e4ff03bb0b8",
+                "tokenSha256": "cc319d34251e6556d0a62734293c4840b70e2a703fd4f4ef54bf12f85f543d94"
+              }
+            }
+          ],
+          "middle": {
+            "id": "3a1e486b-a379-4ba5-b006-563417342080",
+            "ts": 1792199129904,
+            "eventHash": "5f529a25314abbd8fd81f0ff5e1b1b0c04705778d66a598bda71ac6be86c59a4",
+            "index": 2,
+            "time": {
+              "time": {
+                "claimedAt": "2026-10-17T01:05:29.904Z",
+                "attested": {
+                  "kind": "rfc3161",
+                  "tsa": {
+                    "subject": "CN=AMC TSA GRANT SIGNER TEST ONLY",
+                    "certSha256": "660977c9a7412814a6ee8c4f383c384a08d8a01b5f674215680601d2d1065264",
+                    "anchorId": "amc-p125-grant-test-root"
+                  },
+                  "genTime": "2026-10-17T01:05:29.000Z",
+                  "accuracyMs": null,
+                  "policyOid": "1.2.3.4.1",
+                  "serialNumber": "3",
+                  "messageImprint": {
+                    "hashAlgorithm": "sha256",
+                    "digest": "1e56a4e6e99955afeda06186e1b16f7659779942839539378de08e4ff03bb0b8"
+                  },
+                  "tokenDerB64": "MIII9gYJKoZIhvcNAQcCoIII5zCCCOMCAQMxDzANBglghkgBZQMEAgEFADBuBgsqhkiG9w0BCRABBKBfBF0wWwIBAQYEKgMEATAxMA0GCWCGSAFlAwQCAQUABCAeVqTm6ZlVr+2gYYbhsW92WXeZQoOVOTeN4I5P8DuwuAIBAxgPMjAyNjEwMTcwMTA1MjlaAgkA2+ZLMD/Gr4KgggZZMIIDQzCCAiugAwIBAgIBAjANBgkqhkiG9w0BAQsFADAnMSUwIwYDVQQDDBxBTUMgVFNBIEdSQU5UIFJPT1QgVEVTVCBPTkxZMB4XDTI2MTAxNzAxMDUyOVoXDTI2MTAxODAxMDUyOVowKTEnMCUGA1UEAwweQU1DIFRTQSBHUkFOVCBTSUdORVIgVEVTVCBPTkxZMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkC7ZrJ3B7uA2JmL790MdvU6SwkrY9yXhd8g2nT2c+usi7qrk7IvPHsFU/HhVDpNHyERsP4DQTloI/APMqeV7ekzYoo7N5cANi1JannjMe0Ibuow6yUrfKlk5H2uCSTn9Q0YSAUv1MAi8rh5j6b5BlE4UNehIhGjLGCnt1cjwPpIfzAALW3+HfAJwP3WtfmO1Ssv0lMG20ArpXoMPqCTiDnqXm9L/JnVJHMjbKbS2gk7Xg9CVQhQSpYmLOcgVjM10EpWnL+GT6jGZiD4HDRPC9Z5dXFPx55rDPalqY+/1Yz6tw7QEoEUnqzk1lOwDpKrn1RyttuwB2xndE0pT12egXQIDAQABo3gwdjAMBgNVHRMBAf8EAjAAMA4GA1UdDwEB/wQEAwIHgDAWBgNVHSUBAf8EDDAKBggrBgEFBQcDCDAdBgNVHQ4EFgQUhmjcvbKmz0sVI0j8Qfn4+Oo0Cc8wHwYDVR0jBBgwFoAUwWNHas7toiKXHHMkJ1hhwq2RxLMwDQYJKoZIhvcNAQELBQADggEBAFFRjeaixlH5UOMfRyZUeKvc1MiP7NzWZpaTTTBluNdgSnRPJ7Fz4yARI0tKgs75rrR9DWxTUOGzNMmKcrkpNh5W9aAhwHwvr4KdfEcRt/FFYgtcfqf4CjPE0YLhfr5asazIYOiodQGjQRmhjFS8sXJ1P3ps33WwEeDHKvVpMTWvqkK+E7XjlcVo51VuKyKeMcCAZh1szxoCCdlOVq/cTkWfFrMF0F5y6ac6Y6OQ4BMlNejoG0e/Fhf8G17iL2wHX/mETiSu3AIe01RDrcYsdj8+5E8IYjzjCKBejyvAS6HWggVZDrG9/dAkrAZcMqJZ0XYaTVhHRa5luKG07iZt7d8wggMOMIIB9qADAgECAgEBMA0GCSqGSIb3DQEBCwUAMCcxJTAjBgNVBAMMHEFNQyBUU0EgR1JBTlQgUk9PVCBURVNUIE9OTFkwHhcNMjYxMDE3MDEwNTI5WhcNMjYxMDE5MDEwNTI5WjAnMSUwIwYDVQQDDBxBTUMgVFNBIEdSQU5UIFJPT1QgVEVTVCBPTkxZMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1KKloXi2eL7rkj37LH76sHBHkQVmae/26rbdTrG3L0oYm6I6xDVEhWNb87tc/Yr38U0u7lPHR8VNgyA80yGeNqY5mhNsm7ssZX2rq//GbH8jZwWssxec8Jc9Zwn31PZYy5W4CxjA2sg497cEbDLwsPxja1beJq+wKQR/CtxSL8PMrIP35Ww/m4+OTKaqS1QqSCD0erOZOOPOqvY3lf0Qt5QoXbmv77fwl6OBDIWjE7+Kr0pb+RB/24EyR/toJaTkfzrk703crPoLMhq2dUgopXpHPoUkA5bxDGTj3Ov1oJ0Oj7qGUxhPK7ZgE/3RMZasETThei1o1Gravln890l2EQIDAQABo0UwQzASBgNVHRMBAf8ECDAGAQH/AgEAMA4GA1UdDwEB/wQEAwIBBjAdBgNVHQ4EFgQUwWNHas7toiKXHHMkJ1hhwq2RxLMwDQYJKoZIhvcNAQELBQADggEBAK+zfYb5YE1GKY4ncLv6OsN0BkCgsl3e9RlzhzQ1lApEsRGuybH761uhSLs0s7SursTJeXze20L+8C8yi36azKwFWFURtEZuZdVkFwvYpHSSULWLYsJ6bpqi4EfJshcjbhiiUGckmBWu5FRgth5Abwj4h9Mgyr0dBAbBWR7vmlPW2dbIS8f8QKd6ugCPu9v3OGGOkA5aPF6ZtUsiieH9BS1o8l+NHyo1bQm8XV0U6FDwbPjiB0sFNqX3gE7pIeG91fRszE1TCoF53EIkdiSg/FZinfxwnH5a7AIE33qcX2osaWvc6yg5Bt8IIHzNVMi9xZOCAVDTsWAl+hzXjbAQhMUxggH+MIIB+gIBATAsMCcxJTAjBgNVBAMMHEFNQyBUU0EgR1JBTlQgUk9PVCBURVNUIE9OTFkCAQIwDQYJYIZIAWUDBAIBBQCggaQwGgYJKoZIhvcNAQkDMQ0GCyqGSIb3DQEJEAEEMBwGCSqGSIb3DQEJBTEPFw0yNjEwMTcwMTA1MjlaMC8GCSqGSIb3DQEJBDEiBCBPW8rij0oj/nDIAu5Jf6m6dSbO7qAce2/beDf+y4S3sTA3BgsqhkiG9w0BCRACLzEoMCYwJDAiBCBmCXfJp0EoFKbujE84PDhKCNigG19nQhVoBgHS0QZSZDANBgkqhkiG9w0BAQEFAASCAQAduikyE6LbPmoc1eiGLEeROV9y05QWEP0ynn0LJeXlR6VN8/1W2oGJ+VFegD52RYl6SQX2NXRfFYl9FA+PmS2jqcULEkytoi3UOrGhaDs7dZSztXu8jhfZKx2JgDmKrykE1dC2hVCO+oxUFq7EyIOJJQWU9tDx/Sn17WIwTV2xSzEhGQmhd7hpW9bPbqdeVWcH97Yy/CMv0BxD0P/wM8GNmcLB1gGVRFsVFzKn0QT1IhiNj+t6XHbBrSQwg/FPDOpbx0X574fITzDgVWLKAPetu3mC26Gn22AS0CQOGYn6VsiNlW26kzeEM7IS3RmKitK9asCL8wxWOj4xLdEXOYIH",
+                  "revocationChecked": false
+                },
+                "basis": "attested-window",
+                "window": {
+                  "notBefore": "2026-10-17T01:05:29.000Z",
+                  "notAfter": "2026-10-17T01:05:29.000Z"
+                }
+              },
+              "findings": []
+            }
+          },
+          "seedTime": {
+            "time": {
+              "claimedAt": "2026-10-17T01:05:29.880Z",
+              "attested": {
+                "kind": "rfc3161",
+                "tsa": {
+                  "subject": "CN=AMC TSA GRANT SIGNER TEST ONLY",
+                  "certSha256": "660977c9a7412814a6ee8c4f383c384a08d8a01b5f674215680601d2d1065264",
+                  "anchorId": "amc-p125-grant-test-root"
+                },
+                "genTime": "2026-10-17T01:05:29.000Z",
+                "accuracyMs": null,
+                "policyOid": "1.2.3.4.1",
+                "serialNumber": "2",
+                "messageImprint": {
+                  "hashAlgorithm": "sha256",
+                  "digest": "457ad34721e79c3d2f79ceb68719c84733c31d02a84f39dfd66b2d92f5707e17"
+                },
+                "tokenDerB64": "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",
+                "revocationChecked": false
+              },
+              "basis": "attested-upper-bound",
+              "window": {
+                "notBefore": null,
+                "notAfter": "2026-10-17T01:05:29.000Z"
+              }
+            },
+            "findings": []
+          },
+          "lastCheckpointTime": {
+            "time": {
+              "claimedAt": "2026-10-17T01:05:29.916Z",
+              "attested": null,
+              "basis": "claimed"
+            },
+            "findings": []
+          },
+          "defaultObservations": [
+            {
+              "id": "default-lower-inclusive",
+              "claimedTs": 1792198829000,
+              "expected": [],
+              "result": {
+                "time": {
+                  "claimedAt": "2026-10-17T01:00:29.000Z",
+                  "attested": {
+                    "kind": "rfc3161",
+                    "tsa": {
+                      "subject": "CN=AMC TSA GRANT SIGNER TEST ONLY",
+                      "certSha256": "660977c9a7412814a6ee8c4f383c384a08d8a01b5f674215680601d2d1065264",
+                      "anchorId": "amc-p125-grant-test-root"
+                    },
+                    "genTime": "2026-10-17T01:05:29.000Z",
+                    "accuracyMs": null,
+                    "policyOid": "1.2.3.4.1",
+                    "serialNumber": "3",
+                    "messageImprint": {
+                      "hashAlgorithm": "sha256",
+                      "digest": "1e56a4e6e99955afeda06186e1b16f7659779942839539378de08e4ff03bb0b8"
+                    },
+                    "tokenDerB64": "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",
+                    "revocationChecked": false
+                  },
+                  "basis": "attested-window",
+                  "window": {
+                    "notBefore": "2026-10-17T01:05:29.000Z",
+                    "notAfter": "2026-10-17T01:05:29.000Z"
+                  }
+                },
+                "findings": []
+              }
+            },
+            {
+              "id": "default-lower-one-ms-beyond",
+              "claimedTs": 1792198828999,
+              "expected": [
+                "BACKDATED_CLAIM"
+              ],
+              "result": {
+                "time": {
+                  "claimedAt": "2026-10-17T01:00:28.999Z",
+                  "attested": {
+                    "kind": "rfc3161",
+                    "tsa": {
+                      "subject": "CN=AMC TSA GRANT SIGNER TEST ONLY",
+                      "certSha256": "660977c9a7412814a6ee8c4f383c384a08d8a01b5f674215680601d2d1065264",
+                      "anchorId": "amc-p125-grant-test-root"
+                    },
+                    "genTime": "2026-10-17T01:05:29.000Z",
+                    "accuracyMs": null,
+                    "policyOid": "1.2.3.4.1",
+                    "serialNumber": "3",
+                    "messageImprint": {
+                      "hashAlgorithm": "sha256",
+                      "digest": "1e56a4e6e99955afeda06186e1b16f7659779942839539378de08e4ff03bb0b8"
+                    },
+                    "tokenDerB64": "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",
+                    "revocationChecked": false
+                  },
+                  "basis": "attested-window",
+                  "window": {
+                    "notBefore": "2026-10-17T01:05:29.000Z",
+                    "notAfter": "2026-10-17T01:05:29.000Z"
+                  }
+                },
+                "findings": [
+                  "BACKDATED_CLAIM"
+                ]
+              }
+            },
+            {
+              "id": "default-upper-inclusive",
+              "claimedTs": 1792199429000,
+              "expected": [],
+              "result": {
+                "time": {
+                  "claimedAt": "2026-10-17T01:10:29.000Z",
+                  "attested": {
+                    "kind": "rfc3161",
+                    "tsa": {
+                      "subject": "CN=AMC TSA GRANT SIGNER TEST ONLY",
+                      "certSha256": "660977c9a7412814a6ee8c4f383c384a08d8a01b5f674215680601d2d1065264",
+                      "anchorId": "amc-p125-grant-test-root"
+                    },
+                    "genTime": "2026-10-17T01:05:29.000Z",
+                    "accuracyMs": null,
+                    "policyOid": "1.2.3.4.1",
+                    "serialNumber": "3",
+                    "messageImprint": {
+                      "hashAlgorithm": "sha256",
+                      "digest": "1e56a4e6e99955afeda06186e1b16f7659779942839539378de08e4ff03bb0b8"
+                    },
+                    "tokenDerB64": "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",
+                    "revocationChecked": false
+                  },
+                  "basis": "attested-window",
+                  "window": {
+                    "notBefore": "2026-10-17T01:05:29.000Z",
+                    "notAfter": "2026-10-17T01:05:29.000Z"
+                  }
+                },
+                "findings": []
+              }
+            },
+            {
+              "id": "default-upper-one-ms-beyond",
+              "claimedTs": 1792199429001,
+              "expected": [
+                "POSTDATED_CLAIM"
+              ],
+              "result": {
+                "time": {
+                  "claimedAt": "2026-10-17T01:10:29.001Z",
+                  "attested": {
+                    "kind": "rfc3161",
+                    "tsa": {
+                      "subject": "CN=AMC TSA GRANT SIGNER TEST ONLY",
+                      "certSha256": "660977c9a7412814a6ee8c4f383c384a08d8a01b5f674215680601d2d1065264",
+                      "anchorId": "amc-p125-grant-test-root"
+                    },
+                    "genTime": "2026-10-17T01:05:29.000Z",
+                    "accuracyMs": null,
+                    "policyOid": "1.2.3.4.1",
+                    "serialNumber": "3",
+                    "messageImprint": {
+                      "hashAlgorithm": "sha256",
+                      "digest": "1e56a4e6e99955afeda06186e1b16f7659779942839539378de08e4ff03bb0b8"
+                    },
+                    "tokenDerB64": "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",
+                    "revocationChecked": false
+                  },
+                  "basis": "attested-window",
+                  "window": {
+                    "notBefore": "2026-10-17T01:05:29.000Z",
+                    "notAfter": "2026-10-17T01:05:29.000Z"
+                  }
+                },
+                "findings": [
+                  "POSTDATED_CLAIM"
+                ]
+              }
+            }
+          ],
+          "zeroObservations": [
+            {
+              "id": "zero-lower-inclusive",
+              "claimedTs": 1792199129000,
+              "expected": [],
+              "result": {
+                "time": {
+                  "claimedAt": "2026-10-17T01:05:29.000Z",
+                  "attested": {
+                    "kind": "rfc3161",
+                    "tsa": {
+                      "subject": "CN=AMC TSA GRANT SIGNER TEST ONLY",
+                      "certSha256": "660977c9a7412814a6ee8c4f383c384a08d8a01b5f674215680601d2d1065264",
+                      "anchorId": "amc-p125-grant-test-root"
+                    },
+                    "genTime": "2026-10-17T01:05:29.000Z",
+                    "accuracyMs": null,
+                    "policyOid": "1.2.3.4.1",
+                    "serialNumber": "3",
+                    "messageImprint": {
+                      "hashAlgorithm": "sha256",
+                      "digest": "1e56a4e6e99955afeda06186e1b16f7659779942839539378de08e4ff03bb0b8"
+                    },
+                    "tokenDerB64": "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",
+                    "revocationChecked": false
+                  },
+                  "basis": "attested-window",
+                  "window": {
+                    "notBefore": "2026-10-17T01:05:29.000Z",
+                    "notAfter": "2026-10-17T01:05:29.000Z"
+                  }
+                },
+                "findings": []
+              }
+            },
+            {
+              "id": "zero-lower-one-ms-beyond",
+              "claimedTs": 1792199128999,
+              "expected": [
+                "BACKDATED_CLAIM"
+              ],
+              "result": {
+                "time": {
+                  "claimedAt": "2026-10-17T01:05:28.999Z",
+                  "attested": {
+                    "kind": "rfc3161",
+                    "tsa": {
+                      "subject": "CN=AMC TSA GRANT SIGNER TEST ONLY",
+                      "certSha256": "660977c9a7412814a6ee8c4f383c384a08d8a01b5f674215680601d2d1065264",
+                      "anchorId": "amc-p125-grant-test-root"
+                    },
+                    "genTime": "2026-10-17T01:05:29.000Z",
+                    "accuracyMs": null,
+                    "policyOid": "1.2.3.4.1",
+                    "serialNumber": "3",
+                    "messageImprint": {
+                      "hashAlgorithm": "sha256",
+                      "digest": "1e56a4e6e99955afeda06186e1b16f7659779942839539378de08e4ff03bb0b8"
+                    },
+                    "tokenDerB64": "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",
+                    "revocationChecked": false
+                  },
+                  "basis": "attested-window",
+                  "window": {
+                    "notBefore": "2026-10-17T01:05:29.000Z",
+                    "notAfter": "2026-10-17T01:05:29.000Z"
+                  }
+                },
+                "findings": [
+                  "BACKDATED_CLAIM"
+                ]
+              }
+            },
+            {
+              "id": "zero-upper-inclusive",
+              "claimedTs": 1792199129000,
+              "expected": [],
+              "result": {
+                "time": {
+                  "claimedAt": "2026-10-17T01:05:29.000Z",
+                  "attested": {
+                    "kind": "rfc3161",
+                    "tsa": {
+                      "subject": "CN=AMC TSA GRANT SIGNER TEST ONLY",
+                      "certSha256": "660977c9a7412814a6ee8c4f383c384a08d8a01b5f674215680601d2d1065264",
+                      "anchorId": "amc-p125-grant-test-root"
+                    },
+                    "genTime": "2026-10-17T01:05:29.000Z",
+                    "accuracyMs": null,
+                    "policyOid": "1.2.3.4.1",
+                    "serialNumber": "3",
+                    "messageImprint": {
+                      "hashAlgorithm": "sha256",
+                      "digest": "1e56a4e6e99955afeda06186e1b16f7659779942839539378de08e4ff03bb0b8"
+                    },
+                    "tokenDerB64": "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",
+                    "revocationChecked": false
+                  },
+                  "basis": "attested-window",
+                  "window": {
+                    "notBefore": "2026-10-17T01:05:29.000Z",
+                    "notAfter": "2026-10-17T01:05:29.000Z"
+                  }
+                },
+                "findings": []
+              }
+            },
+            {
+              "id": "zero-upper-one-ms-beyond",
+              "claimedTs": 1792199129001,
+              "expected": [
+                "POSTDATED_CLAIM"
+              ],
+              "result": {
+                "time": {
+                  "claimedAt": "2026-10-17T01:05:29.001Z",
+                  "attested": {
+                    "kind": "rfc3161",
+                    "tsa": {
+                      "subject": "CN=AMC TSA GRANT SIGNER TEST ONLY",
+                      "certSha256": "660977c9a7412814a6ee8c4f383c384a08d8a01b5f674215680601d2d1065264",
+                      "anchorId": "amc-p125-grant-test-root"
+                    },
+                    "genTime": "2026-10-17T01:05:29.000Z",
+                    "accuracyMs": null,
+                    "policyOid": "1.2.3.4.1",
+                    "serialNumber": "3",
+                    "messageImprint": {
+                      "hashAlgorithm": "sha256",
+                      "digest": "1e56a4e6e99955afeda06186e1b16f7659779942839539378de08e4ff03bb0b8"
+                    },
+                    "tokenDerB64": "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",
+                    "revocationChecked": false
+                  },
+                  "basis": "attested-window",
+                  "window": {
+                    "notBefore": "2026-10-17T01:05:29.000Z",
+                    "notAfter": "2026-10-17T01:05:29.000Z"
+                  }
+                },
+                "findings": [
+                  "POSTDATED_CLAIM"
+                ]
+              }
+            },
+            {
+              "id": "zero-refuses-default-lower-edge",
+              "claimedTs": 1792198829000,
+              "expected": [
+                "BACKDATED_CLAIM"
+              ],
+              "result": {
+                "time": {
+                  "claimedAt": "2026-10-17T01:00:29.000Z",
+                  "attested": {
+                    "kind": "rfc3161",
+                    "tsa": {
+                      "subject": "CN=AMC TSA GRANT SIGNER TEST ONLY",
+                      "certSha256": "660977c9a7412814a6ee8c4f383c384a08d8a01b5f674215680601d2d1065264",
+                      "anchorId": "amc-p125-grant-test-root"
+                    },
+                    "genTime": "2026-10-17T01:05:29.000Z",
+                    "accuracyMs": null,
+                    "policyOid": "1.2.3.4.1",
+                    "serialNumber": "3",
+                    "messageImprint": {
+                      "hashAlgorithm": "sha256",
+                      "digest": "1e56a4e6e99955afeda06186e1b16f7659779942839539378de08e4ff03bb0b8"
+                    },
+                    "tokenDerB64": "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",
+                    "revocationChecked": false
+                  },
+                  "basis": "attested-window",
+                  "window": {
+                    "notBefore": "2026-10-17T01:05:29.000Z",
+                    "notAfter": "2026-10-17T01:05:29.000Z"
+                  }
+                },
+                "findings": [
+                  "BACKDATED_CLAIM"
+                ]
+              }
+            },
+            {
+              "id": "zero-refuses-default-upper-edge",
+              "claimedTs": 1792199429000,
+              "expected": [
+                "POSTDATED_CLAIM"
+              ],
+              "result": {
+                "time": {
+                  "claimedAt": "2026-10-17T01:10:29.000Z",
+                  "attested": {
+                    "kind": "rfc3161",
+                    "tsa": {
+                      "subject": "CN=AMC TSA GRANT SIGNER TEST ONLY",
+                      "certSha256": "660977c9a7412814a6ee8c4f383c384a08d8a01b5f674215680601d2d1065264",
+                      "anchorId": "amc-p125-grant-test-root"
+                    },
+                    "genTime": "2026-10-17T01:05:29.000Z",
+                    "accuracyMs": null,
+                    "policyOid": "1.2.3.4.1",
+                    "serialNumber": "3",
+                    "messageImprint": {
+                      "hashAlgorithm": "sha256",
+                      "digest": "1e56a4e6e99955afeda06186e1b16f7659779942839539378de08e4ff03bb0b8"
+                    },
+                    "tokenDerB64": "MIII9gYJKoZIhvcNAQcCoIII5zCCCOMCAQMxDzANBglghkgBZQMEAgEFADBuBgsqhkiG9w0BCRABBKBfBF0wWwIBAQYEKgMEATAxMA0GCWCGSAFlAwQCAQUABCAeVqTm6ZlVr+2gYYbhsW92WXeZQoOVOTeN4I5P8DuwuAIBAxgPMjAyNjEwMTcwMTA1MjlaAgkA2+ZLMD/Gr4KgggZZMIIDQzCCAiugAwIBAgIBAjANBgkqhkiG9w0BAQsFADAnMSUwIwYDVQQDDBxBTUMgVFNBIEdSQU5UIFJPT1QgVEVTVCBPTkxZMB4XDTI2MTAxNzAxMDUyOVoXDTI2MTAxODAxMDUyOVowKTEnMCUGA1UEAwweQU1DIFRTQSBHUkFOVCBTSUdORVIgVEVTVCBPTkxZMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkC7ZrJ3B7uA2JmL790MdvU6SwkrY9yXhd8g2nT2c+usi7qrk7IvPHsFU/HhVDpNHyERsP4DQTloI/APMqeV7ekzYoo7N5cANi1JannjMe0Ibuow6yUrfKlk5H2uCSTn9Q0YSAUv1MAi8rh5j6b5BlE4UNehIhGjLGCnt1cjwPpIfzAALW3+HfAJwP3WtfmO1Ssv0lMG20ArpXoMPqCTiDnqXm9L/JnVJHMjbKbS2gk7Xg9CVQhQSpYmLOcgVjM10EpWnL+GT6jGZiD4HDRPC9Z5dXFPx55rDPalqY+/1Yz6tw7QEoEUnqzk1lOwDpKrn1RyttuwB2xndE0pT12egXQIDAQABo3gwdjAMBgNVHRMBAf8EAjAAMA4GA1UdDwEB/wQEAwIHgDAWBgNVHSUBAf8EDDAKBggrBgEFBQcDCDAdBgNVHQ4EFgQUhmjcvbKmz0sVI0j8Qfn4+Oo0Cc8wHwYDVR0jBBgwFoAUwWNHas7toiKXHHMkJ1hhwq2RxLMwDQYJKoZIhvcNAQELBQADggEBAFFRjeaixlH5UOMfRyZUeKvc1MiP7NzWZpaTTTBluNdgSnRPJ7Fz4yARI0tKgs75rrR9DWxTUOGzNMmKcrkpNh5W9aAhwHwvr4KdfEcRt/FFYgtcfqf4CjPE0YLhfr5asazIYOiodQGjQRmhjFS8sXJ1P3ps33WwEeDHKvVpMTWvqkK+E7XjlcVo51VuKyKeMcCAZh1szxoCCdlOVq/cTkWfFrMF0F5y6ac6Y6OQ4BMlNejoG0e/Fhf8G17iL2wHX/mETiSu3AIe01RDrcYsdj8+5E8IYjzjCKBejyvAS6HWggVZDrG9/dAkrAZcMqJZ0XYaTVhHRa5luKG07iZt7d8wggMOMIIB9qADAgECAgEBMA0GCSqGSIb3DQEBCwUAMCcxJTAjBgNVBAMMHEFNQyBUU0EgR1JBTlQgUk9PVCBURVNUIE9OTFkwHhcNMjYxMDE3MDEwNTI5WhcNMjYxMDE5MDEwNTI5WjAnMSUwIwYDVQQDDBxBTUMgVFNBIEdSQU5UIFJPT1QgVEVTVCBPTkxZMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1KKloXi2eL7rkj37LH76sHBHkQVmae/26rbdTrG3L0oYm6I6xDVEhWNb87tc/Yr38U0u7lPHR8VNgyA80yGeNqY5mhNsm7ssZX2rq//GbH8jZwWssxec8Jc9Zwn31PZYy5W4CxjA2sg497cEbDLwsPxja1beJq+wKQR/CtxSL8PMrIP35Ww/m4+OTKaqS1QqSCD0erOZOOPOqvY3lf0Qt5QoXbmv77fwl6OBDIWjE7+Kr0pb+RB/24EyR/toJaTkfzrk703crPoLMhq2dUgopXpHPoUkA5bxDGTj3Ov1oJ0Oj7qGUxhPK7ZgE/3RMZasETThei1o1Gravln890l2EQIDAQABo0UwQzASBgNVHRMBAf8ECDAGAQH/AgEAMA4GA1UdDwEB/wQEAwIBBjAdBgNVHQ4EFgQUwWNHas7toiKXHHMkJ1hhwq2RxLMwDQYJKoZIhvcNAQELBQADggEBAK+zfYb5YE1GKY4ncLv6OsN0BkCgsl3e9RlzhzQ1lApEsRGuybH761uhSLs0s7SursTJeXze20L+8C8yi36azKwFWFURtEZuZdVkFwvYpHSSULWLYsJ6bpqi4EfJshcjbhiiUGckmBWu5FRgth5Abwj4h9Mgyr0dBAbBWR7vmlPW2dbIS8f8QKd6ugCPu9v3OGGOkA5aPF6ZtUsiieH9BS1o8l+NHyo1bQm8XV0U6FDwbPjiB0sFNqX3gE7pIeG91fRszE1TCoF53EIkdiSg/FZinfxwnH5a7AIE33qcX2osaWvc6yg5Bt8IIHzNVMi9xZOCAVDTsWAl+hzXjbAQhMUxggH+MIIB+gIBATAsMCcxJTAjBgNVBAMMHEFNQyBUU0EgR1JBTlQgUk9PVCBURVNUIE9OTFkCAQIwDQYJYIZIAWUDBAIBBQCggaQwGgYJKoZIhvcNAQkDMQ0GCyqGSIb3DQEJEAEEMBwGCSqGSIb3DQEJBTEPFw0yNjEwMTcwMTA1MjlaMC8GCSqGSIb3DQEJBDEiBCBPW8rij0oj/nDIAu5Jf6m6dSbO7qAce2/beDf+y4S3sTA3BgsqhkiG9w0BCRACLzEoMCYwJDAiBCBmCXfJp0EoFKbujE84PDhKCNigG19nQhVoBgHS0QZSZDANBgkqhkiG9w0BAQEFAASCAQAduikyE6LbPmoc1eiGLEeROV9y05QWEP0ynn0LJeXlR6VN8/1W2oGJ+VFegD52RYl6SQX2NXRfFYl9FA+PmS2jqcULEkytoi3UOrGhaDs7dZSztXu8jhfZKx2JgDmKrykE1dC2hVCO+oxUFq7EyIOJJQWU9tDx/Sn17WIwTV2xSzEhGQmhd7hpW9bPbqdeVWcH97Yy/CMv0BxD0P/wM8GNmcLB1gGVRFsVFzKn0QT1IhiNj+t6XHbBrSQwg/FPDOpbx0X574fITzDgVWLKAPetu3mC26Gn22AS0CQOGYn6VsiNlW26kzeEM7IS3RmKitK9asCL8wxWOj4xLdEXOYIH",
+                    "revocationChecked": false
+                  },
+                  "basis": "attested-window",
+                  "window": {
+                    "notBefore": "2026-10-17T01:05:29.000Z",
+                    "notAfter": "2026-10-17T01:05:29.000Z"
+                  }
+                },
+                "findings": [
+                  "POSTDATED_CLAIM"
+                ]
+              }
+            }
+          ],
+          "readerClaimsOnly": true,
+          "persistedRowTimestampsOrClockEdited": false,
+          "eventsUnchangedByReader": true,
+          "ledger": {
+            "beforeReader": true,
+            "afterReader": true,
+            "chain": true,
+            "governance": true,
+            "anchored": true,
+            "errors": 0
+          }
+        }
+      },
+      "windowSemanticAudit": {
+        "queryBoundVerificationProofs": [
+          {
+            "sequence": 1,
+            "verificationChildPid": 79026,
+            "verificationChildArgv": [
+              "/opt/homebrew/bin/openssl",
+              "ts",
+              "-verify",
+              "-queryfile",
+              "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-dAQqR8/request-1.tsq",
+              "-in",
+              "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-dAQqR8/response-1.tsr",
+              "-CAfile",
+              "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-dAQqR8/root.pem"
+            ],
+            "query": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-dAQqR8/request-1.tsq",
+              "bytes": 76,
+              "sha256": "7869a66c6114a7f6ad92feddc0f1b45323e4d536053868d5411f45de8331e31d"
+            },
+            "response": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-dAQqR8/response-1.tsr",
+              "bytes": 2307,
+              "sha256": "b704246dd340400945b8fdb13648cd8f8240c38bd82e79d59dcd1cb79484143b"
+            },
+            "independentGrant": {
+              "genTime": "2026-10-17T01:05:29.000Z",
+              "accuracyMs": null,
+              "digest": "457ad34721e79c3d2f79ceb68719c84733c31d02a84f39dfd66b2d92f5707e17",
+              "anchorId": "amc-p125-grant-test-root",
+              "signerCertSha256": "660977c9a7412814a6ee8c4f383c384a08d8a01b5f674215680601d2d1065264",
+              "tokenSha256": "ec954c4f1c2046a35f49b414af448dd521328ef7f20aef733a0c95d3baec1f84",
+              "revocationChecked": false
+            }
+          },
+          {
+            "sequence": 2,
+            "verificationChildPid": 79028,
+            "verificationChildArgv": [
+              "/opt/homebrew/bin/openssl",
+              "ts",
+              "-verify",
+              "-queryfile",
+              "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-dAQqR8/request-2.tsq",
+              "-in",
+              "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-dAQqR8/response-2.tsr",
+              "-CAfile",
+              "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-dAQqR8/root.pem"
+            ],
+            "query": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-dAQqR8/request-2.tsq",
+              "bytes": 76,
+              "sha256": "97c0ccef1b8918e5e87ea6b0e983b00ffca0a677d27d851bfcf50be875120f0b"
+            },
+            "response": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-dAQqR8/response-2.tsr",
+              "bytes": 2307,
+              "sha256": "32e8f2c94c34288a1cd6ae15272a6be8da14357b6bcd7b8dbe83f59d4e4032af"
+            },
+            "independentGrant": {
+              "genTime": "2026-10-17T01:05:29.000Z",
+              "accuracyMs": null,
+              "digest": "1e56a4e6e99955afeda06186e1b16f7659779942839539378de08e4ff03bb0b8",
+              "anchorId": "amc-p125-grant-test-root",
+              "signerCertSha256": "660977c9a7412814a6ee8c4f383c384a08d8a01b5f674215680601d2d1065264",
+              "tokenSha256": "cc319d34251e6556d0a62734293c4840b70e2a703fd4f4ef54bf12f85f543d94",
+              "revocationChecked": false
+            }
+          }
+        ],
+        "replyObservationScope": "Last reply only; the first proof uses its own named verification child and independent grant.",
+        "signedCheckpointHeads": [
+          {
+            "headEventHash": "4b03bb128d932374e4680c046e1ace2f19e1aed474662b1258209c392e3e9bbb",
+            "eventCount": 1
+          },
+          {
+            "headEventHash": "5f529a25314abbd8fd81f0ff5e1b1b0c04705778d66a598bda71ac6be86c59a4",
+            "eventCount": 3
+          }
+        ],
+        "firstHeadComparisonBoundary": "The public record lacks a separate seed event hash. Its literal comparison remains a source assertion and GREEN-cohort fact; no public recomputation is claimed.",
+        "exactWindow": {
+          "notBefore": "2026-10-17T01:05:29.000Z",
+          "notAfter": "2026-10-17T01:05:29.000Z"
+        },
+        "defaultReaderRows": 4,
+        "zeroReaderRows": 6,
+        "literalDefaultToleranceMs": 300000,
+        "equalSecondGenTimesAccepted": true,
+        "sourceAssertionLocations": {
+          "window": 474,
+          "defaultFindings": 481,
+          "zeroLoopHeader": 486,
+          "zeroFindings": 487
+        },
+        "noReaderClockOrPersistedRowEdit": true
+      }
+    },
+    {
+      "public": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/checkpoint-public-evidence.json",
+        "bytes": 32656,
+        "sha256": "8dff6a6a552b7612d02e0f0164e963371137946ded69d12a4403af0c09e4f4b2"
+      },
+      "caseId": "CHECKPOINT-EVENT-CADENCE",
+      "bodyFailed": false,
+      "bodyErrorName": null,
+      "ledgerOwners": 12,
+      "allCleanupEnvironmentNativeImmutableExact": true,
+      "trust": {
+        "mode": "pinned",
+        "signatureVerifiedListCount": 1,
+        "rootKeyId": "f3ffbe4600eef9bbd39a8277f2dad379c5edec30c5a94e395a2f8534b09ee5d0",
+        "monitorFingerprint": "c432eb4f5c887de035dfab07a1b64971890f4a5e67f0a72f1e3d40600ac75806",
+        "tsaLoaded": true,
+        "signedList": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-lSzKef/home/checkpoint-trust-list.json",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-lSzKef/home/checkpoint-trust-list.json",
+          "bytes": 1993,
+          "sha256": "c0a071e0a34f4f514890e2fdf42ac914c58d06bd241a59b5b1d73180b8980606",
+          "dev": 16777231,
+          "inode": 543900030,
+          "nlink": 1
+        }
+      },
+      "initialLedger": {
+        "ok": true,
+        "chain": true,
+        "governance": true,
+        "anchored": true,
+        "errors": 0,
+        "seedEventId": "fbc7884c-497f-4b76-b1b3-2c07ebf22c29",
+        "sessionId": "b3303acb-9430-49b7-8c14-3c5267c747e7",
+        "eventCount": 1
+      },
+      "checkpointFacts": {
+        "defaultHome": {
+          "resolved": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-lSzKef/home/.config/amc",
+          "expected": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-lSzKef/home/.config/amc",
+          "overridesAbsent": true,
+          "noOptionsLoaderUsed": true,
+          "mode": "pinned",
+          "signatureVerifiedListCount": 1,
+          "listId": "p125-checkpoint-fixture",
+          "listEqualsOwnSignedList": true,
+          "explicitPinCount": 0,
+          "allowUnpinned": false,
+          "allowUnanchored": false,
+          "rootKeyId": "f3ffbe4600eef9bbd39a8277f2dad379c5edec30c5a94e395a2f8534b09ee5d0",
+          "tsaAnchorIds": [
+            "amc-p125-grant-test-root"
+          ],
+          "trustFiles": [
+            {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-lSzKef/home/.config/amc/trust/amc-trust-list.json",
+              "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-lSzKef/home/.config/amc/trust/amc-trust-list.json",
+              "bytes": 1993,
+              "sha256": "c0a071e0a34f4f514890e2fdf42ac914c58d06bd241a59b5b1d73180b8980606",
+              "dev": 16777231,
+              "inode": 543900034,
+              "nlink": 1
+            },
+            {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-lSzKef/home/.config/amc/trust/trust-roots.json",
+              "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-lSzKef/home/.config/amc/trust/trust-roots.json",
+              "bytes": 136,
+              "sha256": "c1cf872bfb23e80da3152774ff7ce8ec042dc2b7143abb0455727f14204ec50c",
+              "dev": 16777231,
+              "inode": 543900035,
+              "nlink": 1
+            }
+          ]
+        },
+        "eventCadence": {
+          "configured": {
+            "required": false,
+            "tsa": [
+              {
+                "name": "checkpoint-tsa",
+                "url": "http://127.0.0.1:59830/cadence-good",
+                "anchorIds": [
+                  "amc-p125-grant-test-root"
+                ],
+                "reqPolicy": "1.2.3.4.1"
+              }
+            ],
+            "checkpoint": {
+              "everyEvents": 2
+            }
+          },
+          "loadedCheckpoint": {
+            "everyEvents": 2,
+            "everyMinutes": 15
+          },
+          "emptyTransparencyAnchors": [],
+          "defaultArgumentsOnly": true,
+          "noClockOrRowEdit": true,
+          "elapsedMinuteOrStudioCredit": false,
+          "configPin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/amc.config.yaml",
+            "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/amc.config.yaml",
+            "bytes": 664,
+            "sha256": "ddd69a24478e4ae4a1f4ea30826f91ec25b47407ce229e5acb5fcec8449d889e",
+            "dev": 16777231,
+            "inode": 543900036,
+            "nlink": 1
+          },
+          "stages": [
+            {
+              "id": "initial",
+              "result": {
+                "ran": true,
+                "anchors": []
+              },
+              "observedAtMs": 1792199130207,
+              "requestPaths": [
+                "/cadence-good"
+              ],
+              "events": [
+                {
+                  "id": "fbc7884c-497f-4b76-b1b3-2c07ebf22c29",
+                  "eventType": "audit",
+                  "ts": 1792199130186,
+                  "eventHash": "273a0b26abb8c8b9e88327054e859e043836801c377fb262fead860322e7bf3b",
+                  "meta": {
+                    "fixtureCase": "CHECKPOINT-EVENT-CADENCE"
+                  }
+                },
+                {
+                  "id": "8e5b559a-1472-4962-ad49-ed587b54eef4",
+                  "eventType": "time/checkpoint",
+                  "ts": 1792199130204,
+                  "eventHash": "177194ba9a6cc6fedaf512cf5a03859fa9af787fae193a37fbe45ec5d2fa728e",
+                  "meta": {
+                    "checkpointSequence": 1,
+                    "checkpointSha256": "4c32a5fd6d449751d15d98dda6d4d5950dba5a592681a27827b99f03f83aed9e",
+                    "tokenSha256": "89652b563d3716252c5f210726992d38db5fed7eabe2cea26bc1dcb5f1302af0"
+                  }
+                }
+              ],
+              "chain": [
+                {
+                  "checkpoint": {
+                    "type": "amc.ledger-checkpoint",
+                    "version": 1,
+                    "workspaceId": "default",
+                    "sequence": 1,
+                    "claimedAt": "2026-10-17T01:05:30.195Z",
+                    "ledger": {
+                      "headEventHash": "273a0b26abb8c8b9e88327054e859e043836801c377fb262fead860322e7bf3b",
+                      "eventCount": 1
+                    },
+                    "transparency": {
+                      "root": "d430b0ecbcb37e3d5446f5be815472407537f4db04416781e8b102cacf5de4a0",
+                      "leafCount": 1,
+                      "algorithm": "rfc9162-sha256"
+                    },
+                    "previousCheckpointSha256": null
+                  },
+                  "sha256": "4c32a5fd6d449751d15d98dda6d4d5950dba5a592681a27827b99f03f83aed9e"
+                }
+              ],
+              "checkpointPins": [
+                {
+                  "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/1.json",
+                  "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/1.json",
+                  "bytes": 704,
+                  "sha256": "29e7f31135f507d5c83e4f8f8bf2052fb30bdb5077aa850f4ff0a58f29764974",
+                  "dev": 16777231,
+                  "inode": 543900040,
+                  "nlink": 1
+                }
+              ],
+              "tokenPins": [
+                {
+                  "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/1.tsr",
+                  "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/1.tsr",
+                  "bytes": 2298,
+                  "sha256": "89652b563d3716252c5f210726992d38db5fed7eabe2cea26bc1dcb5f1302af0",
+                  "dev": 16777231,
+                  "inode": 543900046,
+                  "nlink": 1
+                }
+              ]
+            },
+            {
+              "id": "checkpoint-only",
+              "result": {
+                "ran": false,
+                "anchors": []
+              },
+              "observedAtMs": 1792199130218,
+              "requestPaths": [
+                "/cadence-good"
+              ],
+              "events": [
+                {
+                  "id": "fbc7884c-497f-4b76-b1b3-2c07ebf22c29",
+                  "eventType": "audit",
+                  "ts": 1792199130186,
+                  "eventHash": "273a0b26abb8c8b9e88327054e859e043836801c377fb262fead860322e7bf3b",
+                  "meta": {
+                    "fixtureCase": "CHECKPOINT-EVENT-CADENCE"
+                  }
+                },
+                {
+                  "id": "8e5b559a-1472-4962-ad49-ed587b54eef4",
+                  "eventType": "time/checkpoint",
+                  "ts": 1792199130204,
+                  "eventHash": "177194ba9a6cc6fedaf512cf5a03859fa9af787fae193a37fbe45ec5d2fa728e",
+                  "meta": {
+                    "checkpointSequence": 1,
+                    "checkpointSha256": "4c32a5fd6d449751d15d98dda6d4d5950dba5a592681a27827b99f03f83aed9e",
+                    "tokenSha256": "89652b563d3716252c5f210726992d38db5fed7eabe2cea26bc1dcb5f1302af0"
+                  }
+                }
+              ],
+              "chain": [
+                {
+                  "checkpoint": {
+                    "type": "amc.ledger-checkpoint",
+                    "version": 1,
+                    "workspaceId": "default",
+                    "sequence": 1,
+                    "claimedAt": "2026-10-17T01:05:30.195Z",
+                    "ledger": {
+                      "headEventHash": "273a0b26abb8c8b9e88327054e859e043836801c377fb262fead860322e7bf3b",
+                      "eventCount": 1
+                    },
+                    "transparency": {
+                      "root": "d430b0ecbcb37e3d5446f5be815472407537f4db04416781e8b102cacf5de4a0",
+                      "leafCount": 1,
+                      "algorithm": "rfc9162-sha256"
+                    },
+                    "previousCheckpointSha256": null
+                  },
+                  "sha256": "4c32a5fd6d449751d15d98dda6d4d5950dba5a592681a27827b99f03f83aed9e"
+                }
+              ],
+              "checkpointPins": [
+                {
+                  "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/1.json",
+                  "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/1.json",
+                  "bytes": 704,
+                  "sha256": "29e7f31135f507d5c83e4f8f8bf2052fb30bdb5077aa850f4ff0a58f29764974",
+                  "dev": 16777231,
+                  "inode": 543900040,
+                  "nlink": 1
+                }
+              ],
+              "tokenPins": [
+                {
+                  "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/1.tsr",
+                  "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/1.tsr",
+                  "bytes": 2298,
+                  "sha256": "89652b563d3716252c5f210726992d38db5fed7eabe2cea26bc1dcb5f1302af0",
+                  "dev": 16777231,
+                  "inode": 543900046,
+                  "nlink": 1
+                }
+              ]
+            },
+            {
+              "id": "one-new-audit",
+              "result": {
+                "ran": false,
+                "anchors": []
+              },
+              "observedAtMs": 1792199130223,
+              "requestPaths": [
+                "/cadence-good"
+              ],
+              "events": [
+                {
+                  "id": "fbc7884c-497f-4b76-b1b3-2c07ebf22c29",
+                  "eventType": "audit",
+                  "ts": 1792199130186,
+                  "eventHash": "273a0b26abb8c8b9e88327054e859e043836801c377fb262fead860322e7bf3b",
+                  "meta": {
+                    "fixtureCase": "CHECKPOINT-EVENT-CADENCE"
+                  }
+                },
+                {
+                  "id": "8e5b559a-1472-4962-ad49-ed587b54eef4",
+                  "eventType": "time/checkpoint",
+                  "ts": 1792199130204,
+                  "eventHash": "177194ba9a6cc6fedaf512cf5a03859fa9af787fae193a37fbe45ec5d2fa728e",
+                  "meta": {
+                    "checkpointSequence": 1,
+                    "checkpointSha256": "4c32a5fd6d449751d15d98dda6d4d5950dba5a592681a27827b99f03f83aed9e",
+                    "tokenSha256": "89652b563d3716252c5f210726992d38db5fed7eabe2cea26bc1dcb5f1302af0"
+                  }
+                },
+                {
+                  "id": "11ad0862-758f-4af4-9936-15c603a109f2",
+                  "eventType": "audit",
+                  "ts": 1792199130219,
+                  "eventHash": "fa4019bf6939ba388a36189c1dff33f9a744eec0c874cd40219b0424c2e0ac87",
+                  "meta": {
+                    "fixtureCase": "CHECKPOINT-EVENT-CADENCE",
+                    "fixtureLabel": "cadence-first-audit"
+                  }
+                }
+              ],
+              "chain": [
+                {
+                  "checkpoint": {
+                    "type": "amc.ledger-checkpoint",
+                    "version": 1,
+                    "workspaceId": "default",
+                    "sequence": 1,
+                    "claimedAt": "2026-10-17T01:05:30.195Z",
+                    "ledger": {
+                      "headEventHash": "273a0b26abb8c8b9e88327054e859e043836801c377fb262fead860322e7bf3b",
+                      "eventCount": 1
+                    },
+                    "transparency": {
+                      "root": "d430b0ecbcb37e3d5446f5be815472407537f4db04416781e8b102cacf5de4a0",
+                      "leafCount": 1,
+                      "algorithm": "rfc9162-sha256"
+                    },
+                    "previousCheckpointSha256": null
+                  },
+                  "sha256": "4c32a5fd6d449751d15d98dda6d4d5950dba5a592681a27827b99f03f83aed9e"
+                }
+              ],
+              "checkpointPins": [
+                {
+                  "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/1.json",
+                  "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/1.json",
+                  "bytes": 704,
+                  "sha256": "29e7f31135f507d5c83e4f8f8bf2052fb30bdb5077aa850f4ff0a58f29764974",
+                  "dev": 16777231,
+                  "inode": 543900040,
+                  "nlink": 1
+                }
+              ],
+              "tokenPins": [
+                {
+                  "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/1.tsr",
+                  "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/1.tsr",
+                  "bytes": 2298,
+                  "sha256": "89652b563d3716252c5f210726992d38db5fed7eabe2cea26bc1dcb5f1302af0",
+                  "dev": 16777231,
+                  "inode": 543900046,
+                  "nlink": 1
+                }
+              ]
+            },
+            {
+              "id": "two-new-audits",
+              "result": {
+                "ran": true,
+                "anchors": []
+              },
+              "observedAtMs": 1792199130241,
+              "requestPaths": [
+                "/cadence-good",
+                "/cadence-good"
+              ],
+              "events": [
+                {
+                  "id": "fbc7884c-497f-4b76-b1b3-2c07ebf22c29",
+                  "eventType": "audit",
+                  "ts": 1792199130186,
+                  "eventHash": "273a0b26abb8c8b9e88327054e859e043836801c377fb262fead860322e7bf3b",
+                  "meta": {
+                    "fixtureCase": "CHECKPOINT-EVENT-CADENCE"
+                  }
+                },
+                {
+                  "id": "8e5b559a-1472-4962-ad49-ed587b54eef4",
+                  "eventType": "time/checkpoint",
+                  "ts": 1792199130204,
+                  "eventHash": "177194ba9a6cc6fedaf512cf5a03859fa9af787fae193a37fbe45ec5d2fa728e",
+                  "meta": {
+                    "checkpointSequence": 1,
+                    "checkpointSha256": "4c32a5fd6d449751d15d98dda6d4d5950dba5a592681a27827b99f03f83aed9e",
+                    "tokenSha256": "89652b563d3716252c5f210726992d38db5fed7eabe2cea26bc1dcb5f1302af0"
+                  }
+                },
+                {
+                  "id": "11ad0862-758f-4af4-9936-15c603a109f2",
+                  "eventType": "audit",
+                  "ts": 1792199130219,
+                  "eventHash": "fa4019bf6939ba388a36189c1dff33f9a744eec0c874cd40219b0424c2e0ac87",
+                  "meta": {
+                    "fixtureCase": "CHECKPOINT-EVENT-CADENCE",
+                    "fixtureLabel": "cadence-first-audit"
+                  }
+                },
+                {
+                  "id": "f17c9244-2a52-4672-a682-bfc123fca55d",
+                  "eventType": "audit",
+                  "ts": 1792199130223,
+                  "eventHash": "284d98038a3596d660bbe32244f80ebc581aa0eb96758b6cf3f693eee3bd4538",
+                  "meta": {
+                    "fixtureCase": "CHECKPOINT-EVENT-CADENCE",
+                    "fixtureLabel": "cadence-second-audit"
+                  }
+                },
+                {
+                  "id": "b01546e2-0eab-4336-b26e-a898f17405dc",
+                  "eventType": "time/checkpoint",
+                  "ts": 1792199130238,
+                  "eventHash": "5a76a963668d4d49057595cc6b5d585ec151f706665ea3cccd59209b399ea89f",
+                  "meta": {
+                    "checkpointSequence": 2,
+                    "checkpointSha256": "6ce58918aacecddb27d3aa4d81daabb42c6eb25d386d9f87fdc79105c1f6269f",
+                    "tokenSha256": "6382c76d236b9db59a3bb9fb1b35a049c2717a1a429794579ba8321c8de1efeb"
+                  }
+                }
+              ],
+              "chain": [
+                {
+                  "checkpoint": {
+                    "type": "amc.ledger-checkpoint",
+                    "version": 1,
+                    "workspaceId": "default",
+                    "sequence": 1,
+                    "claimedAt": "2026-10-17T01:05:30.195Z",
+                    "ledger": {
+                      "headEventHash": "273a0b26abb8c8b9e88327054e859e043836801c377fb262fead860322e7bf3b",
+                      "eventCount": 1
+                    },
+                    "transparency": {
+                      "root": "d430b0ecbcb37e3d5446f5be815472407537f4db04416781e8b102cacf5de4a0",
+                      "leafCount": 1,
+                      "algorithm": "rfc9162-sha256"
+                    },
+                    "previousCheckpointSha256": null
+                  },
+                  "sha256": "4c32a5fd6d449751d15d98dda6d4d5950dba5a592681a27827b99f03f83aed9e"
+                },
+                {
+                  "checkpoint": {
+                    "type": "amc.ledger-checkpoint",
+                    "version": 1,
+                    "workspaceId": "default",
+                    "sequence": 2,
+                    "claimedAt": "2026-10-17T01:05:30.229Z",
+                    "ledger": {
+                      "headEventHash": "284d98038a3596d660bbe32244f80ebc581aa0eb96758b6cf3f693eee3bd4538",
+                      "eventCount": 4
+                    },
+                    "transparency": {
+                      "root": "d430b0ecbcb37e3d5446f5be815472407537f4db04416781e8b102cacf5de4a0",
+                      "leafCount": 1,
+                      "algorithm": "rfc9162-sha256"
+                    },
+                    "previousCheckpointSha256": "4c32a5fd6d449751d15d98dda6d4d5950dba5a592681a27827b99f03f83aed9e"
+                  },
+                  "sha256": "6ce58918aacecddb27d3aa4d81daabb42c6eb25d386d9f87fdc79105c1f6269f"
+                }
+              ],
+              "checkpointPins": [
+                {
+                  "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/1.json",
+                  "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/1.json",
+                  "bytes": 704,
+                  "sha256": "29e7f31135f507d5c83e4f8f8bf2052fb30bdb5077aa850f4ff0a58f29764974",
+                  "dev": 16777231,
+                  "inode": 543900040,
+                  "nlink": 1
+                },
+                {
+                  "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/2.json",
+                  "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/2.json",
+                  "bytes": 766,
+                  "sha256": "9b138b025525fdfe162f6c82c1715f6a13cfacd71b5a71b6fd4c9b7886abf66d",
+                  "dev": 16777231,
+                  "inode": 543900050,
+                  "nlink": 1
+                }
+              ],
+              "tokenPins": [
+                {
+                  "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/1.tsr",
+                  "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/1.tsr",
+                  "bytes": 2298,
+                  "sha256": "89652b563d3716252c5f210726992d38db5fed7eabe2cea26bc1dcb5f1302af0",
+                  "dev": 16777231,
+                  "inode": 543900046,
+                  "nlink": 1
+                },
+                {
+                  "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/2.tsr",
+                  "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/2.tsr",
+                  "bytes": 2298,
+                  "sha256": "6382c76d236b9db59a3bb9fb1b35a049c2717a1a429794579ba8321c8de1efeb",
+                  "dev": 16777231,
+                  "inode": 543900056,
+                  "nlink": 1
+                }
+              ]
+            },
+            {
+              "id": "reset",
+              "result": {
+                "ran": false,
+                "anchors": []
+              },
+              "observedAtMs": 1792199130250,
+              "requestPaths": [
+                "/cadence-good",
+                "/cadence-good"
+              ],
+              "events": [
+                {
+                  "id": "fbc7884c-497f-4b76-b1b3-2c07ebf22c29",
+                  "eventType": "audit",
+                  "ts": 1792199130186,
+                  "eventHash": "273a0b26abb8c8b9e88327054e859e043836801c377fb262fead860322e7bf3b",
+                  "meta": {
+                    "fixtureCase": "CHECKPOINT-EVENT-CADENCE"
+                  }
+                },
+                {
+                  "id": "8e5b559a-1472-4962-ad49-ed587b54eef4",
+                  "eventType": "time/checkpoint",
+                  "ts": 1792199130204,
+                  "eventHash": "177194ba9a6cc6fedaf512cf5a03859fa9af787fae193a37fbe45ec5d2fa728e",
+                  "meta": {
+                    "checkpointSequence": 1,
+                    "checkpointSha256": "4c32a5fd6d449751d15d98dda6d4d5950dba5a592681a27827b99f03f83aed9e",
+                    "tokenSha256": "89652b563d3716252c5f210726992d38db5fed7eabe2cea26bc1dcb5f1302af0"
+                  }
+                },
+                {
+                  "id": "11ad0862-758f-4af4-9936-15c603a109f2",
+                  "eventType": "audit",
+                  "ts": 1792199130219,
+                  "eventHash": "fa4019bf6939ba388a36189c1dff33f9a744eec0c874cd40219b0424c2e0ac87",
+                  "meta": {
+                    "fixtureCase": "CHECKPOINT-EVENT-CADENCE",
+                    "fixtureLabel": "cadence-first-audit"
+                  }
+                },
+                {
+                  "id": "f17c9244-2a52-4672-a682-bfc123fca55d",
+                  "eventType": "audit",
+                  "ts": 1792199130223,
+                  "eventHash": "284d98038a3596d660bbe32244f80ebc581aa0eb96758b6cf3f693eee3bd4538",
+                  "meta": {
+                    "fixtureCase": "CHECKPOINT-EVENT-CADENCE",
+                    "fixtureLabel": "cadence-second-audit"
+                  }
+                },
+                {
+                  "id": "b01546e2-0eab-4336-b26e-a898f17405dc",
+                  "eventType": "time/checkpoint",
+                  "ts": 1792199130238,
+                  "eventHash": "5a76a963668d4d49057595cc6b5d585ec151f706665ea3cccd59209b399ea89f",
+                  "meta": {
+                    "checkpointSequence": 2,
+                    "checkpointSha256": "6ce58918aacecddb27d3aa4d81daabb42c6eb25d386d9f87fdc79105c1f6269f",
+                    "tokenSha256": "6382c76d236b9db59a3bb9fb1b35a049c2717a1a429794579ba8321c8de1efeb"
+                  }
+                }
+              ],
+              "chain": [
+                {
+                  "checkpoint": {
+                    "type": "amc.ledger-checkpoint",
+                    "version": 1,
+                    "workspaceId": "default",
+                    "sequence": 1,
+                    "claimedAt": "2026-10-17T01:05:30.195Z",
+                    "ledger": {
+                      "headEventHash": "273a0b26abb8c8b9e88327054e859e043836801c377fb262fead860322e7bf3b",
+                      "eventCount": 1
+                    },
+                    "transparency": {
+                      "root": "d430b0ecbcb37e3d5446f5be815472407537f4db04416781e8b102cacf5de4a0",
+                      "leafCount": 1,
+                      "algorithm": "rfc9162-sha256"
+                    },
+                    "previousCheckpointSha256": null
+                  },
+                  "sha256": "4c32a5fd6d449751d15d98dda6d4d5950dba5a592681a27827b99f03f83aed9e"
+                },
+                {
+                  "checkpoint": {
+                    "type": "amc.ledger-checkpoint",
+                    "version": 1,
+                    "workspaceId": "default",
+                    "sequence": 2,
+                    "claimedAt": "2026-10-17T01:05:30.229Z",
+                    "ledger": {
+                      "headEventHash": "284d98038a3596d660bbe32244f80ebc581aa0eb96758b6cf3f693eee3bd4538",
+                      "eventCount": 4
+                    },
+                    "transparency": {
+                      "root": "d430b0ecbcb37e3d5446f5be815472407537f4db04416781e8b102cacf5de4a0",
+                      "leafCount": 1,
+                      "algorithm": "rfc9162-sha256"
+                    },
+                    "previousCheckpointSha256": "4c32a5fd6d449751d15d98dda6d4d5950dba5a592681a27827b99f03f83aed9e"
+                  },
+                  "sha256": "6ce58918aacecddb27d3aa4d81daabb42c6eb25d386d9f87fdc79105c1f6269f"
+                }
+              ],
+              "checkpointPins": [
+                {
+                  "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/1.json",
+                  "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/1.json",
+                  "bytes": 704,
+                  "sha256": "29e7f31135f507d5c83e4f8f8bf2052fb30bdb5077aa850f4ff0a58f29764974",
+                  "dev": 16777231,
+                  "inode": 543900040,
+                  "nlink": 1
+                },
+                {
+                  "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/2.json",
+                  "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/2.json",
+                  "bytes": 766,
+                  "sha256": "9b138b025525fdfe162f6c82c1715f6a13cfacd71b5a71b6fd4c9b7886abf66d",
+                  "dev": 16777231,
+                  "inode": 543900050,
+                  "nlink": 1
+                }
+              ],
+              "tokenPins": [
+                {
+                  "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/1.tsr",
+                  "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/1.tsr",
+                  "bytes": 2298,
+                  "sha256": "89652b563d3716252c5f210726992d38db5fed7eabe2cea26bc1dcb5f1302af0",
+                  "dev": 16777231,
+                  "inode": 543900046,
+                  "nlink": 1
+                },
+                {
+                  "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/2.tsr",
+                  "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/2.tsr",
+                  "bytes": 2298,
+                  "sha256": "6382c76d236b9db59a3bb9fb1b35a049c2717a1a429794579ba8321c8de1efeb",
+                  "dev": 16777231,
+                  "inode": 543900056,
+                  "nlink": 1
+                }
+              ]
+            }
+          ],
+          "independentGrants": [
+            {
+              "genTime": "2026-10-17T01:05:30.000Z",
+              "accuracyMs": null,
+              "digest": "4c32a5fd6d449751d15d98dda6d4d5950dba5a592681a27827b99f03f83aed9e",
+              "anchorId": "amc-p125-grant-test-root",
+              "signerCertSha256": "7972c28a0bf655eb6d946044bc371cedff79bd23c07b8508fb12e9d41a972b03",
+              "tokenSha256": "89652b563d3716252c5f210726992d38db5fed7eabe2cea26bc1dcb5f1302af0",
+              "revocationChecked": false
+            },
+            {
+              "genTime": "2026-10-17T01:05:30.000Z",
+              "accuracyMs": null,
+              "digest": "6ce58918aacecddb27d3aa4d81daabb42c6eb25d386d9f87fdc79105c1f6269f",
+              "anchorId": "amc-p125-grant-test-root",
+              "signerCertSha256": "7972c28a0bf655eb6d946044bc371cedff79bd23c07b8508fb12e9d41a972b03",
+              "tokenSha256": "6382c76d236b9db59a3bb9fb1b35a049c2717a1a429794579ba8321c8de1efeb",
+              "revocationChecked": false
+            }
+          ],
+          "firstLedger": {
+            "ok": true,
+            "chain": true,
+            "governance": true,
+            "anchored": true,
+            "errors": 0
+          },
+          "oneEventBeforeTick": {
+            "firstAuditId": "11ad0862-758f-4af4-9936-15c603a109f2",
+            "afterHeadIds": [
+              "8e5b559a-1472-4962-ad49-ed587b54eef4",
+              "11ad0862-758f-4af4-9936-15c603a109f2"
+            ],
+            "afterHeadTypes": [
+              "time/checkpoint",
+              "audit"
+            ]
+          },
+          "twoEventsBeforeTick": {
+            "secondAuditId": "f17c9244-2a52-4672-a682-bfc123fca55d",
+            "afterHeadIds": [
+              "8e5b559a-1472-4962-ad49-ed587b54eef4",
+              "11ad0862-758f-4af4-9936-15c603a109f2",
+              "f17c9244-2a52-4672-a682-bfc123fca55d"
+            ],
+            "afterHeadTypes": [
+              "time/checkpoint",
+              "audit",
+              "audit"
+            ]
+          },
+          "final": {
+            "signaturesValid": true,
+            "oldFilesUnchanged": true,
+            "configUnchanged": true,
+            "checkpointRows": [
+              {
+                "id": "8e5b559a-1472-4962-ad49-ed587b54eef4",
+                "eventHash": "177194ba9a6cc6fedaf512cf5a03859fa9af787fae193a37fbe45ec5d2fa728e",
+                "meta": {
+                  "checkpointSequence": 1,
+                  "checkpointSha256": "4c32a5fd6d449751d15d98dda6d4d5950dba5a592681a27827b99f03f83aed9e",
+                  "tokenSha256": "89652b563d3716252c5f210726992d38db5fed7eabe2cea26bc1dcb5f1302af0"
+                }
+              },
+              {
+                "id": "b01546e2-0eab-4336-b26e-a898f17405dc",
+                "eventHash": "5a76a963668d4d49057595cc6b5d585ec151f706665ea3cccd59209b399ea89f",
+                "meta": {
+                  "checkpointSequence": 2,
+                  "checkpointSha256": "6ce58918aacecddb27d3aa4d81daabb42c6eb25d386d9f87fdc79105c1f6269f",
+                  "tokenSha256": "6382c76d236b9db59a3bb9fb1b35a049c2717a1a429794579ba8321c8de1efeb"
+                }
+              }
+            ],
+            "ledger": {
+              "ok": true,
+              "chain": true,
+              "governance": true,
+              "anchored": true,
+              "errors": 0
+            }
+          }
+        }
+      },
+      "windowSemanticAudit": null,
+      "eventCadenceSemanticAudit": {
+        "completeBody": true,
+        "cadenceAcceptance": true,
+        "sourceAssertionLocations": {
+          "oneAudit": 582,
+          "exactTwoAudits": 597
+        },
+        "manualFailureAndMaskClassificationRequired": false,
+        "defaultHomePresent": true,
+        "eventCadencePresent": true,
+        "defaultHomeAudit": {
+          "resolved": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-lSzKef/home/.config/amc",
+          "publicTrustFiles": [
+            {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-lSzKef/home/.config/amc/trust/amc-trust-list.json",
+              "bytes": 1993,
+              "sha256": "c0a071e0a34f4f514890e2fdf42ac914c58d06bd241a59b5b1d73180b8980606"
+            },
+            {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-lSzKef/home/.config/amc/trust/trust-roots.json",
+              "bytes": 136,
+              "sha256": "c1cf872bfb23e80da3152774ff7ce8ec042dc2b7143abb0455727f14204ec50c"
+            }
+          ],
+          "rootKeyId": "f3ffbe4600eef9bbd39a8277f2dad379c5edec30c5a94e395a2f8534b09ee5d0",
+          "mode0600SingleLinkPhysicalUnchanged": true,
+          "rawTrustFilesNotSelectedForPublication": true
+        },
+        "observedStagePrefix": [
+          {
+            "id": "initial",
+            "result": {
+              "ran": true,
+              "anchors": []
+            },
+            "matchesIntendedResult": true,
+            "events": 2,
+            "checkpoints": 1,
+            "requests": 1
+          },
+          {
+            "id": "checkpoint-only",
+            "result": {
+              "ran": false,
+              "anchors": []
+            },
+            "matchesIntendedResult": true,
+            "events": 2,
+            "checkpoints": 1,
+            "requests": 1
+          },
+          {
+            "id": "one-new-audit",
+            "result": {
+              "ran": false,
+              "anchors": []
+            },
+            "matchesIntendedResult": true,
+            "events": 3,
+            "checkpoints": 1,
+            "requests": 1
+          },
+          {
+            "id": "two-new-audits",
+            "result": {
+              "ran": true,
+              "anchors": []
+            },
+            "matchesIntendedResult": true,
+            "events": 5,
+            "checkpoints": 2,
+            "requests": 2
+          },
+          {
+            "id": "reset",
+            "result": {
+              "ran": false,
+              "anchors": []
+            },
+            "matchesIntendedResult": true,
+            "events": 5,
+            "checkpoints": 2,
+            "requests": 2
+          }
+        ],
+        "queryBoundVerificationProofs": [
+          {
+            "sequence": 1,
+            "verificationChildPid": 79034,
+            "verificationChildArgv": [
+              "/opt/homebrew/bin/openssl",
+              "ts",
+              "-verify",
+              "-queryfile",
+              "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-lSzKef/request-1.tsq",
+              "-in",
+              "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-lSzKef/response-1.tsr",
+              "-CAfile",
+              "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-lSzKef/root.pem"
+            ],
+            "query": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-lSzKef/request-1.tsq",
+              "bytes": 76,
+              "sha256": "65fde4b7134a737f6c4b95dadce7db57231220b886db01aee8c2fcf1135d672c"
+            },
+            "response": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-lSzKef/response-1.tsr",
+              "bytes": 2307,
+              "sha256": "7f9f4d3877f90264a2ab14e97c56abbf2ab1e18cbd896b0c925748e2e9ab6b55"
+            },
+            "independentGrant": {
+              "genTime": "2026-10-17T01:05:30.000Z",
+              "accuracyMs": null,
+              "digest": "4c32a5fd6d449751d15d98dda6d4d5950dba5a592681a27827b99f03f83aed9e",
+              "anchorId": "amc-p125-grant-test-root",
+              "signerCertSha256": "7972c28a0bf655eb6d946044bc371cedff79bd23c07b8508fb12e9d41a972b03",
+              "tokenSha256": "89652b563d3716252c5f210726992d38db5fed7eabe2cea26bc1dcb5f1302af0",
+              "revocationChecked": false
+            }
+          },
+          {
+            "sequence": 2,
+            "verificationChildPid": 79037,
+            "verificationChildArgv": [
+              "/opt/homebrew/bin/openssl",
+              "ts",
+              "-verify",
+              "-queryfile",
+              "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-lSzKef/request-2.tsq",
+              "-in",
+              "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-lSzKef/response-2.tsr",
+              "-CAfile",
+              "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-lSzKef/root.pem"
+            ],
+            "query": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-lSzKef/request-2.tsq",
+              "bytes": 76,
+              "sha256": "4f08f51aee6eae27821e6b144c9a2ab7998fceb28176f6cf55d41b7d14cfd2e4"
+            },
+            "response": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-lSzKef/response-2.tsr",
+              "bytes": 2307,
+              "sha256": "67e5413485d2fdfb33a5f0f2cc129f025870adaa1aafcc2b17c34f853bed4066"
+            },
+            "independentGrant": {
+              "genTime": "2026-10-17T01:05:30.000Z",
+              "accuracyMs": null,
+              "digest": "6ce58918aacecddb27d3aa4d81daabb42c6eb25d386d9f87fdc79105c1f6269f",
+              "anchorId": "amc-p125-grant-test-root",
+              "signerCertSha256": "7972c28a0bf655eb6d946044bc371cedff79bd23c07b8508fb12e9d41a972b03",
+              "tokenSha256": "6382c76d236b9db59a3bb9fb1b35a049c2717a1a429794579ba8321c8de1efeb",
+              "revocationChecked": false
+            }
+          }
+        ],
+        "replyObservationScope": "Last independently verified reply only; every earlier proof uses its own query and named child.",
+        "independentGrantCount": 2,
+        "capturedUnverifiedRequests": 0,
+        "finalFactsPresent": true,
+        "actualStages": [
+          {
+            "id": "initial",
+            "result": {
+              "ran": true,
+              "anchors": []
+            },
+            "observedAtMs": 1792199130207,
+            "requestPaths": [
+              "/cadence-good"
+            ],
+            "events": [
+              {
+                "id": "fbc7884c-497f-4b76-b1b3-2c07ebf22c29",
+                "eventType": "audit",
+                "ts": 1792199130186,
+                "eventHash": "273a0b26abb8c8b9e88327054e859e043836801c377fb262fead860322e7bf3b",
+                "meta": {
+                  "fixtureCase": "CHECKPOINT-EVENT-CADENCE"
+                }
+              },
+              {
+                "id": "8e5b559a-1472-4962-ad49-ed587b54eef4",
+                "eventType": "time/checkpoint",
+                "ts": 1792199130204,
+                "eventHash": "177194ba9a6cc6fedaf512cf5a03859fa9af787fae193a37fbe45ec5d2fa728e",
+                "meta": {
+                  "checkpointSequence": 1,
+                  "checkpointSha256": "4c32a5fd6d449751d15d98dda6d4d5950dba5a592681a27827b99f03f83aed9e",
+                  "tokenSha256": "89652b563d3716252c5f210726992d38db5fed7eabe2cea26bc1dcb5f1302af0"
+                }
+              }
+            ],
+            "chain": [
+              {
+                "checkpoint": {
+                  "type": "amc.ledger-checkpoint",
+                  "version": 1,
+                  "workspaceId": "default",
+                  "sequence": 1,
+                  "claimedAt": "2026-10-17T01:05:30.195Z",
+                  "ledger": {
+                    "headEventHash": "273a0b26abb8c8b9e88327054e859e043836801c377fb262fead860322e7bf3b",
+                    "eventCount": 1
+                  },
+                  "transparency": {
+                    "root": "d430b0ecbcb37e3d5446f5be815472407537f4db04416781e8b102cacf5de4a0",
+                    "leafCount": 1,
+                    "algorithm": "rfc9162-sha256"
+                  },
+                  "previousCheckpointSha256": null
+                },
+                "sha256": "4c32a5fd6d449751d15d98dda6d4d5950dba5a592681a27827b99f03f83aed9e"
+              }
+            ],
+            "checkpointPins": [
+              {
+                "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/1.json",
+                "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/1.json",
+                "bytes": 704,
+                "sha256": "29e7f31135f507d5c83e4f8f8bf2052fb30bdb5077aa850f4ff0a58f29764974",
+                "dev": 16777231,
+                "inode": 543900040,
+                "nlink": 1
+              }
+            ],
+            "tokenPins": [
+              {
+                "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/1.tsr",
+                "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/1.tsr",
+                "bytes": 2298,
+                "sha256": "89652b563d3716252c5f210726992d38db5fed7eabe2cea26bc1dcb5f1302af0",
+                "dev": 16777231,
+                "inode": 543900046,
+                "nlink": 1
+              }
+            ]
+          },
+          {
+            "id": "checkpoint-only",
+            "result": {
+              "ran": false,
+              "anchors": []
+            },
+            "observedAtMs": 1792199130218,
+            "requestPaths": [
+              "/cadence-good"
+            ],
+            "events": [
+              {
+                "id": "fbc7884c-497f-4b76-b1b3-2c07ebf22c29",
+                "eventType": "audit",
+                "ts": 1792199130186,
+                "eventHash": "273a0b26abb8c8b9e88327054e859e043836801c377fb262fead860322e7bf3b",
+                "meta": {
+                  "fixtureCase": "CHECKPOINT-EVENT-CADENCE"
+                }
+              },
+              {
+                "id": "8e5b559a-1472-4962-ad49-ed587b54eef4",
+                "eventType": "time/checkpoint",
+                "ts": 1792199130204,
+                "eventHash": "177194ba9a6cc6fedaf512cf5a03859fa9af787fae193a37fbe45ec5d2fa728e",
+                "meta": {
+                  "checkpointSequence": 1,
+                  "checkpointSha256": "4c32a5fd6d449751d15d98dda6d4d5950dba5a592681a27827b99f03f83aed9e",
+                  "tokenSha256": "89652b563d3716252c5f210726992d38db5fed7eabe2cea26bc1dcb5f1302af0"
+                }
+              }
+            ],
+            "chain": [
+              {
+                "checkpoint": {
+                  "type": "amc.ledger-checkpoint",
+                  "version": 1,
+                  "workspaceId": "default",
+                  "sequence": 1,
+                  "claimedAt": "2026-10-17T01:05:30.195Z",
+                  "ledger": {
+                    "headEventHash": "273a0b26abb8c8b9e88327054e859e043836801c377fb262fead860322e7bf3b",
+                    "eventCount": 1
+                  },
+                  "transparency": {
+                    "root": "d430b0ecbcb37e3d5446f5be815472407537f4db04416781e8b102cacf5de4a0",
+                    "leafCount": 1,
+                    "algorithm": "rfc9162-sha256"
+                  },
+                  "previousCheckpointSha256": null
+                },
+                "sha256": "4c32a5fd6d449751d15d98dda6d4d5950dba5a592681a27827b99f03f83aed9e"
+              }
+            ],
+            "checkpointPins": [
+              {
+                "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/1.json",
+                "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/1.json",
+                "bytes": 704,
+                "sha256": "29e7f31135f507d5c83e4f8f8bf2052fb30bdb5077aa850f4ff0a58f29764974",
+                "dev": 16777231,
+                "inode": 543900040,
+                "nlink": 1
+              }
+            ],
+            "tokenPins": [
+              {
+                "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/1.tsr",
+                "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/1.tsr",
+                "bytes": 2298,
+                "sha256": "89652b563d3716252c5f210726992d38db5fed7eabe2cea26bc1dcb5f1302af0",
+                "dev": 16777231,
+                "inode": 543900046,
+                "nlink": 1
+              }
+            ]
+          },
+          {
+            "id": "one-new-audit",
+            "result": {
+              "ran": false,
+              "anchors": []
+            },
+            "observedAtMs": 1792199130223,
+            "requestPaths": [
+              "/cadence-good"
+            ],
+            "events": [
+              {
+                "id": "fbc7884c-497f-4b76-b1b3-2c07ebf22c29",
+                "eventType": "audit",
+                "ts": 1792199130186,
+                "eventHash": "273a0b26abb8c8b9e88327054e859e043836801c377fb262fead860322e7bf3b",
+                "meta": {
+                  "fixtureCase": "CHECKPOINT-EVENT-CADENCE"
+                }
+              },
+              {
+                "id": "8e5b559a-1472-4962-ad49-ed587b54eef4",
+                "eventType": "time/checkpoint",
+                "ts": 1792199130204,
+                "eventHash": "177194ba9a6cc6fedaf512cf5a03859fa9af787fae193a37fbe45ec5d2fa728e",
+                "meta": {
+                  "checkpointSequence": 1,
+                  "checkpointSha256": "4c32a5fd6d449751d15d98dda6d4d5950dba5a592681a27827b99f03f83aed9e",
+                  "tokenSha256": "89652b563d3716252c5f210726992d38db5fed7eabe2cea26bc1dcb5f1302af0"
+                }
+              },
+              {
+                "id": "11ad0862-758f-4af4-9936-15c603a109f2",
+                "eventType": "audit",
+                "ts": 1792199130219,
+                "eventHash": "fa4019bf6939ba388a36189c1dff33f9a744eec0c874cd40219b0424c2e0ac87",
+                "meta": {
+                  "fixtureCase": "CHECKPOINT-EVENT-CADENCE",
+                  "fixtureLabel": "cadence-first-audit"
+                }
+              }
+            ],
+            "chain": [
+              {
+                "checkpoint": {
+                  "type": "amc.ledger-checkpoint",
+                  "version": 1,
+                  "workspaceId": "default",
+                  "sequence": 1,
+                  "claimedAt": "2026-10-17T01:05:30.195Z",
+                  "ledger": {
+                    "headEventHash": "273a0b26abb8c8b9e88327054e859e043836801c377fb262fead860322e7bf3b",
+                    "eventCount": 1
+                  },
+                  "transparency": {
+                    "root": "d430b0ecbcb37e3d5446f5be815472407537f4db04416781e8b102cacf5de4a0",
+                    "leafCount": 1,
+                    "algorithm": "rfc9162-sha256"
+                  },
+                  "previousCheckpointSha256": null
+                },
+                "sha256": "4c32a5fd6d449751d15d98dda6d4d5950dba5a592681a27827b99f03f83aed9e"
+              }
+            ],
+            "checkpointPins": [
+              {
+                "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/1.json",
+                "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/1.json",
+                "bytes": 704,
+                "sha256": "29e7f31135f507d5c83e4f8f8bf2052fb30bdb5077aa850f4ff0a58f29764974",
+                "dev": 16777231,
+                "inode": 543900040,
+                "nlink": 1
+              }
+            ],
+            "tokenPins": [
+              {
+                "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/1.tsr",
+                "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/1.tsr",
+                "bytes": 2298,
+                "sha256": "89652b563d3716252c5f210726992d38db5fed7eabe2cea26bc1dcb5f1302af0",
+                "dev": 16777231,
+                "inode": 543900046,
+                "nlink": 1
+              }
+            ]
+          },
+          {
+            "id": "two-new-audits",
+            "result": {
+              "ran": true,
+              "anchors": []
+            },
+            "observedAtMs": 1792199130241,
+            "requestPaths": [
+              "/cadence-good",
+              "/cadence-good"
+            ],
+            "events": [
+              {
+                "id": "fbc7884c-497f-4b76-b1b3-2c07ebf22c29",
+                "eventType": "audit",
+                "ts": 1792199130186,
+                "eventHash": "273a0b26abb8c8b9e88327054e859e043836801c377fb262fead860322e7bf3b",
+                "meta": {
+                  "fixtureCase": "CHECKPOINT-EVENT-CADENCE"
+                }
+              },
+              {
+                "id": "8e5b559a-1472-4962-ad49-ed587b54eef4",
+                "eventType": "time/checkpoint",
+                "ts": 1792199130204,
+                "eventHash": "177194ba9a6cc6fedaf512cf5a03859fa9af787fae193a37fbe45ec5d2fa728e",
+                "meta": {
+                  "checkpointSequence": 1,
+                  "checkpointSha256": "4c32a5fd6d449751d15d98dda6d4d5950dba5a592681a27827b99f03f83aed9e",
+                  "tokenSha256": "89652b563d3716252c5f210726992d38db5fed7eabe2cea26bc1dcb5f1302af0"
+                }
+              },
+              {
+                "id": "11ad0862-758f-4af4-9936-15c603a109f2",
+                "eventType": "audit",
+                "ts": 1792199130219,
+                "eventHash": "fa4019bf6939ba388a36189c1dff33f9a744eec0c874cd40219b0424c2e0ac87",
+                "meta": {
+                  "fixtureCase": "CHECKPOINT-EVENT-CADENCE",
+                  "fixtureLabel": "cadence-first-audit"
+                }
+              },
+              {
+                "id": "f17c9244-2a52-4672-a682-bfc123fca55d",
+                "eventType": "audit",
+                "ts": 1792199130223,
+                "eventHash": "284d98038a3596d660bbe32244f80ebc581aa0eb96758b6cf3f693eee3bd4538",
+                "meta": {
+                  "fixtureCase": "CHECKPOINT-EVENT-CADENCE",
+                  "fixtureLabel": "cadence-second-audit"
+                }
+              },
+              {
+                "id": "b01546e2-0eab-4336-b26e-a898f17405dc",
+                "eventType": "time/checkpoint",
+                "ts": 1792199130238,
+                "eventHash": "5a76a963668d4d49057595cc6b5d585ec151f706665ea3cccd59209b399ea89f",
+                "meta": {
+                  "checkpointSequence": 2,
+                  "checkpointSha256": "6ce58918aacecddb27d3aa4d81daabb42c6eb25d386d9f87fdc79105c1f6269f",
+                  "tokenSha256": "6382c76d236b9db59a3bb9fb1b35a049c2717a1a429794579ba8321c8de1efeb"
+                }
+              }
+            ],
+            "chain": [
+              {
+                "checkpoint": {
+                  "type": "amc.ledger-checkpoint",
+                  "version": 1,
+                  "workspaceId": "default",
+                  "sequence": 1,
+                  "claimedAt": "2026-10-17T01:05:30.195Z",
+                  "ledger": {
+                    "headEventHash": "273a0b26abb8c8b9e88327054e859e043836801c377fb262fead860322e7bf3b",
+                    "eventCount": 1
+                  },
+                  "transparency": {
+                    "root": "d430b0ecbcb37e3d5446f5be815472407537f4db04416781e8b102cacf5de4a0",
+                    "leafCount": 1,
+                    "algorithm": "rfc9162-sha256"
+                  },
+                  "previousCheckpointSha256": null
+                },
+                "sha256": "4c32a5fd6d449751d15d98dda6d4d5950dba5a592681a27827b99f03f83aed9e"
+              },
+              {
+                "checkpoint": {
+                  "type": "amc.ledger-checkpoint",
+                  "version": 1,
+                  "workspaceId": "default",
+                  "sequence": 2,
+                  "claimedAt": "2026-10-17T01:05:30.229Z",
+                  "ledger": {
+                    "headEventHash": "284d98038a3596d660bbe32244f80ebc581aa0eb96758b6cf3f693eee3bd4538",
+                    "eventCount": 4
+                  },
+                  "transparency": {
+                    "root": "d430b0ecbcb37e3d5446f5be815472407537f4db04416781e8b102cacf5de4a0",
+                    "leafCount": 1,
+                    "algorithm": "rfc9162-sha256"
+                  },
+                  "previousCheckpointSha256": "4c32a5fd6d449751d15d98dda6d4d5950dba5a592681a27827b99f03f83aed9e"
+                },
+                "sha256": "6ce58918aacecddb27d3aa4d81daabb42c6eb25d386d9f87fdc79105c1f6269f"
+              }
+            ],
+            "checkpointPins": [
+              {
+                "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/1.json",
+                "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/1.json",
+                "bytes": 704,
+                "sha256": "29e7f31135f507d5c83e4f8f8bf2052fb30bdb5077aa850f4ff0a58f29764974",
+                "dev": 16777231,
+                "inode": 543900040,
+                "nlink": 1
+              },
+              {
+                "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/2.json",
+                "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/2.json",
+                "bytes": 766,
+                "sha256": "9b138b025525fdfe162f6c82c1715f6a13cfacd71b5a71b6fd4c9b7886abf66d",
+                "dev": 16777231,
+                "inode": 543900050,
+                "nlink": 1
+              }
+            ],
+            "tokenPins": [
+              {
+                "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/1.tsr",
+                "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/1.tsr",
+                "bytes": 2298,
+                "sha256": "89652b563d3716252c5f210726992d38db5fed7eabe2cea26bc1dcb5f1302af0",
+                "dev": 16777231,
+                "inode": 543900046,
+                "nlink": 1
+              },
+              {
+                "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/2.tsr",
+                "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/2.tsr",
+                "bytes": 2298,
+                "sha256": "6382c76d236b9db59a3bb9fb1b35a049c2717a1a429794579ba8321c8de1efeb",
+                "dev": 16777231,
+                "inode": 543900056,
+                "nlink": 1
+              }
+            ]
+          },
+          {
+            "id": "reset",
+            "result": {
+              "ran": false,
+              "anchors": []
+            },
+            "observedAtMs": 1792199130250,
+            "requestPaths": [
+              "/cadence-good",
+              "/cadence-good"
+            ],
+            "events": [
+              {
+                "id": "fbc7884c-497f-4b76-b1b3-2c07ebf22c29",
+                "eventType": "audit",
+                "ts": 1792199130186,
+                "eventHash": "273a0b26abb8c8b9e88327054e859e043836801c377fb262fead860322e7bf3b",
+                "meta": {
+                  "fixtureCase": "CHECKPOINT-EVENT-CADENCE"
+                }
+              },
+              {
+                "id": "8e5b559a-1472-4962-ad49-ed587b54eef4",
+                "eventType": "time/checkpoint",
+                "ts": 1792199130204,
+                "eventHash": "177194ba9a6cc6fedaf512cf5a03859fa9af787fae193a37fbe45ec5d2fa728e",
+                "meta": {
+                  "checkpointSequence": 1,
+                  "checkpointSha256": "4c32a5fd6d449751d15d98dda6d4d5950dba5a592681a27827b99f03f83aed9e",
+                  "tokenSha256": "89652b563d3716252c5f210726992d38db5fed7eabe2cea26bc1dcb5f1302af0"
+                }
+              },
+              {
+                "id": "11ad0862-758f-4af4-9936-15c603a109f2",
+                "eventType": "audit",
+                "ts": 1792199130219,
+                "eventHash": "fa4019bf6939ba388a36189c1dff33f9a744eec0c874cd40219b0424c2e0ac87",
+                "meta": {
+                  "fixtureCase": "CHECKPOINT-EVENT-CADENCE",
+                  "fixtureLabel": "cadence-first-audit"
+                }
+              },
+              {
+                "id": "f17c9244-2a52-4672-a682-bfc123fca55d",
+                "eventType": "audit",
+                "ts": 1792199130223,
+                "eventHash": "284d98038a3596d660bbe32244f80ebc581aa0eb96758b6cf3f693eee3bd4538",
+                "meta": {
+                  "fixtureCase": "CHECKPOINT-EVENT-CADENCE",
+                  "fixtureLabel": "cadence-second-audit"
+                }
+              },
+              {
+                "id": "b01546e2-0eab-4336-b26e-a898f17405dc",
+                "eventType": "time/checkpoint",
+                "ts": 1792199130238,
+                "eventHash": "5a76a963668d4d49057595cc6b5d585ec151f706665ea3cccd59209b399ea89f",
+                "meta": {
+                  "checkpointSequence": 2,
+                  "checkpointSha256": "6ce58918aacecddb27d3aa4d81daabb42c6eb25d386d9f87fdc79105c1f6269f",
+                  "tokenSha256": "6382c76d236b9db59a3bb9fb1b35a049c2717a1a429794579ba8321c8de1efeb"
+                }
+              }
+            ],
+            "chain": [
+              {
+                "checkpoint": {
+                  "type": "amc.ledger-checkpoint",
+                  "version": 1,
+                  "workspaceId": "default",
+                  "sequence": 1,
+                  "claimedAt": "2026-10-17T01:05:30.195Z",
+                  "ledger": {
+                    "headEventHash": "273a0b26abb8c8b9e88327054e859e043836801c377fb262fead860322e7bf3b",
+                    "eventCount": 1
+                  },
+                  "transparency": {
+                    "root": "d430b0ecbcb37e3d5446f5be815472407537f4db04416781e8b102cacf5de4a0",
+                    "leafCount": 1,
+                    "algorithm": "rfc9162-sha256"
+                  },
+                  "previousCheckpointSha256": null
+                },
+                "sha256": "4c32a5fd6d449751d15d98dda6d4d5950dba5a592681a27827b99f03f83aed9e"
+              },
+              {
+                "checkpoint": {
+                  "type": "amc.ledger-checkpoint",
+                  "version": 1,
+                  "workspaceId": "default",
+                  "sequence": 2,
+                  "claimedAt": "2026-10-17T01:05:30.229Z",
+                  "ledger": {
+                    "headEventHash": "284d98038a3596d660bbe32244f80ebc581aa0eb96758b6cf3f693eee3bd4538",
+                    "eventCount": 4
+                  },
+                  "transparency": {
+                    "root": "d430b0ecbcb37e3d5446f5be815472407537f4db04416781e8b102cacf5de4a0",
+                    "leafCount": 1,
+                    "algorithm": "rfc9162-sha256"
+                  },
+                  "previousCheckpointSha256": "4c32a5fd6d449751d15d98dda6d4d5950dba5a592681a27827b99f03f83aed9e"
+                },
+                "sha256": "6ce58918aacecddb27d3aa4d81daabb42c6eb25d386d9f87fdc79105c1f6269f"
+              }
+            ],
+            "checkpointPins": [
+              {
+                "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/1.json",
+                "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/1.json",
+                "bytes": 704,
+                "sha256": "29e7f31135f507d5c83e4f8f8bf2052fb30bdb5077aa850f4ff0a58f29764974",
+                "dev": 16777231,
+                "inode": 543900040,
+                "nlink": 1
+              },
+              {
+                "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/2.json",
+                "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/2.json",
+                "bytes": 766,
+                "sha256": "9b138b025525fdfe162f6c82c1715f6a13cfacd71b5a71b6fd4c9b7886abf66d",
+                "dev": 16777231,
+                "inode": 543900050,
+                "nlink": 1
+              }
+            ],
+            "tokenPins": [
+              {
+                "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/1.tsr",
+                "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/1.tsr",
+                "bytes": 2298,
+                "sha256": "89652b563d3716252c5f210726992d38db5fed7eabe2cea26bc1dcb5f1302af0",
+                "dev": 16777231,
+                "inode": 543900046,
+                "nlink": 1
+              },
+              {
+                "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/2.tsr",
+                "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-myDEnY/.amc/time/checkpoints/2.tsr",
+                "bytes": 2298,
+                "sha256": "6382c76d236b9db59a3bb9fb1b35a049c2717a1a429794579ba8321c8de1efeb",
+                "dev": 16777231,
+                "inode": 543900056,
+                "nlink": 1
+              }
+            ]
+          }
+        ],
+        "actualBeforeOne": {
+          "firstAuditId": "11ad0862-758f-4af4-9936-15c603a109f2",
+          "afterHeadIds": [
+            "8e5b559a-1472-4962-ad49-ed587b54eef4",
+            "11ad0862-758f-4af4-9936-15c603a109f2"
+          ],
+          "afterHeadTypes": [
+            "time/checkpoint",
+            "audit"
+          ]
+        },
+        "actualBeforeTwo": {
+          "secondAuditId": "f17c9244-2a52-4672-a682-bfc123fca55d",
+          "afterHeadIds": [
+            "8e5b559a-1472-4962-ad49-ed587b54eef4",
+            "11ad0862-758f-4af4-9936-15c603a109f2",
+            "f17c9244-2a52-4672-a682-bfc123fca55d"
+          ],
+          "afterHeadTypes": [
+            "time/checkpoint",
+            "audit",
+            "audit"
+          ]
+        },
+        "actualFirstLedger": {
+          "ok": true,
+          "chain": true,
+          "governance": true,
+          "anchored": true,
+          "errors": 0
+        },
+        "actualFinal": {
+          "signaturesValid": true,
+          "oldFilesUnchanged": true,
+          "configUnchanged": true,
+          "checkpointRows": [
+            {
+              "id": "8e5b559a-1472-4962-ad49-ed587b54eef4",
+              "eventHash": "177194ba9a6cc6fedaf512cf5a03859fa9af787fae193a37fbe45ec5d2fa728e",
+              "meta": {
+                "checkpointSequence": 1,
+                "checkpointSha256": "4c32a5fd6d449751d15d98dda6d4d5950dba5a592681a27827b99f03f83aed9e",
+                "tokenSha256": "89652b563d3716252c5f210726992d38db5fed7eabe2cea26bc1dcb5f1302af0"
+              }
+            },
+            {
+              "id": "b01546e2-0eab-4336-b26e-a898f17405dc",
+              "eventHash": "5a76a963668d4d49057595cc6b5d585ec151f706665ea3cccd59209b399ea89f",
+              "meta": {
+                "checkpointSequence": 2,
+                "checkpointSha256": "6ce58918aacecddb27d3aa4d81daabb42c6eb25d386d9f87fdc79105c1f6269f",
+                "tokenSha256": "6382c76d236b9db59a3bb9fb1b35a049c2717a1a429794579ba8321c8de1efeb"
+              }
+            }
+          ],
+          "ledger": {
+            "ok": true,
+            "chain": true,
+            "governance": true,
+            "anchored": true,
+            "errors": 0
+          }
+        },
+        "signedConfigBoundary": "The public config pin and source assertion/GREEN cohort retain signature verification; this auditor does not independently verify its signature.",
+        "maskBoundary": "Captured stages are observations. Only appended independent grants have passed verifyReply; absent later stages/grants/final facts are not credited. Root must read actual task errors and classify every first frame and mask.",
+        "resourceCounts": "Derived by the unchanged public-record loops; no fixed child/socket/ledger-owner/test totals.",
+        "elapsedMinuteOrStudioCredit": false
+      }
+    }
+  ],
+  "noSigningRootTraversalOrKeyRead": true,
+  "noStreamPublication": true,
+  "boundedObservationNotUniversalIsolation": true
+}

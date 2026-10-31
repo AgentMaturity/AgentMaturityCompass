@@ -1,5 +1,4 @@
 import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import { loadDiagnosticBank } from "../diagnostic/bank/bankLoader.js";
 import { runAutoAnswer } from "../diagnostic/autoAnswer/autoAnswerEngine.js";
 import { getForecastLatestForApi } from "../forecast/forecastApi.js";
@@ -92,25 +91,34 @@ function etaFromForecast(workspace: string): MechanicUpgradePlan["eta"] {
       workspace,
       scope: "workspace"
     });
-    if (forecast.etaToTarget.status === "OK") {
-      return {
-        status: "OK",
-        optimisticDays: forecast.etaToTarget.optimisticDays,
-        expectedDays: forecast.etaToTarget.expectedDays,
-        conservativeDays: forecast.etaToTarget.conservativeDays,
-        reasons: []
-      };
-    }
-    return {
-      status: "UNKNOWN",
-      reasons: forecast.etaToTarget.reasons ?? ["insufficient completion history"]
-    };
+    return mechanicEtaFromForecast(forecast);
   } catch {
     return {
       status: "UNKNOWN",
       reasons: ["forecast unavailable"]
     };
   }
+}
+
+/** Internal exact ETA projection shared by the retained calculator and checked publisher. */
+export function mechanicEtaFromForecast(forecast: Pick<ReturnType<typeof getForecastLatestForApi>, "etaToTarget">): MechanicUpgradePlan["eta"] {
+  if (forecast.etaToTarget.status === "OK") {
+    return {
+      status: "OK",
+      optimisticDays: forecast.etaToTarget.optimisticDays,
+      expectedDays: forecast.etaToTarget.expectedDays,
+      conservativeDays: forecast.etaToTarget.conservativeDays,
+      reasons: []
+    };
+  }
+  return {
+    status: "UNKNOWN",
+    reasons: forecast.etaToTarget.reasons ?? ["insufficient completion history"]
+  };
+}
+export function readMechanicCgxHash(workspace: string, agentId: string): string {
+  try { const pack = cgxLatestPackForApi({ workspace, agentId }); return pack ? sha256Hex(canonicalize(pack)) : "0".repeat(64); }
+  catch { return "0".repeat(64); }
 }
 
 function approvalNeeded(kind: MechanicActionKind): boolean {
@@ -159,7 +167,18 @@ export async function createMechanicUpgradePlan(params: {
     createPlan: false
   });
 
-  const gap = buildGapAnalysis({
+  return assembleMechanicUpgradePlan(params, { targets, bank, canon, measured });
+}
+
+/** Internal shared body construction; original optional reads retain their actual construction stages. */
+export function assembleMechanicUpgradePlan(params: Parameters<typeof createMechanicUpgradePlan>[0], inputs: {
+  targets: ReturnType<typeof loadMechanicTargets>; bank: ReturnType<typeof loadDiagnosticBank>; canon: ReturnType<typeof loadCanon>;
+  measured: Awaited<ReturnType<typeof runAutoAnswer>>; gap?: ReturnType<typeof buildGapAnalysis>; targetsSha?: string;
+  cgxHash?: () => string; eta?: () => MechanicUpgradePlan["eta"];
+}) {
+  const { targets, bank, canon, measured } = inputs;
+  const agentId = params.scopeType === "AGENT" ? params.scopeId : "default";
+  const gap = inputs.gap ?? buildGapAnalysis({
     workspace: params.workspace,
     scope: {
       type: params.scopeType,
@@ -225,25 +244,14 @@ export async function createMechanicUpgradePlan(params: {
         }
       }));
 
-  let cgxPackSha256 = "0".repeat(64);
-  try {
-    const pack = cgxLatestPackForApi({
-      workspace: params.workspace,
-      agentId
-    });
-    if (pack) {
-      cgxPackSha256 = sha256Hex(canonicalize(pack));
-    }
-  } catch {
-    // keep default deterministic zero hash when no pack is available
-  }
+  const cgxPackSha256 = inputs.cgxHash === undefined ? readMechanicCgxHash(params.workspace, agentId) : inputs.cgxHash();
 
   const measuredSha = sha256Hex(canonicalize({
     measuredScores: measured.measuredScores,
     evidenceCoverage: measured.evidenceCoverage,
     unknownReasons: measured.unknownReasons
   }));
-  const targetsSha = sha256Hex(readFileSync(mechanicTargetsPath(params.workspace)));
+  const targetsSha = inputs.targetsSha ?? sha256Hex(readFileSync(mechanicTargetsPath(params.workspace)));
 
   const highRiskActionsCount = [
     ...instrumentationKinds,
@@ -314,7 +322,7 @@ export async function createMechanicUpgradePlan(params: {
       }
     ],
     perQuestionPlan,
-    eta: etaFromForecast(params.workspace),
+    eta: inputs.eta === undefined ? etaFromForecast(params.workspace) : inputs.eta(),
     safety: {
       highRiskActionsCount,
       requiresDualControl: highRiskActionsCount > 0,

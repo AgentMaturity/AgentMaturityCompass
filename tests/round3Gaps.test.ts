@@ -201,13 +201,14 @@ describe("R3-02 Enhanced Anti-Gaming — Cross-Session", () => {
     expect(result.collusionIndicators.length).toBeGreaterThan(0);
   });
 
-  test("single session returns clean", () => {
+  test("single session does not evaluate cross-session gaming", () => {
     const result = analyzeSessionFingerprints([{
       sessionId: "s1", ts: 1000, agentId: "a1",
       scoreDistribution: [3.5], evidencePatterns: [],
       responseLatencyMs: [], questionOrder: [],
     }]);
-    expect(result.overallVerdict).toBe("clean");
+    expect(result.overallVerdict).toBe("not_evaluated");
+    expect(result.adaptationScore).toBeNull();
   });
 });
 
@@ -224,7 +225,7 @@ describe("R3-03 Quickscore Variance Stabilization", () => {
     const result = stabilizeScores([3.5, 3.4, 3.6, 3.5, 3.5]);
     expect(result.stability).toBe("stable");
     expect(result.variance).toBeLessThan(0.01);
-    expect(result.confidenceInterval.upper - result.confidenceInterval.lower).toBeLessThan(0.5);
+    expect(result.confidenceInterval.upper! - result.confidenceInterval.lower!).toBeLessThan(0.5);
   });
 
   test("volatile scores are unstable", () => {
@@ -248,7 +249,7 @@ describe("R3-03 Quickscore Variance Stabilization", () => {
 
   test("empty scores handled", () => {
     const result = stabilizeScores([]);
-    expect(result.stabilizedScore).toBe(0);
+    expect(result.stabilizedScore).toBeNull();
     expect(result.stability).toBe("unstable");
   });
 

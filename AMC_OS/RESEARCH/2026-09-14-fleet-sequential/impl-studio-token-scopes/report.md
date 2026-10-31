@@ -1,6 +1,6 @@
 # IMPL-2 — Studio agent token scopes
 
-**Commit** fa2ffac6733fb67ee525f64c2da436365fa7f697 (detached in worktree `/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_3cc93fba-030-1`; the worktree had been provisioned at main 3d6b8d4a, 409 commits behind, so I detached my own checkout at the named commit — no branch moved, no reset, nothing outside the worktree touched).
+**Commit** fa2ffac6733fb67ee525f64c2da436365fa7f697 (detached in worktree `~/AgentMaturityCompass/.claude/worktrees/wf_3cc93fba-030-1`; the worktree had been provisioned at main 3d6b8d4a, 409 commits behind, so I detached my own checkout at the named commit — no branch moved, no reset, nothing outside the worktree touched).
 **Environment** Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0. `pnpm install --frozen-lockfile --prefer-offline` OK; `pnpm build` run only because `tests/studioNativeTaskService.test.ts` imports `dist/`.
 
 ## What changed

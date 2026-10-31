@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { digestField } from "../../dataflow/tokenizer.js";
+import { outputDigestFor } from "../../dataflow/tokenVault.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { defineTool } from "../toolRegistry.js";
 import type { ToolDefinition } from "../toolTypes.js";
@@ -57,7 +59,7 @@ export function webFetchTool(options: WebFetchToolOptions): ToolDefinition {
       const maxBytes = Math.min(args.maxBytes ?? policy.maxBytes, policy.maxBytes);
       if (execution.effectiveMode === "SIMULATE") {
         const url = admitUrl("web_fetch", args.url, policy);
-        return { output: `[amc: SIMULATE web_fetch ${url.href}; no request made]` };
+        return { ok: true, output: `[amc: SIMULATE web_fetch ${url.href}; no request made]` };
       }
       const response = await governedGet({
         tool: "web_fetch", url: args.url, policy, maxBytes,
@@ -81,9 +83,10 @@ export function webFetchTool(options: WebFetchToolOptions): ToolDefinition {
         status: response.status,
         contentType: response.contentType,
         bytes: response.body.byteLength,
-        // The body exactly as received, and what the model was given (redacted, labelled).
-        contentSha256: sha256Hex(response.body),
-        deliveredSha256: sha256Hex(output),
+        // The body exactly as received, and what the model was given (redacted, labelled). Keyed in a workspace that
+        // opted in to protected-data redaction (P2-02): a plain hash of a short body (a bare SSN) can be brute-forced.
+        ...digestField("content", outputDigestFor(execution.workspace, sha256Hex(response.body))),
+        ...digestField("delivered", outputDigestFor(execution.workspace, sha256Hex(output))),
         redactions: redacted.redactions,
         policyDigestSha256: policy.policyDigestSha256,
         fetchedAt: Date.now()

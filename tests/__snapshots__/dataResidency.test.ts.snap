@@ -1,0 +1,5 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`markdown rendering > renders non-compliant report with violations 1`] = `"**Claim:** Self-reported · **Result:** fail · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved"`;
+
+exports[`markdown rendering > renders report with all sections 1`] = `"**Claim:** Self-reported · **Result:** not evaluated (self-reported answers or records cannot satisfy a regulated control) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved"`;

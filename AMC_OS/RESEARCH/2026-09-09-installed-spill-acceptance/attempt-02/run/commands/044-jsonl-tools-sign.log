@@ -1,5 +1,5 @@
 {
   "ok": true,
-  "configPath": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/jsonl/workspace/.amc/tools.yaml",
-  "sigPath": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/jsonl/workspace/.amc/tools.yaml.sig"
+  "configPath": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/jsonl/workspace/.amc/tools.yaml",
+  "sigPath": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/jsonl/workspace/.amc/tools.yaml.sig"
 }

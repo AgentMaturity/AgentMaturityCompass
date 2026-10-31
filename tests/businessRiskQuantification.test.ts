@@ -92,7 +92,7 @@ describe("business risk quantification", () => {
     const apiReference = readProjectFile("docs/API_REFERENCE.md");
     const quickstart = readProjectFile("docs/QUICKSTART.md");
     const gettingStarted = readProjectFile("docs/GETTING_STARTED.md");
-    const audit = readProjectFile("docs/AUDIT_50_AGENTS_BATCH5.md");
+    const audit = readProjectFile("docs/archive/AUDIT_50_AGENTS_BATCH5.md");
 
     expect(source).toContain('.command("risk")');
     expect(source).toContain("Quantify maturity-linked incident frequency and expected annual loss");

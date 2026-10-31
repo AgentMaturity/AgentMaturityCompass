@@ -1,13 +1,11 @@
-import { readFileSync } from "node:fs";
-import YAML from "yaml";
 import type { CompiledPolicyFacts } from "../../actions/authorize.js";
-import { approvalPolicyPath, approvalRuleForAction } from "../../approvals/approvalPolicyEngine.js";
-import { approvalPolicySchema } from "../../approvals/approvalPolicySchema.js";
-import { activeControlPlanHead, type ActiveCompiledPolicy } from "../../catalog/compiler/activate.js";
+import { loadVerifiedApprovalPolicy, approvalRuleForAction } from "../../approvals/approvalPolicyEngine.js";
+import { activeControlPlanHead, loadActiveCompiledPolicy, type ActiveCompiledPolicy } from "../../catalog/compiler/activate.js";
 import type { ApprovalRule, ParamValue } from "../../catalog/compiler/types.js";
-import { getPublicKeyHistory, verifyHexDigestAny } from "../../crypto/keys.js";
+import { loadVerifiedToolsConfigSnapshot, type VerifiedToolsConfigSnapshot } from "../../toolhub/toolhubValidators.js";
+import { matchingBreakGlass } from "../../governor/breakGlass.js";
+import { matchingScopedExceptions } from "../../governor/scopedExceptions.js";
 import type { ActionClass } from "../../types.js";
-import { sha256Hex } from "../../utils/hash.js";
 import { RUN_CODE_TOOL } from "../toolPipeline.js";
 import type { ToolExecution, ToolGuard } from "../toolTypes.js";
 
@@ -29,7 +27,9 @@ function named(policy: ActiveCompiledPolicy, controlIds: readonly string[]): str
 /** `identity-binding`: the lease and the principal come from the authorization record bound for this call. */
 function identityDenial(params: Readonly<Record<string, ParamValue>>, execution: ToolExecution): string | null {
   const record = execution.authorization?.record;
-  if (params.requireAgentLease === true && !record?.delegation.leaseId) return "IDENTITY_UNRESOLVED: the call carries no verified agent lease";
+  if (params.requireAgentLease === true && !record?.delegation.leaseId) {
+    return "IDENTITY_UNRESOLVED: the call carries no verified agent lease, or its lease names a principal that does not resolve";
+  }
   if (params.requirePrincipal === true && (!record || record.principal.authenticatedVia === "cli-os-user")) {
     return "PRINCIPAL_UNRESOLVED: no authenticated principal is bound to the call (an OS user name is self-reported)";
   }
@@ -41,16 +41,27 @@ export function planRequiresAgentLease(policy: ActiveCompiledPolicy | null): boo
   return policy?.runtimePolicy.toolPipeline.guards.some((g) => g.id === "identity-binding" && g.params.requireAgentLease === true) ?? false;
 }
 
+/**
+ * Whether the workspace's verified active plan sets `toolPipeline.requirePrincipal` (identity-binding, L0-IDN-01), read
+ * through the same verifying path the guard's session pins (P1-78). Fails closed: a plan that cannot be verified reads as
+ * requiring a principal.
+ */
+export function planRequiresPrincipal(workspace: string): boolean {
+  let policy: ActiveCompiledPolicy | null;
+  try {
+    policy = loadActiveCompiledPolicy(workspace);
+  } catch {
+    return true;
+  }
+  return policy?.runtimePolicy.toolPipeline.guards.some((g) => g.id === "identity-binding" && g.params.requirePrincipal === true) ?? false;
+}
+
 /** The live signed approval policy must be at least as strict as the compiled rule; read and verified in one read. */
 function approvalDenial(workspace: string, actionClass: ActionClass, rule: ApprovalRule): string | null {
-  const path = approvalPolicyPath(workspace);
   try {
-    const bytes = readFileSync(path);
-    const sig = JSON.parse(readFileSync(`${path}.sig`, "utf8")) as { digestSha256?: unknown; signature?: unknown };
-    const digest = sha256Hex(bytes);
-    if (sig.digestSha256 !== digest || typeof sig.signature !== "string"
-      || !verifyHexDigestAny(digest, sig.signature, getPublicKeyHistory(workspace, "auditor"))) return "the signed approval policy does not verify";
-    const live = approvalRuleForAction(approvalPolicySchema.parse(YAML.parse(bytes.toString("utf8"))), actionClass);
+    const verified = loadVerifiedApprovalPolicy(workspace);
+    if (verified.verdict !== "valid" || verified.policy === null) return "the signed approval policy does not verify";
+    const live = approvalRuleForAction(verified.policy, actionClass);
     const weaker = [
       live.requiredApprovals < rule.requiredApprovals ? `requiredApprovals ${live.requiredApprovals} < ${rule.requiredApprovals}` : "",
       rule.requireDistinctUsers && !live.requireDistinctUsers ? "requireDistinctUsers is off" : "",
@@ -63,6 +74,22 @@ function approvalDenial(workspace: string, actionClass: ActionClass, rule: Appro
   }
 }
 
+/** The verified tools.yaml one guard pass decides from: the native toolset shares one read with its allowlist guards. */
+export type ToolsSnapshotRead = () => VerifiedToolsConfigSnapshot;
+
+/**
+ * P1-10F: a plan compiled from the workspace's signed tools.yaml records the SHA-256 of its bytes. Any other tools.yaml
+ * now (edited, re-signed or removed) denies, as the catalog lock does for the catalog, until the plan is recompiled and
+ * reactivated, so tools.yaml cannot change what an activated plan shows. The denial is model-visible: no host path.
+ */
+function toolsConfigDenial(pinned: string, snapshot: VerifiedToolsConfigSnapshot): string | null {
+  const live = snapshot.digestSha256;
+  if (live === pinned) return null;
+  return live === null
+    ? `the signed tools.yaml this plan was compiled from cannot be read or verified (${snapshot.reason ?? "unknown reason"}); recompile and reactivate the plan`
+    : `the signed tools.yaml changed since this plan was compiled (sha256 ${live.slice(0, 12)}, the plan records ${pinned.slice(0, 12)}); recompile and reactivate the plan`;
+}
+
 /**
  * Whether the policy's `toolPipeline.visibleTools` lists this tool. The guard denies what this refuses; native sessions
  * also leave it out of the tools offered to the model. The Code Mode transport dispatches sub-calls, and each one is
@@ -72,27 +99,62 @@ export function compiledPolicyShows(policy: ActiveCompiledPolicy, name: string):
   return name === RUN_CODE_TOOL || policy.runtimePolicy.toolPipeline.visibleTools.includes(name);
 }
 
-/** Why the pinned policy denies this call, or undefined. */
-export function compiledPolicyDenial(policy: ActiveCompiledPolicy, workspace: string, execution: ToolExecution): string | undefined {
+/**
+ * P2-24: the controls this call deviates from. Only a scoped exception or break-glass record the bound authorization
+ * record names counts, re-read and re-verified now (signature, workspace, approval, revocation, window, scope, amount),
+ * and an exception only for the control version it was granted for. Any read failure deviates from nothing.
+ */
+function deviatedControls(policy: ActiveCompiledPolicy, execution: ToolExecution): ReadonlySet<string> {
+  const record = execution.authorization?.record;
+  if (!record || (record.authority.exceptions.length === 0 && record.authority.breakGlassId === undefined)) return new Set();
+  const call = { workspace: execution.workspace, agentId: execution.agentId, toolName: record.action.toolName, actionClass: record.action.actionClass,
+    amount: record.bindings.amount, resourceId: record.bindings.resourceId };
+  const named = new Set(record.authority.exceptions.map((exception) => exception.exceptionId));
+  const version = (id: string): string | undefined => policy.controls.find((c) => c.controlId === id)?.controlVersion;
+  try {
+    return new Set([
+      ...matchingScopedExceptions(call).filter((e) => named.has(e.exceptionId) && version(e.control.controlId) === e.control.controlVersion)
+        .map((e) => e.control.controlId),
+      ...matchingBreakGlass(call).filter((b) => b.breakGlassId === record.authority.breakGlassId).flatMap((b) => b.scope.controlIds)
+    ]);
+  } catch {
+    return new Set();
+  }
+}
+
+/**
+ * Why the pinned policy denies this call, or undefined. `planeBindsIdentity` is set by a plane that authenticates the
+ * caller itself and has no native authorization record (ToolHub's and hook control's leases, AXR-01); it skips only the
+ * `identity-binding` guard, never an unimplemented one.
+ */
+export function compiledPolicyDenial(policy: ActiveCompiledPolicy, workspace: string, execution: ToolExecution,
+  readTools: ToolsSnapshotRead = () => loadVerifiedToolsConfigSnapshot(workspace), planeBindsIdentity = false): string | undefined {
   const deny = (controlIds: readonly string[], why: string): string => `compiled policy denied this call (control ${named(policy, controlIds)}): ${why}`;
   const pipeline = policy.runtimePolicy.toolPipeline;
+  const toolsWhy = pipeline.toolsConfigSha256 === undefined ? null : toolsConfigDenial(pipeline.toolsConfigSha256, readTools());
+  if (toolsWhy) return `compiled policy denied this call (toolPipeline.toolsConfigSha256): ${toolsWhy}`;
   if (!compiledPolicyShows(policy, execution.name)) {
     return `compiled policy denied this call (toolPipeline.visibleTools): "${execution.name}" is not a visible tool`;
   }
+  // A control is waived only when every control a denial names is covered; the checks above name no control and never are.
+  let deviated: ReadonlySet<string> | null = null;
+  const waived = (controlIds: readonly string[]): boolean =>
+    controlIds.length > 0 && controlIds.every((id) => (deviated ??= deviatedControls(policy, execution)).has(id));
   for (const guard of pipeline.guards) {
-    const why = guard.id === "identity-binding" ? identityDenial(guard.params, execution) : `guard ${guard.id} is not implemented by this pipeline`;
-    if (why) return deny(guard.controlIds, why);
+    const why = guard.id !== "identity-binding" ? `guard ${guard.id} is not implemented by this pipeline`
+      : planeBindsIdentity ? null : identityDenial(guard.params, execution);
+    if (why && !waived(guard.controlIds)) return deny(guard.controlIds, why);
   }
   const rule = policy.runtimePolicy.approvals[execution.actionClass];
   const why = rule ? approvalDenial(workspace, execution.actionClass, rule) : null;
-  return why && rule ? deny(rule.controlIds, why) : undefined;
+  return why && rule && !waived(rule.controlIds) ? deny(rule.controlIds, why) : undefined;
 }
 
 /**
  * The guard. `pinned` is what the session loaded at start, or null. Any other head now (changed, removed, or a plan
  * activated since) denies: the receipt the session wrote names the policy every call ran under.
  */
-export function compiledPolicyGuard(workspace: string, pinned: ActiveCompiledPolicy | null): ToolGuard {
+export function compiledPolicyGuard(workspace: string, pinned: ActiveCompiledPolicy | null, readTools?: ToolsSnapshotRead): ToolGuard {
   return (execution) => {
     let head: string | null;
     try {
@@ -101,7 +163,7 @@ export function compiledPolicyGuard(workspace: string, pinned: ActiveCompiledPol
       return `compiled policy integrity failure: ${message(error)}`;
     }
     if (head !== (pinned?.entrySha256 ?? null)) return "the active compiled policy changed during this session; start a new session";
-    return pinned ? compiledPolicyDenial(pinned, workspace, execution) : undefined;
+    return pinned ? compiledPolicyDenial(pinned, workspace, execution, readTools) : undefined;
   };
 }
 
@@ -111,6 +173,7 @@ export function compiledPolicyFacts(policy: ActiveCompiledPolicy): CompiledPolic
   return {
     digest: policy.runtimePolicy.policyDigest.replace(/^sha256:/, ""),
     revision: policy.revision,
+    deployment: policy.deployment,
     // The rule that admitted the call: its class's approval rule first, then the compiled guards every call passes.
     controlFor: (actionClass) => {
       const id = [...(policy.runtimePolicy.approvals[actionClass]?.controlIds ?? []), ...policy.runtimePolicy.toolPipeline.guards.flatMap((g) => g.controlIds)][0];

@@ -1,0 +1,104 @@
+{
+  "key": "P0-11",
+  "capturedUtc": "2026-10-15T06:46:21.710365+00:00",
+  "source": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+  "codeSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "matrices": [
+    {
+      "control": "C1-map-missing-path-fail-open",
+      "result": {
+        "path": "/private/tmp/p0-11-causal-qualification-20261015/result--C1-map-missing-path-fail-open.json",
+        "bytes": 6106,
+        "sha256": "9ed90044c92da95a0a253ff2f70180d48662112e6fff2c3eed15b95b71c47dfd"
+      },
+      "release": {
+        "path": "/private/tmp/p0-11-causal-qualification-20261015/releases/C1-map-missing-path-fail-open.json",
+        "bytes": 3526,
+        "sha256": "a0edea9a4573b934e17cfdde9275d8d8932cf6ca4f2b83d4cbdeca4ac17345f2"
+      },
+      "passCounts": [
+        7,
+        6,
+        7
+      ],
+      "failureKinds": [
+        "body-assertion"
+      ]
+    },
+    {
+      "control": "C2-tool-recorder-error-propagates",
+      "result": {
+        "path": "/private/tmp/p0-11-causal-qualification-20261015/result--C2-tool-recorder-error-propagates.json",
+        "bytes": 5172,
+        "sha256": "b56fbd50718c0859878e75096f87ca79212aab112a924731a834d9d762599d2d"
+      },
+      "release": {
+        "path": "/private/tmp/p0-11-causal-qualification-20261015/releases/C2-tool-recorder-error-propagates.json",
+        "bytes": 3573,
+        "sha256": "40195ad6903383e4879b9517e16ba7eb23f84dd323ae5c6ab1e83b90b18cfb76"
+      },
+      "passCounts": [
+        7,
+        6,
+        7
+      ],
+      "failureKinds": [
+        "exact-genuine-recorder-error-propagation"
+      ]
+    },
+    {
+      "control": "L1-optional-historical-literal-whole-branch-removal",
+      "result": {
+        "path": "/private/tmp/p0-11-causal-qualification-20261015/result--L1-optional-historical-literal-whole-branch-removal.json",
+        "bytes": 6848,
+        "sha256": "da63e562496468eccf940f4dac0f7b44f0192c8c4fea648a679ed5a314aa208b"
+      },
+      "release": {
+        "path": "/private/tmp/p0-11-causal-qualification-20261015/releases/L1-optional-historical-literal-whole-branch-removal.json",
+        "bytes": 3650,
+        "sha256": "cde65f6afd39b4815df163a6286d6c2b12af62e56a61b845fd3baafb9d952477"
+      },
+      "passCounts": [
+        7,
+        6,
+        7
+      ],
+      "failureKinds": [
+        "body-assertion"
+      ]
+    }
+  ],
+  "executionCounts": {
+    "total": 63,
+    "passed": 60,
+    "failed": 3,
+    "pending": 0,
+    "todo": 0
+  },
+  "distinctFailedFileTitlePairs": 2,
+  "survivingControls": [],
+  "rootReadEveryActualFailure": true,
+  "attribution": {
+    "C1": "Actual missingpath childstatus0 fails originalmap29:20 expected1; laterdiagnostics30\u201331masked. Other6mutantcasesgreen. Specificreference-admissionguard sensitivity only.",
+    "C2": "Actual originalcallback Error at202:15, pipeline record306:19, await206:21; outcome/bodyflagassertions210\u2013213masked. Same genuinelythrowing callback; no real durable-store outage, journalreconciliation or independent mutationphaseeffect sample.",
+    "L1": "Literalwholebranchremoval retains caughtENOENT; originalstatusassert29 passes beforediagnosticassert30:20fails,31masked. No invalidfixtureadmission. Strict historicalmissing-path-passes mutation criterion remainsopen; C1 doesnot silentlysubstitute."
+  },
+  "controllerLifecycle": "All nine completed phases have original7identities/normal0or1/ownedPGIDESRCH, no pending/todo/hook/unhandled/knownlate/native/timeout uncertainty. NoACTIVE/HALTED remains. Originaltests/config/fixtures/guards/deadlines/cleanup and allcompiledfiles unchanged; two source targets restored.",
+  "countBoundary": "63repeatedexecutions across9phases of two distinct7casecorpora, not63unique or a singleinvocation. Original7/2/5/7 remainseparate,primary9 aggregateacrosstwo runs.",
+  "rootAuthoringIssues": [
+    {
+      "path": "/private/tmp/p0-11-copy-helper-authoring-issue-20261015.json",
+      "bytes": 488,
+      "sha256": "c9ba516b4082c5415977261f7693bc381e4dfcb46ec380e36621fbe4df4d55a8"
+    },
+    {
+      "path": "/private/tmp/p0-11-release-helper-count-issue-20261015.json",
+      "bytes": 975,
+      "sha256": "134ae70f43e5c702c71461e0e8541824f39905589c603989e5269f2549433eed"
+    }
+  ],
+  "formalAcceptanceClosed": false,
+  "dependencyReady": false,
+  "done": false,
+  "remaining": "Sidreview/ASIreverify/mapstamp/followupkeycollisions, fullsuite/coverage/Node24/hosted/PR/merge, all16channelbehavior, realcollectoroutage/independentsignedcoldstore, quality1269/2751 and allpriorholds/skips/transfers remainopen."
+}

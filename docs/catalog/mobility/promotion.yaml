@@ -1,0 +1,83 @@
+schemaVersion: 1
+station: mobility
+support: experimental
+review: pending
+promotion: none
+approvedBy: null
+sidPromotionApproval: null
+experts:
+  maritimePortSecurity: null
+  fairHousing: null
+  automotiveSafety: null
+expertRecruitmentOwner: null
+expertDecision: D-14
+recruitmentRoute: D-10
+partners:
+  mobility.ports-logistics-cities: null
+  mobility.vehicles-aviation: null
+partnerRoute: P1-29
+unplacedDomainDecision: null
+signoffs:
+  domainLead: null
+  legalReviewer: null
+  riskOwner: null
+safetyCaseAssessor: null
+stewardship:
+  owner: null
+  funding: null
+  updatePlan: null
+  triageTargetDays: null
+  coverageDoc: docs/catalog/mobility/README.md
+licenceDecision: D-04
+nativeCheckerResult: null
+admissionCriteria:
+  - criterion: 1
+    name: "Manifest and reproducible digest"
+    status: not_evaluated
+    nativeCheckerResult: null
+    reason: "Native manifest, digest reproducibility and compatibility outcomes are unmeasured at this docs-authoring snapshot."
+  - criterion: 2
+    name: "Citations"
+    status: not_met
+    nativeCheckerResult: null
+    reason: "Legal and standards candidates are unread, unverified and lack credentialed legal review; operator-policy drafts do not establish their interpretation."
+  - criterion: 3
+    name: "Applicability"
+    status: not_evaluated
+    nativeCheckerResult: null
+    reason: "Native predicates await execution; real facility/housing/type-approval/operating-domain facts remain unknown and the two unplaced mappings need P1-13."
+  - criterion: 4
+    name: "Binding"
+    status: not_evaluated
+    nativeCheckerResult: null
+    reason: "No production enforcement, real signing authority, change envelope, driving controller or verified manual performance is established."
+  - criterion: 5
+    name: "Tests"
+    status: not_evaluated
+    nativeCheckerResult: null
+    reason: "Native outcomes await root. Cold-chain allow/deny integration is explicitly OPEN: all six wrapper scenarios stay not evaluated while P2-27 is absent."
+  - criterion: 6
+    name: "Negative fixtures"
+    status: not_evaluated
+    nativeCheckerResult: null
+    reason: "Evidence negatives, false-pass counts and guard mutations are unmeasured; no future kill or green result is inferred."
+  - criterion: 7
+    name: "Evidence contracts"
+    status: not_evaluated
+    nativeCheckerResult: null
+    reason: "Native producer/binding/freshness/sampling/invalidation outcomes await root; questionnaires and local examples do not supply observed production evidence."
+  - criterion: 8
+    name: "Unknown facts fail closed"
+    status: not_evaluated
+    nativeCheckerResult: null
+    reason: "Unknown scope, trust, lineage, security level and minimal-risk profile cases await native/local execution."
+  - criterion: 9
+    name: "Sign-offs"
+    status: not_met
+    nativeCheckerResult: null
+    reason: "Three named experts and distinct human domain lead/legal/risk sign-offs are missing; Sid has not promoted this draft."
+  - criterion: 10
+    name: "Stewardship"
+    status: not_met
+    nativeCheckerResult: null
+    reason: "Each assigned domain lacks its P1-29 partner, funded update owner, triage target and real coverage evidence."

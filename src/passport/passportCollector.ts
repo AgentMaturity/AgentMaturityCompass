@@ -1,7 +1,11 @@
-import { readdirSync } from "node:fs";
+import { mean } from "../experiments/stats.js";
 import { join } from "node:path";
-import type { DiagnosticReport, LayerScore } from "../types.js";
+import YAML from "yaml";
+import { defaultPromptPolicy, promptPolicySchema } from "../prompt/promptPolicySchema.js";
+import { promptPolicyPath } from "../prompt/promptPolicyStore.js";
+import type { LayerScore } from "../types.js";
 import { readUtf8, pathExists } from "../utils/fs.js";
+import { latestTrustedRun } from "../governor/actionPolicyEngine.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { loadTrustConfig } from "../trust/trustConfig.js";
@@ -63,28 +67,6 @@ function normalizedScope(scopeType: "WORKSPACE" | "NODE" | "AGENT", scopeId?: st
   };
 }
 
-function readLatestDiagnosticRun(workspace: string, agentId: string): DiagnosticReport | null {
-  const dir = join(workspace, ".amc", "agents", agentId, "runs");
-  if (!pathExists(dir)) {
-    return null;
-  }
-  let best: DiagnosticReport | null = null;
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    if (!entry.isFile() || !entry.name.endsWith(".json")) {
-      continue;
-    }
-    try {
-      const parsed = JSON.parse(readUtf8(join(dir, entry.name))) as DiagnosticReport;
-      if (!best || parsed.ts > best.ts) {
-        best = parsed;
-      }
-    } catch {
-      // ignore broken run files
-    }
-  }
-  return best;
-}
-
 function mapTrustLabel(input: string | undefined): "LOW" | "MEDIUM" | "HIGH" {
   const text = (input ?? "").toLowerCase();
   if (text.includes("high")) return "HIGH";
@@ -112,11 +94,7 @@ function readLayerValue(layers: LayerScore[] | undefined, key: "strategicOps" | 
 
 function avg(values: Array<number | null>): number | null {
   const filtered = values.filter((row): row is number => typeof row === "number" && Number.isFinite(row));
-  if (filtered.length === 0) {
-    return null;
-  }
-  const total = filtered.reduce((sum, row) => sum + row, 0);
-  return Number((total / filtered.length).toFixed(4));
+  return filtered.length === 0 ? null : Number(mean(filtered).toFixed(4));
 }
 
 function latestForecastRisk(
@@ -169,12 +147,12 @@ function trustRank(label: "LOW" | "MEDIUM" | "HIGH"): number {
   return 1;
 }
 
-export function collectPassportData(params: {
+function collectPassportLocalData(params: {
   workspace: string;
   scopeType: "WORKSPACE" | "NODE" | "AGENT";
   scopeId?: string | null;
   policy: PassportPolicy;
-}): {
+}, fixedGeneratedTs?: number, readOnly = false): {
   passport: PassportJson;
   includedEventKinds: string[];
   calculationManifest: Record<string, unknown>;
@@ -195,7 +173,9 @@ export function collectPassportData(params: {
   const truncBytes = params.policy.passportPolicy.privacy.hashTruncBytes;
   const scopeIdHash = hashPassportId(`${scope.type}:${scope.id}`, truncBytes);
 
-  const report = readLatestDiagnosticRun(params.workspace, scope.agentIdForDiagnostic);
+  // Only the agent's trusted run is signed into a passport (WP37, run trust): sealed, this agent's, ledger-anchored and its
+  // newest ledger run. Anything refused takes the null-report path (insufficient evidence), never an older sealed run.
+  const report = latestTrustedRun(params.workspace, scope.agentIdForDiagnostic).run;
   assertNotExample(report, "signed into a passport");
   const trustLabel = mapTrustLabel(report?.trustLabel);
   const integrityIndex = Number((report?.integrityIndex ?? 0).toFixed(4));
@@ -274,6 +254,10 @@ export function collectPassportData(params: {
 
   const promptPolicy = (() => {
     try {
+      if (readOnly) {
+        const path = promptPolicyPath(params.workspace);
+        return pathExists(path) ? promptPolicySchema.parse(YAML.parse(readUtf8(path))) : defaultPromptPolicy();
+      }
       return loadPromptPolicy(params.workspace);
     } catch {
       return null;
@@ -312,7 +296,7 @@ export function collectPassportData(params: {
 
   const approvalsSummary = verifyApprovalPolicySignature(params.workspace).valid ? "PASS" : "FAIL";
   const leasesSummary = verifyLeaseRevocationsSignature(params.workspace).valid ? "PASS" : "FAIL";
-  const pluginSummary = verifyPluginWorkspace({ workspace: params.workspace }).ok ? "PASS" : "FAIL";
+  const pluginSummary = verifyPluginWorkspace({ workspace: params.workspace, readonly: readOnly }).ok ? "PASS" : "FAIL";
 
   const reasons = new Set<string>();
   const gates = params.policy.passportPolicy.integrityGates;
@@ -394,7 +378,7 @@ export function collectPassportData(params: {
     ? fileSha(mechanicTargetsPath(params.workspace))
     : null;
 
-  const generatedTs = Date.now();
+  const generatedTs = fixedGeneratedTs ?? Date.now();
   const passport = passportJsonSchema.parse({
     v: 1,
     passportId: `pass_${hashPassportId(`${scope.type}:${scope.id}:${generatedTs}`, 16)}`,
@@ -553,4 +537,13 @@ export function collectPassportData(params: {
     calculationManifest,
     sourceHashes: calculationManifest.sourceHashes
   };
+}
+
+/** Existing synchronous collection/default behavior. */
+export function collectPassportData(params: Parameters<typeof collectPassportLocalData>[0]) {
+  return collectPassportLocalData(params);
+}
+/** Internal actual producer projection: fixed clock; no workspace policy/plugin initialization during rechecks. */
+export function collectPassportDataForPublication(params: Parameters<typeof collectPassportLocalData>[0], generatedTs: number) {
+  return collectPassportLocalData(params, generatedTs, true);
 }

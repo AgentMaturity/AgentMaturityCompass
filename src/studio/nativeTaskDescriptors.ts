@@ -1,7 +1,7 @@
 import { lstatSync, readFileSync, opendirSync } from "node:fs";
 import { join } from "node:path";
 import { z } from "zod";
-import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 import { writeFileAtomic } from "../utils/fs.js";
@@ -25,6 +25,8 @@ export const taskDescriptorSchema = z.object({
   archivedAt: z.number().int().nonnegative().optional(),
   // P1-67: the id (never the token) of the lease minted for the latest runtime under a compiled plan; omitted likewise.
   leaseId: z.string().regex(/^lease_[a-f0-9]{32}$/).optional(),
+  // P2-13: the parent task and session a forked task's lineage names; omitted likewise.
+  forkedFrom: z.object({ taskId: z.string().regex(/^[a-f0-9]{64}$/), sessionId: z.string().min(1).max(200) }).strict().optional(),
   submissions: z.array(z.object({ clientRequestId: id, bodyHash: z.string().regex(/^[a-f0-9]{64}$/), revision: z.number().int().min(1).max(32) }).strict()).min(1).max(32)
 }).strict().superRefine((value, ctx) => {
   if (value.submissions.length !== value.revision || value.submissions.some((s, i) => s.revision !== i + 1)
@@ -93,7 +95,7 @@ export class NativeTaskDescriptors {
   /** Call under lock. No caller text or credential value enters this file. */
   write(descriptor: NativeTaskDescriptor): void {
     const checked = taskDescriptorSchema.parse(descriptor);
-    const signature = signHexDigest(taskBodyHash(checked), getPrivateKeyPem(this.workspace, "auditor"));
+    const signature = signHexDigest(taskBodyHash(checked), getSigningKey(this.workspace, "artifact-seal"));
     writeFileAtomic(this.path(checked.taskId), JSON.stringify({ descriptor: checked, signature }), 0o600);
   }
 }

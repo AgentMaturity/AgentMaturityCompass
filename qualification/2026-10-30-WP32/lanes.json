@@ -1,0 +1,120 @@
+{
+  "schema": "amc.wp32-qualification/1",
+  "date": "2026-10-30",
+  "sourceCommit": "3e56038befcf845c23a4db5389bcb802a468ce96",
+  "host": {
+    "platform": "darwin",
+    "arch": "arm64",
+    "osRelease": "25.6.0",
+    "macOS": "26.6.2"
+  },
+  "node": "v22.23.3",
+  "processArch": "arm64",
+  "package": "agent-maturity-compass@1.2.0",
+  "packageSha256": "26db8f832fd0923e114b887102d6f68c30b6c92b9cc373833eae210e1ee11b2b",
+  "abi": {
+    "nodeModules": "127",
+    "napi": "10",
+    "nativeAddons": [
+      {
+        "path": "node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+      }
+    ]
+  },
+  "lanes": [
+    {
+      "lane": "darwin-arm64 / Node 22 / fresh packed install, keyless governed CLI task, cold verification",
+      "outcome": "passed",
+      "reason": "npm run qualify:platform: pack, install into an empty prefix with an empty HOME and npm cache, keyless stub agent-loop turn, cold session verify and agent-loop verify from new processes, missing-launcher refusal, restore and re-verification (13 steps)",
+      "evidence": "platform/darwin-arm64-node22/"
+    },
+    {
+      "lane": "darwin-arm64 / Node 22 / installed native modules",
+      "outcome": "passed",
+      "reason": "installed amc doctor --json reports native-modules PASS in the qualified workspace",
+      "evidence": "platform/darwin-arm64-node22/doctor.json"
+    },
+    {
+      "lane": "darwin-arm64 / Node 22 / SDK on the packed install (examples/sdk/quickstart.mjs)",
+      "outcome": "failed",
+      "reason": "check:packed-install --tarball (same artifact) passed every step up to the SDK quickstart; the quickstart's governed fs.write ran in SIMULATE mode (tool status completed, hello.txt not written), so the step failed. Pre-existing on the base 660827742: tests/sdkQuickstart.test.ts fails the same way. Introduced by the AXR-02 change 1549fabbd (native tool calls meet the signed Action Policy); outside WP32 and not changed here",
+      "evidence": "packed-install-check.txt"
+    },
+    {
+      "lane": "darwin-arm64 / Node 22 / installed crash and restart (scripts/installed-crash-recovery-check.mjs)",
+      "outcome": "failed",
+      "reason": "the runner stopped at the first native agent start: amc acp refused because deferred MCP tools need native tool_search READ_ONLY in the signed allowlist (d6441c858). The runner's fixture predates deferred MCP discovery and needs a discovery turn; it was not changed here. Owned processes it had started were all observed gone",
+      "evidence": "lifecycle/installed-crash-receipt.json"
+    },
+    {
+      "lane": "darwin-arm64 / Node 22 / cancellation and restart through the lifecycle helpers (source build)",
+      "outcome": "passed",
+      "reason": "process-tree cancellation, killed-writer recovery, resume, ownership fencing and action-journal receipt processes via tests/helpers/sessionOwnerProcess.ts and ownedNodeGroup.ts; receipts retained; no owned process or listener left",
+      "evidence": "lifecycle/lifecycle-tests.json"
+    },
+    {
+      "lane": "darwin-arm64 / macOS Seatbelt native shell: escape, path, network, process tree",
+      "outcome": "passed",
+      "reason": "AMC declares macos-seatbelt for the native shell on darwin; the real-kernel suite ran with AMC_REQUIRE_REAL_SANDBOX=1 (no skip possible)",
+      "evidence": "platform/darwin-arm64-sandbox/"
+    },
+    {
+      "lane": "darwin-arm64 / Linux-only confinement requested on macOS (Bubblewrap executable extensions, native PTY)",
+      "outcome": "passed",
+      "reason": "refused with a reason, nothing launched, no unconfined fallback (tests/platformHostRefusal.test.ts)",
+      "evidence": "platform/darwin-arm64-sandbox/sandbox.json"
+    },
+    {
+      "lane": "darwin-arm64 / generic write-only Seatbelt backend asked for network, read or process boundaries",
+      "outcome": "passed after fix",
+      "reason": "it ran the command and reported confined: true while ignoring network deny, readDeny, allowHosts, maxProcesses and cancellation (red: 5 failing tests); now refused with nothing run, and cancellation stops the command",
+      "evidence": "tests/sandboxConfinement.test.ts"
+    },
+    {
+      "lane": "darwin-arm64 / Node 24",
+      "outcome": "not run",
+      "reason": "Node 24 is installed here, but WP32 on this host qualifies Node 22 only (lane rules pin Node 22)"
+    },
+    {
+      "lane": "darwin-x64 (Intel macOS)",
+      "outcome": "unavailable",
+      "reason": "this Mac is arm64; recorded on darwin-arm64, macOS 26.6.2: no such host, emulator or remote runner here"
+    },
+    {
+      "lane": "linux-x64 / Node 22 and 24",
+      "outcome": "unavailable",
+      "reason": "recorded on darwin-arm64, macOS 26.6.2: no such host, emulator or remote runner here"
+    },
+    {
+      "lane": "linux-arm64 / Node 22 and 24",
+      "outcome": "unavailable",
+      "reason": "recorded on darwin-arm64, macOS 26.6.2: no such host, emulator or remote runner here"
+    },
+    {
+      "lane": "win32-x64 / Node 22 and 24",
+      "outcome": "unavailable",
+      "reason": "recorded on darwin-arm64, macOS 26.6.2: no such host, emulator or remote runner here"
+    },
+    {
+      "lane": "linux-x64 / Bubblewrap native shell, executable extensions, PTY",
+      "outcome": "unavailable",
+      "reason": "recorded on darwin-arm64, macOS 26.6.2: no such host, emulator or remote runner here; /usr/bin/bwrap is absent"
+    },
+    {
+      "lane": "linux-arm64 / Bubblewrap native shell, executable extensions, PTY",
+      "outcome": "unavailable",
+      "reason": "recorded on darwin-arm64, macOS 26.6.2: no such host, emulator or remote runner here; /usr/bin/bwrap is absent"
+    },
+    {
+      "lane": "win32-x64 / native shell",
+      "outcome": "refused by design",
+      "reason": "AMC has no confined Windows runner (until P2-14)"
+    },
+    {
+      "lane": "desktop installers and GUI launcher",
+      "outcome": "not run",
+      "reason": "outside WP32's packed-install scope on this host"
+    }
+  ]
+}

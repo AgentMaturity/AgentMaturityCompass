@@ -1,0 +1,4 @@
+# Standards-body hosts allowed for voluntary-standard citations, beyond the shared official host list
+# (src/compliance/citations/officialHosts.ts). Empty until P1-34 reviews an addition; each entry is
+# { host: <lowercase hostname>, publisher: <body that publishes there> }.
+hosts: []

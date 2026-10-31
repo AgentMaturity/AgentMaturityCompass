@@ -2,8 +2,8 @@
   "label": "046-jsonl-capture",
   "command": [
     "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-    "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/native-case.mjs",
-    "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/receipts/jsonl-capture/input.json"
+    "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/native-case.mjs",
+    "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/receipts/jsonl-capture/input.json"
   ],
   "startedAt": "2026-09-09T15:40:31.596878+00:00",
   "timeoutSeconds": 120,

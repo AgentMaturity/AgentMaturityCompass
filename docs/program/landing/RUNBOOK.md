@@ -26,7 +26,7 @@ type Action = "cherry-pick" | "cherry-pick-strip-receipts" | "skip-receipt" | "r
 interface SliceMap {
   schemaVersion: 1;
   candidate: { ref: string; head: string; base: string; commitsAhead: number; merges: number };
-  slices: { id: string; issue: string; phase: 0 | 1 | "hidden"; tracks: string[]; buildOrder: number }[];
+  slices: { id: string; issue: string; phase: 0 | 1 | "hidden"; tracks: string[]; buildOrder: number; decision?: string }[];
   tracks: { track: string; branch: string; head: string; acceptedHead: string | null; mergeCommit: string; base: string; verdict: string; verdictFile: string; slice: string }[];
   commits: { sha: string; subject: string; track: string | null; kind: "code" | "mixed" | "receipt-only" | "merge" | "root"; slice: string; issue: string; action: Action; paths: string[] }[];
   overlaps: { path: string; candidateSlices: string[]; issues: string[]; rule: string }[];
@@ -37,7 +37,7 @@ interface SliceMap {
 - `cherry-pick-strip-receipts`: cherry-pick, then remove every `AMC_OS/` path (section 3). The generator gives this action to every picked commit that touches `AMC_OS/`.
 - `skip-receipt`: never picked. Every `receipt-only` commit gets it.
 - `regenerate`: never picked. Rerun the generator that produced it, or, where section 7 says no generator exists, redo the edit by hand as section 7 describes.
-- `record-only`: never picked. Every merge gets it, and so does F2 until P1-46 decides.
+- `record-only`: never picked. Every merge gets it, and so does F2: P1-46 decided not to land it but to fold it into the compiler ([ADR 015](../../adr/015-f2-blueprints.md)). The `hidden` slice's `decision` field, copied from the rules, records that.
 
 `acceptedHead` is the head a monitor accepted, or `null` when no acceptance is recorded. `verdictFile` starts with `37c1466b:` when the file is in the candidate (read it with `git show`), or with `root-checkout:` when it exists only in Sid's root checkout and in no commit.
 
@@ -207,7 +207,7 @@ Merge with `--no-ff`, which keeps the `cherry picked from` lines. Then rerun the
 1. P0-02: done (section 1).
 2. Slices A, B and C. Their files are disjoint, so build them in parallel, then merge in the order A, B, C. After each merge, rebase the remaining slices and rerun their acceptance.
 3. Slice A's register PR (`A-register`: `9d2636531` and `1962e06cf`, receipts stripped). Its test imports S9's manifest, so it waits for B.
-4. Phase 1 by blockers. The map's build order is a default: F4 (P1-17), F1 (P1-15), F3 (P1-16), S8 (P1-43), S6 (P1-45), content (P1-42), O (P1-44), hidden (P1-46). A slice whose blockers are all done may go earlier if it rebases and reruns.
+4. Phase 1 by blockers. The map's build order is a default: F4 (P1-17), F1 (P1-15), F3 (P1-16), S8 (P1-43), S6 (P1-45), content (P1-42), O (P1-44). `hidden` (P1-46) is never built: F2 is folded into the compiler (ADR 015). A slice whose blockers are all done may go earlier if it rebases and reruns.
 
 ## 10. Overlap map
 

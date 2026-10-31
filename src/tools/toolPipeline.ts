@@ -1,15 +1,23 @@
 import { randomUUID } from "node:crypto";
-import type { ActionJournal } from "../actions/actionJournal.js";
+import type { ActionJournal, ActionRequest } from "../actions/actionJournal.js";
+import { authorizationRecordDigest } from "../actions/authorizationRecord.js";
+import { mintIdempotencyKey } from "../actions/idempotency.js";
+import { assertContract } from "../contracts/index.js";
 import {
-  authorizationIntentFor, bindAuthorization, recheckAuthorization,
+  authorizationIntentFor, bindAuthorization, carryBoundPrincipal, recheckAuthorization,
   type AuthorizationContext, type AuthorizationIntentResult, type BindResult
 } from "../actions/authorize.js";
 import { ActionBlocked, blockReason, type BlockCode, type EffectState, type ReceiptState } from "../actions/receiptStates.js";
 import { ACTION_CLASSES } from "../governor/actionCatalog.js";
+import type { ActionClass } from "../types.js";
+import { lifecycleAdmission } from "../lifecycle/reassessment.js";
 import { withWorkspaceScope } from "../enforce/evidenceEmitter.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
-import { freezeToolArguments } from "./toolArguments.js";
+import { digestField, type OutputDigest } from "../dataflow/tokenizer.js";
+import { outputDigestFor } from "../dataflow/tokenVault.js";
+import { argumentSchemaError, freezeToolArguments } from "./toolArguments.js";
+import { denialOutcome, effectGuardDenial, effectVerdict, notDispatched, thrownOutcome } from "./toolOutcomes.js";
 import type { ToolRegistry } from "./toolRegistry.js";
 import {
   DefiniteFailureError,
@@ -19,8 +27,11 @@ import {
   type ToolDenial,
   type ToolExecution,
   type ToolMode,
-  type ToolOutcome
+  type ToolOutcome,
+  type RecordedToolCall
 } from "./toolTypes.js";
+import { killSwitchDenial } from "../runtime/killSwitch.js";
+import { activeFreezeStatus } from "../drift/freezeEngine.js";
 
 /**
  * The tool execution pipeline (P4.1, ADR-4).
@@ -81,6 +92,16 @@ export const RUN_CODE_TOOL = "run_code";
  */
 export type ToolDispatchMode = "native" | "code";
 
+/**
+ * Classes whose calls must not overlap.
+ *
+ * A read can run beside anything. Two writes to the same workspace cannot: read-before-edit would see one of them land
+ * between another's check and its write, and the resulting file is neither of the edits asked for. The native seam runs
+ * these as step barriers; the pipeline also serializes their bodies, so a Code Mode sub-call (whose `run_code` is a
+ * parallel read) meets the same invariant (PXB-15).
+ */
+export const EXCLUSIVE_CLASSES: ReadonlySet<string> = new Set(["WRITE_LOW", "WRITE_HIGH", "DEPLOY", "SECURITY", "FINANCIAL", "IDENTITY"]);
+
 /** Classes bound to an authorization record by default: every class except reads and low-impact writes. */
 export const DEFAULT_AUTHORIZE_CLASSES: ReadonlySet<string> = new Set(
   ACTION_CLASSES.filter((actionClass) => actionClass !== "READ_ONLY" && actionClass !== "WRITE_LOW"));
@@ -102,6 +123,8 @@ export interface BoundApprovalGate {
 }
 
 export interface ToolPipelineInit {
+  /** Bounded asynchronous guard preparation; synchronous guards still decide after every wait. */
+  readonly prepareGuards?: (execution: ToolExecution) => Promise<void>;
   readonly registry: ToolRegistry;
   readonly workspace: string;
   /** Defaults to `native`. */
@@ -111,8 +134,8 @@ export interface ToolPipelineInit {
   /** Action classes that must be approved before guards are consulted. */
   readonly approvalRequiredFor?: ReadonlySet<string>;
   readonly filters?: readonly ToolOutputFilter[];
-  /** Called exactly once per call, after the outcome is final. */
-  readonly record?: (execution: ToolExecution, outcome: ToolOutcome) => void;
+  /** Called exactly once per call, after the outcome is final; a visibility refusal is recorded too (P1-78). */
+  readonly record?: (execution: RecordedToolCall, outcome: ToolOutcome) => void;
   /** Classes whose calls are bound to an authorization record and rechecked before the body. */
   readonly authorizeClasses?: ReadonlySet<string>;
   /** Authorized classes that need a signed approval through `authority` even with no gate bound (hooks, ToolHub). */
@@ -124,11 +147,17 @@ export interface ToolPipelineInit {
    * the authorized classes are journaled. A journal that cannot be read or opened denies the call `journal_unavailable`.
    */
   readonly journal?: () => ActionJournal;
+  /** The mode a call enters with (AXR-02: the signed Action Policy's downgrade). It can only turn EXECUTE into SIMULATE. */
+  readonly narrowMode?: (call: { readonly name: string; readonly agentId: string; readonly actionClass: ActionClass; readonly requestedMode: ToolMode }) => ToolMode;
 }
 
 export interface ToolCallInput {
+  /** Trusted native session step that owns any work this call starts. */
+  readonly ownerStep?: ToolExecution["ownerStep"];
   /** The turn's cancellation signal, for a body long enough to need one. */
   readonly signal?: AbortSignal;
+  /** See `ToolExecution.onApprovalWait`. */
+  readonly onApprovalWait?: (waiting: boolean) => void;
   readonly name: string;
   readonly agentId: string;
   readonly arguments: Record<string, unknown>;
@@ -138,6 +167,8 @@ export interface ToolCallInput {
   readonly parentToken?: string | null;
   /** Set only by trusted composition, after an approval was granted. Arguments never grant anything. */
   readonly authority?: ToolAuthority;
+  /** Trusted narrowing guard after all approval waits and immediately before the body; null alone permits dispatch. */
+  readonly beforeEffect?: () => string | null;
 }
 
 /** What the authorization stage needs, decided when the call entered. */
@@ -152,33 +183,18 @@ interface CallAuthorization {
 
 /** How often a running journaled body refreshes its heartbeat, for recovery on another host. */
 const HEARTBEAT_MS = 10_000;
-/** Undeclared effects of these classes are `outcome_unknown`: the effect is too costly to assume either way. */
-const EFFECT_MUST_BE_DECLARED: ReadonlySet<string> = new Set(["FINANCIAL", "DATA_EXPORT", "IDENTITY"]);
 
-type EffectVerdict =
-  | { readonly state: "completed"; readonly effect: EffectState | null; readonly reasonCode: string }
-  | { readonly state: "outcome_unknown"; readonly reasonCode: string };
-
-/** Effect classification (P1-03) for a body that returned, or one that threw. */
-function effectVerdict(actionClass: string, settled: { readonly result: ToolBodyResult } | { readonly error: unknown }): EffectVerdict {
-  if ("error" in settled) {
-    return settled.error instanceof DefiniteFailureError ? { state: "completed", effect: "not_applied", reasonCode: "definite_failure" }
-      : { state: "outcome_unknown", reasonCode: "body_threw_ambiguous" };
-  }
-  const effect: unknown = settled.result.effect;
-  if (effect === "applied" || effect === "not_applied") return { state: "completed", effect, reasonCode: `effect_declared:${effect}` };
-  if (effect === "unknown") return { state: "outcome_unknown", reasonCode: "effect_declared_unknown" };
-  // A declaration nobody defined is not a declaration: fail toward unknown, never toward "applied".
-  if (effect !== undefined) return { state: "outcome_unknown", reasonCode: "effect_declaration_invalid" };
-  return EFFECT_MUST_BE_DECLARED.has(actionClass) ? { state: "outcome_unknown", reasonCode: "effect_not_declared" }
-    : { state: "completed", effect: null, reasonCode: "completed" };
-}
-
-/** What a receipt binds about an outcome: its facts and the output's digest, never the output. */
-function outcomeDigest(outcome: ToolOutcome): string {
+/**
+ * What a receipt binds about an outcome: its facts and the output's digest, never the output. The digest's form is part
+ * of the bound object: `outputSha256` (plain, as before) or, in a workspace that opted in to protected-data redaction
+ * (P2-02), `outputDigest: { kind: "hmac-sha256", value }`, keyed so a short output (an SSN, a card number) cannot be
+ * brute-forced from it. The call's `stdout` evidence row carries the same field, so a verifier knows which form to check.
+ */
+function outcomeDigest(outcome: DigestedOutcome): string {
   return sha256Hex(canonicalize({ ok: outcome.ok, exitCode: outcome.exitCode, timedOut: outcome.timedOut, bytes: outcome.bytes,
-    outputSha256: sha256Hex(outcome.output) }));
+    ...digestField("output", outcome.outputDigest) }));
 }
+type DigestedOutcome = ToolOutcome & { readonly outputDigest: OutputDigest };
 
 /**
  * The call once its record binds: the record, its execution id and AMC's key (P1-04) on the carrier the signed tool
@@ -194,35 +210,36 @@ function boundExecution(draft: ToolExecution, bound: Extract<BindResult, { ok: t
     ...(carrier?.carrier === "argument" ? { arguments: freezeToolArguments({ ...draft.arguments, [carrier.name]: key }) } : {}) };
 }
 
-function thrownOutcome(error: unknown): ToolOutcome {
-  // A thrown tool is a failed call, not a denied one. Reporting it as a
-  // denial would credit policy with stopping something policy allowed.
-  return { ok: false, exitCode: null, timedOut: false, denied: null, output: error instanceof Error ? error.message : String(error), bytes: 0 };
+
+/** Bracket an approval wait for the caller's clock. The bracket closes however the wait ends. */
+async function waitingOnApproval<T>(execution: ToolExecution, wait: () => Promise<T>): Promise<T> {
+  execution.onApprovalWait?.(true);
+  try {
+    return await wait();
+  } finally {
+    execution.onApprovalWait?.(false);
+  }
 }
 
-function denialOutcome(denied: ToolDenial): ToolOutcome {
-  return {
-    ok: false,
-    // Not an exit code. A call that never ran has no exit status, and using a
-    // sentinel here would make "denied" indistinguishable from "the tool
-    // exited 126" in six-month-old evidence.
-    exitCode: null,
-    timedOut: false,
-    denied,
-    output: "",
-    bytes: 0
-  };
-}
 
 // The selected body must remain distinguishable from a later scoped override
 // while approval is awaited. Callers cannot assign this binding through argv.
 const selectedDefinitions = new WeakMap<ToolExecution, ToolDefinition>();
+const selectedAvailability = new WeakMap<ToolExecution, () => boolean>();
 export function selectedToolDefinitionFor(execution: ToolExecution): ToolDefinition | undefined {
   return selectedDefinitions.get(execution);
 }
 
+/** Why a pipeline refuses every call once a record failed (P1-78): evidence that cannot be written is never skipped. */
+const lostEvidence = (error: unknown): string =>
+  `EVIDENCE_RECORDER_FAILED: a tool-evidence record failed (${error instanceof Error ? error.message : String(error)}); this pipeline refuses every later call`;
+
 export class ToolPipeline {
   private readonly gates: BoundApprovalGate[] = [];
+  /** Settles when the last queued exclusive-class body has finished (see `writeTurn`). */
+  private writeTail: Promise<void> = Promise.resolve();
+  /** Set by the first failed record (P1-78); from then on every call is refused before any stage runs. */
+  private recorderFailure: string | null = null;
 
   constructor(private readonly init: ToolPipelineInit) {}
 
@@ -231,12 +248,19 @@ export class ToolPipeline {
     this.gates.push(gate);
   }
 
-  /** The intent an approval for this call must bind, or null for a call outside the authorized classes. */
-  authorizationIntent(input: Pick<ToolCallInput, "name" | "agentId" | "arguments" | "requestedMode">): AuthorizationIntentResult | null {
+  /** The intent an approval must bind; a refused route cannot raise a human question, regardless of action class. */
+  authorizationIntent(input: Pick<ToolCallInput, "name" | "agentId" | "arguments" | "requestedMode" | "parentToken">): AuthorizationIntentResult | null {
+    const routeDenial = this.init.registry.invocationDenial(input.name, input.agentId, (input.parentToken ?? null) !== null);
+    if (routeDenial !== undefined) return { ok: false, failures: ["tool_changed"], reason: routeDenial };
     const definition = this.init.registry.visible(input.agentId).get(input.name);
     if (!definition || !this.authorizes(definition.actionClass)) return null;
     return authorizationIntentFor({ workspace: this.init.workspace, name: definition.name, actionClass: definition.actionClass,
-      effectiveMode: input.requestedMode, arguments: input.arguments }, this.init.authorizationContext?.());
+      effectiveMode: this.entryMode(definition.name, definition.actionClass, input), arguments: input.arguments }, this.init.authorizationContext?.());
+  }
+
+  private entryMode(name: string, actionClass: ActionClass, input: Pick<ToolCallInput, "agentId" | "requestedMode">): ToolMode {
+    return input.requestedMode === "EXECUTE" && this.init.narrowMode?.({ name, agentId: input.agentId, actionClass, requestedMode: "EXECUTE" }) === "SIMULATE"
+      ? "SIMULATE" : input.requestedMode;
   }
 
   private authorizes(actionClass: string): boolean {
@@ -245,35 +269,31 @@ export class ToolPipeline {
 
   async execute(input: ToolCallInput): Promise<ToolOutcome> {
     return withWorkspaceScope(this.init.workspace, async () => {
-      const collapsed = this.collapses(input);
-      if (collapsed) {
+      const visible = this.init.registry.visible(input.agentId);
+      const definition = visible.get(input.name);
+      if (this.recorderFailure !== null) return this.refuseUnresolved(input, definition?.actionClass ?? null, this.recorderFailure, "authorization");
+      if (this.collapses(input)) {
         // Terminates HERE, before pre-execute policy and before guards.
         //
         // A collapsed call can only ever fail, and letting the policy pipeline
         // observe it would mean asking a human to approve — and recording an
         // approval for — something that was never going to run. It would also
         // spend budget and produce guard decisions about a call that does not
-        // exist in any meaningful sense.
-        return denialOutcome({
-          stage: "visibility",
-          reason: `"${input.name}" cannot be called directly under code mode; dispatch it from inside ${RUN_CODE_TOOL}`,
-          guardLabel: null
-        });
+        // exist in any meaningful sense. The refusal itself is still recorded.
+        return this.refuseUnresolved(input, definition?.actionClass ?? null,
+          `"${input.name}" cannot be called directly under code mode; dispatch it from inside ${RUN_CODE_TOOL}`);
       }
-
-      const visible = this.init.registry.visible(input.agentId);
-      const definition = visible.get(input.name);
       if (!definition) {
-        // No execution exists yet, so there is nothing to record against and
-        // nothing for a guard to have seen. An invisible tool is not a policy
-        // decision about a call; it is the absence of a call.
-        return denialOutcome({
-          stage: "visibility",
-          reason: `unknown tool "${input.name}"`,
-          guardLabel: null
-        });
+        // No guard sees a call that resolved to no tool, but the refusal is recorded: a call that leaves no trace
+        // is one nobody can review (P1-78, L0-TOOL-01).
+        return this.refuseUnresolved(input, null, `unknown tool "${input.name}"`);
       }
 
+      const nested = (input.parentToken ?? null) !== null;
+      const routeDenial = this.init.registry.invocationDenial(input.name, input.agentId, nested);
+      if (routeDenial !== undefined) return this.refuseUnresolved(input, definition.actionClass, routeDenial);
+      // Capture the selected registration and route before approval or queue waits. The registry rechecks both at effect time.
+      const available = this.init.registry.admissionCheck(input.name, input.agentId, nested);
       const callId = input.callId ?? randomUUID();
       const draft: ToolExecution = {
         token: `tok_${randomUUID()}`,
@@ -284,31 +304,57 @@ export class ToolPipeline {
         workspace: this.init.workspace,
         actionClass: definition.actionClass,
         requestedMode: input.requestedMode,
-        effectiveMode: input.requestedMode,
+        effectiveMode: this.entryMode(definition.name, definition.actionClass, input),
         arguments: freezeToolArguments(input.arguments),
         parentToken: input.parentToken ?? null,
-        ...(input.signal === undefined ? {} : { signal: input.signal })
+        ...(input.ownerStep === undefined ? {} : { ownerStep: Object.freeze({ ...input.ownerStep }) }),
+        ...(input.signal === undefined ? {} : { signal: input.signal }),
+        ...(input.onApprovalWait === undefined ? {} : { onApprovalWait: input.onApprovalWait })
       };
+      // Before entry, approval and guards (PXA-22): an invalid call is a failed call, recorded, never one anyone is asked about.
+      const invalid = argumentSchemaError(definition.parameters, draft.arguments);
+      if (invalid !== null) return this.recordUnresolved(input, definition.actionClass, thrownOutcome(invalid));
 
-      const authorization = await this.enter(draft, input.authority);
-      const bound = authorization.bound;
-      const execution: ToolExecution = bound?.ok ? boundExecution(draft, bound) : draft;
+      const gate = [...this.gates].reverse().find((candidate) => candidate.gates(draft.name));
+      // A journaled sub-call must be admitted before its bound gate can ask. Other paths keep their existing entry order.
+      const deferEntry = this.init.journal !== undefined && this.authorizes(definition.actionClass)
+        && draft.parentToken !== null && gate !== undefined;
+      const authorization = deferEntry ? null : await this.enter(draft, input.authority, gate);
+      const bound = authorization?.bound;
+      let execution: ToolExecution = bound?.ok ? boundExecution(draft, bound) : draft;
       selectedDefinitions.set(execution, definition);
+      selectedAvailability.set(execution, available);
+      const release = await this.writeTurn(definition.actionClass, draft.signal);
       let outcome: ToolOutcome;
       try {
-        outcome = this.init.journal !== undefined && this.authorizes(definition.actionClass)
-          ? await this.runJournaled(this.init.journal, execution, definition.body, authorization)
-          : await this.runStages(execution, definition.body, authorization);
+        outcome = release === null ? notDispatched()
+          : this.init.journal !== undefined && this.authorizes(definition.actionClass)
+          ? await this.runJournaled(this.init.journal, execution, definition.body, authorization,
+            () => this.enter(draft, input.authority, gate), (fresh) => {
+              selectedDefinitions.delete(execution);
+              selectedAvailability.delete(execution);
+              execution = fresh;
+              selectedDefinitions.set(execution, definition);
+              selectedAvailability.set(execution, available);
+            }, input.beforeEffect)
+          : await this.runStages(execution, definition.body, authorization!, input.beforeEffect);
       } finally {
+        release?.();
         selectedDefinitions.delete(execution);
+        selectedAvailability.delete(execution);
       }
       try {
-        this.init.record?.(execution, outcome);
-      } catch {
+        if (this.init.record !== undefined) {
+          outcome = this.withOutputDigest(outcome);
+          this.init.record(execution, outcome);
+        }
+      } catch (error) {
         // The guarantee belongs HERE, not to each recorder. A recorder that
         // threw would turn an evidence problem into a tool failure, and the
-        // model would see a denial that policy never made. The gap shows in the
-        // spine as a missing row rather than as a wrong answer to the caller.
+        // model would see a denial that policy never made. This call keeps its
+        // real outcome (its effect may have happened); the failure latches, so
+        // every later call is refused before any stage runs (P1-78).
+        this.recorderFailure ??= lostEvidence(error);
         //
         // It was previously the caller's job, which made it untestable: proving
         // it required a recorder that genuinely failed, and every filesystem
@@ -333,6 +379,54 @@ export class ToolPipeline {
   }
 
   /**
+   * This pipeline's write turn for an exclusive class (PXB-15): a release function, or null when `signal` aborted while
+   * waiting. Turns are granted in arrival order; an abandoned wait passes its place on. Other classes never wait.
+   */
+  private async writeTurn(actionClass: string, signal: AbortSignal | undefined): Promise<(() => void) | null> {
+    if (!EXCLUSIVE_CLASSES.has(actionClass)) return () => undefined;
+    const previous = this.writeTail;
+    let release!: () => void;
+    const mine = new Promise<void>((resolve) => { release = resolve; });
+    this.writeTail = previous.then(() => mine);
+    if (signal === undefined) {
+      await previous;
+      return release;
+    }
+    let onAbort: (() => void) | undefined;
+    const aborted = new Promise<true>((resolve) => {
+      onAbort = () => resolve(true);
+      if (signal.aborted) resolve(true);
+      else signal.addEventListener("abort", onAbort, { once: true });
+    });
+    const gaveUp = await Promise.race([previous.then(() => false), aborted]);
+    signal.removeEventListener("abort", onAbort!);
+    if (!gaveUp) return release;
+    release();
+    return null;
+  }
+
+  /**
+   * A refusal before the call became an execution (visibility, or a latched recorder failure), recorded like any other
+   * denial. A recorder that throws cannot change it, and latches like any failed record (see `execute`).
+   */
+  private refuseUnresolved(input: ToolCallInput, actionClass: RecordedToolCall["actionClass"], reason: string,
+    stage: "visibility" | "authorization" = "visibility"): ToolOutcome {
+    return this.recordUnresolved(input, actionClass, denialOutcome({ stage, reason, guardLabel: null }));
+  }
+
+  private recordUnresolved(input: ToolCallInput, actionClass: RecordedToolCall["actionClass"], outcome: ToolOutcome): ToolOutcome {
+    const callId = input.callId ?? randomUUID();
+    try {
+      this.init.record?.({ token: `tok_${randomUUID()}`, callId, rootCallId: input.rootCallId ?? callId, name: input.name, agentId: input.agentId,
+        workspace: this.init.workspace, actionClass, requestedMode: input.requestedMode, effectiveMode: input.requestedMode,
+        arguments: freezeToolArguments(input.arguments), parentToken: input.parentToken ?? null }, outcome);
+    } catch (error) {
+      this.recorderFailure ??= lostEvidence(error);
+    }
+    return outcome;
+  }
+
+  /**
    * Whether this call is denied by the mode itself.
    *
    * A SUB-call is never collapsed: it carries a parent token, which means it
@@ -351,24 +445,50 @@ export class ToolPipeline {
    * so the human wait is never inside the record's lifetime. Binding failures are held until after the guards, so a
    * guard's denial is still the one reported for a call the guards refuse.
    */
-  private async enter(draft: ToolExecution, supplied: ToolAuthority | undefined): Promise<CallAuthorization> {
+  private async enter(draft: ToolExecution, supplied: ToolAuthority | undefined, gate: BoundApprovalGate | undefined): Promise<CallAuthorization> {
     const authorizes = this.authorizes(draft.actionClass);
-    const gate = [...this.gates].reverse().find((candidate) => candidate.gates(draft.name));
     let authority = supplied;
     if (gate !== undefined && draft.parentToken !== null) {
       const intent = authorizes ? authorizationIntentFor(draft, this.init.authorizationContext?.()) : null;
       // An intent that cannot bind is not put to a human; the authorization stage denies it after the guards.
-      const granted = intent?.ok === false ? undefined : await gate.ask(draft, intent).catch((): null => null);
+      const granted = intent?.ok === false ? undefined : await waitingOnApproval(draft, () => gate.ask(draft, intent)).catch((): null => null);
       if (granted === null) {
         return { refused: { stage: "approval", reason: "approval not granted for this sub-call", guardLabel: null },
           context: null, bound: null, required: false };
       }
       authority = granted;
     }
-    if (!authorizes) return { refused: null, context: null, bound: null, required: false };
+    if (!authorizes) {
+      // P2-23: an unbound call (a read or low-impact write) still passes lifecycle admission; suspended and retired agents are held.
+      // Both checks always run (a kill released before the authorization stage must not let a held agent through); a kill,
+      // the cause when it also suspended the agent, is the one reason reported.
+      const killed = killSwitchDenial(draft.workspace, { kind: "tool", agentId: draft.agentId, actionClass: draft.actionClass });
+      const lifecycle = lifecycleAdmission(draft.workspace, draft.agentId, { actionClass: draft.actionClass });
+      const reason = killed ?? (lifecycle.ok ? null : `agent_not_active: ${lifecycle.reason}`);
+      return { refused: reason === null ? null : { stage: "authorization", reason, guardLabel: null }, context: null, bound: null, required: false };
+    }
     const context: AuthorizationContext = { ...(this.init.authorizationContext?.() ?? {}), ...(authority ? { authority } : {}) };
     const required = gate !== undefined || (this.init.boundApprovalRequiredFor?.has(draft.actionClass) ?? false);
     return { refused: null, context, bound: bindAuthorization(draft, context), required };
+  }
+
+  /** Bind the fresh record to this pipeline's already committed reservation; never import caller-supplied IDs. */
+  private bindJournalAdmission(authorization: CallAuthorization, request: ActionRequest): CallAuthorization {
+    const bound = authorization.bound;
+    if (!bound?.ok) return authorization;
+    // The request's session/parent attribution is immutable too. A changed composition must not silently relabel it.
+    if (bound.record.session.sessionId !== request.sessionId || bound.record.delegation.parentExecutionId !== request.parentExecutionId) {
+      return { ...authorization, bound: { ok: false, failures: ["approval_intent_mismatch"],
+        reason: "the authorization context no longer names the requested session and parent" } };
+    }
+    try {
+      const record = carryBoundPrincipal(bound.record, assertContract("authorization-record", { ...bound.record,
+        executionId: request.executionId, idempotencyKey: request.idempotencyKey }));
+      return { ...authorization, bound: { ...bound, record, digest: authorizationRecordDigest(record) } };
+    } catch (error) {
+      return { ...authorization, bound: { ok: false, failures: ["authority_store_unavailable"],
+        reason: `the journal admission could not bind the fresh authorization: ${String(error)}` } };
+    }
   }
 
   /** A record that did not bind, or a required approval that is missing: a denial before anything is authorized. */
@@ -383,39 +503,57 @@ export class ToolPipeline {
 
   /** The authorization stage: a reason to deny, or null. Synchronous, so nothing runs between it and the body. */
   private authorizationDenial(execution: ToolExecution, authorization: CallAuthorization): string | null {
+    // P2-26: every class, bound or not, meets the kill switch here; a dispatched body is never interrupted, the next call is refused.
+    const killed = killSwitchDenial(execution.workspace, { kind: "tool", agentId: execution.agentId, actionClass: execution.actionClass });
+    if (killed !== null) return killed;
     const binding = this.bindingDenial(authorization);
     if (binding !== null) return binding.reason;
     const { bound, context } = authorization;
-    if (bound === null || context === null || !bound.ok) return null;
+    // AXR-03: an unbound class (a read or low-impact write) meets the freezes here; the recheck covers bound ones.
+    if (bound === null) return unboundFreezeDenial(execution);
+    if (context === null || !bound.ok) return null;
     const recheck = recheckAuthorization(bound.record, execution, context);
     return recheck.ok ? null : recheck.failures.join(", ");
   }
 
   /** The body's result after the output filters. A filter may rewrite output and nothing else. */
   private bodyOutcome(execution: ToolExecution, result: ToolBodyResult): ToolOutcome {
+    // A body that states no result is a failed call, never a success by default (DXC-02).
+    if (typeof result.ok !== "boolean") throw new Error(`tool "${execution.name}" returned no ok status; recorded as a failed call`);
     const output = (this.init.filters ?? []).reduce((text, filter) => filter(text, execution), result.output);
     return {
-      ok: result.ok ?? true,
+      ok: result.ok,
       exitCode: result.exitCode ?? null,
       timedOut: result.timedOut ?? false,
       denied: null,
       output,
+      ...(result.effect === undefined ? {} : { effect: result.effect }),
       bytes: result.bytes ?? Buffer.byteLength(output, "utf8")
     };
   }
 
-  private async runStages(execution: ToolExecution, body: ToolBody, authorization: CallAuthorization): Promise<ToolOutcome> {
+  private async runStages(execution: ToolExecution, body: ToolBody, authorization: CallAuthorization,
+    beforeEffect: ToolCallInput["beforeEffect"]): Promise<ToolOutcome> {
     if (authorization.refused !== null) return denialOutcome(authorization.refused);
     const approval = await this.askApproval(execution);
     if (approval !== null) return approval;
 
+    await this.init.prepareGuards?.(execution);
     const denied = this.init.registry.guardReason(execution);
     if (denied) {
       return denialOutcome({ stage: "guard", reason: denied.reason, guardLabel: denied.label });
     }
 
+    if (selectedAvailability.get(execution)?.() !== true) {
+      return denialOutcome({ stage: "visibility", reason: "tool registration, invocation route or step availability was revoked", guardLabel: null });
+    }
     const unauthorized = this.authorizationDenial(execution, authorization);
     if (unauthorized !== null) return denialOutcome({ stage: "authorization", reason: unauthorized, guardLabel: null });
+    // Read again after the approval wait: a call cancelled while it waited (a timed-out program's sub-call) never runs.
+    if (execution.signal?.aborted) return notDispatched();
+
+    const effectDenial = effectGuardDenial(beforeEffect);
+    if (effectDenial !== null) return denialOutcome(effectDenial);
 
     try {
       return this.bodyOutcome(execution, await body(execution));
@@ -425,25 +563,30 @@ export class ToolPipeline {
   }
 
   /**
-   * The stages of a journaled call (P1-03), each state a receipt. Everything after the approval wait, from the guards to
-   * the body, is synchronous: no cancellation, block, recheck or intent can change in this process between the last
+   * The stages of a journaled call (P1-03), each state a receipt. After bounded asynchronous guard preparation, the
+   * guard decisions through dispatch are synchronous: no cancellation, block, recheck or intent can change in this process between the last
    * check and dispatch, and `start` re-reads the block in its transaction against other processes. Everything read
    * before the wait is read again after it: the block here, the record's facts and approvals by the recheck.
    */
   private async runJournaled(open: () => ActionJournal, execution: ToolExecution, body: ToolBody,
-    authorization: CallAuthorization): Promise<ToolOutcome> {
-    const bound = authorization.bound;
-    const executionId = bound?.ok ? bound.record.executionId : `exec_${randomUUID()}`;
+    authorization: CallAuthorization | null, enter: () => Promise<CallAuthorization>, selectExecution: (execution: ToolExecution) => void,
+    beforeEffect: ToolCallInput["beforeEffect"]): Promise<ToolOutcome> {
+    const initial = authorization?.bound;
+    const executionId = initial?.ok ? initial.record.executionId : `exec_${randomUUID()}`;
+    const idempotencyKey = initial?.ok ? initial.record.idempotencyKey : authorization === null ? mintIdempotencyKey() : null;
     let head: ReceiptState = "requested";
     const action = (state: ReceiptState, evidenceComplete = true) => ({ executionId, state, evidenceComplete });
     const unavailable = (error: unknown): ToolDenial => ({ stage: "authorization", guardLabel: null,
       reason: error instanceof Error && /^journal_(unavailable|integrity_failed)/.test(error.message) ? error.message : `journal_unavailable: ${String(error)}` });
     let journal: ActionJournal;
+    let request: ActionRequest;
     try {
+      const context = authorization === null ? this.init.authorizationContext?.() : authorization.context;
       journal = open();
-      journal.request({ executionId, agentId: execution.agentId, toolName: execution.name, actionClass: execution.actionClass,
-        sessionId: authorization.context?.sessionId ?? null, callId: execution.callId,
-        parentExecutionId: authorization.context?.delegation?.parentExecutionId ?? null, idempotencyKey: bound?.ok ? bound.record.idempotencyKey : null });
+      request = { executionId, agentId: execution.agentId, toolName: execution.name, actionClass: execution.actionClass,
+        sessionId: context?.sessionId ?? null, callId: execution.callId,
+        parentExecutionId: context?.delegation?.parentExecutionId ?? null, idempotencyKey };
+      journal.request(request);
     } catch (error) {
       return denialOutcome(unavailable(error)); // Failure row 1: nothing requested, nothing dispatched.
     }
@@ -458,6 +601,14 @@ export class ToolPipeline {
     };
     const blocked = (blockedBy: string, code: BlockCode = "blocked_by_unreconciled"): ToolOutcome =>
       deny({ stage: "authorization", guardLabel: null, reason: blockReason(code, blockedBy) }, `${code}:${blockedBy}`);
+    const cancelled = (): ToolOutcome => {
+      try {
+        journal.cancel(executionId, "aborted_before_dispatch");
+        return { ok: false, exitCode: null, timedOut: false, denied: null, output: "", bytes: 0, action: action("cancelled") };
+      } catch (error) {
+        return deny(unavailable(error), "journal_unavailable");
+      }
+    };
     /** The block as it is now: an id that blocks this call, null for none, or a denial when the journal cannot say. */
     const blockingNow = (): string | ToolOutcome | null => {
       try {
@@ -468,24 +619,38 @@ export class ToolPipeline {
     };
     const early = blockingNow();
     if (early !== null) return typeof early === "string" ? blocked(early) : early;
+    if (authorization === null) {
+      if (execution.signal?.aborted) return cancelled();
+      try {
+        // No authorization record lives across the bound gate's human wait. All authority, facts and times are fresh.
+        authorization = this.bindJournalAdmission(await enter(), request);
+      } catch (error) {
+        // The journal is fine here: deciding the call's authority threw (its context or gate), so say that.
+        return deny({ stage: "authorization", guardLabel: null, reason: `authority_store_unavailable: the call's authority could not be decided: ${String(error)}` },
+          "authorization_denied:authority_store_unavailable");
+      }
+      const fresh = authorization.bound;
+      if (fresh?.ok) {
+        execution = boundExecution(execution, fresh);
+        selectExecution(execution); // Guards, body, selected-definition lookup and recorder all use these final IDs/digest.
+      }
+    }
+    const bound = authorization.bound;
     if (authorization.refused !== null) return deny(authorization.refused, "approval_denied");
     const approval = await this.askApproval(execution);
     if (approval?.denied) return deny(approval.denied, "approval_denied");
+    await this.init.prepareGuards?.(execution);
     const guard = this.init.registry.guardReason(execution);
     if (guard) return deny({ stage: "guard", reason: guard.reason, guardLabel: guard.label }, `guard_denied:${guard.label}`);
+    if (selectedAvailability.get(execution)?.() !== true) {
+      return deny({ stage: "visibility", reason: "tool registration, invocation route or step availability was revoked", guardLabel: null }, "tool_availability_revoked");
+    }
     const binding = this.bindingDenial(authorization);
     if (binding !== null || bound === null || !bound.ok || authorization.context === null) {
       return deny({ stage: "authorization", reason: binding?.reason ?? "authorization record missing", guardLabel: null },
         `authorization_denied:${binding?.code ?? "record_missing"}`);
     }
-    if (execution.signal?.aborted) {
-      try {
-        journal.cancel(executionId, "aborted_before_dispatch");
-        return { ok: false, exitCode: null, timedOut: false, denied: null, output: "", bytes: 0, action: action("cancelled") };
-      } catch (error) {
-        return deny(unavailable(error), "journal_unavailable");
-      }
-    }
+    if (execution.signal?.aborted) return cancelled();
     try {
       journal.authorize(executionId, bound.digest);
       head = "authorized";
@@ -499,6 +664,8 @@ export class ToolPipeline {
     if (!recheck.ok) {
       return deny({ stage: "authorization", reason: recheck.failures.join(", "), guardLabel: null }, `recheck_failed:${recheck.failures.join(",")}`);
     }
+    const effectDenial = effectGuardDenial(beforeEffect);
+    if (effectDenial !== null) return deny(effectDenial, "guard_denied:trusted-before-effect");
     try {
       journal.start(executionId, bound.record);
     } catch (error) {
@@ -537,8 +704,11 @@ export class ToolPipeline {
     const verdict = effectVerdict(execution.actionClass, settled);
     try {
       if (verdict.state === "completed") {
+        // A keyed digest needs the token keys; if they cannot load, the receipt is not written (it stays `started`).
+        const digested = this.withOutputDigest(outcome);
+        outcome = digested;
         const ref = "result" in settled ? settled.result.externalRef : undefined;
-        journal.complete(executionId, { effect: verdict.effect, outcomeDigest: outcomeDigest(outcome), reasonCode: verdict.reasonCode,
+        journal.complete(executionId, { effect: verdict.effect, outcomeDigest: outcomeDigest(digested), reasonCode: verdict.reasonCode,
           externalRef: typeof ref === "string" && ref.length > 0 && ref.length <= 512 ? ref : null });
       } else {
         journal.markUnknown(executionId, verdict.reasonCode);
@@ -549,6 +719,11 @@ export class ToolPipeline {
       // journal keeps this execution blocking the agent's journaled calls in this process.
       return { ...outcome, action: action("started", false) };
     }
+  }
+
+  /** How evidence binds this call's output, decided once and carried on the outcome, so receipt and stdout row agree. */
+  private withOutputDigest(outcome: ToolOutcome): DigestedOutcome {
+    return { ...outcome, outputDigest: outcome.outputDigest ?? outputDigestFor(this.init.workspace, sha256Hex(outcome.output)) };
   }
 
   /** Returns a denial outcome, or null to continue. */
@@ -563,12 +738,24 @@ export class ToolPipeline {
         guardLabel: null
       });
     }
-    const answer = await this.init.approve(execution).catch((): ToolApprovalAnswer => "unavailable");
+    const approve = this.init.approve;
+    const answer = await waitingOnApproval(execution, () => approve(execution)).catch((): ToolApprovalAnswer => "unavailable");
     if (answer === "allow") return null;
     return denialOutcome({
       stage: "approval",
       reason: answer === "deny" ? "approval denied" : "approval unavailable",
       guardLabel: null
     });
+  }
+}
+
+/** A drift or integrity freeze holding this call's class, as ToolHub refuses it. A freeze that cannot be read denies. */
+function unboundFreezeDenial(execution: ToolExecution): string | null {
+  try {
+    const freeze = activeFreezeStatus(execution.workspace, execution.agentId);
+    return freeze.active && (freeze.actionClasses as readonly string[]).includes(execution.actionClass)
+      ? `action_class_frozen: incidents ${freeze.incidentIds.join(", ")}` : null;
+  } catch (error) {
+    return `action_class_frozen: the freeze state could not be read: ${String(error)}`;
   }
 }

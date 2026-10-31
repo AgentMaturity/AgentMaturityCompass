@@ -1,0 +1,106 @@
+{
+ "schemaVersion": 1,
+ "key": "P2-37",
+ "date": "2026-10-28",
+ "commit": "e1699efa394f57e312bc8debfb4cd30bf96fc850",
+ "branch": "rtd/w4-p2-37",
+ "node": "v22.23.3",
+ "pnpm": "10.33.0",
+ "os": "macOS 26.6.2",
+ "arch": "arm64",
+ "commands": [
+  {
+   "cmd": "npm run -s build",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s gen:schemas",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npx vitest run <40 files: tests/a4 (4 P2-37 files + 2 existing) and every existing test file touching the changed modules: native tasks, acp, prompt packs, artifact signatures, Enforce manifests, execution contract, resume rules, adapter manifests, pack contents, architecture boundaries, A4 signing probes> --maxWorkers=2",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s typecheck",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s typecheck:tests",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s lint",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:gates",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:schemas",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:dead-code",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:duplicates",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:counts",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:api-ref",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:docs-drift",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:pack-contents",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:architecture-boundaries",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:freeze",
+   "exit": 1,
+   "durationMs": 0
+  }
+ ],
+ "tests": {
+  "total": 598,
+  "passed": 598,
+  "failed": 0,
+  "skipped": 0
+ },
+ "artifacts": [
+  {
+   "path": "integration-claims.json",
+   "sha256": "1a01963bb3e012bdb21936f2d39afe9d15e85886982b91f49328e28ab6a9d33f"
+  }
+ ],
+ "notes": "All P2-37 In-list parts: manifest-projected IntegrationClaims (+ acs:<hook>, card source/pinned version, dist/adapter-claims packaging); contract execution phases in Assemble Review; P2-12 resume rule on A4 effect retry; the Studio native-task loader for the signed prompt pack and A4 context plugin (fail closed in a regulated workspace) with context.native_delivery evaluated at Adapt Review; the mechanic write link (checked TUNE seed, signed attach of executed results, mechanic:<phaseId> vocabulary); a4Package's boundary row from the claim. Local macOS run, not CI; durations not recorded. Red before green: every new P2-37 test file fails at its base (the functions it tests do not exist there). Mutation checks, each killed then restored: claim ignores manifest problems; adapter-name check skipped; role check dropped; signed ACTION_STATE lookup dropped; applied effect may retry; any completed head may retry; release boundary back to tool_pipeline-only; regulated refusal skipped in the loader; plugin signature verdict ignored (consistent forgery); pack verification ignored; mechanic pair verification ignored; mechanic scope check dropped; native-delivery agent filter dropped. check:freeze exits 1 at base and here only on other items' exception keys; P2-37 adds no CLI command. Not covered by a test: the end-to-end A4 retry route and the attach route over a real deployed, tuned project (P2-35 scenario work)."
+}

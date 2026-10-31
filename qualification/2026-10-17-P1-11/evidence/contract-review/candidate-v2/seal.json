@@ -1,0 +1,25 @@
+{
+  "schema": "p111-candidate-v2-review-seal/1",
+  "at": "2026-10-16T19:26:53.283131+00:00",
+  "allReadsFinished": true,
+  "blockers": [],
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/contract-review/candidate-v2/review.json",
+      "bytes": 6451,
+      "sha256": "15c905b0d661247f9f97a06d3d7425c0ff98154ff71e5936f492dffb8e7f6c23"
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/contract-review/candidate-v2/README.md",
+      "bytes": 942,
+      "sha256": "80539c936a1c543b046f129fc37a10f58f40ed3b958bf2e56b0b88d7c7b964c1"
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/contract-review/candidate-v2/input-pins.json",
+      "bytes": 9825,
+      "sha256": "87afe3dc35cc9cfd2183ce103d072e907cb4d1ddfd0bed13966e9df0f538b713"
+    }
+  ],
+  "candidateExecutedOrParsed": false,
+  "sourceWrites": false
+}

@@ -1,0 +1,63 @@
+{
+  "schema": "amc-p207-local-oidc/2",
+  "label": "failed-refresh",
+  "synthetic": true,
+  "issuer": "http://127.0.0.1:63583/57b30bee-98af-4b18-bd42-f9d435f36f37",
+  "requests": [
+    {
+      "id": 1,
+      "connectionId": 1,
+      "method": "GET",
+      "path": "/57b30bee-98af-4b18-bd42-f9d435f36f37/jwks",
+      "bodyBytes": 0,
+      "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "requestEnded": true,
+      "responseClosed": true,
+      "responseStatus": 200,
+      "responseBodyBytes": 410,
+      "responseDelayMs": null,
+      "headers": {
+        "accept": "application/json"
+      }
+    },
+    {
+      "id": 2,
+      "connectionId": 2,
+      "method": "GET",
+      "path": "/57b30bee-98af-4b18-bd42-f9d435f36f37/jwks",
+      "bodyBytes": 0,
+      "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "requestEnded": true,
+      "responseClosed": true,
+      "responseStatus": 503,
+      "responseBodyBytes": 37,
+      "responseDelayMs": null,
+      "headers": {
+        "accept": "application/json"
+      }
+    }
+  ],
+  "observations": [
+    {
+      "retainedKnownKey": true,
+      "unknownKeysRefused": true,
+      "requests": 2
+    }
+  ],
+  "handlerErrors": [],
+  "transportErrors": [],
+  "transportErrorClassifications": [],
+  "lifecycle": {
+    "inProcessServer": true,
+    "closed": true,
+    "listening": false,
+    "openSockets": 0,
+    "connectionCount": 2,
+    "childProcessCreated": false,
+    "signalsSent": false,
+    "exactOptInRestored": true
+  },
+  "failed": false,
+  "originalError": null,
+  "cleanupError": null
+}

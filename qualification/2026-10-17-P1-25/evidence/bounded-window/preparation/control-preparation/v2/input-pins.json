@@ -1,0 +1,50 @@
+{
+  "schema": "p125w-controls-v2-input-pins/1",
+  "inputs": [
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/source-control.py.source.txt",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/source-control.py.source.txt",
+      "bytes": 21957,
+      "sha256": "2a7181aca9d9f3c76889b460495c426d3969f1e05279c400ab1c9414da775137",
+      "dev": 16777231,
+      "inode": 543743090,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/seal.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/seal.json",
+      "bytes": 4490,
+      "sha256": "9e2ac66f8b40ae69d2cfd8fff967a57b37bbbd3e80ef6d1427206a111fd6867c",
+      "dev": 16777231,
+      "inode": 543748061,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/README.md",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/README.md",
+      "bytes": 7070,
+      "sha256": "90c500e6f66d789cb502feb3a535e9100332769da7037a9d705c6f0236ed43af",
+      "dev": 16777231,
+      "inode": 543748058,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/runtime-protected-inputs.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/runtime-protected-inputs.json",
+      "bytes": 78069,
+      "sha256": "f84cd7442210621575ebb659e8fb783fc5764dea3222b7aa5bdccefc0473b725",
+      "dev": 16777231,
+      "inode": 543741688,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/protected-inputs.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/protected-inputs.json",
+      "bytes": 73883,
+      "sha256": "d5e42ca4121f2cb2b098303d1e79e8645ba02045bd012c466a0b55ec5a0e62ca",
+      "dev": 16777231,
+      "inode": 543741190,
+      "nlink": 1
+    }
+  ]
+}

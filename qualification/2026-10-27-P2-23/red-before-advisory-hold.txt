@@ -1,0 +1,5 @@
+admission.test.ts and entryPoints.test.ts on db74b9cef reassessment.ts:
+     × no compiled-policy context is needed: bindAuthorization alone denies 917ms
+     × an advisory plan still denies a suspended agent (an explicit suspension holds everywhere) 874ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  2 failed | 8 passed (10)

@@ -29,12 +29,13 @@ describe("CLAIM_TTL", () => {
 });
 
 describe("checkClaimExpiry", () => {
-  it("empty array returns all-zero result", () => {
+  it("empty array leaves certification unevaluated", () => {
     const result = checkClaimExpiry([]);
     expect(result.expired).toHaveLength(0);
     expect(result.stale).toHaveLength(0);
     expect(result.fresh).toHaveLength(0);
-    expect(result.certificationBlocked).toBe(false);
+    expect(result.certificationBlocked).toBeNull();
+    expect(result.outcome).toBe("not_evaluated");
   });
 
   it("expired claims correctly identified", () => {

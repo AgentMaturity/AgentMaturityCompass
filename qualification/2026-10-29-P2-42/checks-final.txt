@@ -1,0 +1,9 @@
+lint exit=0
+check:gates exit=0
+check:dead-code exit=0
+check:duplicates exit=0
+check:counts exit=0
+check:api-ref exit=0
+check:docs-drift exit=0
+check:schemas exit=0
+check:architecture-boundaries exit=0

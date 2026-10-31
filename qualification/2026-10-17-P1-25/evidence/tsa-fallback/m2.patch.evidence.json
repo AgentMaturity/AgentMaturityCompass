@@ -1,0 +1,11 @@
+{
+  "schema": "amc-qualification-lossless-original/1",
+  "encoding": "base64",
+  "original": {
+    "relativePath": "evidence/tsa-fallback/m2.patch",
+    "bytes": 513,
+    "sha256": "78c67228af26e6e4832291aef960142e8655bc09312b079fc3be217830ef4508"
+  },
+  "dataBase64": "ZGlmZiAtLWdpdCBhL3NyYy90aW1lL3RzYUNsaWVudC50cyBiL3NyYy90aW1lL3RzYUNsaWVudC50cwppbmRleCA4MGI1NWJmMDkuLjY0YjA2MzU5MSAxMDA2NDQKLS0tIGEvc3JjL3RpbWUvdHNhQ2xpZW50LnRzCisrKyBiL3NyYy90aW1lL3RzYUNsaWVudC50cwpAQCAtMTcwLDYgKzE3MCw3IEBAIGV4cG9ydCBhc3luYyBmdW5jdGlvbiByZXF1ZXN0VGltZXN0YW1wKGlucHV0OiB7CiAgICAgfSBjYXRjaCAoZXJyb3IpIHsKICAgICAgIGlmIChlcnJvciBpbnN0YW5jZW9mIEVncmVzc0Jsb2NrZWQpIHsgZmlyc3RCbG9ja2VkID8/PSBlcnJvcjsgZGVuaWVkICs9IDE7IH0KICAgICAgIGZhaWx1cmVzLnB1c2goYCR7dHNhLm5hbWV9OiAke2Vycm9yIGluc3RhbmNlb2YgRXJyb3IgPyBlcnJvci5tZXNzYWdlIDogU3RyaW5nKGVycm9yKX1gKTsKKyAgICAgIGJyZWFrOwogICAgIH0KICAgfQogICBpZiAoZmlyc3RCbG9ja2VkICYmIGRlbmllZCA9PT0gdHNhcy5sZW5ndGgpIHRocm93IGZpcnN0QmxvY2tlZDsK",
+  "boundary": "Exact original bytes retained losslessly; decode and verify bytes/SHA256 before use. No command result changes."
+}

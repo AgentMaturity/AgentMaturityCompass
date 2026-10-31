@@ -4,8 +4,8 @@
     "/Library/Developer/CommandLineTools/usr/bin/python3",
     "-c",
     "import importlib.util,json,pathlib,sys;sys.dont_write_bytecode=True;s=importlib.util.spec_from_file_location('reviewed_helper',sys.argv[1]);m=importlib.util.module_from_spec(s);s.loader.exec_module(m);c=json.loads(pathlib.Path(sys.argv[2]).read_text());print(m.validate(c))",
-    "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-09-installed-spill-acceptance/run.py",
-    "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/config.json"
+    "~/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-09-installed-spill-acceptance/run.py",
+    "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/config.json"
   ],
   "startedAt": "2026-09-09T15:34:13.996209+00:00",
   "timeoutSeconds": 30,

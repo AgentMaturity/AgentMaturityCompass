@@ -1,0 +1,35 @@
+{
+  "at": "2026-10-16T23:43:10.765848+00:00",
+  "phase": "p125k-m1",
+  "sourceCommit": "e49e21348e454ba8f1556cb6dfd3ed69e0e883c2",
+  "operator": "OMIT-CHECKPOINT-EVENT",
+  "outcomeSha256": "72b4b7323fa3f16ea203057bda4a9d7038e42436c7a1d97b842b5276e87bd9fe",
+  "rootAllFailuresRead": true,
+  "allFailuresClassified": true,
+  "firstSensitiveAssertionRead": true,
+  "noHookOrEnvironmentFailure": true,
+  "actualCohortAndHooksMatchCanonical": true,
+  "actualOwnedChildrenAndCleanupRead": true,
+  "allFailures": [
+    {
+      "test": "P1-25 real signed ledger checkpoint transitions completes the same signed pending checkpoint with a genuine query-bound token and ledger event",
+      "message": "expected [] to have a length of 1 but got +0",
+      "firstSensitiveFrame": "tests/time/checkpointWindow.test.ts:268:32",
+      "classification": "Direct missing checkpoint ledger event after successful genuine grant, signed checkpoint bytes and stored token positives."
+    }
+  ],
+  "firstSensitiveAssertion": "expect(checkpointRows).toHaveLength(1) received0 at tests/time/checkpointWindow.test.ts:268:32",
+  "masking": [
+    "Exact checkpoint row metadata and +1 event-count assertions at269/270 are masked by row-count failure.",
+    "Later ledger verification, seed upper-bound and final checkpoint claimed-time assertions are masked as assertions; their precomputed public facts show valid ledger and timestamped upper-bound but earn no independent assertion pass beyond the first witness."
+  ],
+  "actualPublicFacts": "Independent query-bound OpenSSL and AMC verification succeeded; same sequence1 signed checkpoint bytes unchanged; stored rawCMS token matches; actual checkpointRows[]; required refusal body and other19 tests passed.",
+  "actualLifecycle": {
+    "childrenNatural0": 22,
+    "explicitStreamsHashMatched": 44,
+    "closedSockets": 6,
+    "closedLedgerOwners": 9,
+    "cleanupErrors": 0
+  },
+  "allHoldsRetained": true
+}

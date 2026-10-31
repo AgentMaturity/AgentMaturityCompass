@@ -1,0 +1,186 @@
+{
+  "schema": "p125pc-preservation-adapter-static-review-input-pins/1",
+  "count": 20,
+  "files": [
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/check-preservation.py",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/check-preservation.py",
+      "bytes": 3294,
+      "sha256": "d0d423129073d749b3b05c1c10cf2cb09cfe2c8239b24278277d9bb1a4572bed",
+      "dev": 16777231,
+      "inode": 543910300,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/completed-runtime-review/review.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/completed-runtime-review/review.json",
+      "bytes": 10143,
+      "sha256": "e2e0e6abb0e4bf92d0d8299660e3f47e506e6490a9b41a709f7ef374bd39191c",
+      "dev": 16777231,
+      "inode": 544002127,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/completed-runtime-review/seal.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/completed-runtime-review/seal.json",
+      "bytes": 1602,
+      "sha256": "26fb99490c91f1347217c3a0fd1456ff71d51e0f70d112f79412a1088cab1869",
+      "dev": 16777231,
+      "inode": 544002129,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/fresh-source-binding.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/fresh-source-binding.json",
+      "bytes": 127548,
+      "sha256": "9aa8dc730a6daaffbaef8f24bf12c9595a4d07c721841fb27a6d874b2cc12980",
+      "dev": 16777231,
+      "inode": 543990375,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/original-p125-packet-pinset.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/original-p125-packet-pinset.json",
+      "bytes": 506921,
+      "sha256": "860123709cfd11075a6983574c4ad8cf62bf1d52cd70747b2066b8b514f01117",
+      "dev": 16777231,
+      "inode": 544001984,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/original-p125-packet/README.md",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/original-p125-packet/README.md",
+      "bytes": 39139,
+      "sha256": "aba7856d4dd7af0f69ef520cc3c0acb801c4d49c93ab4fe680573fe97483a80b",
+      "dev": 16777231,
+      "inode": 543999052,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/original-p125-packet/assembly-inputs.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/original-p125-packet/assembly-inputs.json",
+      "bytes": 877972,
+      "sha256": "b6ccb30242fd6f54ae7490d5d382cd093c0862575c5c88a43deb0996eb069cb0",
+      "dev": 16777231,
+      "inode": 543999053,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/original-p125-packet/receipt.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/original-p125-packet/receipt.json",
+      "bytes": 525598,
+      "sha256": "63877e73c81c7888b702d47acf3777279e3002ba26db2a38dfbf0d68e50e51df",
+      "dev": 16777231,
+      "inode": 544001947,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/README.md",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/README.md",
+      "bytes": 2901,
+      "sha256": "f2bb87aa601afb0c0ad813155c45cc7823d7c90dbb84759bfaeee361a8ba4989",
+      "dev": 16777231,
+      "inode": 544002397,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/author-review.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/author-review.json",
+      "bytes": 1511,
+      "sha256": "d035c915fe7b71cd8dd5488f088fdb9e45d3dc0b1cf221db88877fe5d2bc53e3",
+      "dev": 16777231,
+      "inode": 544002398,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/c39-to-producer.patch.txt",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/c39-to-producer.patch.txt",
+      "bytes": 8932,
+      "sha256": "bef40a2b68d7577d3b51054789bdaf5aeaf1ec4e8b0afbad2530062531dcb64a",
+      "dev": 16777231,
+      "inode": 544002327,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/check-preservation.py.base.source.txt",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/check-preservation.py.base.source.txt",
+      "bytes": 3294,
+      "sha256": "d0d423129073d749b3b05c1c10cf2cb09cfe2c8239b24278277d9bb1a4572bed",
+      "dev": 16777231,
+      "inode": 544002326,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/check-preservation.py.source.txt",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/check-preservation.py.source.txt",
+      "bytes": 7187,
+      "sha256": "c4ae4e33e4182fa2e540fb55f58bcd4af6c648841651468d55096fc978db4aa0",
+      "dev": 16777231,
+      "inode": 544002325,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/input-pins.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/input-pins.json",
+      "bytes": 3544,
+      "sha256": "a52c943794a6923be87a60395c892bae4ccc3b44d1d088d6bf6e612cae9f431d",
+      "dev": 16777231,
+      "inode": 544002329,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/root-metadata-admission.template.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/root-metadata-admission.template.json",
+      "bytes": 2332,
+      "sha256": "7db5a43a23eac63a07c6802e241274433aba4bad2a2aa58d97a8310cbc065c47",
+      "dev": 16777231,
+      "inode": 544002328,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/seal.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/seal.json",
+      "bytes": 3837,
+      "sha256": "7fff960589024f152f77fee2c4c492d82b2eec614dd0115bb701ed28077ec5f8",
+      "dev": 16777231,
+      "inode": 544002399,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/protected-inputs-v3.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/protected-inputs-v3.json",
+      "bytes": 88277,
+      "sha256": "ba4495dc366f2e2051cc29679815f540f4159c7f205c6b25c22cba2fdc5a5aac",
+      "dev": 16777231,
+      "inode": 543919520,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/runtime-protected-inputs.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/runtime-protected-inputs.json",
+      "bytes": 90612,
+      "sha256": "42bfd4e5565b5d3757d8c14d39b504188ab8a30ec2b19c1bfe71750a47194c59",
+      "dev": 16777231,
+      "inode": 543919887,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/source-checkpoint.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/source-checkpoint.json",
+      "bytes": 453,
+      "sha256": "6173074e96a07158d14eea016d3c0d55e1b704d564bb76aed9f159c7f92b8b6f",
+      "dev": 16777231,
+      "inode": 543926767,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/source-selection.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/source-selection.json",
+      "bytes": 7899,
+      "sha256": "40618cf6cd152f4a56319124eb44aa967ae939b1dbdb454f2277634c30cf7431",
+      "dev": 16777231,
+      "inode": 543919580,
+      "nlink": 1
+    }
+  ]
+}

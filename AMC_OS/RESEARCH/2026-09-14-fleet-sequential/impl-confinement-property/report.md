@@ -1,6 +1,6 @@
 ## IMPL-4 — `ToolsetReadiness.confined` as a measured process property
 
-**Boundary.** Source commit c3c46083a8087b7c6fd6cfaad79b3180f9f7483f (worktree `/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_a2e7e6c6-6fc-1`, fast-forwarded from 3d6b8d4a — see decisions). Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0, `/usr/bin/sandbox-exec` present, not root. Source qualification only: no package, platform or deployed-release claim.
+**Boundary.** Source commit c3c46083a8087b7c6fd6cfaad79b3180f9f7483f (worktree `~/AgentMaturityCompass/.claude/worktrees/wf_a2e7e6c6-6fc-1`, fast-forwarded from 3d6b8d4a — see decisions). Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0, `/usr/bin/sandbox-exec` present, not root. Source qualification only: no package, platform or deployed-release claim.
 
 ### What changed
 - `src/sandbox/processConfinement.ts` (rewritten, 215 lines): `measureProcessConfinement()` returns `{verdict: confined|unconfined|unknown, declaredProbeDir, probe{path,result,code}, reason}`. One `openSync(path,"wx")` in the launcher-declared `AMC_CONFINEMENT_PROBE_DIR` (else `os.tmpdir()`), unlinked on success. EPERM/EACCES in a directory this process owns, may write by mode and can list → `confined`; permitted → `unconfined` regardless of declaration; everything else → `unknown`. `processIsConfined(m)` is true for exactly `verdict === "confined"`.

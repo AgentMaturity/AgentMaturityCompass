@@ -1,0 +1,19 @@
+{
+  "name": "amc-conformance",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Conformance suite runner for the AMC spec: tests any verifier, producer, adapter or compiler, in any language, through its command line. Private until Sid publishes it.",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "bin": {
+    "amc-conformance": "./bin/amc-conformance.mjs"
+  },
+  "files": [
+    "bin/amc-conformance.mjs",
+    "lib/*.mjs",
+    "README.md"
+  ],
+  "license": "MIT"
+}

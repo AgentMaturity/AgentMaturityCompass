@@ -1,0 +1,74 @@
+{
+  "schema": "p125pc-inert-preservation-readonly-git-successor-seal/1",
+  "at": "2026-10-17T02:15:37.027580+00:00",
+  "parentSeal": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/seal.json",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/seal.json",
+    "bytes": 3837,
+    "sha256": "7fff960589024f152f77fee2c4c492d82b2eec614dd0115bb701ed28077ec5f8",
+    "dev": 16777231,
+    "inode": 544002399,
+    "nlink": 1
+  },
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/v2/check-preservation.py.source.txt",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/v2/check-preservation.py.source.txt",
+      "bytes": 7209,
+      "sha256": "ed81b906b74b7a8c548bdb786ce39dbae8804398a88b7c10e814ec7e40e2e98a",
+      "dev": 16777231,
+      "inode": 544002640,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/v2/v1-to-v2.patch.txt",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/v2/v1-to-v2.patch.txt",
+      "bytes": 1093,
+      "sha256": "03583f63a74486f6135df9536e6050170a5fafe5047201557452870cc5ff34ff",
+      "dev": 16777231,
+      "inode": 544002641,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/v2/c39-to-producer.patch.txt",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/v2/c39-to-producer.patch.txt",
+      "bytes": 9133,
+      "sha256": "f36ce523c818b6d1b24033a6e0748f5095b92e97be74d17a04033cc35c1d1c4d",
+      "dev": 16777231,
+      "inode": 544002642,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/v2/input-pins.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/v2/input-pins.json",
+      "bytes": 3177,
+      "sha256": "ccf87bc7d84feb4a394969e2db61ef4109dac4145ae74bdc0066ce5e2b4297d0",
+      "dev": 16777231,
+      "inode": 544002643,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/v2/README.md",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/v2/README.md",
+      "bytes": 973,
+      "sha256": "fb7817b9fd69a50f65824223cb37f7bf5ff5be0a0d1b196ae188c33a06182bff",
+      "dev": 16777231,
+      "inode": 544002644,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/v2/author-review.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/v2/author-review.json",
+      "bytes": 570,
+      "sha256": "97a688d46842a4dad27e938219d230da8a0b1199ec7ea46be0488ed71c7a1336",
+      "dev": 16777231,
+      "inode": 544002645,
+      "nlink": 1
+    }
+  ],
+  "onlyChange": "Exactly one global --no-optional-locks argument after git; all other helper bytes equal V1.",
+  "originalTemplateAndAllV1ArtifactsPreserved": true,
+  "helperImportedParsedCompiledOrExecuted": false,
+  "blockers": [],
+  "noExecutionOrAdmissionCredit": true
+}

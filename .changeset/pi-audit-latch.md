@@ -1,0 +1,11 @@
+---
+"agent-maturity-compass": minor
+---
+
+Pi control mode now follows the evidence rules of Claude Code's hooks: a Pi tool outcome AMC cannot record no longer passes silently. Re-install Pi control installations (`amc connect hooks install --provider pi --mode control`), because AMC's extension module changed and the old installation reads as drifted.
+
+- **Outcomes at the control route.** On `tool_result` the extension records `action.completed` or `action.failed` at the observed ingress, then posts `{ hook_event_name: "tool_result", pi: { sessionId, toolCallId }, tool_name, tool_input, isError, ingressRecorded, decisionReceiptSha256 }` to `/bridge/hooks/control/v1`. AMC records `amc.pi-post-execution/v1` (decision, authorized and reported argument digests, `authorizationMismatch`), signed and verified as written, only when it names the call's decision, comes with that decision's lease and the session is registered; otherwise it records it as unmatched and refuses it (409). `ingressRecorded: false` is recorded and refused (422). The input is never stored. Pi decision rows now record their `leaseId`.
+- **Audit latch.** A failure of AMC's own writer while recording a registered Pi session's outcome or registration latches the workspace's hooks (`<AMC home>/state/hook-audit-latch/`), so every later Pi `tool_call` is blocked and Pi is told why, until `amc connect hooks health --provider pi --recover-latch` (owner mode, vault passphrase). Input never latches.
+- **Repeats.** The extension never counts a 409 as recorded: a request observation that conflicts with one AMC recorded blocks the call. The same outcome sent again for the same decision is answered as recorded (an idempotent replay); any other repeat is kept, flagged `conflictOf` and refused.
+- **Intake caps.** Pi outcomes are capped per session (120 a minute), lease (360) and workspace (1,200); over a cap the outcome is listed in a signed intake summary row and the scope's `tool_call` decisions are denied until its minute passes. Pi session registrations are capped at 30 a minute per lease and 60 per workspace; the registration counters are now shared by Claude Code and Pi.
+- **Errors.** A Bridge error the extension reports now includes the Bridge's reason.

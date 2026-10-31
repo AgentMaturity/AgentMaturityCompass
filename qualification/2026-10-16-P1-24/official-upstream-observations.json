@@ -1,0 +1,112 @@
+{
+  "recordedUtc": "2026-10-16T09:59:17.818785+00:00",
+  "files": [
+    {
+      "revision": "5badb15009ae1756c3afe0ae0cef1faafc290ccc",
+      "url": "https://raw.githubusercontent.com/deepseek-ai/deepseek-harness/5badb15009ae1756c3afe0ae0cef1faafc290ccc/packages/core/session/src/types.ts",
+      "path": "/private/tmp/p1-24-qualification-20261016/upstream-read/5badb15009ae1756c3afe0ae0cef1faafc290ccc/packages/core/session/src/types.ts",
+      "bytes": 23124,
+      "sha256": "67ff2491ae8284ab61c2c1a57e346fd4d12effb1e82a42aa654bcc90f067215c"
+    },
+    {
+      "revision": "5badb15009ae1756c3afe0ae0cef1faafc290ccc",
+      "url": "https://raw.githubusercontent.com/deepseek-ai/deepseek-harness/5badb15009ae1756c3afe0ae0cef1faafc290ccc/packages/session/session-persistence-jsonl/src/format.ts",
+      "path": "/private/tmp/p1-24-qualification-20261016/upstream-read/5badb15009ae1756c3afe0ae0cef1faafc290ccc/packages/session/session-persistence-jsonl/src/format.ts",
+      "bytes": 21586,
+      "sha256": "87d536ead041fb953f866e0191a79b4dbbbc510aee1461706f9cdc2e4c46a038"
+    },
+    {
+      "revision": "5badb15009ae1756c3afe0ae0cef1faafc290ccc",
+      "url": "https://raw.githubusercontent.com/deepseek-ai/deepseek-harness/5badb15009ae1756c3afe0ae0cef1faafc290ccc/packages/session/session-log-deepseek/README.md",
+      "path": "/private/tmp/p1-24-qualification-20261016/upstream-read/5badb15009ae1756c3afe0ae0cef1faafc290ccc/packages/session/session-log-deepseek/README.md",
+      "bytes": 6165,
+      "sha256": "79f2a9baa66880cddfe6164ba39c1caf8e62821ed5e193a9118cc2b186297325"
+    },
+    {
+      "revision": "5badb15009ae1756c3afe0ae0cef1faafc290ccc",
+      "url": "https://raw.githubusercontent.com/deepseek-ai/deepseek-harness/5badb15009ae1756c3afe0ae0cef1faafc290ccc/packages/session/session-log-deepseek/src/types.ts",
+      "path": "/private/tmp/p1-24-qualification-20261016/upstream-read/5badb15009ae1756c3afe0ae0cef1faafc290ccc/packages/session/session-log-deepseek/src/types.ts",
+      "bytes": 3514,
+      "sha256": "50502d41818d223ed559c7cd694b5bf8b1837a1511e8f6fc3dfd0965b85a9e79"
+    },
+    {
+      "revision": "5badb15009ae1756c3afe0ae0cef1faafc290ccc",
+      "url": "https://raw.githubusercontent.com/deepseek-ai/deepseek-harness/5badb15009ae1756c3afe0ae0cef1faafc290ccc/packages/session/session-log-deepseek/src/index.ts",
+      "path": "/private/tmp/p1-24-qualification-20261016/upstream-read/5badb15009ae1756c3afe0ae0cef1faafc290ccc/packages/session/session-log-deepseek/src/index.ts",
+      "bytes": 10338,
+      "sha256": "28db84b705fbf74970cf9dd566fcb7908b1d1cea798d8ea5bd136113ccb260b0"
+    },
+    {
+      "revision": "c389f96bf3a9b6807cb71ed6bdad5849be0df6d8",
+      "url": "https://raw.githubusercontent.com/deepseek-ai/deepseek-harness/c389f96bf3a9b6807cb71ed6bdad5849be0df6d8/packages/core/session/src/types.ts",
+      "path": "/private/tmp/p1-24-qualification-20261016/upstream-read/c389f96bf3a9b6807cb71ed6bdad5849be0df6d8/packages/core/session/src/types.ts",
+      "bytes": 21226,
+      "sha256": "439b52f9d1e8c5fd0146e60fcc93f25bba99261dd877b91d160fe839626cac0e"
+    },
+    {
+      "revision": "c389f96bf3a9b6807cb71ed6bdad5849be0df6d8",
+      "url": "https://raw.githubusercontent.com/deepseek-ai/deepseek-harness/c389f96bf3a9b6807cb71ed6bdad5849be0df6d8/packages/session/session-persistence-jsonl/src/format.ts",
+      "path": "/private/tmp/p1-24-qualification-20261016/upstream-read/c389f96bf3a9b6807cb71ed6bdad5849be0df6d8/packages/session/session-persistence-jsonl/src/format.ts",
+      "bytes": 20812,
+      "sha256": "d6e76e16efe1528f2f7406fc4c49151a1923b68c0ee4b31d2f2fddcf40ffa10b"
+    },
+    {
+      "revision": "c389f96bf3a9b6807cb71ed6bdad5849be0df6d8",
+      "url": "https://raw.githubusercontent.com/deepseek-ai/deepseek-harness/c389f96bf3a9b6807cb71ed6bdad5849be0df6d8/packages/session/session-log-deepseek/README.md",
+      "path": "/private/tmp/p1-24-qualification-20261016/upstream-read/c389f96bf3a9b6807cb71ed6bdad5849be0df6d8/packages/session/session-log-deepseek/README.md",
+      "bytes": 4311,
+      "sha256": "87a75f6f480b2132c6cfd1b29b98c3253b66e5d15d056839150d5bc864b6bedb"
+    },
+    {
+      "revision": "c389f96bf3a9b6807cb71ed6bdad5849be0df6d8",
+      "url": "https://raw.githubusercontent.com/deepseek-ai/deepseek-harness/c389f96bf3a9b6807cb71ed6bdad5849be0df6d8/packages/session/session-log-deepseek/src/types.ts",
+      "path": "/private/tmp/p1-24-qualification-20261016/upstream-read/c389f96bf3a9b6807cb71ed6bdad5849be0df6d8/packages/session/session-log-deepseek/src/types.ts",
+      "bytes": 2769,
+      "sha256": "5662d15b2d8eee5203f913a1a3e48295ae2870d326097d21deb24b9c2f4a0d7c"
+    },
+    {
+      "revision": "c389f96bf3a9b6807cb71ed6bdad5849be0df6d8",
+      "url": "https://raw.githubusercontent.com/deepseek-ai/deepseek-harness/c389f96bf3a9b6807cb71ed6bdad5849be0df6d8/packages/session/session-log-deepseek/src/index.ts",
+      "path": "/private/tmp/p1-24-qualification-20261016/upstream-read/c389f96bf3a9b6807cb71ed6bdad5849be0df6d8/packages/session/session-log-deepseek/src/index.ts",
+      "bytes": 6898,
+      "sha256": "2b88738788bc898e1fcd99a3755464af9234b133ff85eb009ceb0c8e6d812a8f"
+    }
+  ],
+  "selectedFacts": [
+    {
+      "revision": "5badb15009ae1756c3afe0ae0cef1faafc290ccc",
+      "formatVersion": 4,
+      "physicalHeaderFields": [
+        "type:session",
+        "version",
+        "id",
+        "createdAt",
+        "isSeeded",
+        "delegationDepth"
+      ],
+      "enabledDefault": "true",
+      "maxBytesDefault": 8388608,
+      "note": "Null fieldcap means no independent request-field cap atAMCpin; no generic provider size assertion."
+    },
+    {
+      "revision": "c389f96bf3a9b6807cb71ed6bdad5849be0df6d8",
+      "formatVersion": 2,
+      "physicalHeaderFields": [
+        "type:session",
+        "version",
+        "id",
+        "createdAt",
+        "isSeeded",
+        "delegationDepth"
+      ],
+      "enabledDefault": "false",
+      "maxBytesDefault": null,
+      "note": "Null fieldcap means no independent request-field cap atAMCpin; no generic provider size assertion."
+    }
+  ],
+  "noRuntime": true,
+  "v4SessionsRecordedForAMC": false,
+  "v4SupportQualified": false,
+  "deploymentNeverUploaded": false,
+  "notReadAsCurrentHead": "Both immutablehistoricalpins, not a claimabout repositorylatest release."
+}

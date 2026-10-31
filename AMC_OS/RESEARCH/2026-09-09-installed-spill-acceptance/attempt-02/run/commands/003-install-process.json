@@ -10,7 +10,7 @@
     "--foreground-scripts",
     "--ignore-scripts=false",
     "--save-exact",
-    "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/inputs/candidate.tgz"
+    "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/inputs/candidate.tgz"
   ],
   "startedAt": "2026-09-09T15:38:44.060559+00:00",
   "timeoutSeconds": 600,

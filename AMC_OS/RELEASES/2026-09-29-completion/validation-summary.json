@@ -67,8 +67,8 @@
   "hostedStatus": "final-hosted-status.json",
   "remainingScope": "README.md#remaining-boundaries-and-next-required-inputs",
   "externalNotesUpdated": [
-    "/Users/sid/Documents/AMC/AMC Home.md",
-    "/Users/sid/Documents/AMC/Projects/AMC/AMC Roadmap.md"
+    "~/Documents/AMC/AMC Home.md",
+    "~/Documents/AMC/Projects/AMC/AMC Roadmap.md"
   ],
   "finalCommitScope": "Evidence, plans and handoff only; runtime/source remains tested candidate421859b0.",
   "handoffChecks": {

@@ -21,9 +21,9 @@ input.on("line", data => {
   if (request.id === undefined) return;
   if (request.method === "initialize") {
     const image = mode === "no-image" ? false : mode === "truthy-image" ? "true" : true;
-    process.stdout.write(line(reply(request.id, { protocolVersion: 1, agentInfo: { name: "agent-maturity-compass", version: "untrusted-fixture" },
+    process.stdout.write(line(reply(request.id, { protocolVersion: 1, agentInfo: { name: "agent-maturity-compass", version: "1.2.0" },
       agentCapabilities: { loadSession: true, promptCapabilities: { image, audio: false, embeddedContext: false },
-        _meta: { "dev.agentmaturity.amc": { releaseSession: true } } } })));
+        _meta: { "dev.agentmaturity.amc": { releaseSession: true, executionApi: 1 } } } })));
   } else if (request.method === "session/new") process.stdout.write(line(reply(request.id, { sessionId })));
   else if (request.method === "_amc/session/release") process.stdout.write(line(reply(request.id, {})));
   else if (request.method === "session/prompt") {

@@ -176,3 +176,12 @@ describe("GAP-3754 promptflow risk/cost/latency SLO boundary", () => {
     }
   });
 });
+
+
+it("retains rounded nearest-rank latency in risk/cost SLO receipts", () => {
+  const receipt = buildRiskCostLatencySloReceipt({
+    definition: definition(),
+    traces: [trace("stats-1", { latencyMs: 1 }), trace("stats-2", { latencyMs: 9.12345678 })],
+  });
+  expect(receipt.liveTrends.p95LatencyMs).toBe(9.123457);
+});

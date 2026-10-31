@@ -1,0 +1,272 @@
+[
+  {
+    "name": "frozen-install",
+    "cmd": "pnpm install --frozen-lockfile",
+    "exit": 0,
+    "durationMs": 1914,
+    "startedUtc": "2026-10-14T20:24:50.919686+00:00",
+    "log": "/private/tmp/p0-27-frozen-install-20261015.log",
+    "sourceHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4"
+  },
+  {
+    "name": "current-build",
+    "cmd": "npm run build",
+    "exit": 0,
+    "durationMs": 30468,
+    "startedUtc": "2026-10-14T20:25:37.655346+00:00",
+    "log": "/private/tmp/p0-27-current-build-20261015.log",
+    "sourceHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4"
+  },
+  {
+    "name": "original-runtime-contracts",
+    "cmd": "npx vitest run tests/nativeBudgets.test.ts tests/cliAgentLoopCommands.test.ts --reporter=json --outputFile=/private/tmp/p0-27-original-runtime-contracts-20261015.json",
+    "exit": 0,
+    "durationMs": 11034,
+    "startedUtc": "2026-10-14T20:26:59.431672+00:00",
+    "log": "/private/tmp/p0-27-original-runtime-contracts-20261015.log",
+    "sourceHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4"
+  },
+  {
+    "name": "budget-integrity-first",
+    "cmd": "env AMC_P0_27_BUDGET_EVIDENCE_DIR=/private/tmp/p0-27-budget-first-evidence-20261015 npx vitest run tests/budgetIntegrityQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-27-budget-integrity-first-20261015.json",
+    "exit": 0,
+    "durationMs": 4441,
+    "startedUtc": "2026-10-14T20:30:10.943696+00:00",
+    "log": "/private/tmp/p0-27-budget-integrity-first-20261015.log",
+    "sourceHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4"
+  },
+  {
+    "name": "checkpoint-first",
+    "cmd": "env AMC_P0_27_CHECKPOINT_EFFECTS_DIR=/private/tmp/p0-27-checkpoint-first-20261015 pnpm exec vitest run tests/controlCheckpointQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-27-checkpoint-first-20261015.json",
+    "exit": 0,
+    "durationMs": 748,
+    "startedUtc": "2026-10-14T20:33:20.180219+00:00",
+    "log": "/private/tmp/p0-27-checkpoint-first-20261015.log",
+    "sourceHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4"
+  },
+  {
+    "name": "export-first",
+    "cmd": "env AMC_P0_27_EXPORT_EFFECTS_DIR=/private/tmp/p0-27-export-first-20261015 pnpm exec vitest run tests/evidenceAgentFilterQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-27-export-first-20261015.json",
+    "exit": 1,
+    "durationMs": 3564,
+    "startedUtc": "2026-10-14T20:33:20.180224+00:00",
+    "log": "/private/tmp/p0-27-export-first-20261015.log",
+    "sourceHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4"
+  },
+  {
+    "name": "compiled-cli-first",
+    "cmd": "node /private/tmp/p0-27-compiled-cli-20261015.mjs",
+    "exit": 1,
+    "durationMs": 2559,
+    "startedUtc": "2026-10-14T20:34:28.240373+00:00",
+    "log": "/private/tmp/p0-27-compiled-cli-first-20261015.log",
+    "sourceHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4"
+  },
+  {
+    "name": "session-first",
+    "cmd": "pnpm exec vitest run tests/assuranceSessionQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-27-session-first-20261015.json",
+    "exit": 0,
+    "durationMs": 6047,
+    "startedUtc": "2026-10-14T20:34:27.974214+00:00",
+    "log": "/private/tmp/p0-27-session-first-20261015.log",
+    "sourceHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4"
+  },
+  {
+    "name": "causal-fixture",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-27-private-causal-v8mdbxtn/fixture.mjs",
+    "exit": 0,
+    "durationMs": 673,
+    "startedUtc": "2026-10-14T20:37:04.363659+00:00",
+    "log": "/private/tmp/p0-27-causal-fixture-20261015.log",
+    "sourceHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4"
+  },
+  {
+    "name": "compiled-cli-current-contract",
+    "cmd": "node /private/tmp/p0-27-compiled-cli-20261015.mjs",
+    "exit": 1,
+    "durationMs": 5503,
+    "startedUtc": "2026-10-14T20:37:18.849924+00:00",
+    "log": "/private/tmp/p0-27-compiled-cli-current-contract-20261015.log",
+    "sourceHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4"
+  },
+  {
+    "name": "checkpoint-causal-baseline",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-27-private-causal-v8mdbxtn/observer.mjs checkpoint baseline",
+    "exit": 0,
+    "durationMs": 272,
+    "startedUtc": "2026-10-14T20:37:35.323138+00:00",
+    "log": "/private/tmp/p0-27-checkpoint-causal-baseline-20261015.log",
+    "sourceHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4"
+  },
+  {
+    "name": "checkpoint-causal-mutant",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-27-private-causal-v8mdbxtn/observer.mjs checkpoint mutant",
+    "exit": 1,
+    "durationMs": 281,
+    "startedUtc": "2026-10-14T20:37:35.773327+00:00",
+    "log": "/private/tmp/p0-27-checkpoint-causal-mutant-20261015.log",
+    "sourceHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4"
+  },
+  {
+    "name": "checkpoint-causal-restored",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-27-private-causal-v8mdbxtn/observer.mjs checkpoint restored",
+    "exit": 0,
+    "durationMs": 272,
+    "startedUtc": "2026-10-14T20:37:36.233297+00:00",
+    "log": "/private/tmp/p0-27-checkpoint-causal-restored-20261015.log",
+    "sourceHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4"
+  },
+  {
+    "name": "export-causal-baseline",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-27-private-causal-v8mdbxtn/observer.mjs export baseline",
+    "exit": 1,
+    "durationMs": 300,
+    "startedUtc": "2026-10-14T20:37:36.682073+00:00",
+    "log": "/private/tmp/p0-27-export-causal-baseline-20261015.log",
+    "sourceHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4"
+  },
+  {
+    "name": "credential-permissions-diagnostic",
+    "cmd": "env -i PATH=/opt/homebrew/opt/node@22/bin:/usr/bin:/bin HOME=/private/tmp/p0-27-compiled-cli-0wrJI8/owned-state/operator-home AMC_HOME=/private/tmp/p0-27-compiled-cli-0wrJI8/owned-state/operator-home /opt/homebrew/opt/node@22/bin/node --input-type=module -",
+    "exit": 0,
+    "durationMs": 94,
+    "startedUtc": "2026-10-14T20:37:43.423813+00:00",
+    "log": "/private/tmp/p0-27-credential-permissions-diagnostic-20261015.log",
+    "sourceHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4"
+  },
+  {
+    "name": "export-causal-selection-baseline",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-27-private-causal-v8mdbxtn/observer.mjs export selection-baseline",
+    "exit": 0,
+    "durationMs": 302,
+    "startedUtc": "2026-10-14T20:38:22.474421+00:00",
+    "log": "/private/tmp/p0-27-export-causal-selection-baseline-20261015.log",
+    "sourceHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4"
+  },
+  {
+    "name": "export-causal-selection-mutant",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-27-private-causal-v8mdbxtn/observer.mjs export selection-mutant",
+    "exit": 1,
+    "durationMs": 296,
+    "startedUtc": "2026-10-14T20:38:22.955214+00:00",
+    "log": "/private/tmp/p0-27-export-causal-selection-mutant-20261015.log",
+    "sourceHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4"
+  },
+  {
+    "name": "export-causal-selection-restored",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-27-private-causal-v8mdbxtn/observer.mjs export selection-restored",
+    "exit": 0,
+    "durationMs": 296,
+    "startedUtc": "2026-10-14T20:38:23.426399+00:00",
+    "log": "/private/tmp/p0-27-export-causal-selection-restored-20261015.log",
+    "sourceHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4"
+  },
+  {
+    "name": "session-private-guards",
+    "cmd": "python3 /private/tmp/p0-27-private-runner-guards-20261015.py",
+    "exit": 0,
+    "durationMs": 4758,
+    "startedUtc": "2026-10-14T20:38:49.868625+00:00",
+    "log": "/private/tmp/p0-27-session-private-guards-20261015.log",
+    "sourceHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4"
+  },
+  {
+    "name": "compiled-cli-cold",
+    "cmd": "node /private/tmp/p0-27-compiled-cli-20261015.mjs",
+    "exit": 0,
+    "durationMs": 7843,
+    "startedUtc": "2026-10-14T20:40:12.253163+00:00",
+    "log": "/private/tmp/p0-27-compiled-cli-cold-20261015.log",
+    "sourceHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4"
+  },
+  {
+    "name": "session-private-guards-exact-inputs",
+    "cmd": "python3 /private/tmp/p0-27-private-runner-exact-inputs-20261015.py",
+    "exit": 0,
+    "durationMs": 4909,
+    "startedUtc": "2026-10-14T20:40:39.127058+00:00",
+    "log": "/private/tmp/p0-27-session-private-guards-exact-inputs-20261015.log",
+    "sourceHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4"
+  },
+  {
+    "name": "generate-counts",
+    "cmd": "npm run gen-counts",
+    "exit": 0,
+    "durationMs": 547,
+    "startedUtc": "2026-10-14T20:42:35.717013+00:00",
+    "log": "/private/tmp/p0-27-generate-counts-20261015.log",
+    "sourceHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4"
+  },
+  {
+    "name": "candidate-lint",
+    "cmd": "npm run lint",
+    "exit": 0,
+    "durationMs": 4914,
+    "startedUtc": "2026-10-14T20:42:34.461617+00:00",
+    "log": "/private/tmp/p0-27-candidate-lint-20261015.log",
+    "sourceHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4"
+  },
+  {
+    "name": "candidate-production-types",
+    "cmd": "npm run typecheck",
+    "exit": 0,
+    "durationMs": 29294,
+    "startedUtc": "2026-10-14T20:42:34.461579+00:00",
+    "log": "/private/tmp/p0-27-candidate-production-types-20261015.log",
+    "sourceHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4"
+  },
+  {
+    "name": "candidate-test-types",
+    "cmd": "npm run typecheck:tests",
+    "exit": 0,
+    "durationMs": 38127,
+    "startedUtc": "2026-10-14T20:42:34.461580+00:00",
+    "log": "/private/tmp/p0-27-candidate-test-types-20261015.log",
+    "sourceHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4"
+  },
+  {
+    "name": "final-build",
+    "cmd": "npm run build",
+    "exit": 0,
+    "durationMs": 30358,
+    "startedUtc": "2026-10-14T20:44:55.312665+00:00",
+    "log": "/private/tmp/p0-27-final-build-20261015.log",
+    "sourceHead": "8c16a9044ddea43923e3ed49bc36a9aada485855"
+  },
+  {
+    "name": "final-source-duplicates",
+    "cmd": "npm run check:duplicates",
+    "exit": 1,
+    "durationMs": 1372,
+    "startedUtc": "2026-10-14T20:45:45.730418+00:00",
+    "log": "/private/tmp/p0-27-final-source-duplicates-20261015.log",
+    "sourceHead": "8c16a9044ddea43923e3ed49bc36a9aada485855"
+  },
+  {
+    "name": "final-source-dead-code",
+    "cmd": "npm run check:dead-code",
+    "exit": 1,
+    "durationMs": 3931,
+    "startedUtc": "2026-10-14T20:45:45.730488+00:00",
+    "log": "/private/tmp/p0-27-final-source-dead-code-20261015.log",
+    "sourceHead": "8c16a9044ddea43923e3ed49bc36a9aada485855"
+  },
+  {
+    "name": "final-bounded-node22",
+    "cmd": "npx vitest run tests/nativeBudgets.test.ts tests/cliAgentLoopCommands.test.ts tests/assuranceSessionQualification.test.ts tests/budgetIntegrityQualification.test.ts tests/controlCheckpointQualification.test.ts tests/evidenceAgentFilterQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-27-final-bounded-node22-20261015.json",
+    "exit": 1,
+    "durationMs": 14695,
+    "startedUtc": "2026-10-14T20:46:54.278640+00:00",
+    "log": "/private/tmp/p0-27-final-bounded-node22-20261015.log",
+    "sourceHead": "8c16a9044ddea43923e3ed49bc36a9aada485855"
+  },
+  {
+    "name": "final-normal-static",
+    "cmd": "python3 -c 'import subprocess,sys; commands=[\"check:freeze\",\"check:architecture-boundaries\",\"check:counts\",\"check:docs-drift\",\"check:clean-source\",\"check:api-ref\"]; statuses=[]; [(print(\"RUN \"+c,flush=True),statuses.append(subprocess.run([\"npm\",\"run\",c]).returncode)) for c in commands]; print(statuses);sys.exit(any(statuses))'",
+    "exit": 0,
+    "durationMs": 57259,
+    "startedUtc": "2026-10-14T20:46:54.278637+00:00",
+    "log": "/private/tmp/p0-27-final-normal-static-20261015.log",
+    "sourceHead": "8c16a9044ddea43923e3ed49bc36a9aada485855"
+  }
+]

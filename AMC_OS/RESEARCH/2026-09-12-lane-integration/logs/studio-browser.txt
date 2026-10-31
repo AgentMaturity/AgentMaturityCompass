@@ -1,5 +1,5 @@
 
- RUN  v4.1.11 /Users/sid/AgentMaturityCompass
+ RUN  v4.1.11 ~/AgentMaturityCompass
 
  ❯ tests/cosProduct09StudioPage.test.ts (4 tests | 4 failed) 7303ms
    × P09 actual browser text attachments retain the original bytes across explicit retry and preserve edited drafts 5775ms
@@ -10,7 +10,7 @@
 ⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
 
  FAIL  tests/cosProduct09StudioPage.test.ts > P09 actual browser text attachments retain the original bytes across explicit retry and preserve edited drafts
-Error: browserType.launch: Executable doesn't exist at /Users/sid/Library/Caches/ms-playwright/chromium_headless_shell-1234/chrome-headless-shell-mac-arm64/chrome-headless-shell
+Error: browserType.launch: Executable doesn't exist at ~/Library/Caches/ms-playwright/chromium_headless_shell-1234/chrome-headless-shell-mac-arm64/chrome-headless-shell
 ╔════════════════════════════════════════════════════════════╗
 ║ Looks like Playwright was just installed or updated.       ║
 ║ Please run the following command to download new browsers: ║
@@ -31,7 +31,7 @@ Error: browserType.launch: Executable doesn't exist at /Users/sid/Library/Caches
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
 
  FAIL  tests/cosProduct09StudioPage.test.ts > P09 an old real poll cannot restore controls after offline, and failed setup still exposes reconnect
-Error: browserType.launch: Executable doesn't exist at /Users/sid/Library/Caches/ms-playwright/chromium_headless_shell-1234/chrome-headless-shell-mac-arm64/chrome-headless-shell
+Error: browserType.launch: Executable doesn't exist at ~/Library/Caches/ms-playwright/chromium_headless_shell-1234/chrome-headless-shell-mac-arm64/chrome-headless-shell
 ╔════════════════════════════════════════════════════════════╗
 ║ Looks like Playwright was just installed or updated.       ║
 ║ Please run the following command to download new browsers: ║
@@ -52,7 +52,7 @@ Error: browserType.launch: Executable doesn't exist at /Users/sid/Library/Caches
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
 
  FAIL  tests/cosProduct09StudioPage.test.ts > P09 signed approval visibility, actual cancellation, and same-session resume never imply a prompt replay
-Error: browserType.launch: Executable doesn't exist at /Users/sid/Library/Caches/ms-playwright/chromium_headless_shell-1234/chrome-headless-shell-mac-arm64/chrome-headless-shell
+Error: browserType.launch: Executable doesn't exist at ~/Library/Caches/ms-playwright/chromium_headless_shell-1234/chrome-headless-shell-mac-arm64/chrome-headless-shell
 ╔════════════════════════════════════════════════════════════╗
 ║ Looks like Playwright was just installed or updated.       ║
 ║ Please run the following command to download new browsers: ║
@@ -73,7 +73,7 @@ Error: browserType.launch: Executable doesn't exist at /Users/sid/Library/Caches
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
 
  FAIL  tests/cosProduct09StudioPage.test.ts > P09 original media picker follows real discovery, keeps ordering local, and never tests a provider by selecting files
-Error: browserType.launch: Executable doesn't exist at /Users/sid/Library/Caches/ms-playwright/chromium_headless_shell-1234/chrome-headless-shell-mac-arm64/chrome-headless-shell
+Error: browserType.launch: Executable doesn't exist at ~/Library/Caches/ms-playwright/chromium_headless_shell-1234/chrome-headless-shell-mac-arm64/chrome-headless-shell
 ╔════════════════════════════════════════════════════════════╗
 ║ Looks like Playwright was just installed or updated.       ║
 ║ Please run the following command to download new browsers: ║

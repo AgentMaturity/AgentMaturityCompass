@@ -14,6 +14,7 @@
  *  - "Unsupported confidence penalty" → when confidence and evidence diverge
  */
 
+import { mean as statsMean, median as statsMedian } from "../experiments/stats.js";
 import Database from "better-sqlite3";
 import { z } from "zod";
 import type { Claim, ClaimProvenanceTag } from "./claimTypes.js";
@@ -448,11 +449,8 @@ export function buildConfidenceHistograms(
     }
 
     const confidences = domainAssessments.map((a) => a.adjustedConfidence);
-    const sorted = [...confidences].sort((a, b) => a - b);
-    const avg = confidences.reduce((s, c) => s + c, 0) / confidences.length;
-    const median = sorted.length % 2 === 0
-      ? ((sorted[sorted.length / 2 - 1] ?? 0) + (sorted[sorted.length / 2] ?? 0)) / 2
-      : sorted[Math.floor(sorted.length / 2)] ?? 0;
+    const avg = statsMean(confidences);
+    const median = statsMedian(confidences);
 
     const threshold = cfg.domainMinConfidence[domain] ?? cfg.globalMinConfidence;
     const belowThreshold = domainAssessments.filter(

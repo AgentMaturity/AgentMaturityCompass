@@ -1,0 +1,140 @@
+{
+  "schema": "amc-private-score-qualification-runtime-observer/1",
+  "pid": 23525,
+  "cwd": "/private/tmp/p0-11-causal-qualification-20261015/closure",
+  "reason": "passed",
+  "files": [
+    "/private/tmp/p0-11-causal-qualification-20261015/closure/tests/toolEvidenceRecording.test.ts"
+  ],
+  "testCount": 7,
+  "unhandledErrors": [],
+  "tasks": [
+    {
+      "kind": "file",
+      "id": "1533357729",
+      "name": "tests/toolEvidenceRecording.test.ts",
+      "fullName": null,
+      "filepath": "/private/tmp/p0-11-causal-qualification-20261015/closure/tests/toolEvidenceRecording.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "1533357729_0",
+      "name": "tests/toolEvidenceRecording.test.ts a governed call leaves evidence",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1533357729_0_0",
+      "name": "tests/toolEvidenceRecording.test.ts a governed call leaves evidence records an ALLOWED call",
+      "fullName": "a governed call leaves evidence records an ALLOWED call",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1533357729_0_1",
+      "name": "tests/toolEvidenceRecording.test.ts a governed call leaves evidence records a DENIED call, with which guard refused and why",
+      "fullName": "a governed call leaves evidence records a DENIED call, with which guard refused and why",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1533357729_0_2",
+      "name": "tests/toolEvidenceRecording.test.ts a governed call leaves evidence writes an audit row AND a metric row per call",
+      "fullName": "a governed call leaves evidence writes an audit row AND a metric row per call",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1533357729_0_3",
+      "name": "tests/toolEvidenceRecording.test.ts a governed call leaves evidence correlates a call to its token, so a denial can be traced",
+      "fullName": "a governed call leaves evidence correlates a call to its token, so a denial can be traced",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1533357729_0_4",
+      "name": "tests/toolEvidenceRecording.test.ts a governed call leaves evidence does NOT copy the arguments into the audit row",
+      "fullName": "a governed call leaves evidence does NOT copy the arguments into the audit row",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "1533357729_1",
+      "name": "tests/toolEvidenceRecording.test.ts recording never breaks the call",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1533357729_1_0",
+      "name": "tests/toolEvidenceRecording.test.ts recording never breaks the call returns the tool's real outcome when the recorder throws",
+      "fullName": "recording never breaks the call returns the tool's real outcome when the recorder throws",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "1533357729_2",
+      "name": "tests/toolEvidenceRecording.test.ts the projection itself",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1533357729_2_0",
+      "name": "tests/toolEvidenceRecording.test.ts the projection itself labels the three outcomes distinctly",
+      "fullName": "the projection itself labels the three outcomes distinctly",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    }
+  ],
+  "boundary": "Run-end records precede global teardown; post-exit outer streams are separately checked. Serialized test errors retain body/hook stacks for manual classification."
+}

@@ -1,0 +1,16 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L0-IDN-04",
+  "polarity": "negative",
+  "evidenceClass": "unknown_authority",
+  "setup": {
+    "harness": "lease_revocation_drill",
+    "actionClass": "WRITE_HIGH",
+    "mode": "revocation_list_tampered",
+    "boundMs": 5000
+  },
+  "expected": {
+    "result": "deny",
+    "reasonCode": "authorization_denied:authority_store_unavailable"
+  }
+}

@@ -1,0 +1,20 @@
+$ fs.read { path: greet.ts, offset: 1, limit: 3 }
+     1	export function greet(name: string): string {
+     2	  return "Hello, " + name;
+     3	}
+[amc: lines 1-3 of 5]
+
+$ fs.edit {"path":"greet.ts","edits":[{"find":"\"Hello, \" + name","replace":"`Hello, ${name}`"},{"find":"\"world\"","replace":"\"AMC\""}]}
+edited greet.ts (2 replacements)
+--- a/greet.ts
++++ b/greet.ts
+@@ -1,5 +1,5 @@
+ export function greet(name: string): string {
+-  return "Hello, " + name;
++  return `Hello, ${name}`;
+ }
+ 
+-console.log(greet("world"));
++console.log(greet("AMC"));
+
+audit payload: {"auditType":"TOOL_CALL_ALLOWED","tool":"fs.edit","denied":null,"outcome":"ok","fileChange":{"path":"greet.ts","beforeSha256":"61cbf0691b7ea152d1f3778e784b2643e07b6ba419dc3ef99ec6a7e201e596ef","afterSha256":"64909030647cc9cd6cbd37561d7570e294ab09a42b0c8ecd1aaa2aa3879bb33f","bytesBefore":105,"bytesAfter":103,"replacements":2,"diffSha256":"1a23c9a46f56e04a44e12495a9d1d47c0c4468dd91593951f38c217eff4640eb","diffTruncated":false}}

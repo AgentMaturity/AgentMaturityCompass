@@ -110,7 +110,7 @@
         "--foreground-scripts",
         "--ignore-scripts=false",
         "--save-exact",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/inputs/candidate.tgz"
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/inputs/candidate.tgz"
       ],
       "startedAt": "2026-09-09T15:38:44.060559+00:00",
       "timeoutSeconds": 600,
@@ -172,7 +172,7 @@
       "label": "004-sqlite-init",
       "command": [
         "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
         "init",
         "--trust-boundary",
         "isolated"
@@ -219,7 +219,7 @@
       "label": "005-sqlite-budgets",
       "command": [
         "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
         "budgets",
         "init",
         "--agent",
@@ -267,7 +267,7 @@
       "label": "006-sqlite-firewall",
       "command": [
         "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
         "firewall",
         "enable",
         "--mode",
@@ -316,7 +316,7 @@
       "label": "007-sqlite-tools-init",
       "command": [
         "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
         "tools",
         "init"
       ],
@@ -362,7 +362,7 @@
       "label": "008-sqlite-tools-sign",
       "command": [
         "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
         "tools",
         "sign",
         "--json"
@@ -409,7 +409,7 @@
       "label": "009-sqlite-tools-verify",
       "command": [
         "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
         "tools",
         "verify"
       ],
@@ -455,8 +455,8 @@
       "label": "010-sqlite-capture",
       "command": [
         "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/native-case.mjs",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/receipts/sqlite-capture/input.json"
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/native-case.mjs",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/receipts/sqlite-capture/input.json"
       ],
       "startedAt": "2026-09-09T15:39:02.463026+00:00",
       "timeoutSeconds": 120,
@@ -509,7 +509,7 @@
       "label": "011-sqlite-cold-A",
       "command": [
         "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
         "agent-loop",
         "verify",
         "af486e3f-e261-41f6-8668-eff2baa13937",
@@ -557,7 +557,7 @@
       "label": "012-sqlite-cold-B",
       "command": [
         "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
         "agent-loop",
         "verify",
         "51c486fa-9367-491f-8ad1-16a418293fc6",
@@ -605,11 +605,11 @@
       "label": "013-sqlite-inventory",
       "command": [
         "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
         "spill",
         "inventory",
         "--workspace",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
         "--expect-monitor",
         "7f3af702e029d3cee4468b300a91aa726616360bce94f0ff9c79f6ecfe2f574d",
         "--json"
@@ -656,12 +656,12 @@
       "label": "014-sqlite-range-A-0",
       "command": [
         "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
         "session",
         "spill-read",
         "amc-spill:v2:8f5ea55897b6682f430656160638787ef82d65b29ebbf059a7cac5da546a368c:3685ae9928f75b7af05d6d00e3d5dc0c-owned_read_0",
         "--workspace",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
         "--expect-monitor",
         "7f3af702e029d3cee4468b300a91aa726616360bce94f0ff9c79f6ecfe2f574d",
         "--offset",
@@ -712,12 +712,12 @@
       "label": "015-sqlite-range-A-1",
       "command": [
         "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
         "session",
         "spill-read",
         "amc-spill:v2:8f5ea55897b6682f430656160638787ef82d65b29ebbf059a7cac5da546a368c:3685ae9928f75b7af05d6d00e3d5dc0c-owned_read_0",
         "--workspace",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
         "--expect-monitor",
         "7f3af702e029d3cee4468b300a91aa726616360bce94f0ff9c79f6ecfe2f574d",
         "--offset",
@@ -768,12 +768,12 @@
       "label": "016-sqlite-range-A-2",
       "command": [
         "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
         "session",
         "spill-read",
         "amc-spill:v2:8f5ea55897b6682f430656160638787ef82d65b29ebbf059a7cac5da546a368c:3685ae9928f75b7af05d6d00e3d5dc0c-owned_read_0",
         "--workspace",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
         "--expect-monitor",
         "7f3af702e029d3cee4468b300a91aa726616360bce94f0ff9c79f6ecfe2f574d",
         "--offset",
@@ -824,12 +824,12 @@
       "label": "017-sqlite-range-A-3",
       "command": [
         "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
         "session",
         "spill-read",
         "amc-spill:v2:8f5ea55897b6682f430656160638787ef82d65b29ebbf059a7cac5da546a368c:3685ae9928f75b7af05d6d00e3d5dc0c-owned_read_0",
         "--workspace",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
         "--expect-monitor",
         "7f3af702e029d3cee4468b300a91aa726616360bce94f0ff9c79f6ecfe2f574d",
         "--offset",
@@ -880,12 +880,12 @@
       "label": "018-sqlite-range-B-0",
       "command": [
         "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
         "session",
         "spill-read",
         "amc-spill:v2:e62a9c1436243a8dd1713f2776600baaeec1a3b8965871e9c3932f611c43ddf2:b7d79226ce359dfcbcbc265aa99cbf3c-owned_read_2",
         "--workspace",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
         "--expect-monitor",
         "7f3af702e029d3cee4468b300a91aa726616360bce94f0ff9c79f6ecfe2f574d",
         "--offset",
@@ -936,12 +936,12 @@
       "label": "019-sqlite-range-B-1",
       "command": [
         "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
         "session",
         "spill-read",
         "amc-spill:v2:e62a9c1436243a8dd1713f2776600baaeec1a3b8965871e9c3932f611c43ddf2:b7d79226ce359dfcbcbc265aa99cbf3c-owned_read_2",
         "--workspace",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
         "--expect-monitor",
         "7f3af702e029d3cee4468b300a91aa726616360bce94f0ff9c79f6ecfe2f574d",
         "--offset",
@@ -992,12 +992,12 @@
       "label": "020-sqlite-range-B-2",
       "command": [
         "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
         "session",
         "spill-read",
         "amc-spill:v2:e62a9c1436243a8dd1713f2776600baaeec1a3b8965871e9c3932f611c43ddf2:b7d79226ce359dfcbcbc265aa99cbf3c-owned_read_2",
         "--workspace",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
         "--expect-monitor",
         "7f3af702e029d3cee4468b300a91aa726616360bce94f0ff9c79f6ecfe2f574d",
         "--offset",
@@ -1048,12 +1048,12 @@
       "label": "021-sqlite-range-B-3",
       "command": [
         "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
         "session",
         "spill-read",
         "amc-spill:v2:e62a9c1436243a8dd1713f2776600baaeec1a3b8965871e9c3932f611c43ddf2:b7d79226ce359dfcbcbc265aa99cbf3c-owned_read_2",
         "--workspace",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
         "--expect-monitor",
         "7f3af702e029d3cee4468b300a91aa726616360bce94f0ff9c79f6ecfe2f574d",
         "--offset",
@@ -1104,8 +1104,8 @@
       "label": "022-sqlite-api-ranges",
       "command": [
         "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/native-case.mjs",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/receipts/sqlite-api-ranges/input.json"
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/native-case.mjs",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/receipts/sqlite-api-ranges/input.json"
       ],
       "startedAt": "2026-09-09T15:39:18.869678+00:00",
       "timeoutSeconds": 120,
@@ -1149,16 +1149,16 @@
       "label": "023-sqlite-export",
       "command": [
         "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
         "spill",
         "export",
         "--workspace",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
         "--expect-monitor",
         "7f3af702e029d3cee4468b300a91aa726616360bce94f0ff9c79f6ecfe2f574d",
         "--json",
         "--out",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/transport"
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/transport"
       ],
       "startedAt": "2026-09-09T15:39:20.128716+00:00",
       "timeoutSeconds": 120,
@@ -1202,16 +1202,16 @@
       "label": "024-sqlite-restore-overwrite",
       "command": [
         "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
         "spill",
         "restore",
         "--workspace",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
         "--expect-monitor",
         "7f3af702e029d3cee4468b300a91aa726616360bce94f0ff9c79f6ecfe2f574d",
         "--json",
         "--from",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/transport"
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/transport"
       ],
       "startedAt": "2026-09-09T15:39:21.372280+00:00",
       "timeoutSeconds": 120,
@@ -1255,11 +1255,11 @@
       "label": "025-sqlite-tampered-inventory",
       "command": [
         "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
         "spill",
         "inventory",
         "--workspace",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
         "--expect-monitor",
         "7f3af702e029d3cee4468b300a91aa726616360bce94f0ff9c79f6ecfe2f574d",
         "--json"
@@ -1306,7 +1306,7 @@
       "label": "026-sqlite-tampered-range",
       "command": [
         "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
         "session",
         "spill-read",
         "amc-spill:v2:8f5ea55897b6682f430656160638787ef82d65b29ebbf059a7cac5da546a368c:3685ae9928f75b7af05d6d00e3d5dc0c-owned_read_0",
@@ -1354,11 +1354,11 @@
       "label": "027-sqlite-missing-inventory",
       "command": [
         "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
         "spill",
         "inventory",
         "--workspace",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
         "--expect-monitor",
         "7f3af702e029d3cee4468b300a91aa726616360bce94f0ff9c79f6ecfe2f574d",
         "--json"
@@ -1405,7 +1405,7 @@
       "label": "028-sqlite-missing-range",
       "command": [
         "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
         "session",
         "spill-read",
         "amc-spill:v2:8f5ea55897b6682f430656160638787ef82d65b29ebbf059a7cac5da546a368c:3685ae9928f75b7af05d6d00e3d5dc0c-owned_read_0",
@@ -1453,16 +1453,16 @@
       "label": "029-sqlite-restore-missing",
       "command": [
         "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
         "spill",
         "restore",
         "--workspace",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
         "--expect-monitor",
         "7f3af702e029d3cee4468b300a91aa726616360bce94f0ff9c79f6ecfe2f574d",
         "--json",
         "--from",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/transport"
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/transport"
       ],
       "startedAt": "2026-09-09T15:39:27.644883+00:00",
       "timeoutSeconds": 120,
@@ -1506,12 +1506,12 @@
       "label": "030-sqlite-restored-A",
       "command": [
         "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
         "session",
         "spill-read",
         "amc-spill:v2:8f5ea55897b6682f430656160638787ef82d65b29ebbf059a7cac5da546a368c:3685ae9928f75b7af05d6d00e3d5dc0c-owned_read_0",
         "--workspace",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
         "--expect-monitor",
         "7f3af702e029d3cee4468b300a91aa726616360bce94f0ff9c79f6ecfe2f574d",
         "--offset",
@@ -1562,12 +1562,12 @@
       "label": "031-sqlite-restored-B",
       "command": [
         "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
         "session",
         "spill-read",
         "amc-spill:v2:e62a9c1436243a8dd1713f2776600baaeec1a3b8965871e9c3932f611c43ddf2:b7d79226ce359dfcbcbc265aa99cbf3c-owned_read_2",
         "--workspace",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
         "--expect-monitor",
         "7f3af702e029d3cee4468b300a91aa726616360bce94f0ff9c79f6ecfe2f574d",
         "--offset",
@@ -1618,11 +1618,11 @@
       "label": "032-sqlite-partial-origin",
       "command": [
         "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
         "spill",
         "erase",
         "--workspace",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
         "--expect-monitor",
         "7f3af702e029d3cee4468b300a91aa726616360bce94f0ff9c79f6ecfe2f574d",
         "--json",
@@ -1673,11 +1673,11 @@
       "label": "033-sqlite-erase-plan",
       "command": [
         "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
         "spill",
         "erase",
         "--workspace",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
         "--expect-monitor",
         "7f3af702e029d3cee4468b300a91aa726616360bce94f0ff9c79f6ecfe2f574d",
         "--json",
@@ -1728,11 +1728,11 @@
       "label": "034-sqlite-stale-plan",
       "command": [
         "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
         "spill",
         "erase",
         "--workspace",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
         "--expect-monitor",
         "7f3af702e029d3cee4468b300a91aa726616360bce94f0ff9c79f6ecfe2f574d",
         "--json",
@@ -1786,11 +1786,11 @@
       "label": "035-sqlite-erase-review",
       "command": [
         "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
         "spill",
         "erase",
         "--workspace",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
         "--expect-monitor",
         "7f3af702e029d3cee4468b300a91aa726616360bce94f0ff9c79f6ecfe2f574d",
         "--json",
@@ -1841,11 +1841,11 @@
       "label": "036-sqlite-erase-apply",
       "command": [
         "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
         "spill",
         "erase",
         "--workspace",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
         "--expect-monitor",
         "7f3af702e029d3cee4468b300a91aa726616360bce94f0ff9c79f6ecfe2f574d",
         "--json",
@@ -1899,8 +1899,8 @@
       "label": "037-sqlite-erase-audit",
       "command": [
         "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/native-case.mjs",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/receipts/sqlite-erase-audit/input.json"
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/native-case.mjs",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/receipts/sqlite-erase-audit/input.json"
       ],
       "startedAt": "2026-09-09T15:40:20.167288+00:00",
       "timeoutSeconds": 120,
@@ -1944,11 +1944,11 @@
       "label": "038-sqlite-after-erase-inventory",
       "command": [
         "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
         "spill",
         "inventory",
         "--workspace",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
         "--expect-monitor",
         "7f3af702e029d3cee4468b300a91aa726616360bce94f0ff9c79f6ecfe2f574d",
         "--json"
@@ -1995,12 +1995,12 @@
       "label": "039-sqlite-other-origin-preserved",
       "command": [
         "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
         "session",
         "spill-read",
         "amc-spill:v2:e62a9c1436243a8dd1713f2776600baaeec1a3b8965871e9c3932f611c43ddf2:b7d79226ce359dfcbcbc265aa99cbf3c-owned_read_2",
         "--workspace",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
         "--expect-monitor",
         "7f3af702e029d3cee4468b300a91aa726616360bce94f0ff9c79f6ecfe2f574d",
         "--offset",
@@ -2051,7 +2051,7 @@
       "label": "040-jsonl-init",
       "command": [
         "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
         "init",
         "--trust-boundary",
         "isolated"
@@ -2098,7 +2098,7 @@
       "label": "041-jsonl-budgets",
       "command": [
         "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
         "budgets",
         "init",
         "--agent",
@@ -2146,7 +2146,7 @@
       "label": "042-jsonl-firewall",
       "command": [
         "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
         "firewall",
         "enable",
         "--mode",
@@ -2195,7 +2195,7 @@
       "label": "043-jsonl-tools-init",
       "command": [
         "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
         "tools",
         "init"
       ],
@@ -2241,7 +2241,7 @@
       "label": "044-jsonl-tools-sign",
       "command": [
         "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
         "tools",
         "sign",
         "--json"
@@ -2288,7 +2288,7 @@
       "label": "045-jsonl-tools-verify",
       "command": [
         "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
         "tools",
         "verify"
       ],
@@ -2334,8 +2334,8 @@
       "label": "046-jsonl-capture",
       "command": [
         "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/native-case.mjs",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/receipts/jsonl-capture/input.json"
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/native-case.mjs",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/receipts/jsonl-capture/input.json"
       ],
       "startedAt": "2026-09-09T15:40:31.596878+00:00",
       "timeoutSeconds": 120,
@@ -2415,25 +2415,25 @@
       "evidence": [
         {
           "exitCode": 0,
-          "log": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/001-node-version.log",
-          "processReceipt": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/001-node-version-process.json"
+          "log": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/001-node-version.log",
+          "processReceipt": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/001-node-version-process.json"
         },
         {
           "exitCode": 0,
-          "log": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/002-npm-version.log",
-          "processReceipt": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/002-npm-version-process.json"
+          "log": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/002-npm-version.log",
+          "processReceipt": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/002-npm-version-process.json"
         },
         {
           "exitCode": 0,
-          "log": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/003-install.log",
-          "processReceipt": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/003-install-process.json"
+          "log": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/003-install.log",
+          "processReceipt": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/003-install-process.json"
         }
       ],
       "blockers": [],
       "installed": {
         "packageVersion": "1.2.0",
-        "consumer": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer",
-        "cli": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+        "consumer": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer",
+        "cli": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
         "lockSha256": "85a5a28505a14770df49386cdb2a315023b4451fdaec484208c64ba662001957"
       }
     },
@@ -2490,38 +2490,38 @@
       "evidence": [
         {
           "exitCode": 0,
-          "log": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/004-sqlite-init.log",
-          "processReceipt": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/004-sqlite-init-process.json"
+          "log": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/004-sqlite-init.log",
+          "processReceipt": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/004-sqlite-init-process.json"
         },
         {
           "exitCode": 0,
-          "log": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/005-sqlite-budgets.log",
-          "processReceipt": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/005-sqlite-budgets-process.json"
+          "log": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/005-sqlite-budgets.log",
+          "processReceipt": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/005-sqlite-budgets-process.json"
         },
         {
           "exitCode": 0,
-          "log": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/006-sqlite-firewall.log",
-          "processReceipt": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/006-sqlite-firewall-process.json"
+          "log": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/006-sqlite-firewall.log",
+          "processReceipt": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/006-sqlite-firewall-process.json"
         },
         {
           "exitCode": 0,
-          "log": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/007-sqlite-tools-init.log",
-          "processReceipt": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/007-sqlite-tools-init-process.json"
+          "log": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/007-sqlite-tools-init.log",
+          "processReceipt": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/007-sqlite-tools-init-process.json"
         },
         {
           "exitCode": 0,
-          "log": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/008-sqlite-tools-sign.log",
-          "processReceipt": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/008-sqlite-tools-sign-process.json"
+          "log": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/008-sqlite-tools-sign.log",
+          "processReceipt": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/008-sqlite-tools-sign-process.json"
         },
         {
           "exitCode": 0,
-          "log": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/009-sqlite-tools-verify.log",
-          "processReceipt": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/009-sqlite-tools-verify-process.json"
+          "log": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/009-sqlite-tools-verify.log",
+          "processReceipt": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/009-sqlite-tools-verify-process.json"
         },
         {
           "exitCode": 0,
-          "log": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/010-sqlite-capture.log",
-          "processReceipt": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/010-sqlite-capture-process.json",
+          "log": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/010-sqlite-capture.log",
+          "processReceipt": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/010-sqlite-capture-process.json",
           "report": {
             "schemaVersion": 1,
             "source": "a5987643ef6c26b01f687226fbc6a6709fc182cb",
@@ -2634,7 +2634,7 @@
             "subjects": [
               {
                 "name": "A",
-                "fixturePath": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace/workspace/allowed/A.txt",
+                "fixturePath": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace/workspace/allowed/A.txt",
                 "fixtureRelative": "workspace/allowed/A.txt",
                 "fixtureBytes": 98304,
                 "fixtureSha256": "8aad1d6792e5fde41714e501dafea616064d7d9619fa83a64a1320678b028aad",
@@ -2705,7 +2705,7 @@
               },
               {
                 "name": "B",
-                "fixturePath": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace/workspace/allowed/B.txt",
+                "fixturePath": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace/workspace/allowed/B.txt",
                 "fixtureRelative": "workspace/allowed/B.txt",
                 "fixtureBytes": 98304,
                 "fixtureSha256": "5f87a6b38dc9b2027bfd5eb59bee639b58e614d09212c67ab238bce76b8f3cff",
@@ -2785,16 +2785,16 @@
               "sha256": "ffc2e45b8634d59a3ce7cc5b800054150b881335f0669c0d62d3f6643538b43e"
             },
             "cli": {
-              "path": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+              "path": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
               "sha256": "d009af626174b806e283e78a80c654fbbbc16e8c9d3a521169917c256ab2fb4b"
             },
             "publicExports": {
               "agent-maturity-compass/sdk/native": {
-                "resolved": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/sdk/nativeAgentClient.js",
+                "resolved": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/sdk/nativeAgentClient.js",
                 "sha256": "6802809eb08a5a902ab72eab13ddc127838be0ee8badaf4608ae7db36c0c811a"
               },
               "agent-maturity-compass": {
-                "resolved": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/index.js",
+                "resolved": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/index.js",
                 "sha256": "71fd011afca17c6074a56ca2f2aaa35fff2981c0118ef088712fc87d9a5c99f0"
               }
             },
@@ -2816,12 +2816,12 @@
             "rangeEvidence": null,
             "finishedAt": "2026-09-09T15:39:04.391Z"
           },
-          "evidenceDirectory": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/receipts/sqlite-capture"
+          "evidenceDirectory": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/receipts/sqlite-capture"
         },
         {
           "exitCode": 0,
-          "log": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/011-sqlite-cold-A.log",
-          "processReceipt": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/011-sqlite-cold-A-process.json",
+          "log": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/011-sqlite-cold-A.log",
+          "processReceipt": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/011-sqlite-cold-A-process.json",
           "report": {
             "sessionId": "af486e3f-e261-41f6-8668-eff2baa13937",
             "ok": true,
@@ -2850,8 +2850,8 @@
         },
         {
           "exitCode": 0,
-          "log": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/012-sqlite-cold-B.log",
-          "processReceipt": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/012-sqlite-cold-B-process.json",
+          "log": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/012-sqlite-cold-B.log",
+          "processReceipt": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/012-sqlite-cold-B-process.json",
           "report": {
             "sessionId": "51c486fa-9367-491f-8ad1-16a418293fc6",
             "ok": true,
@@ -2907,17 +2907,17 @@
       "evidence": [
         {
           "exitCode": 0,
-          "log": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/013-sqlite-inventory.log",
-          "processReceipt": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/013-sqlite-inventory-process.json",
+          "log": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/013-sqlite-inventory.log",
+          "processReceipt": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/013-sqlite-inventory-process.json",
           "report": {
             "schemaVersion": 1,
             "command": "inventory",
-            "workspace": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+            "workspace": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
             "backend": "sqlite",
             "plaintextVerified": false,
             "inspection": {
               "phase": "read-only",
-              "workspace": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+              "workspace": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
               "backend": "sqlite",
               "eventCount": 58,
               "historySha256": "9a025e5b32f10927185a802a4ff6d3f54695a5f5c8ecb821ca3b87a375abef8e",
@@ -2970,7 +2970,7 @@
           }
         },
         {
-          "ciphertextSnapshot": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/ciphertext-before.json"
+          "ciphertextSnapshot": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/ciphertext-before.json"
         }
       ],
       "blockers": []
@@ -2996,8 +2996,8 @@
       "evidence": [
         {
           "exitCode": 0,
-          "log": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/014-sqlite-range-A-0.log",
-          "processReceipt": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/014-sqlite-range-A-0-process.json",
+          "log": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/014-sqlite-range-A-0.log",
+          "processReceipt": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/014-sqlite-range-A-0-process.json",
           "report": {
             "locator": "amc-spill:v2:8f5ea55897b6682f430656160638787ef82d65b29ebbf059a7cac5da546a368c:3685ae9928f75b7af05d6d00e3d5dc0c-owned_read_0",
             "contentSha256": "8aad1d6792e5fde41714e501dafea616064d7d9619fa83a64a1320678b028aad",
@@ -3023,8 +3023,8 @@
         },
         {
           "exitCode": 0,
-          "log": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/015-sqlite-range-A-1.log",
-          "processReceipt": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/015-sqlite-range-A-1-process.json",
+          "log": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/015-sqlite-range-A-1.log",
+          "processReceipt": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/015-sqlite-range-A-1-process.json",
           "report": {
             "locator": "amc-spill:v2:8f5ea55897b6682f430656160638787ef82d65b29ebbf059a7cac5da546a368c:3685ae9928f75b7af05d6d00e3d5dc0c-owned_read_0",
             "contentSha256": "8aad1d6792e5fde41714e501dafea616064d7d9619fa83a64a1320678b028aad",
@@ -3050,8 +3050,8 @@
         },
         {
           "exitCode": 0,
-          "log": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/016-sqlite-range-A-2.log",
-          "processReceipt": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/016-sqlite-range-A-2-process.json",
+          "log": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/016-sqlite-range-A-2.log",
+          "processReceipt": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/016-sqlite-range-A-2-process.json",
           "report": {
             "locator": "amc-spill:v2:8f5ea55897b6682f430656160638787ef82d65b29ebbf059a7cac5da546a368c:3685ae9928f75b7af05d6d00e3d5dc0c-owned_read_0",
             "contentSha256": "8aad1d6792e5fde41714e501dafea616064d7d9619fa83a64a1320678b028aad",
@@ -3077,8 +3077,8 @@
         },
         {
           "exitCode": 0,
-          "log": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/017-sqlite-range-A-3.log",
-          "processReceipt": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/017-sqlite-range-A-3-process.json",
+          "log": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/017-sqlite-range-A-3.log",
+          "processReceipt": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/017-sqlite-range-A-3-process.json",
           "report": {
             "locator": "amc-spill:v2:8f5ea55897b6682f430656160638787ef82d65b29ebbf059a7cac5da546a368c:3685ae9928f75b7af05d6d00e3d5dc0c-owned_read_0",
             "contentSha256": "8aad1d6792e5fde41714e501dafea616064d7d9619fa83a64a1320678b028aad",
@@ -3104,8 +3104,8 @@
         },
         {
           "exitCode": 0,
-          "log": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/018-sqlite-range-B-0.log",
-          "processReceipt": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/018-sqlite-range-B-0-process.json",
+          "log": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/018-sqlite-range-B-0.log",
+          "processReceipt": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/018-sqlite-range-B-0-process.json",
           "report": {
             "locator": "amc-spill:v2:e62a9c1436243a8dd1713f2776600baaeec1a3b8965871e9c3932f611c43ddf2:b7d79226ce359dfcbcbc265aa99cbf3c-owned_read_2",
             "contentSha256": "5f87a6b38dc9b2027bfd5eb59bee639b58e614d09212c67ab238bce76b8f3cff",
@@ -3131,8 +3131,8 @@
         },
         {
           "exitCode": 0,
-          "log": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/019-sqlite-range-B-1.log",
-          "processReceipt": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/019-sqlite-range-B-1-process.json",
+          "log": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/019-sqlite-range-B-1.log",
+          "processReceipt": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/019-sqlite-range-B-1-process.json",
           "report": {
             "locator": "amc-spill:v2:e62a9c1436243a8dd1713f2776600baaeec1a3b8965871e9c3932f611c43ddf2:b7d79226ce359dfcbcbc265aa99cbf3c-owned_read_2",
             "contentSha256": "5f87a6b38dc9b2027bfd5eb59bee639b58e614d09212c67ab238bce76b8f3cff",
@@ -3158,8 +3158,8 @@
         },
         {
           "exitCode": 0,
-          "log": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/020-sqlite-range-B-2.log",
-          "processReceipt": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/020-sqlite-range-B-2-process.json",
+          "log": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/020-sqlite-range-B-2.log",
+          "processReceipt": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/020-sqlite-range-B-2-process.json",
           "report": {
             "locator": "amc-spill:v2:e62a9c1436243a8dd1713f2776600baaeec1a3b8965871e9c3932f611c43ddf2:b7d79226ce359dfcbcbc265aa99cbf3c-owned_read_2",
             "contentSha256": "5f87a6b38dc9b2027bfd5eb59bee639b58e614d09212c67ab238bce76b8f3cff",
@@ -3185,8 +3185,8 @@
         },
         {
           "exitCode": 0,
-          "log": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/021-sqlite-range-B-3.log",
-          "processReceipt": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/021-sqlite-range-B-3-process.json",
+          "log": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/021-sqlite-range-B-3.log",
+          "processReceipt": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/021-sqlite-range-B-3-process.json",
           "report": {
             "locator": "amc-spill:v2:e62a9c1436243a8dd1713f2776600baaeec1a3b8965871e9c3932f611c43ddf2:b7d79226ce359dfcbcbc265aa99cbf3c-owned_read_2",
             "contentSha256": "5f87a6b38dc9b2027bfd5eb59bee639b58e614d09212c67ab238bce76b8f3cff",
@@ -3212,8 +3212,8 @@
         },
         {
           "exitCode": 0,
-          "log": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/022-sqlite-api-ranges.log",
-          "processReceipt": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/022-sqlite-api-ranges-process.json",
+          "log": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/022-sqlite-api-ranges.log",
+          "processReceipt": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/022-sqlite-api-ranges-process.json",
           "report": {
             "schemaVersion": 1,
             "source": "a5987643ef6c26b01f687226fbc6a6709fc182cb",
@@ -3294,12 +3294,12 @@
               "sha256": "ffc2e45b8634d59a3ce7cc5b800054150b881335f0669c0d62d3f6643538b43e"
             },
             "cli": {
-              "path": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+              "path": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
               "sha256": "d009af626174b806e283e78a80c654fbbbc16e8c9d3a521169917c256ab2fb4b"
             },
             "publicExports": {
               "agent-maturity-compass": {
-                "resolved": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/index.js",
+                "resolved": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/index.js",
                 "sha256": "71fd011afca17c6074a56ca2f2aaa35fff2981c0118ef088712fc87d9a5c99f0"
               }
             },
@@ -3319,7 +3319,7 @@
             },
             "finishedAt": "2026-09-09T15:39:19.674Z"
           },
-          "evidenceDirectory": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/receipts/sqlite-api-ranges"
+          "evidenceDirectory": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/receipts/sqlite-api-ranges"
         }
       ],
       "blockers": []
@@ -3349,17 +3349,17 @@
       "evidence": [
         {
           "exitCode": 0,
-          "log": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/023-sqlite-export.log",
-          "processReceipt": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/023-sqlite-export-process.json",
+          "log": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/023-sqlite-export.log",
+          "processReceipt": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/023-sqlite-export-process.json",
           "report": {
             "schemaVersion": 1,
             "command": "export",
-            "workspace": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+            "workspace": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
             "backend": "sqlite",
             "plaintextVerified": false,
             "inspection": {
               "phase": "before-operation",
-              "workspace": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+              "workspace": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
               "backend": "sqlite",
               "eventCount": 58,
               "historySha256": "9a025e5b32f10927185a802a4ff6d3f54695a5f5c8ecb821ca3b87a375abef8e",
@@ -3409,7 +3409,7 @@
             "ok": true,
             "status": "complete",
             "mutationAttempted": true,
-            "destination": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/transport",
+            "destination": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/transport",
             "transportFormat": "amc-spill-export-v1",
             "outcomes": [
               {
@@ -3460,17 +3460,17 @@
       "evidence": [
         {
           "exitCode": 1,
-          "log": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/024-sqlite-restore-overwrite.log",
-          "processReceipt": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/024-sqlite-restore-overwrite-process.json",
+          "log": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/024-sqlite-restore-overwrite.log",
+          "processReceipt": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/024-sqlite-restore-overwrite-process.json",
           "report": {
             "schemaVersion": 1,
             "command": "restore",
-            "workspace": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+            "workspace": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
             "backend": "sqlite",
             "plaintextVerified": false,
             "inspection": {
               "phase": "before-operation",
-              "workspace": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+              "workspace": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
               "backend": "sqlite",
               "eventCount": 58,
               "historySha256": "9a025e5b32f10927185a802a4ff6d3f54695a5f5c8ecb821ca3b87a375abef8e",
@@ -3520,7 +3520,7 @@
             "ok": false,
             "status": "incomplete",
             "mutationAttempted": true,
-            "source": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/transport",
+            "source": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/transport",
             "outcomes": [
               {
                 "locator": "amc-spill:v2:8f5ea55897b6682f430656160638787ef82d65b29ebbf059a7cac5da546a368c:3685ae9928f75b7af05d6d00e3d5dc0c-owned_read_0",
@@ -3568,17 +3568,17 @@
       "evidence": [
         {
           "exitCode": 1,
-          "log": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/025-sqlite-tampered-inventory.log",
-          "processReceipt": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/025-sqlite-tampered-inventory-process.json",
+          "log": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/025-sqlite-tampered-inventory.log",
+          "processReceipt": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/025-sqlite-tampered-inventory-process.json",
           "report": {
             "schemaVersion": 1,
             "command": "inventory",
-            "workspace": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+            "workspace": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
             "backend": "sqlite",
             "plaintextVerified": false,
             "inspection": {
               "phase": "read-only",
-              "workspace": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+              "workspace": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
               "backend": "sqlite",
               "eventCount": 58,
               "historySha256": "9a025e5b32f10927185a802a4ff6d3f54695a5f5c8ecb821ca3b87a375abef8e",
@@ -3638,8 +3638,8 @@
         },
         {
           "exitCode": 1,
-          "log": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/026-sqlite-tampered-range.log",
-          "processReceipt": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/026-sqlite-tampered-range-process.json",
+          "log": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/026-sqlite-tampered-range.log",
+          "processReceipt": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/026-sqlite-tampered-range-process.json",
           "report": {
             "ok": false,
             "error": "spill retrieval failed (tampered): encrypted spill does not match its signed envelope commitment"
@@ -3647,17 +3647,17 @@
         },
         {
           "exitCode": 1,
-          "log": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/027-sqlite-missing-inventory.log",
-          "processReceipt": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/027-sqlite-missing-inventory-process.json",
+          "log": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/027-sqlite-missing-inventory.log",
+          "processReceipt": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/027-sqlite-missing-inventory-process.json",
           "report": {
             "schemaVersion": 1,
             "command": "inventory",
-            "workspace": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+            "workspace": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
             "backend": "sqlite",
             "plaintextVerified": false,
             "inspection": {
               "phase": "read-only",
-              "workspace": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+              "workspace": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
               "backend": "sqlite",
               "eventCount": 58,
               "historySha256": "9a025e5b32f10927185a802a4ff6d3f54695a5f5c8ecb821ca3b87a375abef8e",
@@ -3711,11 +3711,11 @@
         },
         {
           "exitCode": 1,
-          "log": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/028-sqlite-missing-range.log",
-          "processReceipt": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/028-sqlite-missing-range-process.json",
+          "log": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/028-sqlite-missing-range.log",
+          "processReceipt": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/028-sqlite-missing-range-process.json",
           "report": {
             "ok": false,
-            "error": "spill retrieval failed (missing): ENOENT: no such file or directory, lstat '/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace/.amc/spill/session-8f5ea55897b6682f430656160638787ef82d65b29ebbf059a7cac5da546a368c/3685ae9928f75b7af05d6d00e3d5dc0c-owned_read_0'"
+            "error": "spill retrieval failed (missing): ENOENT: no such file or directory, lstat '~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace/.amc/spill/session-8f5ea55897b6682f430656160638787ef82d65b29ebbf059a7cac5da546a368c/3685ae9928f75b7af05d6d00e3d5dc0c-owned_read_0'"
           }
         }
       ],
@@ -3738,17 +3738,17 @@
       "evidence": [
         {
           "exitCode": 0,
-          "log": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/029-sqlite-restore-missing.log",
-          "processReceipt": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/029-sqlite-restore-missing-process.json",
+          "log": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/029-sqlite-restore-missing.log",
+          "processReceipt": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/029-sqlite-restore-missing-process.json",
           "report": {
             "schemaVersion": 1,
             "command": "restore",
-            "workspace": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+            "workspace": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
             "backend": "sqlite",
             "plaintextVerified": false,
             "inspection": {
               "phase": "before-operation",
-              "workspace": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+              "workspace": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
               "backend": "sqlite",
               "eventCount": 58,
               "historySha256": "9a025e5b32f10927185a802a4ff6d3f54695a5f5c8ecb821ca3b87a375abef8e",
@@ -3798,7 +3798,7 @@
             "ok": true,
             "status": "complete",
             "mutationAttempted": true,
-            "source": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/transport",
+            "source": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/transport",
             "outcomes": [
               {
                 "locator": "amc-spill:v2:8f5ea55897b6682f430656160638787ef82d65b29ebbf059a7cac5da546a368c:3685ae9928f75b7af05d6d00e3d5dc0c-owned_read_0",
@@ -3816,8 +3816,8 @@
         },
         {
           "exitCode": 0,
-          "log": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/030-sqlite-restored-A.log",
-          "processReceipt": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/030-sqlite-restored-A-process.json",
+          "log": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/030-sqlite-restored-A.log",
+          "processReceipt": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/030-sqlite-restored-A-process.json",
           "report": {
             "locator": "amc-spill:v2:8f5ea55897b6682f430656160638787ef82d65b29ebbf059a7cac5da546a368c:3685ae9928f75b7af05d6d00e3d5dc0c-owned_read_0",
             "contentSha256": "8aad1d6792e5fde41714e501dafea616064d7d9619fa83a64a1320678b028aad",
@@ -3843,8 +3843,8 @@
         },
         {
           "exitCode": 0,
-          "log": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/031-sqlite-restored-B.log",
-          "processReceipt": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/031-sqlite-restored-B-process.json",
+          "log": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/031-sqlite-restored-B.log",
+          "processReceipt": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/031-sqlite-restored-B-process.json",
           "report": {
             "locator": "amc-spill:v2:e62a9c1436243a8dd1713f2776600baaeec1a3b8965871e9c3932f611c43ddf2:b7d79226ce359dfcbcbc265aa99cbf3c-owned_read_2",
             "contentSha256": "5f87a6b38dc9b2027bfd5eb59bee639b58e614d09212c67ab238bce76b8f3cff",
@@ -3912,8 +3912,8 @@
       "evidence": [
         {
           "exitCode": 1,
-          "log": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/032-sqlite-partial-origin.log",
-          "processReceipt": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/032-sqlite-partial-origin-process.json",
+          "log": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/032-sqlite-partial-origin.log",
+          "processReceipt": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/032-sqlite-partial-origin-process.json",
           "report": {
             "schemaVersion": 1,
             "command": "erase",
@@ -3942,17 +3942,17 @@
         },
         {
           "exitCode": 0,
-          "log": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/033-sqlite-erase-plan.log",
-          "processReceipt": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/033-sqlite-erase-plan-process.json",
+          "log": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/033-sqlite-erase-plan.log",
+          "processReceipt": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/033-sqlite-erase-plan-process.json",
           "report": {
             "schemaVersion": 1,
             "command": "erase",
-            "workspace": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+            "workspace": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
             "backend": "sqlite",
             "plaintextVerified": false,
             "inspection": {
               "phase": "before-operation",
-              "workspace": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+              "workspace": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
               "backend": "sqlite",
               "eventCount": 58,
               "historySha256": "9a025e5b32f10927185a802a4ff6d3f54695a5f5c8ecb821ca3b87a375abef8e",
@@ -4071,8 +4071,8 @@
         },
         {
           "exitCode": 1,
-          "log": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/034-sqlite-stale-plan.log",
-          "processReceipt": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/034-sqlite-stale-plan-process.json",
+          "log": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/034-sqlite-stale-plan.log",
+          "processReceipt": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/034-sqlite-stale-plan-process.json",
           "report": {
             "schemaVersion": 1,
             "command": "erase",
@@ -4090,17 +4090,17 @@
         },
         {
           "exitCode": 0,
-          "log": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/035-sqlite-erase-review.log",
-          "processReceipt": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/035-sqlite-erase-review-process.json",
+          "log": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/035-sqlite-erase-review.log",
+          "processReceipt": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/035-sqlite-erase-review-process.json",
           "report": {
             "schemaVersion": 1,
             "command": "erase",
-            "workspace": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+            "workspace": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
             "backend": "sqlite",
             "plaintextVerified": false,
             "inspection": {
               "phase": "before-operation",
-              "workspace": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+              "workspace": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
               "backend": "sqlite",
               "eventCount": 58,
               "historySha256": "9a025e5b32f10927185a802a4ff6d3f54695a5f5c8ecb821ca3b87a375abef8e",
@@ -4219,17 +4219,17 @@
         },
         {
           "exitCode": 0,
-          "log": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/036-sqlite-erase-apply.log",
-          "processReceipt": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/036-sqlite-erase-apply-process.json",
+          "log": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/036-sqlite-erase-apply.log",
+          "processReceipt": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/036-sqlite-erase-apply-process.json",
           "report": {
             "schemaVersion": 1,
             "command": "erase",
-            "workspace": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+            "workspace": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
             "backend": "sqlite",
             "plaintextVerified": false,
             "inspection": {
               "phase": "before-operation",
-              "workspace": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+              "workspace": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
               "backend": "sqlite",
               "eventCount": 58,
               "historySha256": "9a025e5b32f10927185a802a4ff6d3f54695a5f5c8ecb821ca3b87a375abef8e",
@@ -4301,8 +4301,8 @@
         },
         {
           "exitCode": 0,
-          "log": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/037-sqlite-erase-audit.log",
-          "processReceipt": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/037-sqlite-erase-audit-process.json",
+          "log": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/037-sqlite-erase-audit.log",
+          "processReceipt": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/037-sqlite-erase-audit-process.json",
           "report": {
             "schemaVersion": 1,
             "source": "a5987643ef6c26b01f687226fbc6a6709fc182cb",
@@ -4343,12 +4343,12 @@
               "sha256": "ffc2e45b8634d59a3ce7cc5b800054150b881335f0669c0d62d3f6643538b43e"
             },
             "cli": {
-              "path": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+              "path": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
               "sha256": "d009af626174b806e283e78a80c654fbbbc16e8c9d3a521169917c256ab2fb4b"
             },
             "publicExports": {
               "agent-maturity-compass": {
-                "resolved": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/index.js",
+                "resolved": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/index.js",
                 "sha256": "71fd011afca17c6074a56ca2f2aaa35fff2981c0118ef088712fc87d9a5c99f0"
               }
             },
@@ -4368,21 +4368,21 @@
             "rangeEvidence": null,
             "finishedAt": "2026-09-09T15:40:20.890Z"
           },
-          "evidenceDirectory": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/receipts/sqlite-erase-audit"
+          "evidenceDirectory": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/receipts/sqlite-erase-audit"
         },
         {
           "exitCode": 1,
-          "log": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/038-sqlite-after-erase-inventory.log",
-          "processReceipt": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/038-sqlite-after-erase-inventory-process.json",
+          "log": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/038-sqlite-after-erase-inventory.log",
+          "processReceipt": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/038-sqlite-after-erase-inventory-process.json",
           "report": {
             "schemaVersion": 1,
             "command": "inventory",
-            "workspace": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+            "workspace": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
             "backend": "sqlite",
             "plaintextVerified": false,
             "inspection": {
               "phase": "read-only",
-              "workspace": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+              "workspace": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
               "backend": "sqlite",
               "eventCount": 60,
               "historySha256": "58b7d3c5895be3028e7622e47680484c4534f66c6accaf05eaba6e968079c5af",
@@ -4436,8 +4436,8 @@
         },
         {
           "exitCode": 0,
-          "log": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/039-sqlite-other-origin-preserved.log",
-          "processReceipt": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/039-sqlite-other-origin-preserved-process.json",
+          "log": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/039-sqlite-other-origin-preserved.log",
+          "processReceipt": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/039-sqlite-other-origin-preserved-process.json",
           "report": {
             "locator": "amc-spill:v2:e62a9c1436243a8dd1713f2776600baaeec1a3b8965871e9c3932f611c43ddf2:b7d79226ce359dfcbcbc265aa99cbf3c-owned_read_2",
             "contentSha256": "5f87a6b38dc9b2027bfd5eb59bee639b58e614d09212c67ab238bce76b8f3cff",
@@ -4463,7 +4463,7 @@
         }
       ],
       "blockers": [],
-      "reviewRequest": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/erase-review-request.json"
+      "reviewRequest": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/erase-review-request.json"
     },
     {
       "backend": "jsonl",
@@ -4502,38 +4502,38 @@
       "evidence": [
         {
           "exitCode": 0,
-          "log": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/040-jsonl-init.log",
-          "processReceipt": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/040-jsonl-init-process.json"
+          "log": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/040-jsonl-init.log",
+          "processReceipt": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/040-jsonl-init-process.json"
         },
         {
           "exitCode": 0,
-          "log": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/041-jsonl-budgets.log",
-          "processReceipt": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/041-jsonl-budgets-process.json"
+          "log": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/041-jsonl-budgets.log",
+          "processReceipt": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/041-jsonl-budgets-process.json"
         },
         {
           "exitCode": 0,
-          "log": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/042-jsonl-firewall.log",
-          "processReceipt": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/042-jsonl-firewall-process.json"
+          "log": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/042-jsonl-firewall.log",
+          "processReceipt": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/042-jsonl-firewall-process.json"
         },
         {
           "exitCode": 0,
-          "log": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/043-jsonl-tools-init.log",
-          "processReceipt": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/043-jsonl-tools-init-process.json"
+          "log": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/043-jsonl-tools-init.log",
+          "processReceipt": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/043-jsonl-tools-init-process.json"
         },
         {
           "exitCode": 0,
-          "log": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/044-jsonl-tools-sign.log",
-          "processReceipt": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/044-jsonl-tools-sign-process.json"
+          "log": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/044-jsonl-tools-sign.log",
+          "processReceipt": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/044-jsonl-tools-sign-process.json"
         },
         {
           "exitCode": 0,
-          "log": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/045-jsonl-tools-verify.log",
-          "processReceipt": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/045-jsonl-tools-verify-process.json"
+          "log": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/045-jsonl-tools-verify.log",
+          "processReceipt": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/045-jsonl-tools-verify-process.json"
         },
         {
           "exitCode": 1,
-          "log": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/046-jsonl-capture.log",
-          "processReceipt": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/046-jsonl-capture-process.json",
+          "log": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/046-jsonl-capture.log",
+          "processReceipt": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/commands/046-jsonl-capture-process.json",
           "report": {
             "schemaVersion": 1,
             "source": "a5987643ef6c26b01f687226fbc6a6709fc182cb",
@@ -4570,7 +4570,7 @@
             "subjects": [
               {
                 "name": "A",
-                "fixturePath": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/jsonl/workspace/workspace/allowed/A.txt",
+                "fixturePath": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/jsonl/workspace/workspace/allowed/A.txt",
                 "fixtureRelative": "workspace/allowed/A.txt",
                 "fixtureBytes": 98304,
                 "fixtureSha256": "8aad1d6792e5fde41714e501dafea616064d7d9619fa83a64a1320678b028aad",
@@ -4641,7 +4641,7 @@
               },
               {
                 "name": "B",
-                "fixturePath": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/jsonl/workspace/workspace/allowed/B.txt",
+                "fixturePath": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/jsonl/workspace/workspace/allowed/B.txt",
                 "fixtureRelative": "workspace/allowed/B.txt",
                 "fixtureBytes": 98304,
                 "fixtureSha256": "5f87a6b38dc9b2027bfd5eb59bee639b58e614d09212c67ab238bce76b8f3cff",
@@ -4654,7 +4654,7 @@
               {
                 "name": "AMCNativeRefusedError",
                 "message": "the method failed",
-                "stack": "AMCNativeRefusedError: the method failed\n    at AMCNativeClient.ingest (file:///Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/sdk/nativeAgentClient.js:411:36)\n    at Socket.<anonymous> (file:///Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/sdk/nativeAgentClient.js:223:54)\n    at Socket.emit (node:events:519:28)\n    at addChunk (node:internal/streams/readable:561:12)\n    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)\n    at Readable.push (node:internal/streams/readable:392:5)\n    at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)"
+                "stack": "AMCNativeRefusedError: the method failed\n    at AMCNativeClient.ingest (file://~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/sdk/nativeAgentClient.js:411:36)\n    at Socket.<anonymous> (file://~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/sdk/nativeAgentClient.js:223:54)\n    at Socket.emit (node:events:519:28)\n    at addChunk (node:internal/streams/readable:561:12)\n    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)\n    at Readable.push (node:internal/streams/readable:392:5)\n    at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)"
               }
             ],
             "blockers": [],
@@ -4666,12 +4666,12 @@
               "sha256": "ffc2e45b8634d59a3ce7cc5b800054150b881335f0669c0d62d3f6643538b43e"
             },
             "cli": {
-              "path": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+              "path": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
               "sha256": "d009af626174b806e283e78a80c654fbbbc16e8c9d3a521169917c256ab2fb4b"
             },
             "publicExports": {
               "agent-maturity-compass/sdk/native": {
-                "resolved": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/sdk/nativeAgentClient.js",
+                "resolved": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/sdk/nativeAgentClient.js",
                 "sha256": "6802809eb08a5a902ab72eab13ddc127838be0ee8badaf4608ae7db36c0c811a"
               }
             },
@@ -4686,7 +4686,7 @@
             "rangeEvidence": null,
             "finishedAt": "2026-09-09T15:40:32.901Z"
           },
-          "evidenceDirectory": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/receipts/jsonl-capture"
+          "evidenceDirectory": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/receipts/jsonl-capture"
         }
       ],
       "blockers": [],
@@ -4771,7 +4771,7 @@
     {
       "backend": "jsonl",
       "error": "governed SDK fixture verdict",
-      "traceback": "Traceback (most recent call last):\n  File \"/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-09-installed-spill-acceptance/run.py\", line 674, in execute\n    self.variant(backend)\n  File \"/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-09-installed-spill-acceptance/run.py\", line 439, in variant\n    self.check(group, \"governed SDK fixture verdict\", capture[\"exitCode\"] == 0 and capture[\"report\"].get(\"verdict\") == \"passed\")\n  File \"/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-09-installed-spill-acceptance/run.py\", line 230, in check\n    require(condition, name)\n  File \"/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-09-installed-spill-acceptance/run.py\", line 34, in require\n    raise RuntimeError(message)\nRuntimeError: governed SDK fixture verdict\n"
+      "traceback": "Traceback (most recent call last):\n  File \"~/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-09-installed-spill-acceptance/run.py\", line 674, in execute\n    self.variant(backend)\n  File \"~/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-09-installed-spill-acceptance/run.py\", line 439, in variant\n    self.check(group, \"governed SDK fixture verdict\", capture[\"exitCode\"] == 0 and capture[\"report\"].get(\"verdict\") == \"passed\")\n  File \"~/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-09-installed-spill-acceptance/run.py\", line 230, in check\n    require(condition, name)\n  File \"~/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-09-installed-spill-acceptance/run.py\", line 34, in require\n    raise RuntimeError(message)\nRuntimeError: governed SDK fixture verdict\n"
     }
   ],
   "blockers": [],
@@ -4781,7 +4781,7 @@
     "allowExecution": true,
     "source": "a5987643ef6c26b01f687226fbc6a6709fc182cb",
     "sourceReceipt": {
-      "path": "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/installed-candidate-a598/source.json",
+      "path": "~/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/installed-candidate-a598/source.json",
       "sha256": "8a9f100998949288f5c7e5a81aa4f34a08e2b1c4e8a935f74b050f60dd48fefd"
     },
     "tarball": {
@@ -4801,15 +4801,15 @@
     },
     "cliSha256": "d009af626174b806e283e78a80c654fbbbc16e8c9d3a521169917c256ab2fb4b",
     "supervisor": {
-      "path": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill/AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/attempt-3/runner.py",
+      "path": "~/AgentMaturityCompass/tmp/cos-installed-spill/AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/attempt-3/runner.py",
       "sha256": "e5696055be4b67ca81678da26bb8a253484199eabefcdbdc0ffc8f11d690b54d"
     },
     "native": {
-      "path": "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-09-installed-spill-acceptance/native-case.mjs",
+      "path": "~/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-09-installed-spill-acceptance/native-case.mjs",
       "sha256": "b666026f9aa3ece8d806d8aa5288225ec302373b707cdc07e578f768079e44ec"
     },
     "runnerSha256": "8fd0003f4e4c5ea198bc77ad5c43a7b147cb6e8db1878d168f555155c6ad0fc0",
-    "root": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run",
+    "root": "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run",
     "backends": [
       "sqlite",
       "jsonl"

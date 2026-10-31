@@ -2,14 +2,16 @@ import { mkdtempSync, rmSync, realpathSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
+import { SessionService } from "../src/session/sessionService.js";
 import { initWorkspace } from "../src/workspace.js";
+import { openLedger } from "../src/ledger/ledger.js";
 import { initBudgets } from "../src/budgets/budgets.js";
 import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 import { agentToolset } from "../src/agent/agentToolset.js";
+import { OUTCOME_UNKNOWN_NOTICES } from "../src/agent/pipelineToolSeam.js";
 import { initToolsConfig, loadToolsConfig } from "../src/toolhub/toolhubValidators.js";
 import { rootIdentity } from "../src/agent/delegationIdentity.js";
 import { MAX_PLAN_NODES } from "../src/workflow/workflowPlan.js";
-import type { LoopEventRecord } from "../src/session/loopEventMeta.js";
 import type { SubagentRunContext, SubagentRunResult } from "../src/agent/subagentSpawn.js";
 
 /**
@@ -24,8 +26,10 @@ import type { SubagentRunContext, SubagentRunResult } from "../src/agent/subagen
  */
 const PASS = "workflow-tool-test-passphrase";
 const dirs: string[] = [];
+const sessions: SessionService[] = [];
 
 afterEach(() => {
+  for (const session of sessions.splice(0)) session.disposeWithoutClosing();
   while (dirs.length > 0) {
     const dir = dirs.pop();
     if (dir) rmSync(dir, { recursive: true, force: true });
@@ -37,6 +41,10 @@ function workspace(): string {
   const dir = realpathSync(mkdtempSync(join(tmpdir(), "amc-wf-tool-")));
   dirs.push(dir);
   initWorkspace({ workspacePath: dir, agentId: "payments-agent", trustBoundaryMode: "isolated" });
+  // P1-78: a toolset with no session writer records only into a session the ledger holds open.
+  const ledger = openLedger(dir);
+  ledger.startSession({ sessionId: "toolset-test-session", runtime: "amc", binaryPath: "test", binarySha256: "test" });
+  ledger.close();
   initBudgets(dir, "payments-agent");
   writeRuntimeFirewallPolicy({ workspace: dir, mode: "observe" });
   return dir;
@@ -53,18 +61,20 @@ function allow(dir: string, name: string): void {
   });
 }
 
-const recorder = () => {
-  const rows: LoopEventRecord[] = [];
-  return { rows, recordLoopEvent: (r: LoopEventRecord) => { rows.push(r); return null; },
-    recordProjectedEvidence: () => null };
-};
+function recorder(dir: string): SessionService {
+  const session = new SessionService(dir);
+  sessions.push(session);
+  session.open({ sessionId: "workflow-parent", agentId: "payments-agent", harnessVersion: "test",
+    compositionDigest: "composition", policyDigest: "policy" });
+  return session;
+}
 
 function toolsetWith(dir: string, runner: (ctx: SubagentRunContext) => Promise<SubagentRunResult>) {
   return agentToolset({
     workspace: dir,
     agentId: "payments-agent",
     sessionId: "toolset-test-session",
-    subagents: { identity: rootIdentity("payments-agent"), runner, session: recorder() }
+    subagents: { identity: rootIdentity("payments-agent"), runner, session: recorder(dir) }
   });
 }
 
@@ -140,6 +150,23 @@ describe("the model gets its own structure back, labelled by its own ids", () =>
     toolset.close();
   });
 
+  it("resumes through the existing workflow tool without repeating a proven node", async () => {
+    const dir = workspace();
+    allow(dir, "workflow");
+    let effects = 0;
+    const toolset = toolsetWith(dir, async ctx => { effects++; return okRunner(ctx); });
+    try {
+      const first = await toolset.seam.execute(call(agent("a")));
+      const run = JSON.parse(String(first.content)) as { runId: string };
+      expect(typeof run.runId).toBe("string");
+      const second = await toolset.seam.execute({ ...call(agent("a")), callId: "resume-2",
+        rawArguments: JSON.stringify({ plan: agent("a"), runId: run.runId }) });
+      expect(second.outcome).toBe("OK");
+      expect(JSON.parse(String(second.content)).agentsRun).toBe(0);
+      expect(effects).toBe(1);
+    } finally { toolset.close(); }
+  });
+
   it("keeps answers and failures apart instead of concatenating them", async () => {
     // `delegate`'s rule, carried over: the runtime's account is never presented
     // as something an agent said. With several children the two are structurally
@@ -182,6 +209,7 @@ describe("a plan the model got wrong is refused, not attempted", () => {
     expect(String(outcome.content)).toContain("workflow refused");
     expect(String(outcome.content), "and says what was wrong").toContain("would run nothing");
     expect(spawned, "nothing ran").toBe(0);
+    expect(outcome.outcome).toBe("ERROR");
     toolset.close();
   });
 
@@ -207,7 +235,9 @@ describe("a plan the model got wrong is refused, not attempted", () => {
 
     const outcome = await toolset.seam.execute({ ...call(null), rawArguments: JSON.stringify({}) });
 
-    expect(String(outcome.content)).toContain("workflow refused");
+    // Refused by the published schema before the body (PXA-22), as a failed call.
+    expect(String(outcome.content)).toContain("must have required property 'plan'");
+    expect(outcome.outcome).toBe("ERROR");
     toolset.close();
   });
 });
@@ -234,15 +264,11 @@ describe("a workflow stops when the turn is cancelled", () => {
     });
 
     expect(spawned, "the later stages never reached a runner").toBe(1);
-    expect(outcome.outcome, "the loop is told the call was cancelled").toBe("CANCELLED");
-
-    // The partial answers do NOT reach the model, and that is the loop's
-    // contract rather than a loss: `pipelineToolSeam` maps any aborted call to
-    // CANCELLED with empty content, and special-casing `workflow` would put a
-    // result into a turn the loop has already decided was cancelled. The work is
-    // not lost from the RECORD — each delegation that ran wrote its own
-    // started/completed pair and its own child session.
-    expect(String(outcome.content)).toBe("");
+    // WP16: an aborted call whose body reports an explicit unknown effect stays TOOL_OUTCOME_UNKNOWN rather than
+    // CANCELLED: the interrupted delegation may have taken effect. The loop is told so, never that nothing happened.
+    // Each delegation that ran still wrote its own started/completed pair and its own child session.
+    expect(outcome.outcome, "the loop is told the interrupted plan's effect is unknown").toBe("TOOL_OUTCOME_UNKNOWN");
+    expect(String(outcome.content)).toContain(OUTCOME_UNKNOWN_NOTICES[0]);
     toolset.close();
   });
 });

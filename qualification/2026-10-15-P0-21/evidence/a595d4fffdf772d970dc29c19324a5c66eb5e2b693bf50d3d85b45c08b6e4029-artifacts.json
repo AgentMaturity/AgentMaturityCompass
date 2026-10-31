@@ -1,0 +1,47 @@
+[
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--mutant/classification.json",
+    "bytes": 10258,
+    "sha256": "072b3e76dcce1d421c3cf4e1398e0a1f499f1ecd76aae43c8ecd901729d7fd2a"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--mutant/command.json",
+    "bytes": 1940,
+    "sha256": "5dec9355062a935576b1b1580ae9d66073f63bc0708391cd2dbb613e4e6e90fd"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--mutant/inputs-after.json",
+    "bytes": 877,
+    "sha256": "ab0665a6a07a83c0455d271a9cdb69695c683d0a41a8b2526c9d6306174b26c8"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--mutant/inputs-before.json",
+    "bytes": 877,
+    "sha256": "624ceda3861452b8117b3bee9e6055dc749d8bfac726fe14d4d5222f7dfe5529"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--mutant/observer.json",
+    "bytes": 25893,
+    "sha256": "96316d6c08546a8aabd74306a6df6f638c3f241f31c29bfc6019403a74946c4d"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--mutant/owned-group-after-exit.json",
+    "bytes": 520,
+    "sha256": "ca7acfc7d1f1333a877df8ac6d58ec8c5dbf1ed2f717edbf59dcb963c44242eb"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--mutant/owned-process.json",
+    "bytes": 1565,
+    "sha256": "a8b05787f4ac002072f2074d6b4af021b9e8fa8683b118221283f4882bf26ca9"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--mutant/raw.json",
+    "bytes": 17285,
+    "sha256": "ce66931af9c58d80d721f0f7c65ba226876fe143a3ec62d47855fc2c12d62de9"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--mutant/stdout-stderr.log",
+    "bytes": 3161,
+    "sha256": "f877052c79c7dc3f471a4b02ee94213e1d668e8a2c6500977b063dd365b96700"
+  }
+]

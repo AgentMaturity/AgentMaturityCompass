@@ -1,0 +1,237 @@
+{
+  "baseline": "7a81b5aa7316471e841f4ae0ea684a64c85ae4a1",
+  "application_record": {
+    "path": "/private/tmp/p0-47-applied-doc-source-repairs-20261014.json",
+    "sha256": "d0b1328fee2991f430c3d87d5776c119d7bbd1f0eeeae05164ebd050496d6baf"
+  },
+  "read_only": true,
+  "path_hash_checks": [
+    {
+      "path": "tests/compareBadgeDocs.test.ts",
+      "before_sha256": "d133d1a9524cdf6b1d535b26bd43afe159da3be9f58b573154f2fd77edfc6e8f",
+      "after_sha256": "09e846ba5619db4fca1c7da5071b357a0cd954ab07d10b90688c27d6a47e015d",
+      "before_record_matches": true,
+      "after_record_matches": true
+    },
+    {
+      "path": "docs/CLAIM_KINDS.md",
+      "before_sha256": "772d98f777801dfce807bcd399c7424f7c7447c89f223ad8b8ab8043fe4b0a04",
+      "after_sha256": "d5450ad102df85cffaec88f925250251b44cf166c0f9b09ed6f085260241bd62",
+      "before_record_matches": true,
+      "after_record_matches": true
+    },
+    {
+      "path": "docs/COMPLIANCE.md",
+      "before_sha256": "95ab43695b1f6af8c343a7470fdd7c4a20619fe57ef1ca062d597da4153aae32",
+      "after_sha256": "ae60f2dc0d4fa0bc995cdda599b24e41f396bab3edc400f7f646dc924999ab84",
+      "before_record_matches": true,
+      "after_record_matches": true
+    },
+    {
+      "path": "docs/COMPLIANCE_FRAMEWORKS.md",
+      "before_sha256": "7002426868714dcbd74b142478b6a9d55a4f1c9cc7331a7b434a53fb4cd86079",
+      "after_sha256": "8cf3c5663a3a543542c2abf731420c55851701a5ce7611cb9c52fc7f9a8fea20",
+      "before_record_matches": true,
+      "after_record_matches": true
+    },
+    {
+      "path": "docs/IDENTITY.md",
+      "before_sha256": "56315dd3871b306809332294be5df1f09069ea2530ae708ce9a8a66012a1fd17",
+      "after_sha256": "b38a1c744dfd1e4d00d723d00336262db59fbd9f35b54078f5c645da06c4b49a",
+      "before_record_matches": true,
+      "after_record_matches": true
+    },
+    {
+      "path": "docs/MCP_SERVER.md",
+      "before_sha256": "b2e91f65bf8f2edd871eb02c5623c5deb8188c1e0a0be931fff1fda297f3a31d",
+      "after_sha256": "61daaab281c399f486090fb91cca3437a86d13966e78935161763d211c16709b",
+      "before_record_matches": true,
+      "after_record_matches": true
+    },
+    {
+      "path": "docs/NATIVE_MCP.md",
+      "before_sha256": "253a2fad4f35f1229f5c59eea3bb1f47d7b6c0def3c77cfca454d0a586187587",
+      "after_sha256": "c8080ec475b437cc1795fcfc79462239baad84f1f558983e898a0d11d0e818db",
+      "before_record_matches": true,
+      "after_record_matches": true
+    },
+    {
+      "path": "docs/NATIVE_SANDBOX_UBUNTU.md",
+      "before_sha256": "4dff0260d8df7ba59c3d4ea8a0b27b8ae709537240e453fe1d0b939908a057df",
+      "after_sha256": "8834fd339ff54e89a24f640ac69d85171dd0101b77a2999edd4880ea88e76a52",
+      "before_record_matches": true,
+      "after_record_matches": true
+    },
+    {
+      "path": "docs/NATIVE_STUDIO_TASKS.md",
+      "before_sha256": "f11ada1f73b383d5ac9fddeed7f2af0616e6d74cf155205a87aeec6d4c5db4c4",
+      "after_sha256": "5cf8b846708a19a0deb07373c3360386d41de18e8d31d8664182477a3537c4a9",
+      "before_record_matches": true,
+      "after_record_matches": true
+    },
+    {
+      "path": "docs/OPEN_STANDARD.md",
+      "before_sha256": "24c5d09401665f41bcb3fe94dafb538059f0b56e9929ecef9ef176dae1313088",
+      "after_sha256": "40bf60250072d1bf78cd15df82d027e47cde071529f3d4ffe68f7165b371453f",
+      "before_record_matches": true,
+      "after_record_matches": true
+    },
+    {
+      "path": "docs/SCORING_METHODOLOGY.md",
+      "before_sha256": "8f4ee05e339ccc2ae14a3a654918f2afc41b9d47a5a5aa0d28d92e875a33dfaf",
+      "after_sha256": "c19cbb4f8afefedc79e5b73cab15463b311e1035a326251af4cdf619aa88bf80",
+      "before_record_matches": true,
+      "after_record_matches": true
+    },
+    {
+      "path": "docs/THREAT_MODEL.md",
+      "before_sha256": "41696e9cee3ec9a8c887f6c69b9dbd9dfdeee573abc3976552bea202075cc9e9",
+      "after_sha256": "9172c2a1e3c9b25eced0fb70972658158ea658f5090936f3b681e1f8dbaa40d3",
+      "before_record_matches": true,
+      "after_record_matches": true
+    },
+    {
+      "path": "docs/TOOLHUB.md",
+      "before_sha256": "16987d1bbddfd2193686837102d000b351c3d59bb9ae7eef234e53eba2726913",
+      "after_sha256": "9740640ceb83f9d95217a05a0089df8ad3729a635ea985d9e7ee016b9b75124c",
+      "before_record_matches": true,
+      "after_record_matches": true
+    },
+    {
+      "path": "docs/TRANSPARENCY_MERKLE.md",
+      "before_sha256": "21aac00a8c59e648f6c79db45581341b18baee7ed12639ea02e9e147f8b37b8b",
+      "after_sha256": "658549d2931f1ef252449a9755e6dd236b3a7381dcbb8ca919a2852aa521ce4c",
+      "before_record_matches": true,
+      "after_record_matches": true
+    },
+    {
+      "path": "website/docs/docs.js",
+      "before_sha256": "405c1c55741df4d2d597b3dc97590ef8d25b7ffb2415fafac13d8ded4e320b8c",
+      "after_sha256": "0c61862106ae8b9330f91e2cf67f79bf2833fe4ae28de4583423e64310f20ef4",
+      "before_record_matches": true,
+      "after_record_matches": true
+    },
+    {
+      "path": "scripts/build-pages-site.mjs",
+      "before_sha256": "1ca7faf9bb9e37c892f1f3840cf2b23657a2c839fb5bb2f4694098d2e88b14f2",
+      "after_sha256": "33ff3ac2dd0cf1f49c0ac77806cccaa1a01990b3fc4a1790f7b4647c1300756a",
+      "before_record_matches": true,
+      "after_record_matches": true
+    },
+    {
+      "path": "src/llm/adapter/llmRuntime.ts",
+      "before_sha256": "16f508efb7b0b2897794654333f058e1edc9143e11e47e6b13f1f347467f607f",
+      "after_sha256": "6ffc6892a8ed3e94ac931fe7472a6268ddaad9f665fd365e68972b2e6edebf1c",
+      "before_record_matches": true,
+      "after_record_matches": true
+    },
+    {
+      "path": "scripts/evidence-paths.json",
+      "before_sha256": "8066f27d0aef0c9366b32f2027600cb053cf4c8e8a4b9122bca78a6af198ce61",
+      "after_sha256": "899f5d051c5858843de9785e597caa1b154f9fb348b9b0aeb069a8919ab60dfc",
+      "before_record_matches": true,
+      "after_record_matches": true
+    },
+    {
+      "path": "tests/publicDocsArtifact.test.ts",
+      "before_sha256": "148aa551296ce4ecb7bbe8556f6cb1624e42c50d6b27392329c762f541a890e9",
+      "after_sha256": "87fbd65b394f3854f39c9c098c76424611b82b49756e17749694c86f44be9cd3",
+      "before_record_matches": true,
+      "after_record_matches": true
+    },
+    {
+      "path": "src/claims/evidenceProvenance.ts",
+      "before_sha256": "8500cb76d7dabbdf1198cfe4a44b4abfba18c66f9d47d15022526d05578ff4e8",
+      "after_sha256": "0cb32b77a73ca2d1dadc4a1a783fdb3f6edd4664ea52e988c49d30e5826fb3ee",
+      "before_record_matches": true,
+      "after_record_matches": true
+    },
+    {
+      "path": "tests/compliance/evidenceBinding.test.ts",
+      "before_sha256": "905ed8c2f7a15106ec3610366577fdf72aecbe3a2c663065b3c600319f0a713f",
+      "after_sha256": "413979d7258ec7327bbedbbd43066d2f4a58066041a9a4a5dd133fee97526c9a",
+      "before_record_matches": true,
+      "after_record_matches": true
+    }
+  ],
+  "boundary_checks": [
+    {
+      "path": "tests/llmResponsesCapabilities.test.ts",
+      "unchanged": true,
+      "sha256": "825ef823769d403314efe461abb056dfed6fc138edbd11ea63412a811f16c376"
+    },
+    {
+      "path": "tests/publicDocsGraph.test.ts",
+      "unchanged": true,
+      "sha256": "162cad72bc0a32b5398478750926d6a30fe69f3f4e88413a9eb216b52d7df104"
+    },
+    {
+      "path": "tests/evidencePathsExist.test.ts",
+      "unchanged": true,
+      "sha256": "a7739551e9191e4ca2abf8a1d27499c4ae0ede837ca9fa99749d6a3bb7674947"
+    },
+    {
+      "path": "vitest.config.ts",
+      "unchanged": true,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+    },
+    {
+      "path": "scripts/per-file-coverage.mjs",
+      "unchanged": true,
+      "sha256": "ce5b1fcaa4d81cfb7c14cd6fe3d9f26d0563f9ce7f19f9a746cdcf8b817cffb3"
+    },
+    {
+      "path": "scripts/quality/coverage-baseline.json",
+      "unchanged": true,
+      "sha256": "a70844ba9e1f234e3aaf5576ad511d3bc35bb6bc6657e20c13ba7e06cfb7c6da"
+    },
+    {
+      "path": "scripts/check-freeze.mjs",
+      "unchanged": true,
+      "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1"
+    },
+    {
+      "path": "scripts/freeze-baseline.json",
+      "unchanged": true,
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013"
+    },
+    {
+      "path": "src/cli.ts",
+      "unchanged": true,
+      "sha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236"
+    },
+    {
+      "path": "typedoc.json",
+      "unchanged": true,
+      "sha256": "c2a2a00dc9d674225dfb15b42fed1b7dcd2cd51eae9540a38fe952a1e3cb3f06"
+    },
+    {
+      "path": "unused-code/plan-edits/manifest.json",
+      "unchanged": true,
+      "sha256": "7be034f9e3ba05cc36cf90e5c7bcd396dbb9244d8934a509dc8c247f8318bbe7"
+    }
+  ],
+  "producer_keys_added": {
+    "user": "manual",
+    "inferred": "manual",
+    "carried": "manual",
+    "numeric_self_answer": "manual",
+    "default": "manual"
+  },
+  "existing_producer_keys_changed": {},
+  "reviewed_metadata_labels_added": [
+    "compliance_report",
+    "diagnostic_report",
+    "legacy",
+    "legacy-unverified",
+    "path_presence",
+    "predicate",
+    "record",
+    "reviewer_exception"
+  ],
+  "reviewed_metadata_labels_removed": [],
+  "source_enumeration_and_all_binding_tests_tail_byte_identical": true,
+  "tracked_archive_diff_paths": [],
+  "verdict": "No concrete integrity defect found in the reviewed applied slice. All21 path before/after hashes match the root application record; classification additions exactly match the five manual/eight reviewed metadata labels. Existing guards and protected policy/source/archive boundaries are preserved. Qualification is being executed by root; this review makes no new test-pass or coverage-pass claim.",
+  "scope_limit": "Other root-owned integration fixture repairs are outside this21-path applied-slice review. No source edits, test/build/check execution or tracker changes were performed by this reviewer."
+}

@@ -31,7 +31,7 @@ const MAX_PROFILE_BYTES = 4 * 1024 * 1024;
 const PROFILE_FILE = /^a4-[a-z]+\.operating-profile\.json$/;
 const ACTIVATION_FILE = /\.activation\.json$/;
 /** The follow-up that applies a profile through an A4 effect gate (design §6.1 a4.adapt.activate_profile). */
-export const PROFILE_EFFECT_KEY = "A4_PROFILE_EFFECT";
+const PROFILE_EFFECT_KEY = "A4_PROFILE_EFFECT";
 
 /** What Understand records about the profile comparison; `error` is a code, never a path or a message. */
 export interface AdaptPermissionsFacts {

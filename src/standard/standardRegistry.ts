@@ -20,8 +20,3 @@ export function standardMetaSigPath(workspace: string): string {
 export function standardBundleSigPath(workspace: string): string {
   return join(standardRoot(workspace), "schemas.sig");
 }
-
-export function ensureStandardDirs(workspace: string): void {
-  ensureDir(standardRoot(workspace));
-  ensureDir(standardSchemasDir(workspace));
-}

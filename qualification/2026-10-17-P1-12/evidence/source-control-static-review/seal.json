@@ -1,0 +1,23 @@
+{
+  "schema": "private-static-helper-review-seal/1",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/source-control-static-review/review.json",
+      "bytes": 3181,
+      "sha256": "50b1e5a556a2f066192788dc3daaa59338a6c3e95fda6f7601c78fde4968b1f6"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/source-control-static-review/README.md",
+      "bytes": 703,
+      "sha256": "c9f675b5e3e38d668801c1564995aac81618a0cab409a8cdfb38fbb0936c2559"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/source-control-static-review/input-pins.json",
+      "bytes": 943,
+      "sha256": "fe126f1f46b7ae5d769e0a19d0b520a169ea8e0249b203dd601841a936eb0a83"
+    }
+  ],
+  "allReadsFinished": true,
+  "blockers": [],
+  "executionByReviewer": false
+}

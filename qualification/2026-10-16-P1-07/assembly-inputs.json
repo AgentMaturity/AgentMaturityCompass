@@ -1,0 +1,106 @@
+{
+  "schema": "p107-receipt-assembly-inputs/1",
+  "readyForAssembly": true,
+  "sourceCommit": "0e06b251a8ff18d8d087657f8a2b62866da89b5c",
+  "canonicalPhase": "p107-fresh-canonical",
+  "date": "2026-10-16",
+  "branch": "codex/p1-07-gate-qualification",
+  "runtime": {
+    "node": "v22.23.3",
+    "pnpm": "10.33.0",
+    "os": "Darwin",
+    "arch": "arm64"
+  },
+  "sourceRestored": true,
+  "allActualBodiesReviewed": true,
+  "formalDone": false,
+  "globalQualityGreen": false,
+  "fullNpmTestRun": false,
+  "sourceProof": {
+    "path": "/private/tmp/p1-07-gate-qualification-20261016/source-commit.json",
+    "bytes": 777,
+    "sha256": "2e8b6f1e5d0549ec2e630d9f1b99ca544bf3815864a3f80b20aedba6e29f997a"
+  },
+  "freshBinding": {
+    "path": "/private/tmp/p1-07-gate-qualification-20261016/fresh-source-binding.json",
+    "bytes": 11026,
+    "sha256": "8b2dfb76a10435847b92e768b6eac044a012bf73c7184345d515cb0e3b3c7af7"
+  },
+  "rootReview": {
+    "path": "/private/tmp/p1-07-gate-qualification-20261016/root-final-review.json",
+    "bytes": 3363,
+    "sha256": "2e8df42109331e180ff5885309c65734817c157d851b8f44f7b851406016a806"
+  },
+  "readme": {
+    "path": "/private/tmp/p1-07-gate-qualification-20261016/root-receipt-README.md",
+    "bytes": 8830,
+    "sha256": "1d942765a07efefb8c368bfdd0eb7fc9f0cfe1a7fdd67d115ebcc06315f576fc"
+  },
+  "notes": {
+    "path": "/private/tmp/p1-07-gate-qualification-20261016/root-receipt-notes.txt",
+    "bytes": 2335,
+    "sha256": "e9af1a3a52c7201c4fcc03b129d6bb4a27c42b5e722f607bb03412207df6c74a"
+  },
+  "controls": [
+    {
+      "operator": "M1",
+      "redPhase": "p107-m1",
+      "restoredPhase": "p107-m1-restored",
+      "applied": {
+        "path": "/private/tmp/p1-07-gate-qualification-20261016/m1-apply.json",
+        "bytes": 845,
+        "sha256": "876ac7f7fcd12bb12c8a0c36b948b3d2b518760741fbdb42a083363410144102"
+      },
+      "classification": {
+        "path": "/private/tmp/p1-07-gate-qualification-20261016/m1-classification-bound.json",
+        "bytes": 3211,
+        "sha256": "65dd8f8b1b051184d06d2244f376778e05fdabb2106bf7a8c8a2430ac34391ae"
+      },
+      "restored": {
+        "path": "/private/tmp/p1-07-gate-qualification-20261016/m1-restore.json",
+        "bytes": 847,
+        "sha256": "a3eaf8f65a4cbecf10e8814ece9c6640b056dc365190f0990c4ddf0a66d2a14c"
+      }
+    },
+    {
+      "operator": "M2",
+      "redPhase": "p107-m2",
+      "restoredPhase": "p107-m2-restored",
+      "applied": {
+        "path": "/private/tmp/p1-07-gate-qualification-20261016/m2-apply.json",
+        "bytes": 850,
+        "sha256": "34b2a59b50e29fffd9148b90aa1c23aeab332b742b8149c86eca9e73a7e2951a"
+      },
+      "classification": {
+        "path": "/private/tmp/p1-07-gate-qualification-20261016/m2-classification-bound.json",
+        "bytes": 3372,
+        "sha256": "cce130c3ecf4607a728987142710a2a9afe732eaffd2b1fc95e4846190cd5ae9"
+      },
+      "restored": {
+        "path": "/private/tmp/p1-07-gate-qualification-20261016/m2-restore.json",
+        "bytes": 852,
+        "sha256": "1f0b089a6e1cc3f43513c919725d7b2ba4ec6c62ddbc6bb40a8ff7bb81a67159"
+      }
+    },
+    {
+      "operator": "M3",
+      "redPhase": "p107-m3",
+      "restoredPhase": "p107-m3-restored",
+      "applied": {
+        "path": "/private/tmp/p1-07-gate-qualification-20261016/m3-apply.json",
+        "bytes": 848,
+        "sha256": "2639af490377e4123644eab8376b261dbaa5aeb76a73a05c2dc7d194efe75822"
+      },
+      "classification": {
+        "path": "/private/tmp/p1-07-gate-qualification-20261016/m3-classification-bound.json",
+        "bytes": 7968,
+        "sha256": "3bb508bbf336e57c99e8a1097d62572a795daa80ed07222f4f09dab63d95743a"
+      },
+      "restored": {
+        "path": "/private/tmp/p1-07-gate-qualification-20261016/m3-restore.json",
+        "bytes": 850,
+        "sha256": "63912f283c30f99d8625b2040bf9c85b20a02d95aac50debdb492118c2c8ab9b"
+      }
+    }
+  ]
+}

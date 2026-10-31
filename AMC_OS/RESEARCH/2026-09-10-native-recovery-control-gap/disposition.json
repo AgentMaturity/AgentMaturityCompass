@@ -31,7 +31,7 @@
       "arch": "arm64",
       "node": "v25.5.0",
       "pnpm": "10.33.0",
-      "browserExecutable": "/Users/sid/Library/Caches/ms-playwright/chromium_headless_shell-1217/chrome-headless-shell-mac-arm64/chrome-headless-shell",
+      "browserExecutable": "~/Library/Caches/ms-playwright/chromium_headless_shell-1217/chrome-headless-shell-mac-arm64/chrome-headless-shell",
       "browserSha256": "a8a0ac2829aeaa132389b001640fb835bdc93a49fb7f26af0c3de0df3ee4d66f",
       "browserVersion": "Google Chrome for Testing 147.0.7727.15"
     },
@@ -88,7 +88,7 @@
     }
   ],
   "vault": {
-    "path": "/Users/sid/Documents/AMC/Evidence/2026-09-10 Native Recovery Control Gap.md",
+    "path": "~/Documents/AMC/Evidence/2026-09-10 Native Recovery Control Gap.md",
     "checkpointAppended": true
   },
   "oldRefusalsPreserved": true,

@@ -9,7 +9,7 @@ describe("buyer packages website link", () => {
     const homepage = read("website/index.html");
     const styles = read("website/style.css");
     const buyerPackages = read("docs/BUYER_PACKAGES.md");
-    const audit = read("docs/AUDIT_50_AGENTS_BATCH5.md");
+    const audit = read("docs/archive/AUDIT_50_AGENTS_BATCH5.md");
 
     expect(buyerPackages).toContain("Commercial offers by buyer type");
     expect(homepage).toContain('href="./docs/#BUYER_PACKAGES"');

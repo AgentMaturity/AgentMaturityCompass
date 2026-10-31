@@ -1,0 +1,47 @@
+[
+  {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C2-tool-recorder-error-propagates--restored/classification.json",
+    "bytes": 227,
+    "sha256": "91c20674729fcbed4fd622bf6f22112342c0af0fa9255787c8cde71ca5d4f34c"
+  },
+  {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C2-tool-recorder-error-propagates--restored/command.json",
+    "bytes": 1732,
+    "sha256": "f799ae94eda6b2eff1230778e22b984db4af04f194ee7683a97a23ac24539246"
+  },
+  {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C2-tool-recorder-error-propagates--restored/inputs-after.json",
+    "bytes": 830,
+    "sha256": "f749bd8cc577733064ddcc1fa8b74ae3ee8e8e89c4f846404bb5b99e910f2ca1"
+  },
+  {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C2-tool-recorder-error-propagates--restored/inputs-before.json",
+    "bytes": 830,
+    "sha256": "4670b66c605a62721eaebbdb5af146b06f067b1cf5ea1363d60d0d2e745cdc27"
+  },
+  {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C2-tool-recorder-error-propagates--restored/observer.json",
+    "bytes": 4535,
+    "sha256": "b13a447c056981600d0bbed049a11142bfb34e02d33a40e48be41712bcf8c0e5"
+  },
+  {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C2-tool-recorder-error-propagates--restored/owned-group-after-exit.json",
+    "bytes": 520,
+    "sha256": "a84b302b019182a608a0865b157fcd239c80f43cca61deb0d0af40e864e3733c"
+  },
+  {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C2-tool-recorder-error-propagates--restored/owned-process.json",
+    "bytes": 1357,
+    "sha256": "8e7197ce972c9b45e7235d3a39919ff6ed4c92fcbb42d3723d1f32d682b56ead"
+  },
+  {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C2-tool-recorder-error-propagates--restored/raw.json",
+    "bytes": 2708,
+    "sha256": "98917cba5f8cde22ed6571e5300bdc613a0d6c35c61cf16c6c597b2bcfcf39f5"
+  },
+  {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/phases/C2-tool-recorder-error-propagates--restored/stdout-stderr.log",
+    "bytes": 472,
+    "sha256": "3b6bc52143e46a6a8baafa47f848826443d1cb030b2c60d4fba579f092eaeda4"
+  }
+]

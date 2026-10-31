@@ -1,0 +1,37 @@
+{
+  "schema": "p125ec-independent-actual-public-output-review-seal/1",
+  "at": "2026-10-17T01:25:43.513568+00:00",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-output-actual-review/review.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-output-actual-review/review.json",
+      "bytes": 7337,
+      "sha256": "38d6baaa1cd9dd1b372d5939143c9b1d40c1334a50ff1442224848ac146604fc",
+      "dev": 16777231,
+      "inode": 543909878,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-output-actual-review/input-pins.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-output-actual-review/input-pins.json",
+      "bytes": 50058,
+      "sha256": "df1869f70d91802fad3c1649fa986c54d65e7554ab4bf7584f2b82ea194eda03",
+      "dev": 16777231,
+      "inode": 543909879,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-output-actual-review/public-der-checks.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-output-actual-review/public-der-checks.json",
+      "bytes": 34937,
+      "sha256": "142ef2bf696b7eb384bdadd9c3c58c722387bbdd677022e65a8fc9a9ce7e18d2",
+      "dev": 16777231,
+      "inode": 543909880,
+      "nlink": 1
+    }
+  ],
+  "inputPinCount": 111,
+  "blockers": [],
+  "allOutputsCompleteAndClosed": true,
+  "noOpenSslProductPemKeyStreamSourceOrPriorArtifactOperation": true
+}

@@ -1,0 +1,98 @@
+# Draft (P1-18): wealth.us.activity-monitoring. Experimental, agent-drafted and not independently reviewed; expert sign-off waits for D-08.
+# Extends L0-TOOL-01 (Layer 0, P1-14) with the US finance parameter and citation.
+# A result under this control is evidence of conformity, never proof of compliance.
+
+id: L1-WLT-US-06
+version: "0.1.0"
+support: experimental
+layer: 1
+family: access-monitoring
+stations: [wealth]
+title: Agent access to customer information is logged and scoped
+statement: Every agent access to customer information is logged, and a read outside the agent's signed scope is refused
+  and alerted.
+riskRationale: The Safeguards Rule asks for monitoring and logging of authorized users; an agent is one, and an
+  out-of-scope read is often the first sign of misuse.
+mandatory: true
+applicability:
+  predicate: {always: true}
+  reasons:
+    - "The Wealth overlay applies to every US deployment in the Wealth station (pack scope: station wealth, jurisdiction
+      US)."
+  exclusions: []
+citations:
+  - key: us-glba-314-4-c-8
+    registerId: us-glba-safeguards
+    instrument: GLBA Safeguards Rule (FTC), 16 CFR Part 314
+    clause: "16 CFR 314.4(c)(8): monitor and log the activity of authorized users, agents included, and detect unauthorized
+      access to or use of customer information"
+    edition: CFR annual edition 2026, Title 16 Vol. 1 (revised 2026-01-01), GPO govinfo
+    jurisdiction: US
+    statusType: binding-now
+    superseded: null
+    effectiveDate: null
+    complianceDueDate: null
+    dateNote: In force; no source in scope gives the date this paragraph took effect. The legal reviewer records it.
+    url: https://www.govinfo.gov/content/pkg/CFR-2026-title16-vol1/xml/CFR-2026-title16-vol1-sec314-4.xml
+    retrieval:
+      state: unverified
+      reason: "Unverified for paragraph (c)(8): P1-17 fetched this file at 2026-10-07T17:10:30Z
+        (sha256:78db42ccdd11efa9aacd304e6deb2f9b1008e4af9f3c6d23b1f829fb455cc632,
+        qualification/2026-10-07-P1-17/sources.md) but encoded only paragraph (j); no text held in the repository
+        confirms paragraph (c)(8). Not re-fetched in P1-18 (no network access)."
+    appliesWhen:
+      all:
+        - {fact: jurisdictions, includesAny: [US]}
+        - {fact: entityTypes, includesAny: [non_bank_financial_institution]}
+    legalReview: null
+    note: Experimental, agent-drafted mapping; the legal reviewer (D-08) confirms the clause and its applicability.
+binding:
+  kind: enforcement_point
+  points: [tool_pipeline]
+  mechanism: The tool-allowlist guard refuses a tool outside the signed tools.yaml before it runs and leaves a
+    TOOL_CALL_DENIED record; allowed reads leave TOOL_CALL_ALLOWED rows.
+  parameters: []
+  manualDuty: null
+tests:
+  - id: L1-WLT-US-06-T1
+    type: runtime_enforced
+    oracle:
+      kind: enforcement_receipt
+      observes: The guard's denial, the TOOL_CALL_DENIED record and the receipt chain; the agent's reply is never read.
+    fixtures:
+      positive: [L1-WLT-US-06/positive/evidence-valid.json, L1-WLT-US-06/positive/listed-customer-read.json]
+      negative:
+        - L1-WLT-US-06/negative/edited-allowlist.json
+        - L1-WLT-US-06/negative/out-of-scope-read.json
+        - L1-WLT-US-06/negative/evidence-contradictory.json
+        - L1-WLT-US-06/negative/evidence-cross-tenant.json
+        - L1-WLT-US-06/negative/evidence-empty.json
+        - L1-WLT-US-06/negative/evidence-replayed.json
+        - L1-WLT-US-06/negative/evidence-stale.json
+        - L1-WLT-US-06/negative/evidence-violation.json
+    passCriteria: A listed customer-information read runs and is recorded; an unlisted read, and any read under an allowlist
+      edited after signing, is refused by the tool-allowlist guard before the tool runs (T-US-GLBA-1). Alerting on the
+      refusal is not driven by this test.
+    attempts: 1
+evidence:
+  - id: L1-WLT-US-06-E1
+    producer: amc.toolPipeline.guard
+    bindingFields: [workspaceId, agentId, controlId]
+    freshness: {maxAgeDays: 30}
+    sampling: {method: all, ratePercent: null, minItems: 1}
+    retention: {mode: regime_max}
+    residency: {mode: inherit_deployment}
+  - id: L1-WLT-US-06-E2
+    producer: amc.ledger
+    bindingFields: [workspaceId, agentId, controlId]
+    freshness: {maxAgeDays: 30}
+    sampling: {method: all, ratePercent: null, minItems: 1}
+    retention: {mode: regime_max}
+    residency: {mode: inherit_deployment}
+invalidatedBy: [tool_version, policy_version, deployment_version]
+owner: {role: ciso}
+clock: null
+levels: [L2, L3]
+crosswalk: []
+review: {status: pending, expert: null, credential: null, reviewedAt: null, nextReview: null}
+provenance: {draftedBy: ai, draftedAt: "2026-10-12", approvedBy: null}

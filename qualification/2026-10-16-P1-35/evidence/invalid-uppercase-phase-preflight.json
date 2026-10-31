@@ -1,0 +1,9 @@
+{
+  "requestedPhase": "p135-M1",
+  "wrapperExit": 70,
+  "diagnostic": "P109 wrapper incomplete: Invalid phase or Node major",
+  "launchedProductChild": false,
+  "ACTIVEorHALTEDcreated": false,
+  "subsequentLowercasePhase": "p135-m1",
+  "wrapperUnchanged": true
+}

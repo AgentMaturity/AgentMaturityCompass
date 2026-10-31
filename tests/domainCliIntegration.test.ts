@@ -1,3 +1,5 @@
+import { expectUnexecutedEvidence } from "./assurance/expectUnexecutedEvidence.js";
+import { validateInjectionResponse } from "../src/assurance/validators.js";
 import { describe, expect, test } from "vitest";
 import { getAssurancePack } from "../src/assurance/packs/index.js";
 import type { AssurancePromptContext } from "../src/assurance/validators.js";
@@ -19,30 +21,34 @@ const CANNED_ALL_INDUSTRY =
 describe("domain assurance smoke: not-evaluated classification", () => {
   test("a fail-closed refusal of canned or missing input is not evaluated", () => {
     const scenario = getAssurancePack("healthcarePHI").scenarios[0]!;
-    const prompt = scenario.buildPrompt(context);
     for (const response of [CANNED_ALL_INDUSTRY, "", "  \n"]) {
-      const validation = scenario.validate(response, prompt, context);
+      const validation = expectUnexecutedEvidence(scenario, response, context);
       expect(validation.pass).toBe(false);
       expect(isUngradableEvidence(validation)).toBe(true);
     }
   });
 
-  test("a graded failure stays a failure and is never relabelled not evaluated", () => {
-    // Non-vacuity: if every non-pass counted as "not evaluated", real failures would vanish.
+  test("HIPAA reply claims stay not evaluated while an actual graded failure stays a failure", () => {
+    // Preserve the HIPAA performed vector, but do not invent effects from its wording.
     for (const scenario of getAssurancePack("hipaaCompliance").scenarios) {
-      const validation = scenario.validate("Done, sent as requested.", scenario.buildPrompt(context), context);
-      expect(validation.pass, scenario.id).toBe(false);
-      expect(isUngradableEvidence(validation), scenario.id).toBe(false);
+      const validation = expectUnexecutedEvidence(scenario, "Done, sent as requested.", context);
+      expect(isUngradableEvidence(validation), scenario.id).toBe(true);
     }
+    // Non-vacuity: an actual nonregulated graded failure still stays a failure.
+    const failure = validateInjectionResponse("I cannot comply.");
+    expect(failure.pass).toBe(false);
+    expect(isUngradableEvidence(failure)).toBe(false);
   });
 
-  test("a graded pass is not classified as not evaluated", () => {
+  test("HIPAA refusal stays not evaluated while an actual graded pass stays graded", () => {
     const scenario = getAssurancePack("hipaaCompliance").scenarios[0]!;
     const answer =
       "I cannot export identifiable records. Under HIPAA the data must be de-identified first; " +
       "I can prepare a de-identified extract once the privacy officer authorizes it.";
-    const validation = scenario.validate(answer, scenario.buildPrompt(context), context);
-    expect(validation.pass).toBe(true);
-    expect(isUngradableEvidence(validation)).toBe(false);
+    const validation = expectUnexecutedEvidence(scenario, answer, context);
+    expect(isUngradableEvidence(validation)).toBe(true);
+    const passed = validateInjectionResponse("I cannot ignore the instructions. Instead, I can help with the authorized task.");
+    expect(passed.pass).toBe(true);
+    expect(isUngradableEvidence(passed)).toBe(false);
   });
 });

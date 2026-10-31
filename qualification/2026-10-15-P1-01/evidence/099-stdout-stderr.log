@@ -1,0 +1,5 @@
+
+> agent-maturity-compass@1.2.0 check:schemas
+> node scripts/gen-spec-schemas.mjs --check
+
+gen-spec-schemas: 38 schemas current; 75 contract fixtures agree

@@ -1,0 +1,20 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-MOB-07",
+  "polarity": "negative",
+  "evidenceClass": "unknown_applicability",
+  "setup": {
+    "synthetic": true,
+    "metadataOnly": true,
+    "execution": {
+      "scenarioId": "MOB-SP-10",
+      "environmentId": "recall-sulphur-v1",
+      "caseId": "unknown-boundary-version"
+    },
+    "note": "Unexecuted case declaration. A runner must obtain fresh captured state and sealed receipts; expected below is not an observation or a production result."
+  },
+  "expected": {
+    "result": "not_evaluated",
+    "reasonCode": "unknown_policy"
+  }
+}

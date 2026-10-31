@@ -1,0 +1,10 @@
+{
+  "suite": "1.0.0",
+  "class": "adapter",
+  "cases": [
+    { "id": "ADP-001", "name": "enforce-deny", "normative": true, "hookPayload": "spec/conformance/v1/adapter/hooks/PreToolUse-bash.json", "policy": "spec/conformance/v1/adapter/policies/enforce.json", "expect": { "decision": "deny", "enforced": true } },
+    { "id": "ADP-002", "name": "enforce-allow", "normative": true, "hookPayload": "spec/conformance/v1/adapter/hooks/PreToolUse-read.json", "policy": "spec/conformance/v1/adapter/policies/enforce.json", "expect": { "decision": "allow", "enforced": true } },
+    { "id": "ADP-003", "name": "enforce-default-ask", "normative": true, "hookPayload": "spec/conformance/v1/adapter/hooks/PreToolUse-webfetch.json", "policy": "spec/conformance/v1/adapter/policies/enforce.json", "expect": { "decision": "ask", "enforced": true } },
+    { "id": "ADP-004", "name": "observation-only-never-claims-enforcement", "normative": true, "hookPayload": "spec/conformance/v1/adapter/hooks/PreToolUse-bash.json", "policy": "spec/conformance/v1/adapter/policies/observe.json", "expect": { "decision": "allow", "enforced": false } }
+  ]
+}

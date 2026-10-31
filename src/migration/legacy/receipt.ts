@@ -32,20 +32,12 @@ export function originalsDigest(hashes: readonly string[]): string {
   return sha256Hex([...hashes].sort().join("\n"));
 }
 
-/** The receipt's bytes, its path and its signature. Call before anything is written: a failed signature stops the run. */
-export function signReceipt(workspace: string, receipt: MigrationReceipt, sign: (digestHex: string) => SignedDigest):
-  { path: string; json: string; signed: SignedDigest } {
+/** The existing path and JSON recipe, shared by the synchronous signer and the maintained asynchronous producer. */
+export function prepareReceipt(workspace: string, receipt: MigrationReceipt): { path: string; json: string } {
   const path = join(RECEIPTS_DIR, `${receipt.finishedAt.replace(/[-:.]/g, "")}.json`);
   if (existsSync(join(workspace, path))) throw new Error(`receipt already exists: ${path}`);
   const json = `${JSON.stringify(receipt, null, 2)}\n`;
-  return { path, json, signed: sign(sha256Hex(json)) };
-}
-
-/** Signature first, as the repair receipt does, so a receipt on disk always has its signature beside it. Never overwrites. */
-export function writeReceipt(workspace: string, out: { path: string; json: string; signed: SignedDigest }): void {
-  mkdirSync(join(workspace, RECEIPTS_DIR), { recursive: true });
-  writeFileSync(join(workspace, `${out.path}.sig`), `${JSON.stringify(out.signed, null, 2)}\n`, { flag: "wx" });
-  writeFileSync(join(workspace, out.path), out.json, { flag: "wx" });
+  return { path, json };
 }
 
 /** Receipt file names, oldest first (names are UTC timestamps). */

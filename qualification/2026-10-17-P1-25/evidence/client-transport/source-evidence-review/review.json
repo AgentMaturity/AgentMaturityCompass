@@ -1,0 +1,318 @@
+{
+  "schema": "p125c-source-evidence-independent-review/1",
+  "at": "2026-10-16T21:49:24.220436+00:00",
+  "blockers": [],
+  "allReadsFinished": true,
+  "sourceCommit": "5beb3eae69b08f2e895520c7f459e1465780beeb",
+  "sourceParent": "e2cbdb909ad2ff4cf0b97577a3be3e66a70241b7",
+  "sourceCheckpoint": {
+    "exactElevenBlobWorkingPreparedHashes": [
+      {
+        "relativePath": "README.md",
+        "bytes": 59828,
+        "sha256": "1cf5097efb8c894746065edb1ef625fc21f616c76060fc4bd2c0011eadbc5826",
+        "committedWorkingPreparedExact": true
+      },
+      {
+        "relativePath": "CONTRIBUTING.md",
+        "bytes": 16220,
+        "sha256": "49837eb4b3cea2bbf03c46244d370dc80c72c0dec6e78cad7dbc426ef3896c9e",
+        "committedWorkingPreparedExact": true
+      },
+      {
+        "relativePath": "website/index.html",
+        "bytes": 43520,
+        "sha256": "0bf924630aac6ffc3666ed5b899c493c7abbbf16cdbba4ebc1d793893d06ea53",
+        "committedWorkingPreparedExact": true
+      },
+      {
+        "relativePath": "website/lite.html",
+        "bytes": 11197,
+        "sha256": "85a23bdc6aa1890627afb0c57562aca3aa2479f0764c0f771d92e03576704db3",
+        "committedWorkingPreparedExact": true
+      },
+      {
+        "relativePath": "website/i18n.js",
+        "bytes": 44169,
+        "sha256": "d8385bdeacd02b68add2930d54bc3578fa5d256d0020b5b245462be6eff900c1",
+        "committedWorkingPreparedExact": true
+      },
+      {
+        "relativePath": "docs/content/show-hn-draft.md",
+        "bytes": 1951,
+        "sha256": "950a26cb53c37c58e98d298878f9219a448cccdc74511e23ba0ebda2e0ab70b5",
+        "committedWorkingPreparedExact": true
+      },
+      {
+        "relativePath": "docs/content/reddit-launch-drafts.md",
+        "bytes": 3075,
+        "sha256": "45b32dc7ffb39cb808b59f72da39cded0a59c4feeca5bddf0f4c8e5e2e9eea02",
+        "committedWorkingPreparedExact": true
+      },
+      {
+        "relativePath": "docs/internal/competitive-landscape.md",
+        "bytes": 3880,
+        "sha256": "ce8d53e766334530a3d89f0b30a4ed12db3696eec72e900bb956c521321783dd",
+        "committedWorkingPreparedExact": true
+      },
+      {
+        "relativePath": "docs/internal/mirofish-simulation-council.md",
+        "bytes": 2489,
+        "sha256": "06ae59f494f5fe76df76c5be54a94d11ea7fbbce4cd60cec4d8be4c8330d7551",
+        "committedWorkingPreparedExact": true
+      },
+      {
+        "relativePath": "whitepaper/AMC_WHITEPAPER_v1.md",
+        "bytes": 107509,
+        "sha256": "f980b8c42da97ea010b88408b2114d60330040c75be2753be856083c945f9e01",
+        "committedWorkingPreparedExact": true
+      },
+      {
+        "relativePath": "tests/time/tsaClient.test.ts",
+        "bytes": 15569,
+        "sha256": "2e70ff1d331f9ec7263dc437119ce9ab505fc1e39c5fbbb27592569cad6c1cb8",
+        "committedWorkingPreparedExact": true
+      }
+    ],
+    "changedPathSetExact": true,
+    "currentHeadCleanIndexEmpty": true,
+    "ordinaryCommittedRangeWhitespaceExit": 0,
+    "historicalStagedWhitespaceRootRecord": 0,
+    "stageStop": "Ordinary add returned1 on ignored docs/internal ancestor while all11 intended paths were staged. Existing tracked ancestor files and stage blobs were read; no commit at that stop. Ordinary tracked add --update returned0, then complete11-blob/default-whitespace/protected admission preceded ordinary commit0. No force, ignore change, reset, amend, no-verify or bypass.",
+    "stageStopRetained": true
+  },
+  "countDelta": {
+    "paths": 10,
+    "numericSpans": 15,
+    "fourteenCommaLiteralsOneEncodedBadge": true,
+    "from": 1691,
+    "to": 1692,
+    "allOtherAuthoredBytesExact": true,
+    "surfaces": [
+      {
+        "relativePath": "README.md",
+        "numericSpans": 2,
+        "allOtherBytesExact": true,
+        "sha256": "1cf5097efb8c894746065edb1ef625fc21f616c76060fc4bd2c0011eadbc5826"
+      },
+      {
+        "relativePath": "CONTRIBUTING.md",
+        "numericSpans": 1,
+        "allOtherBytesExact": true,
+        "sha256": "49837eb4b3cea2bbf03c46244d370dc80c72c0dec6e78cad7dbc426ef3896c9e"
+      },
+      {
+        "relativePath": "website/index.html",
+        "numericSpans": 1,
+        "allOtherBytesExact": true,
+        "sha256": "0bf924630aac6ffc3666ed5b899c493c7abbbf16cdbba4ebc1d793893d06ea53"
+      },
+      {
+        "relativePath": "website/lite.html",
+        "numericSpans": 1,
+        "allOtherBytesExact": true,
+        "sha256": "85a23bdc6aa1890627afb0c57562aca3aa2479f0764c0f771d92e03576704db3"
+      },
+      {
+        "relativePath": "website/i18n.js",
+        "numericSpans": 1,
+        "allOtherBytesExact": true,
+        "sha256": "d8385bdeacd02b68add2930d54bc3578fa5d256d0020b5b245462be6eff900c1"
+      },
+      {
+        "relativePath": "docs/content/show-hn-draft.md",
+        "numericSpans": 1,
+        "allOtherBytesExact": true,
+        "sha256": "950a26cb53c37c58e98d298878f9219a448cccdc74511e23ba0ebda2e0ab70b5"
+      },
+      {
+        "relativePath": "docs/content/reddit-launch-drafts.md",
+        "numericSpans": 2,
+        "allOtherBytesExact": true,
+        "sha256": "45b32dc7ffb39cb808b59f72da39cded0a59c4feeca5bddf0f4c8e5e2e9eea02"
+      },
+      {
+        "relativePath": "docs/internal/competitive-landscape.md",
+        "numericSpans": 1,
+        "allOtherBytesExact": true,
+        "sha256": "ce8d53e766334530a3d89f0b30a4ed12db3696eec72e900bb956c521321783dd"
+      },
+      {
+        "relativePath": "docs/internal/mirofish-simulation-council.md",
+        "numericSpans": 1,
+        "allOtherBytesExact": true,
+        "sha256": "06ae59f494f5fe76df76c5be54a94d11ea7fbbce4cd60cec4d8be4c8330d7551"
+      },
+      {
+        "relativePath": "whitepaper/AMC_WHITEPAPER_v1.md",
+        "numericSpans": 4,
+        "allOtherBytesExact": true,
+        "sha256": "f980b8c42da97ea010b88408b2114d60330040c75be2753be856083c945f9e01"
+      }
+    ],
+    "twentyClaudeRVariantPinsExact": true,
+    "countsBeforeNaturalRedRetained": true
+  },
+  "actualSourceRuntime": {
+    "tests": {
+      "total": 28,
+      "passed": 28,
+      "failed": 0,
+      "skipped": 0
+    },
+    "files": 2,
+    "newClientLiteralCases": 11,
+    "unchangedVerifierLiteralCases": 17,
+    "orderedUniqueIdentityJoin": true,
+    "hookTaskEntries": 2,
+    "individualHookValues": 3,
+    "noTaskUnhandledLateErrors": true,
+    "commandExit": 0,
+    "durationMs": 11811,
+    "ownedPgid": 42673,
+    "groupAbsentByESRCH": true,
+    "signalsOtherThanZeroSent": false,
+    "timeoutConfiguredMs": 10000,
+    "timeoutMeasuredMs": 10004.961125,
+    "resourceBoundary": "All literal client bodies and their finally assertions completed successfully, including finite-cap and stalled-response cleanup. No per-request public resource transcript or universal descendant/socket isolation is claimed. These are the actual direct local client fixtures, not TSA grant verification or live/external service evidence.",
+    "noExtraPublicEvidenceRecords": true
+  },
+  "elevenSourceChecks": [
+    {
+      "phase": "p125c-test-types",
+      "exit": 0,
+      "durationMs": 35929,
+      "ownedPgid": 42198,
+      "naturalESRCH": true,
+      "signalsOtherThanZeroSent": false
+    },
+    {
+      "phase": "p125c-source-types",
+      "exit": 0,
+      "durationMs": 25873,
+      "ownedPgid": 42324,
+      "naturalESRCH": true,
+      "signalsOtherThanZeroSent": false
+    },
+    {
+      "phase": "p125c-lint",
+      "exit": 0,
+      "durationMs": 2799,
+      "ownedPgid": 42434,
+      "naturalESRCH": true,
+      "signalsOtherThanZeroSent": false
+    },
+    {
+      "phase": "p125c-build",
+      "exit": 0,
+      "durationMs": 29245,
+      "ownedPgid": 42460,
+      "naturalESRCH": true,
+      "signalsOtherThanZeroSent": false
+    },
+    {
+      "phase": "p125c-source-counts",
+      "exit": 0,
+      "durationMs": 384,
+      "ownedPgid": 43854,
+      "naturalESRCH": true,
+      "signalsOtherThanZeroSent": false
+    },
+    {
+      "phase": "p125c-source-gates",
+      "exit": 0,
+      "durationMs": 321,
+      "ownedPgid": 43871,
+      "naturalESRCH": true,
+      "signalsOtherThanZeroSent": false
+    },
+    {
+      "phase": "p125c-source-threat",
+      "exit": 0,
+      "durationMs": 258,
+      "ownedPgid": 43886,
+      "naturalESRCH": true,
+      "signalsOtherThanZeroSent": false
+    },
+    {
+      "phase": "p125c-source-architecture",
+      "exit": 0,
+      "durationMs": 1599,
+      "ownedPgid": 43902,
+      "naturalESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "result": {
+        "status": "passed",
+        "failures": [],
+        "prefixBranchCount": 2
+      }
+    },
+    {
+      "phase": "p125c-source-docs",
+      "exit": 0,
+      "durationMs": 312,
+      "ownedPgid": 43923,
+      "naturalESRCH": true,
+      "signalsOtherThanZeroSent": false
+    },
+    {
+      "phase": "p125c-source-freeze",
+      "exit": 0,
+      "durationMs": 1136,
+      "ownedPgid": 43938,
+      "naturalESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "result": {
+        "cliCommandPaths": 1236,
+        "cliInventoryPaths": 1236,
+        "stationPacks": 41,
+        "stationPackQuestions": 632
+      }
+    },
+    {
+      "phase": "p125c-source-notices",
+      "exit": 0,
+      "durationMs": 214,
+      "ownedPgid": 43997,
+      "naturalESRCH": true,
+      "signalsOtherThanZeroSent": false
+    }
+  ],
+  "quality": {
+    "duplicatesBeforeAndAfter": 1268,
+    "duplicatesActualExitBeforeAndAfter": 1,
+    "deadCodeBefore": 2723,
+    "deadCodeAfter": 2720,
+    "deadCodeActualExitBeforeAndAfter": 1,
+    "exactRemoved": [
+      "[\"src/time/tsaClient.ts\",\"exports\",{\"name\":\"TSA_TIMEOUT_MS\"}]",
+      "[\"src/time/tsaClient.ts\",\"exports\",{\"name\":\"buildTimestampRequest\"}]",
+      "[\"src/time/tsaClient.ts\",\"exports\",{\"name\":\"postTimestampQuery\"}]"
+    ],
+    "added": [],
+    "newImportReachability": "The new test imports exactly TSA_TIMEOUT_MS/buildTimestampRequest/postTimestampQuery; the actual existing scanner removes exactly those three export findings. No production/scanner/config/baseline repair.",
+    "bothFullReportsExact": true,
+    "diagnosticExit0IsNotQualityPass": true,
+    "globalStatus": "RED",
+    "waiver": false
+  },
+  "preservation": {
+    "protectedInputsExact": 121,
+    "priorNativePhysicalPinsExact": 6,
+    "actualCurrentSelectedPaths": 71,
+    "compiledPairsSelected": 8,
+    "allOldProductionAndOldTestsUnchangedInCommit": true,
+    "heldRHeadStatus18RowsIndexEmptyExact": true,
+    "reservationReprobe": false,
+    "allHoldsAndF37SkipPreserved": true
+  },
+  "freshAndControlCredit": false,
+  "fullIssueDone": false,
+  "fullSuiteOrCoverageClaim": false,
+  "remainingBoundaries": [
+    "Fresh clone binding, canonical and controls are outside this source-only review and require their actual independent evidence.",
+    "No real/public TSA, ordered requestTimestamp fallback, grant/checkpoint integration, new library/public entry decision, universal crypto/secrecy/lifecycle or global quality claim.",
+    "P1-25 whole acceptance, held decisions, earlier gaps and the complete plan remain open."
+  ],
+  "executionBoundary": "Private JSON/hash/text comparisons and read-only Git with --no-optional-locks only. No product/helper/parser/compiler/native/SQL/network/process probe execution, reservation probe, checkout/index/Git mutation or QA write."
+}

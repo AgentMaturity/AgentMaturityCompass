@@ -126,21 +126,29 @@ docker compose -f docker-compose.tls.yml up -d --build
 
 ## Option E: Kubernetes (Helm)
 
+Validate the chart first (helm lint, the render checks and kubeconform run when those tools are installed):
+
 ```bash
-helm install amc deploy/helm/amc \
-  --set replicaCount=2 \
+node scripts/deploy/deploy-pack-check.mjs
+```
+
+Chart 0.2.0 runs one replica only (the workspace has a single writer; `replicaCount=2` is refused) and renders no Secret by default. Create `amc-bootstrap` from files only you can read before installing:
+
+```bash
+kubectl create namespace amc-system
+kubectl -n amc-system create secret generic amc-bootstrap \
+  --from-file=vaultPassphrase=./vault-passphrase.txt \
+  --from-file=ownerUsername=./owner-username.txt \
+  --from-file=ownerPassword=./owner-password.txt
+helm upgrade --install amc deploy/helm/amc --namespace amc-system --atomic --wait \
   --set workspace.persistence.size=10Gi \
-  --set ingress.enabled=true
+  --set ingress.enabled=true \
+  --set env.AMC_CORS_ALLOWED_ORIGINS=https://amc.local
 ```
 
-Validate the chart first:
+Before `helm test`, pin the monitor key and mint a one-time pairing code; see Verify Runtime in `docs/KUBERNETES_HELM_DEPLOYMENT.md`.
 
-```bash
-helm lint deploy/helm/amc
-helm template amc deploy/helm/amc
-```
-
-See `deploy/helm/amc/values.yaml` for all configurable values.
+With the Ingress enabled, add its origin to `env.AMC_CORS_ALLOWED_ORIGINS` (the chart's `ingress.hosts` default is `amc.local`), or Studio refuses browser sessions through it. See `deploy/helm/amc/values.yaml` for all configurable values.
 
 For production rollout, secret creation, health checks, rollback, Kustomize, and the Terraform Helm-release example, see `docs/KUBERNETES_HELM_DEPLOYMENT.md`.
 

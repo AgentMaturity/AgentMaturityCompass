@@ -40,7 +40,7 @@
 | dsh public doc site (`deepseek-harness.github.io`) | 12 pages: quickstart, providers, python-sdk, develop/basic (index, tool, config, publish), develop/framework (lifecycle, service, events), practice, reference |
 | dsh in-repo docs (330 files) | architecture, agent-lifecycle, tool-execution-pipeline, capability-seams, config/tool/persistence catalogs, cordis primer + tutorial, defensive-patterns, testing, 4 postmortems |
 | AMC repo at `f419839a` (branch `codex/reconcile-stale-worktrees`) | Dedicated baseline reader with verified absence claims (grep-backed) |
-| Prior session state | Vault checkpoint (`/Users/sid/Documents/AMC`), npm state (1.1.1), open P0 (release), test-count drift |
+| Prior session state | Vault checkpoint (`~/Documents/AMC`), npm state (1.1.1), open P0 (release), test-count drift |
 
 Full agent reports: `scratchpad/research/*.md` (16 files, session-local). Key claims in this document cite file paths in the respective repos.
 
@@ -115,7 +115,7 @@ No **agent loop** (no plan/act/tool-iterate anywhere); no **model-facing** tool 
 5. **Quality gates unenforced**: coverage thresholds 0; `lint` aliases `typecheck`; Playwright e2e unwired in CI (`@playwright/test` not even a devDependency); several QA harnesses (persona QA, 8-agent dogfood, swarm testers, incident-readiness) run only by hand.
 6. **Number drift is systemic**: tests (README badge 8,604 vs ~4.2k `it()` blocks in 1,118 files vs qa/'s claimed 5,031), questions (126/240/244/264 across CLI strings, bank version, README), assurance packs (README 142 vs 153 files), five-dimension taxonomy differs between whitepaper and code. Three scorers disagree (CLI evidence scorer, `api/index.ts` prefix heuristic, Python platform demo).
 7. **Duplication debt to consolidate during migration**: five fix systems (oneClickFix, mechanic, doctorFix, agentFixPlan, fixerRca), three "run-under-observation" generations (`wrap`/`supervise`/`adapters run`), three redaction engines, two benchmark subsystems, two red-team engines, two GitHub Actions, three distribution channels (signed plugins / unsigned `packs` / marketplace), 10+ SQLite files in three creation idioms, 1.0GB npm cache inside `.amc/`.
-8. **The vault** (`/Users/sid/Documents/AMC`) is 3+ weeks past every `review_after`; `plans/` was empty until this document.
+8. **The vault** (`~/Documents/AMC`) is 3+ weeks past every `review_after`; `plans/` was empty until this document.
 
 ---
 
@@ -542,7 +542,7 @@ Verify: `gen-counts --check` passes; grep finds no stale hardcoded counts.
 Exit: numbers can't drift silently again. Rollback: revert.
 
 **P0.5 — Refresh the vault checkpoint. [S, default] ∥**
-Context: `/Users/sid/Documents/AMC` is 3+ weeks past `review_after`; this plan changes direction.
+Context: `~/Documents/AMC` is 3+ weeks past `review_after`; this plan changes direction.
 Do: Reverify `AMC Now`/`AMC Roadmap` against `f419839a`, live Linear, npm; record the superharness direction and link this plan. (Per ADR-10 this is the last big external-vault synthesis before ADRs move in-repo.)
 Verify: against external ground truth, not self-attestation — the vault's stated HEAD matches `git rev-parse HEAD`, its npm claim matches `npm view agent-maturity-compass version`, and its Linear claims match live issue states.
 Exit: workflow state matches reality. Rollback: n/a.
@@ -556,7 +556,7 @@ Exit: **Phase 0's exit gate** — Phase 1 is unblocked. Rollback: n/a (decision)
 ### Phase 1 — The composition kernel — ~4–6 weeks (critical path root)
 
 **P1.1 — Vendor Cordis. [M, strongest]**
-Context: ADR-1/-9. Prerequisite: P0.6 resolved the repo layout. **Vendor source-of-truth: dsh's already-patched vendor tree** at `/Users/sid/Downloads/deepseek-harness-master/vendor/` (`cordis, cosmokit, schemastery, loader, include, group, timer, hmr, logger-console`) — it already embeds the 18 hardening patches (fiber lifecycle, transactional loader, lazy `!!js`, `--dump-config`); do not re-derive them from upstream `@cordisjs/*`. Its divergence ledger is `vendor/README.md` in that repo. dsh's repo is MIT; note `native/landlock-run` (used later in P4.4) is **BSD-3-Clause** — carry THIRD_PARTY_NOTICES obligations for everything vendored.
+Context: ADR-1/-9. Prerequisite: P0.6 resolved the repo layout. **Vendor source-of-truth: dsh's already-patched vendor tree** at `~/Downloads/deepseek-harness-master/vendor/` (`cordis, cosmokit, schemastery, loader, include, group, timer, hmr, logger-console`) — it already embeds the 18 hardening patches (fiber lifecycle, transactional loader, lazy `!!js`, `--dump-config`); do not re-derive them from upstream `@cordisjs/*`. Its divergence ledger is `vendor/README.md` in that repo. dsh's repo is MIT; note `native/landlock-run` (used later in P4.4) is **BSD-3-Clause** — carry THIRD_PARTY_NOTICES obligations for everything vendored.
 Do: Add `vendor/` with the packages rescoped to `@amc/*` via a `rescope-vendor.ts` script. Start AMC's own divergence ledger recording **per-patch provenance** (upstream-cordis / dsh / AMC-local — ADR-9). Add pnpm workspace + `link:` resolution + a `verify-vendored-links` gate + THIRD_PARTY_NOTICES generation. Add `tsconfig` host/client faces if the two-face split is adopted (defer to P7 if web isn't touched yet).
 Verify: `pnpm install` resolves vendor links; a trivial `ctx.plugin(() => {})` loads and disposes with effect tracking; the divergence ledger lists every local mod with provenance; notices file covers the vendored tree.
 Exit: Cordis runs inside the AMC repo. Rollback: remove `vendor/`, revert workspace config. **This is the gate for all of Phase 1+.**
@@ -620,7 +620,7 @@ Verify: a rotated key applies on the next request without restart; a write shado
 Exit: providers have a credential source. Rollback: env-vars-only fallback.
 
 **P3.1 — LLM adapter seam + providers. [L, strongest]**
-Context: dsh LLM seam — StreamChunk contract, BlockAssembler, `prepareCall` pins adapter, deep-frozen reconstructable requests; the contract text is at `/Users/sid/Downloads/deepseek-harness-master/packages/llm/llm/src/types.ts` and `docs/subsystems/llm-streaming.md` (digest: plans/research/dsh/code-orchestration.md). AMC today only proxies.
+Context: dsh LLM seam — StreamChunk contract, BlockAssembler, `prepareCall` pins adapter, deep-frozen reconstructable requests; the contract text is at `~/Downloads/deepseek-harness-master/packages/llm/llm/src/types.ts` and `docs/subsystems/llm-streaming.md` (digest: plans/research/dsh/code-orchestration.md). AMC today only proxies.
 Do: Build `ctx.llm` (adapter registry, routes, StreamChunk protocol, BlockAssembler). Implement adapters for the providers AMC's users need first (Anthropic, OpenAI, plus AMC's gateway-as-provider so foreign traffic still routes through evidence capture). Token meter + context-pressure projections. Request derivation from the session log (`request/header` + derived history) lands here — this completes P2.2's reconstructability story.
 Verify: a streamed completion assembles correctly; `usage` precedes `finish`; a recorded request reconstructs byte-identically from the session log; a forced 429 surfaces a typed retryable error from a direct `ctx.llm.stream()` call with a durable event.
 Exit: AMC can call models natively (not just proxy). Rollback: n/a (new).

@@ -1,0 +1,9 @@
+# P1-35 CLI actual independent review
+
+The retained v2 bridge closed naturally with exit 0 in 1,798 ms. Its two child CLI commands closed with their asserted statuses: dry run 0 and incompatible repair flags 2. The complete retained streams show ledger PASSED, the exact owned monitor fingerprint, four scanned/already recorded artifacts, and the dry-run no-write message; the refusal emitted only its fixed diagnostic. These are two CLI contracts, not test-suite case counts.
+
+Eight complete protected files and the receipt/signature inventory match before, after each command, and finally. This review independently rehashed those files, runtime/key pins and full streams after execution. WAL remained empty and SHM remained 32,768 bytes with matching hashes at every observation. There is no body or preservation error. The root-owned closure record reports PGID 94862 absent by ESRCH and no nonzero signal sent. The wrapper was not observer-enabled; no raw-test or unhandled-observer result is claimed.
+
+Timing is explicit: root's generic pre-launch pin script failed with a KeyError after assuming the wrong input schema, and the bridge nevertheless launched. Root reports the corrected 31-row check passed afterward. This review separately verifies those same 27 input plus four output rows after execution; it does not manufacture a successful complete pre-execution check. The bridge itself records its own protected snapshots before spawning children.
+
+Scope remains CLI integration/no-write behavior on the already relabelled genuine owned workspace. This audit did not rerun commands, probe processes, invoke native/SQL/network code, or modify a checkout, source, index, or QA record. Unexpected-exit/signal propagation branches have static review only. All finite inputs are pinned beside this report.

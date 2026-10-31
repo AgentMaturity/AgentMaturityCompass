@@ -25,6 +25,7 @@ import { deepseekChatEncoder } from "./deepseekChatEncoder.js";
 import { geminiContentEncoder } from "./geminiContentEncoder.js";
 import { geminiContentEncoderV2 } from "./geminiContentEncoderV2.js";
 import { ollamaChatEncoder } from "./ollamaChatEncoder.js";
+import { anthropicMessagesEncoderV5, openaiChatEncoderV5, openaiResponsesEncoderV4 } from "./cacheRetentionEncoders.js";
 import type { RequestEncoder } from "./requestEncoder.js";
 
 export const BUILT_IN_REQUEST_ENCODERS: readonly RequestEncoder[] = [
@@ -32,13 +33,16 @@ export const BUILT_IN_REQUEST_ENCODERS: readonly RequestEncoder[] = [
   anthropicMessagesEncoderV2,
   anthropicMessagesEncoderV3,
   anthropicMessagesEncoderV4,
+  anthropicMessagesEncoderV5,
   openaiChatEncoder,
   openaiChatEncoderV2,
   openaiChatEncoderV3,
   openaiChatEncoderV4,
+  openaiChatEncoderV5,
   openaiResponsesEncoder,
   openaiResponsesEncoderV2,
   openaiResponsesEncoderV3,
+  openaiResponsesEncoderV4,
   deepseekChatEncoder,
   geminiContentEncoder,
   geminiContentEncoderV2,

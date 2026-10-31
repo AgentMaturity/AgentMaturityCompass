@@ -6,9 +6,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { addPublicKeyToHistory, ensureSigningKeys, getAuthenticatedKeyHistory, getPrivateKeyPem, getPublicKeyHistory, getPublicKeyPem, migratePublicKeyHistory, signHexDigest, signHexDigestWith, verifyHexDigest, verifyHexDigestAny, verifyKeyHistoryChain } from "../../src/crypto/keys.js";
 import { buildKeyHistoryEntry } from "../../src/crypto/keyHistoryChain.js";
 import { publicKeyFromPrivate, sealKeyHistory, verifyKeyHistoryEnvelope } from "../../src/crypto/keyHistoryEnvelope.js";
-import { verifyKeyRotationReceipt } from "../../src/crypto/keyRotationReceipt.js";
+import { verifyRotationStatement } from "../../src/keys/rotationStatement.js";
 import { decryptVaultPayload } from "../../src/vault/vaultCrypto.js";
-import { lockVault, rotateMonitorKeyInVault, setVaultSecret, unlockVault, vaultPaths } from "../../src/vault/vault.js";
+import { rotateMonitorKeyInVault } from "../../src/keys/purposeKeys.js";
+import { lockVault, setVaultSecret, unlockVault, vaultPaths } from "../../src/vault/vault.js";
 import { sha256Hex } from "../../src/utils/hash.js";
 import { canonicalize } from "../../src/utils/json.js";
 import { signDigestWithVault } from "../../src/crypto/signing/signerVault.js";
@@ -16,6 +17,7 @@ import { signDigestWithPolicy } from "../../src/crypto/signing/signer.js";
 import { openLedger } from "../../src/ledger/ledger.js";
 import { verifyLedgerIntegrity } from "../../src/ledger/ledgerVerification.js";
 import * as fileOps from "../../src/utils/fs.js";
+import * as containedFs from "../../src/utils/containedFs.js";
 
 const pair = () => {
   const keys = generateKeyPairSync("ed25519");
@@ -174,7 +176,7 @@ describe("authenticated history admission", () => {
     expect(getPublicKeyHistory(workspace, "auditor")).toEqual([getPublicKeyPem(workspace, "auditor")]);
   });
 
-  it("rotation preserves old signatures and emits independently pinned continuity proof", () => {
+  it("rotation preserves old signatures and emits an independently pinned rotation statement (P1-08)", () => {
     openLedger(workspace).close();
     const oldPrivate = getPrivateKeyPem(workspace, "monitor");
     const oldPublic = getPublicKeyPem(workspace, "monitor");
@@ -183,17 +185,17 @@ describe("authenticated history admission", () => {
     const result = rotateMonitorKeyInVault(workspace, "amc-test-passphrase");
     expect(getPublicKeyHistory(workspace, "monitor")).toEqual([oldPublic, getPublicKeyPem(workspace, "monitor")]);
     expect(verifyHexDigestAny(messageDigest, oldSignature, getPublicKeyHistory(workspace, "monitor"))).toBe(true);
-    const receipt = JSON.parse(readFileSync(result.rotationReceiptPath, "utf8"));
-    expect(verifyKeyRotationReceipt(receipt, digest(oldPublic))).toBe(true);
-    expect(verifyKeyRotationReceipt(receipt, result.fingerprint)).toBe(false);
-    expect(verifyKeyRotationReceipt({ ...receipt, nextFingerprint: "f".repeat(64) }, digest(oldPublic))).toBe(false);
+    // The statement replaces the monitor-only receipt; it verifies only for a verifier that already trusts the old key.
+    const statement = readFileSync(result.rotationReceiptPath);
+    const expected = { workspaceId: "default", purpose: "ledger-row" } as const;
+    expect(verifyRotationStatement(statement, { expected, trustedCurrentPublicKeyPem: oldPublic, previous: null })).toMatchObject({ valid: true });
+    expect(verifyRotationStatement(statement, { expected, trustedCurrentPublicKeyPem: getPublicKeyPem(workspace, "monitor"), previous: null })).toMatchObject({ valid: false });
+    expect(JSON.parse(statement.toString("utf8")).statement.nextKeyId).toBe(result.fingerprint);
     const pinned = verifyLedgerIntegrity(workspace, { expectedMonitorFingerprint: digest(oldPublic) });
     expect(pinned.trustRoot.anchored).toBe(false);
     expect(pinned.chain.errors.join(" ")).toContain("trust root");
-    expect(receipt.previousHistorySha256).toBe(digest(readFileSync(join(result.recoveryDirectory, "previous-monitor-history.json"), "utf8")));
-    expect(receipt.nextHistorySha256).toBe(digest(readFileSync(historyFile("monitor"), "utf8")));
-    const oldVault = JSON.parse(readFileSync(join(result.recoveryDirectory, "previous-vault.amcvault"), "utf8"));
-    expect(JSON.parse(decryptVaultPayload(oldVault, "amc-test-passphrase").toString()).monitorPrivateKeyPem).toBe(oldPrivate);
+    const oldVault = JSON.parse(readFileSync(join(result.recoveryDirectory, "vault.amcvault"), "utf8"));
+    expect(JSON.parse(decryptVaultPayload(oldVault, "amc-test-passphrase").toString()).keys["ledger-row"].privateKeyPem).toBe(oldPrivate);
   });
 
   it("rotation refuses untrusted legacy history before replacing the private key", () => {
@@ -204,20 +206,19 @@ describe("authenticated history admission", () => {
     expect(readFileSync(paths.vaultFile, "utf8")).toBe(raw);
   });
 
-  it("interrupted rotation refuses historical verification and retains recoverable encrypted state", () => {
+  it("a rotation that fails while staging leaves the previous key set in force (P1-08)", () => {
     const paths = vaultPaths(workspace);
     const oldPrivate = getPrivateKeyPem(workspace, "monitor");
-    const write = fileOps.writeFileAtomic;
-    vi.spyOn(fileOps, "writeFileAtomic").mockImplementation((path, bytes, mode) => {
-      if (path === paths.monitorHistory) throw new Error("simulated history publication failure");
-      write(path, bytes, mode);
+    const write = containedFs.writeContained;
+    vi.spyOn(containedFs, "writeContained").mockImplementation((root, rel, bytes, mode) => {
+      if (rel === ".amc/keys/monitor_history.json.keyset-staged") throw new Error("simulated history staging failure");
+      write(root, rel, bytes, mode);
     });
     expect(() => rotateMonitorKeyInVault(workspace, "amc-test-passphrase")).toThrow(/simulated/);
-    expect(getAuthenticatedKeyHistory(workspace, "monitor")).toBeNull();
-    expect(verifyHexDigestAny("b".repeat(64), signHexDigest("b".repeat(64), oldPrivate), getPublicKeyHistory(workspace, "monitor"))).toBe(false);
-    const recovery = join(paths.keysDir, "rotations", readdirSync(join(paths.keysDir, "rotations"))[0]!);
-    const saved = JSON.parse(readFileSync(join(recovery, "previous-vault.amcvault"), "utf8"));
-    expect(JSON.parse(decryptVaultPayload(saved, "amc-test-passphrase").toString()).monitorPrivateKeyPem).toBe(oldPrivate);
-    expect(readdirSync(recovery)).toContain("next-vault.amcvault");
+    vi.restoreAllMocks();
+    expect(getAuthenticatedKeyHistory(workspace, "monitor")).not.toBeNull();
+    expect(getPrivateKeyPem(workspace, "monitor")).toBe(oldPrivate);
+    expect(verifyHexDigestAny("b".repeat(64), signHexDigest("b".repeat(64), oldPrivate), getPublicKeyHistory(workspace, "monitor"))).toBe(true);
+    expect(readdirSync(paths.keysDir).filter((name) => name.endsWith(".keyset-staged"))).toEqual([]);
   });
 });

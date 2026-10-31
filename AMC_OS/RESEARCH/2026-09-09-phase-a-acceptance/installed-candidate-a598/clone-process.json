@@ -7,7 +7,7 @@
     "--no-local",
     "--no-hardlinks",
     "--no-checkout",
-    "/Users/sid/AgentMaturityCompass",
+    "~/AgentMaturityCompass",
     "/private/tmp/amc-a5987643-package-01/checkout"
   ],
   "startedAt": "2026-09-09T11:51:51.498006+00:00",

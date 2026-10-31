@@ -9,7 +9,7 @@ import { checkSignature } from "../../trust/signatureCheck.js";
 import type { TransparencyLog } from "../../trust/trustList.js";
 import { pathExists, readUtf8 } from "../../utils/fs.js";
 import { sha256Hex } from "../../utils/hash.js";
-import { NOTE_MAX_BYTES, parseCheckpoint, parseSignedNote, verifySignedNote } from "../checkpointNote.js";
+import { NOTE_MAX_BYTES, parseCheckpoint, parseSignedNote, verifyCanonicalSignedNote } from "../checkpointNote.js";
 import type { MerkleAlgorithm } from "../merkle.js";
 import { verifyConsistency } from "../rfc9162.js";
 import { REKOR_V2_RESPONSE_MAX_BYTES, verifyRekorV2Response } from "./rekorV2.js";
@@ -151,7 +151,7 @@ export function verifyBundledAnchor(input: {
     const check = checkSignature({ signature: "anchor.note", purpose: "artifact-seal", candidates: input.candidates, context: input.trust,
       verify: pem => {
         try {
-          return verifySignedNote(note, { name: origin, publicKeyPem: pem }) !== null;
+          return verifyCanonicalSignedNote(note, { name: origin, publicKeyPem: pem }) !== null;
         } catch {
           return false;
         }

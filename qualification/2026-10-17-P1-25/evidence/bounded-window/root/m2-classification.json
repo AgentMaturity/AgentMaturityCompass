@@ -1,0 +1,44 @@
+{
+  "phase": "p125w-m2",
+  "sourceCommit": "f11a15ae06a318e0ce9a4c778269b2020af4eb7c",
+  "operator": "OMIT-TOLERANCE-CONTRIBUTION",
+  "outcomeSha256": "c9417b2cee2bed7fb57f19013071bf4370419aa11ca872df2d7d006d9a6849e7",
+  "at": "2026-10-17T00:18:42.154868+00:00",
+  "rootAllFailuresRead": true,
+  "allFailuresClassified": true,
+  "firstSensitiveAssertionRead": true,
+  "noHookOrEnvironmentFailure": true,
+  "actualCohortAndHooksMatchCanonical": true,
+  "actualOwnedChildrenAndCleanupRead": true,
+  "allFailures": [
+    {
+      "test": "P1-25 real signed ledger checkpoint transitions completes the same signed pending checkpoint with a genuine query-bound token and ledger event",
+      "messages": [
+        "expected [ 'POSTDATED_CLAIM' ] to deeply equal []"
+      ],
+      "classification": "The pre-existing pending-completion test fails its final seed-finding assertion: with the five-minute tolerance removed and nullable accuracy zero, genuine seed claimedAt00:17:49.162Z exceeds signed genTime00:17:49.000Z by162ms and correctly exposes POSTDATED_CLAIM under the mutant. Genuine timestamp, same signed checkpoint, exact stored token, checkpoint ledger event metadata, verified ledger and upper-bound shape positives preceded this sensitive assertion.",
+      "firstSensitiveFrame": "tests/time/checkpointWindow.test.ts:290:35"
+    },
+    {
+      "test": "P1-25 real signed ledger checkpoint transitions derives a genuine two-checkpoint window and inclusive default and zero-tolerance reader boundaries",
+      "messages": [
+        "default-lower-inclusive: expected [ 'BACKDATED_CLAIM' ] to deeply equal []"
+      ],
+      "classification": "The new two-bound test reaches the intended independent default-lower-inclusive assertion. Removing only tolerance preserves both real grant/checkpoint/window positives, but makes the literal default lower edge BACKDATED_CLAIM instead of empty findings. This is intended sensitivity to the five-minute contribution, not a fixture, crypto or environment failure.",
+      "firstSensitiveFrame": "tests/time/checkpointWindow.test.ts:452:47"
+    }
+  ],
+  "firstSensitiveAssertion": "Existing checkpointWindow.test.ts:290:35 seed findings and new checkpointWindow.test.ts:452:47 default-lower-inclusive findings. Both actual errors were read and classified.",
+  "masking": [
+    "Existing test stops at290; final checkpoint claimed-basis assertion292 is masked.",
+    "New test reaches452 after crypto/checkpoint/event/ledger/exact-window/claimedAt/seed/final-checkpoint positives. Failure on first default observation masks its row assertions453-455, remaining default row assertions and every zero-tolerance assertion458 onward. All4default+6zero observations are retained as precomputed facts; matching zero results are not asserted-pass credit."
+  ],
+  "actualResourceCounts": {
+    "children": 30,
+    "explicitChildStreamHashCount": 60,
+    "closedSockets": 8,
+    "closedLedgerOwners": 16
+  },
+  "actualTotal22Passed20Failed2": true,
+  "noHooksUnhandledLateOrCleanupFailures": true
+}

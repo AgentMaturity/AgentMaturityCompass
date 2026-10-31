@@ -46,6 +46,14 @@ export interface ContextCollectInput {
    * its own and a retained signal aborts work nobody asked to stop.
    */
   readonly signal?: AbortSignal;
+  /** Workspace paths named by committed filesystem calls, attributed to their signed call rows. */
+  readonly touchedPaths?: readonly TouchedInstructionPath[];
+}
+
+export interface TouchedInstructionPath {
+  readonly path: string;
+  readonly eventId: string;
+  readonly directory?: boolean;
 }
 
 /**

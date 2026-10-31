@@ -2,9 +2,9 @@
 
 Use GPT-6 Pro for this task and every Goal continuation. No fallback, worker spawn or model switch. Sid wants CoS to keep implementing in parallel while Codex owns the broader program; do not wait for routine permission.
 
-FIRST TOOL CALL: read /agentmaturitycompass/plans/2026-09-09-amc-execution-brief.md in full. Then read this task, root plans/ownership-manifest.md, AMC_OS/ROLEBOOKS/00_GLOBAL_STANDARDS.md and 10_REVENUE_DELIVERY.md. Approved virtual root /agentmaturitycompass maps to /Users/sid/AgentMaturityCompass; use the virtual path for connector read/apply_patch and native paths for exec_command.
+FIRST TOOL CALL: read /agentmaturitycompass/plans/2026-09-09-amc-execution-brief.md in full. Then read this task, root plans/ownership-manifest.md, AMC_OS/ROLEBOOKS/00_GLOBAL_STANDARDS.md and 10_REVENUE_DELIVERY.md. Approved virtual root /agentmaturitycompass maps to ~/AgentMaturityCompass; use the virtual path for connector read/apply_patch and native paths for exec_command.
 
-The previous capture implementation is complete and merged at 3d1f464c842934ec73d0f68bf1fd30467c054e5f. Do not repeat or alter it. New isolated worktree: /Users/sid/AgentMaturityCompass/tmp/cos-observer-guide, branch codex/cos-observer-guide, base 3d1f464c842934ec73d0f68bf1fd30467c054e5f.
+The previous capture implementation is complete and merged at 3d1f464c842934ec73d0f68bf1fd30467c054e5f. Do not repeat or alter it. New isolated worktree: ~/AgentMaturityCompass/tmp/cos-observer-guide, branch codex/cos-observer-guide, base 3d1f464c842934ec73d0f68bf1fd30467c054e5f.
 
 Write ONLY:
 - scripts/human-first-use-observer.mjs

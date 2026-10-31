@@ -3,11 +3,11 @@
 Use GPT-6 Pro for this task and every continuation. Do not spawn workers or switch models.
 FIRST TOOL CALL: read /agentmaturitycompass/plans/2026-09-09-amc-execution-brief.md in full.
 Then read this task, root plans/ownership-manifest.md, AMC_OS/ROLEBOOKS/00_GLOBAL_STANDARDS.md and 10_REVENUE_DELIVERY.md.
-The approved virtual root /agentmaturitycompass maps to /Users/sid/AgentMaturityCompass.
+The approved virtual root /agentmaturitycompass maps to ~/AgentMaturityCompass.
 
 Codex has completed the runtime implementation batch at 68458818799d1db7826d67d1b604d6ad77ac4432 and is independently running final clean-clone validation. Your task is a usable closure ledger, not another runtime review or implementation expansion. Current input: root AMC_OS/RESEARCH/2026-09-09-chat-on-steroids/closure-issue-snapshot.json (live Linear listing: 42 issues, 31 In Review and 11 In Progress). This is a dated input, not permission to call statuses current forever.
 
-Worktree /Users/sid/AgentMaturityCompass/tmp/cos-closure-map, branch codex/cos-closure-map, pinned to that exact source.
+Worktree ~/AgentMaturityCompass/tmp/cos-closure-map, branch codex/cos-closure-map, pinned to that exact source.
 Write ONLY in this worktree:
 - AMC_OS/RESEARCH/2026-09-09-closure-map/closure-map.json
 - AMC_OS/RESEARCH/2026-09-09-closure-map/closure-map.md

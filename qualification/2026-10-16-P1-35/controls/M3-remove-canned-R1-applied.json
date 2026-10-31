@@ -1,0 +1,30 @@
+{
+  "name": "M3-remove-canned-R1",
+  "target": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/src/migration/legacy/classify.ts",
+  "relative": "src/migration/legacy/classify.ts",
+  "original": {
+    "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/src/migration/legacy/classify.ts",
+    "bytes": 8769,
+    "sha256": "adfab60d34e85334e82b2ff7ea4e08f0d740b520c88376faf3d203b5d59e29fb"
+  },
+  "frozen": {
+    "path": "/private/tmp/p1-35-legacy-qualification-20261016/M3-remove-canned-R1.original",
+    "bytes": 8769,
+    "sha256": "adfab60d34e85334e82b2ff7ea4e08f0d740b520c88376faf3d203b5d59e29fb"
+  },
+  "patch": {
+    "path": "/private/tmp/p1-35-legacy-qualification-20261016/runtime-and-control-review/M3-remove-canned-R1.patch",
+    "bytes": 682,
+    "sha256": "b6d00d59205fe383a573c020cf5066fa56d1f9ecdff718ea92faa93121fb497c"
+  },
+  "inode": 542949508,
+  "at": "2026-10-16T17:19:41.988089+00:00",
+  "sourceOnly": true,
+  "compiledOutputRebuilt": false,
+  "mutant": {
+    "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/src/migration/legacy/classify.ts",
+    "bytes": 8640,
+    "sha256": "d49b04d3a5d6b85ad9dffbb60a08a5a2afcda43a5ddd4dc920727fc9f8938dbe"
+  },
+  "mutantInode": 542962702
+}

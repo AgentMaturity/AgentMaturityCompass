@@ -1,0 +1,360 @@
+{
+  "schema": "amc-p139-oauth-first/1",
+  "label": "governed-token-redaction",
+  "synthetic": true,
+  "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout",
+  "retainedRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-y8YnAF",
+  "observations": {
+    "realAuthorization": {
+      "startedWithoutGrant": true,
+      "completed": true,
+      "authorizeValid": true,
+      "tokenValid": true,
+      "grantReloadMatches": true,
+      "requests": [
+        {
+          "method": "POST",
+          "path": "/mcp/v1",
+          "status": 401,
+          "authorizationPresent": false
+        },
+        {
+          "method": "GET",
+          "path": "/prm",
+          "status": 200,
+          "authorizationPresent": false
+        },
+        {
+          "method": "GET",
+          "path": "/.well-known/oauth-authorization-server/issuer/path",
+          "status": 200,
+          "authorizationPresent": false
+        },
+        {
+          "method": "GET",
+          "path": "/authorize",
+          "status": 302,
+          "authorizationPresent": false
+        },
+        {
+          "method": "POST",
+          "path": "/token",
+          "status": 200,
+          "authorizationPresent": false
+        }
+      ],
+      "authorizations": 1,
+      "tokenRequests": 1
+    },
+    "authenticatedMethods": [
+      "server/discover",
+      "tools/list",
+      "server/discover",
+      "tools/list",
+      "tools/list",
+      "tools/call"
+    ],
+    "governedOutcomeOK": true,
+    "callCount": 1,
+    "correctHeader": true,
+    "tokenInUrlOrBody": false,
+    "outcomeTokenAbsent": true,
+    "outcomeHasRedaction": true,
+    "toolEvents": [
+      "tool/call",
+      "tool/result"
+    ],
+    "toolEventsSigned": true,
+    "metadataSafe": true,
+    "payloadsSafe": true,
+    "resultHasRedaction": true,
+    "committedPayloadsRead": 9,
+    "receiptSafe": true,
+    "receiptMatchesReviewed": true,
+    "receiptStateless": true,
+    "receiptAuthMatches": true,
+    "sampleMountReceipt": {
+      "serverId": "oauth_fixture",
+      "catalogDigest": "25592d15431056566b4dde61e8de7fa3ceabbf6c4a25d497b21cb49446d11d48",
+      "protocol": {
+        "negotiatedVersion": "2026-07-28",
+        "mode": "stateless",
+        "serverInfo": {
+          "name": "synthetic-oauth-catalog",
+          "version": "1"
+        }
+      },
+      "auth": {
+        "issuer": "http://127.0.0.1:53951/issuer/path",
+        "scopes": [
+          "read"
+        ],
+        "tokenExpiresAt": "2026-10-16T17:03:30.208Z"
+      }
+    },
+    "setupCallerEnvironment": "Inherited process.env and user dotenv remain enabled by the public configuration caller",
+    "governedLifecycle": {
+      "sessionOpened": true,
+      "turnStarted": true,
+      "stepStarted": true,
+      "mountClosed": true,
+      "toolsetClosed": true,
+      "stepEnded": true,
+      "turnEnded": true,
+      "turnSealed": true,
+      "sessionClosed": true,
+      "disposedUnsealed": false,
+      "cleanupErrorCount": 0
+    }
+  },
+  "requests": [
+    {
+      "method": "POST",
+      "path": "/mcp/v1",
+      "status": 401,
+      "authorizationPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "method": "GET",
+      "path": "/prm",
+      "status": 200,
+      "authorizationPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "method": "GET",
+      "path": "/.well-known/oauth-authorization-server/issuer/path",
+      "status": 200,
+      "authorizationPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "method": "GET",
+      "path": "/authorize",
+      "status": 302,
+      "authorizationPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "method": "POST",
+      "path": "/token",
+      "status": 200,
+      "authorizationPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "method": "POST",
+      "path": "/mcp/v1",
+      "status": 401,
+      "authorizationPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "method": "GET",
+      "path": "/prm",
+      "status": 200,
+      "authorizationPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "method": "GET",
+      "path": "/.well-known/oauth-authorization-server/issuer/path",
+      "status": 200,
+      "authorizationPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "method": "POST",
+      "path": "/mcp/v1",
+      "status": 200,
+      "authorizationPresent": true,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "method": "POST",
+      "path": "/mcp/v1",
+      "status": 200,
+      "authorizationPresent": true,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "method": "POST",
+      "path": "/mcp/v1",
+      "status": 200,
+      "authorizationPresent": true,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "method": "POST",
+      "path": "/mcp/v1",
+      "status": 200,
+      "authorizationPresent": true,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "method": "POST",
+      "path": "/mcp/v1",
+      "status": 200,
+      "authorizationPresent": true,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "method": "POST",
+      "path": "/mcp/v1",
+      "status": 200,
+      "authorizationPresent": true,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseFinished": true,
+      "responseClosed": true
+    }
+  ],
+  "clients": [
+    {
+      "phase": "authorization",
+      "status": 302,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketClosed": true,
+      "socketHadError": false
+    },
+    {
+      "phase": "callback",
+      "status": 200,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketClosed": true,
+      "socketHadError": false
+    }
+  ],
+  "sockets": [
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    }
+  ],
+  "lifecycle": {
+    "started": true,
+    "closed": true,
+    "listening": false,
+    "openSockets": 0
+  },
+  "errors": [],
+  "bodyFailed": false,
+  "bodyError": null,
+  "cleanupErrors": [],
+  "environmentMutated": false,
+  "productionCallbackServerCloseObserved": false,
+  "childProcessCreated": false,
+  "signalsSent": false
+}

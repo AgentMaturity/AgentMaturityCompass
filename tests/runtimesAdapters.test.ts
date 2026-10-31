@@ -23,6 +23,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { z } from "zod";
+import { adaptersDetectCli } from "../src/adapters/adapterCli.js";
 import {
   discoverCapabilities,
   resolveCommand,
@@ -228,6 +229,29 @@ describe("runtime adapter detect()", () => {
 });
 
 describe("runtime registry", () => {
+  it("projects canonical adapter install state, including fallback command names", () => {
+    const dir = tempBin();
+    process.env.PATH = dir;
+    writeHelpCli(dir, "claude-cli", "Claude 1.2.3\n");
+    writeHelpCli(dir, "gemini-cli", "Gemini 1.2.3\n");
+    writeHelpCli(dir, "claw", "OpenClaw 1.2.3\n", "stderr", 2);
+    const config = makeConfig({
+      claude: { command: "claude" },
+      gemini: { command: "gemini" },
+      openclaw: { command: "openclaw" }
+    });
+
+    const canonical = adaptersDetectCli({ includePlugins: false });
+    const legacy = detectAllRuntimes(config);
+
+    for (const entry of legacy) {
+      const adapter = canonical.find((candidate) => candidate.adapterId === `${entry.name}-cli`);
+      expect(adapter?.installed).toBe(true);
+      expect(entry.available).toBe(adapter?.installed);
+      expect(entry.command).toBe(adapter?.command);
+    }
+  });
+
   it("detectAllRuntimes covers every non-mock adapter and drops raw help from the summary", () => {
     const dir = tempBin();
     const resolved = writeHelpCli(dir, "amc-gemini-present", "Usage\n  --version\n");
@@ -294,6 +318,37 @@ describe("spawnCollect", () => {
 
 describe("runHarnessWithRetries", () => {
   const schema = z.object({ level: z.number(), note: z.string() });
+
+  it.each([
+    ["claude", "claude-cli"],
+    ["gemini", "gemini-cli"],
+    ["openclaw", "claw"]
+  ] as const)("launches the canonical %s fallback selected during detection", async (runtimeName, fallback) => {
+    const dir = tempBin();
+    process.env.PATH = dir;
+    writeExecutable(dir, runtimeName, [
+      'if (process.argv.includes("--version")) process.exit(2);',
+      'process.stdout.write(JSON.stringify({ level: 1, note: "wrong-default" }));'
+    ].join("\n"));
+    writeExecutable(dir, fallback, [
+      'if (process.argv.includes("--version")) { process.stdout.write("1.2.3"); process.exit(0); }',
+      `process.stdout.write(JSON.stringify({ level: 1, note: ${JSON.stringify(fallback)} }));`
+    ].join("\n"));
+    const config = makeConfig({ [runtimeName]: { command: runtimeName } });
+    const detection = getRuntimeIntegration(runtimeName).detect(config);
+    expect(detection.command).toBe(fallback);
+
+    const result = await runHarnessWithRetries(runtimeName, "assess-me", { config, schema, maxRetries: 0 });
+
+    expect(result.value.note).toBe(detection.command);
+    expect(result.usedFallback).toBe(false);
+
+    writeExecutable(dir, "configured-cli", 'process.stdout.write(JSON.stringify({ level: 1, note: "configured-cli" }));');
+    const overridden = await runHarnessWithRetries(runtimeName, "assess-me", {
+      config: makeConfig({ [runtimeName]: { command: "configured-cli" } }), schema, maxRetries: 0
+    });
+    expect(overridden.value.note).toBe("configured-cli");
+  });
 
   it("substitutes {{prompt}} into the args template and extracts JSON from a markdown-wrapped reply", async () => {
     const dir = tempBin();

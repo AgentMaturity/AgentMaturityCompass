@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { z } from "zod";
 import { NativeExtensionError } from "../extensions/nativeExtensionManifest.js";
+import { nativeExtensionHookEventSchema, nativeExtensionHookKindSchema, type NativeExtensionHookKind } from "../extensions/nativeExtensionHookSchema.js";
 import { readNativeExtension, type NativeExtensionSnapshot } from "../extensions/nativeExtensionStore.js";
 import { bwrapBackend } from "../sandbox/bwrapBackend.js";
 import { SandboxRunner } from "../sandbox/sandboxRunner.js";
@@ -31,7 +32,8 @@ function failure(error: unknown): NativeExecutableError {
  * A process-local, pinned load. Construction validates but imports no code.
  * Every call gets a fresh confined Node process and bounded onLoad/handler/
  * onUnload lifecycle. No persistent module process survives a call. Revocation
- * or any runtime fault is terminal for this handle; reload is explicit.
+ * or a safety fault is terminal for this handle; reload is explicit. A verified
+ * observer-handler failure alone does not disable unrelated contributions.
  */
 export class NativeExecutableRunner {
   private readonly snapshot: NativeExtensionSnapshot;
@@ -55,6 +57,9 @@ export class NativeExecutableRunner {
   get manifestDigest(): string { return this.snapshot.manifestDigest; }
   contextNames(): readonly string[] { return this.declaration.contexts.map(entry => entry.name); }
   commandNames(): readonly string[] { return Object.keys(this.declaration.commands); }
+  hookNames(): readonly NativeExtensionHookKind[] {
+    return Object.keys(this.declaration.hooks ?? {}) as NativeExtensionHookKind[];
+  }
   inspect() {
     return { id: this.id, manifestDigest: this.manifestDigest,
       state: this.fault ? "refused" : this.active ? "running" : "loaded-not-running",
@@ -90,22 +95,27 @@ export class NativeExecutableRunner {
     } catch (error) { throw this.invalidate(failure(error)); }
   }
 
-  async invoke(kind: "context" | "command", name: string, input: Readonly<Record<string, unknown>>, signal?: AbortSignal): Promise<string> {
+  async invoke(kind: "context" | "command" | "hook", name: string, input: Readonly<Record<string, unknown>>, signal?: AbortSignal): Promise<string> {
     this.assertCurrent();
     if (this.active) throw new NativeExecutableError("EXECUTABLE_BUSY", "This extension already has an active invocation. Calls are not queued or retried automatically.");
     if (signal?.aborted) throw new NativeExecutableError("EXECUTABLE_CANCELLED", "The invocation was cancelled before code was launched.");
     if (this.usedCalls >= this.declaration.limits.maxCalls) throw this.invalidate(new NativeExecutableError("EXECUTABLE_CALL_LIMIT", "The executable load exhausted its declared invocation budget. Reload requires an explicit operator action."));
+    const hook = nativeExtensionHookKindSchema.safeParse(name);
     const selected = kind === "context" ? this.declaration.contexts.find(entry => entry.name === name)
-      : Object.hasOwn(this.declaration.commands, name) ? this.declaration.commands[name] : undefined;
-    const capability = kind === "context" ? "context.generate" : "command.invoke";
+      : kind === "command" ? Object.hasOwn(this.declaration.commands, name) ? this.declaration.commands[name] : undefined
+      : hook.success ? this.declaration.hooks?.[hook.data] : undefined;
+    const capability = kind === "context" ? "context.generate" : kind === "command" ? "command.invoke"
+      : name === "pre-tool" ? "hook.deny" : "hook.observe";
     if (!selected || !this.declaration.capabilities.includes(capability)) {
-      throw new NativeExecutableError("EXECUTABLE_CAPABILITY_DENIED", "The signed declaration does not grant this context or command handler.");
+      throw new NativeExecutableError("EXECUTABLE_CAPABILITY_DENIED", "The signed declaration does not grant this context, command or hook handler.");
     }
-    const parsedInput = (kind === "context" ? contextInput : commandInput).safeParse(input);
-    if (!parsedInput.success) throw new NativeExecutableError("EXECUTABLE_INPUT_INVALID", "Executable inputs must match the bounded context metadata or command-argument contract; no host session, environment or tool object is accepted.");
+    const parsedInput = (kind === "context" ? contextInput : kind === "command" ? commandInput : nativeExtensionHookEventSchema).safeParse(input);
+    if (!parsedInput.success || (kind === "hook" && (!("kind" in parsedInput.data) || parsedInput.data.kind !== name))) {
+      throw new NativeExecutableError("EXECUTABLE_INPUT_INVALID", "Executable inputs must match the bounded context, command or flat hook metadata contract; no host session, environment or tool object is accepted.");
+    }
     const invocationId = randomUUID();
     const request = JSON.stringify({ invocationId, extensionId: this.id, exportName: selected.export,
-      capabilities: this.declaration.capabilities, input: parsedInput.data, maxOutputBytes: this.declaration.limits.maxOutputBytes });
+      capabilities: this.declaration.capabilities, input: Object.freeze(parsedInput.data), maxOutputBytes: this.declaration.limits.maxOutputBytes });
     if (Buffer.byteLength(request) > NATIVE_EXECUTABLE_LIMITS.inputBytes) throw new NativeExecutableError("EXECUTABLE_INPUT_LIMIT", "Executable invocation input exceeds its byte limit.");
 
     const controller = new AbortController();
@@ -170,7 +180,14 @@ export class NativeExecutableRunner {
       // result that races with completion; stdout cannot attest authority.
       this.assertCurrent();
       return response.output;
-    } catch (error) { throw this.invalidate(failure(error)); }
+    } catch (error) {
+      const refused = failure(error);
+      // The response is decoded only after confinement and child-tree exit are
+      // proven. An observer's ordinary handler failure cannot poison a later
+      // context or command; all authority, timeout and safety faults still do.
+      if (kind === "hook" && name !== "pre-tool" && refused.code === "EXECUTABLE_HANDLER_FAILED") throw refused;
+      throw this.invalidate(refused);
+    }
     finally {
       if (poll !== undefined) clearInterval(poll);
       if (deadline !== undefined) clearTimeout(deadline);

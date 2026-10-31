@@ -1,0 +1,11 @@
+AMC Studio {{ .Chart.AppVersion }} is deployed as {{ include "amc.fullname" . }} in namespace {{ .Release.Namespace }}.
+
+Run the governed-turn check (logs in, runs a stub-provider native task, verifies its evidence):
+
+  helm test {{ .Release.Name }} --namespace {{ .Release.Namespace }} --logs
+
+Liveness and readiness alone do not prove a governed turn; see docs/KUBERNETES_HELM_DEPLOYMENT.md.
+{{- if not .Values.image.digest }}
+
+The image is referenced by tag ({{ .Values.image.repository }}:{{ .Values.image.tag }}). Set image.digest to pin it.
+{{- end }}

@@ -1,3 +1,4 @@
+import { mean, standardDeviation } from "../experiments/stats.js";
 /**
  * determinism.ts — Statistical analysis of output determinism.
  *
@@ -33,10 +34,9 @@ function shannonEntropy(values: string[]): number {
 
 function coefficientOfVariation(nums: number[]): number {
   if (nums.length < 2) return 0;
-  const mean = nums.reduce((a, b) => a + b, 0) / nums.length;
-  if (mean === 0) return 0;
-  const variance = nums.reduce((s, x) => s + (x - mean) ** 2, 0) / (nums.length - 1);
-  return Math.sqrt(variance) / Math.abs(mean);
+  const center = mean(nums);
+  if (center === 0) return 0;
+  return standardDeviation(nums) / Math.abs(center);
 }
 
 /* ── Outlier detection (IQR for numeric, frequency for string) ──── */
@@ -45,6 +45,7 @@ function detectOutliers(values: string[]): string[] {
   const nums = values.map(Number);
   if (nums.every(n => !isNaN(n)) && nums.length >= 4) {
     const sorted = [...nums].sort((a, b) => a - b);
+    // Unlike experiments/stats.ts quantile, IQR uses floor(n * p) order statistics, including the upper quartile.
     const q1 = sorted[Math.floor(sorted.length * 0.25)]!;
     const q3 = sorted[Math.floor(sorted.length * 0.75)]!;
     const iqr = q3 - q1;

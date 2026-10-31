@@ -1,0 +1,311 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-23",
+  "date": "2026-10-14",
+  "commit": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46",
+  "branch": "codex/p0-23-current-qualification",
+  "node": "v22.23.3; no final Node24 qualification claim",
+  "pnpm": "10.33.0",
+  "os": "macOS-26.6.2-arm64-arm-64bit",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run build",
+      "exit": 0,
+      "durationMs": 29199
+    },
+    {
+      "cmd": "pnpm exec vitest run tests/mcpClaimLabels.test.ts --reporter=default --reporter=json --outputFile.json=/private/tmp/p0-23-mcp-final-labels-removed-mutant-20261014.json",
+      "exit": 1,
+      "durationMs": 7747
+    },
+    {
+      "cmd": "pnpm exec vitest run tests/mcpClaimLabels.test.ts tests/apiClaimLabels.test.ts tests/studioClaimLabels.test.ts tests/industryPackCli.test.ts tests/claimBadge.test.ts tests/mcpServer.test.ts tests/mcpServerTools.test.ts tests/claims/claimEligibility.test.ts tests/claims/claimAdapters.test.ts tests/claims/claimLabels.test.ts tests/industryPackSchema.test.ts tests/industryPackEntitlement.test.ts tests/openapiContracts.test.ts --reporter=default --reporter=json --outputFile.json=tmp/p0-23-qualification/final-bounded-node22.json",
+      "exit": 1,
+      "durationMs": 10815
+    },
+    {
+      "cmd": "npm run typecheck",
+      "exit": 0,
+      "durationMs": 28417
+    },
+    {
+      "cmd": "npm run typecheck:tests",
+      "exit": 0,
+      "durationMs": 34737
+    },
+    {
+      "cmd": "npm run lint",
+      "exit": 0,
+      "durationMs": 3908
+    },
+    {
+      "cmd": "npm run check:freeze",
+      "exit": 0,
+      "durationMs": 1446
+    },
+    {
+      "cmd": "npm run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 1488
+    },
+    {
+      "cmd": "npm run check:counts",
+      "exit": 0,
+      "durationMs": 316
+    },
+    {
+      "cmd": "npm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 268
+    },
+    {
+      "cmd": "npm run check:duplicates",
+      "exit": 1,
+      "durationMs": 1363
+    },
+    {
+      "cmd": "npm run check:dead-code",
+      "exit": 1,
+      "durationMs": 3163
+    },
+    {
+      "cmd": "npm run check:clean-source",
+      "exit": 0,
+      "durationMs": 49913
+    }
+  ],
+  "tests": {
+    "total": 229,
+    "passed": 222,
+    "failed": 7,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "9c56d045b03449f78ae42c27d0f0dc213fc1829dbde100fa795a5933f57037c5"
+    },
+    {
+      "path": "api-claim-responses-refined-red-generated-openapi-accounting.json",
+      "sha256": "c9a251fe8f44bbcba80b9aea8303273921e4b9d67370a58a1786e2e640dbf3a7"
+    },
+    {
+      "path": "api-claim-responses-refined-red-saved-openapi-accounting.json",
+      "sha256": "ad0c631275d1e22f0c00742ec89da1641def586eb22e65746a6058f64ffd9695"
+    },
+    {
+      "path": "api-final-red.json",
+      "sha256": "3ad0f4f89857235df191a63455ce05d246c5342b19edc396e426cf18717c8ca9"
+    },
+    {
+      "path": "api-test-design-red.json",
+      "sha256": "705af620d73171b6052c8e218af9ec83f63103b15cd18d85641f3db42ee0b8bc"
+    },
+    {
+      "path": "api-test-design-red.md",
+      "sha256": "51e52a112708c90ace637ea2ec2f0ec10a16363b2a381a9fdd31a9e2c28cfe90"
+    },
+    {
+      "path": "badge-component-tests.json",
+      "sha256": "428078981c7cfca0a07fcb00df79173506177311bcb8ef6712701256bbdb972c"
+    },
+    {
+      "path": "canonical-review.json",
+      "sha256": "17ca505710f1062d26915faaadfb4aa861c4eac4f5fce42732e67826196f8f68"
+    },
+    {
+      "path": "canonical-review.md",
+      "sha256": "b36781266f22a692a950ecd84fce0deffce4595bff245b6b7b68983ec997bf9a"
+    },
+    {
+      "path": "cli-pack-guard-receipt.json",
+      "sha256": "e0adc8962833002c5e9c2a24523565ea1235e6f869a2d84ceff992fd91e2b98c"
+    },
+    {
+      "path": "cli-pack-guard-tests.json",
+      "sha256": "e9d79dc802b28af66c5cf4a7c36ba98ad2a0dcc0283015d5bca0f017e65ddcc2"
+    },
+    {
+      "path": "command-phases.json",
+      "sha256": "25785ce9b6e3003f0826126cd652cbe634e3fd038d437978de89d4912bf233f1"
+    },
+    {
+      "path": "committed-source-build.log",
+      "sha256": "516ccd433616698b973476f1c77413724a1e6563c4cf02160260917164fc2c2a"
+    },
+    {
+      "path": "final-architecture.log",
+      "sha256": "a66abd9cbff5520e4aa6a0946e74c0c884c980afce02e1f4369f2c532c252e71"
+    },
+    {
+      "path": "final-bounded-node22.json",
+      "sha256": "603446f0fcab2751d8fe9ad13423f6321474537e94666a9d4545b377d98e42f5"
+    },
+    {
+      "path": "final-bounded-node22.log",
+      "sha256": "559be37fcce49b708a28eb589323034e39327aabfeae6e455ee913ef7aee63f4"
+    },
+    {
+      "path": "final-bounded-summary.json",
+      "sha256": "efddb4d483c4f48c562e896a284e4567ec7f551db655562f91fec4edc96d6422"
+    },
+    {
+      "path": "final-clean-source.log",
+      "sha256": "97fdf58bd16d1e7fe6aa6158ade7a9f274cce9281bc845724167e35bae394c3e"
+    },
+    {
+      "path": "final-counts.log",
+      "sha256": "a2ae3cae17c8353cf503e5a8c33c8def635220fcc2892e5514a8824f74454630"
+    },
+    {
+      "path": "final-docs-drift.log",
+      "sha256": "496e5a178832976fb79379985f745b649d87a7783285b90590a936e8202207c0"
+    },
+    {
+      "path": "final-freeze.log",
+      "sha256": "26127faafb4df55e7ae5d92af2cdc72f2537f6b58a4dd716d96e427f0c20b811"
+    },
+    {
+      "path": "final-lint.log",
+      "sha256": "040222d6959186f49b79c0b39e44d5ce4480cf11f1903c61fbd334c027ddf898"
+    },
+    {
+      "path": "final-source-dead-code.log",
+      "sha256": "321a7d158dfccd94efa49385a5c1952ac6ad2506b17c3947a07baab9c6d1b2f7"
+    },
+    {
+      "path": "final-source-duplicates.log",
+      "sha256": "80b2bfb44413ef6790b099126bf776a2c9785ca576562c73eef9b47acad41ed5"
+    },
+    {
+      "path": "final-source-manifest.json",
+      "sha256": "4a8723a9bfc03a364126fb58d23c3d7486960eb44abfed4be62a7a218afcb687"
+    },
+    {
+      "path": "final-source-types.log",
+      "sha256": "fcc68f772403ea039a2942eeaeec6ec00419f4c723add862d0afa87e27c23f6d"
+    },
+    {
+      "path": "final-test-types.log",
+      "sha256": "366916d5096c94755a6df4da14b7567f0602cd91b70cfb77482368bc4293568b"
+    },
+    {
+      "path": "graph-navigation.log",
+      "sha256": "2dca2b4aa0a1db5f7610afe828859a25bfa3d059126aa3b903d9d06507274dc1"
+    },
+    {
+      "path": "mcp-final-labels-removed-mutant.log",
+      "sha256": "ef713dbed55891b3ebe895c4959d1c8b660a8fc6d722f047e225921a6f054dce"
+    },
+    {
+      "path": "mcp-final-mutant.json",
+      "sha256": "7b31bb998bae81e45faecb57d42c53ccbcc84cffe516776bf44ffedf12b496cd"
+    },
+    {
+      "path": "mcp-final-mutation-summary.json",
+      "sha256": "a34e8aa98e141c14ff84f65e5bf30ce48a6373d10f9981ba7a13f196c5a9654d"
+    },
+    {
+      "path": "mcp-first-green.json",
+      "sha256": "810a2a2ef7664f7efb6d412ffd31c5996067afd86c966bb5a36d68d9dfa1dcb5"
+    },
+    {
+      "path": "mcp-first-red.json",
+      "sha256": "ef57c89df47f2ad24e89c8235740786f2e0a985e77c1f68693f2f072b98d83e3"
+    },
+    {
+      "path": "mcp-fixture-corrected-green.json",
+      "sha256": "1378c34960f1d04350080c43a77151de681f2cf912866767ade9d3cadfb73829"
+    },
+    {
+      "path": "mcp-label-removal.patch",
+      "sha256": "c8532f8176dcbb47ec483e5b5d6a3015d3ebd60606e6201898c5b76810555bf2"
+    },
+    {
+      "path": "mcp-repair-review.json",
+      "sha256": "ceba350d45abbd24d902d0903994899721b50f313c72acd7ff77d19b69487ac9"
+    },
+    {
+      "path": "mcp-repair-review.md",
+      "sha256": "34f7f52f37e3d6a44e43da406963b9ad8cdcf2ffb77344ac6e6d28f6bde05503"
+    },
+    {
+      "path": "mcp-sdk-early-contracts.json",
+      "sha256": "667ecb30536fff7489888d5f3abb97d4b731e578be87733afde9d3cfbd425403"
+    },
+    {
+      "path": "mcp-standard-parser-and-cli-preparation.json",
+      "sha256": "4c226ce5c749897c571c15218db2daca59075ae4821a7d4a9090ad09126ba538"
+    },
+    {
+      "path": "mcp-standard-parser-green.json",
+      "sha256": "78f7fa862fffafe82f89460bc2f24fa3d031e99759d3a1b4a015246cd98cbb78"
+    },
+    {
+      "path": "next-priority-audit.json",
+      "sha256": "925a27b566d9311fe6da4efe59e32e558b58edd9fe9468fcd9b9121d623679f8"
+    },
+    {
+      "path": "next-priority-audit.md",
+      "sha256": "ba34e20a89168f709bc90dc25ad0746dc7bf10c81b0ae9481d8451a8641e3451"
+    },
+    {
+      "path": "pre-parser-test-type-errors.log",
+      "sha256": "453c221adab6ee1bbdfa1420b7043d0051360cd84a1e75b9380c125d39960e7f"
+    },
+    {
+      "path": "prebuild-count-refusal.log",
+      "sha256": "3ff21b8a96a104713a1a1bc832740817242d0b57d5dfa6deaa8a53e20c82aaad"
+    },
+    {
+      "path": "precommit-built-count-update.log",
+      "sha256": "af2efd3653982107415b54c40fb39c661c7c140dc2114164e4f285eb0ff8945d"
+    },
+    {
+      "path": "preservation-check.json",
+      "sha256": "05cae9b6450b9132e563c401bffc49a7bfd58e8e539ec4ca95fdecfa1e8ae1e2"
+    },
+    {
+      "path": "private-response-assets.json",
+      "sha256": "5d4c7e1d81df3662dc53930734e7f303ab6739e9a4326e1bc9747b2d61e326ad"
+    },
+    {
+      "path": "readonly-preflight.json",
+      "sha256": "762b079bb903538c07da51103775d16f6c85f7bd946ef58ba7fc5264dbb44f05"
+    },
+    {
+      "path": "readonly-preflight.md",
+      "sha256": "1e1f05398ad31fe4ba091b9baa56954340777b77e5ac19a37f5d8416a522c432"
+    },
+    {
+      "path": "remaining-acceptance.json",
+      "sha256": "1be7303af07c18ebb69e46f6fdca12e1738763c4164e16b294ddd6e139e36f6b"
+    },
+    {
+      "path": "slice-routing.json",
+      "sha256": "9a3ee34e28dda0fdfc105473a3dd9c08541475ca84dfe2165e39ab59940d902e"
+    },
+    {
+      "path": "slice-routing.md",
+      "sha256": "0df64bac12094ccc02f351e5022ad775b01f923b33c919240c773a2068fe48e6"
+    },
+    {
+      "path": "source-quality.json",
+      "sha256": "11efc620f0335d3ebd64fafc9dc6d298316ae7f86d81688e3bd1a709da86bb38"
+    },
+    {
+      "path": "studio-final-red.json",
+      "sha256": "b5ffcfe006ad0a90545581f00ec4d37ff8016a4e6b9cc7843ccc163813e27ae8"
+    },
+    {
+      "path": "studio-test-design-red.json",
+      "sha256": "1b7d127bd8672aa5372592c769ed6c93dafbdb459a50ede7a020ca42d7be3860"
+    },
+    {
+      "path": "studio-test-design-red.md",
+      "sha256": "1f7a91c79aec2a32a308c4c52b70e671cb49f12d3f5fe31bcc2bdedc535425b5"
+    }
+  ],
+  "notes": "Bounded qualification finished; P0-23 remains unresolved, not Done. 229 final cases:222passed7failed0pending/todo. MCP23/23, CLI5/5 and badge9/9 pass; API3 and Studio4 held failures remain active. Actual final label-removal mutant has16failures and source restores exactly. Final source build/types/lint/freeze/architecture/counts/docs/clean-source pass. Required source-quality checks fail:1270duplicates/2780dead-code. Full suite/coverage/Node24/hosted CI, all routes and browser proof remain open. Previous evidence is contextual only. P0-22 two arrays remain unresolved. All Claude/reservation/protected source bytes preserved; no gate/floor/baseline/dependency change, source overlay, paused work, external message, tracker closure, push or publication. Next P0-51 is a documented dependency-priority tie choice; P0-46 remains open."
+}

@@ -1,0 +1,26 @@
+{
+  "schema": "p126-discovery-review-seal/1",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/metadata-discovery-review/README.md",
+      "bytes": 1776,
+      "sha256": "5183f2cf4d9ae2e856fde5e0b13bbafc5473d3512eeb5dc02d12f191de23963d",
+      "readScope": "sealed output"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/metadata-discovery-review/input-pins.json",
+      "bytes": 6707,
+      "sha256": "4c4f68c5b29356df8b97623f97d31967fe48920cde527a0c372834b9c5efd01e",
+      "readScope": "sealed output"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/metadata-discovery-review/review.json",
+      "bytes": 6169,
+      "sha256": "1baf10de6a1a4915f69cf6d534d1b935e7a10884a9f73342ec724a4590c80abd",
+      "readScope": "sealed output"
+    }
+  ],
+  "inputCount": 22,
+  "blockers": [],
+  "noRuntimeOrSourceWrites": true
+}

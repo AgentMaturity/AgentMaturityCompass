@@ -2,7 +2,7 @@
 
 ## 1. STRUCTURE
 
-**Workspace root: `<project>/.amc/`** (created by `initWorkspace` in `src/workspace.ts`). Real current contents of `/Users/sid/AgentMaturityCompass/.amc/`:
+**Workspace root: `<project>/.amc/`** (created by `initWorkspace` in `src/workspace.ts`). Real current contents of `~/AgentMaturityCompass/.amc/`:
 
 - **Signed config plane** — YAML + detached `.sig` pairs at root: `action-policy.yaml`, `adapters.yaml`, `agent.config.yaml`, `bridge.yaml`, `budgets.yaml`, `fleet.yaml`, `gateway.yaml`, `model-taxonomy.yaml`, `ops-policy.yaml`, `tools.yaml`, `trust.yaml`. Unsigned: `amc.config.yaml` (profiles dev/ci/prod, runtimes, trustBoundaryMode), `guardrails.yaml`, `eval-harness.yaml`, `prompt-addendum.md`, `context-graph.json`, `current-agent` (active agent id).
 - **Keys/crypto** — `keys/`: public keys + rotation history only (`{monitor,auditor,lease,session}_ed25519.pub` + `*_history.json`). Private keys live encrypted in `vault.amcvault` (+ `vault.amcvault.meta.json` fingerprints); `src/crypto/keys.ts` delegates to `src/vault/vault.ts`. NB: a separate empty `vault/` dir also exists.

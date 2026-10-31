@@ -53,7 +53,7 @@ this section in place and note the correction in the execution log.
 
 | Fact | Value |
 |---|---|
-| Repo root | `/Users/sid/AgentMaturityCompass` |
+| Repo root | `~/AgentMaturityCompass` |
 | Branch | `amc/gap-register-execution` |
 | HEAD at brief authoring | `7bd1e8ce` (2026-09-12 correction: integration HEAD is `4d2d69e5`, unchanged since 2026-09-11; 2026-09-14: `6e7875f2`, fresh-clone accepted — suite 14,101/14,101, gate 14/14, receipt `AMC_OS/RESEARCH/2026-09-14-fleet-sequential/README.md`) |
 | Main | `3d6b8d4a` (root is ~197 commits ahead) |
@@ -62,7 +62,7 @@ this section in place and note the correction in the execution log.
 | Evidence root | `AMC_OS/RESEARCH/2026-09-08-dsh-pi/` |
 | Linear epic | AMC-1505 |
 | Linear team UUID | `9cee9981-00cf-40b2-8b48-2a1b588bfb43` |
-| Obsidian vault | `/Users/sid/Documents/AMC` (589 notes, 10 canvases) |
+| Obsidian vault | `~/Documents/AMC` (589 notes, 10 canvases) |
 | Local package version | `1.2.0` |
 | Published npm version | `1.1.1` |
 | Worktrees | 45 registered, ~15 dirty (2026-09-12 correction: 63 registered, 15 dirty; receipt `AMC_OS/RESEARCH/2026-09-09-worktree-audit/refresh-2026-09-12T131601Z/`) |
@@ -487,7 +487,7 @@ it.
 
 ## 9. Obsidian contract
 
-Vault: `/Users/sid/Documents/AMC`. It is a real, curated vault — treat it as a document you
+Vault: `~/Documents/AMC`. It is a real, curated vault — treat it as a document you
 are maintaining, not a dump target.
 
 **Notes to keep current** (all exist):

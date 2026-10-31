@@ -14,7 +14,7 @@
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/v/release/AgentMaturity/AgentMaturityCompass?labelColor=0a0a0a&color=4AEF79&label=release" alt="GitHub release" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/downloads/AgentMaturity/AgentMaturityCompass/total?labelColor=0a0a0a&color=4AEF79&label=downloads" alt="verified release downloads" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/AgentMaturity/AgentMaturityCompass/ci.yml?branch=main&labelColor=0a0a0a&color=4AEF79&label=CI" alt="CI" /></a>
-  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/test%20source%20files-1%2C610-4AEF79?labelColor=0a0a0a" alt="test source files" /></a>
+  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/test%20source%20files-2%2C312-4AEF79?labelColor=0a0a0a" alt="test source files" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-4AEF79?labelColor=0a0a0a" alt="MIT" /></a>
 </p>
 
@@ -38,7 +38,7 @@ Its native runtime owns the model loop, workspace tools, approvals, streaming ch
 
 ## Run a native agent task
 
-The native workflow requires the current 1.2.0 source build; follow [From source](#from-source) first. The published npm package and GitHub release are 1.1.1 and do not contain this workflow. Then inspect your setup:
+The native workflow requires the current source build, which is unreleased (the next release is 2.0.0); follow [From source](#from-source) first. The published npm package and GitHub release are 1.1.1 and do not contain this workflow. Then inspect your setup:
 
 ```bash
 amc agent-loop guide
@@ -57,30 +57,30 @@ curl -fsSL https://agentmaturity.co/install.sh | sh
 amc start
 ```
 
-That's the whole setup. `amc start` does everything:
+`amc start` is another name for `amc up`. In the run recorded for this README (a new workspace and home directory, current source build, 2026-10-11; [record](qualification/2026-10-11-P0-28/README.md)), it:
 
-- Sets up your workspace and keys. **No account. No API key. No cloud.**
-- Checks your agent across all 8 areas (see below).
-- Opens a report card in your browser.
+- Created the workspace under `.amc/`: signing keys, a vault and signed configuration. It needs a vault passphrase: it reads `AMC_VAULT_PASSPHRASE`, uses one it remembered, asks in a terminal, or generates and remembers one in a non-interactive shell. **No account. No provider API key. No cloud.**
+- Started Studio (API and Compass Console), the gateway, a proxy, the dashboard and the bridge on `127.0.0.1` in the background, and printed the console URL. It did not open a browser.
+- Ran a first 8-surface baseline (`amc run`), because the workspace had no earlier run, and printed the result. With no agent connected it graded F, with 4 of 8 surfaces evaluated.
 
-Run it again tomorrow — it remembers your setup and just starts.
+`amc down` stops the background services. A second `amc start` in the same workspace reused it and, in the recorded run, ran the baseline again. `amc up --no-baseline` skips the baseline; `amc up --demo` starts a no-vault demo instead.
 
 **What you get:**
 
 1. **An evidence-backed assessment.** L0 to L5 with traceable sources. Signatures expose changes to the signed report; the assessment still depends on the underlying evidence.
 2. **A fix list.** Exactly what's weak, and generated fixes: guardrails, config patches, CI gates.
-3. **Proof you can hand to anyone.** Auditors, customers, your boss. They can verify it without trusting you.
+3. **Signed records you can hand to others.** A reviewer who pinned your keys can check that a record is unchanged and which key signed it. A signature proves integrity, not that the recorded statements are true.
 
 **The 8 areas AMC covers:**
 
 | Area | Plain meaning |
 |---|---|
 | **Score** | How mature is this agent, really? |
-| **Shield** | Does it survive attacks? (142 attack packs included) |
+| **Shield** | Does it survive attacks? (<!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> registered assurance packs) |
 | **Enforce** | Can it be stopped from doing dangerous things? |
 | **Vault** | Are its secrets and keys protected? |
 | **Watch** | Do you see what it does in real time? |
-| **Comply** | Does it meet the rules? (EU AI Act, NIST AI RMF, ISO 42001, SOC 2) |
+| **Comply** | Which controls have evidence? (EU AI Act, NIST AI RMF, ISO 42001, SOC 2 mappings; evidence of conformity, not a compliance verdict) |
 | **Fleet** | Do many agents work together safely? |
 | **Passport** | Can it prove its record anywhere it goes? |
 
@@ -118,7 +118,7 @@ That is the entire thesis: **trust, but verify — with receipts**.
 # macOS or Linux: download the pinned GitHub release and verify SHA-256
 curl -fsSL https://agentmaturity.co/install.sh | sh
 
-# Start everything: workspace, keys, all 8 areas, report card in your browser
+# Start Studio and the gateway, and run a first 8-surface baseline (prints the console URL)
 cd your-agent-project
 amc start
 
@@ -154,12 +154,13 @@ curl -fsSL https://agentmaturity.co/install.sh | sh
 irm https://agentmaturity.co/install.ps1 | iex
 ```
 
-Each installer pins the published AMC release, downloads the platform archive and `SHA256SUMS` from GitHub Releases, verifies the archive, then installs the included package. The published npm package and GitHub release are 1.1.1; use the source build for the current 1.2.0 native workflow. The Homebrew tap is not publicly available. See [publication evidence](website/publication-status.json).
+Each installer pins the published AMC release, downloads the platform archive and `SHA256SUMS` from GitHub Releases, verifies the archive, then installs the included package. The published npm package and GitHub release are 1.1.1; use the source build for the current native workflow (unreleased; the next release is 2.0.0). The Homebrew tap is not publicly available. See [publication evidence](website/publication-status.json).
 
 **Docker**
 ```bash
 docker build -t amc-quickstart -f docker/Dockerfile.quickstart .
-docker run -it --rm amc-quickstart amc
+docker run -it --rm amc-quickstart            # interactive quickscore
+docker run --rm amc-quickstart --version
 ```
 
 Use the local build command unless a GHCR package has been verified public.
@@ -244,7 +245,9 @@ AMC is not an observability tool and not an eval harness. It is a **trust scorec
 | Resilience | 55 | Graceful degradation, circuit breakers, memory safety, threat resistance, fact/simulation boundaries |
 | Skills | 52 | Tool mastery, injection defense, DLP, scenario traceability, replay safety |
 
-### 142 Assurance Packs
+### <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> Registered Assurance Packs
+
+In these counts, registered = packs returned by `listAssurancePacks()`; files on disk may differ (the generated [API reference](docs/API_REFERENCE.md#assurance-packs) lists the files).
 
 | Category | Examples |
 |----------|---------|
@@ -267,7 +270,7 @@ AMC is not an observability tool and not an eval harness. It is a **trust scorec
 | Environment | 6 | EU Farm-to-Fork, REACH, IEC 61850 |
 | Governance | 5 | EU eIDAS 2.0, UNCAC, UNGPs |
 
-Industry Packs are implemented behind an entitlement boundary, with a planned commercial price of `$9.99/month` for all 41 packs. **Public checkout and automatic license issuance are not yet publicly live or available.** `amc domain pack access` reports this state; `amc domain pack checkout` fails closed unless an operator has configured a verified checkout provider. Do not send payment based on repository copy alone.
+Industry Packs are paid, self-reported questionnaires behind a licence gate, with a planned price of `$9.99/month` for all 41 packs. A licence unlocks access to pack questions and runs only; the same answers and evidence give the same score, gap, report, assurance result and roadmap with or without one, and pack names and descriptions stay visible without one. **Public checkout is not live.** `amc domain pack access` states what your deployment offers: checkout appears only when a checkout URL and a licence signing key pinned in your AMC trust list are both configured; otherwise it says checkout is not available in this deployment and to contact sales. Do not send payment based on repository copy alone.
 
 ### Simulation & Forecast Evaluation Lane
 
@@ -530,7 +533,7 @@ amc connect hooks install --provider claude-code --mode control --agent my-agent
 
 The default `observe` mode preserves unrelated provider settings, adds a managed `.gitignore` rule for `.amc/hooks/`, stores a dedicated `hook:observe` lease outside provider config with mode `0600`, signs its ownership manifest, and removes only the AMC-owned handlers and ignore block. It records requested actions and their completed or failed terminal state under one stable action ID. `hooks health` distinguishes an intact installation awaiting its first event from the latest receipt-verified event and from fail-closed drift, expiry, malformed metadata, or evidence tamper. Last-observed time is historical evidence, not a claim that the provider is live now. A locked Vault cannot authenticate encrypted event bodies, so health exits 2 with `HOOK_EVIDENCE_UNAVAILABLE`; run `amc vault unlock` or set `AMC_VAULT_PASSPHRASE` for non-interactive use. The lifecycle command verifies each receipt and fails closed on missing, ambiguous, conflicting, cross-agent, out-of-order, or tampered evidence. Tool arguments, outputs, error messages, cwd, transcript paths, and raw session IDs are not retained.
 
-`--mode control` is an explicit loopback-only Enforce path. It adds `hook:control`, evaluates raw provider input in memory without retaining it, reuses signed ToolHub, Action Policy, Approval Policy, budget, freeze, maturity, and assurance gates, and binds the exact native response to a signed receipt. Claude Code can receive `allow`, `deny`, or `ask`. Gemini CLI has no native `ask` result, so AMC converts that outcome to an explicit deny. Multi-user or distinct-user AMC quorum is never weakened to one provider prompt. Codex, Cursor, OpenCode, and other providers remain unsupported until their native per-tool hook contracts are pinned and fixture-tested.
+`--mode control` is an explicit loopback-only Enforce path. It adds `hook:control`, evaluates raw provider input in memory without retaining it, reuses signed ToolHub, Action Policy, Approval Policy, budget, freeze, maturity, and assurance gates, and binds the exact native response to a signed receipt. For Claude Code AMC only restricts: it denies, or lets a call through with an empty answer so Claude Code's own permissions still decide, and only for AMC's signed decision bound to that exact payload. A provider-local ask is not AMC approval and AMC has no approval path for hook calls, so a call that needs approval is denied. Control mode also installs SessionStart (session registration), UserPromptSubmit (admission) and Stop hooks; [docs/adapters/claude-code-hooks.md](docs/adapters/claude-code-hooks.md) states the claim per hook, the managed-settings delivery and the limits. Gemini CLI has no native `ask` result, so AMC converts that outcome to an explicit deny. Multi-user or distinct-user AMC quorum is never weakened to one provider prompt. Codex, Cursor, OpenCode, and other providers remain unsupported until their native per-tool hook contracts are pinned and fixture-tested.
 
 Track real first-run outcomes without creating traffic or evidence:
 
@@ -638,20 +641,22 @@ amc guide --go                   # detect framework → apply guardrails to conf
 amc guide --watch                # continuous monitoring + auto-update
 ```
 
-### Compliance in one command
+### Compliance evidence
 
 ```bash
-amc audit binder create --framework eu-ai-act            # EU AI Act evidence binder
-amc compliance report --framework iso-42001              # ISO 42001 report
-amc domain assess --domain health                        # HIPAA assessment
-amc domain assess --domain wealth                        # MiFID II / DORA
+amc audit binder create --scope workspace --out binder.amcaudit                  # signed .amcaudit evidence binder
+amc compliance report --framework iso-42001                                      # evidence-linked control report
+amc domain conformance --station health --agent default --max-evidence-age 30d   # per-requirement PASS / FAIL / NOT_EVALUATED
+amc domain conformance --station wealth --agent default --max-evidence-age 30d
 ```
+
+On the new workspace recorded above, with no agent evidence, the compliance report said `Result: not evaluated (no evidence events were recorded)`, and the health and wealth conformance runs reported `PASS 0, FAIL 0` with every requirement (163 and 92) `NOT_EVALUATED`. These are evidence of conformity, never a compliance verdict. `amc domain assess` needs an Industry Packs license, which is not purchasable yet; without one it prints a locked notice and exits 1.
 
 ### GitHub Actions — preview boundary
 
 The repository contains a composite action prototype, but no GitHub Marketplace publication has been independently verified. Do not use `@main` as a production trust boundary. Until an immutable action release is published and tested, run AMC from a reviewed source checkout in CI or pin the prototype to an exact reviewed commit; see [`amc-action/README.md`](amc-action/README.md).
 
-### Badge for your README
+### Run comparison badge
 
 For a run-to-run or model-route comparison badge, generate it from the real comparison command:
 
@@ -660,14 +665,7 @@ amc compare <run-a> <run-b> --output compare.json --badge
 # writes compare-badge.svg beside the report; to compare models, run the agent with each model and compare the two runs
 ```
 
-Standalone maturity badges are also available when you only need a README trust marker:
-
-```markdown
-<!-- Add this to your README -->
-[![AMC Score](https://img.shields.io/badge/AMC-L3_(72.5)-green?logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTEyIDJMMiA3bDEwIDUgMTAtNXptMCA5bC04LjUtNC4yNUwyIDEybDEwIDUgMTAtNXptMCA5bC04LjUtNC4yNUwyIDIxbDEwIDUgMTAtNXoiLz48L3N2Zz4=)](https://github.com/AgentMaturity/AgentMaturityCompass)
-```
-
-Result: ![AMC Score](https://img.shields.io/badge/AMC-L3_(72.5)-green)
+The comparison badge shows two of your own runs; it is not a maturity or certification mark. Badges and certification marks will only come from a public registry (Gate G3).
 
 ---
 
@@ -706,7 +704,7 @@ Do not treat a detected runtime as proof of event/control coverage. Issue a port
 amc adapters capabilities --agent my-agent --adapter claude-cli --out adapter-capabilities.json --json
 ```
 
-Claude Code receipts can verify allow/deny/ask and bounded corrective steer only with a valid signed control hook. Steer blocks the current call, rewrites no input, and requires a new fully governed action for retry. Gemini CLI receipts expose allow/deny and explicitly record that ask or requested steer degrades to a lossy deny. Metadata-only plugin adapters fail closed instead of inheriting a compatibility claim.
+Claude Code receipts can verify allow/deny and bounded corrective steer only with a valid signed control hook. Steer blocks the current call, rewrites no input, and requires a new fully governed action for retry. Gemini CLI receipts expose allow/deny and explicitly record that ask or requested steer degrades to a lossy deny. Metadata-only plugin adapters fail closed instead of inheriting a compatibility claim.
 
 For supported shell input, the same hook performs a compound-command blast-radius review across every bounded segment and applies the most restrictive result. Unsupported expansion or syntax fails closed before partial policy output. Signed evidence keeps only action classes, canonical tool names, outcomes, reason codes, and counts; the raw command and argument values are never retained.
 
@@ -738,12 +736,13 @@ curl -fsSL https://agentmaturity.co/install.sh | sh
 irm https://agentmaturity.co/install.ps1 | iex
 ```
 
-Both scripts install the published 1.1.1 GitHub release after SHA-256 verification. npm also publishes 1.1.1; neither channel contains the current 1.2.0 source workflow. The Homebrew tap is not publicly available. Use Node.js 22 or 24 for the current production qualification targets; the installer retains a Node 20 compatibility floor. See [platform qualification](docs/PLATFORM_QUALIFICATION.md) and [publication evidence](website/publication-status.json).
+Both scripts install the published 1.1.1 GitHub release after SHA-256 verification. npm also publishes 1.1.1; neither channel contains the current source workflow (unreleased; the next release is 2.0.0). The Homebrew tap is not publicly available. Use Node.js 22 or 24 for the current production qualification targets; the installer retains a Node 20 compatibility floor. See [platform qualification](docs/PLATFORM_QUALIFICATION.md) and [publication evidence](website/publication-status.json).
 
 ### Docker
 ```bash
 docker build -t amc-quickstart -f docker/Dockerfile.quickstart .
-docker run -it --rm amc-quickstart amc
+docker run -it --rm amc-quickstart            # interactive quickscore
+docker run --rm amc-quickstart --version
 ```
 
 Use the local build command unless a GHCR package has been verified public.
@@ -767,22 +766,25 @@ If Corepack is unavailable, install the pinned manager with `npm install --globa
 
 ## Deploy
 
-| Platform | Deploy |
-|----------|--------|
-| **Docker Compose** | Create the three runtime secret files described in [the container guide](docker/README.md#studio-with-persistent-state), then `cd docker && docker compose up --build` |
-| **Vercel** | [![Deploy](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/AgentMaturity/AgentMaturityCompass) |
-| **Railway** | [![Deploy](https://railway.app/button.svg)](https://railway.app/template?referralCode=amc&repo=https://github.com/AgentMaturity/AgentMaturityCompass) |
+All four targets stay documented (decision D-03). Only a qualified target may be called supported, and no target has passed CI qualification yet; see the [deployment confirmation runbook](docs/DEPLOYMENT_CONFIRMATION_RUNBOOK.md#which-deploy-targets-can-pass).
+
+| Platform | Deploy | Qualification |
+|----------|--------|---------------|
+| **Helm on Kubernetes** | [Kubernetes Helm guide](docs/KUBERNETES_HELM_DEPLOYMENT.md) | Local only: kind on macOS arm64, 2026-10-11 ([record](qualification/2026-10-11-P0-14/README.md)); CI pending |
+| **Docker Compose** | Create the three runtime secret files described in [the container guide](docker/README.md#studio-with-persistent-state), then `cd docker && docker compose up --build` | Documented; CI pending |
+| **Vercel** | [![Deploy](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/AgentMaturity/AgentMaturityCompass) | Documented, unqualified: serves the lightweight scoring API only, not Studio or the gateway |
+| **Railway** | [![Deploy](https://railway.app/button.svg)](https://railway.app/template?referralCode=amc&repo=https://github.com/AgentMaturity/AgentMaturityCompass) | Documented, unqualified: same lightweight API |
 
 ---
 
 ## Pricing
 
-The full trust stack is **free and MIT licensed**. Industry Packs are the planned commercial add-on, but checkout and license issuance are not yet publicly live.
+The full trust stack is **free and MIT licensed**. Industry Packs are the planned commercial add-on, but checkout and license issuance are not yet publicly live. Payment unlocks access only: it never changes a result, a trust tier or a verification outcome.
 
 | Tier | What you get |
 |---|---|
-| **Free / Open Source** | Everything — Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport, all <!-- amc:count:adapters -->16<!-- /amc:count --> adapters, 1,236 registered CLI command paths, browser playground, CI gates |
-| **Industry Packs (planned; not yet purchasable)** | Planned `$9.99/month` tier for all 41 Industry Domain Packs; public checkout is not live |
+| **Free / Open Source** | Everything — Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport, all <!-- amc:count:adapters -->16<!-- /amc:count --> adapters, 1,268 registered CLI command paths, browser playground, CI gates |
+| **Industry Packs (planned; not yet purchasable)** | Planned `$9.99/month` tier for all 41 Industry Domain Packs, which are self-reported questionnaires; public checkout is not live |
 | **Enterprise (contact-first; not self-serve)** | Planned Industry Packs access plus priority support, custom pack development, and deployment assistance |
 
 > Industry Packs are 41 sector-specific domain packs (healthcare, finance, education, logistics, government, etc.) that require ongoing regulatory research and maintenance. The core trust stack stays MIT licensed. See [`website/publication-status.json`](website/publication-status.json) before making any availability claim.
@@ -816,7 +818,7 @@ The full trust stack is **free and MIT licensed**. Industry Packs are the planne
 | [Community Demo Kit](docs/COMMUNITY_DEMO_KIT.md) | [Why AMC One-Pager](docs/WHY_AMC_ONE_PAGER.md) |
 | [Solo Dev Quickstart](docs/SOLO_DEV_QUICKSTART.md) | [Platform Engineer Quickstart](docs/PLATFORM_ENGINEER_QUICKSTART.md) |
 | [Security & Compliance Quickstart](docs/SECURITY_COMPLIANCE_QUICKSTART.md) | [Troubleshooting](docs/TROUBLESHOOTING.md) |
-| [CLI Reference (1,236 command paths)](docs/CLI_COMMAND_INVENTORY.md) | [Architecture](docs/ARCHITECTURE_MAP.md) |
+| [CLI Reference (1,268 command paths)](docs/CLI_COMMAND_INVENTORY.md) | [Architecture](docs/ARCHITECTURE_MAP.md) |
 | [Compatibility Matrix](docs/COMPATIBILITY_MATRIX.md) | [Starter Blueprints](docs/STARTER_BLUEPRINTS.md) |
 | [Install Packages](docs/INSTALL_PACKAGES.md) | [Support Policy](docs/SUPPORT_POLICY.md) |
 | [Release Cadence](docs/RELEASE_CADENCE.md) | [CI Templates](docs/CI_TEMPLATES.md) |
@@ -915,7 +917,7 @@ AMC is MIT licensed. We welcome contributions — especially new **assurance pac
 
 ```bash
 git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
-cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- amc:count:testFiles -->1,610<!-- /amc:count --> test source files; Vitest reports run outcomes
+cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- amc:count:testFiles -->2,312<!-- /amc:count --> test source files; Vitest reports run outcomes
 ```
 
 **→ [CONTRIBUTING.md](CONTRIBUTING.md)** — includes guides for writing packs, mapping research papers, and adding adapters.
@@ -936,6 +938,6 @@ cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- a
 ---
 
 <p align="center">
-  <strong><!-- amc:count:diagnosticQuestions -->244<!-- /amc:count --> default diagnostic questions + 20 lifecycle expansion questions · <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> assurance packs · 41 domain packs · <!-- amc:count:adapters -->16<!-- /amc:count --> adapters · 1,236 CLI command paths</strong><br>
+  <strong><!-- amc:count:diagnosticQuestions -->244<!-- /amc:count --> default diagnostic questions + 20 lifecycle expansion questions · <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> assurance packs · 41 domain packs · <!-- amc:count:adapters -->16<!-- /amc:count --> adapters · 1,268 CLI command paths</strong><br>
   <em>Stop trusting. Start verifying.</em>
 </p>

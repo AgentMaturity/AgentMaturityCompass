@@ -3,6 +3,7 @@ import { lookup } from "node:dns/promises";
 import { createServer, request as httpRequest, type IncomingMessage } from "node:http";
 import { connect, isIP, type Socket } from "node:net";
 import { canonicalHost, decideEgress } from "../../enforce/egressAllowlist.js";
+import { checkEgress, isEgressRefusal } from "../../residency/checkEgress.js";
 import type { ShellEgressRow } from "../sandboxTypes.js";
 
 /**
@@ -18,6 +19,12 @@ import type { ShellEgressRow } from "../sandboxTypes.js";
  * cannot rebind between the decision and the connection. Every decision is
  * recorded before it takes effect; a decision that cannot be recorded is a
  * denial.
+ *
+ * Each connection the allowlist admits then meets checkEgress (residency and
+ * the kill switch, P2-01/P2-26) for the shell's workspace and agent, as agent
+ * `network-tool` traffic, before it opens: an active kill refuses every new
+ * connection. A command already running is not interrupted, and a tunnel
+ * already open stays open.
  */
 export interface ShellEgressProxy {
   /** `http://amc:<token>@127.0.0.1:<port>`, for HTTP_PROXY and its siblings. */
@@ -42,6 +49,9 @@ function target(authority: string, defaultPort: number | null): { host: string; 
 export async function startShellEgressProxy(options: {
   readonly allowHosts: readonly string[];
   readonly record: (row: ShellEgressRow) => void;
+  /** The trusted workspace and the agent whose call started the shell; never taken from the proxied request. */
+  readonly workspace: string;
+  readonly agentId: string;
 }): Promise<ShellEgressProxy> {
   const policy = { allowHosts: [...options.allowHosts] };
   const token = randomBytes(24).toString("hex");
@@ -55,14 +65,24 @@ export async function startShellEgressProxy(options: {
     catch { return false; }
     return decision.allowed;
   };
-  /** The checked address to connect to, or null when denied. */
-  const admit = async (host: string, port: number): Promise<string | null> => {
+  /** Synchronous, after the allowlist and DNS: any refusal (or failure) of checkEgress denies the connection. */
+  const preflight = (url: string, decision: { allowed: boolean; reason: string }): { allowed: boolean; reason: string } => {
+    if (!decision.allowed) return decision;
+    try {
+      checkEgress({ workspace: options.workspace, channel: "network-tool", url, agentId: options.agentId, dataClasses: null, purpose: "shell-egress-proxy" });
+      return decision;
+    } catch (error) {
+      return { allowed: false, reason: isEgressRefusal(error) ? error.message : "the egress preflight failed" };
+    }
+  };
+  /** The checked address to connect to, or null when denied. `url` locates the destination for checkEgress. */
+  const admit = async (host: string, port: number, url: string): Promise<string | null> => {
     const byName = decideEgress(host, [], policy);
-    if (!byName.allowed || isIP(host) !== 0) return decide(host, port, byName) ? host : null;
+    if (!byName.allowed || isIP(host) !== 0) return decide(host, port, preflight(url, byName)) ? host : null;
     let addresses: string[] = [];
     try { addresses = (await lookup(host, { all: true, verbatim: true })).map(entry => entry.address); } catch { /* denied below */ }
     const decision = addresses.length === 0 ? { allowed: false, reason: `${host} did not resolve` } : decideEgress(host, addresses, policy);
-    return decide(host, port, decision) ? addresses[0]! : null;
+    return decide(host, port, preflight(url, decision)) ? addresses[0]! : null;
   };
 
   const sockets = new Set<Socket>();
@@ -74,8 +94,8 @@ export async function startShellEgressProxy(options: {
       try { url = new URL(request.url ?? ""); } catch { /* refused below */ }
       const destination = url?.protocol === "http:" ? target(url.host, 80) : null;
       if (!url || !destination) { response.writeHead(400).end("amc: the shell egress proxy forwards absolute http:// URLs and CONNECT only\n"); return; }
-      const address = await admit(destination.host, destination.port);
-      if (address === null) { response.writeHead(403).end(`amc: the signed egress allowlist denied ${destination.host}\n`); return; }
+      const address = await admit(destination.host, destination.port, url.href);
+      if (address === null) { response.writeHead(403).end(`amc: AMC's egress policy denied ${destination.host}\n`); return; }
       // The Host header names the checked destination, never another site on the same address.
       const { "proxy-authorization": _credential, "proxy-connection": _hop, ...forwarded } = request.headers;
       const headers = { ...forwarded, host: url.host };
@@ -94,7 +114,8 @@ export async function startShellEgressProxy(options: {
       if (!authorized(request)) { client.end("HTTP/1.1 407 Proxy Authentication Required\r\nProxy-Authenticate: Basic\r\n\r\n"); return; }
       const destination = target(request.url ?? "", null);
       if (!destination) { client.end("HTTP/1.1 400 Bad Request\r\n\r\n"); return; }
-      const address = await admit(destination.host, destination.port);
+      // As at the gateway: the HTTPS root URL is a registry locator for the opaque tunnel, not evidence of TLS.
+      const address = await admit(destination.host, destination.port, `https://${request.url}/`);
       if (address === null) { client.end("HTTP/1.1 403 Forbidden\r\n\r\n"); return; }
       const upstream = connect({ host: address, port: destination.port }, () => {
         client.write("HTTP/1.1 200 Connection Established\r\n\r\n");

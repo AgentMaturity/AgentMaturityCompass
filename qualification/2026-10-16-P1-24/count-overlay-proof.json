@@ -1,0 +1,79 @@
+{
+  "oldTestFiles": 1671,
+  "newTestFiles": 1675,
+  "generatedSurfaces": [
+    {
+      "path": "README.md",
+      "beforeSha256": "0eb92d51ae1187641e69d0952a194d31fe35b6b7f668b849ef2d1de3ee72becf",
+      "sha256": "0ea904abbf32e7bc0334b457735ea2d6d2060f15f039d96872011fbc5a1498dd",
+      "bytes": 59828,
+      "onlyLiteralCountReplacements": true
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "beforeSha256": "a4b0fa66efbc57642635872b1ead2c8df2f4bb81fb8ece52009046be3780ae10",
+      "sha256": "f492477cd9a569e28014f01fdc61e463207c8a3780fd27ea0b0e1c824b54b9b2",
+      "bytes": 16220,
+      "onlyLiteralCountReplacements": true
+    },
+    {
+      "path": "website/index.html",
+      "beforeSha256": "65d8464b5c83237bab8f341c5f2c02c40b285cf7c309ea1c295e3027bd9f9a49",
+      "sha256": "e9bbfcd0144e0440aa26bc5fe6d9612d7d20b06400e60ab1687cc5b578f120dc",
+      "bytes": 43520,
+      "onlyLiteralCountReplacements": true
+    },
+    {
+      "path": "website/lite.html",
+      "beforeSha256": "36aab215078e64aa7017e78d36b0586057cdc624c2c12262b6f1e8324d62b2cc",
+      "sha256": "85ded49355a2e8d7861512ad3e3902db9401eb6cf9315f25862df8692ba06dc2",
+      "bytes": 11197,
+      "onlyLiteralCountReplacements": true
+    },
+    {
+      "path": "website/i18n.js",
+      "beforeSha256": "4eafb94609f3776779374cb75b6c7b9b5cf1a92daa60f51db577ab993fb77eb6",
+      "sha256": "c452fb156b6e19ed47579b140b8e8244927850dc2fdce05badcf5a8f92060734",
+      "bytes": 44169,
+      "onlyLiteralCountReplacements": true
+    },
+    {
+      "path": "docs/content/show-hn-draft.md",
+      "beforeSha256": "a6ee33afb04b45c79cf9854ccfffd5dfa2280aa007aa3daa06c2de82bc09ef62",
+      "sha256": "67df8a4f97629b03f54301eea7614f9d955153061d3bd912a42919c2229481f9",
+      "bytes": 1951,
+      "onlyLiteralCountReplacements": true
+    },
+    {
+      "path": "docs/content/reddit-launch-drafts.md",
+      "beforeSha256": "c909876e5e424381caf1997e205bc38cdecaf437bf0e19587b54874fd34bc072",
+      "sha256": "d02330a7330aa13f13072d9686d179650cd4be29523bc146fe88eb150c29d1de",
+      "bytes": 3075,
+      "onlyLiteralCountReplacements": true
+    },
+    {
+      "path": "docs/internal/competitive-landscape.md",
+      "beforeSha256": "034ecd10ac3ba9d72f344bd1576a3344b565a24afdc1db7bedd3bd3eecba10ac",
+      "sha256": "979d0a610b3d149e9909db89aa65b712fa55b4d0cb340cfcce2cad8690e2cfad",
+      "bytes": 3880,
+      "onlyLiteralCountReplacements": true
+    },
+    {
+      "path": "docs/internal/mirofish-simulation-council.md",
+      "beforeSha256": "6a71c1bd85c88445dbc259eda3f097645079d2458b2bcc48051102a3597087cd",
+      "sha256": "bd8c076d51a4705608e410c4ec5f43a2b030097dc33e6f228bd6fda98acfbd56",
+      "bytes": 2489,
+      "onlyLiteralCountReplacements": true
+    },
+    {
+      "path": "whitepaper/AMC_WHITEPAPER_v1.md",
+      "beforeSha256": "9b17114417ec5bd9d598a4f027b6d380ae197aa1481c87aad08acca44f8df2b6",
+      "sha256": "00980c0268e2d08d076460d0252cf11a279456ee5d1b1a091553077bbf128e99",
+      "bytes": 107509,
+      "onlyLiteralCountReplacements": true
+    }
+  ],
+  "authoredBytesPreservedExceptCountLiterals": true,
+  "floorBaselineUpdated": false,
+  "waiver": false
+}

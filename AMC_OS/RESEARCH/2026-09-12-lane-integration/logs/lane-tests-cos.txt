@@ -1,5 +1,5 @@
 
- RUN  v4.1.11 /Users/sid/AgentMaturityCompass
+ RUN  v4.1.11 ~/AgentMaturityCompass
 
  ❯ tests/cosProduct10NativeTaskService.test.ts (8 tests | 7 failed) 3593ms
      × admission snapshots before await, dispatches audio once, and stores only the signed identity hash 702ms

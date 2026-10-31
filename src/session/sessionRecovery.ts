@@ -9,7 +9,12 @@ import { createHash, randomUUID } from "node:crypto";
 import type { EvidenceEvent, EvidenceEventType, RuntimeName } from "../types.js";
 import { verifyNativeSessionContinuation } from "../ledger/ledgerVerification.js";
 import { executionIdsForCalls, recoverActionJournal } from "../actions/actionRecovery.js";
-import { assertSessionOwnerAvailable, newSessionWriterOwner, readSessionWriter, sessionWriterMeta, SESSION_WRITER_META, SessionWriterRefused } from "./sessionOwnership.js";
+import {
+  assertSessionOwnerAvailable, newSessionWriterOwner, readSessionWriter, sessionWriterMeta, SESSION_WRITER_META, SessionWriterRefused, writerMetaMigration,
+  type WriterTakeover
+} from "./sessionOwnership.js";
+import { AntiRollbackError } from "../keys/highWater.js";
+import { assertSessionJournalCurrent } from "./writerFence.js";
 import { openSessionEventStore } from "../persistence/openSessionEventStore.js";
 import { openHistoryReader } from "./sessionHistoryReader.js";
 import { authenticateJsonlContinuation } from "./jsonlContinuation.js";
@@ -54,6 +59,8 @@ export interface RecoverSessionParams {
   readonly staleAfterMs?: number; // liveness gate; default 60_000
   readonly force?: boolean; // bypass only the age wait; never a live-owner check
   readonly close?: boolean; // also append session/close and seal the row
+  /** Claim a remote or unresponsive owner whose lease lapsed one lease ago (P2-12); the reason is recorded in the claim. */
+  readonly takeover?: { readonly reason: string };
   /**
    * Store to recover through. Absent, the workspace's pinned backend is opened.
    * Recovery is a SECOND writer taking over after the crashed one is gone, so a
@@ -119,7 +126,8 @@ class SyntheticAppender {
     private readonly runtime: RuntimeName,
     seq: number,
     prevHash: string,
-    headEventId: string | null
+    headEventId: string | null,
+    private readonly epoch: number
   ) {
     this.seqCounter = seq;
     this.prevHash = prevHash;
@@ -168,7 +176,7 @@ class SyntheticAppender {
       sessionId: this.sessionId,
       runtime: this.runtime,
       eventType: spec.eventType,
-      meta: embedEnvelope({ ...spec.typeMeta, [SESSION_WRITER_META]: sessionWriterMeta(this.writerOwner, released) }, envelope),
+      meta: embedEnvelope({ ...spec.typeMeta, [SESSION_WRITER_META]: sessionWriterMeta({ ...this.writerOwner, epoch: this.epoch }, released) }, envelope),
       sessionWriteFence: { owner: this.writerOwner, mode: spec.eventType === "session/recovery-claim" ? "claim" : released ? "release" : "append",
         head: { eventId: this.headEventId, eventHash: this.prevHash, seq: seq - 1 } },
       ...(spec.id !== undefined ? { id: spec.id } : {}),
@@ -447,6 +455,13 @@ export function recoverSession(params: RecoverSessionParams): RecoveryReport {
     if (verification && !verification.chain.ok) return report({ verdict: "TAMPERED", sessionId: params.sessionId, claimEventId: null, wonClaim: false,
       syntheticTurnEnds: 0, syntheticStepEnds: 0, unknownToolOutcomes: 0, unsealedTailCountBefore: countUnsealedTail(preflightEvents), closed: false,
       reason: verification.chain.errors.join("; ") });
+    // P2-12: a journal older than this machine's mark, or a fork of it, is a tamper finding, never a crash to repair.
+    try { assertSessionJournalCurrent(params.workspace, params.sessionId, preflightEvents); }
+    catch (error) {
+      if (!(error instanceof AntiRollbackError)) throw error;
+      return report({ verdict: "TAMPERED", sessionId: params.sessionId, claimEventId: null, wonClaim: false, syntheticTurnEnds: 0, syntheticStepEnds: 0,
+        unknownToolOutcomes: 0, unsealedTailCountBefore: countUnsealedTail(preflightEvents), closed: false, reason: error.message });
+    }
   } finally { reader.store.close(); }
   let store = params.store;
   let acquiredClaim: string | null = null;
@@ -524,7 +539,8 @@ export function recoverSession(params: RecoverSessionParams): RecoveryReport {
     }
 
     // A handle drop is not process death, and force only bypasses the age wait.
-    try { assertSessionOwnerAvailable(lastEvent); }
+    let takeover: WriterTakeover | null;
+    try { takeover = assertSessionOwnerAvailable(lastEvent, params.takeover); }
     catch (error) {
       if (!(error instanceof SessionWriterRefused)) throw error;
       return report({ verdict: "INDETERMINATE", sessionId: params.sessionId, claimEventId: null, wonClaim: false,
@@ -546,7 +562,8 @@ export function recoverSession(params: RecoverSessionParams): RecoveryReport {
       sessionRuntime(store, params.sessionId, events),
       seed.seq,
       seed.prevHash,
-      lastEvent.id
+      lastEvent.id,
+      (readSessionWriter(lastEvent)?.epoch ?? 0) + 1
     );
     recoveryAppender = appender;
 
@@ -564,7 +581,8 @@ export function recoverSession(params: RecoverSessionParams): RecoveryReport {
           bootId: params.claimant.bootId,
           startedAt: params.claimant.startedAt
         },
-        observedHeadEventId
+        observedHeadEventId,
+        ...(takeover === null ? {} : { takeover })
       },
       surface: { op: "none" },
       turn: null,
@@ -572,13 +590,17 @@ export function recoverSession(params: RecoverSessionParams): RecoveryReport {
     });
 
     acquiredClaim = claim.eventId;
+    // P2-12: a version-1 owner's session records its format change once, inside the recovery window.
+    const migration = writerMetaMigration(lastEvent);
+    const migrated = migration === null ? null
+      : appender.append({ eventType: "session/migration", typeMeta: migration, surface: { op: "none" }, turn: null, step: null });
     const contested = readSessionEvents(store, params.sessionId);
     // 5. Unknown tool outcomes FIRST, so the projection is well-formed (each
     //    tool_use is followed by its tool_result before the turn closes).
     const resultBytes = Buffer.from(SYNTHETIC_TOOL_RESULT_BODY, "utf8");
     const resultSha = sha256Hex(resultBytes);
-    const windowHashes: string[] = [claim.eventHash];
-    let windowLastId = claim.eventId;
+    const windowHashes: string[] = [claim.eventHash, ...(migrated === null ? [] : [migrated.eventHash])];
+    let windowLastId = migrated?.eventId ?? claim.eventId;
     let unknownToolOutcomes = 0;
     for (const call of unmatchedToolCalls(contested)) {
       const ref = appender.append({

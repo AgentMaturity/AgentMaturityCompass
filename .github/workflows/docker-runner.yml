@@ -49,8 +49,18 @@ env:
   IMAGE_NAME: agentmaturity/amc-runner
 
 jobs:
+  # P0-35: each architecture is built, qualified and pushed natively; the
+  # manifest job then joins the qualified digests into multi-platform tags.
   build-and-push:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-latest
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v6
 
@@ -91,11 +101,11 @@ jobs:
           target: runner
           load: true
           push: false
-          platforms: linux/amd64
-          tags: ${{ steps.meta.outputs.tags }}
+          platforms: linux/${{ matrix.arch }}
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}-${{ matrix.arch }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=runner-${{ matrix.arch }}
+          cache-to: type=gha,mode=max,scope=runner-${{ matrix.arch }}
 
       - name: Smoke test
         env:
@@ -106,17 +116,89 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: amc-runner-smoke
+          name: amc-runner-smoke-${{ matrix.arch }}
           path: tmp/runner-container-smoke.json
 
       - name: Push qualified image
         if: github.event_name != 'pull_request'
         env:
           AMC_RUNNER_IMAGE: ${{ steps.runtime_image.outputs.imageid }}
+          AMC_REPOSITORY: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          AMC_ARCH: ${{ matrix.arch }}
+        run: |
+          tag="$AMC_REPOSITORY:$GITHUB_SHA-$AMC_ARCH"
+          [ "$(docker image inspect --format '{{.Id}}' "$tag")" = "$AMC_RUNNER_IMAGE" ]
+          docker push "$tag"
+          mkdir -p tmp/runner-digest
+          docker image inspect "$tag" | node -e '
+            const image = JSON.parse(require("node:fs").readFileSync(0, "utf8"))[0];
+            const digest = image.RepoDigests.find(value => value.startsWith(process.argv[1] + "@"))?.split("@")[1];
+            if (!/^sha256:[a-f0-9]{64}$/.test(digest ?? "")) throw Error("pushed image digest missing");
+            if (image.Id !== process.env.AMC_RUNNER_IMAGE || image.Architecture !== process.env.AMC_ARCH) throw Error("pushed image is not the qualified image");
+            console.log(JSON.stringify({ arch: process.env.AMC_ARCH, platform: "linux/" + process.env.AMC_ARCH, imageId: image.Id, digest }));
+          ' "$AMC_REPOSITORY" > "tmp/runner-digest/$AMC_ARCH.json"
+          cat "tmp/runner-digest/$AMC_ARCH.json"
+
+      - name: Upload per-architecture digest
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v7
+        with:
+          name: runner-digest-${{ matrix.arch }}
+          path: tmp/runner-digest/${{ matrix.arch }}.json
+          if-no-files-found: error
+
+  manifest:
+    if: github.event_name != 'pull_request'
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Log in to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix=
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Download qualified per-architecture digests
+        uses: actions/download-artifact@v8
+        with:
+          pattern: runner-digest-*
+          path: tmp/runner-digests
+          merge-multiple: true
+
+      - name: Create multi-platform tags from the qualified digests
+        env:
+          AMC_REPOSITORY: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           AMC_IMAGE_TAGS: ${{ steps.meta.outputs.tags }}
         run: |
-          while IFS= read -r tag; do
-            [ -n "$tag" ] || continue
-            [ "$(docker image inspect --format '{{.Id}}' "$tag")" = "$AMC_RUNNER_IMAGE" ]
-            docker push "$tag"
-          done <<< "$AMC_IMAGE_TAGS"
+          set -euo pipefail
+          digest() { jq -er --arg arch "$1" 'select(.arch == $arch) | .digest | select(test("^sha256:[a-f0-9]{64}$"))' "tmp/runner-digests/$1.json"; }
+          AMD64=$(digest amd64)
+          ARM64=$(digest arm64)
+          args=()
+          while IFS= read -r tag; do [ -n "$tag" ] && args+=(-t "$tag"); done <<< "$AMC_IMAGE_TAGS"
+          [ "${#args[@]}" -gt 0 ]
+          docker buildx imagetools create "${args[@]}" "$AMC_REPOSITORY@$AMD64" "$AMC_REPOSITORY@$ARM64"
+          first="${args[1]}"
+          RAW=$(docker buildx imagetools inspect --raw "$first")
+          LISTED=$(jq -r '[.manifests[] | select(.platform.os == "linux") | "\(.platform.architecture)=\(.digest)"] | sort | join(",")' <<<"$RAW")
+          [ "$LISTED" = "amd64=$AMD64,arm64=$ARM64" ] || { echo "index lists $LISTED"; exit 1; }
+          {
+            echo "### Runner image digests"
+            echo
+            echo "- index: $(docker buildx imagetools inspect "$first" --format '{{json .Manifest}}' | jq -r '.digest')"
+            echo "- linux/amd64: $AMD64"
+            echo "- linux/arm64: $ARM64"
+          } >> "$GITHUB_STEP_SUMMARY"

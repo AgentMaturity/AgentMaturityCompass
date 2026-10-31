@@ -1,0 +1,234 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-46",
+  "date": "2026-10-15",
+  "commit": "4c8f39b583a51c7bc1b2bba180c8aef60a94263f",
+  "branch": "codex/p0-46-current-qualification",
+  "node": "v22.23.3 selected override; defaultNode20/Node24 unqualified",
+  "pnpm": "10.33.0",
+  "os": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "pnpm run build",
+      "exit": 0,
+      "durationMs": 29963
+    },
+    {
+      "cmd": "pnpm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 867
+    },
+    {
+      "cmd": "pnpm run check:counts",
+      "exit": 0,
+      "durationMs": 1474
+    },
+    {
+      "cmd": "pnpm run check:duplicates",
+      "exit": 1,
+      "durationMs": 2667
+    },
+    {
+      "cmd": "pnpm run check:freeze",
+      "exit": 0,
+      "durationMs": 3201
+    },
+    {
+      "cmd": "pnpm run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 3850
+    },
+    {
+      "cmd": "pnpm exec vitest run tests/amcActionLocalPnpmQualification.test.ts tests/publicationTruthfulness.test.ts tests/publicDistributionTruth.test.ts --reporter=json --outputFile=/private/tmp/p0-46-final-bounded-node22-20261015.json",
+      "exit": 0,
+      "durationMs": 7585
+    },
+    {
+      "cmd": "pnpm run check:dead-code",
+      "exit": 1,
+      "durationMs": 9177
+    },
+    {
+      "cmd": "pnpm run lint",
+      "exit": 0,
+      "durationMs": 9545
+    },
+    {
+      "cmd": "pnpm run typecheck",
+      "exit": 0,
+      "durationMs": 36069
+    },
+    {
+      "cmd": "pnpm run typecheck:tests",
+      "exit": 0,
+      "durationMs": 46949
+    },
+    {
+      "cmd": "pnpm run check:clean-source",
+      "exit": 0,
+      "durationMs": 57574
+    }
+  ],
+  "tests": {
+    "total": 33,
+    "passed": 33,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "330aeda725ceeea6c292d3782b9bec9616081d0ef476caf0a960ba872a36d4ef"
+    },
+    {
+      "path": "command-phases.json",
+      "sha256": "82341215a5538dd75a202abf4a709f698ae10715d30e6c9c5414ac48293dfe9e"
+    },
+    {
+      "path": "exact-local-install.log",
+      "sha256": "570a81c460552b78a2f729ef91b151b4e16aede07b8c066c843de673ac5e4f47"
+    },
+    {
+      "path": "executed-local-install-block.sh",
+      "sha256": "b2bc5ddc3dca6880619d4248096a522a6a787a0bcf9ed5450ab0fdeaced0b4d8"
+    },
+    {
+      "path": "final-architecture.log",
+      "sha256": "9180f9bfe7ce1e0590e3dde1678c9b9080b8e63e83bd330d8b3fa119c3928089"
+    },
+    {
+      "path": "final-bounded-node22.json",
+      "sha256": "a93ccdd0d3dbc1a6d7f3c52a683f7e038b724cad43eeb1ecd44fb8d4da090ed4"
+    },
+    {
+      "path": "final-bounded-node22.log",
+      "sha256": "c46f3f5fa45cb7b1fafbff9697a1b18ebf1c755547071593762f38f83e88b75c"
+    },
+    {
+      "path": "final-bounded-summary.json",
+      "sha256": "a1a43941d9ae5bdd64bb3d2d76f40bbcc27c20679188a60b6e2a46b6a3c97088"
+    },
+    {
+      "path": "final-build.log",
+      "sha256": "71eb64fbb08383e76358686bb665f3349d905b06bf9f7764a62ccc379d8573e6"
+    },
+    {
+      "path": "final-clean-source.log",
+      "sha256": "ada61e0f197bca1a839568bf5fde181abb2f88b6348f6a2b25282f91aea5b5b8"
+    },
+    {
+      "path": "final-counts.log",
+      "sha256": "9cad4525a572e7e84d173fe8e2296ee630db50bc0af1167b35a877834d04847a"
+    },
+    {
+      "path": "final-docs.log",
+      "sha256": "ac3cb757c9b09c031c5f6890314012be08fe99fdb948590b841c58f0201a110a"
+    },
+    {
+      "path": "final-freeze.log",
+      "sha256": "42a5d2098283a105329c04aa4b84e1c705bf82c6a74235f7a767bcf21a8d19d4"
+    },
+    {
+      "path": "final-lint.log",
+      "sha256": "2bdc33e64e4868de8314e0970cee4f175db063832054a1873df85ce3813c7177"
+    },
+    {
+      "path": "final-shell-observations.json",
+      "sha256": "80779a5094fa5be3c15132de8043f87c8ff35be2e8eed98f3386fb50db3088b5"
+    },
+    {
+      "path": "final-source-dead-code.log",
+      "sha256": "478a6dbb93f732beeb5c7159a35f68f744d401c6e4fb3708061a16af0e144b07"
+    },
+    {
+      "path": "final-source-duplicates.log",
+      "sha256": "488b25d5b27125e79b3e9632629f59f6927dd62cf7b4d25afd34c1669a641985"
+    },
+    {
+      "path": "final-source-manifest.json",
+      "sha256": "f255d489dce13579c6193905e215bbd4064e2c31b5a907b8b268beaf747aca89"
+    },
+    {
+      "path": "final-test-types.log",
+      "sha256": "a072c23d0c18f4314eb87b0c653bd05bd272ab5fae8f34de3722d1bf56075483"
+    },
+    {
+      "path": "final-types.log",
+      "sha256": "ada898d512ca3dfedfc531e348e11793a7df16ab9aa21427eb92bf7dda1ab279"
+    },
+    {
+      "path": "first-shell-green.json",
+      "sha256": "1890a01fd461903fdf761cf2a4c8da07a9949f4211104589e30f330728e6c1c6"
+    },
+    {
+      "path": "installed-help.log",
+      "sha256": "cc01a17b8d8d85c5ad052d2b0b1d02c0ca8c27498820f72df3014b43c9f436f7"
+    },
+    {
+      "path": "installed-version.log",
+      "sha256": "1e5b51cde515396a9fa762909cf8ca6584ccc564b325d2eebeea76175fe95c4d"
+    },
+    {
+      "path": "local-install-harness.py",
+      "sha256": "f918862948cdf48ef83ec3eac52eaefb0a3cd4bd0b241aaed6d8010a8dd75824"
+    },
+    {
+      "path": "local-install-witness.json",
+      "sha256": "734db22d57f877456c8cf934aaf78544357367ea4d3d863ccfcadad67326f20c"
+    },
+    {
+      "path": "next-p0-52-preflight.json",
+      "sha256": "fad8ae38b309bfa6575eaa5323943de2b3279892dcce8ca9d3ddbed4f9540bf3"
+    },
+    {
+      "path": "next-p0-52-preflight.md",
+      "sha256": "cc9fe24fe9547305dd4cc7e5a7b7f16d3c8692937437f59a2a22c68a9112c0c0"
+    },
+    {
+      "path": "original-install-block.sh",
+      "sha256": "1f9e3c5b0e8ad4b1efbdaba00d7a39396cc96cc158b363ae8ad888702b00bb5a"
+    },
+    {
+      "path": "original-publication-contracts.json",
+      "sha256": "a68c3194fb07645d4ce05ec7c639952a46aa1fe353ec55f2b9258bf3b693c5c3"
+    },
+    {
+      "path": "preservation-check.json",
+      "sha256": "35807a2050e7ea79f98320ff7c8f13442fb30e8469cd02b834abb3d3ce740f42"
+    },
+    {
+      "path": "readonly-preflight.json",
+      "sha256": "c1c80b80faa7b2d666a5e9e33d1bf151f1e874a9ba28fe3da77aa6f6f676ce29"
+    },
+    {
+      "path": "readonly-preflight.md",
+      "sha256": "ee8e0061082f725e5785cc605e8c419a012423df345e026df7329f3dba23bde7"
+    },
+    {
+      "path": "remaining-acceptance.json",
+      "sha256": "01055a93043ff17fe52c243540fbea32d5bd8366b2845dbc0360dc2468f3a82d"
+    },
+    {
+      "path": "scope-review.json",
+      "sha256": "0d128fbc9ca2392cdb4b46410c9516e4f11e17ce4d317c8544535b8b3a1ee440"
+    },
+    {
+      "path": "scope-review.md",
+      "sha256": "9c4d45d9256c9d5046d6a5d983033166819421bfed2a971dd309284ae2939082"
+    },
+    {
+      "path": "shell-qualification.json",
+      "sha256": "e9fc73bbd66e78ccd0f126106769ed17433ce5022f817c2d97d991fae018a291"
+    },
+    {
+      "path": "shell-qualification.md",
+      "sha256": "f5d028c3eccbbd89f3c61ab5bd36a568f6680fdb866d5f61f5ce9040ee353566"
+    },
+    {
+      "path": "source-quality.json",
+      "sha256": "7383f20c34f21ee21c8f4a7cf61f954edad5c0781661c8f915baec564d20e09f"
+    }
+  ],
+  "notes": "Selected Node22 local action component qualified; full acceptance remains unresolved, not Done. All 33 bounded tests pass with zero pending/todo. Real exact frozen install/build/private npm prefix and linked CLI version/help pass; seven input hashes unchanged. Thirteen inert shell observer cases and actual historical/current command-order assertion RED/GREEN are distinct from real install evidence. No actual release installer or hosted action ran. Final build/types/lint/freeze/architecture/counts/docs/clean-source pass. Required source-quality checks fail with 1,269 duplicates and 2,780 dead-code findings. DefaultNode20, Node24, hostedUbuntu, fullCI/whole suite/coverage/releasegate remain open. Existing P0-51/P0-22/P0-23/P0-29 debt is active. Production/action/workflow/package/lock/scripts/archives/D15/reservations/Claude preserved. No waiver, paused work, shared prefix, held overlay, tracker closure, external message, push or publication. Next P0-52 follows current priority/date."
+}

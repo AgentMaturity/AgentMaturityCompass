@@ -7,8 +7,8 @@ Use `stops-and-credentials.py` only after the implementation batch is committed.
 Supply the final full source SHA and actual absolute Node 22 / pnpm JavaScript entrypoint paths. The pnpm version must match the candidate's `packageManager`. Replace every placeholder deliberately:
 
 ```sh
-python3 /Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/mutations/stops-and-credentials.py \
-  --repository /Users/sid/AgentMaturityCompass \
+python3 ~/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/mutations/stops-and-credentials.py \
+  --repository ~/AgentMaturityCompass \
   --source FULL_FORTY_CHARACTER_FINAL_CANDIDATE_SHA \
   --clone /private/tmp/NEW-STOP-AUTH-CLONE \
   --output /private/tmp/NEW-STOP-AUTH-RECEIPT \

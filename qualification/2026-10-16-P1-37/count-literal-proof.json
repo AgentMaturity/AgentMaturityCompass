@@ -1,0 +1,68 @@
+{
+  "at": "2026-10-16T10:55:32.951768+00:00",
+  "files": [
+    {
+      "path": "README.md",
+      "beforeSha256": "0ea904abbf32e7bc0334b457735ea2d6d2060f15f039d96872011fbc5a1498dd",
+      "afterSha256": "ccd0c1404c37fc70022968a28fe58c7199f470e45ab07b756816291ba686288a",
+      "literalOnly": true
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "beforeSha256": "f492477cd9a569e28014f01fdc61e463207c8a3780fd27ea0b0e1c824b54b9b2",
+      "afterSha256": "afc55d16c70d6b3a5a4bf68fbe071d902cf6d7853bb90db92e03a44c22415fe6",
+      "literalOnly": true
+    },
+    {
+      "path": "website/index.html",
+      "beforeSha256": "e9bbfcd0144e0440aa26bc5fe6d9612d7d20b06400e60ab1687cc5b578f120dc",
+      "afterSha256": "531623bbee6cef5529e60d4d385781292afab4b2f58123d9662df8cd3a7e2022",
+      "literalOnly": true
+    },
+    {
+      "path": "website/lite.html",
+      "beforeSha256": "85ded49355a2e8d7861512ad3e3902db9401eb6cf9315f25862df8692ba06dc2",
+      "afterSha256": "3a946fe5aa9d6ec644b86f6ca8c0d501632b29891c1d8d0d7e8e70a7fe29ab3f",
+      "literalOnly": true
+    },
+    {
+      "path": "website/i18n.js",
+      "beforeSha256": "c452fb156b6e19ed47579b140b8e8244927850dc2fdce05badcf5a8f92060734",
+      "afterSha256": "d9ac61410f8fb2c23d8e91dd66dfc50bff9b7d2f187647b282978d6353810c79",
+      "literalOnly": true
+    },
+    {
+      "path": "docs/content/show-hn-draft.md",
+      "beforeSha256": "67df8a4f97629b03f54301eea7614f9d955153061d3bd912a42919c2229481f9",
+      "afterSha256": "25c52168c201bff93fa61ea6932de0ac6d23a75cadc760306b3eb9dbf32316fa",
+      "literalOnly": true
+    },
+    {
+      "path": "docs/content/reddit-launch-drafts.md",
+      "beforeSha256": "d02330a7330aa13f13072d9686d179650cd4be29523bc146fe88eb150c29d1de",
+      "afterSha256": "4531d5a2ccd8d164bc27d306588cc7efe92509447920f7ff66ceb45d1907b710",
+      "literalOnly": true
+    },
+    {
+      "path": "docs/internal/competitive-landscape.md",
+      "beforeSha256": "979d0a610b3d149e9909db89aa65b712fa55b4d0cb340cfcce2cad8690e2cfad",
+      "afterSha256": "79c12a5ecda93fb303b2a6eee2848165c8ce053a639b38d95b05a83cde2977f3",
+      "literalOnly": true
+    },
+    {
+      "path": "docs/internal/mirofish-simulation-council.md",
+      "beforeSha256": "bd8c076d51a4705608e410c4ec5f43a2b030097dc33e6f228bd6fda98acfbd56",
+      "afterSha256": "16b4d8f7abf5c56280d0d13d6b0ef7050e214090c042567bde83372aedd781dd",
+      "literalOnly": true
+    },
+    {
+      "path": "whitepaper/AMC_WHITEPAPER_v1.md",
+      "beforeSha256": "00980c0268e2d08d076460d0252cf11a279456ee5d1b1a091553077bbf128e99",
+      "afterSha256": "3f1983cb7f5474b53ee195ff509cd7763c0784a08473d072b9e08ce7cae66c39",
+      "literalOnly": true
+    }
+  ],
+  "onlyTrackedChangesAreTenCountSurfaces": true,
+  "newTestRemainsUntrackedUntilOrdinaryCommit": true,
+  "passingResultsInvented": false
+}

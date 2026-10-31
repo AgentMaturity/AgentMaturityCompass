@@ -8,12 +8,14 @@ import { initWorkspace } from "../src/workspace.js";
 import { initBudgets } from "../src/budgets/budgets.js";
 import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 import { initToolsConfig, loadToolsConfig } from "../src/toolhub/toolhubValidators.js";
+import { initProcessorRegistry } from "../src/dataflow/processorRegistry.js";
 import { agentToolset } from "../src/agent/agentToolset.js";
 import { SessionService } from "../src/session/sessionService.js";
 import { discoverNativeMcpCatalog, mountNativeMcpServer, nativeMcpToolName, type MountedNativeMcpServer } from "../src/mcp/nativeMcpClient.js";
 import { NATIVE_MCP_HTTP_LIMITS, NativeMcpHttpTransport, nativeMcpHttpEndpoint, type NativeMcpHttpServer } from "../src/mcp/nativeMcpHttpTransport.js";
 import { loadNativeMcpConfiguration, resolveNativeMcpServer } from "../src/setup/nativeMcpConfig.js";
 import { sha256Hex } from "../src/utils/hash.js";
+import { removeActionPolicy } from "./helpers/actionPolicyFixtures.js";
 
 const SECRET = "synthetic-http-mcp-credential-41a9";
 const cleanup: (() => Promise<void>)[] = [];
@@ -26,7 +28,8 @@ interface Call { method: string; rpc?: string; session?: string; origin?: string
 async function fixture(state: State = {}, options: Partial<NativeMcpHttpServer> = {}) {
   vi.stubEnv("AMC_VAULT_PASSPHRASE", "http-mcp-fixture-vault-only");
   const workspace = mkdtempSync(join(tmpdir(), "amc-http-mcp-"));
-  initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" }); initBudgets(workspace);
+  initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+  removeActionPolicy(workspace); // AXR-02: no Action Policy configured, as before; this file is not about it (amc init signs one). initBudgets(workspace);
   writeRuntimeFirewallPolicy({ workspace, mode: "observe" });
   const configured = loadToolsConfig(workspace), name = nativeMcpToolName("fixture", "lookup");
   initToolsConfig(workspace, { ...configured, tools: { ...configured.tools,
@@ -88,7 +91,7 @@ async function fixture(state: State = {}, options: Partial<NativeMcpHttpServer> 
   return { workspace, server, state, calls, toolset, notifications,
     mount: async () => { const reviewed = await discoverNativeMcpCatalog(server, workspace); const mount = await mountNativeMcpServer({
       server, workspace, agentId: "default", toolset, expectedCatalogDigest: reviewed.digest, grants: [{ name: "lookup", actionClass: "READ_ONLY" }] }); mounts.push(mount); return mount; },
-    call: (signal = new AbortController().signal) => toolset.seam.execute({ callId: `http-call-${++sequence}`, toolName: name, rawArguments: '{"query":"fixture"}',
+    call: (signal = new AbortController().signal, rawArguments = '{"query":"fixture"}') => toolset.seam.execute({ callId: `http-call-${++sequence}`, toolName: name, rawArguments,
       sessionId: session.sessionId, turn: 1, step: 1, parentToken: null, dispatch: "native", signal }) };
 }
 
@@ -185,12 +188,24 @@ describe("governed native Streamable HTTP", () => {
   test("cancellation aborts the active stream, terminates the session and removes the grant", async () => {
     const f = await fixture({ hold: true }); await f.mount(); const controller = new AbortController(); const call = f.call(controller.signal);
     await vi.waitFor(() => expect(f.calls.filter(call => call.rpc === "tools/call")).toHaveLength(1)); controller.abort();
-    expect((await call).outcome).toBe("CANCELLED"); expect((await f.call()).outcome).toBe("DENIED");
+    // WP16: the tools/call was dispatched before the abort, so its remote effect is unknown, not cancelled.
+    expect((await call).outcome).toBe("TOOL_OUTCOME_UNKNOWN"); expect((await f.call()).outcome).toBe("DENIED");
     await vi.waitFor(() => expect(f.calls.filter(call => call.method === "DELETE")).toHaveLength(2));
+  });
+  test("P2-02: a token argument on an unbound grant is refused purpose_violation before tools/call, and the mount stays open", async () => {
+    const f = await fixture();
+    // Opted in with nothing restorable: a READ_ONLY grant binds no record, so no token can be restored for it.
+    initProcessorRegistry(f.workspace, { schemaVersion: "amc.dataflow-processors/v1", experimental: true, processors: [], purposes: [], bindings: [] });
+    await f.mount();
+    const refused = await f.call(undefined, JSON.stringify({ query: "[[amc:phi:0123456789abcdef]]" }));
+    expect(refused).toMatchObject({ outcome: "ERROR", content: "Protected data egress refused: purpose_violation" });
+    expect(f.calls.filter(call => call.rpc === "tools/call")).toEqual([]);
+    expect((await f.call()).outcome).toBe("OK");
+    expect(f.calls.filter(call => call.rpc === "tools/call")).toHaveLength(1);
   });
   test("timeouts and remote error results retain distinct failure facts", async () => {
     const f = await fixture({ remoteError: true }); const mount = await f.mount();
     expect(await f.call()).toMatchObject({ outcome: "ERROR", timedOut: false, exitCode: 1 });
-    f.state.hold = true; expect(await f.call()).toMatchObject({ outcome: "ERROR", timedOut: true, exitCode: 1 }); await mount.close();
+    f.state.hold = true; expect(await f.call()).toMatchObject({ outcome: "TOOL_OUTCOME_UNKNOWN", timedOut: true, exitCode: 1 }); await mount.close();
   });
 });

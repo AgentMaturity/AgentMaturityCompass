@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { afterEach, describe, expect, test } from "vitest";
 import { initWorkspace } from "../../src/workspace.js";
+import { renderClaimLegend } from "../../src/claims/eligibility/render.js";
 import {
   runBenchmarkSuite,
   compareBenchmarks,
@@ -117,6 +118,13 @@ describe("renderBenchRunMarkdown", () => {
     expect(md).toContain("latency");
     expect(md).toContain("accuracy");
     expect(md).toContain("safety");
+    expect(md).toContain("**Claim:** Self-reported · **Result:** not evaluated");
+    expect(md).toContain(renderClaimLegend("markdown"));
+    expect(md.split("\n").filter((line) => line.startsWith("**Claim:**") || result.categories.some((category) => line.startsWith(`| ${category.category} |`)))).toMatchSnapshot();
+    for (const category of result.categories) {
+      const row = md.split("\n").find((line) => line.startsWith(`| ${category.category} |`));
+      expect(row).toMatch(/\| self_reported \|$/);
+    }
   });
 });
 
@@ -135,5 +143,12 @@ describe("renderBenchCompareMarkdown", () => {
     expect(md).toContain("agent-b");
     expect(md).toContain("Head-to-Head");
     expect(md).toContain("Winner");
+    expect(md).toContain("**Claim:** Self-reported · **Result:** not evaluated");
+    expect(md).toContain(renderClaimLegend("markdown"));
+    expect(md.split("\n").filter((line) => line.startsWith("**Claim:**") || result.categories.some((category) => line.startsWith(`| ${category.category} |`)))).toMatchSnapshot();
+    for (const category of result.categories) {
+      const row = md.split("\n").find((line) => line.startsWith(`| ${category.category} |`));
+      expect(row).toMatch(/\| self_reported \|$/);
+    }
   });
 });

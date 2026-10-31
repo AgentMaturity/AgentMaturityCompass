@@ -1,0 +1,11 @@
+     × a dangling default trust list is refused, never read as no list (self-audit) 6ms
+     × a root pinned twice is the same root set as the root pinned once (self-audit) 2ms
+     × refuses a list signed by another auditor purpose's key after a purpose split (self-audit) 1504ms
+     × a key-compromise rotation also drops the key from a purpose that split off it earlier (self-audit) 1225ms
+     × a recovery directory planted as a symlink is refused before anything is copied into it 603ms
+     × after rotating one purpose, every other purpose's public key stays pinned 701ms
+     × resume refuses a pending key set this workspace did not start, or one without its recovery manifest 410ms
+     × rolling forward never overwrites a file it did not write, nor an earlier discarded copy 3039ms
+     × raises the key-set mark when it reads a generation, so a restored older key set is refused 789ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 9 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  9 failed | 50 passed (59)

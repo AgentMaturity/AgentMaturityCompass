@@ -1,0 +1,51 @@
+{
+  "schema": "p125f-explicit-root-control-admission/1",
+  "at": "2026-10-16T22:23:22.208044+00:00",
+  "sourceCommit": "d8b5c3250138a10078c21886642595f669c4a73c",
+  "binding": {
+    "path": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-source-binding.json",
+    "physicalPath": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-source-binding.json",
+    "bytes": 88422,
+    "sha256": "2d45e6ae6c0632762ca7bc358744d4ba44686f913bc0a696eacb3c079df3d86f",
+    "dev": 16777231,
+    "inode": 543575822,
+    "nlink": 1
+  },
+  "helperSeal": {
+    "path": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-control-preparation/seal.json",
+    "physicalPath": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-control-preparation/seal.json",
+    "bytes": 4385,
+    "sha256": "ba76c35cc9dfdd0ba9895092bb0ab935f2eab30d0e3b1de38a9e7bf03525d073",
+    "dev": 16777231,
+    "inode": 543510952,
+    "nlink": 1
+  },
+  "independentStaticReview": {
+    "path": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-control-helper-static-review/review.json",
+    "physicalPath": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-control-helper-static-review/review.json",
+    "bytes": 4555,
+    "sha256": "7403620f55dfb70e8c32b833c5daf828fbfb1fa2433d3c5fbe38ca677e2a0aa2",
+    "dev": 16777231,
+    "inode": 543511470,
+    "nlink": 1
+  },
+  "rootFullHelperRecipeAndReviewRead": true,
+  "sourceAndFreshActualSame21Green": true,
+  "actualHooks": {
+    "entries": 2,
+    "values": 3
+  },
+  "freshFullLifecycleLogRead": true,
+  "allFourCasesCleanupZero": true,
+  "freshDefaultAbortElapsedMs": 10011.649333,
+  "preservation": {
+    "selectedPathsEachRoot": 72,
+    "compiledPairs": 8,
+    "protectedInputs": 128,
+    "nativePhysicalPins": 8,
+    "allSelectedBytesAndPhysicalPinsExact": true,
+    "heldRHeadStatusIndexExact": true
+  },
+  "operations": "Each apply and restore separately invoked, followed by one observed run. Root reads every actual failure and masking before exact restoration. No automatic restore/retry or deadline change.",
+  "allHoldsAndF37SkipRetained": true
+}

@@ -1,0 +1,113 @@
+{
+  "education": {
+    "questionCount": 16,
+    "regulations": [
+      "EU AI Act",
+      "FERPA",
+      "COPPA",
+      "PPRA",
+      "IDEA",
+      "ADA Title II",
+      "Title IX"
+    ],
+    "station": "education",
+    "unverifiedSources": 0
+  },
+  "environment": {
+    "questionCount": 17,
+    "regulations": [
+      "EU AI Act",
+      "NIS2",
+      "CER Directive",
+      "NERC CIP-015-1",
+      "NERC CIP-013-2",
+      "FDA Food Traceability Rule",
+      "SDWA Section 1433 (42 U.S.C. 300i-2)",
+      "Directive (EU) 2024/825",
+      "Regulation (EU) 2023/1115 as amended by Regulation (EU) 2025/2650",
+      "Cyber Resilience Act (Regulation (EU) 2024/2847)"
+    ],
+    "station": "environment",
+    "unverifiedSources": 3
+  },
+  "finance": {
+    "questionCount": 56,
+    "regulations": [
+      "SOX",
+      "MiCA",
+      "DORA",
+      "Regulation B",
+      "Instant Payments Regulation",
+      "TFR",
+      "Consumer Credit Directive",
+      "Regulation S-P",
+      "Basel III",
+      "AML",
+      "MiFID II",
+      "MAR"
+    ],
+    "station": "wealth",
+    "unverifiedSources": 19
+  },
+  "government": {
+    "questionCount": 56,
+    "regulations": [
+      "FedRAMP",
+      "EU AI Act",
+      "NIST SP 800-63B-4",
+      "FISMA"
+    ],
+    "station": "governance",
+    "unverifiedSources": 50
+  },
+  "healthcare": {
+    "questionCount": 58,
+    "regulations": [
+      "HIPAA",
+      "FDA QMSR (21 CFR Part 820)",
+      "FDA 21 CFR Part 11",
+      "ACA §1557 final rule (45 CFR Part 92)",
+      "EU AI Act (Regulation (EU) 2024/1689)",
+      "European Health Data Space (Regulation (EU) 2025/327)",
+      "CMS Interoperability and Prior Authorization final rule (CMS-0057-F)",
+      "ICH E6(R3) Good Clinical Practice",
+      "ONC HTI-1 certification criteria (45 CFR Part 170)"
+    ],
+    "station": "health",
+    "unverifiedSources": 0
+  },
+  "mobility": {
+    "questionCount": 16,
+    "regulations": [
+      "EU AI Act",
+      "UN R155",
+      "UN R156",
+      "Implementing Regulation (EU) 2022/1426",
+      "NIST SP 800-161r1",
+      "NHTSA Standing General Order 2021-01 (Third Amended)",
+      "33 CFR Part 101 Subpart F (USCG, Cybersecurity in the Marine Transportation System)",
+      "Regulation (EU) 2023/1805 (FuelEU Maritime)",
+      "Regulation (EU) 2019/2144 (General Safety Regulation)",
+      "Regulation (EU) 2023/2854 (Data Act)",
+      "Regulation (EU) 2024/2847 (Cyber Resilience Act)"
+    ],
+    "station": "mobility",
+    "unverifiedSources": 3
+  },
+  "technology": {
+    "questionCount": 16,
+    "regulations": [
+      "EU AI Act",
+      "Cyber Resilience Act",
+      "Digital Services Act",
+      "Data Act",
+      "GDPR",
+      "Digital Markets Act",
+      "NIS2 Directive",
+      "Copyright in the Digital Single Market Directive",
+      "COPPA Rule"
+    ],
+    "station": "technology",
+    "unverifiedSources": 0
+  }
+}

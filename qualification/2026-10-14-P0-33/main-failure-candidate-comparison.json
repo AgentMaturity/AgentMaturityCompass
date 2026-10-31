@@ -1,0 +1,768 @@
+{
+  "mainCommit": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+  "mainRunUrl": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/38132701944",
+  "candidateCommit": "c04d1b892d4307c966ac5b2639af7c8dc925cfac",
+  "candidatePlatform": "Darwin ARM64 / Node22.23.3",
+  "candidateReportSha256": "b0d00c56a1e25449fa546294166d338d75ce0a27fc57a937301e25094fbb6c61",
+  "counts": {
+    "not-matched": 2,
+    "passed": 102
+  },
+  "limitations": "Exact-name comparison across actual reports on different platforms. This is not Ubuntu proof, current-main qualification, or permission to integrate Claude source. Candidate suite remained failed on two separate deadline errors.",
+  "tests": [
+    {
+      "file": "tests/apiRouters.test.ts",
+      "test": "AMC API routers enforce router covers status and formal verification routes",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 17.03487499999983
+    },
+    {
+      "file": "tests/archiveFilesParity.test.ts",
+      "test": "archive file utility parity: src/audit/binderArtifact.ts preserves extraction bounds, all verifiers, domain errors and public APIs",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 17.78416699999798
+    },
+    {
+      "file": "tests/compareBadgeDocs.test.ts",
+      "test": "compare badge DevRel docs documents compare badge generation in public onboarding docs",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 3.8931249999999977
+    },
+    {
+      "file": "tests/enterpriseSsoScim.test.ts",
+      "test": "enterprise identity (OIDC/SAML/SCIM) OIDC auth code + PKCE flow creates session and mapped workspace roles",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 4753.738083
+    },
+    {
+      "file": "tests/enterpriseSsoScim.test.ts",
+      "test": "enterprise identity (OIDC/SAML/SCIM) OIDC rejects identity tokens without an affirmative email_verified claim",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 3531.194624999999
+    },
+    {
+      "file": "tests/enterpriseSsoScim.test.ts",
+      "test": "enterprise identity (OIDC/SAML/SCIM) OIDC rejects bad state, bad nonce/signature, and missing email",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 3875.8505000000005
+    },
+    {
+      "file": "tests/evidencePathsExist.test.ts",
+      "test": "evidence paths keeps the frozen list honest \u2014 every entry really is absent",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 1.6059999999999945
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows uses existing literal report inputs and exercises every changed domain with a ready original receipt",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 51.43745899999976
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows ragFlowDiagnostics: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 8.31354199999987
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows incidentTriageLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 2.940708000000086
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows benchmarkSubmissionLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 5.276875000000018
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows testSuiteEvaluationLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 5.547708000000057
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows evalAiLibraryQuestionLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 7.5128749999998945
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows openModelRagQuestionLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 5.765334000000166
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows opikEvaluationQuestionLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 3.501958000000286
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows deepEvalQuestionLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 8.360250000000178
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows statisticalAgentTrialLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 7.320666999999958
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows codeQuestQualityLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 4.691542000000027
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows multiUserBenchmarkLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 2.995249999999942
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows professionalTaskLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 2.977041999999983
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows iotFirmwareQuestionLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 7.3741250000002765
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows retailSalesQuestionLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 3.2910000000001673
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows continualLearningBenchmarkLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 2.9822079999999005
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows hermesTurboPerformanceLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 5.075458000000253
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows obsStudioDrilldownLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 3.034624999999778
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows scorableStudioDrilldownLens: satisfied proof, failed proof, pending repair and missing evidence preserve bytes",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 4.858042000000296
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows incidentTriageProofHashes: each omitted or malformed proof retains original refusal",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 14.927999999999884
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows benchmarkSubmissionProofHashes: each omitted or malformed proof retains original refusal",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 3.0954999999999018
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows multiUserBenchmarkProofHashes: each omitted or malformed proof retains original refusal",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 8.280874999999924
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows continualLearningBenchmarkProofHashes: each omitted or malformed proof retains original refusal",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 25.534000000000106
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows hermesTurboPerformanceProofHashes: each omitted or malformed proof retains original refusal",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 24.23766599999999
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows iotFirmwareQuestionProofHashes: each omitted or malformed proof retains original refusal",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 40.95674999999983
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows retailSalesQuestionProofHashes: each omitted or malformed proof retains original refusal",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 26.291749999999865
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows scorableStudioDrilldownProofHashes: each omitted or malformed proof retains original refusal",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 38.70650000000023
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "test": "explainability shared contracts retain complete original exported flows obsStudioDrilldownProofHashes: each omitted or malformed proof retains original refusal",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 6.786499999999705
+    },
+    {
+      "file": "tests/jsonlWriterResume.test.ts",
+      "test": "authenticated native JSONL writer recovery real killed writer: original prefix, acknowledged effects and pending usage survive genuine resume",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 4357.187333
+    },
+    {
+      "file": "tests/jsonlWriterResume.test.ts",
+      "test": "authenticated native JSONL writer recovery two real resumers cannot acquire the same abandoned writer",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 4190.256041000001
+    },
+    {
+      "file": "tests/jsonlWriterResume.test.ts",
+      "test": "authenticated native JSONL writer recovery an empty replacement operations journal cannot authorize uncertain dispatch recovery",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 4013.7897919999996
+    },
+    {
+      "file": "tests/jsonlWriterResume.test.ts",
+      "test": "authenticated native JSONL writer recovery a released complete turn resumes only as a new explicit turn",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 2145.006083
+    },
+    {
+      "file": "tests/jsonlWriterResume.test.ts",
+      "test": "authenticated native JSONL writer recovery a released cancelled turn resumes only as a new explicit turn",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 2393.9577919999974
+    },
+    {
+      "file": "tests/jsonlWriterResume.test.ts",
+      "test": "authenticated native JSONL writer recovery a parent cancellation cannot be promoted to a standalone resumed agent",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 2748.579125
+    },
+    {
+      "file": "tests/jsonlWriterResume.test.ts",
+      "test": "authenticated native JSONL writer recovery changed agent refuses before new writer rights or append",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 2855.2239999999983
+    },
+    {
+      "file": "tests/jsonlWriterResume.test.ts",
+      "test": "authenticated native JSONL writer recovery changed composition refuses before new writer rights or append",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 1756.1160830000008
+    },
+    {
+      "file": "tests/jsonlWriterResume.test.ts",
+      "test": "authenticated native JSONL writer recovery changed policy refuses before new writer rights or append",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 2395.4487919999992
+    },
+    {
+      "file": "tests/jsonlWriterResume.test.ts",
+      "test": "authenticated native JSONL writer recovery changed head refuses before new writer rights or append",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 2930.918042000005
+    },
+    {
+      "file": "tests/jsonlWriterResume.test.ts",
+      "test": "authenticated native JSONL writer recovery changed trust refuses before new writer rights or append",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 2847.8962500000052
+    },
+    {
+      "file": "tests/jsonlWriterResume.test.ts",
+      "test": "authenticated native JSONL writer recovery torn history refuses without rewriting its bytes",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 2979.727874999997
+    },
+    {
+      "file": "tests/jsonlWriterResume.test.ts",
+      "test": "authenticated native JSONL writer recovery unterminated history refuses without rewriting its bytes",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 3038.8123750000013
+    },
+    {
+      "file": "tests/jsonlWriterResume.test.ts",
+      "test": "authenticated native JSONL writer recovery signature history refuses without rewriting its bytes",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 3370.1437920000026
+    },
+    {
+      "file": "tests/jsonlWriterResume.test.ts",
+      "test": "authenticated native JSONL writer recovery future history refuses without rewriting its bytes",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 2978.290084
+    },
+    {
+      "file": "tests/jsonlWriterResume.test.ts",
+      "test": "authenticated native JSONL writer recovery unreadable workspace owner is not stolen",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 3066.7942089999997
+    },
+    {
+      "file": "tests/jsonlWriterResume.test.ts",
+      "test": "authenticated native JSONL writer recovery foreign workspace owner is not stolen",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 3004.965458999999
+    },
+    {
+      "file": "tests/jsonlWriterResume.test.ts",
+      "test": "authenticated native JSONL writer recovery live workspace owner is not stolen",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 2387.7999160000036
+    },
+    {
+      "file": "tests/jsonlWriterResume.test.ts",
+      "test": "authenticated native JSONL writer recovery direct recovery cannot steal a handle dropped by a live process",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 2875.141708000003
+    },
+    {
+      "file": "tests/llmResponsesCapabilities.test.ts",
+      "test": "explicit Responses protocol and required capabilities explicit unknown or unsupported requirements refuse before reading session/credentials or transport",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 1.1455839999998716
+    },
+    {
+      "file": "tests/nativeSandboxPolicyBinding.test.ts",
+      "test": "the requirement follows the actual confined body refuses a signed policy change between admission and dispatch",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 3215.9315419999984
+    },
+    {
+      "file": "tests/nativeSandboxPolicyBinding.test.ts",
+      "test": "the requirement follows the actual confined body refuses a unsigned policy change between admission and dispatch",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 2823.546291000006
+    },
+    {
+      "file": "tests/privateModuleHelperVisibility.test.ts",
+      "test": "individually reviewed module-private helper visibility retains the exact finite declaration manifest and supported package entries",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 5.961457999999993
+    },
+    {
+      "file": "tests/publicDocsGraph.test.ts",
+      "test": "AMC public Docs graph every local guide edge resolves to another promoted guide",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 40.593333
+    },
+    {
+      "file": "tests/questionScoreExplainability.test.ts",
+      "test": "question score explainability receipts GAP-0634 binds cognitive-retrieval preprint metadata to existing eval score explainability primitives",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 13.357082999999875
+    },
+    {
+      "file": "tests/questionScoreExplainability.test.ts",
+      "test": "question score explainability receipts binds UpTrain repository metadata to existing eval score explainability primitives",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 3.328958000000057
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures binder real signatures verify through embedded, explicit and workspace trust paths",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 963.6788750000005
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures binder public argument getters keep the original access order",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 284.74908400000004
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures binder preserves renamed child root discovery",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 1171.0819169999995
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures binder preserves flat root root discovery",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 1206.1724590000013
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures binder tampered digest refuses",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 413.4092500000006
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures binder tampered signature refuses",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 869.6996670000008
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures binder tampered envelope mismatch refuses",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 914.6350420000017
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures binder privacy missing scan retains the domain policy",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 294.3015000000014
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures binder privacy failed scan retains the domain policy",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 1355.9551659999997
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures binder privacy checksum mismatch retains the domain policy",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 200.39849999999933
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures binder privacy missing checksum retains the domain policy",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 565.4553750000014
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures binder absent inclusion directory and ignored suffixes preserve existing proof admission",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 545.1047079999989
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures binder multiple privacy failures retain error order and checksum whitespace behavior",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 2657.5443750000013
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures binder root and calculation-manifest hash tampering refuses",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 2780.7141669999983
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures passport real signatures verify through embedded, explicit and workspace trust paths",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 674.8969579999975
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures passport public argument getters keep the original access order",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 464.60025000000314
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures passport preserves renamed child root discovery",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 523.5601670000033
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures passport preserves flat root root discovery",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 490.6909999999989
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures passport tampered digest refuses",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 419.7258329999968
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures passport tampered signature refuses",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 480.4650419999962
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures passport tampered envelope mismatch refuses",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 391.9177500000005
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures passport privacy missing scan retains the domain policy",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 277.02666700000555
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures passport privacy failed scan retains the domain policy",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 612.6896249999991
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures passport privacy checksum mismatch retains the domain policy",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 914.3317499999976
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures passport privacy missing checksum retains the domain policy",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 651.4187089999978
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures passport absent inclusion directory and ignored suffixes preserve existing proof admission",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 1638.5945409999986
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures passport multiple privacy failures retain error order and checksum whitespace behavior",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 453.5303750000021
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures passport root and calculation-manifest hash tampering refuses",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 1578.1049170000042
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures multiple unbound expected proof ids refuse even when their input order differs",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 797.3379579999964
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures workspace verification reports every refusal from a tampered registered binder",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 310.3132919999989
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures passport revocation remains enforced with workspace trust",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 204.37983299999905
+    },
+    {
+      "file": "tests/signedArtifactVerificationParity.test.ts",
+      "test": "entire archived signed artifact workflows against real local signatures passport expiry is enforced without changing the signed document",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 218.1642920000013
+    },
+    {
+      "file": "tests/studioNativeTaskService.test.ts",
+      "test": "real stub turns are committed once, survive release/restart/resume and cold verify",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 8244.036417
+    },
+    {
+      "file": "tests/studioNativeTaskService.test.ts",
+      "test": "owner/selected-agent/demo and stale submission boundaries refuse without extra native requests",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 4597.93975
+    },
+    {
+      "file": "tests/studioNativeTaskService.test.ts",
+      "test": "a stale non-owning observer recovers the exact lost follow-up acknowledgement without dispatching it again",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 5900.879208999999
+    },
+    {
+      "file": "tests/studioNativeTaskService.test.ts",
+      "test": "JSONL managed task cold inspection, verification and archive retain actual history and create deduplication",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 5665.2255829999995
+    },
+    {
+      "file": "tests/studioNativeTaskService.test.ts",
+      "test": "archive frees a current-history slot while retaining sealed evidence and all dedup identities after restart",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 12992.453332999998
+    },
+    {
+      "file": "tests/studioNativeTaskService.test.ts",
+      "test": "archive refuses active, foreign, stale, unsealed and uncertain tasks without changing retained metadata",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 4228.934958000013
+    },
+    {
+      "file": "tests/studioNativeTaskService.test.ts",
+      "test": "archive authenticates evidence again and hidden archived descriptors still fail closed on tampering",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 5430.439707999991
+    },
+    {
+      "file": "tests/studioNativeTaskService.test.ts",
+      "test": "a physical workspace alias runs the same native session, while a different ACP root is refused",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 5932.592457999999
+    },
+    {
+      "file": "tests/compliance/dataResidencyPersistence.test.ts",
+      "test": "data residency survives the process chains and signs stored records so tampering is detectable",
+      "mainStatus": "failed",
+      "candidateStatus": "not-matched",
+      "candidateDurationMs": null,
+      "sourceReview": "Claude changed the contract to the current signed-hold registry or stricter OIDC algorithm and transport admission. Original assertions were replaced or extended; not an exact-name pass.",
+      "replacementCases": [
+        {
+          "test": "data residency survives the process signs each stored hold and anchors the set in HEAD and the journal (P2-01)",
+          "status": "passed"
+        },
+        {
+          "test": "data residency survives the process refuses a forged release in the record instead of reporting the tenant unheld",
+          "status": "passed"
+        },
+        {
+          "test": "data residency survives the process refuses a broken record signature instead of reporting the tenant unheld",
+          "status": "passed"
+        },
+        {
+          "test": "data residency survives the process refuses a deleted record and signature instead of reporting the tenant unheld",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "tests/compliance/evidenceBinding.test.ts",
+      "test": "source-literal enumeration every source literal in src is classified",
+      "mainStatus": "failed",
+      "candidateStatus": "passed",
+      "candidateDurationMs": 377.6071670000001
+    },
+    {
+      "file": "tests/security/api-security.test.ts",
+      "test": "API security hardening OIDC JWT verifier rejects expired and nonce-mismatched tokens",
+      "mainStatus": "failed",
+      "candidateStatus": "not-matched",
+      "candidateDurationMs": null,
+      "sourceReview": "Claude changed the contract to the current signed-hold registry or stricter OIDC algorithm and transport admission. Original assertions were replaced or extended; not an exact-name pass.",
+      "replacementCases": [
+        {
+          "test": "API security hardening OIDC JWT verifier rejects expired, nonce-mismatched, EdDSA and non-loopback-opt-in HTTP tokens",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}

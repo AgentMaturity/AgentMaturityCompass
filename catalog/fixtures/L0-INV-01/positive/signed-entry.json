@@ -1,0 +1,15 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L0-INV-01",
+  "polarity": "positive",
+  "evidenceClass": "valid",
+  "setup": {
+    "harness": "agent_config",
+    "agentId": "fixture-agent",
+    "entry": "signed"
+  },
+  "expected": {
+    "result": "pass",
+    "reasonCode": null
+  }
+}

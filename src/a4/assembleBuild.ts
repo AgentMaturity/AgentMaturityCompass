@@ -1,7 +1,7 @@
 /**
  * Assemble's Build and Review (P1-60; design §10.2). Build runs the approved plan: refusals first (owner mode,
- * the signing key, the baseline Enforce manifest through proposeEnforceResourceLifecycle, and the native session's
- * admission as Studio's native task route checks it), then the deterministic executors (the revised typed graph, the
+ * the signing key, the baseline Enforce manifest through proposeEnforceResourceLifecycle, the native session's
+ * admission as Studio's native task route checks it, and the principal its lease will name, P1-78), then the deterministic executors (the revised typed graph, the
  * agent's preset merged into the signed presets file), and journals the native build session in its revision before
  * anything starts it: the router starts it after the transition commits, on the live NativeTaskService Studio already
  * holds (`context.nativeTasks.service`), never a second instance. Further turns, cancel and resume go through Studio's
@@ -13,16 +13,20 @@
  */
 import { randomUUID } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
-import { join, relative, sep } from "node:path";
+import { join } from "node:path";
 import { actionEvidenceCoverage } from "../actions/actionEvidenceCoverage.js";
 import { verifyAgentRun } from "../agent/runReport.js";
 import type { NativeTaskApiContext } from "../api/nativeTasksRouter.js";
 import { readBudgetEvents } from "../budgets/nativeBudgetUsage.js";
+import { EXECUTION_PHASES, type ExecutionPhase, type ExecutionStatus } from "../execution/executionContract.js";
+import { executionStatusFor } from "../execution/executionStatus.js";
+import { loadActiveCompiledPolicy } from "../catalog/compiler/activate.js";
 import { getPrivateKeyPem } from "../crypto/keys.js";
 import { readAndVerifyArtifactFileSignature } from "../lifecycle/artifactSignature.js";
 import { lifecyclePath, lifecycleStages } from "../lifecycle/lifecycle.js";
 import { evaluateEnforceResourceLifecycle, projectEnforceResourceLifecycleStatus, proposeEnforceResourceLifecycle } from "../enforce/resourceManifest.js";
 import { writeTypedMultiAgentGraph } from "../fleet/typedGraph.js";
+import { LeasePrincipalRefused, resolveLeasePrincipal } from "../leases/leasePrincipal.js";
 import { openLedger } from "../ledger/ledger.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import { readPresets, savePresets } from "../presets/agentPresets.js";
@@ -30,19 +34,18 @@ import { assertNativeExecutionIdentity, NativeAdmissionError } from "../studio/n
 import { nativeTaskId } from "../studio/nativeTaskDescriptors.js";
 import { nativeTaskStartSchema } from "../studio/nativeTaskInput.js";
 import { NativeTaskServiceError, type NativeTaskActor, type NativeTaskStartRequest, type NativeTaskView } from "../studio/nativeTaskTypes.js";
+import { planRequiresAgentLease } from "../tools/guards/compiledPolicyGuard.js";
 import { loadTrustContext } from "../trust/trustContext.js";
 import { buildVerifierReport } from "../trust/verifierReport.js";
 import type { EvidenceEvent } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import type { A4ProducerContext, A4ProducerResult } from "./a4RouterStages.js";
-import { A4StoreError } from "./a4Store.js";
 import { errorCodeOf } from "./aspireUnderstand.js";
 import { ASSEMBLE_CLAIM_BOUNDARY, assembleSpecOf, LIFECYCLE_SEAM_KEY, presetIdOf, proposedFor, STUB_WORDING } from "./spec/assemble.js";
 import { answerValues, listValue } from "./spec/aspire.js";
+import { fail, relPath } from "./stages/common.js";
 
-const fail = (status: number, code: string, message: string, detail?: unknown): A4StoreError => new A4StoreError(status, code, message, detail);
-const relPath = (workspace: string, path: string): string => relative(workspace, path).split(sep).join("/");
 /** States in which a session may still change what it did: Review waits for them. */
 const RUNNING = new Set<NativeTaskView["state"]>(["starting", "running", "cancel-requested", "releasing", "verifying"]);
 
@@ -69,9 +72,37 @@ interface PlannedSession {
 type Session = { provider: NativeTaskStartRequest["provider"]; model: string | null; tools: "none" | "workspace"; toolsDigest: string | null; maxSteps: number; maxTokens: number };
 
 /**
+ * P1-78 before Build writes anything: a workspace-tools session under a plan whose identity-binding requires an agent
+ * lease (L0-IDN-01) runs under a lease Studio's native service mints for the session's principal (P1-67), and it
+ * refuses one that is not an active local users.yaml user under a plan that also requires a principal. The same
+ * principal (`session:<plane>:<userId>`, as the service keys it) is resolved here, so that refusal (409
+ * PRINCIPAL_UNRESOLVED) comes before the graph, the preset or the journaled session, never after the step is recorded.
+ * A plan that does not verify reads as requiring both (the service refuses to start under it too). Read-only.
+ */
+function assertSessionPrincipal(workspace: string, principalId: string): void {
+  let leased = true;
+  try {
+    leased = planRequiresAgentLease(loadActiveCompiledPolicy(workspace));
+  } catch {
+    // Unverifiable: resolved as if required (fail closed); the service refuses to start under it as well.
+  }
+  if (!leased) return;
+  try {
+    resolveLeasePrincipal(workspace, principalId.startsWith("session:") ? principalId.slice("session:".length) : null);
+  } catch (error) {
+    if (error instanceof LeasePrincipalRefused) {
+      throw fail(409, "PRINCIPAL_UNRESOLVED", `${error.message.replace(/^PRINCIPAL_UNRESOLVED: /, "")}. No build session was journaled and nothing was written; `
+        + "sign in as an active local users.yaml user.");
+    }
+    throw error;
+  }
+}
+
+/**
  * The native session Build journals: admitted as Studio's native task route admits it (read-only refusal, the human
- * execution identity) and checked against the live service's configuration, which must still offer the approved
- * provider (credential configured), tool scope (same digest) and validation config (same sha256). Read-only.
+ * execution identity, the principal its lease will name) and checked against the live service's configuration, which
+ * must still offer the approved provider (credential configured), tool scope (same digest) and validation config (same
+ * sha256). Read-only.
  */
 async function plannedSession(ctx: A4ProducerContext, spec: Record<string, unknown>): Promise<PlannedSession> {
   const native = requireNative(ctx);
@@ -85,6 +116,7 @@ async function plannedSession(ctx: A4ProducerContext, spec: Record<string, unkno
   } catch (error) {
     throw nativeRefusal(error);
   }
+  if (session.tools === "workspace") assertSessionPrincipal(ctx.workspace, native.principalId);
   const config = await native.service.configuration(nativeActor(native, agentId)).catch((error: unknown) => {
     throw nativeRefusal(error);
   });
@@ -160,7 +192,7 @@ export async function buildAssemble(ctx: A4ProducerContext): Promise<A4ProducerR
   const { spec, answers } = assembleSpecOf(ctx.state);
   if (!proposedFor(spec, answers)) throw fail(409, "A4_NOT_READY", "Build runs the proposed plan; propose it again first.", { reasonCodes: ["PLAN_STALE"] });
   const native = spec.path === "native";
-  getPrivateKeyPem(workspace, "auditor");
+  getPrivateKeyPem(workspace, "artifact-seal"); // P1-08: the key savePresets signs with (BUNDLE)
   const preview = enforcePreview(workspace, agentId);
   const presets = native ? readPresets(workspace) : null;
   if (presets !== null && !presets.ok) throw fail(409, "A4_NOT_READY", "The workspace presets file does not verify; restore it or re-sign it.", { reasonCodes: ["PRESETS_UNTRUSTED"] });
@@ -263,23 +295,33 @@ function effectivePolicyOf(workspace: string, sessionId: string): { status: "eva
   return { status: receipts.length === 0 ? "not_evaluated" : "evaluated", reason: receipts.length === 0 ? "NO_EFFECTIVE_POLICY_RECEIPT" : null, receipts, downgrades, unverified: 0 };
 }
 
+const PHASE_SOURCES: Readonly<Record<ExecutionPhase, string>> = {
+  admission: "native task descriptor (the runtime opened the session)", "model-completion": "the session's recorded turn ending",
+  "side-effect-completion": "verified receipt chains of the session's journaled actions (sessionReceipts)", "evidence-verification": "verifyAgentRun (integrity self-check)"
+};
+
 /**
- * The four execution phases (design §10.2; P2-37 replaces this with P2-13's contract), derived from existing sources:
- * admission from the task, model completion from its state and turn end, side-effect completion from the action
- * journal's coverage, evidence verification from AMC's integrity self-check. Admission is not task completion.
+ * The four execution phases of one build session as P2-13's contract states them (P2-37; design §10.2): each phase's
+ * state is the contract's own, and the detail says what it rests on (the turn ending, the receipt states, the anchoring).
+ * A cancelled journaled call leaves `outcome_unknown`, which the contract reads `side-effect-completion: unknown`.
  */
-function executionPhases(view: NativeTaskView, coverage: ReturnType<typeof actionEvidenceCoverage>, integrity: Awaited<ReturnType<typeof sessionIntegrity>>) {
-  const model = view.state === "failed" ? "failed" : view.turnEndReason !== null && !RUNNING.has(view.state) ? `completed (${view.turnEndReason.slice(0, 64)})` : "not_evaluated";
-  const effects = coverage.status !== "evaluated" ? "not_evaluated" : coverage.calls === 0 ? "not_evaluated (no consequential calls)"
-    : coverage.unknown > 0 || coverage.integrityFailures > 0 ? "outcome_unknown" : coverage.linked === coverage.calls ? "receipts_linked" : "incomplete";
-  const verification = integrity.notEvaluated !== null ? "not_evaluated" : integrity.integrityOk !== true ? "failed"
-    : integrity.anchored === true ? "externally-anchored" : "workspace-key-consistency";
-  return [
-    { phase: "admission", status: view.sessionId === null ? "not_admitted" : "admitted", source: "native task descriptor" },
-    { phase: "model-completion", status: model, source: "native task state and turn end" },
-    { phase: "side-effect-completion", status: effects, source: "actionEvidenceCoverage (action journal)" },
-    { phase: "evidence-verification", status: verification, source: "verifyAgentRun (integrity self-check)" }
-  ];
+export function executionPhaseRows(status: ExecutionStatus, turnEndReason: string | null, anchoring: string | null) {
+  const detail: Readonly<Record<ExecutionPhase, string | null>> = {
+    admission: null, "model-completion": turnEndReason?.slice(0, 64) ?? null,
+    "side-effect-completion": status.receiptStates.length === 0 ? "no journaled actions" : [...new Set(status.receiptStates)].join(", "),
+    "evidence-verification": anchoring
+  };
+  return EXECUTION_PHASES.map((phase) => ({ phase, status: status.phases[phase], detail: detail[phase], source: PHASE_SOURCES[phase] }));
+}
+
+/** The session's status from the contract: admitted (it has a session), its recorded ending, and AMC's integrity check. */
+function executionPhases(workspace: string, view: NativeTaskView, integrity: Awaited<ReturnType<typeof sessionIntegrity>>) {
+  // Studio feeds evidence-verification the same way: any verdict but a failure is verified (src/studio/nativeTaskService.ts).
+  const status = executionStatusFor(workspace, { sessionId: view.sessionId!, admission: "admitted",
+    turn: RUNNING.has(view.state) ? "running" : view.turnEndReason ?? (view.state === "failed" ? "error" : null),
+    verified: integrity.notEvaluated !== null ? null : integrity.integrityOk === true });
+  const anchoring = integrity.notEvaluated ?? (integrity.integrityOk !== true ? null : integrity.anchored === true ? "externally-anchored" : "workspace-key-consistency");
+  return executionPhaseRows(status, view.turnEndReason, anchoring);
 }
 
 /**
@@ -297,7 +339,7 @@ function bindingMismatch(view: NativeTaskView, start: NativeTaskStartRequest): s
   return Object.keys(expected).filter((key) => expected[key] !== actual[key]);
 }
 /** What Review records about the prompt binding until the native task lane exposes the first submission's bodyHash. */
-export const PROMPT_BINDING = "not_evaluated (the native task view exposes no submission bodyHash to compare with the journaled start)";
+const PROMPT_BINDING = "not_evaluated (the native task view exposes no submission bodyHash to compare with the journaled start)";
 
 /**
  * One build session as its owner reads it now; refuses one that is not the journaled start (409 BUILD_SESSION_MISMATCH),
@@ -379,7 +421,7 @@ export async function reviewAssemble(ctx: A4ProducerContext): Promise<A4Producer
       && pinned.every((id) => view.validation.checks.some((check) => check.id === id && check.status === "passed"));
     const coverage = actionEvidenceCoverage(workspace, sessionId);
     const effectivePolicy = effectivePolicyOf(workspace, sessionId);
-    const phases = executionPhases(view, coverage, integrity);
+    const phases = executionPhases(workspace, view, integrity);
     const agentFacing = stub ? { claimKind: "synthetic_example" as const, method: "synthetic" } : { claimKind: "self_reported" as const, method: null };
     outputs.push({ output: "review", lane: "implementation", ...agentFacing, label: `assemble review: build session ${sessionId}${stub ? " (stub provider: synthetic)" : ""}`,
       body: { taskId: view.taskId, sessionId, headEventHash: view.history.headEventHash, provider: view.provider, model: view.model, state: view.state,

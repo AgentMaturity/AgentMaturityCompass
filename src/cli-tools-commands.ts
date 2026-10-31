@@ -1,15 +1,15 @@
 import type { Command } from "commander";
 import chalk from "chalk";
-import { formatToolhubContextText, initToolhubConfig, inspectToolhubContextForCli, verifyToolhubConfig } from "./toolhub/toolhubCli.js";
-import { signToolsConfig, toolsConfigPath } from "./toolhub/toolhubValidators.js";
+import { formatToolhubContextText, initToolhubConfigAsync, inspectToolhubContextForCli, verifyToolhubConfig } from "./toolhub/toolhubCli.js";
+import { signToolsConfigAsync, toolsConfigPath } from "./toolhub/toolhubValidators.js";
 
 export function registerToolsCommands(program: Command): void {
   const tools = program.command("tools").description("ToolHub tools config");
 
   tools.command("init")
     .description("Create and sign .amc/tools.yaml")
-    .action(() => {
-      const created = initToolhubConfig(process.cwd());
+    .action(async () => {
+      const created = await initToolhubConfigAsync(process.cwd());
       console.log(chalk.green(`Tools config created: ${created.configPath}`));
       console.log(`Signature: ${created.sigPath}`);
     });
@@ -17,10 +17,10 @@ export function registerToolsCommands(program: Command): void {
   tools.command("sign")
     .description("Validate and sign the existing reviewed tool policy without changing its grants")
     .option("--json", "Output signature metadata")
-    .action((opts: { json?: boolean }) => {
+    .action(async (opts: { json?: boolean }) => {
       try {
         const workspace = process.cwd();
-        const sigPath = signToolsConfig(workspace);
+        const sigPath = await signToolsConfigAsync(workspace);
         if (opts.json) console.log(JSON.stringify({ ok: true, configPath: toolsConfigPath(workspace), sigPath }, null, 2));
         else console.log(chalk.green(`Reviewed tool policy signed: ${sigPath}`));
       } catch {

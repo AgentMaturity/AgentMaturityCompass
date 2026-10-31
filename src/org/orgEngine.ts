@@ -1,11 +1,16 @@
+import { percentileRank } from "../experiments/stats.js";
 import { readdirSync } from "node:fs";
-import { join } from "node:path";
+import { join, relative, resolve } from "node:path";
 import { listAgents, verifyAgentConfigSignature, verifyFleetConfigSignature } from "../fleet/registry.js";
+import { listTrustedRuns } from "../governor/runTrust.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { parseWindowToMs } from "../utils/time.js";
-import type { DiagnosticReport, TrustTier } from "../types.js";
+import type { DiagnosticReport, EvidenceOutcome, TrustTier } from "../types.js";
 import { pathExists, readUtf8 } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
+import { canonicalize } from "../utils/json.js";
+import { keyPolicy, loadKeysConfig } from "../keys/keysConfig.js";
+import { assertPolicySignerCurrent, describePolicySigner } from "../crypto/signing/signer.js";
 import { questionBank } from "../diagnostic/questionBank.js";
 import { activeFreezeStatus } from "../drift/freezeEngine.js";
 import { latestAssuranceByPack } from "../assurance/assuranceRunner.js";
@@ -17,7 +22,10 @@ import { robustScore, weightedDistribution, weightedMedian, weightedMean, type W
 import type { OrgConfig, OrgNode, OrgNodeScorecard, OrgScorecard, OrgNodeType, NodeLayerScore, NodeQuestionScore, WeightedDistribution } from "./orgSchema.js";
 import { loadOrgConfig, nodeAgentIds, memberWeightForNode } from "./orgStore.js";
 import { verifyOrgConfigSignature } from "./orgStore.js";
-import { writeOrgScorecard } from "./orgScorecard.js";
+import { writeOrgScorecard, prepareOrgScorecardAsync, orgScorecardPathsForResult } from "./orgScorecard.js";
+import { appendTransparencyEntryAttemptAsync, captureWorkspaceLogAuthority } from "../transparency/asyncWorkspaceAppend.js";
+import { withControlFileLock } from "../lifecycle/controlFileLock.js";
+import { captureOrgComputationInputs, captureOrgScorecardAuthority, OrgFollowupError, type OrgEffectOptions } from "./orgPublication.js";
 
 const LAYER_NAMES = [
   "Strategic Agent Operations",
@@ -50,24 +58,10 @@ function clamp(n: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, n));
 }
 
+/** Trusted runs only: an edited, copied or unanchored run, or a thinned history, refuses the signed org scorecard. */
 function latestRunInWindow(workspace: string, agentId: string, windowStartTs: number, windowEndTs: number): DiagnosticReport | null {
-  const runsDir = getAgentPaths(workspace, agentId).runsDir;
-  if (!pathExists(runsDir)) {
-    return null;
-  }
-  const rows = readdirSync(runsDir)
-    .filter((file) => file.endsWith(".json"))
-    .map((file) => {
-      try {
-        return JSON.parse(readUtf8(join(runsDir, file))) as DiagnosticReport;
-      } catch {
-        return null;
-      }
-    })
-    .filter((row): row is DiagnosticReport => row !== null)
-    .filter((row) => row.ts >= windowStartTs && row.ts <= windowEndTs && row.status === "VALID")
-    .sort((a, b) => b.ts - a.ts);
-  return rows[0] ?? null;
+  return listTrustedRuns(workspace, agentId)
+    .find((row) => row.ts >= windowStartTs && row.ts <= windowEndTs && row.status === "VALID") ?? null;
 }
 
 function latestOutcomeValuesInWindow(workspace: string, agentId: string, windowStartTs: number, windowEndTs: number): {
@@ -178,6 +172,8 @@ function buildAgentSnapshots(params: {
     const freeze = activeFreezeStatus(params.workspace, agentId);
     const agentSig = verifyAgentConfigSignature(params.workspace, agentId);
     const hasConfigIssue = !agentSig.valid || !fleetSig.valid;
+    // One preserves the existing weight when no freeze/configuration penalty applies.
+    // One preserves the existing weight when no freeze/configuration penalty applies.
     const penaltyWeight = freeze.active || hasConfigIssue ? 0.8 : 1.0;
 
     const outcome = latestOutcomeValuesInWindow(params.workspace, agentId, params.windowStartTs, params.windowEndTs);
@@ -459,24 +455,9 @@ function ecosystemRollupFromBenchmarks(
     return null;
   }
   const peers = listImportedBenchmarks(workspace);
-  if (peers.length === 0) {
-    return {
-      peerCount: 0,
-      localEnterpriseOverall: enterpriseRollup.headline.median,
-      localEnterpriseIntegrity: enterpriseRollup.integrityIndex,
-      localEnterpriseValue: enterpriseRollup.valueScore,
-      percentiles: {
-        overall: 100,
-        integrity: 100,
-        value: enterpriseRollup.valueScore === null ? null : 100
-      }
-    };
-  }
-
-  const percentile = (value: number, rows: number[]): number => {
-    if (rows.length === 0) return 100;
-    const lowerOrEqual = rows.filter((row) => row <= value).length;
-    return Number(((lowerOrEqual / rows.length) * 100).toFixed(2));
+  const percentile = (value: number, rows: number[]): number | null => {
+    if (rows.length === 0) return null;
+    return Number(percentileRank(rows, value).toFixed(2));
   };
 
   const overallRows = peers.map((row) => row.bench.run.overall);
@@ -488,19 +469,25 @@ function ecosystemRollupFromBenchmarks(
     })
     .filter((row): row is number => row !== null);
 
+  const percentiles = {
+    overall: percentile(enterpriseRollup.headline.median, overallRows),
+    integrity: percentile(enterpriseRollup.integrityIndex, integrityRows),
+    value: enterpriseRollup.valueScore === null ? null : percentile(enterpriseRollup.valueScore, valueRows),
+  };
+  const metricOutcomes: Record<"overall" | "integrity" | "value", EvidenceOutcome> = {
+    overall: percentiles.overall === null ? "not_evaluated" : "measured",
+    integrity: percentiles.integrity === null ? "not_evaluated" : "measured",
+    value: percentiles.value === null ? "not_evaluated" : "measured",
+  };
   return {
+    outcome: Object.values(percentiles).some(value => value !== null) ? "measured" : "not_evaluated",
+    sampleSize: peers.length,
+    metricOutcomes,
     peerCount: peers.length,
     localEnterpriseOverall: enterpriseRollup.headline.median,
     localEnterpriseIntegrity: enterpriseRollup.integrityIndex,
     localEnterpriseValue: enterpriseRollup.valueScore,
-    percentiles: {
-      overall: percentile(enterpriseRollup.headline.median, overallRows),
-      integrity: percentile(enterpriseRollup.integrityIndex, integrityRows),
-      value:
-        enterpriseRollup.valueScore === null || valueRows.length === 0
-          ? null
-          : percentile(enterpriseRollup.valueScore, valueRows)
-    }
+    percentiles,
   };
 }
 
@@ -508,10 +495,11 @@ export function computeOrgScorecard(params: {
   workspace: string;
   window: string;
   config?: OrgConfig;
+  asOfTs?: number;
 }): OrgScorecard {
   const config = params.config ?? loadOrgConfig(params.workspace);
   const orgSig = verifyOrgConfigSignature(params.workspace);
-  const now = Date.now();
+  const now = params.asOfTs ?? Date.now();
   const windowMs = parseWindowToMs(params.window);
   const windowStartTs = now - windowMs;
   const windowEndTs = now;
@@ -592,6 +580,44 @@ export function recomputeAndPersistOrgScorecard(params: {
     scorecard,
     ...written
   };
+}
+
+/** Computed values are historical at computedAt; only the exact consumed org pair remains a current input gate. */
+export async function recomputeAndPersistOrgScorecardAsync(params: { workspace: string; window: string },
+  options: OrgEffectOptions = {}): Promise<ReturnType<typeof recomputeAndPersistOrgScorecard>> {
+  const assertSigningEnabled = () => { if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize policy signing"); };
+  assertSigningEnabled();
+  const actor = options.beforePublish, beforeAuthority = () => { assertSigningEnabled(); actor?.(); assertSigningEnabled(); };
+  const resultWorkspace = params.workspace, input = { workspace: resolve(resultWorkspace), window: params.window };
+  const assertOriginal = captureOrgScorecardAuthority(input.workspace, beforeAuthority);
+  const logDescriptors = (["TRANSPARENCY_ROOT", "MERKLE_ROOT"] as const).map(kind => describePolicySigner(input.workspace, kind));
+  const logPolicy = logDescriptors.some(row => row.mode === "VAULT") ? canonicalize(keyPolicy(loadKeysConfig(input.workspace))) : null;
+  const beforeLog = () => { beforeAuthority();
+    for (const descriptor of logDescriptors) assertPolicySignerCurrent(input.workspace, descriptor);
+    if (logPolicy !== null && canonicalize(keyPolicy(loadKeysConfig(input.workspace))) !== logPolicy)
+      throw new Error("original org log signing policy changed while preparing the operation");
+  };
+  const originalLog = captureWorkspaceLogAuthority(input.workspace, beforeLog);
+  const inputs = captureOrgComputationInputs(input.workspace), computed = computeOrgScorecard({ ...input, config: inputs.config });
+  const beforePublish = () => { assertOriginal(); originalLog.assertCurrent(); inputs.assertCurrent(); };
+  beforePublish();
+  const prepared = await prepareOrgScorecardAsync(input.workspace, computed, { beforePublish });
+  const written = prepared.publish(), scorecard = prepared.scorecard;
+  const publishedPaths = Object.freeze([written.latestPath, written.historyPath, written.latestSigPath, written.historySigPath]
+    .map(path => relative(input.workspace, path)));
+  let completedEntryHash: string | null = null;
+  try {
+    const stable = () => withControlFileLock({ root: join(input.workspace, ".amc"), name: "org-scorecard-pairs", operation: () => {
+      beforePublish(); prepared.assertCurrent();
+    } });
+    const attempt = await appendTransparencyEntryAttemptAsync({ workspace: input.workspace, type: "ORG_SCORECARD_RECORDED", agentId: "org",
+      artifact: { kind: "policy", sha256: sha256Hex(Buffer.from(JSON.stringify(scorecard), "utf8")), id: String(scorecard.computedAt) } },
+      { beforeCommit: stable, beforeMember: stable });
+    completedEntryHash = attempt.entry.hash; stable(); attempt.assertCurrent();
+  } catch (error) {
+    throw new OrgFollowupError("log", publishedPaths, null, error, completedEntryHash);
+  }
+  return { scorecard, ...orgScorecardPathsForResult(resultWorkspace, scorecard.computedAt) };
 }
 
 export function nodeHierarchy(config: OrgConfig): Array<{

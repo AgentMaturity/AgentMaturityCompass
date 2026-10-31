@@ -1,0 +1,35 @@
+{
+  "schema": "p125-client-peer-review-seal/1",
+  "at": "2026-10-16T21:27:53.471899+00:00",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/next-client-candidate-review/README.md",
+      "bytes": 2137,
+      "sha256": "e2f9910cd3d34ff133539728e7d582bcd483713f250384d1dbe63c8e906bc8e6",
+      "readScope": "sealed peer output"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/next-client-candidate-review/input-pins.json",
+      "bytes": 3506,
+      "sha256": "bb90f0010175c589fb787c957ff15e4a1c56f41a09c29c7f190dce1191a5c818",
+      "readScope": "sealed peer output"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/next-client-candidate-review/review.json",
+      "bytes": 11300,
+      "sha256": "9b8dc3ba7ae8dcd1b051695f6ef1e515f850a15b5b81b857a08e00705aa1c7cd",
+      "readScope": "sealed peer output"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/next-client-candidate-review/verified-author-inputs.json",
+      "bytes": 13433,
+      "sha256": "d04cfd6282a531cb3bde2e6abd81acbe7efaaaf7263e11096ee02eb96d76c792",
+      "readScope": "sealed peer output"
+    }
+  ],
+  "blockers": [],
+  "authorInputsVerified": 45,
+  "authorOutputsVerified": 6,
+  "noExecutionOrCheckoutWrites": true,
+  "allocated": false
+}

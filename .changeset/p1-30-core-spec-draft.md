@@ -1,0 +1,5 @@
+---
+"agent-maturity-compass": patch
+---
+
+Docs: the AMC Core Spec 1.0 draft (1.0.0-draft.1) is in `spec/`: ten chapters (scope, conformance classes, claim kinds and vocabulary, evidence model, control results, maturity levels, authorization records and receipt states, scoped attestations, verification, versioning), Annex A (EU AI Act articles; informative, experimental, expert sign-off open), Annex B (reading 1.x results), a changelog and an RFC process. It is a draft, not a standard; AMC output is evidence of conformity, never proof of compliance. Its tables of levels, claim kinds, banned wording, schema `$id`s and receipt states are generated from the code by `scripts/check-spec-sync.mjs`, which CI runs with `--check`. The site renders it under `/spec/`. `docs/AMC_STANDARD_RFC.md` and `docs/OPEN_RUBRIC_STANDARD.md` are marked superseded and kept for history; the rubric no longer calls the AMC software proprietary. The spec carries the repository licence (MIT) until licence decision D-04 is recorded.

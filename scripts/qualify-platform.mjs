@@ -2,11 +2,11 @@
 /** Real local artifact qualification. No mocked execution, global installation or provider calls. */
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
-import { closeSync, existsSync, mkdirSync, mkdtempSync, openSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
+import { closeSync, existsSync, mkdirSync, mkdtempSync, openSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir, release } from "node:os";
-import { dirname, join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { dirname, join, relative, resolve } from "node:path";
 import { verifyPackedRun } from "./packed-evidence-verification.mjs";
+import { isEntrypoint } from "./lib/entrypoint.mjs";
 
 const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
 export function qualifyPlatform({ root = process.cwd(), out = join(root, "tmp/platform-qualification/report.json"), keep = false } = {}) {
@@ -40,6 +40,7 @@ function qualifyPlatformInOwnedDirectory({ root, out, keep, reportFd }) {
   const report = { schema: "amc.platform-qualification", version: 1, generatedAt: new Date().toISOString(),
     platform: process.platform, arch: process.arch, osRelease: release(), node: process.version,
     supportedNode: [22, 24].includes(Number(process.versions.node.split(".")[0])), package: `${packageInfo.name}@${packageInfo.version}`,
+    abi: { nodeModules: process.versions.modules, napi: process.versions.napi ?? null, nativeAddons: null },
     sourceCommit: null, sourceDirty: null, packageSha256: null, steps: [], status: "inconclusive", cleanup: "pending", scratch,
     scope: "local npm artifact, Node entry point, keyless native SQLite/signing and cold verification",
     limitations: ["No real-provider task, desktop installer, OS shell sandbox, global npm shim or published release qualification."] };
@@ -74,6 +75,10 @@ function qualifyPlatformInOwnedDirectory({ root, out, keep, reportFd }) {
     const tarball = join(scratch, packed[0].filename);
     report.packageSha256 = hash(readFileSync(tarball));
     requireStep(command("fresh-install", process.execPath, [npmCli, "install", "--omit=dev", "--no-audit", "--no-fund", tarball], consumer));
+    // The installed native addons this Node ABI loads, by path and digest (WP32).
+    const modules = join(consumer, "node_modules");
+    report.abi.nativeAddons = readdirSync(modules, { recursive: true }).map(String).filter((path) => path.endsWith(".node")).sort()
+      .map((path) => ({ path: relative(consumer, join(modules, path)).split("\\").join("/"), sha256: hash(readFileSync(join(modules, path))) }));
     const cli = join(consumer, "node_modules", packageInfo.name, "dist", "cli.js");
     const runCli = (id, args) => command(id, process.execPath, [cli, ...args]);
     requireStep(command("private-kernel-absent", process.execPath, ["-e", "try{require.resolve('@amc/core');process.exit(1)}catch(e){if(e.code!=='MODULE_NOT_FOUND')throw e}"], consumer));
@@ -107,7 +112,7 @@ function qualifyPlatformInOwnedDirectory({ root, out, keep, reportFd }) {
   return report;
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (isEntrypoint(import.meta.url)) {
   const outIndex = process.argv.indexOf("--out");
   const report = qualifyPlatform({ out: outIndex < 0 ? undefined : resolve(process.argv[outIndex + 1] ?? "tmp/platform-qualification/report.json"), keep: process.argv.includes("--keep") });
   console.log(`Platform qualification: ${report.status}`);

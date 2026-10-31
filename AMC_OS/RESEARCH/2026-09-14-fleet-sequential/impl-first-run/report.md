@@ -1,6 +1,6 @@
 # IMPL-5 — first-run: `amc firewall enable`, `amc doctor` fixes, `amc init` actions
 
-**Source:** 910e6d9785a51ded454233aa24ec9f84de0e87e4 (amc/gap-register-execution) + this uncommitted diff, in worktree `/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_e71e93d9-c37-1` (detached at that commit; the worktree had been created at 3d6b8d4a, 424 commits behind — moved with `git checkout --detach`, nothing else touched). **Environment:** Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0, `pnpm install --frozen-lockfile --prefer-offline` exit 0, `pnpm build` exit 0. This is a fresh worktree with a clean install, not a fresh clone (§4 receipt rule); nothing was committed.
+**Source:** 910e6d9785a51ded454233aa24ec9f84de0e87e4 (amc/gap-register-execution) + this uncommitted diff, in worktree `~/AgentMaturityCompass/.claude/worktrees/wf_e71e93d9-c37-1` (detached at that commit; the worktree had been created at 3d6b8d4a, 424 commits behind — moved with `git checkout --detach`, nothing else touched). **Environment:** Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0, `pnpm install --frozen-lockfile --prefer-offline` exit 0, `pnpm build` exit 0. This is a fresh worktree with a clean install, not a fresh clone (§4 receipt rule); nothing was committed.
 
 ## What was wrong at 910e6d97 (baseline measured, workspace `/tmp/amc-firstrun-Dc8Xky`, removed)
 - `amc doctor` after `amc init --minimal`: `PASS ✅ (29 pass, 0 fail, 3 warn, 3 info)` — never mentioned the runtime firewall policy, the precondition that denies every tool call.
@@ -45,7 +45,7 @@ Operator path from nothing: `export AMC_VAULT_PASSPHRASE`, `init`, `firewall ena
 - Mutations (all RED, sources restored and diff-verified): drop firewall fixHint; FAIL→WARN (pre-split); leak passphrase into doctor text; idempotence ignores mode (dist rebuilt, protocol test RED); ignore `--strict`; drop vault fixHint.
 
 ## Not exercised
-Real providers, notary/`--live-probes`, Studio, Linux/Windows, the full vitest suite, package/platform/release qualification, a human first-use session (this is one automated session on one machine). Side effect of the CLI's own design: `amc firewall enable` wrote host-local checkpoints under `/Users/sid/.amc/control-checkpoints/<workspace-id>/runtime-firewall-policy/` for the temp workspaces; not removed.
+Real providers, notary/`--live-probes`, Studio, Linux/Windows, the full vitest suite, package/platform/release qualification, a human first-use session (this is one automated session on one machine). Side effect of the CLI's own design: `amc firewall enable` wrote host-local checkpoints under `~/.amc/control-checkpoints/<workspace-id>/runtime-firewall-policy/` for the temp workspaces; not removed.
 
 ## Defects for other tracks
 1. Tool-guard denial text does not name `amc firewall enable` and `agent-loop run` hides the denial (policyGuards.ts / cli-agent-commands).

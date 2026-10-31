@@ -1,0 +1,63 @@
+{
+  "schema": "p125w-fresh-binder-independent-static-review/1",
+  "at": "2026-10-17T00:11:32.210687+00:00",
+  "independence": "Reviewer did not author or edit the fresh binder, its predecessor, delta, report or seal. Reviewer authored the separately identified control helper and names-only source-pinset earlier; no independence is claimed for that preparation. This review independently checks the fresh binder code and its exact consumption of that fixed pinset.",
+  "preferredHelper": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/fresh-binding-preparation/bind-fresh.py.source.txt",
+    "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/fresh-binding-preparation/bind-fresh.py.source.txt",
+    "bytes": 4948,
+    "sha256": "aa3eca5d09af75a3c12cc3062a81ae72d091b9da03f49d8c18a04bac05a64898",
+    "dev": 16777231,
+    "inode": 543748138,
+    "nlink": 1
+  },
+  "preferredAuthorSeal": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/fresh-binding-preparation/seal.json",
+    "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/fresh-binding-preparation/seal.json",
+    "bytes": 1618,
+    "sha256": "8b54e2f44fd03d55921bf35fd8a29e8f3e58b9bdf6cc7464e7b7fb5b10d89a58",
+    "dev": 16777231,
+    "inode": 543748143,
+    "nlink": 1
+  },
+  "fullHelperAndCompleteDeltaRead": true,
+  "all5SealedOutputsAnd6AuthorInputsExact": true,
+  "deltaReproducesExactlyFromPinnedB37": true,
+  "runtime151SchemaPreflight": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/fresh-binding-static-review/runtime-preflight.json",
+    "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/fresh-binding-static-review/runtime-preflight.json",
+    "bytes": 1208,
+    "sha256": "25a779f1077766c69b3d3b16e77f2507c394df6879a27e06f519767e418a967c",
+    "dev": 16777231,
+    "inode": 543750040,
+    "nlink": 1
+  },
+  "guards": {
+    "unchangedReadOnlyGitCallsOnly": true,
+    "fourActiveHaltedMarkersRetained": true,
+    "actualClosedZeroEsrchNoSignalCommandRequired": true,
+    "exactNode22CleanSourceArgvAndHeldRunnerContextRetained": true,
+    "commitDerivedActualSourceCheckpoint": true,
+    "freshRootDerivedSingleActualKeptLogLine": true,
+    "sameActualCommitCleanSourceFreshIndexesRequired": true,
+    "all151ActiveProtectedBytesCheckedAtUse": true,
+    "oldTenNativesPhysicalHashesAndDistinctEleventhRequired": true,
+    "same94NamesAnd19PairsComparedWithB37": true,
+    "94UniqueSafeRelativeNamesAndPairMembershipAdded": true,
+    "188DistinctSelectedRegularSingleLinkFilesPinnedAtUse": true,
+    "noCompiledSourceOrNativeMutation": true,
+    "exclusivePrivateBindingOutputOnly": true,
+    "noVitestOrFutureHashOrUniversalIsolationClaim": true
+  },
+  "blockers": [],
+  "runtimePrerequisites": [
+    "Root reads/adopts exact helper bytes and this independent static scope.",
+    "Actual source-checkpoint.json and naturally closed p125w-clean-source command/log must exist before root executes binder.",
+    "Actual root must recheck current runtime151 protection and source/fresh filesystem state; this static review is not runtime validation."
+  ],
+  "noBinderImportParseCompileExecute": true,
+  "noProductTestsSourceIndexQaWrites": true,
+  "noMissingReservationProbeOrClaudeContact": true,
+  "readOnlyAssemblyDiagnostic": "The initial concatenated read requested nonexistent author-static-review.json after the five named files. cat exited1 only for that filename; actual report.json was then read. This did not execute the binder or a product command.",
+  "allHoldsRetained": true
+}

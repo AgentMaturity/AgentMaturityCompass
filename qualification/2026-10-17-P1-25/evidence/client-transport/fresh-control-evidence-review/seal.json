@@ -1,0 +1,37 @@
+{
+  "schema": "p125c-fresh-control-evidence-review-seal/1",
+  "at": "2026-10-16T21:52:39.647906+00:00",
+  "sourceCommit": "5beb3eae69b08f2e895520c7f459e1465780beeb",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/fresh-control-evidence-review/README.md",
+      "bytes": 2521,
+      "sha256": "5c68ce1e604881953ca70a7b9c332d12dca4d9ac903981513ee43c774eedfe75"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/fresh-control-evidence-review/input-pins.json",
+      "bytes": 108017,
+      "sha256": "c02dff86b3c69db85050ccddceae166d02d7ba442bb0a6f0c1ec45b255d6b379"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/fresh-control-evidence-review/operation-preservation.json",
+      "bytes": 9924,
+      "sha256": "510d3b3cb1cec234327c6a0287ee83b5a883e7baaa9187d6402e4742a73c3ba2"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/fresh-control-evidence-review/phase-joins.json",
+      "bytes": 11490,
+      "sha256": "ea42cce076e92444deaba5c80b266f17c94fc65780eb02cebd6ac23dc5956b7e"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/fresh-control-evidence-review/review.json",
+      "bytes": 8216,
+      "sha256": "28bdf11188e0a656d9208a89d8374a60f5ef31341ed99cfd7dda45eb4b1fd18e"
+    }
+  ],
+  "inputPinCount": 330,
+  "blockers": [],
+  "allReadsFinished": true,
+  "productExecution": false,
+  "checkoutIndexQaWrites": false
+}

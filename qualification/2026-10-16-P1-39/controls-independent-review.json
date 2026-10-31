@@ -1,0 +1,203 @@
+{
+  "schema": "p139-independent-actual-causal-controls-review/1",
+  "at": "2026-10-16T16:13:44.154057+00:00",
+  "blockers": [],
+  "sourceCommit": "aa198eaf060a656628d4f78a2822ca17ce4df3ab",
+  "scope": "Finite independent review of five closed source-mode phases, exact control design/helper and retained public evidence. No product/helper/runtime/probe execution and no Q checkout/native reads or stats.",
+  "phaseResults": [
+    {
+      "phase": "p139-fresh-nine-files",
+      "total": 81,
+      "passed": 81,
+      "failed": 0,
+      "exit": 0,
+      "durationMs": 12884,
+      "ownedPgid": 83341,
+      "same81Identities": true,
+      "rawObserverIdentityAndStatusExact": true,
+      "passingHooks": 60,
+      "all32PublicCleanupRecordsClean": true
+    },
+    {
+      "phase": "p139-issuer-control-nine-files",
+      "total": 81,
+      "passed": 80,
+      "failed": 1,
+      "exit": 1,
+      "durationMs": 11417,
+      "ownedPgid": 83666,
+      "same81Identities": true,
+      "rawObserverIdentityAndStatusExact": true,
+      "passingHooks": 60,
+      "all32PublicCleanupRecordsClean": true
+    },
+    {
+      "phase": "p139-issuer-restored-nine-files",
+      "total": 81,
+      "passed": 81,
+      "failed": 0,
+      "exit": 0,
+      "durationMs": 11395,
+      "ownedPgid": 83906,
+      "same81Identities": true,
+      "rawObserverIdentityAndStatusExact": true,
+      "passingHooks": 60,
+      "all32PublicCleanupRecordsClean": true
+    },
+    {
+      "phase": "p139-replay-control-nine-files",
+      "total": 81,
+      "passed": 79,
+      "failed": 2,
+      "exit": 1,
+      "durationMs": 11519,
+      "ownedPgid": 83995,
+      "same81Identities": true,
+      "rawObserverIdentityAndStatusExact": true,
+      "passingHooks": 60,
+      "all32PublicCleanupRecordsClean": true
+    },
+    {
+      "phase": "p139-replay-restored-nine-files",
+      "total": 81,
+      "passed": 81,
+      "failed": 0,
+      "exit": 0,
+      "durationMs": 11523,
+      "ownedPgid": 84182,
+      "same81Identities": true,
+      "rawObserverIdentityAndStatusExact": true,
+      "passingHooks": 60,
+      "all32PublicCleanupRecordsClean": true
+    }
+  ],
+  "corpusAccounting": "The same81 file/title identities recur in all five phases; these are not405 unique cases. The32 retained new-fixture records per phase are160 repeated lifecycle observations, not160 tests. All60 observed hooks pass in each phase.",
+  "issuerControl": {
+    "causalWitnessEstablished": true,
+    "actualFailures": 1,
+    "fullFirstFailure": "AssertionError expected false to be true at tests/mcp/mcpOauth.test.ts220:31",
+    "priorMatchingPositiveReached": true,
+    "publicFacts": {
+      "matchingIssuer": true,
+      "mismatchFailed": false,
+      "mismatchClassified": false,
+      "mismatchFixedDiagnostic": false,
+      "requests": 2
+    },
+    "metadataRequests": "Two valid HTTP200 GETs to the literal issuer metadata path, with complete owned request/response/socket closure and no endpoint/cleanup errors.",
+    "mutation": "Only document.issuer !== issuer is removed from the metadata rejection disjunct; object and S256 checks remain.",
+    "masking": [
+      "NativeMcpOAuthRefused class assertion at221",
+      "fixed diagnostic assertion at222",
+      "later final transcript assertion"
+    ],
+    "maskMeaning": "Public false classification/diagnostic facts were gathered before the first assertion and are separately observed; their later assertions were not executed."
+  },
+  "replayControl": {
+    "causalWitnessEstablished": true,
+    "actualFailures": 2,
+    "fullFirstFrames": [
+      "tests/mcp/mcp20260728.test.ts358:31 effect count expected1 actual2",
+      "tests/mcp/mcp20260728.test.ts375:32 call count expected1 actual2"
+    ],
+    "actualOrderedReplayFacts": [
+      {
+        "label": "stateless-tool-no-replay",
+        "effects": 2,
+        "toolPosts": 2,
+        "firstRequestId": 3,
+        "firstFiniteEof": true,
+        "secondRequestId": "amc-reissue-1",
+        "secondValidMatchingCompleteJson": true,
+        "observedOutcome": "OK"
+      },
+      {
+        "label": "strict-typed-unknown-evidence",
+        "effects": 2,
+        "toolPosts": 2,
+        "firstRequestId": 3,
+        "firstFiniteEof": true,
+        "secondRequestId": "amc-reissue-1",
+        "secondValidMatchingCompleteJson": true,
+        "observedOutcome": "OK"
+      }
+    ],
+    "mutation": "Only the stateless transient catch reissue gate admits tools/call while retaining attempt===0. No fixture, retry budget, legacy path, status retry rule or compile output changes.",
+    "masking": {
+      "noReplay": "The failure at358 masks later single-call/EOF, outcome/record-pair, grant-disposal and subsequent denied/no-dispatch assertions.",
+      "strictTyped": "The failure at375 masks assertRecordedPair and every later typed UNKNOWN/content assertion. Retained returned outcomes are independently observed OK; they are not reached UNKNOWN assertion failures."
+    }
+  },
+  "unrelatedAndClosureChecks": {
+    "unexpectedFailureIdentities": [],
+    "bodyErrorsExactlyNamedControlAssertionErrors": true,
+    "allFiveRawAndObserver81IdentityStatusSetsExact": true,
+    "allOuterCapturedStreamsAndFirstFailureFramesRead": true,
+    "all160PublicRecordsParsedAndHashed": true,
+    "allApplicableOwnedHttpClientSocketServerSessionToolsetMountClosuresClean": true,
+    "actualMutatedEnvironmentRestorationKeysChecked": "stateless environmentRestored; governed legacy exactEnvironmentRestored; OAuth environmentMutatedfalse",
+    "observerUnhandledErrors": [],
+    "knownLateTimeoutAndCloseDiagnosticsFound": [],
+    "ownedGroups": "All five final owned-group artifacts record natural expected0/1 plus signal-zero ESRCH; no reviewer probe and no nonzero signal.",
+    "productionCallbackLimit": "OAuth public records explicitly retain productionCallbackServerCloseObserved=false. Observed owned driver/fixture closure does not certify the product void/closeAllConnections callback server boundary or universal descendant absence.",
+    "existingRegressionLimit": "The six unchanged regression files keep their original fixture/lifecycle limits;32 new public records do not requalify every old child/resource."
+  },
+  "sourceAndRestoration": {
+    "mutations": [
+      {
+        "operator": "skip-issuer-equality",
+        "originalBytes": 13603,
+        "originalSha256": "18a60455c4b13609710bf0638f5ab316bba4d4d678bb04bca8c2fd5ba58fb4f0",
+        "mutantBytes": 13573,
+        "mutantSha256": "d8ab3e1f0dabb06a52098eee544d7a37fee6403e9ea12c6b0abe80ca79981a02",
+        "exactOneFragmentOnly": true,
+        "rootApplyIdentity": {
+          "dev": 16777231,
+          "inode": 542721443
+        },
+        "rootRestoreRecordedExact": true
+      },
+      {
+        "operator": "allow-first-tools-call-reissue",
+        "originalBytes": 41548,
+        "originalSha256": "a0807d999cd2f65a50397182bff1616204e600f3bb8a65c2697de520ad16462b",
+        "mutantBytes": 41581,
+        "mutantSha256": "40ab482595c38beef71d12122a1d03929f9cd649abbe31e661404e5d6b28ad6e",
+        "exactOneFragmentOnly": true,
+        "rootApplyIdentity": {
+          "dev": 16777231,
+          "inode": 542721438
+        },
+        "rootRestoreRecordedExact": true
+      }
+    ],
+    "exclusiveOriginalsAndExpectedMutantsIndependentlyRecomputed": true,
+    "helperReadInFull": true,
+    "helperGuards": "Before apply: new namespace idle/no halt, canonical green, prior issuer restore green before replay, Q commit/40 selected hashes, native bytes/inode/nlink1, expected scoped worktree/index state and original S/R operator bytes. In-place O_NOFOLLOW guarded descriptor validates regular single-link target/inode/current bytes before write, truncation and fsync. Restore requires root causal classification and exact mutant plus frozen original, then repeats protected checks.",
+    "selectedBinding": "40 Q comparison byte pins:35 source/test/docs/config rows and5 compiledJS rows; nativeQ separately records inode542761915, nlink1 and SHA1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560. This finite binding is not a universal transitive/physical-file inventory.",
+    "restoredOriginalRuns": "Issuer and replay each return81/81 after exact source restoration. Compiled outputs are unchanged; no mutant build or compiled-child sensitivity credit.",
+    "rootFinalClosurePin": {
+      "path": "/private/tmp/p1-39-mcp-qualification-20261016/source-control-chain-closure.json",
+      "bytes": 2413,
+      "sha256": "d7b82488363148f06342cd961f7f5a484110e5759e0241195a27d5b31d1fbeac"
+    },
+    "rootFinalPhysicalVerificationBoundary": "Root final closure separately records167 concrete rows verified, Q40+S40/R24 preservation, all three native identities distinct/exact, S/Q clean ataa198eaf, heldR18 paths/index exact and no active control/new namespace idle. This reviewer verifies the retained closure artifact and consistency with apply/restore/helper/actual results, without reopening or statting Q or native files.",
+    "privateDesignCaptureVersion": "Design was captured at81758 and its historical OAuth candidate. Operational binding and actual nine-file command selectaa198eaf/fbd1550e real-auth fixture; exact primary issuer220 and stateless358/375 witnesses remain. Historical design/applied/pending fields are not rewritten or treated as final current state."
+  },
+  "freshAndFrozenBoundary": {
+    "cleanSource": "Root-owned clean-source command naturally0 in56486ms: committed clone/frozen install/build/doctor/init/keyless turn and actual two-process resume checks. R runner/cwd remains distinct from Q source authority.",
+    "compilerHalt": "Old P1-39 compiler ACTIVE/HALTED and original evidence still match the pinned natural-closure certificate; the new wrapper SHAabbda23f645d38e643133ebbb4a9b19dc4f9bad5cab20d098c02449c6d3885e6 retains natural0/1, reporters and deadlines.",
+    "noQualityWaiver": true,
+    "noIndependentCryptographicProofFromSignedPresence": true,
+    "noFullP139GlobalReleaseOrPlanDoneClaim": true
+  },
+  "artifactPinsVerified": 238,
+  "allReadsFinished": true,
+  "reviewerPreservation": {
+    "QCheckoutAndNativeUntouchedUnreadUnstatted": true,
+    "noSourceCheckoutIndexQAOrTrackerWrites": true,
+    "privateReviewFilesOnly": true,
+    "noProductHelperCodeParserCompilerTestNativeSqlNetworkRuntimeOrProcessProbeExecution": true,
+    "ClaudeHeldDecisionsFreezeQualityDeadlinesAndOldNamespacesPreserved": true
+  }
+}

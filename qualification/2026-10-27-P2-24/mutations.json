@@ -1,0 +1,113 @@
+[
+ {
+  "mutation": "M1 reviewStatusFor skips digest comparison",
+  "file": "src/approvals/reviewRecords.ts",
+  "test": "tests/approvals/reviewRecords.test.ts",
+  "failingTests": [
+   "P2-24 review records bind to the exact digest a review of digest A does not count after the artifact changed to B (decisive L348: stale)"
+  ]
+ },
+ {
+  "mutation": "M2 unsigned fallback restored in publishSignedRecord",
+  "file": "src/governor/boundRecords.ts",
+  "test": "tests/governor/breakGlass.test.ts",
+  "failingTests": [
+   "P2-24 break-glass without a signing key activation is refused and nothing is recorded"
+  ]
+ },
+ {
+  "mutation": "M3 break-glass bypasses the freeze",
+  "file": "src/actions/authorize.ts",
+  "test": "tests/governor/breakGlass.test.ts",
+  "failingTests": [
+   "P2-24 break-glass covering FINANCIAL while a signed freeze for FINANCIAL is active: denied action_class_frozen"
+  ]
+ },
+ {
+  "mutation": "M4 guard waives every control",
+  "file": "src/tools/guards/compiledPolicyGuard.ts",
+  "test": "tests/governor/scopedExceptions.test.ts",
+  "failingTests": [
+   "P2-24 scoped exceptions at the enforcement point without an exception, control C denies the call",
+   "P2-24 scoped exceptions at the enforcement point the same exception does not cover 150.00: denied by the control (decisive L342)",
+   "P2-24 scoped exceptions at the enforcement point an exception copied from another workspace, or with a broken signature, is ignored (decisive L348)",
+   "P2-24 scoped exceptions at the enforcement point a revoked exception, or one whose window ended, denies the next call",
+   "P2-24 scoped exceptions at the enforcement point an exception for another control version never waives this one"
+  ]
+ },
+ {
+  "mutation": "M5 amount limit ignored",
+  "file": "src/governor/scopedExceptions.ts",
+  "test": "tests/governor/scopedExceptions.test.ts",
+  "failingTests": [
+   "P2-24 scoped exceptions at the enforcement point the same exception does not cover 150.00: denied by the control (decisive L342)",
+   "P2-24 regulated --approval-exception answerer answers only questions the signed exception covers, and abstains after revocation"
+  ]
+ },
+ {
+  "mutation": "M6 revocation ignored",
+  "file": "src/governor/scopedExceptions.ts",
+  "test": "tests/governor/scopedExceptions.test.ts",
+  "failingTests": [
+   "P2-24 scoped exceptions at the enforcement point a revoked exception, or one whose window ended, denies the next call",
+   "P2-24 scoped exceptions at the enforcement point a revocation between the guard and the recheck denies exception_not_honoured, and any revocation file revokes",
+   "P2-24 regulated --approval-exception answerer answers only questions the signed exception covers, and abstains after revocation"
+  ]
+ },
+ {
+  "mutation": "M7 unreviewed previous break-glass not checked",
+  "file": "src/governor/breakGlass.ts",
+  "test": "tests/governor/breakGlass.test.ts",
+  "failingTests": [
+   "P2-24 break-glass a second break-glass before the first one's review is refused previous_break_glass_unreviewed"
+  ]
+ },
+ {
+  "mutation": "M8 reviewer equal to requester accepted",
+  "file": "src/approvals/reviewRecords.ts",
+  "test": "tests/approvals/reviewRecords.test.ts",
+  "failingTests": [
+   "P2-24 review records bind to the exact digest a reviewer equal to the requester is refused at creation"
+  ]
+ },
+ {
+  "mutation": "M9 requester counted toward the quorum",
+  "file": "src/governor/boundRecords.ts",
+  "test": "tests/governor/scopedExceptions.test.ts",
+  "failingTests": [
+   "P2-24 scoped exceptions at the enforcement point issuing refuses an approval without the quorum, an unbound decision or the requester as approver"
+  ]
+ },
+ {
+  "mutation": "M10 regulated profile not detected",
+  "file": "src/cli-agent-options.ts",
+  "test": "tests/approvals/regulatedApprovalException.test.ts",
+  "failingTests": [
+   "P2-24 regulated profiles refuse unsigned approval exception notes in a regulated profile the unsigned note is refused and a signed exception for the approval control is accepted"
+  ]
+ },
+ {
+  "mutation": "M11 recheck skips deviation re-verification",
+  "file": "src/actions/authorize.ts",
+  "test": "tests/governor/scopedExceptions.test.ts",
+  "failingTests": [
+   "P2-24 scoped exceptions at the enforcement point a revocation between the guard and the recheck denies exception_not_honoured, and any revocation file revokes"
+  ]
+ },
+ {
+  "mutation": "M12 approval binding of exceptions skipped on read",
+  "file": "src/governor/scopedExceptions.ts",
+  "test": "tests/governor/scopedExceptions.test.ts",
+  "failingTests": [
+   "P2-24 scoped exceptions at the enforcement point an exception whose approval request no longer verifies is ignored"
+  ]
+ },
+ {
+  "mutation": "M13 exception control version not matched",
+  "file": "src/tools/guards/compiledPolicyGuard.ts",
+  "test": "tests/governor/scopedExceptions.test.ts",
+  "failingTests": [
+   "P2-24 scoped exceptions at the enforcement point an exception for another control version never waives this one"
+  ]
+ }
+]

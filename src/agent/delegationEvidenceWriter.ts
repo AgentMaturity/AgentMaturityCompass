@@ -1,3 +1,4 @@
+import { mintChainedReceiptAsync, readDelegationLineage, nativeDelegationReceiptInput } from "../receipts/receiptChain.js";
 import {
   delegationEvidenceFor,
   type DelegationEvidenceFact
@@ -69,4 +70,17 @@ export function writeDelegationEvidence(
     // The delegation is already accounted for in the parent's signed log, so
     // the loss here is a scoreable projection, not the audit record.
   }
+}
+
+/** Mint only an actual committed native event; injected recorders without an event reference have no ledger lineage. */
+export async function mintNativeDelegationReceipt(workspace: string, ref: unknown): Promise<void> {
+  if (ref === null || typeof ref !== "object" || !("eventId" in ref) || typeof ref.eventId !== "string") return;
+  const eventId = ref.eventId;
+  const lineage = readDelegationLineage(workspace), entry = lineage.delegations.find(row => row.event.id === eventId);
+  if (!entry) throw new Error("Delegation lineage event is not in the canonical ledger");
+  const event = entry.event;
+  await mintChainedReceiptAsync({ ...nativeDelegationReceiptInput(lineage, entry), workspace }, () => {
+    const current = readDelegationLineage(workspace).delegations.find(row => row.event.id === event.id);
+    if (current?.event.event_hash !== event.event_hash) throw new Error("Delegation lineage event changed while signing");
+  });
 }

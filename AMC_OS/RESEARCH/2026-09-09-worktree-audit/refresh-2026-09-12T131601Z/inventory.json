@@ -37,7 +37,7 @@
  },
  "worktrees": [
   {
-   "path": "/Users/sid/AgentMaturityCompass",
+   "path": "~/AgentMaturityCompass",
    "branch": "amc/gap-register-execution",
    "head": "4d2d69e5",
    "dirtyPaths": 242,
@@ -58,420 +58,420 @@
    "exclusiveCommits": 0
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass-worktrees/domain-proof-lane",
+   "path": "~/AgentMaturityCompass-worktrees/domain-proof-lane",
    "branch": "agent/domain-proof-lane",
    "head": "b253cc17",
    "dirtyPaths": 34,
    "exclusiveCommits": 26
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0635",
+   "path": "~/AgentMaturityCompass-worktrees/gap-0635",
    "branch": "agent/gap-0635",
    "head": "0d19650e",
    "dirtyPaths": 8,
    "exclusiveCommits": 13
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0636",
+   "path": "~/AgentMaturityCompass-worktrees/gap-0636",
    "branch": "agent/gap-0636",
    "head": "0d19650e",
    "dirtyPaths": 10,
    "exclusiveCommits": 13
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0637",
+   "path": "~/AgentMaturityCompass-worktrees/gap-0637",
    "branch": "agent/gap-0637",
    "head": "0d19650e",
    "dirtyPaths": 4,
    "exclusiveCommits": 13
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0638",
+   "path": "~/AgentMaturityCompass-worktrees/gap-0638",
    "branch": "agent/gap-0638",
    "head": "0d19650e",
    "dirtyPaths": 12,
    "exclusiveCommits": 13
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0639",
+   "path": "~/AgentMaturityCompass-worktrees/gap-0639",
    "branch": "agent/gap-0639",
    "head": "0d19650e",
    "dirtyPaths": 9,
    "exclusiveCommits": 13
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0640",
+   "path": "~/AgentMaturityCompass-worktrees/gap-0640",
    "branch": "agent/gap-0640",
    "head": "84c2a1f2",
    "dirtyPaths": 0,
    "exclusiveCommits": 14
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0641",
+   "path": "~/AgentMaturityCompass-worktrees/gap-0641",
    "branch": "agent/gap-0641",
    "head": "84c2a1f2",
    "dirtyPaths": 0,
    "exclusiveCommits": 14
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0642",
+   "path": "~/AgentMaturityCompass-worktrees/gap-0642",
    "branch": "agent/gap-0642",
    "head": "84c2a1f2",
    "dirtyPaths": 0,
    "exclusiveCommits": 14
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0643",
+   "path": "~/AgentMaturityCompass-worktrees/gap-0643",
    "branch": "agent/gap-0643",
    "head": "84c2a1f2",
    "dirtyPaths": 0,
    "exclusiveCommits": 14
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0644",
+   "path": "~/AgentMaturityCompass-worktrees/gap-0644",
    "branch": "agent/gap-0644",
    "head": "84c2a1f2",
    "dirtyPaths": 0,
    "exclusiveCommits": 14
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0645",
+   "path": "~/AgentMaturityCompass-worktrees/gap-0645",
    "branch": "agent/gap-0645",
    "head": "84c2a1f2",
    "dirtyPaths": 0,
    "exclusiveCommits": 14
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0646",
+   "path": "~/AgentMaturityCompass-worktrees/gap-0646",
    "branch": "agent/gap-0646",
    "head": "84c2a1f2",
    "dirtyPaths": 0,
    "exclusiveCommits": 14
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0647",
+   "path": "~/AgentMaturityCompass-worktrees/gap-0647",
    "branch": "agent/gap-0647",
    "head": "84c2a1f2",
    "dirtyPaths": 0,
    "exclusiveCommits": 14
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0648",
+   "path": "~/AgentMaturityCompass-worktrees/gap-0648",
    "branch": "agent/gap-0648",
    "head": "84c2a1f2",
    "dirtyPaths": 0,
    "exclusiveCommits": 14
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0649",
+   "path": "~/AgentMaturityCompass-worktrees/gap-0649",
    "branch": "agent/gap-0649",
    "head": "a984023e",
    "dirtyPaths": 0,
    "exclusiveCommits": 16
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0650",
+   "path": "~/AgentMaturityCompass-worktrees/gap-0650",
    "branch": "agent/gap-0650",
    "head": "98da12c0",
    "dirtyPaths": 0,
    "exclusiveCommits": 16
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0651",
+   "path": "~/AgentMaturityCompass-worktrees/gap-0651",
    "branch": "agent/gap-0651",
    "head": "0cbffc03",
    "dirtyPaths": 0,
    "exclusiveCommits": 16
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0652",
+   "path": "~/AgentMaturityCompass-worktrees/gap-0652",
    "branch": "agent/gap-0652",
    "head": "d2252996",
    "dirtyPaths": 0,
    "exclusiveCommits": 16
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0653",
+   "path": "~/AgentMaturityCompass-worktrees/gap-0653",
    "branch": "agent/gap-0653",
    "head": "0020199e",
    "dirtyPaths": 0,
    "exclusiveCommits": 16
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0654",
+   "path": "~/AgentMaturityCompass-worktrees/gap-0654",
    "branch": "agent/gap-0654",
    "head": "2efcaa3e",
    "dirtyPaths": 0,
    "exclusiveCommits": 16
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0655",
+   "path": "~/AgentMaturityCompass-worktrees/gap-0655",
    "branch": "agent/gap-0655",
    "head": "4af70f4d",
    "dirtyPaths": 0,
    "exclusiveCommits": 16
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0656",
+   "path": "~/AgentMaturityCompass-worktrees/gap-0656",
    "branch": "agent/gap-0656",
    "head": "d7cf71b2",
    "dirtyPaths": 0,
    "exclusiveCommits": 16
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0657",
+   "path": "~/AgentMaturityCompass-worktrees/gap-0657",
    "branch": "agent/gap-0657",
    "head": "39606508",
    "dirtyPaths": 0,
    "exclusiveCommits": 16
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0658",
+   "path": "~/AgentMaturityCompass-worktrees/gap-0658",
    "branch": "agent/gap-0658",
    "head": "2f587bdc",
    "dirtyPaths": 0,
    "exclusiveCommits": 16
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0659",
+   "path": "~/AgentMaturityCompass-worktrees/gap-0659",
    "branch": "agent/gap-0659",
    "head": "bfb4bbb2",
    "dirtyPaths": 0,
    "exclusiveCommits": 27
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0660",
+   "path": "~/AgentMaturityCompass-worktrees/gap-0660",
    "branch": "agent/gap-0660",
    "head": "1cadbe49",
    "dirtyPaths": 0,
    "exclusiveCommits": 27
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0661",
+   "path": "~/AgentMaturityCompass-worktrees/gap-0661",
    "branch": "agent/gap-0661",
    "head": "b253cc17",
    "dirtyPaths": 3,
    "exclusiveCommits": 26
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0662",
+   "path": "~/AgentMaturityCompass-worktrees/gap-0662",
    "branch": "agent/gap-0662",
    "head": "b253cc17",
    "dirtyPaths": 3,
    "exclusiveCommits": 26
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0663",
+   "path": "~/AgentMaturityCompass-worktrees/gap-0663",
    "branch": "agent/gap-0663",
    "head": "fca3c073",
    "dirtyPaths": 0,
    "exclusiveCommits": 27
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0664",
+   "path": "~/AgentMaturityCompass-worktrees/gap-0664",
    "branch": "agent/gap-0664",
    "head": "6f52c907",
    "dirtyPaths": 0,
    "exclusiveCommits": 27
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0665",
+   "path": "~/AgentMaturityCompass-worktrees/gap-0665",
    "branch": "agent/gap-0665",
    "head": "00f73fa1",
    "dirtyPaths": 0,
    "exclusiveCommits": 27
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0666",
+   "path": "~/AgentMaturityCompass-worktrees/gap-0666",
    "branch": "agent/gap-0666",
    "head": "b9d63bdb",
    "dirtyPaths": 0,
    "exclusiveCommits": 27
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0667",
+   "path": "~/AgentMaturityCompass-worktrees/gap-0667",
    "branch": "agent/gap-0667",
    "head": "c2d11191",
    "dirtyPaths": 0,
    "exclusiveCommits": 27
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0668",
+   "path": "~/AgentMaturityCompass-worktrees/gap-0668",
    "branch": "agent/gap-0668",
    "head": "b253cc17",
    "dirtyPaths": 0,
    "exclusiveCommits": 26
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass-worktrees/hermes-knowledge-refresh-20260713",
+   "path": "~/AgentMaturityCompass-worktrees/hermes-knowledge-refresh-20260713",
    "branch": "hermes/knowledge-refresh-20260713",
    "head": "6579367f",
    "dirtyPaths": 1,
    "exclusiveCommits": 0
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass-worktrees/hermes-state-of-art-20260713",
+   "path": "~/AgentMaturityCompass-worktrees/hermes-state-of-art-20260713",
    "branch": "hermes/state-of-art-20260713",
    "head": "ef5486c3",
    "dirtyPaths": 0,
    "exclusiveCommits": 0
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass-worktrees/state-of-art-20260713",
+   "path": "~/AgentMaturityCompass-worktrees/state-of-art-20260713",
    "branch": "hermes/state-of-art-20260713-v2",
    "head": "360b4166",
    "dirtyPaths": 0,
    "exclusiveCommits": 0
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass/.claude/worktrees/admiring-gates-a751a8",
+   "path": "~/AgentMaturityCompass/.claude/worktrees/admiring-gates-a751a8",
    "branch": "claude/admiring-gates-a751a8",
    "head": "8ebe4b3b",
    "dirtyPaths": 25,
    "exclusiveCommits": 0
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass/.claude/worktrees/dreamy-moser-3bf7b8",
+   "path": "~/AgentMaturityCompass/.claude/worktrees/dreamy-moser-3bf7b8",
    "branch": "claude/dreamy-moser-3bf7b8",
    "head": "e4d1312a",
    "dirtyPaths": 0,
    "exclusiveCommits": 21
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass/.claude/worktrees/interesting-haslett-d9efa9",
+   "path": "~/AgentMaturityCompass/.claude/worktrees/interesting-haslett-d9efa9",
    "branch": "claude/interesting-haslett-d9efa9",
    "head": "12803a2e",
    "dirtyPaths": 14,
    "exclusiveCommits": 0
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass/.claude/worktrees/stoic-faraday-20e4ee",
+   "path": "~/AgentMaturityCompass/.claude/worktrees/stoic-faraday-20e4ee",
    "branch": "claude/stoic-faraday-20e4ee",
    "head": "3d6b8d4a",
    "dirtyPaths": 4,
    "exclusiveCommits": 0
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass/.claude/worktrees/sweet-merkle-71246c",
+   "path": "~/AgentMaturityCompass/.claude/worktrees/sweet-merkle-71246c",
    "branch": "claude/sweet-merkle-71246c",
    "head": "b5e2ec77",
    "dirtyPaths": 17,
    "exclusiveCommits": 0
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass/.claude/worktrees/vigilant-merkle-2d8549",
+   "path": "~/AgentMaturityCompass/.claude/worktrees/vigilant-merkle-2d8549",
    "branch": "claude/vigilant-merkle-2d8549",
    "head": "3d6b8d4a",
    "dirtyPaths": 8,
    "exclusiveCommits": 0
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass/tmp/amc-1545-stop-operator",
+   "path": "~/AgentMaturityCompass/tmp/amc-1545-stop-operator",
    "branch": "codex/amc-1545-stop-operator",
    "head": "6ee3a0e0",
    "dirtyPaths": 0,
    "exclusiveCommits": 0
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass/tmp/amc-1545-stop-runtime",
+   "path": "~/AgentMaturityCompass/tmp/amc-1545-stop-runtime",
    "branch": "codex/amc-1545-stop-runtime",
    "head": "0d1565d4",
    "dirtyPaths": 0,
    "exclusiveCommits": 0
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass/tmp/amc-1546-agent-auth-tests",
+   "path": "~/AgentMaturityCompass/tmp/amc-1546-agent-auth-tests",
    "branch": "codex/amc-1546-agent-auth-tests",
    "head": "7c18ce64",
    "dirtyPaths": 0,
    "exclusiveCommits": 0
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass/tmp/amc-1547-spill-lifecycle",
+   "path": "~/AgentMaturityCompass/tmp/amc-1547-spill-lifecycle",
    "branch": "codex/amc-1547-spill-lifecycle",
    "head": "7f2e38e3",
    "dirtyPaths": 0,
    "exclusiveCommits": 0
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass/tmp/amc-1547-spill-mutation-prep",
+   "path": "~/AgentMaturityCompass/tmp/amc-1547-spill-mutation-prep",
    "branch": "codex/amc-1547-spill-mutation-prep",
    "head": "f145ea1e",
    "dirtyPaths": 0,
    "exclusiveCommits": 0
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass/tmp/amc-1547-spill-session-tests",
+   "path": "~/AgentMaturityCompass/tmp/amc-1547-spill-session-tests",
    "branch": "codex/amc-1547-spill-session-tests",
    "head": "603b9f37",
    "dirtyPaths": 0,
    "exclusiveCommits": 0
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass/tmp/amc-1547-spill-storage",
+   "path": "~/AgentMaturityCompass/tmp/amc-1547-spill-storage",
    "branch": "codex/amc-1547-spill-storage",
    "head": "e89f4842",
    "dirtyPaths": 0,
    "exclusiveCommits": 0
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass/tmp/amc-cancellation-candidate-prep",
+   "path": "~/AgentMaturityCompass/tmp/amc-cancellation-candidate-prep",
    "branch": "codex/amc-cancellation-candidate-prep",
    "head": "6c55771c",
    "dirtyPaths": 0,
    "exclusiveCommits": 0
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass/tmp/amc-stop-auth-mutation-prep",
+   "path": "~/AgentMaturityCompass/tmp/amc-stop-auth-mutation-prep",
    "branch": "codex/amc-stop-auth-mutation-prep",
    "head": "3f955a33",
    "dirtyPaths": 0,
    "exclusiveCommits": 0
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass/tmp/cos-closure-map",
+   "path": "~/AgentMaturityCompass/tmp/cos-closure-map",
    "branch": "codex/cos-closure-map",
    "head": "4967f975",
    "dirtyPaths": 0,
    "exclusiveCommits": 0
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass/tmp/cos-human-first-use",
+   "path": "~/AgentMaturityCompass/tmp/cos-human-first-use",
    "branch": "codex/cos-human-first-use",
    "head": "0030c2b5",
    "dirtyPaths": 0,
    "exclusiveCommits": 0
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill",
+   "path": "~/AgentMaturityCompass/tmp/cos-installed-spill",
    "branch": "codex/cos-installed-spill",
    "head": "a5987643",
    "dirtyPaths": 0,
    "exclusiveCommits": 0
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass/tmp/cos-observer-guide",
+   "path": "~/AgentMaturityCompass/tmp/cos-observer-guide",
    "branch": "codex/cos-observer-guide",
    "head": "71a81a96",
    "dirtyPaths": 0,
    "exclusiveCommits": 0
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass/tmp/cos-spill-boundaries",
+   "path": "~/AgentMaturityCompass/tmp/cos-spill-boundaries",
    "branch": "codex/cos-spill-boundaries",
    "head": "491a5077",
    "dirtyPaths": 0,
    "exclusiveCommits": 0
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass/tmp/cos-spill-commands",
+   "path": "~/AgentMaturityCompass/tmp/cos-spill-commands",
    "branch": "codex/cos-spill-commands",
    "head": "7c0f01bf",
    "dirtyPaths": 0,
    "exclusiveCommits": 0
   },
   {
-   "path": "/Users/sid/AgentMaturityCompass/tmp/cos-study-capture",
+   "path": "~/AgentMaturityCompass/tmp/cos-study-capture",
    "branch": "codex/cos-study-capture",
    "head": "74589311",
    "dirtyPaths": 0,
@@ -480,7 +480,7 @@
  ],
  "worktreeDeltaVsRefresh2026_09_11": [
   {
-   "path": "/Users/sid/AgentMaturityCompass",
+   "path": "~/AgentMaturityCompass",
    "delta": {
     "dirtyPaths": [
      239,

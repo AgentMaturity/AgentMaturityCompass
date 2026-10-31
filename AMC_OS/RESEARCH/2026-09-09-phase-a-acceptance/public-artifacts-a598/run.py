@@ -6,7 +6,7 @@ import os
 from pathlib import Path
 import signal
 
-ROOT = Path('/Users/sid/AgentMaturityCompass')
+ROOT = Path('~/AgentMaturityCompass')
 RECORD = Path(__file__).resolve().parent
 CLONE = Path('/private/tmp/amc-a5987643-package-01/checkout')
 BASE = Path('/private/tmp/amc-a5987643-public-artifacts-01')

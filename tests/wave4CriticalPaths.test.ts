@@ -252,6 +252,7 @@ describe("wave4 critical scoring + verification paths", () => {
     const report: VerifyAllReport = {
       status: "FAIL",
       criticalFail: true,
+      skippedCritical: [],
       generatedTs: 1,
       checks: [
         { id: "a", status: "FAIL", critical: true, details: ["a-1", "a-2"] },

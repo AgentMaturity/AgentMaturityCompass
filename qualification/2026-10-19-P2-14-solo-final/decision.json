@@ -1,0 +1,20 @@
+{
+  "scope": "cut-first experimental and unreviewed prototype only",
+  "realEntry": "always typed refusal",
+  "fakeEntry": "synthetic protocol only",
+  "windowsLive": "not measured: no Windows host",
+  "nativeEnablement": "no-go on present evidence; not a claim of technical impossibility",
+  "primaryResearch": {
+    "status": "unverified",
+    "reverify": true,
+    "readThisTask": false,
+    "microsoftMechanismVerified": false
+  },
+  "sidCapacityDecision": null,
+  "sidAdrReview": null,
+  "windowsQualificationHost": null,
+  "P2-06": "open",
+  "P2-15": "open",
+  "promotion": "none",
+  "nativeBackendLauncherGateProcessTreeAndWindowsCi": "not implemented by this cut-first slice"
+}

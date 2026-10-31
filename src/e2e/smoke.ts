@@ -8,7 +8,7 @@ import { issueLeaseForCli } from "../leases/leaseCli.js";
 import { runDiagnostic } from "../diagnostic/runner.js";
 import { refreshForecastForApi } from "../forecast/forecastApi.js";
 import { benchCreateCli, benchInitCli, benchVerifyCli } from "../bench/benchCli.js";
-import { backupCreateCli, backupVerifyCli } from "../ops/backup/backupCli.js";
+import { backupCreateCliAsync, backupVerifyCli } from "../ops/backup/backupCli.js";
 import { releaseVerifyCli } from "../release/releaseCli.js";
 import { loadTrustContext, workspaceSelfTrust } from "../trust/trustContext.js";
 import { createReleaseBundle } from "../release/releaseBundle.js";
@@ -308,12 +308,12 @@ async function runLocalSmoke(params: SmokeParams): Promise<SmokeReport> {
     }
 
     steps.push(
-      await runStep("backup-create-verify", () => {
+      await runStep("backup-create-verify", async () => {
         const old = process.env.AMC_BACKUP_PASSPHRASE;
         process.env.AMC_BACKUP_PASSPHRASE = backupPassphrase;
         try {
           const backupFile = join(workspace, ".amc", "backup", "smoke.amcbackup");
-          const created = backupCreateCli(workspace, backupFile);
+          const created = await backupCreateCliAsync(workspace, backupFile);
           const verified = backupVerifyCli({
             backupFile: created.outFile,
             passphrase: backupPassphrase,

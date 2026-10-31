@@ -322,7 +322,7 @@ describe("fleet mode and trust tiers", () => {
 
   test("sandbox run uses deterministic docker args with mocked docker and writes attestation", async () => {
     const workspace = newWorkspace();
-    const wrapAnyMock = vi.fn(async () => "sandbox-session");
+    const wrapAnyMock = vi.fn(async () => ({ sessionId: "sandbox-session", exitCode: 0, terminatedBy: null }));
     const spawnSyncMock = vi.fn((cmd: string, args: readonly string[] = []) => {
       if (cmd === "docker" && args[0] === "--version") {
         return { status: 0, stdout: "Docker version test\n", stderr: "" } as ReturnType<typeof import("node:child_process").spawnSync>;
@@ -334,7 +334,7 @@ describe("fleet mode and trust tiers", () => {
     });
 
     vi.doMock("../src/ledger/monitor.js", () => ({
-      wrapAny: wrapAnyMock
+      wrapAnyOutcome: wrapAnyMock
     }));
     vi.doMock("node:child_process", async () => {
       const actual = await vi.importActual<typeof import("node:child_process")>("node:child_process");

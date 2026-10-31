@@ -1,0 +1,67 @@
+
+ RUN  v4.1.11 /private/tmp/p0-21-causal-qualification-20261015/closure
+
+ ✓ tests/transparencyReport.test.ts (15 tests) 40ms
+ ✓ tests/noCertificationFromSelfAssessment.test.ts (7 tests) 2481ms
+     ✓ MCP sector-pack and trust-score text say self-assessment and evidence standing  2439ms
+ ✓ tests/selfReportedLevelCap.test.ts (5 tests) 21ms
+ ✓ tests/logisticsIndustryPack.test.ts (2 tests) 6ms
+ ✓ tests/scoreUnits.test.ts (4 tests) 5ms
+ ❯ tests/domainAssessmentUnits.test.ts (4 tests | 3 failed) 14ms
+     × a raw 6 in domainQuestionScores throws instead of scoring 6% 9ms
+     × a percentage passed as a Likert answer throws 0ms
+     ✓ a base level of 7 throws 0ms
+     × valid units convert explicitly: base levels via levelToPercent, answers via likertToPercent 2ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domainAssessmentUnits.test.ts > domain engine takes typed units (P0-21) > a raw 6 in domainQuestionScores throws instead of scoring 6%
+AssertionError: expected function to throw an error, but it didn't
+ ❯ tests/domainAssessmentUnits.test.ts:23:45
+     21| describe("domain engine takes typed units (P0-21)", () => {
+     22|   test("a raw 6 in domainQuestionScores throws instead of scoring 6%",…
+     23|     expect(() => assessDomain(input(3, 6))).toThrow(new RangeError("Li…
+       |                                             ^
+     24|   });
+     25|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  tests/domainAssessmentUnits.test.ts > domain engine takes typed units (P0-21) > a percentage passed as a Likert answer throws
+AssertionError: expected function to throw an error, but it didn't
+ ❯ tests/domainAssessmentUnits.test.ts:27:46
+     25|
+     26|   test("a percentage passed as a Likert answer throws", () => {
+     27|     expect(() => assessDomain(input(3, 80))).toThrow(RangeError);
+       |                                              ^
+     28|   });
+     29|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/domainAssessmentUnits.test.ts > domain engine takes typed units (P0-21) > valid units convert explicitly: base levels via levelToPercent, answers via likertToPercent
+AssertionError: expected 60 to be 50 // Object.is equality
+
+- Expected
++ Received
+
+- 50
++ 60
+
+ ❯ tests/domainAssessmentUnits.test.ts:37:32
+     35|     const result = assessDomain(input(3, 3));
+     36|     expect(result.baseScore).toBe(60); // L3 -> 60%
+     37|     expect(result.domainScore).toBe(50); // Likert 3 -> 50%
+       |                                ^
+     38|     expect(result.compositeScore).toBe(56);
+     39|     expect(result.level).toBe("L3"); // the one level table: 55 <= 56 …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed | 5 passed (6)
+      Tests  3 failed | 34 passed (37)
+   Start at  10:53:41
+   Duration  3.87s (transform 2.23s, setup 73ms, import 637ms, tests 2.57s, environment 0ms)
+
+JSON report written to /private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--mutant/raw.json

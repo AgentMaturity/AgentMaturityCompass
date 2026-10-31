@@ -1,0 +1,20 @@
+# P0-62 amc up --demo timing, unloaded, fresh node:24-bookworm container (amc-p062-studio:arm64), 8 up/down cycles per tarball
+# rc.tgz = RC 21190c7d…0340; branch.tgz = this branch at cfb8f87f9, b6a15334…de5c
+tarball rc.tgz busy 0 nproc 4 cli 8b9ec22158bc
+cycle 1 up exit 0 3511ms loadavg 1.70 :: Studio API: http://127.0.0.1:30010
+cycle 2 up exit 0 2961ms loadavg 1.64 :: Studio API: http://127.0.0.1:30020
+cycle 3 up exit 0 2718ms loadavg 1.59 :: Studio API: http://127.0.0.1:30030
+cycle 4 up exit 0 2582ms loadavg 1.63 :: Studio API: http://127.0.0.1:30040
+cycle 5 up exit 0 2618ms loadavg 1.58 :: Studio API: http://127.0.0.1:30050
+cycle 6 up exit 0 2875ms loadavg 1.53 :: Studio API: http://127.0.0.1:30060
+cycle 7 up exit 0 3284ms loadavg 1.49 :: Studio API: http://127.0.0.1:30070
+cycle 8 up exit 0 3321ms loadavg 1.37 :: Studio API: http://127.0.0.1:30080
+tarball branch.tgz busy 0 nproc 4 cli 8b9ec22158bc
+cycle 1 up exit 0 3811ms loadavg 1.56 :: Studio API: http://127.0.0.1:30010
+cycle 2 up exit 0 2622ms loadavg 1.52 :: Studio API: http://127.0.0.1:30020
+cycle 3 up exit 0 3339ms loadavg 1.52 :: Studio API: http://127.0.0.1:30030
+cycle 4 up exit 0 3880ms loadavg 1.47 :: Studio API: http://127.0.0.1:30040
+cycle 5 up exit 0 3381ms loadavg 1.36 :: Studio API: http://127.0.0.1:30050
+cycle 6 up exit 0 3462ms loadavg 1.30 :: Studio API: http://127.0.0.1:30060
+cycle 7 up exit 0 5801ms loadavg 1.36 :: Studio API: http://127.0.0.1:30070
+cycle 8 up exit 0 4107ms loadavg 1.30 :: Studio API: http://127.0.0.1:30080

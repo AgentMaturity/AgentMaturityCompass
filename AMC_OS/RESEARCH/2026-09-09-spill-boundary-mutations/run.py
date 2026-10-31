@@ -25,7 +25,7 @@ import time
 import types
 
 AUTHORING_BASE = "a5987643ef6c26b01f687226fbc6a6709fc182cb"
-SHARED_ROOT = Path("/Users/sid/AgentMaturityCompass")
+SHARED_ROOT = Path("~/AgentMaturityCompass")
 OPERATOR = "src/cli-spill-commands.ts"
 READER = "src/session/spill/spillRead.ts"
 OP_TEST = "tests/cliSpillCommands.test.ts"

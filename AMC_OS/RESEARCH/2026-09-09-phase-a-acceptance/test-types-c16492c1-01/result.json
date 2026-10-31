@@ -105,7 +105,7 @@
         "--no-hardlinks",
         "--no-checkout",
         "--",
-        "/Users/sid/AgentMaturityCompass",
+        "~/AgentMaturityCompass",
         "/private/tmp/amc-c16492c1-test-types-01/checkout"
       ],
       "startedAt": "2026-09-09T11:17:56.462302+00:00",
@@ -788,7 +788,7 @@
     }
   ],
   "helper": {
-    "path": "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/attempt-2/runner.py",
+    "path": "~/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/attempt-2/runner.py",
     "sha256": "e5696055be4b67ca81678da26bb8a253484199eabefcdbdc0ffc8f11d690b54d"
   },
   "runnerSha256": "e6c929d4d99d5c7ede78d2e045ab4f72ccb77ecb11b7bf9b09cf0718892a40d9",

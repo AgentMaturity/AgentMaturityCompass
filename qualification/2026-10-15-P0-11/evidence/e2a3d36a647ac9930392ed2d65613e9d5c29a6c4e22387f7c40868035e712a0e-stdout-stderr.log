@@ -1,0 +1,35 @@
+
+ RUN  v4.1.11 /private/tmp/p0-11-causal-qualification-20261015/closure
+
+ ❯ tests/toolEvidenceRecording.test.ts (7 tests | 1 failed) 1238ms
+     ✓ records an ALLOWED call 296ms
+     ✓ records a DENIED call, with which guard refused and why 244ms
+     ✓ writes an audit row AND a metric row per call 227ms
+     ✓ correlates a call to its token, so a denial can be traced 230ms
+     ✓ does NOT copy the arguments into the audit row 234ms
+     × returns the tool's real outcome when the recorder throws 3ms
+     ✓ labels the three outcomes distinctly 0ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/toolEvidenceRecording.test.ts > recording never breaks the call > returns the tool's real outcome when the recorder throws
+Error: the evidence store is unreachable
+ ❯ Object.record tests/toolEvidenceRecording.test.ts:202:15
+    200|       record: () => {
+    201|         recorderCalled = true;
+    202|         throw new Error("the evidence store is unreachable");
+       |               ^
+    203|       }
+    204|     });
+ ❯ src/tools/toolPipeline.ts:306:19
+ ❯ tests/toolEvidenceRecording.test.ts:206:21
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 6 passed (7)
+   Start at  12:14:00
+   Duration  3.68s (transform 1.70s, setup 20ms, import 2.27s, tests 1.24s, environment 0ms)
+
+JSON report written to /private/tmp/p0-11-causal-qualification-20261015/phases/C2-tool-recorder-error-propagates--mutant/raw.json

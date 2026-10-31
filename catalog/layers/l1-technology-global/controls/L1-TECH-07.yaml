@@ -1,0 +1,159 @@
+# technology.nis2-early-warning. Experimental and unreviewed; synthetic fixtures do not establish production enforcement.
+"id": "L1-TECH-07"
+"version": "0.1.0"
+"support": "experimental"
+"layer": 1
+"family": "incident-warning"
+"stations":
+  - "technology"
+"title": "Exercise the existing NIS2 early-warning clock"
+"statement": "An early-warning drill preserves a scoped incident-awareness record and a complete draft warning
+  packet against the existing 24-hour NIS2 clock."
+"riskRationale": "An incident timestamp without entity applicability, awareness provenance or warning content
+  cannot show that a notification duty was performed."
+"mandatory": true
+"applicability":
+  "predicate":
+    "all":
+      - "fact": "stations"
+        "includesAny":
+          - "technology"
+      - "fact": "domains"
+        "includesAny":
+          - "technology.platforms-data"
+      - "fact": "jurisdictions"
+        "includesAny":
+          - "EU"
+  "reasons":
+    - "Experimental, unreviewed draft for technology.platforms-data; applicability facts are operator
+      assertions and require a scoped legal determination."
+  "exclusions":
+    - "when":
+        "not":
+          "fact": "domains"
+          "includesAny":
+            - "technology.platforms-data"
+      "reason": "The deployment is outside the Technology platforms-and-data domain; no legal applicability is
+        inferred from a station name."
+    - "when":
+        "not":
+          "fact": "jurisdictions"
+          "includesAny":
+            - "EU"
+      "reason": "The deployment has no asserted nexus to this control's jurisdiction; unresolved jurisdiction is not
+        treated as an exclusion or a pass."
+"citations":
+  - "key": "eu-nis2-art23"
+    "registerId": "eu-nis2"
+    "instrument": "NIS2 Directive"
+    "clause": "Article 23, candidate reporting pin"
+    "edition": "Source locator inherited from S5; text and edition not read for P2-30"
+    "jurisdiction": "EU"
+    "statusType": "binding-now"
+    "superseded": null
+    "effectiveDate": null
+    "complianceDueDate": null
+    "dateNote": "Dates intentionally null pending primary-text verification and named expert review."
+    "url": "https://publications.europa.eu/resource/celex/32022L2555"
+    "retrieval":
+      "state": "unverified"
+      "reason": "Unverified: candidate official source locator inherited from the existing S5 register. No primary
+        text fetched or hashed in P2-30; this record is not source verification or a legal review."
+    "appliesWhen":
+      "fact": "jurisdictions"
+      "includesAny":
+        - "EU"
+    "legalReview": null
+    "note": "Experimental, unreviewed draft. Primary-text verification and D-14 expert scope review remain pending."
+"binding":
+  "kind": "manual"
+  "points": []
+  "mechanism": "Experimental, unreviewed manual-duty draft. Fixture results establish only local exercise
+    behavior; a production result requires admitted evidence and a named human assessor."
+  "parameters": []
+  "manualDuty":
+    "duty": "Determine entity scope, national implementation and the appropriate authority with counsel, then
+      retain the awareness event, applicable clock and draft early-warning record."
+    "ownerRole": "ciso"
+    "cadence": "At each relevant incident-response drill and candidate significant incident."
+    "evidenceOfPerformance": "The existing NIS2 clock's awareness event and draft warning record; this
+      content-only extension does not send a notification or establish national applicability."
+"tests":
+  - "id": "L1-TECH-07-T1"
+    "type": "drill"
+    "oracle":
+      "kind": "ledger_state"
+      "observes": "Synthetic awareness and draft warning records checked against the existing NIS2 early-warning
+        clock; no notification is sent and no national applicability is established."
+    "fixtures":
+      "positive":
+        - "L1-TECH-07/positive/evidence-valid.json"
+        - "L1-TECH-07/positive/oracle-nis2-on-time.json"
+        - "L1-TECH-07/positive/oracle-nis2-at-deadline.json"
+      "negative":
+        - "L1-TECH-07/negative/evidence-stale.json"
+        - "L1-TECH-07/negative/evidence-replayed.json"
+        - "L1-TECH-07/negative/evidence-contradictory.json"
+        - "L1-TECH-07/negative/evidence-cross-tenant.json"
+        - "L1-TECH-07/negative/evidence-empty.json"
+        - "L1-TECH-07/negative/evidence-violation.json"
+        - "L1-TECH-07/negative/oracle-nis2-late.json"
+        - "L1-TECH-07/negative/oracle-nis2-incomplete.json"
+        - "L1-TECH-07/negative/oracle-nis2-no-clock.json"
+        - "L1-TECH-07/negative/oracle-nis2-no-awareness.json"
+    "passCriteria": "The synthetic warning packet identifies the same incident, includes the local draft fields and
+      is timestamped no later than the awareness time plus the actual NIS2 clock deadline. Late or incomplete
+      packets fail locally; a missing clock or awareness record is not evaluated. Local drill success never fills
+      missing production evidence, which remains not evaluated with enforcement none."
+    "attempts": 1
+"evidence":
+  - "id": "L1-TECH-07-E1"
+    "producer": "amc.questionnaire"
+    "bindingFields":
+      - "tenantId"
+      - "workspaceId"
+      - "deploymentId"
+      - "agentId"
+      - "controlId"
+      - "controlVersion"
+    "freshness":
+      "maxAgeDays": 30
+    "sampling":
+      "method": "all"
+      "ratePercent": null
+      "minItems": 1
+    "retention":
+      "mode": "regime_max"
+    "residency":
+      "mode": "inherit_deployment"
+"invalidatedBy":
+  - "model_version"
+  - "prompt_version"
+  - "tool_version"
+  - "policy_version"
+  - "deployment_version"
+"owner":
+  "role": "ciso"
+"clock":
+  "clockId": "nis2-23-4a-early-warning"
+  "deadline":
+    "amount": 24
+    "unit": "hours"
+"levels":
+  - "L1"
+"crosswalk":
+  - "framework": "amc-audit-map-v1"
+    "clause": "INCIDENT_RESPONSE_PREPAREDNESS.ADVISORIES"
+    "relation": "partial"
+    "rationale": "The internal audit-map control is related, but does not cover this station-specific requirement,
+      legal scope or oracle. Mapping is experimental and unreviewed."
+"review":
+  "status": "pending"
+  "expert": null
+  "credential": null
+  "reviewedAt": null
+  "nextReview": null
+"provenance":
+  "draftedBy": "ai"
+  "draftedAt": "2026-10-18"
+  "approvedBy": null

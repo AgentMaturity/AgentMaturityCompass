@@ -1,0 +1,47 @@
+[
+  {
+    "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C1-fail-closed-hold-admission--restored/classification.json",
+    "bytes": 229,
+    "sha256": "10fa3a90cf586f652b033ccd51c73df87be05930f1047bda50893fb016d2b83d"
+  },
+  {
+    "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C1-fail-closed-hold-admission--restored/command.json",
+    "bytes": 1724,
+    "sha256": "bd0138c096de9dcf32fa873002cd69424d862c7528b2eef6781b4fa42fbd0608"
+  },
+  {
+    "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C1-fail-closed-hold-admission--restored/inputs-after.json",
+    "bytes": 830,
+    "sha256": "c1073ec2d1bb6abbd1836ca0333dc1dd11adf380cd1783784903a2a2afa99fc9"
+  },
+  {
+    "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C1-fail-closed-hold-admission--restored/inputs-before.json",
+    "bytes": 830,
+    "sha256": "ee0e3f37249a8a45d47a0ffad22b1db1a7364476b62eb1f6081b9f767ab5c1f4"
+  },
+  {
+    "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C1-fail-closed-hold-admission--restored/observer.json",
+    "bytes": 6178,
+    "sha256": "2359cf1ef4d3866744a883dfc5c14d85d8290feda1cab7468bffc78079a2fb8f"
+  },
+  {
+    "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C1-fail-closed-hold-admission--restored/owned-group-after-exit.json",
+    "bytes": 520,
+    "sha256": "b68d23219f9ca89e099fcac1b8d89f4da3eb1762905899488b0ef3ddcb1d7da9"
+  },
+  {
+    "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C1-fail-closed-hold-admission--restored/owned-process.json",
+    "bytes": 1349,
+    "sha256": "be664dc6a32ac5bbe3e810e3bdde1ee43c3b4984e75b263778cc31ba9e86fe0a"
+  },
+  {
+    "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C1-fail-closed-hold-admission--restored/raw.json",
+    "bytes": 4173,
+    "sha256": "cfb594b91c64e17934da5d900d321d69d854a3d5797bc7f7e36768210f7b210e"
+  },
+  {
+    "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C1-fail-closed-hold-admission--restored/stdout-stderr.log",
+    "bytes": 427,
+    "sha256": "8ed7bd3aca44d02e48971a1e5e0ae5af886644818bbee9c4997ff023eb222f4f"
+  }
+]

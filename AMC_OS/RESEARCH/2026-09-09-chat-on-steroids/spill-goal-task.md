@@ -2,9 +2,9 @@
 
 Use GPT-6 Pro for this task and every Goal continuation. No fallback, worker spawn or model switch. Sid wants CoS to keep implementing in parallel while Codex owns the broader program; do not wait for routine permission.
 
-FIRST TOOL CALL: read /agentmaturitycompass/plans/2026-09-09-amc-execution-brief.md in full. Then read this task, root plans/ownership-manifest.md, AMC_OS/ROLEBOOKS/00_GLOBAL_STANDARDS.md and 10_REVENUE_DELIVERY.md. Approved virtual root /agentmaturitycompass maps to /Users/sid/AgentMaturityCompass; use virtual paths for connector read/apply_patch and native paths for exec_command.
+FIRST TOOL CALL: read /agentmaturitycompass/plans/2026-09-09-amc-execution-brief.md in full. Then read this task, root plans/ownership-manifest.md, AMC_OS/ROLEBOOKS/00_GLOBAL_STANDARDS.md and 10_REVENUE_DELIVERY.md. Approved virtual root /agentmaturitycompass maps to ~/AgentMaturityCompass; use virtual paths for connector read/apply_patch and native paths for exec_command.
 
-The completed intake/capture/observer work is already integrated. Do not repeat it. New isolated worktree: /Users/sid/AgentMaturityCompass/tmp/cos-spill-commands, branch codex/cos-spill-commands from249a2a812f2600c53564fa571761aa2cfb80a144.
+The completed intake/capture/observer work is already integrated. Do not repeat it. New isolated worktree: ~/AgentMaturityCompass/tmp/cos-spill-commands, branch codex/cos-spill-commands from249a2a812f2600c53564fa571761aa2cfb80a144.
 
 Write ONLY in that worktree:
 - src/cli-spill-commands.ts

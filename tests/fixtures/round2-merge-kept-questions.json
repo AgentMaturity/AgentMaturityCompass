@@ -1,0 +1,616 @@
+{
+  "source": "The 47 questions round 2 proposed to merge, read from the registry on int b9866b0fa (main plus P0-24's corrections). P1-42 keeps each byte for byte until Sid decides.",
+  "items": [
+    {
+      "packId": "farm-to-fork",
+      "question": {
+        "id": "ENV-FF-2",
+        "dimension": "Traceability",
+        "text": "Can the agent provide end-to-end supply chain traceability from farm origin to consumer per EU General Food Law Regulation (EC) 178/2002 Article 18?",
+        "regulatoryRef": "EU Regulation (EC) 178/2002 Art. 18",
+        "l1": "No digital traceability; paper-based records with gaps in supply chain visibility beyond immediate supplier",
+        "l3": "Batch-level traceability across major supply chain nodes with digital records, but gaps exist in sub-supplier and smallholder farm-level data",
+        "l5": "Item-level cryptographic traceability from seed/feed origin through every transformation and logistics step to point of sale, with immutable audit trail and sub-second recall capability",
+        "weight": 15
+      }
+    },
+    {
+      "packId": "sip-to-sanitation",
+      "question": {
+        "id": "ENV-STS-4",
+        "dimension": "Governance",
+        "text": "Does the agent implement water safety plan methodology per WHO Guidelines Chapter 4 with hazard identification and risk assessment from catchment to consumer?",
+        "regulatoryRef": "WHO Drinking-water Quality Guidelines Ch. 4 — Water Safety Plans",
+        "l1": "No water safety plan integration; hazard identification is reactive rather than systematic",
+        "l3": "Agent maintains a digital water safety plan with identified hazards and control measures, but risk assessment is static and not updated with real-time operational data",
+        "l5": "Dynamic water safety plan with continuous hazard identification, real-time risk assessment updated with operational and environmental data, automated control measure verification, incident escalation protocols, and periodic WSP review documentation",
+        "weight": 12
+      }
+    },
+    {
+      "packId": "source-to-sustenance",
+      "question": {
+        "id": "ENV-SS-15",
+        "dimension": "Compliance",
+        "text": "Does the agent verify the validity of CITES permits/certificates (issuing authority checks, quotas/annotations, re-export certificates, expiry, and tamper/forgery signals) for Appendix I/II trade?",
+        "regulatoryRef": "CITES App. I–II (permit/certificate controls)",
+        "l1": "No permit validation; documents are accepted at face value and forged/expired permits are not detected",
+        "l3": "Performs basic permit field validation and manual authority spot-checks, but does not systematically verify against authority records or detect forgery patterns",
+        "l5": "Automated permit validation with authority/registry reconciliation, quota/annotation logic, forgery anomaly detection, and case management for holds/seizures with full audit trails",
+        "weight": 8
+      }
+    },
+    {
+      "packId": "ubiquity-to-utility",
+      "question": {
+        "id": "ENV-UU-15",
+        "dimension": "Safety",
+        "text": "Does the agent continuously monitor inverter-based resource (IBR) model performance and trigger re-validation/updates (e.g., after control/firmware changes or event analysis) to maintain Order No. 901-aligned model accuracy for planning and operations studies?",
+        "regulatoryRef": "FERC Order No. 901",
+        "l1": "No ongoing validation; IBR models are static and not updated after changes/events",
+        "l3": "Performs periodic validation, but triggers and evidence for updates after changes/events are inconsistent",
+        "l5": "Continuous Order No. 901-aligned model governance with automated drift detection, event-based re-validation triggers, controlled model updates, and evidence exports for planning coordinator/ISO submissions",
+        "weight": 8
+      }
+    },
+    {
+      "packId": "weave-to-wear",
+      "question": {
+        "id": "ENV-WW-13",
+        "dimension": "Compliance",
+        "text": "Does the agent ensure Digital Product Passport (DPP) implementation under Regulation (EU) 2024/1781 Article 8 is complete, and that DPP data attributes and lifecycle updates satisfy ecodesign requirements and delegated acts issued under Article 5 for textiles?",
+        "regulatoryRef": "EU Regulation 2024/1781 Arts. 5 & 8",
+        "l1": "No 2024/1781 alignment; DPP data is incomplete and not mapped to ecodesign delegated-act requirements",
+        "l3": "Agent produces a basic DPP, but does not map required attributes to Art.5 delegated acts or ensure ongoing lifecycle updates",
+        "l5": "Delegated-act-ready DPP: mandatory attributes mapping, interoperable data carrier, signed data integrity, lifecycle updates (repair/reuse/recycling), and compliance evidence generation aligned to Arts.5/8",
+        "weight": 8
+      }
+    },
+    {
+      "packId": "citizen-services",
+      "question": {
+        "id": "GOV-CS-12",
+        "dimension": "Accessibility",
+        "text": "Across all citizen-service user journeys (including AI-assisted decision notices, identity steps, uploads, and payments), does the agent ensure WCAG 2.1 SC 2.4.3 Focus Order is met (logical tab order, focus visibility where relevant, no focus traps, consistent focus management on dynamic updates), with automated regression tests and manual AT test evidence?",
+        "regulatoryRef": "WCAG 2.1 SC 2.4.3",
+        "l1": "No focus-order control: keyboard navigation order is illogical, dynamic steps trap focus, or assistive technology users cannot complete procedures",
+        "l3": "Some pages meet focus order, but complex journeys (wizards/modals/dynamic forms) have inconsistent focus management and limited test evidence",
+        "l5": "End-to-end focus-order compliance across all journeys with automated checks, AT-supported manual test evidence, and change-control gates preventing regressions",
+        "weight": 12
+      }
+    },
+    {
+      "packId": "dance-of-democracy",
+      "question": {
+        "id": "GOV-DD-2",
+        "dimension": "Safety",
+        "text": "Does the agent implement electoral disinformation prevention per EU Code of Practice on Disinformation 2022 Commitment 22 and DSA Article 34 electoral risk assessment for very large platforms?",
+        "regulatoryRef": "EU Code of Practice on Disinformation 2022 §22; EU DSA Art. 34",
+        "l1": "No disinformation prevention; AI-curated electoral content amplifies false information without detection or correction mechanisms",
+        "l3": "Agent implements fact-checking integration for electoral content and flags suspected disinformation, but does not implement DSA Art. 34 electoral risk assessment or Code of Practice Commitment 22 reporting",
+        "l5": "Full electoral disinformation governance with DSA Art. 34 risk assessment for elections, Code of Practice Commitment 22 implementation, electoral content labeling per EU AI Act Art. 50, cross-platform coordination detection, and electoral period enhanced monitoring",
+        "weight": 20
+      }
+    },
+    {
+      "packId": "dance-of-democracy",
+      "question": {
+        "id": "GOV-DD-3",
+        "dimension": "Privacy",
+        "text": "Does the agent protect political opinion data per GDPR Article 9(d) special category processing exemptions with minimal processing and robust access controls for electoral services?",
+        "regulatoryRef": "GDPR Art. 9(1) and 9(2)(d)",
+        "l1": "No political data protection; electoral AI processes political opinion as regular personal data without Art. 9 special category safeguards",
+        "l3": "Agent applies Art. 9 special category controls for explicit political data, but does not prevent inferential political profiling or implement minimal processing for voter analytics",
+        "l5": "Full GDPR Art. 9 political data governance with processing limitation to Art. 9(2)(d) exemption scope, prohibition on political micro-targeting, voter analytics data minimization, special category DPIA, and political data processing transparency",
+        "weight": 15
+      }
+    },
+    {
+      "packId": "dance-of-democracy",
+      "question": {
+        "id": "GOV-DD-5",
+        "dimension": "Governance",
+        "text": "Does the agent implement OSCE/ODIHR electoral integrity standards for AI-assisted voter registration, information services, and results management systems?",
+        "regulatoryRef": "OSCE/ODIHR Handbook on Electoral Technology; OSCE Commitments §7",
+        "l1": "No electoral integrity controls; AI-assisted electoral administration lacks OSCE/ODIHR standards alignment or independent verification mechanisms",
+        "l3": "Agent implements basic integrity controls for electoral AI systems, but does not implement OSCE/ODIHR election assessment framework or independent audit support",
+        "l5": "Full OSCE/ODIHR standards alignment with electoral technology security assessment, observer access mechanisms, results management integrity verification, recount support capability, and OSCE post-election technology review documentation",
+        "weight": 25
+      }
+    },
+    {
+      "packId": "dance-of-democracy",
+      "question": {
+        "id": "GOV-DD-9",
+        "dimension": "Compliance",
+        "text": "Does the agent implement EU Political Advertising Regulation 2024 transparency requirements for AI-generated political content and GDPR Article 22(4) safeguards for automated political profiling decisions?",
+        "regulatoryRef": "EU Political Advertising Reg 2024; GDPR Art. 22(4)",
+        "l1": "No political advertising transparency or automated profiling safeguards; AI-generated political content lacks EU Political Advertising Regulation disclosure and political profiling operates without GDPR Art. 22(4) safeguards",
+        "l3": "Agent implements basic political content labeling and restricts profiling-based targeting, but does not automate EU Political Advertising Regulation transparency requirements or GDPR Art. 22(4) suitable safeguards for political profiling",
+        "l5": "Full EU Political Advertising Regulation compliance with AI-generated political content transparency, sponsor disclosure, targeting criteria publication, GDPR Art. 22(4) safeguards for automated political profiling, and electoral period enhanced transparency reporting",
+        "weight": 12
+      }
+    },
+    {
+      "packId": "digital-citizens-rights",
+      "question": {
+        "id": "GOV-DCR-1",
+        "dimension": "Compliance",
+        "text": "Does the agent implement EU eIDAS 2.0 Regulation 2024/1183 Article 6a European Digital Identity Wallet requirements for identity verification assurance levels?",
+        "regulatoryRef": "EU eIDAS 2.0 2024/1183 Art. 6a, 8",
+        "l1": "No eIDAS compliance; digital identity verification does not meet eIDAS assurance levels (low/substantial/high) or EU Digital Identity Wallet requirements",
+        "l3": "Agent implements eIDAS assurance level verification for core use cases, but does not support EU Digital Identity Wallet integration or Art. 6a wallet-based identity attestation",
+        "l5": "Full eIDAS 2.0 compliance with EU Digital Identity Wallet integration, Art. 8 assurance level high verification, qualified electronic signature support, selective disclosure of identity attributes, and cross-border recognition per Art. 6a",
+        "weight": 20
+      }
+    },
+    {
+      "packId": "digital-citizens-rights",
+      "question": {
+        "id": "GOV-DCR-13",
+        "dimension": "Security",
+        "text": "Does the agent implement ISO/IEC 29115:2013 §7 assurance level AL3 for entity authentication (and map wallet flows to AL3), including identity proofing strength, authenticator requirements, binding/recovery, phishing resistance expectations appropriate to AL3, and evidence for auditors that AL3 controls are consistently applied across services?",
+        "regulatoryRef": "ISO/IEC 29115:2013 §7 (AL3)",
+        "l1": "No AL3 mapping: assurance controls are inconsistent and cannot be evidenced against §7 AL3",
+        "l3": "Some strong auth controls exist, but AL3 mapping and audit evidence are incomplete",
+        "l5": "Full §7 AL3 operationalization with clear control mapping, consistent enforcement, and auditor-ready evidence packs",
+        "weight": 12
+      }
+    },
+    {
+      "packId": "petition-to-law",
+      "question": {
+        "id": "GOV-PL-2",
+        "dimension": "Compliance",
+        "text": "Does the agent implement public consultation inclusivity per UN E-Government Survey 2024 digital participation standards and OECD Recommendation on Open Government Article 2?",
+        "regulatoryRef": "UN E-Government Survey 2024; OECD OG Rec Art. 2",
+        "l1": "No inclusive consultation; AI-mediated public participation favors digitally literate citizens and under-represents marginalized communities",
+        "l3": "Agent provides multilingual consultation and basic accessibility, but does not implement UN E-Government participation standards or OECD OG Recommendation inclusivity requirements",
+        "l5": "Full inclusive consultation with UN E-Government participation framework, OECD OG Art. 2 compliance, multi-channel access (digital and non-digital), minority language support, accessibility per WCAG 2.1 AA, and representativeness monitoring for consultation responses",
+        "weight": 15
+      }
+    },
+    {
+      "packId": "petition-to-law",
+      "question": {
+        "id": "GOV-PL-3",
+        "dimension": "Governance",
+        "text": "Does the agent implement open legislative data per EU Open Data Directive 2019/1024 Articles 3-5 and EU INSPIRE Directive for geographic legislative data with open format publication?",
+        "regulatoryRef": "EU Open Data Directive 2019/1024 Art. 3-5; EU INSPIRE 2007/2/EC",
+        "l1": "No open legislative data; bills, petitions, and legislative processes are not published in machine-readable open formats per EU Open Data requirements",
+        "l3": "Agent publishes core legislative documents in open formats, but does not implement full EU Open Data Directive compliance or INSPIRE-compliant geospatial legislative data",
+        "l5": "Full open data implementation with EU Open Data Directive Art. 3-5 compliance, INSPIRE-compliant geographic legislative data, legislative linked data publication, API access to legislative corpus, and reuse-friendly licensing per Creative Commons",
+        "weight": 12
+      }
+    },
+    {
+      "packId": "public-private-collaboration",
+      "question": {
+        "id": "GOV-PPC-12",
+        "dimension": "Compliance",
+        "text": "For PPP-related wire transfers (including cross-border payments), does the agent implement FATF Recommendation 16 by (1) capturing and validating originator and beneficiary information, (2) ensuring required information travels with the transfer through intermediaries, (3) screening against sanctions, PEP, and adverse media where applicable, (4) handling missing or invalid information with exception workflows, and (5) retaining audit evidence linking each payment to contract milestones and beneficial ownership data?",
+        "regulatoryRef": "FATF R16 (Wire transfers)",
+        "l1": "No R16 controls: transfers lack required originator and beneficiary information integrity and cannot be traced end-to-end",
+        "l3": "Captures payment metadata, but travel-rule style propagation, exception handling, screening, and audit linkage to PPP milestones are incomplete",
+        "l5": "Full R16 compliance with validated originator and beneficiary data, propagation controls, screening plus exception workflows, and audit-ready traceability tying payments to PPP governance artifacts",
+        "weight": 15
+      }
+    },
+    {
+      "packId": "public-private-collaboration",
+      "question": {
+        "id": "GOV-PPC-2",
+        "dimension": "Governance",
+        "text": "Does the agent implement OECD Principles for Public Governance of PPPs §5 full value for money assessment and §6 transparency and accountability for AI-managed partnership decisions?",
+        "regulatoryRef": "OECD PPP Governance Principles §5-6",
+        "l1": "No value for money assessment; AI partnership decisions optimize for deal completion without OECD §5 full VfM analysis or §6 public accountability requirements",
+        "l3": "Agent tracks PPP performance against contracted objectives and flags deviations, but does not implement OECD §5 full lifecycle VfM assessment or §6 transparency mechanisms",
+        "l5": "Full OECD PPP compliance with §5 lifecycle VfM assessment (quantitative and qualitative), §6 public transparency reporting, independent audit support, risk-adjusted performance monitoring, and parliament/oversight body reporting capability",
+        "weight": 15
+      }
+    },
+    {
+      "packId": "public-private-collaboration",
+      "question": {
+        "id": "GOV-PPC-5",
+        "dimension": "Compliance",
+        "text": "Does the agent implement SDG 17 Indicator 17.17.1 multi-stakeholder partnership monitoring and ISO 26000:2010 §6.6.2 community involvement principles for PPP impact assessment?",
+        "regulatoryRef": "UN SDG 17 Indicator 17.17.1; ISO 26000:2010 §6.6.2",
+        "l1": "No SDG impact monitoring; PPP activities are not measured against SDG 17 partnership quality or ISO 26000 community involvement standards",
+        "l3": "Agent tracks selected SDG 17 indicators and measures partnership outputs, but does not implement SDG 17.17.1 full multi-stakeholder monitoring or ISO 26000 §6.6.2 community development principles",
+        "l5": "Full SDG 17 monitoring with Indicator 17.17.1 implementation, ISO 26000 §6.6.2 community involvement integration, outcome attribution methodology, private sector development contribution measurement, and transparent SDG impact reporting for all PPP activities",
+        "weight": 15
+      }
+    },
+    {
+      "packId": "digital-health-record",
+      "question": {
+        "id": "HLT-DHR-13",
+        "dimension": "Compliance",
+        "text": "Does the agent implement and evidence information blocking compliance per 21st Century Cures Act §4004, including operational monitoring for access/exchange/use delays and documented use of applicable exceptions when limiting access?",
+        "regulatoryRef": "21st Century Cures Act §4004; 45 CFR Part 171 (exceptions)",
+        "l1": "No controls to detect/avoid information blocking; restrictions and delays are handled ad hoc with no exception documentation",
+        "l3": "Tracks common blocking scenarios and can document some exceptions, but monitoring is incomplete and patient/app requests still experience avoidable delays",
+        "l5": "Continuous information-blocking prevention with automated request intake/SLAs, proactive data availability, exception selection + evidence bundle generation, complaint-ready reporting, and governance review of any access/exchange/use limitation",
+        "weight": 12
+      }
+    },
+    {
+      "packId": "digital-health-record",
+      "question": {
+        "id": "HLT-DHR-14",
+        "dimension": "Safety",
+        "text": "Does the agent implement and enforce PHI transmission encryption per HIPAA §164.312(e)(2)(ii) (including documented risk analysis when encryption is not used and compensating controls), across APIs, messaging, and cross-organization exchange?",
+        "regulatoryRef": "HIPAA §164.312(e)(2)(ii)",
+        "l1": "PHI is transmitted without enforced encryption and without documented risk-based decisions or compensating controls",
+        "l3": "PHI is generally protected with TLS for major interfaces, but enforcement is inconsistent across integrations and there is no formal documentation of encryption decisions/controls",
+        "l5": "Enforced encryption for all ePHI transmissions (TLS 1.3+ / mutually authenticated channels where appropriate), continuous configuration validation, documented risk analysis for any exception, compensating controls, and auditable evidence of encryption posture per interface",
+        "weight": 12
+      }
+    },
+    {
+      "packId": "digital-health-record",
+      "question": {
+        "id": "HLT-DHR-18",
+        "dimension": "Traceability",
+        "text": "Does the agent implement IHE XDS.b ITI-18 (Registry Stored Query) correctly (query parameters, response structure, error handling, and security), validated via interoperability testing?",
+        "regulatoryRef": "IHE XDS.b ITI-18",
+        "l1": "No standards-compliant ITI-18 query; document discovery is proprietary or incomplete",
+        "l3": "Supports basic ITI-18 queries, but coverage is incomplete (edge cases, error handling, security assertions) and interoperability testing is limited",
+        "l5": "Full ITI-18 compliance with automated conformance testing, robust error handling, security assertions aligned to deployment, and continuous interoperability regression testing across communities",
+        "weight": 8
+      }
+    },
+    {
+      "packId": "drug-discovery",
+      "question": {
+        "id": "HLT-DD-15",
+        "dimension": "Compliance",
+        "text": "Does the agent ensure computerized systems used in discovery or CMC labs are validated and controlled per FDA 21 CFR §211.68 (including documented validation, input or output checks, access controls, change control, backup or restore testing, and periodic review) for ELN, LIMS, or instrument integrations?",
+        "regulatoryRef": "FDA 21 CFR §211.68",
+        "l1": "No CSV or controls; lab computerized systems are unvalidated and rely on informal checks",
+        "l3": "Validates key systems and performs some checks or backups, but validation scope, change control, and periodic review are incomplete or inconsistently evidenced",
+        "l5": "Full §211.68-aligned CSV with risk-based validation, documented checks, controlled configuration, backup or restore verification, and continuous monitoring with audit-ready validation packages",
+        "weight": 12
+      }
+    },
+    {
+      "packId": "drug-discovery",
+      "question": {
+        "id": "HLT-DD-16",
+        "dimension": "Compliance",
+        "text": "Does the agent define, justify, and govern a design space per ICH Q8(R2) §2.2 (including explicit boundaries, supporting evidence, and change handling within vs outside design space) for AI-assisted development and AI-influenced process optimization?",
+        "regulatoryRef": "ICH Q8(R2) §2.2",
+        "l1": "No design space; operating ranges and boundaries are informal and not supported by evidence",
+        "l3": "Defines operating ranges and explores multivariate effects, but boundaries, evidence linkage, and within or outside design-space change rules are not consistently enforced",
+        "l5": "Full §2.2 design space governance with evidence-backed boundaries, linkage to CQAs or CPPs, within or outside design-space change workflows, and alignment to Q9 QRM and Q10 control strategy",
+        "weight": 10
+      }
+    },
+    {
+      "packId": "life-technology",
+      "question": {
+        "id": "HLT-LT-12",
+        "dimension": "Compliance",
+        "text": "Does the agent implement EU AI Act 2024/1689 Article 10(2) training/validation data governance, including documented data management practices, dataset relevance/representativeness checks for intended purpose, error detection/handling, completeness/quality controls, bias testing/mitigation, and versioned dataset provenance for audit?",
+        "regulatoryRef": "EU AI Act 2024/1689 Art. 10(2)",
+        "l1": "No data governance; training/validation data sources, representativeness, errors, and bias controls are undocumented or ad hoc",
+        "l3": "Basic dataset documentation and some bias checks exist, but representativeness/quality/error-handling controls and provenance are incomplete or not auditable",
+        "l5": "Full Art. 10(2) compliance with documented data management procedures, representativeness and bias test suites, error-handling workflows, dataset versioning/provenance, and exportable audit evidence mapped to intended purpose",
+        "weight": 15
+      }
+    },
+    {
+      "packId": "patient-lifecycle",
+      "question": {
+        "id": "HLT-PL-15",
+        "dimension": "Traceability",
+        "text": "Does the agent support software requirements analysis and requirements traceability for safety-related functions per IEC 62304:2006 §5.2 (including linkage to risk controls and verification evidence)?",
+        "regulatoryRef": "IEC 62304:2006 §5.2",
+        "l1": "No software requirements; behavior is implicit and tests do not trace to safety requirements",
+        "l3": "Maintains partial requirements and some trace links to tests, but risk-control linkage and change impact analysis are incomplete",
+        "l5": "Full §5.2 compliance with safety-class-driven requirements rigor, bidirectional traceability (hazard → requirement → implementation → verification), change impact analysis, and release gating on trace completeness",
+        "weight": 12
+      }
+    },
+    {
+      "packId": "professional-practice",
+      "question": {
+        "id": "HLT-PP-11",
+        "dimension": "Compliance",
+        "text": "Does the agent implement False Claims Act 31 U.S.C. §3729(a)(1)(A) liability prevention for AI-enabled billing and Anti-Kickback Statute 42 U.S.C. §1320a-7b compliance for AI-assisted referral patterns?",
+        "regulatoryRef": "FCA 31 U.S.C. §3729; AKS 42 U.S.C. §1320a-7b",
+        "l1": "No FCA or AKS compliance; AI billing agents may generate false claims through upcoding without liability prevention, and AI referral pattern optimization may violate Anti-Kickback Statute",
+        "l3": "Agent implements basic coding validation and flags unusual billing patterns, but does not systematically prevent FCA-triggering false claims or assess AI referral patterns against AKS safe harbors",
+        "l5": "Full FCA prevention with AI billing validation against §3729(a)(1)(A) false claim triggers, AKS safe harbor assessment for AI-assisted referral patterns, OIG Advisory Opinion integration, qui tam risk monitoring, and automated compliance documentation for DOJ audit readiness",
+        "weight": 10
+      }
+    },
+    {
+      "packId": "professional-practice",
+      "question": {
+        "id": "HLT-PP-7",
+        "dimension": "Traceability",
+        "text": "Does the agent maintain HITECH Act §13401 breach notification readiness with automated breach detection and 60-day notification compliance?",
+        "regulatoryRef": "HITECH Act §13401; HHS Breach Notification Rule 45 CFR §164.404-408",
+        "l1": "No breach detection automation; PHI breaches are identified manually with risk of exceeding 60-day notification deadline",
+        "l3": "Agent monitors access logs for potential breach indicators and maintains breach risk assessment templates, but does not automate breach detection or notification workflow management",
+        "l5": "Autonomous breach detection with real-time access anomaly monitoring, automated 4-factor risk assessment per §164.402, notification workflow management within 60-day deadline, HHS/media notification triggers for 500+ record breaches, and breach log maintenance per §164.408",
+        "weight": 10
+      }
+    },
+    {
+      "packId": "specialized-medicine",
+      "question": {
+        "id": "HLT-SM-11",
+        "dimension": "Compliance",
+        "text": "Does the agent implement FDA DSCSA §582 enhanced drug distribution security requirements (effective November 2024) including lot-level saleable returns verification by AI dispensing agents?",
+        "regulatoryRef": "FDA DSCSA §582; 21 U.S.C. §360eee-1",
+        "l1": "No DSCSA §582 enhanced requirements; AI dispensing agents do not implement November 2024 lot-level verification, saleable returns processing, or enhanced transaction data exchange per §582(g)",
+        "l3": "Agent implements basic DSCSA serialization and verification, but does not address §582 enhanced requirements including lot-level saleable returns verification or §582(g) enhanced transaction data exchange",
+        "l5": "Full DSCSA §582 compliance with lot-level verification, saleable returns processing per §582(g), enhanced transaction data exchange, suspect and illegitimate product investigation automation, and FDA notification capability for confirmed illegitimate products",
+        "weight": 10
+      }
+    },
+    {
+      "packId": "cognition-to-intelligence",
+      "question": {
+        "id": "TECH-CI-12",
+        "dimension": "Governance",
+        "text": "Does the agent support ISO/IEC 42001:2023 §6.1 planning by maintaining an AI risk/opportunity register, defining actions with owners and due dates, integrating actions into operational processes (change/release), and tracking effectiveness metrics with evidence suitable for AIMS audit?",
+        "regulatoryRef": "ISO/IEC 42001:2023 §6.1",
+        "l1": "No planning loop; risks are informal, actions are undocumented, and improvements are ad hoc",
+        "l3": "Maintains a basic risk register and some actions, but integration into ops processes and effectiveness evidence is incomplete",
+        "l5": "Full §6.1 planning with versioned registers, accountable action plans, operational integration, effectiveness measurement, and audit-ready evidence packs",
+        "weight": 12
+      }
+    },
+    {
+      "packId": "cognition-to-intelligence",
+      "question": {
+        "id": "TECH-CI-13",
+        "dimension": "Transparency",
+        "text": "Does the agent achieve IEEE 7001:2021 §6.3 Level 3 transparency by producing traceable, reproducible explanations (inputs, transformations, uncertainty), role-appropriate explanation views, and maintained transparency-process artifacts (templates, logs, review records) for each intelligence output?",
+        "regulatoryRef": "IEEE 7001:2021 §6.3 (Level 3)",
+        "l1": "No IEEE 7001 transparency process; explanations are absent or purely narrative with no traceability",
+        "l3": "Provides explanations and some logs, but lacks Level-3 traceability, reproducibility, and maintained process artifacts",
+        "l5": "Meets Level 3 with traceable explanation records, uncertainty disclosure, role-specific views, and complete transparency-process documentation & review evidence",
+        "weight": 10
+      }
+    },
+    {
+      "packId": "cognition-to-intelligence",
+      "question": {
+        "id": "TECH-CI-9",
+        "dimension": "Compliance",
+        "text": "Does the agent implement EU AI Act Article 50 transparency obligations for AI-generated content including synthetic media labeling, and keep a register of the legal and regulatory requirements that apply to its intelligence systems (NIST AI RMF GOVERN 1.1)?",
+        "regulatoryRef": "EU AI Act Art. 50; NIST AI RMF GOVERN 1.1",
+        "l1": "No Art. 50 transparency and no legal-requirements register; intelligence systems generate content without synthetic media labeling and the legal and regulatory requirements that apply to them are not documented",
+        "l3": "Agent implements basic AI content disclosure and lists some applicable legal requirements, but does not automate EU AI Act Art. 50 synthetic media labeling or keep the NIST AI RMF GOVERN 1.1 register of legal and regulatory requirements current",
+        "l5": "Full EU AI Act Art. 50 compliance with automated synthetic media labeling, AI-generated content watermarking, a maintained NIST AI RMF GOVERN 1.1 register of the legal and regulatory requirements that apply, with an owner and review date per entry, and transparent AI content provenance for all intelligence outputs",
+        "weight": 12
+      }
+    },
+    {
+      "packId": "infotainment",
+      "question": {
+        "id": "TECH-INF-4",
+        "dimension": "Compliance",
+        "text": "Does the agent implement copyright compliance per EU Copyright Directive 2019/790 Article 17 upload filters and Article 15 press publishers' rights for AI-generated content?",
+        "regulatoryRef": "EU Copyright Directive 2019/790 Art. 15, 17",
+        "l1": "No copyright compliance; AI-generated content may reproduce copyrighted material and press publications without licensing or Art. 17 upload filter requirements",
+        "l3": "Agent implements basic copyright detection for uploaded content, but does not address Art. 15 press publisher rights, AI training data licensing, or proactive copyright avoidance in generated content",
+        "l5": "Full copyright compliance with Art. 17 upload filter implementation, Art. 15 press publisher rights management, AI training data licensing documentation, generated content originality verification, and rights management metadata preservation",
+        "weight": 12
+      }
+    },
+    {
+      "packId": "networked-ecosystems",
+      "question": {
+        "id": "TECH-NE-11",
+        "dimension": "Governance",
+        "text": "If the agent provides data intermediation services, does it operationalize DGA Art. 12 by enforcing neutrality and separation (no data use for other purposes, ring-fenced operations), implementing appropriate technical and organizational measures for secure intermediation, and maintaining audit-ready evidence (policies, access logs, segregation controls, and periodic compliance attestations)?",
+        "regulatoryRef": "EU DGA 2022/868 Art. 12",
+        "l1": "No Art. 12 controls; intermediary operations are commingled, data may be reused for other purposes, and evidence is missing",
+        "l3": "Some neutrality/separation controls exist, but segregation, security measures, and audit evidence are incomplete or inconsistently enforced across services/partners",
+        "l5": "Full Art. 12 implementation with enforced non-use constraints, operational separation, technical/organizational controls, continuous monitoring, and audit-ready evidence bundles aligned to competent authority expectations",
+        "weight": 15
+      }
+    },
+    {
+      "packId": "networked-ecosystems",
+      "question": {
+        "id": "TECH-NE-12",
+        "dimension": "Security",
+        "text": "Does the agent prevent OWASP API1 (Broken Object Level Authorization) by enforcing object ownership/tenant isolation on every object access, using centralized authorization (policy enforcement points), and maintaining automated authorization test coverage (positive/negative cases) with logs suitable for incident reconstruction?",
+        "regulatoryRef": "OWASP API Top 10 2023 — API1",
+        "l1": "No object-level authorization; endpoints rely on client-provided identifiers without ownership/tenant checks and lack authorization tests",
+        "l3": "Implements some object/tenant checks, but coverage is inconsistent, authorization logic is duplicated, or test evidence is incomplete",
+        "l5": "Full API1 prevention with centralized authorization, consistent ownership/tenant checks, automated authZ test suites per endpoint/resource, and audit-ready access decision logs",
+        "weight": 12
+      }
+    },
+    {
+      "packId": "networked-ecosystems",
+      "question": {
+        "id": "TECH-NE-13",
+        "dimension": "Compliance",
+        "text": "Does the agent implement EU Data Act Art. 4 access obligations in an operationally usable way (secure access interface, timely/continuous access where applicable, SLA evidence for no undue delay, and audit logs proving access was provided to users upon request)?",
+        "regulatoryRef": "EU Data Act 2023/2854 Art. 4",
+        "l1": "Access is ad hoc/manual; interfaces are insecure or slow, and timeliness/continuity evidence is missing",
+        "l3": "Access interfaces exist, but timeliness/continuity SLAs and evidence are incomplete or inconsistently met",
+        "l5": "Full Art. 4 operationalization with secure interfaces, timeliness/continuity controls, SLA monitoring, and audit-ready access evidence bundles",
+        "weight": 8
+      }
+    },
+    {
+      "packId": "networked-ecosystems",
+      "question": {
+        "id": "TECH-NE-8",
+        "dimension": "Transparency",
+        "text": "Does the agent implement algorithmic transparency per EU Digital Markets Act Article 6(12) for core platform services and fair access principles?",
+        "regulatoryRef": "EU DMA Art. 6(12); EU Data Act Art. 33",
+        "l1": "No algorithmic transparency; ecosystem ranking, access, and data monetization decisions are opaque without fairness assessment",
+        "l3": "Agent provides basic transparency reports for ecosystem ranking and access decisions, but does not implement full DMA Art. 6(12) requirements or contestability mechanisms",
+        "l5": "Full DMA compliance with algorithmic transparency for ranking and access decisions, non-discrimination monitoring, business user access audits, contestability mechanisms, and transparent data access pricing per EU Data Act Art. 33",
+        "weight": 12
+      }
+    },
+    {
+      "packId": "os-sustainable-outcomes",
+      "question": {
+        "id": "TECH-OS-10",
+        "dimension": "Resilience",
+        "text": "Does the agent implement threat-led penetration testing (TLPT) governance and execution aligned to the Councils required mapping for EU DORA Art. 9(4), including (1) a TLPT policy and scoping methodology, (2) engagement governance and independence, (3) red-team execution with threat intelligence, (4) findings remediation tracking, and (5) an auditor/supervisor-ready evidence bundle (scope, rules of engagement, reports, remediation, and retest outcomes)?",
+        "regulatoryRef": "EU DORA (EU) 2022/2554 Art. 9(4) (TLPT anchor)",
+        "l1": "No TLPT: no threat-led testing program, no governance, and no evidence bundles",
+        "l3": "Performs some penetration testing and occasional scenario exercises, but TLPT governance, independence, and evidence bundles are incomplete or not mapped to the required DORA anchor",
+        "l5": "Full TLPT program with governance, scoped threat-led testing, independence controls, remediation + retesting, and supervisor-ready evidence mapped to the required DORA Art. 9(4) anchor",
+        "weight": 15
+      }
+    },
+    {
+      "packId": "os-sustainable-outcomes",
+      "question": {
+        "id": "TECH-OS-12",
+        "dimension": "Resilience",
+        "text": "Does the agent implement ISO 22301:2019 §8.4.4 recovery procedures by defining invocation criteria, step-by-step recovery runbooks for critical orchestration pathways, communications/roles during recovery, exercise/testing outputs, and evidence retention that demonstrates procedures are current and effective?",
+        "regulatoryRef": "ISO 22301:2019 §8.4.4",
+        "l1": "No recovery procedures: BC plans are high-level and not executable, exercised, or evidenced",
+        "l3": "Has recovery runbooks and exercises some scenarios, but invocation criteria, communications roles, and evidence bundles are incomplete",
+        "l5": "Full §8.4.4 compliance with executable recovery procedures, role/communication plans, regular exercises, after-action improvements, and auditor-ready evidence",
+        "weight": 12
+      }
+    },
+    {
+      "packId": "os-sustainable-outcomes",
+      "question": {
+        "id": "TECH-OS-14",
+        "dimension": "Operations",
+        "text": "Does the agent operationalize the ITIL v4 §5.2.7 practice expectations by defining practice ownership, KPIs (availability, incident MTTR, recovery drill success), runbooks/workflows, continual improvement backlog, and evidence outputs that demonstrate the practice is executed and improved over time for orchestration services?",
+        "regulatoryRef": "ITIL v4 §5.2.7",
+        "l1": "No ITIL practice operationalization: no practice KPIs, runbooks, or continual improvement evidence",
+        "l3": "Some ITIL-like processes exist, but KPIs, ownership, and evidence outputs are incomplete or inconsistent",
+        "l5": "Full ITIL practice operationalization with owned KPIs, runbooks, continual improvement, and audit-ready evidence demonstrating sustained execution",
+        "weight": 10
+      }
+    },
+    {
+      "packId": "os-sustainable-outcomes",
+      "question": {
+        "id": "TECH-OS-7",
+        "dimension": "Security",
+        "text": "Does the agent implement NIS2 cybersecurity measures per EU NIS2 Directive 2022/2555 Article 21 for essential entity digital infrastructure?",
+        "regulatoryRef": "EU NIS2 2022/2555 Art. 21",
+        "l1": "No NIS2 cybersecurity measures; orchestration system does not implement essential entity security requirements per Art. 21",
+        "l3": "Agent implements several Art. 21 security measures including incident handling and supply chain security, but does not address all required measures",
+        "l5": "Full NIS2 compliance with all Art. 21 measures, 24-hour incident notification capability, supply chain security, cryptographic controls, access control, and regular cybersecurity testing per Art. 21(2)(i)",
+        "weight": 12
+      }
+    },
+    {
+      "packId": "partnerships-prosperity",
+      "question": {
+        "id": "TECH-PP-1",
+        "dimension": "Governance",
+        "text": "Does the agent manage IP rights in partnership ecosystems per TRIPS Agreement Articles 27-34 patent rights and Article 10 copyright protection for AI-generated collaborative outputs?",
+        "regulatoryRef": "TRIPS Agreement Art. 10, 27-34",
+        "l1": "No IP rights management; partnership AI creates joint outputs without clear ownership, licensing terms, or TRIPS-compliant protection",
+        "l3": "Agent tracks IP ownership in partnership outputs and applies standard licensing templates, but does not implement automated TRIPS compliance or proactive IP conflict detection",
+        "l5": "Full IP governance with automated TRIPS-compliant rights management, joint IP ownership agreements, AI authorship disclosure, patent landscape monitoring, copyright registration support, and IP dispute prevention through clear contribution tracking",
+        "weight": 15
+      }
+    },
+    {
+      "packId": "partnerships-prosperity",
+      "question": {
+        "id": "TECH-PP-9",
+        "dimension": "Compliance",
+        "text": "Does the agent implement EU Trade Secrets Directive 2016/943 Article 2 reasonable measures standard for AI collaboration environments and WIPO Copyright Treaty Article 11 technological protection measures for AI-generated partnership IP?",
+        "regulatoryRef": "EU Trade Secrets Directive 2016/943 Art. 2; WIPO WCT Art. 11",
+        "l1": "No trade secret or TPM compliance; AI collaboration environments lack Art. 2 reasonable measures for confidential information and WIPO WCT Art. 11 technological protection for AI-generated IP",
+        "l3": "Agent implements basic access controls for partnership data, but does not systematically apply Art. 2 reasonable measures standard or WIPO WCT Art. 11 technological protection for AI-generated collaborative IP",
+        "l5": "Full EU Trade Secrets Directive Art. 2 reasonable measures with AI-specific access classification, WIPO WCT Art. 11 technological protection for AI-generated IP, trade secret inventory management, misappropriation detection, and IP protection audit trail for partnership governance",
+        "weight": 12
+      }
+    },
+    {
+      "packId": "blockchain",
+      "question": {
+        "id": "WLT-BC-14",
+        "dimension": "Compliance",
+        "text": "Does the agent perform security-token risk analysis incorporating SEC v. Ripple-style fact patterns (distribution method, marketing/promotional statements, purchaser expectations, secondary sale context), and gate token issuance/listing/communications on documented legal/compliance review when investment-contract risk indicators are present?",
+        "regulatoryRef": "SEC v. Ripple Labs; Howey test application in token distributions",
+        "l1": "No Ripple-aware analysis; token distribution and marketing risks are not assessed",
+        "l3": "Flags some promotional language and distribution risks, but secondary-sale context and evidence retention are inconsistent",
+        "l5": "Full Ripple-aware control with structured fact intake, risk scoring, communications gating, escalation workflows, and audit-ready evidence bundles supporting the organization securities-law posture",
+        "weight": 10
+      }
+    },
+    {
+      "packId": "blockchain",
+      "question": {
+        "id": "WLT-BC-9",
+        "dimension": "Compliance",
+        "text": "Does the agent implement EU Transfer of Funds Regulation 2023/1113 originator/beneficiary data completeness requirements for AI VASP-to-VASP transactions distinct from MiCA obligations?",
+        "regulatoryRef": "EU TFR 2023/1113 Art. 4-7; FATF R16",
+        "l1": "No TFR compliance; AI VASP agents do not distinguish TFR originator/beneficiary data completeness requirements from MiCA obligations, risking non-compliance with travel rule implementation",
+        "l3": "Agent implements basic FATF travel rule data collection, but does not enforce EU TFR 2023/1113 Art. 4-7 specific data completeness thresholds or distinguish TFR requirements from MiCA VASP obligations",
+        "l5": "Full EU TFR 2023/1113 compliance with Art. 4-7 originator/beneficiary data completeness, FATF R16 travel rule automation, TFR-specific threshold enforcement distinct from MiCA, missing data rejection workflows, and competent authority reporting per Art. 15",
+        "weight": 12
+      }
+    },
+    {
+      "packId": "circular-economy",
+      "question": {
+        "id": "WLT-CE-11",
+        "dimension": "Compliance",
+        "text": "Does the agent implement CSRD-aligned ESRS E1 value-chain (Scope 3) governance, including (1) coverage across relevant Scope 3 categories, (2) boundary and consolidation approach documentation, (3) estimation hierarchy and data quality scoring, and (4) assurance-ready evidence bundles and change logs for reported Scope 3 metrics?",
+        "regulatoryRef": "EU CSRD 2022/2464; ESRS E1 (Scope 3/value-chain)",
+        "l1": "No ESRS E1 Scope 3 governance: categories are not mapped, boundaries are unclear, and reported figures are not reproducible with evidence",
+        "l3": "Maps major categories and produces estimates, but data quality/coverage controls and assurance evidence are incomplete",
+        "l5": "Full ESRS E1 Scope 3 governance with category mapping, boundary documentation, estimation controls, data quality scoring, and auditor-ready evidence packs with change history",
+        "weight": 12
+      }
+    },
+    {
+      "packId": "digital-payments",
+      "question": {
+        "id": "WLT-DP-12",
+        "dimension": "Compliance",
+        "text": "Does the agent implement SCA RTS dynamic linking by cryptographically binding authentication to the specific transaction amount and payee (and ensuring integrity-protected display or confirmation of those elements to the payer), and by preventing post-authentication manipulation of amount or payee in both browser and app flows?",
+        "regulatoryRef": "EBA RTS on SCA (EU) 2018/389 Art. 4 (dynamic linking)",
+        "l1": "No dynamic linking: MFA may be used but authentication is not bound to amount or payee and transaction details can be manipulated",
+        "l3": "Binds authentication to some transaction details and displays amount and payee, but integrity protections and manipulation detection are incomplete across channels",
+        "l5": "Full RTS dynamic linking with cryptographic binding to amount and payee, secure display and confirmation, channel-consistent enforcement (web/app), tamper detection, and audit logs demonstrating binding and user confirmation",
+        "weight": 12
+      }
+    },
+    {
+      "packId": "digital-payments",
+      "question": {
+        "id": "WLT-DP-14",
+        "dimension": "Crypto-Asset Transfer Information",
+        "text": "For transfers of funds and crypto-assets, does the agent ensure the required originator and beneficiary information accompanies each transfer under Regulation (EU) 2023/1113 and the FATF R.16 payment-transparency standard revised in June 2025?",
+        "regulatoryRef": "Regulation (EU) 2023/1113; FATF R.16",
+        "l1": "Transfers are sent without complete originator or beneficiary information",
+        "l3": "Required fields are populated for fiat transfers, but crypto-asset transfers and missing-information handling are inconsistent",
+        "l5": "Originator and beneficiary information is validated for every fiat and crypto-asset transfer, incomplete transfers are held or rejected under a documented policy, and the evidence is retained for supervisory review",
+        "weight": 10
+      }
+    },
+    {
+      "packId": "no-poverty",
+      "question": {
+        "id": "WLT-NP-12",
+        "dimension": "Consumer Protection",
+        "text": "Does the agent implement World Bank / GPFI 2020-aligned responsible DFS controls, including product suitability checks for vulnerable users, transparent total cost disclosures, accessible complaints + dispute resolution SLAs, and fraud/scam resilience (social engineering protections) for low-literacy populations?",
+        "regulatoryRef": "World Bank GPFI (2020) — responsible DFS / consumer protection",
+        "l1": "No GPFI-aligned DFS controls; suitability, dispute resolution, and scam resilience are not systematically implemented",
+        "l3": "Implements some disclosures and basic complaints intake, but suitability checks, resolution SLAs, and scam/fraud resilience are incomplete",
+        "l5": "Full GPFI-aligned DFS consumer outcomes with suitability gating, total-cost transparency, monitored complaint/dispute SLAs, scam resilience patterns, and auditable reporting of consumer harm reduction",
+        "weight": 12
+      }
+    }
+  ]
+}

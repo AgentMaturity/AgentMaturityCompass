@@ -1,3 +1,4 @@
+import { mean as arithmeticMean } from "../experiments/stats.js";
 /**
  * Vendor-named drift receipt builder — NO VENDOR API IS CONTACTED.
  *
@@ -147,8 +148,9 @@ function unique(values: unknown): string[] {
   return normalizeEvidenceRefs(values);
 }
 
+// These receipts preserve their caller fallback and six-place rounding around the experiments/stats.ts mean.
 function mean(values: number[], fallback = 0): number {
-  return values.length === 0 ? fallback : round(values.reduce((sum, value) => sum + value, 0) / values.length);
+  return values.length === 0 ? fallback : round(arithmeticMean(values));
 }
 
 function sourceRefsFor(input: RunRagTextGenerationLiveDriftInput): string[] {

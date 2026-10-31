@@ -56,4 +56,4 @@ Token admission requires finite expiry and issuance claims, a non-empty subject,
 
 No new settings or CLI paths are introduced, so existing signed identity YAML is preserved. Private-network or HTTP identity endpoints and previously accepted EdDSA tokens now fail OIDC admission. See [SSO OIDC](SSO_OIDC.md) for the exact loopback-development exception, key rotation and remaining browser/session boundaries.
 
-Standard SAML remains separate work. [ADR 014](adr/014-saml-library.md) is a proposed library direction awaiting review; this OIDC implementation does not change the compact SAML runtime or SCIM behavior.
+Standard SAML remains separate work. [ADR 014](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/adr/014-saml-library.md) is a proposed library direction awaiting review; this OIDC implementation does not change the compact SAML runtime or SCIM behavior.

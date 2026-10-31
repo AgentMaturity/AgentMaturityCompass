@@ -1,0 +1,103 @@
+$ amc domain conformance --station wealth --agent default --max-evidence-age 30d
+# exit 0
+
+Conformance run (wealth, agent default)
+Claim: Self-reported · Result: not evaluated · Evidence: incomplete · Enforcement: none · Review: pending · Applicability: unresolved
+Status: REQUIREMENTS_NOT_MET (evidence of conformity within the derived requirement set)
+Requirements: 92 total, PASS 0, FAIL 0, NOT_EVALUATED 92
+NOT_EVALUATED:
+  industry-pack:future-of-work:WLT-FW-1 — no accepted response for this question
+  industry-pack:future-of-work:WLT-FW-2 — no accepted response for this question
+  industry-pack:future-of-work:WLT-FW-3 — no accepted response for this question
+  industry-pack:future-of-work:WLT-FW-4 — no accepted response for this question
+  industry-pack:future-of-work:WLT-FW-5 — no accepted response for this question
+  industry-pack:future-of-work:WLT-FW-6 — no accepted response for this question
+  industry-pack:future-of-work:WLT-FW-7 — no accepted response for this question
+  industry-pack:future-of-work:WLT-FW-8 — no accepted response for this question
+  industry-pack:future-of-work:WLT-FW-9 — no accepted response for this question
+  industry-pack:future-of-work:WLT-FW-10 — no accepted response for this question
+  industry-pack:future-of-work:WLT-FW-11 — no accepted response for this question
+  industry-pack:future-of-work:WLT-FW-12 — no accepted response for this question
+  industry-pack:future-of-work:WLT-FW-13 — no accepted response for this question
+  industry-pack:future-of-work:WLT-FW-14 — no accepted response for this question
+  industry-pack:future-of-work:WLT-FW-15 — no accepted response for this question
+  industry-pack:digital-payments:WLT-DP-1 — no accepted response for this question
+  industry-pack:digital-payments:WLT-DP-2 — no accepted response for this question
+  industry-pack:digital-payments:WLT-DP-3 — no accepted response for this question
+  industry-pack:digital-payments:WLT-DP-4 — no accepted response for this question
+  industry-pack:digital-payments:WLT-DP-5 — no accepted response for this question
+  industry-pack:digital-payments:WLT-DP-6 — no accepted response for this question
+  industry-pack:digital-payments:WLT-DP-7 — no accepted response for this question
+  industry-pack:digital-payments:WLT-DP-8 — no accepted response for this question
+  industry-pack:digital-payments:WLT-DP-9 — no accepted response for this question
+  industry-pack:digital-payments:WLT-DP-10 — no accepted response for this question
+  industry-pack:digital-payments:WLT-DP-11 — no accepted response for this question
+  industry-pack:digital-payments:WLT-DP-12 — no accepted response for this question
+  industry-pack:digital-payments:WLT-DP-13 — no accepted response for this question
+  industry-pack:digital-payments:WLT-DP-14 — no accepted response for this question
+  industry-pack:digital-payments:WLT-DP-15 — no accepted response for this question
+  industry-pack:no-poverty:WLT-NP-1 — no accepted response for this question
+  industry-pack:no-poverty:WLT-NP-2 — no accepted response for this question
+  industry-pack:no-poverty:WLT-NP-3 — no accepted response for this question
+  industry-pack:no-poverty:WLT-NP-4 — no accepted response for this question
+  industry-pack:no-poverty:WLT-NP-5 — no accepted response for this question
+  industry-pack:no-poverty:WLT-NP-6 — no accepted response for this question
+  industry-pack:no-poverty:WLT-NP-7 — no accepted response for this question
+  industry-pack:no-poverty:WLT-NP-8 — no accepted response for this question
+  industry-pack:no-poverty:WLT-NP-9 — no accepted response for this question
+  industry-pack:no-poverty:WLT-NP-10 — no accepted response for this question
+  industry-pack:no-poverty:WLT-NP-11 — no accepted response for this question
+  industry-pack:no-poverty:WLT-NP-12 — no accepted response for this question
+  industry-pack:no-poverty:WLT-NP-13 — no accepted response for this question
+  industry-pack:no-poverty:WLT-NP-14 — no accepted response for this question
+  industry-pack:no-poverty:WLT-NP-15 — no accepted response for this question
+  industry-pack:circular-economy:WLT-CE-1 — no accepted response for this question
+  industry-pack:circular-economy:WLT-CE-2 — no accepted response for this question
+  industry-pack:circular-economy:WLT-CE-3 — no accepted response for this question
+  industry-pack:circular-economy:WLT-CE-4 — no accepted response for this question
+  industry-pack:circular-economy:WLT-CE-5 — no accepted response for this question
+  industry-pack:circular-economy:WLT-CE-6 — no accepted response for this question
+  industry-pack:circular-economy:WLT-CE-7 — no accepted response for this question
+  industry-pack:circular-economy:WLT-CE-8 — no accepted response for this question
+  industry-pack:circular-economy:WLT-CE-9 — no accepted response for this question
+  industry-pack:circular-economy:WLT-CE-10 — no accepted response for this question
+  industry-pack:circular-economy:WLT-CE-11 — no accepted response for this question
+  industry-pack:circular-economy:WLT-CE-12 — no accepted response for this question
+  industry-pack:circular-economy:WLT-CE-13 — no accepted response for this question
+  industry-pack:circular-economy:WLT-CE-14 — no accepted response for this question
+  industry-pack:circular-economy:WLT-CE-15 — no accepted response for this question
+  industry-pack:blockchain:WLT-BC-1 — no accepted response for this question
+  industry-pack:blockchain:WLT-BC-2 — no accepted response for this question
+  industry-pack:blockchain:WLT-BC-3 — no accepted response for this question
+  industry-pack:blockchain:WLT-BC-4 — no accepted response for this question
+  industry-pack:blockchain:WLT-BC-5 — no accepted response for this question
+  industry-pack:blockchain:WLT-BC-6 — no accepted response for this question
+  industry-pack:blockchain:WLT-BC-7 — no accepted response for this question
+  industry-pack:blockchain:WLT-BC-8 — no accepted response for this question
+  industry-pack:blockchain:WLT-BC-9 — no accepted response for this question
+  industry-pack:blockchain:WLT-BC-10 — no accepted response for this question
+  industry-pack:blockchain:WLT-BC-11 — no accepted response for this question
+  industry-pack:blockchain:WLT-BC-12 — no accepted response for this question
+  industry-pack:blockchain:WLT-BC-13 — no accepted response for this question
+  industry-pack:blockchain:WLT-BC-14 — no accepted response for this question
+  industry-pack:blockchain:WLT-BC-15 — no accepted response for this question
+  domain-question:wealth:WLT-1 — no accepted response for this question
+  domain-question:wealth:WLT-2 — no accepted response for this question
+  domain-question:wealth:WLT-3 — no accepted response for this question
+  domain-question:wealth:WLT-4 — no accepted response for this question
+  domain-question:wealth:WLT-5 — no accepted response for this question
+  domain-question:wealth:WLT-6 — no accepted response for this question
+  domain-question:wealth:FIN-1 — no accepted response for this question
+  domain-question:wealth:FIN-2 — no accepted response for this question
+  domain-question:wealth:FIN-3 — no accepted response for this question
+  domain-question:wealth:FIN-4 — no accepted response for this question
+  domain-question:wealth:FIN-5 — no accepted response for this question
+  domain-question:wealth:FIN-6 — no accepted response for this question
+  domain-question:wealth:FIN-7 — no accepted response for this question
+  domain-question:wealth:FIN-8 — no accepted response for this question
+  assurance-pack:wealthManagementMiFID — no sealed assurance run with ledger provenance contains this pack
+  assurance-pack:financialModelRisk — no sealed assurance run with ledger provenance contains this pack
+  scenario-pack:injection — no sealed assurance run with ledger provenance contains this pack
+Refused inputs: none
+Export: <tmp>/ws/.amc/reports/conformance/ba6a9869-67b5-49eb-a4ec-e3218504dab3.json
+Summary: <tmp>/ws/.amc/reports/conformance/ba6a9869-67b5-49eb-a4ec-e3218504dab3.md

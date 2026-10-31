@@ -1,0 +1,29 @@
+{
+  "schema": "p125ec-independent-public-curator-static-review-seal/1",
+  "at": "2026-10-17T01:21:04.269594+00:00",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-output-static-review/review.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-output-static-review/review.json",
+      "bytes": 8809,
+      "sha256": "2d18949fc9315618e0edcca939611e18accee69bc2353b7bcda2779745967dd9",
+      "dev": 16777231,
+      "inode": 543909398,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-output-static-review/input-pins.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-output-static-review/input-pins.json",
+      "bytes": 36078,
+      "sha256": "04c425d9d1c55f5d3fa80f855ad5744bfd9e147819356e0ebf97a26f4e13eb3d",
+      "dev": 16777231,
+      "inode": 543909399,
+      "nlink": 1
+    }
+  ],
+  "inputPinCount": 82,
+  "blockers": [],
+  "allOutputsCompleteAndClosed": true,
+  "noHelperExecutionOrOutputMaterialization": true,
+  "noPriorArtifactsChanged": true
+}

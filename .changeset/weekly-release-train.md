@@ -1,0 +1,5 @@
+---
+"agent-maturity-compass": patch
+---
+
+Contributor tooling only, no runtime change: the weekly release train (P1-41). `npm-publish.yml` also refreshes the version pull request every Tuesday at 09:00 UTC and on manual dispatch, with only `contents: write` and `pull-requests: write` on its version job. `release:prepare` writes weekly-train notes for a minor or patch release that has none and still refuses a breaking release without hand-written notes. `node scripts/check-release-notes.mjs <file>` fails on banned claim words outside inline code, negated or not; CI runs it on every `docs/releases/*.md` and `release.yml` on the tag's notes before packing. The new `post-publish-verify.yml` runs after every successful Release run with read-only permissions and no secret: `node scripts/check-published-release.mjs <version>` checks npm, the GitHub release and anonymous pull of the Studio image, and `node scripts/distribution-metrics.mjs` records npm's last-week downloads and cumulative GitHub release asset downloads, writing "not measured" for any figure it cannot read. See docs/RELEASE_CADENCE.md.

@@ -8,7 +8,7 @@ The [machine-readable map](closure-map.json) contains one row for every supplied
 
 The supplied `AMC_OS/RESEARCH/2026-09-09-chat-on-steroids/closure-issue-snapshot.json`, retrieved **2026-09-09T11:01:29.221Z**, contains **42 issues: 31 In Review and 11 In Progress**, with `hasNextPage: false`. These are counts of that supplied snapshot, not newly queried live statuses. The brief's older queue count is not used.
 
-Assigned worktree: `/Users/sid/AgentMaturityCompass/tmp/cos-closure-map`; branch: `codex/cos-closure-map`; pinned source: **`68458818799d1db7826d67d1b604d6ad77ac4432`**. The worktree pointer, branch HEAD and branch ref were read as text. No Git operation or ancestry check was executed.
+Assigned worktree: `~/AgentMaturityCompass/tmp/cos-closure-map`; branch: `codex/cos-closure-map`; pinned source: **`68458818799d1db7826d67d1b604d6ad77ac4432`**. The worktree pointer, branch HEAD and branch ref were read as text. No Git operation or ancestry check was executed.
 
 **Final runtime acceptance is pending and was not inspected.** The inspected root `plans/ownership-manifest.md` reports a clean-install success followed by a TypeScript build failure at the assigned pin, a correction at `e12060297b6f847903501354d3a6425ffc51adb7`, and a later frozen candidate declaration at `c16492c10592112fe610bd2e59f216f8f7f310b4`. These are separate facts. This map does not silently repin its source, inspect an ongoing run, or turn a source correction into a pass.
 
@@ -18,7 +18,7 @@ All snapshot descriptions are truncated. The earlier full archive, `AMC_OS/RESEA
 
 ## How to read the evidence
 
-The JSON `evidence` registry resolves each identifier below to an **actually opened file**, its root, read range, evidence class and limits. `repository` means `/Users/sid/AgentMaturityCompass`; `assigned-worktree` means the isolated closure worktree. Root research notes may postdate the worktree pin; inspection does not prove their bytes were committed at that pin.
+The JSON `evidence` registry resolves each identifier below to an **actually opened file**, its root, read range, evidence class and limits. `repository` means `~/AgentMaturityCompass`; `assigned-worktree` means the isolated closure worktree. Root research notes may postdate the worktree pin; inspection does not prove their bytes were committed at that pin.
 
 An opened guide can identify a relevant test or receipt without making that nested file independently inspected. Source/helper authoring is not execution; a scoped dirty-source review is not the brief's fresh-clone acceptance; historical installed receipts remain limited to their actual source and environment. All five helper source inspections were partial and their ranges are explicitly recorded. Implementation hashes are reported from inspected contracts/notes, not newly proved merge ancestry.
 

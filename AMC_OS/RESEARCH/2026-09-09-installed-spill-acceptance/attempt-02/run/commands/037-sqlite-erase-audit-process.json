@@ -2,8 +2,8 @@
   "label": "037-sqlite-erase-audit",
   "command": [
     "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
-    "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/native-case.mjs",
-    "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/receipts/sqlite-erase-audit/input.json"
+    "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/native-case.mjs",
+    "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/receipts/sqlite-erase-audit/input.json"
   ],
   "startedAt": "2026-09-09T15:40:20.167288+00:00",
   "timeoutSeconds": 120,

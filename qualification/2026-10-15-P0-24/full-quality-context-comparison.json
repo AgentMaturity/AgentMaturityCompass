@@ -1,0 +1,41 @@
+{
+  "prior": {
+    "path": "/private/tmp/p0-27-runtime-compatibility-candidate-full-dead-code-20261015.json",
+    "sha256": "0a33d09f2f323f643e7d99c517a5d397ea72f1053d1c20395408328ca3449b0a",
+    "source": "75cbdf8a1b83ed6b3851ecce3a069940352a40cd",
+    "findingCount": 2774
+  },
+  "current": {
+    "path": "/private/tmp/p0-24-current-full-dead-code-20261015.json",
+    "sha256": "e635ca7fc11270f45f5510dc4444a7473d79b5c2f53c3c3708e4e83bd149a52e",
+    "candidateTestSha256": "c184101b8dc302cfaf2980b6b2900cac26bbe9965d2f5ba3dbc68f2468bd0712",
+    "findingCount": 2751
+  },
+  "removed": [
+    "[\"src/compliance/euAiActClassifier.ts\",\"types\",{\"name\":\"EuAiActApplicationDate\"}]",
+    "[\"src/compliance/euAiActClassifier.ts\",\"types\",{\"name\":\"EuAiActFinding\"}]",
+    "[\"src/compliance/euAiActClassifier.ts\",\"types\",{\"name\":\"EuAiActRemediationItem\"}]",
+    "[\"src/compliance/euAiActClassifier.ts\",\"types\",{\"name\":\"EuAiActRiskTier\"}]",
+    "[\"src/compliance/euAiActClassifier.ts\",\"types\",{\"name\":\"EuAiActRoadmapStep\"}]",
+    "[\"src/domains/industryPackAudit.ts\",\"exports\",{\"name\":\"INDUSTRY_PACK_AUDIT_ANCHORS\"}]",
+    "[\"src/domains/industryPackAudit.ts\",\"exports\",{\"name\":\"INDUSTRY_PACK_AUDIT_SCHEMA_VERSION\"}]",
+    "[\"src/domains/industryPackAudit.ts\",\"exports\",{\"name\":\"verifyIndustryPackAudit\"}]",
+    "[\"src/domains/industryPackAudit.ts\",\"types\",{\"name\":\"AuditControl\"}]",
+    "[\"src/domains/industryPackAudit.ts\",\"types\",{\"name\":\"AuditRemediation\"}]",
+    "[\"src/domains/industryPackAudit.ts\",\"types\",{\"name\":\"ControlStatus\"}]",
+    "[\"src/domains/industryPackAudit.ts\",\"types\",{\"name\":\"CrosswalkEntry\"}]",
+    "[\"src/domains/industryPackAudit.ts\",\"types\",{\"name\":\"FrameworkAnchors\"}]",
+    "[\"src/domains/industryPackAudit.ts\",\"types\",{\"name\":\"IndustryPackAuditVerifyCode\"}]",
+    "[\"src/score/domainPacks.ts\",\"exports\",{\"name\":\"EDUCATION_QUESTIONS\"}]",
+    "[\"src/score/domainPacks.ts\",\"exports\",{\"name\":\"ENVIRONMENT_QUESTIONS\"}]",
+    "[\"src/score/domainPacks.ts\",\"exports\",{\"name\":\"FINANCIAL_QUESTIONS\"}]",
+    "[\"src/score/domainPacks.ts\",\"exports\",{\"name\":\"GOVERNANCE_QUESTIONS\"}]",
+    "[\"src/score/domainPacks.ts\",\"exports\",{\"name\":\"HEALTH_QUESTIONS\"}]",
+    "[\"src/score/domainPacks.ts\",\"exports\",{\"name\":\"MOBILITY_QUESTIONS\"}]",
+    "[\"src/score/domainPacks.ts\",\"exports\",{\"name\":\"SAFETY_CRITICAL_QUESTIONS\"}]",
+    "[\"src/score/domainPacks.ts\",\"exports\",{\"name\":\"TECHNOLOGY_QUESTIONS\"}]",
+    "[\"src/score/domainPacks.ts\",\"exports\",{\"name\":\"WEALTH_QUESTIONS\"}]"
+  ],
+  "added": [],
+  "interpretation": "Complete normalized finding sets are retained. Only one new qualification test and ten exact numeric inventory changes distinguish candidate input from the prior source; production and scanner/configuration are unchanged. No production cleanup or causal explanation is asserted. The diagnostic collection exit 0 is not the ordinary quality gate; that gate remains exit 1 at 2,751 findings."
+}

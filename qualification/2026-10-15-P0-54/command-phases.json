@@ -1,0 +1,272 @@
+[
+  {
+    "name": "frozen-install",
+    "cmd": "pnpm install --frozen-lockfile",
+    "exit": 0,
+    "durationMs": 1691,
+    "startedUtc": "2026-10-14T19:28:11.188452+00:00",
+    "log": "/private/tmp/p0-54-frozen-install-20261015.log",
+    "sourceHead": "bc0666fbb25bc5e53f0cfb6e84d53eb9eb86f01b"
+  },
+  {
+    "name": "current-build",
+    "cmd": "pnpm run build",
+    "exit": 0,
+    "durationMs": 31568,
+    "startedUtc": "2026-10-14T19:29:08.771614+00:00",
+    "log": "/private/tmp/p0-54-current-build-20261015.log",
+    "sourceHead": "bc0666fbb25bc5e53f0cfb6e84d53eb9eb86f01b"
+  },
+  {
+    "name": "current-threat-model",
+    "cmd": "pnpm run check:threat-model",
+    "exit": 0,
+    "durationMs": 464,
+    "startedUtc": "2026-10-14T19:30:44.061513+00:00",
+    "log": "/private/tmp/p0-54-current-threat-model-20261015.log",
+    "sourceHead": "bc0666fbb25bc5e53f0cfb6e84d53eb9eb86f01b"
+  },
+  {
+    "name": "current-gates",
+    "cmd": "pnpm run check:gates",
+    "exit": 0,
+    "durationMs": 657,
+    "startedUtc": "2026-10-14T19:30:44.063059+00:00",
+    "log": "/private/tmp/p0-54-current-gates-20261015.log",
+    "sourceHead": "bc0666fbb25bc5e53f0cfb6e84d53eb9eb86f01b"
+  },
+  {
+    "name": "current-no-fabrication",
+    "cmd": "pnpm run check:no-fabrication -- --json",
+    "exit": 0,
+    "durationMs": 2420,
+    "startedUtc": "2026-10-14T19:30:44.061513+00:00",
+    "log": "/private/tmp/p0-54-current-no-fabrication-20261015.log",
+    "sourceHead": "bc0666fbb25bc5e53f0cfb6e84d53eb9eb86f01b"
+  },
+  {
+    "name": "original-guards",
+    "cmd": "pnpm exec vitest run tests/checkNoFabrication.test.ts tests/threatModelMap.test.ts tests/planEditsManifest.test.ts tests/privateModuleHelperVisibility.test.ts --reporter=json --outputFile=/private/tmp/p0-54-original-guards-20261015.json",
+    "exit": 0,
+    "durationMs": 7995,
+    "startedUtc": "2026-10-14T19:30:44.061520+00:00",
+    "log": "/private/tmp/p0-54-original-guards-20261015.log",
+    "sourceHead": "bc0666fbb25bc5e53f0cfb6e84d53eb9eb86f01b"
+  },
+  {
+    "name": "guard-first",
+    "cmd": "pnpm exec vitest run tests/a4GuardQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-54-guard-first-20261015.json",
+    "exit": 0,
+    "durationMs": 1748,
+    "startedUtc": "2026-10-14T19:31:09.294109+00:00",
+    "log": "/private/tmp/p0-54-guard-first-20261015.log",
+    "sourceHead": "bc0666fbb25bc5e53f0cfb6e84d53eb9eb86f01b"
+  },
+  {
+    "name": "guard-without-a4-mutant",
+    "cmd": "env AMC_P0_54_SCANNER=/private/tmp/amc-p0-54-scanner-mutant-d5fbi4f5/check-no-fabrication.mjs pnpm exec vitest run tests/a4GuardQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-54-guard-without-a4-mutant-20261015.json",
+    "exit": 1,
+    "durationMs": 1718,
+    "startedUtc": "2026-10-14T19:31:27.000853+00:00",
+    "log": "/private/tmp/p0-54-guard-without-a4-mutant-20261015.log",
+    "sourceHead": "bc0666fbb25bc5e53f0cfb6e84d53eb9eb86f01b"
+  },
+  {
+    "name": "owner-mode-first",
+    "cmd": "pnpm exec vitest run tests/a4OwnerModeQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-54-owner-mode-first-20261015.json",
+    "exit": 0,
+    "durationMs": 631,
+    "startedUtc": "2026-10-14T19:32:50.240675+00:00",
+    "log": "/private/tmp/p0-54-owner-mode-first-20261015.log",
+    "sourceHead": "bc0666fbb25bc5e53f0cfb6e84d53eb9eb86f01b"
+  },
+  {
+    "name": "factual-count-update",
+    "cmd": "pnpm run gen-counts",
+    "exit": 0,
+    "durationMs": 545,
+    "startedUtc": "2026-10-14T19:34:03.543910+00:00",
+    "log": "/private/tmp/p0-54-factual-count-update-20261015.log",
+    "sourceHead": "bc0666fbb25bc5e53f0cfb6e84d53eb9eb86f01b"
+  },
+  {
+    "name": "owner-mode-wording-green",
+    "cmd": "pnpm exec vitest run tests/a4OwnerModeQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-54-owner-mode-wording-green-20261015.json",
+    "exit": 0,
+    "durationMs": 855,
+    "startedUtc": "2026-10-14T19:34:27.525831+00:00",
+    "log": "/private/tmp/p0-54-owner-mode-wording-green-20261015.log",
+    "sourceHead": "bc0666fbb25bc5e53f0cfb6e84d53eb9eb86f01b"
+  },
+  {
+    "name": "precommit-test-types",
+    "cmd": "pnpm run typecheck:tests",
+    "exit": 0,
+    "durationMs": 36174,
+    "startedUtc": "2026-10-14T19:34:02.358054+00:00",
+    "log": "/private/tmp/p0-54-precommit-test-types-20261015.log",
+    "sourceHead": "bc0666fbb25bc5e53f0cfb6e84d53eb9eb86f01b"
+  },
+  {
+    "name": "owner-mode-private-baseline",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-54-private-mode-causal-20261015.mjs baseline",
+    "exit": 0,
+    "durationMs": 94,
+    "startedUtc": "2026-10-14T19:36:01.372387+00:00",
+    "log": "/private/tmp/p0-54-owner-mode-private-baseline-20261015.log",
+    "sourceHead": "bc0666fbb25bc5e53f0cfb6e84d53eb9eb86f01b"
+  },
+  {
+    "name": "owner-mode-private-mutant",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-54-private-mode-causal-20261015.mjs mutant",
+    "exit": 1,
+    "durationMs": 89,
+    "startedUtc": "2026-10-14T19:36:07.740174+00:00",
+    "log": "/private/tmp/p0-54-owner-mode-private-mutant-20261015.log",
+    "sourceHead": "bc0666fbb25bc5e53f0cfb6e84d53eb9eb86f01b"
+  },
+  {
+    "name": "owner-mode-private-restored",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-54-private-mode-causal-20261015.mjs restored",
+    "exit": 0,
+    "durationMs": 89,
+    "startedUtc": "2026-10-14T19:36:13.133191+00:00",
+    "log": "/private/tmp/p0-54-owner-mode-private-restored-20261015.log",
+    "sourceHead": "bc0666fbb25bc5e53f0cfb6e84d53eb9eb86f01b"
+  },
+  {
+    "name": "final-production-types",
+    "cmd": "pnpm run typecheck",
+    "exit": 0,
+    "durationMs": 32251,
+    "startedUtc": "2026-10-14T19:38:16.516986+00:00",
+    "log": "/private/tmp/p0-54-final-production-types-20261015.log",
+    "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe"
+  },
+  {
+    "name": "final-build",
+    "cmd": "pnpm run build",
+    "exit": 0,
+    "durationMs": 36307,
+    "startedUtc": "2026-10-14T19:38:16.517348+00:00",
+    "log": "/private/tmp/p0-54-final-build-20261015.log",
+    "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe"
+  },
+  {
+    "name": "final-test-types",
+    "cmd": "pnpm run typecheck:tests",
+    "exit": 0,
+    "durationMs": 42094,
+    "startedUtc": "2026-10-14T19:38:16.516968+00:00",
+    "log": "/private/tmp/p0-54-final-test-types-20261015.log",
+    "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe"
+  },
+  {
+    "name": "final-threat-model",
+    "cmd": "pnpm run check:threat-model",
+    "exit": 0,
+    "durationMs": 455,
+    "startedUtc": "2026-10-14T19:39:47.781100+00:00",
+    "log": "/private/tmp/p0-54-final-threat-model-20261015.log",
+    "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe"
+  },
+  {
+    "name": "final-gates",
+    "cmd": "pnpm run check:gates",
+    "exit": 0,
+    "durationMs": 920,
+    "startedUtc": "2026-10-14T19:39:47.786421+00:00",
+    "log": "/private/tmp/p0-54-final-gates-20261015.log",
+    "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe"
+  },
+  {
+    "name": "final-freeze",
+    "cmd": "pnpm run check:freeze",
+    "exit": 0,
+    "durationMs": 2739,
+    "startedUtc": "2026-10-14T19:39:47.783040+00:00",
+    "log": "/private/tmp/p0-54-final-freeze-20261015.log",
+    "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe"
+  },
+  {
+    "name": "final-no-fabrication",
+    "cmd": "pnpm run check:no-fabrication -- --json",
+    "exit": 0,
+    "durationMs": 3595,
+    "startedUtc": "2026-10-14T19:39:47.782959+00:00",
+    "log": "/private/tmp/p0-54-final-no-fabrication-20261015.log",
+    "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe"
+  },
+  {
+    "name": "final-lint",
+    "cmd": "pnpm run lint",
+    "exit": 0,
+    "durationMs": 5169,
+    "startedUtc": "2026-10-14T19:39:47.780372+00:00",
+    "log": "/private/tmp/p0-54-final-lint-20261015.log",
+    "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe"
+  },
+  {
+    "name": "final-bounded-node22",
+    "cmd": "env -u AMC_P0_54_SCANNER AMC_P0_54_OWNER_MODE_EFFECTS_DIR=/private/tmp/p0-54-final-owner-mode-effects-20261015 pnpm exec vitest run tests/a4GuardQualification.test.ts tests/a4OwnerModeQualification.test.ts tests/checkNoFabrication.test.ts tests/threatModelMap.test.ts tests/planEditsManifest.test.ts tests/privateModuleHelperVisibility.test.ts --reporter=json --outputFile=/private/tmp/p0-54-final-bounded-node22-20261015.json",
+    "exit": 0,
+    "durationMs": 8650,
+    "startedUtc": "2026-10-14T19:39:47.780361+00:00",
+    "log": "/private/tmp/p0-54-final-bounded-node22-20261015.log",
+    "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe"
+  },
+  {
+    "name": "final-docs",
+    "cmd": "pnpm run check:docs-drift",
+    "exit": 0,
+    "durationMs": 550,
+    "startedUtc": "2026-10-14T19:39:58.934325+00:00",
+    "log": "/private/tmp/p0-54-final-docs-20261015.log",
+    "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe"
+  },
+  {
+    "name": "final-counts",
+    "cmd": "pnpm run check:counts",
+    "exit": 0,
+    "durationMs": 595,
+    "startedUtc": "2026-10-14T19:39:58.994637+00:00",
+    "log": "/private/tmp/p0-54-final-counts-20261015.log",
+    "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe"
+  },
+  {
+    "name": "final-source-duplicates",
+    "cmd": "pnpm run check:duplicates -- --json",
+    "exit": 1,
+    "durationMs": 1537,
+    "startedUtc": "2026-10-14T19:39:58.971421+00:00",
+    "log": "/private/tmp/p0-54-final-source-duplicates-20261015.log",
+    "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe"
+  },
+  {
+    "name": "final-architecture",
+    "cmd": "pnpm run check:architecture-boundaries",
+    "exit": 0,
+    "durationMs": 1989,
+    "startedUtc": "2026-10-14T19:39:59.010678+00:00",
+    "log": "/private/tmp/p0-54-final-architecture-20261015.log",
+    "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe"
+  },
+  {
+    "name": "final-source-dead-code",
+    "cmd": "pnpm run check:dead-code -- --json",
+    "exit": 1,
+    "durationMs": 5302,
+    "startedUtc": "2026-10-14T19:39:58.984815+00:00",
+    "log": "/private/tmp/p0-54-final-source-dead-code-20261015.log",
+    "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe"
+  },
+  {
+    "name": "final-clean-source",
+    "cmd": "pnpm run check:clean-source",
+    "exit": 0,
+    "durationMs": 50847,
+    "startedUtc": "2026-10-14T19:39:58.969142+00:00",
+    "log": "/private/tmp/p0-54-final-clean-source-20261015.log",
+    "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe"
+  }
+]

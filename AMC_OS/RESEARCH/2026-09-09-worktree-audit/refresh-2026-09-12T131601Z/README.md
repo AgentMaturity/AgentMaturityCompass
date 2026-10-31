@@ -21,7 +21,7 @@ Captured 2026-09-12T13:16:01Z; written 2026-09-12T13:17:37.992957+00:00. Integra
 
 | Worktree | Delta |
 |---|---|
-| /Users/sid/AgentMaturityCompass | {"dirtyPaths": [239, 242]} |
+| ~/AgentMaturityCompass | {"dirtyPaths": [239, 242]} |
 
 Root dirty paths added since September 11 (all P01 lane authoring dated 2026-09-11 14:30–14:38 local):
 

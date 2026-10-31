@@ -1,0 +1,133 @@
+{
+  "at": "2026-10-17T00:09:34.505663+00:00",
+  "checks": [
+    {
+      "phase": "p125w-test-types",
+      "exit": 0,
+      "durationMs": 36228,
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125w-test-types/stdout-stderr.log",
+        "bytes": 161,
+        "sha256": "fb4ed4c9025dd5e6271e65a32d037c413d19a08be3c3b2a5cac093c68f75f865"
+      }
+    },
+    {
+      "phase": "p125w-source-types",
+      "exit": 0,
+      "durationMs": 25307,
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125w-source-types/stdout-stderr.log",
+        "bytes": 149,
+        "sha256": "ffc3342aa63f1c01882b849ff8dd0a3cd4e7b509f07c4fb8c69713242b5a98d5"
+      }
+    },
+    {
+      "phase": "p125w-source-lint",
+      "exit": 0,
+      "durationMs": 2917,
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125w-source-lint/stdout-stderr.log",
+        "bytes": 447,
+        "sha256": "22a03ddf6f49358fb4bcfe04bd56da9a1a9e26cc5aa8ffde1b5892abef468b95"
+      }
+    },
+    {
+      "phase": "p125w-source-build",
+      "exit": 0,
+      "durationMs": 29696,
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125w-source-build/stdout-stderr.log",
+        "bytes": 955,
+        "sha256": "e6e36dcd7bda0fc5d63469c9f1781ef19fe59c3a49afbf5d2c7c6c0c8dd1acce"
+      }
+    },
+    {
+      "phase": "p125w-source-counts",
+      "exit": 0,
+      "durationMs": 495,
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125w-source-counts/stdout-stderr.log",
+        "bytes": 239,
+        "sha256": "82ac60039fcf8bc00dc663aabd78dcafc658cffc866e81929505bb199e8df7e4"
+      }
+    },
+    {
+      "phase": "p125w-source-gates",
+      "exit": 0,
+      "durationMs": 493,
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125w-source-gates/stdout-stderr.log",
+        "bytes": 821,
+        "sha256": "5664206ddf6d3b7a49d53c87907f78750517c4c583479f77268a1da353dba4ed"
+      }
+    },
+    {
+      "phase": "p125w-source-threat-model",
+      "exit": 0,
+      "durationMs": 294,
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125w-source-threat-model/stdout-stderr.log",
+        "bytes": 294,
+        "sha256": "d8a37764ab52c8fe6a84b8aaf1de67c240c7f01698f2abf5b1a802764503d3f4"
+      }
+    },
+    {
+      "phase": "p125w-source-architecture",
+      "exit": 0,
+      "durationMs": 1626,
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125w-source-architecture/stdout-stderr.log",
+        "bytes": 95863,
+        "sha256": "b087df083209af89c9f69496ec867445d1dd69fb2b68b44665ac280965341751"
+      }
+    },
+    {
+      "phase": "p125w-source-docs-drift",
+      "exit": 0,
+      "durationMs": 317,
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125w-source-docs-drift/stdout-stderr.log",
+        "bytes": 205,
+        "sha256": "ff57cb43abfed0a3cdba4ccb780bf3ee40b5fe7ddb1345e712cb8ca9a6e5461a"
+      }
+    },
+    {
+      "phase": "p125w-source-freeze",
+      "exit": 0,
+      "durationMs": 1182,
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125w-source-freeze/stdout-stderr.log",
+        "bytes": 268,
+        "sha256": "3199e5a58779af0c155703596b9ee80ae34437586d6d73ebc321f54f0fa6aaad"
+      }
+    },
+    {
+      "phase": "p125w-source-notices",
+      "exit": 0,
+      "durationMs": 219,
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125w-source-notices/stdout-stderr.log",
+        "bytes": 246,
+        "sha256": "b08a81bb4bc0bf41a60819f50f08086ced4d2a2e97ae8676d4948ca3695ecb00"
+      }
+    },
+    {
+      "phase": "p125w-source-qualification",
+      "exit": 0,
+      "durationMs": 904,
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125w-source-qualification/stdout-stderr.log",
+        "bytes": 240,
+        "sha256": "c187c36d52bda87a6242be711ca8e430d76356675865f941d921c3a603aa494d"
+      }
+    }
+  ],
+  "workingDiffWhitespaceExit": 0,
+  "countsPassedWithoutRegeneration": true,
+  "changedPaths": [
+    "tests/time/checkpointWindow.test.ts",
+    "tests/time/tsaTestFixture.ts"
+  ],
+  "runtimeAuditStillPendingIndependentAdapterReview": true,
+  "globalQualityUnwaived": true
+}

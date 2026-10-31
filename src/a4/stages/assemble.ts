@@ -11,7 +11,6 @@
  * self_reported; a stub-provider session's agent-facing refs are synthetic_example.
  */
 import { readFileSync } from "node:fs";
-import { relative, sep } from "node:path";
 import { checkToolsetReadiness } from "../../agent/agentToolset.js";
 import { loadActiveCompiledPolicy, type ActiveCompiledPolicy } from "../../catalog/compiler/activate.js";
 import { applyEnforceResourceLifecycle, projectEnforceResourceLifecycleStatus } from "../../enforce/resourceManifest.js";
@@ -27,13 +26,12 @@ import { sha256Hex } from "../../utils/hash.js";
 import { canonicalize } from "../../utils/json.js";
 import type { WorkflowNode } from "../../workflow/workflowPlan.js";
 import type { A4EffectContext, A4EffectDef, A4EffectOutcome } from "../a4Effects.js";
-import { explain, type A4ExplainFact, type A4ExplainLevel } from "../a4Explain.js";
+import type { A4ExplainFact, A4ExplainLevel } from "../a4Explain.js";
 import { RESOURCE_SLOTS } from "../a4Gates.js";
 import type { A4GateRow } from "../a4Readiness.js";
 import type { A4ProducerContext, A4ProducerResult } from "../a4RouterStages.js";
 import type { A4Answer, A4StageRegistry } from "../a4Schema.js";
-import { A4StoreError } from "../a4Store.js";
-import { INTEGRATION_CLAIMS, integrationClaimFor, SCAFFOLD_FRAMEWORK } from "../assemblePaths.js";
+import { claimLabel, INTEGRATION_CLAIMS, integrationClaimFor, SCAFFOLD_FRAMEWORK } from "../assemblePaths.js";
 import { buildAssemble, nativeActor, reviewAssemble } from "../assembleBuild.js";
 import { blockingExecutionsIn } from "../assembleLockout.js";
 import { errorCodeOf } from "../aspireUnderstand.js";
@@ -41,10 +39,8 @@ import {
   APPLY_EFFECT_ID, ASSEMBLE_CLAIM_BOUNDARY, ASSEMBLE_SPEC_SCHEMA, CARRIED, answerGaps, assembleItems, assembleSpecOf, carriedValues, parseProvider, presetIdOf,
   workflowPlanOf
 } from "../spec/assemble.js";
-import { answersDigestOf, answerValues, aspireSpecOf, dependencyDigest, listValue, textValue } from "../spec/aspire.js";
-
-const fail = (status: number, code: string, message: string, detail?: unknown): A4StoreError => new A4StoreError(status, code, message, detail);
-const relPath = (workspace: string, path: string): string => relative(workspace, path).split(sep).join("/");
+import { answersDigestOf, answerValues, askGapCodes, aspireSpecOf, carryAnswers, listValue, textValue } from "../spec/aspire.js";
+import { attempt, explanationResult, fail, relPath } from "./common.js";
 
 /** The agent's preset as a verified read of the signed presets file gives it; null when it has none; unreadable throws. */
 function presetSha256(workspace: string, agentId: string): string | null {
@@ -97,20 +93,7 @@ const APPLY_EFFECT: A4EffectDef = { id: APPLY_EFFECT_ID, toolName: "a4.assemble.
 
 /** The router's entry (src/a4/spec/assemble.ts PRODUCERS). */
 export async function produceAssemble(step: "understand" | "explain" | "propose" | "build" | "review", ctx: A4ProducerContext): Promise<A4ProducerResult> {
-  if (step === "understand") return understand(ctx);
-  if (step === "explain") return explainStep(ctx);
-  if (step === "propose") return propose(ctx);
-  if (step === "build") return buildAssemble(ctx);
-  return reviewAssemble(ctx);
-}
-
-/** One reader's answer, or the error's code: a fact that cannot be read is recorded as such, never as "fine". */
-function attempt<T>(read: () => T): T | { error: string } {
-  try {
-    return read();
-  } catch (error) {
-    return { error: errorCodeOf(error, "UNREADABLE") };
-  }
+  return { understand, explain: explainStep, propose, build: buildAssemble, review: reviewAssemble }[step](ctx);
 }
 
 /**
@@ -172,7 +155,8 @@ async function understandFacts(ctx: A4ProducerContext) {
     compiledPolicy: compiled === null ? "none" : "error" in compiled ? compiled : "active",
     workflowTool: compiled === null ? { visible: true, revision: null } : "error" in compiled ? compiled : workflowVisibility(compiled),
     outcomeUnknown: Array.isArray(outcomeUnknown) ? outcomeUnknown.length : outcomeUnknown, baseline,
-    paths: Object.values(INTEGRATION_CLAIMS).map(({ path, enforcementBoundary, evidenceTier, supported, reason }) => ({ path, enforcementBoundary, evidenceTier, supported, reason }))
+    paths: Object.values(INTEGRATION_CLAIMS).map((claim) => ({ path: claim.path, enforcementBoundary: claim.enforcementBoundary, evidenceTier: claim.evidenceTier,
+      supported: claim.supported, reason: claim.reason, label: claimLabel(claim), source: claim.source, pinnedVersion: claim.conformanceReceipt?.pinnedVersion ?? null }))
   };
   const output = (label: string, body: unknown, lane: "implementation" | "recommendation" = "implementation") =>
     ({ output: "understanding", label: `assemble understand: ${label}`, lane, method: null, body });
@@ -194,12 +178,7 @@ async function understandFacts(ctx: A4ProducerContext) {
 async function understand(ctx: A4ProducerContext): Promise<A4ProducerResult> {
   const { spec, answers } = assembleSpecOf(ctx.state);
   const carried = carriedValues(ctx.state);
-  const revisionNo = ctx.state.project.revision_no + 1;
-  const kept = answers.filter((answer) => !(CARRIED as readonly string[]).includes(answer.questionId));
-  const values = answerValues(kept);
-  for (const [id, value] of carried) values.set(id, value);
-  const carriedAnswers: A4Answer[] = [...carried].map(([questionId, value]) => ({ questionId, value, source: "carried", answeredAtRevision: revisionNo,
-    dependencyDigest: dependencyDigest([], values) }));
+  const { kept, carriedAnswers } = carryAnswers(answers, CARRIED, carried, ctx.state.project.revision_no + 1);
   const merged = [...kept, ...carriedAnswers].sort((a, b) => a.questionId.localeCompare(b.questionId));
   const { facts, outputs } = await understandFacts(ctx);
   const understanding = { answersDigest: answersDigestOf(merged), carried: [...carried.keys()], facts };
@@ -232,9 +211,9 @@ export function assembleFacts(spec: Record<string, unknown>, answers: readonly A
       novice: "Each build session is small on purpose: a few steps and a short answer per turn. A bigger build is done in more turns, never with bigger limits.",
       practitioner: limits ? `Per turn: ${limits.maxSteps} steps and ${limits.maxTokens} tokens; ${limits.maxActive} active sessions across Studio; ${Math.round(limits.lifetimeMs / 60_000)} minutes per session, ${Math.round(limits.idleTimeoutMs / 60_000)} idle.` : "Native task limits were not readable (Understand runs from Studio).",
       expert: "LIMITS in src/studio/nativeTaskService.ts are never raised by A4; Build chunks work into turns of at most maxSteps." },
-    { id: "path", sources: ["src/a4/assemblePaths.ts", "design §13"], dataStatus: null,
+    { id: "path", sources: ["src/a4/assemblePaths.ts", "docs/adapters/manifests (P2-17)", "design §13"], dataStatus: null,
       novice: claim ? `You chose ${claim.path}: AMC ${claim.supported === "supported" ? "builds and controls it" : `can only ${claim.supported === "preview" ? "partly" : "not yet"} support it`} (${claim.reason ?? "fully supported"}).` : "No engineering path is chosen yet.",
-      practitioner: claim ? `${claim.path}: enforcement boundary ${claim.enforcementBoundary}, evidence ${claim.evidenceTier}, ${claim.supported}${claim.reason ? ` (${claim.reason})` : ""}. Not covered: ${claim.notCovered.join("; ")}.` : "No path chosen.",
+      practitioner: claim ? `${claim.path}: ${claimLabel(claim)} (boundary ${claim.enforcementBoundary}), evidence ${claim.evidenceTier}${claim.reason ? ` (${claim.reason})` : ""}; source ${claim.source}${claim.conformanceReceipt ? `, pinned ${claim.conformanceReceipt.pinnedVersion}` : ""}. Not covered: ${claim.notCovered.join("; ")}.` : "No path chosen.",
       expert: claim ? `IntegrationClaim ${JSON.stringify({ path: claim.path, enforcementBoundary: claim.enforcementBoundary, supported: claim.supported })}; enforced only for hook:*/pi:* with a conformance receipt for the pinned version.` : "integrationClaimFor(null) = null." },
     { id: "shell", sources: ["nativeShellReadiness", "decideNativeShell", "src/sandbox/nativeShellGate.ts"], dataStatus: null,
       novice: shell === null ? "AMC has not read how this computer runs the agent's shell commands: run Understand."
@@ -279,9 +258,7 @@ function explainStep(ctx: A4ProducerContext): A4ProducerResult {
   const level: A4ExplainLevel = ctx.level ?? "practitioner";
   const { spec, answers } = assembleSpecOf(ctx.state);
   const facts = assembleFacts(spec, answers);
-  const items = explain(facts, level);
-  return { outputs: [{ output: "explanation", label: `assemble explain at the ${level} level`, lane: "recommendation", method: null, body: { level, items } }],
-    spec: { ...spec, explanation: { level, facts } }, response: { explanation: { level, items } } };
+  return explanationResult("assemble", spec, facts, level);
 }
 
 /** Aspire's typed-graph draft with the agent node's permissions and capabilities for this plan. */
@@ -300,9 +277,7 @@ function revisedGraph(ctx: A4ProducerContext, tools: "none" | "workspace", scope
 function propose(ctx: A4ProducerContext): A4ProducerResult {
   const { workspace } = ctx;
   const { spec, answers } = assembleSpecOf(ctx.state);
-  const gaps = answerGaps(answers, carriedValues(ctx.state));
-  const codes = [...gaps.missing.map((id) => `ANSWER_MISSING:${id}`), ...gaps.stale.map((id) => `ANSWER_STALE:${id}`), ...gaps.invalid.map((id) => `ANSWER_INVALID:${id}`),
-    ...gaps.carried];
+  const codes = askGapCodes(answerGaps(answers, carriedValues(ctx.state)));
   if (codes.length > 0) throw fail(409, "A4_NOT_READY", "Answer or confirm the listed questions before proposing.", { reasonCodes: codes });
   for (const key of Object.keys(ctx.spec ?? {})) {
     if (canonicalize(ctx.spec![key] ?? null) !== canonicalize(spec[key] ?? null)) {

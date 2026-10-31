@@ -1,0 +1,104 @@
+{
+  "schema": "p125pc-inert-source-control-preparation-seal/3",
+  "at": "2026-10-17T01:48:10.905151+00:00",
+  "priorSeal": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/v2/seal.json",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/v2/seal.json",
+    "bytes": 4740,
+    "sha256": "2f22476d817a92bb58fd57072068f09f56fd5f78b3723bc1fe239042e2996db3",
+    "dev": 16777231,
+    "inode": 543919763,
+    "nlink": 1
+  },
+  "preservedBase": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/source-control.py.base.source.txt",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/source-control.py.base.source.txt",
+    "bytes": 26289,
+    "sha256": "a30fa847e29155f851eca012ce4c315729285cc84b34d575cd84d17c64687853",
+    "dev": 16777231,
+    "inode": 543919672,
+    "nlink": 1
+  },
+  "unchangedRecipes": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/controls.json",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/controls.json",
+    "bytes": 7181,
+    "sha256": "02db629a3438a38970aabdda2d612a2a216a5d245c2e3b24d6142bea169ede06",
+    "dev": 16777231,
+    "inode": 543919671,
+    "nlink": 1
+  },
+  "preferredRootBindingsTemplate": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/v2/control-root-bindings.template.json",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/v2/control-root-bindings.template.json",
+    "bytes": 3682,
+    "sha256": "37db95e678bd505194f3d913d258b1704e38af91b599fe78d2096ab17c47c7e2",
+    "dev": 16777231,
+    "inode": 543919760,
+    "nlink": 1
+  },
+  "preferredInputPins": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/v2/input-pins.json",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/v2/input-pins.json",
+    "bytes": 5161,
+    "sha256": "c50e28823bff103f48c81c6d371874affc1ff90d872dd6e8ad4ef25a5e65637e",
+    "dev": 16777231,
+    "inode": 543919761,
+    "nlink": 1
+  },
+  "priorFullInstructions": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/v2/README.md",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/v2/README.md",
+    "bytes": 5862,
+    "sha256": "6cda2e921b26b9bbb1029d30ef1ec726901586130b748c8dbef8f45ac5d81332",
+    "dev": 16777231,
+    "inode": 543919762,
+    "nlink": 1
+  },
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/v3/source-control.py.source.txt",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/v3/source-control.py.source.txt",
+      "bytes": 28698,
+      "sha256": "44f1f8e540f111b8dd3a72202930a1a21fcbbf191096424e38cc6a8443c2d2a5",
+      "dev": 16777231,
+      "inode": 543919790,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/v3/v2-to-v3.patch.txt",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/v3/v2-to-v3.patch.txt",
+      "bytes": 1184,
+      "sha256": "14f03ee338228e980feaef39a2d8b31967dfd6cfadfb7a917d244cdb6f23dcb7",
+      "dev": 16777231,
+      "inode": 543919791,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/v3/source-control-from-C39.patch.txt",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/v3/source-control-from-C39.patch.txt",
+      "bytes": 16690,
+      "sha256": "a988ad54e285166a3f456005305176cb3d40c6209f724d75823d7cb6bc0c9e6c",
+      "dev": 16777231,
+      "inode": 543919792,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/v3/README.md",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/v3/README.md",
+      "bytes": 1294,
+      "sha256": "a94dc441b0971177c60636c6d3e5808226feced182fc5e6f0b3233415a131b78",
+      "dev": 16777231,
+      "inode": 543919793,
+      "nlink": 1
+    }
+  ],
+  "diagnosis": "Two concatenated BASE_PROTECTED call identifiers caught by full author self-read; only parentheses restored. No execution or adoption occurred.",
+  "fiveAdmissionFlagsFalse": true,
+  "futureSemanticCommitFreshRuntimeBindingOutcomeActionFieldsUnready": true,
+  "noParserImportCompilerHelperProductTestOpenSslNativeNetworkKeyStreamOrReservationOperation": true,
+  "noSourceIndexQaPriorArtifactOrAllocationMutation": true,
+  "fullAuthorReadPending": true,
+  "requiresRootFullReadIndependentReviewAndActualSourceFreshAdmission": true,
+  "blockers": []
+}

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "authorSource": "d9d55034b1e856513eea1c68b09e50ecd433063e",
   "source": "c16492c10592112fe610bd2e59f216f8f7f310b4",
-  "repository": "/Users/sid/AgentMaturityCompass",
+  "repository": "~/AgentMaturityCompass",
   "clone": "/private/tmp/amc-c16492c1-stop-auth-clone-01",
   "output": "/private/tmp/amc-c16492c1-stop-auth-receipts-01",
   "helperSha256": "2f85821fbe6df0a0b5912ac0cfb84720d04fc806de71bc6d1e45dfba70a25690",

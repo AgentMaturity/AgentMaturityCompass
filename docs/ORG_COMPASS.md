@@ -10,12 +10,12 @@ ORG Compass adds signed, trust-aware comparative scorecards across:
 
 ## Org Model
 
-`/Users/sid/AgentMaturityCompass/.amc/org.yaml` defines:
+`~/AgentMaturityCompass/.amc/org.yaml` defines:
 - `nodes`: `ENTERPRISE | TEAM | FUNCTION | PROCESS | ECOSYSTEM`
 - `memberships`: agent-to-node assignments (one agent can be in multiple nodes)
 - `policies.defaultsByNode`: inherited node-level defaults (risk tier, policy refs)
 
-`org.yaml` is signed (`/Users/sid/AgentMaturityCompass/.amc/org.yaml.sig`). Invalid signature marks org views untrusted and applies display-level caps.
+`org.yaml` is signed (`~/AgentMaturityCompass/.amc/org.yaml.sig`). Invalid signature marks org views untrusted and applies display-level caps.
 
 ## Commands
 

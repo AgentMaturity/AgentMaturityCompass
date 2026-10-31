@@ -241,3 +241,12 @@ describe("GAP-3746 Self-Hosting-Guide override and near-miss analytics boundary"
     }
   });
 });
+
+
+it("retains rounded nearest-rank latency in override receipts", () => {
+  const receipt = buildOverrideNearMissAnalyticsReceipt({
+    window: window(),
+    events: [event("stats-1", { latencyMs: 1 }), event("stats-2", { latencyMs: 9.12345678 })],
+  });
+  expect(receipt.liveTrends.p95LatencyMs).toBe(9.123457);
+});

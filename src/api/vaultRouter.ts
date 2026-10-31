@@ -78,7 +78,7 @@ export async function handleVaultRoute(
   // POST /api/v1/vault/keys/rotate — rotate vault keys
   if (pathname === '/api/v1/vault/keys/rotate' && method === 'POST') {
     try {
-      const { rotateMonitorKeyInVault } = await import('../vault/vault.js');
+      const { rotateMonitorKeyInVault } = await import('../keys/purposeKeys.js');
       const body = await bodyJson<{ passphrase?: string }>(req);
       const result = rotateMonitorKeyInVault(workspace, body.passphrase);
       apiSuccess(res, { rotated: true, ...result });

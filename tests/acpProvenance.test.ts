@@ -9,6 +9,7 @@ import { initWorkspace } from "../src/workspace.js";
 import { SessionService } from "../src/session/sessionService.js";
 import type { AgentPromptResult, AgentSession } from "../src/agent/agentSession.js";
 import type { EvidenceEvent } from "../src/types.js";
+import { removeActionPolicy } from "./helpers/actionPolicyFixtures.js";
 
 /**
  * Three defects found by scoping the Python client against the running server.
@@ -26,6 +27,7 @@ function workspace(): string {
   const dir = realpathSync(mkdtempSync(join(tmpdir(), "amc-acpprov-")));
   dirs.push(dir);
   initWorkspace({ workspacePath: dir, agentId: "default", trustBoundaryMode: "isolated" });
+  removeActionPolicy(dir); // AXR-02: no Action Policy configured, as before; this file is not about it (amc init signs one).
   return dir;
 }
 

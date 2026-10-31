@@ -1,6 +1,6 @@
 # AMC Harness-Capability Baseline (for gap analysis vs. DeepSeek Harness)
 
-Repo: `/Users/sid/AgentMaturityCompass` (TypeScript ESM, Node >=20, npm package `agent-maturity-compass` v1.1.1, bin `amc` -> `dist/cli.js`). ~1,600 TS files under `src/`. Runtime deps are minimal: `@modelcontextprotocol/sdk`, `better-sqlite3`, `chalk`, `commander`, `inquirer`, `semver`, `yaml`, `zod`.
+Repo: `~/AgentMaturityCompass` (TypeScript ESM, Node >=20, npm package `agent-maturity-compass` v1.1.1, bin `amc` -> `dist/cli.js`). ~1,600 TS files under `src/`. Runtime deps are minimal: `@modelcontextprotocol/sdk`, `better-sqlite3`, `chalk`, `commander`, `inquirer`, `semver`, `yaml`, `zod`.
 
 ## 1. CLI command surface
 

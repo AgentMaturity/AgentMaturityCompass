@@ -1,0 +1,14 @@
+typecheck exit=0 :: 
+typecheck:tests exit=0 :: 
+lint exit=0 :: check-no-fabrication: passed; allowlisted findings R1 0, R2 0, R3 304, R4 10; 16 random marker(s); 0 pending entries.
+check:counts exit=0 :: Published source counts match the repository; this check does not execute tests.
+check:docs-drift exit=0 :: Docs drift check passed (336 files scanned).
+check:freeze exit=0 :: Freeze guard passed: {"cliCommandPaths":1241,"cliInventoryPaths":1241,"stationPacks":41,"stationPackQuestions":632}
+check:architecture-boundaries exit=0 :: }
+check:gates exit=0 :: check:gates: every evaluated gate requirement has a registered, non-synthetic emitter.
+check:schemas exit=0 :: gen-spec-schemas: 38 schemas current; 75 contract fixtures agree
+check:api-ref exit=0 :: docs/API_REFERENCE.md matches the source.
+check:threat-model exit=0 :: check-threat-model: ok (<worktree>/docs/security/channel-map.json)
+check:duplicates exit=0 :: No source-quality baseline at origin/main (merge-base 4b5f9b7d51e0): one-time bootstrap, base check skipped
+check:dead-code exit=0 :: No source-quality baseline at origin/main (merge-base 4b5f9b7d51e0): one-time bootstrap, base check skipped
+check:deploy-pack exit=0 :: deploy-pack-check: passed

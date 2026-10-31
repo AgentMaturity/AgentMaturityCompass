@@ -35,7 +35,9 @@ import {
 import { loadTargetProfile, loadTargetProfileFromFile, setTargetProfileInteractive, verifyTargetProfileSignature } from "./targets/targetProfile.js";
 import { runTuneWizard, runUpgradeWizard } from "./tuning/tuneWizard.js";
 import { loadContextGraph } from "./context/contextGraph.js";
-import { applyAMCConfigProfile, initWorkspace, loadAMCConfig, quickstartWizard, saveAMCConfig, signAmcConfig } from "./workspace.js";
+import { applyAMCConfigProfile, initWorkspace, loadAMCConfig, quickstartWizard, saveAMCConfigAsync, signAmcConfigAsync } from "./workspace.js";
+import { initWorkspaceAsync } from "./workspaceInitializationAsync.js";
+import { captureInstantWorkspaceDiagnostic } from "./cli/instantWorkspaceDiagnostic.js";
 import { runDoctorCli } from "./doctor/doctorCli.js";
 import { firstRunActions, firstRunFixCommands } from "./doctor/firstRunPlan.js";
 import {
@@ -48,8 +50,8 @@ import {
   suggestCommandPaths
 } from "./cliUx.js";
 import {
-  bindAgentRoute,
-  initGatewayConfig,
+  bindGatewayAgentAsync,
+  initGatewayConfigAsync,
   loadGatewayConfig,
   presetGatewayConfigForProvider,
   saveGatewayConfig,
@@ -96,10 +98,10 @@ import { warnSupersededCommand } from "./cli/deprecatedCommand.js";
 import { commandPath, installClaimLabelHooks } from "./cli/claimLabelHooks.js";
 import {
   aggregateClaim, artifactClaim, assuranceClaim, controlSurfaceClaim, emitClaimResult, executedTestClaim, fleetHealthClaim, latestRunsClaim,
-  printClaimLegendFooter, printClaimResult, printControlSurfaceSkip, printLabelledReport, printTitledResult, runClaimEnvelope, runIdClaim, selfAnswerClaim,
+  latestRunForDisplay, namedRunForDisplay, printClaimLegendFooter, printClaimResult, printControlSurfaceSkip, printLabelledReport, printTitledResult, runClaimEnvelope, runIdClaim, selfAnswerClaim,
   unverifiedClaim, withClaimFields, withClaimFieldsEach
 } from "./cli/claimOutput.js";
-import { renderDiagnosticReportHtml } from "./cli/reportRenderers.js";
+import { renderDiagnosticReportHtml } from "./cli/reportRenderers.js"; import { emitScoreEvidenceResult } from "./cli/scoreEvidenceOutput.js";
 import { envelopeForComplianceReport } from "./claims/eligibility/adapters/results.js";
 import { formatClaimLabel, renderClaimLabel, renderClaimLegend } from "./claims/eligibility/render.js";
 import { listDecisionReceipts, loadDecisionReceipt, observeDecisionOutcomes, writeDecisionReceipts, type DecisionReceipt } from "./lifecycle/decisionReceipt.js";
@@ -107,7 +109,7 @@ import { exportFindingProofs, listFindingProofs, loadFindingProof, writeFindingP
 import { exportLifecycleChangeReceipts, listLifecycleChangeReceipts, loadLifecycleChangeReceipt, writeLifecycleChangeReceipts } from "./lifecycle/changeReceipt.js";
 import { exportLifecycleRunArtifact, listLifecycleRunArtifacts, loadLifecycleRunArtifact, writeLifecycleRunArtifact } from "./lifecycle/lifecycleRunArtifact.js";
 import { listObservabilityLaneRecords, loadObservabilityLaneRecord, writeObservabilityLaneRecord } from "./lifecycle/observabilityLane.js";
-import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest } from "./crypto/keys.js";
+import { getSigningKey, getPublicKeyHistory, signHexDigest } from "./crypto/keys.js";
 import { computeIncidentHash, createIncidentStore } from "./incidents/incidentStore.js";
 import {
   RECORDABLE_TRIGGERS,
@@ -118,11 +120,13 @@ import {
   recordIncidentClockEvent
 } from "./incidents/incidentClockEvents.js";
 import { buildEvidencePacket, renderEvidencePacketMarkdown } from "./incidents/evidencePacket.js";
-import { oversightRecordPath, readOversightRecords, recordWorkspaceOversight } from "./incidents/oversightRecord.js";
+import { oversightRecordPath, readOversightRecords, recordWorkspaceOversightAsync, workspaceOversightPublicKeys } from "./incidents/oversightRecord.js";
+import { startIncidentClocks } from "./incidents/clockRuntime.js";
+import { printIncidentClocks } from "./cli-incident-clocks.js";
 import {
   addAgentInteractive,
   buildAgentConfig,
-  initFleet,
+  initFleetAsync,
   listAgents,
   loadAgentConfig,
   removeAgent,
@@ -132,10 +136,9 @@ import {
   verifyFleetConfigSignature
 } from "./fleet/registry.js";
 import { getAgentPaths, resolveAgentId } from "./fleet/paths.js";
-import { latestRunForAgent } from "./governor/actionPolicyEngine.js";
 import { getProviderTemplateById, listProviderTemplates, providerTemplateChoices } from "./providers/providerTemplates.js";
 import { runSandboxCommand } from "./sandbox/sandbox.js";
-import { attestIngestSession, ingestEvidence, type IngestType } from "./ingest/ingest.js";
+import { attestIngestSessionAsync, ingestEvidence, type IngestType } from "./ingest/ingest.js";
 import { generateFleetReport } from "./fleet/report.js";
 import { evaluateFleet, renderFleetScoringMarkdown, type FleetScoreProgressEvent } from "./fleet/fleetScoring.js";
 import { listFleetLifecycleRunArtifacts, loadFleetLifecycleRunArtifact } from "./fleet/fleetLifecycle.js";
@@ -162,9 +165,7 @@ import {
   addDelegationEdge,
   removeDelegationEdge,
   listDelegationEdges,
-  computeTrustComposition,
-  saveTrustCompositionReport,
-  renderTrustCompositionMarkdown,
+  generateTrustCompositionReportAsync,
   verifyCrossAgentReceipts,
   type DelegationEdge
 } from "./fleet/trustComposition.js";
@@ -184,12 +185,11 @@ import {
 } from "./fleet/trustInheritance.js";
 import type { TrustInheritancePolicyMode } from "./fleet/trustInheritance.js";
 import {
-  acceptHandoffPacket,
-  createHandoffPacket,
   verifyHandoffContract,
   verifyHandoffPacket,
   renderHandoffPacketMarkdown
 } from "./fleet/handoffPacket.js";
+import { acceptHandoffPacketAsync, createHandoffPacketAsync } from "./fleet/handoffPacketSigning.js";
 import {
   detectContradictions,
   renderContradictionReportMarkdown
@@ -202,17 +202,21 @@ import {
   verifyEvidenceBundle
 } from "./bundles/bundle.js";
 import { defaultEvidenceExportPath, exportVerifierEvidence, generateAuditPacket } from "./evidence/index.js";
-import { initCiForAgent, printCiSteps, runBundleGate } from "./ci/gate.js";
-import { applyArchetype, describeArchetype, listArchetypes, previewArchetypeApply } from "./archetypes/index.js";
+import { initCiForAgent, initCiForAgentAttemptAsync, printCiSteps, runBundleGate } from "./ci/gate.js";
+import { describeArchetype, listArchetypes, previewArchetypeApply } from "./archetypes/index.js";
+import { captureArchetypeApply } from "./archetypes/archetypePublication.js";
 import { exportBadge, exportPolicyPack } from "./exports/policyExport.js";
 import { applyAssurancePatchKit, listAssuranceHistory, loadAssuranceReport, runAssurance, verifyAssuranceRun } from "./assurance/assuranceRunner.js";
 import { AgentResponderUnavailableError } from "./assurance/agentResponder.js";
+import { assuranceSarifEntries, renderAssuranceOverallScore, renderAssurancePackLine, renderAssuranceScenarioHeading, renderAssuranceTotalLine } from "./assurance/cliPresentation.js";
+import { executedRerunFlags, selectExecutedAssuranceOptions, withExecutedAssuranceOptions, type AssuranceRunCliOptions } from "./assurance/executed/cliOptions.js";
 import { getAssurancePack, listAssurancePacks } from "./assurance/packs/index.js";
 import { registerMirofishCommands } from "./mirofish/cli.js";
 import { registerCompositionCommands } from "./cli-composition-commands.js";
 import { registerVaultZkCommands } from "./cli-vault-zk-commands.js";
-import { registerVaultHistoryCommands, registerVaultRotationCommand } from "./cli-vault-history-commands.js";
+import { registerKeysCommands, registerVaultHistoryCommands, registerVaultRotationCommand } from "./cli-vault-history-commands.js";
 import { registerEvidenceStoreCommands, renderLedgerVerdict } from "./cli-evidence-store-commands.js";
+import { registerLifecycleGovernanceCommands } from "./cli-lifecycle-governance-commands.js";
 import {
   exitIfUntrusted, finishVerify, ledgerExitCode, trustFromFlags, unsignedArtifactReport, verifyAllExit, withTrustFlags, type TrustFlags
 } from "./cli-trust-flags.js";
@@ -227,50 +231,50 @@ import { registerAgentCommands } from "./cli-agent-commands.js";
 import { registerNativeProviderCommands } from "./cli-agent-options.js";
 import { registerNativeExtensionCommands } from "./cli-native-extension-commands.js";
 import { registerCredentialsCommands } from "./cli-credentials-commands.js";
-import { issueCertificate, inspectCertificate, revokeCertificate, verifyCertificate, verifyRevocation } from "./assurance/certificate.js";
-import { generateTrustCertificate } from "./cert/trustCertificate.js";
+import { issueCertificate, inspectCertificate, revokeCertificateAsync, verifyCertificate, verifyRevocation } from "./assurance/certificate.js";
+import { generateTrustCertificateAsync } from "./cert/trustCertificate.js";
 import { renderFailureRiskMarkdown, runFleetIndices, runIndicesForAgent } from "./assurance/indices.js";
 import {
-  assuranceApplyPolicyCli,
+  assuranceApplyPolicyCliAsync as assuranceApplyPolicyCli,
   assuranceDefaultPolicyCli,
-  assuranceInitCli,
+  assuranceInitCliAsync as assuranceInitCli,
   assuranceIssueCertCli,
-  assurancePrintPolicyCli,
+  assurancePrintPolicyCliAsync as assurancePrintPolicyCli,
   assuranceRunCli,
   assuranceRunsCli,
-  assuranceSchedulerEnableCli,
+  assuranceSchedulerEnableCliAsync as assuranceSchedulerEnableCli,
   assuranceSchedulerRunNowCli,
   assuranceSchedulerStatusCli,
   assuranceShowRunCli,
   assuranceVerifyCertCli,
   assuranceVerifyPolicyCli,
   assuranceWaiverRequestCli,
-  assuranceWaiverRevokeCli,
-  assuranceWaiverStatusCli
+  assuranceWaiverRevokeCliAsync as assuranceWaiverRevokeCli,
+  assuranceWaiverStatusCliAsync as assuranceWaiverStatusCli
 } from "./assurance/assuranceCli.js";
 import {
-  auditApplyPolicyCli,
+  auditApplyPolicyCliAsync, assertAuditCliOwnerMode,
   auditBinderCreateCli,
   auditBinderExportExecuteCli,
   auditBinderExportRequestCli,
   auditEnterpriseExportCli,
   auditBinderVerifyCli,
   auditBindersCli,
-  auditInitCli,
-  auditMapApplyCli,
-  auditMapListCli,
-  auditMapShowCli,
+  auditInitCliAsync,
+  auditMapApplyCliAsync,
+  auditMapListCliAsync,
+  auditMapShowCliAsync,
   auditMapVerifyCli,
-  auditPrintPolicyCli,
+  auditPrintPolicyCliAsync,
   auditRequestApproveCli,
-  auditRequestCreateCli,
+  auditRequestCreateCliAsync as auditRequestCreateCli,
   auditRequestFulfillCli,
   auditRequestListCli,
-  auditRequestRejectCli,
-  auditSchedulerEnableCli,
+  auditRequestRejectCliAsync as auditRequestRejectCli,
+  auditSchedulerEnableCliAsync,
   auditSchedulerRunNowCli,
   auditSchedulerStatusCli,
-  auditVerifyPolicyCli,
+  auditVerifyPolicyCliAsync,
   auditVerifyWorkspaceCli
 } from "./audit/auditCli.js";
 import { auditVibeCode } from "./score/vibeCodeAudit.js";
@@ -282,15 +286,18 @@ import { buildDashboard } from "./dashboard/build.js";
 import { serveDashboard } from "./dashboard/serve.js";
 import { assignOwnership, createCommitmentPlan, learnQuestion } from "./eoc/flows.js";
 import inquirer from "inquirer";
-import { assertOwnerMode, getMode, setMode, type AMCMode } from "./mode/mode.js";
-import { initVaultInteractive, lockVaultNow, unlockVaultInteractive, vaultStatusNow } from "./vault/vaultCli.js";
+import { assertOwnerMode, getMode, leaveAgentMode, setMode, type AMCMode } from "./mode/mode.js";
+import { writeRuntimeFirewallPolicyAsync, migrateRuntimeFirewallPolicySignatureAsync } from "./runtime/firewallPolicyAsync.js";
+import { installFatalHandlers } from "./runtime/fatalDiagnostic.js";
+import { initVaultInteractive, lockVaultNow, promptPassphrase, unlockVaultInteractive, vaultStatusNow } from "./vault/vaultCli.js";
 import { forgetVaultPassphrase } from "./vault/passphraseStore.js";
 import { ensureUpVaultPassphrase, runFirstBaselineIfNeeded } from "./studio/oneCommandUp.js";
+import { agentRunFiles, latestRunSummary } from "./diagnostic/runReportResolution.js";
 import { buildConnectInstructions } from "./studio/connectWizard.js";
 import { registerHookIntegrationCommands } from "./adapters/hookIntegrationCli.js";
 import { runStudioForeground, startStudioDaemon, stopStudioDaemon, studioStatus } from "./studio/studioSupervisor.js";
 import { readAdminToken, readStudioState, studioLogsDir } from "./studio/studioState.js";
-import { fixSignatures, inspectSignatures } from "./studio/signatures.js";
+import { fixSignaturesAsync, FixSignaturesPublicationError, inspectSignatures } from "./studio/signatures.js";
 import {
   completeOnboarding,
   createOnboardingState,
@@ -311,34 +318,35 @@ import {
   runGovernorCheck
 } from "./governor/governorCli.js";
 import {
-  initActionPolicy,
+  initActionPolicy, initActionPolicyAsync,
   verifyActionPolicySignature
 } from "./governor/actionPolicyEngine.js";
 import { initToolhubConfig } from "./toolhub/toolhubCli.js";
 import { registerToolsCommands } from "./cli-tools-commands.js";
 import { parseActionClasses, parseRiskTier } from "./workorders/workorderCli.js";
 import {
-  createWorkOrder,
-  expireWorkOrder,
+  createWorkOrderAsync,
+  expireWorkOrderAsync,
   listWorkOrders,
   loadWorkOrder,
   verifyWorkOrder
 } from "./workorders/workorderEngine.js";
-import { issueExecTicket, verifyExecTicket } from "./tickets/execTicketVerify.js";
+import { issueExecTicketAsync, verifyExecTicket } from "./tickets/execTicketVerify.js";
 import { normalizeActionClass, parseTtlToMs } from "./tickets/execTicketCli.js";
 import { registerBudgetCommands } from "./cli-budget-commands.js";
-import { driftCheckCli, driftReportCli, freezeLiftCli, freezeStatusCli } from "./drift/driftCli.js";
-import { initAlertsConfig, sendTestAlert, verifyAlertsConfigSignature } from "./drift/alerts.js";
+import { driftCheckCliAsync as driftCheckCli, driftReportCliAsync as driftReportCli, freezeLiftCliAsync as freezeLiftCli, freezeStatusCli } from "./drift/driftCli.js";
+import { initAlertsConfigAsync as initAlertsConfig, sendTestAlert, verifyAlertsConfigSignature } from "./drift/alerts.js";
 import { startTrustDriftMonitor } from "./monitor/trustDriftMonitor.js";
 import { generateBom } from "./bom/bomGenerator.js";
-import { signBomFile, verifyBomSignature } from "./bom/bomVerifier.js";
+import { signBomFileAsync, verifyBomSignature } from "./bom/bomVerifier.js";
 import { registerApprovalCliCommands } from "./approvals/approvalCliCommands.js";
 import { registerActionCliCommands } from "./actions/actionCliCommands.js";
 import { registerCatalogCommands } from "./catalog/catalogCli.js";
 import { initApprovalPolicy, verifyApprovalPolicySignature } from "./approvals/approvalPolicyEngine.js";
 import { simulateTargetWhatIf } from "./simulator/targetWhatIf.js";
 import { parseSetPairs, parseTargetMappingFile } from "./simulator/whatIfCli.js";
-import { exportBenchmarkArtifact } from "./benchmarks/benchExport.js";
+import { exportBenchmarkArtifactAsync } from "./benchmarks/benchExport.js";
+import { assertBenchmarkExportOwnerMode, assertBenchCreateOwnerMode } from "./benchmarks/benchCli.js";
 import { verifyBenchmarkArtifact } from "./benchmarks/benchVerify.js";
 import { ingestBenchmarks } from "./benchmarks/benchImport.js";
 import { listImportedBenchmarks } from "./benchmarks/benchStore.js";
@@ -359,19 +367,19 @@ import {
   type ReplayBenchmarkCorpusInput,
 } from "./benchmarks/replayBenchmarkCorpus.js";
 import {
-  benchCompareCli,
+  benchCompareCliAsync as benchCompareCli,
   benchComparisonLatestCli,
-  benchCreateCli,
+  benchCreateCliAsync as benchCreateCli,
   benchImportCli,
-  benchInitCli,
+  benchInitCliAsync as benchInitCli,
   benchListExportsCli,
   benchListImportsCli,
   benchPrintCli,
   benchPrintPolicyCli,
-  benchPublishExecuteCli,
+  benchPublishExecuteCliAsync as benchPublishExecuteCli,
   benchPublishRequestCli,
-  benchRegistriesApplyCli,
-  benchRegistriesCli,
+  benchRegistriesApplyCliAsync as benchRegistriesApplyCli,
+  benchRegistriesCliAsync as benchRegistriesCli,
   benchRegistryInitCli,
   benchRegistryPublishCli,
   benchRegistryServeCli,
@@ -380,9 +388,9 @@ import {
   benchVerifyCli,
   benchVerifyPolicyCli
 } from "./bench/benchCli.js";
-import { initOpsPolicy, loadOpsPolicy, signOpsPolicy, verifyOpsPolicySignature } from "./ops/policy.js";
-import { retentionRunCli, retentionStatusCli, retentionVerifyCli } from "./ops/retention/retentionCli.js";
-import { backupCreateCli, backupPrintCli, backupRestoreCli, backupVerifyCli } from "./ops/backup/backupCli.js";
+import { initOpsPolicyAsync, loadOpsPolicy, signOpsPolicyAsync, verifyOpsPolicySignature } from "./ops/policy.js";
+import { retentionRunCliAsync, retentionStatusCli, retentionVerifyCli } from "./ops/retention/retentionCli.js";
+import { backupCreateCliAsync, backupPrintCli, backupRestoreCli, backupVerifyCli } from "./ops/backup/backupCli.js";
 import {
   maintenancePruneCacheCli,
   maintenanceReindexCli,
@@ -391,9 +399,9 @@ import {
   maintenanceVacuumCli
 } from "./ops/maintenance/maintenanceCli.js";
 import {
-  blobKeyInitCli,
-  blobKeyRotateCli,
-  blobsReencryptCli,
+  blobKeyInitCliAsync as blobKeyInitCli,
+  blobKeyRotateCliAsync as blobKeyRotateCli,
+  blobsReencryptCliAsync as blobsReencryptCli,
   blobsVerifyCli
 } from "./storage/blobs/blobCli.js";
 import { ensureBlobKey, verifyBlobCurrentKeySignature } from "./storage/blobs/blobKeys.js";
@@ -414,11 +422,11 @@ import {
 import { request as httpRequest } from "node:http";
 import {
   parseRolesCsv,
-  userAddCli,
-  userInitCli,
+  userAddCliAsync as userAddCli,
+  userInitCliAsync as userInitCli,
   userListCli,
-  userRevokeCli,
-  userRoleSetCli,
+  userRevokeCliAsync as userRevokeCli,
+  userRoleSetCliAsync as userRoleSetCli,
   userVerifyCli
 } from "./auth/authCli.js";
 import { verifyUsersConfigSignature } from "./auth/authApi.js";
@@ -432,7 +440,7 @@ import {
   scimTokenCreateCli
 } from "./identity/identityCli.js";
 import { createPairingCode } from "./pairing/pairingCodes.js";
-import { disableLanMode, enableLanMode, lanModePath, loadLanMode, verifyLanModeSignature } from "./pairing/lanMode.js";
+import { captureLanModeEnableBeforeUnlock, captureLanModeDisableBeforeUnlock, disableLanModeAsync as disableLanMode, enableLanModeAsync as enableLanMode, lanModePath, loadLanMode, verifyLanModeSignature } from "./pairing/lanMode.js";
 import { createBridgePairingCode } from "./bridge/bridgeAuth.js";
 import { redactBridgeText } from "./bridge/bridgeRedaction.js";
 import { stripProviderKeys } from "./utils/providerKeys.js";
@@ -444,13 +452,13 @@ import {
   verifyTransparencyLog
 } from "./transparency/logCli.js";
 import {
-  transparencyMerkleProofCli,
-  transparencyMerkleRebuildCli,
-  transparencyMerkleRootCli,
+  transparencyMerkleProofCliAsync,
+  transparencyMerkleRebuildCliAsync,
+  transparencyMerkleRootCliAsync,
   transparencyMerkleVerifyProofCli
 } from "./transparency/transparencyMerkleCli.js";
 import {
-  policyPackApplyCli,
+  policyPackApplyCliAsync,
   policyPackDescribeCli,
   policyPackDiffCli,
   policyPackListCli
@@ -470,7 +478,7 @@ import {
   complianceDiffCli,
   complianceFleetReportCli,
   complianceReportCli,
-  initComplianceMapsCli,
+  initComplianceMapsCliAsync,
   verifyComplianceMapsCli
 } from "./compliance/complianceCli.js";
 import { complianceFrameworkFamilies, frameworkChoices, getFrameworkFamily, normalizeFrameworkName, type ComplianceFramework } from "./compliance/frameworks.js";
@@ -480,8 +488,8 @@ import { benchmarkResultClaim, runBenchmarkSuite, compareBenchmarks, renderBench
 import {
   federateExportCli,
   federateImportCli,
-  federateInitCli,
-  federatePeerAddCli,
+  federateInitCliAsync as federateInitCli,
+  federatePeerAddCliAsync as federatePeerAddCli,
   federatePeerListCli,
   federateVerifyBundleCli,
   federateVerifyCli
@@ -489,96 +497,96 @@ import {
 import {
   integrationsDispatchCli,
   integrationsExportJournalCli,
-  integrationsInitCli,
+  integrationsInitCliAsync as integrationsInitCli,
   integrationsStatusCli,
   integrationsTestCli,
   integrationsVerifyCli
 } from "./integrations/integrationsCli.js";
 import {
-  outcomesAttestCli,
+  outcomesAttestCliAsync, assertOutcomesAttestOwnerMode,
   outcomesDiffCli,
   outcomesFleetReportCli,
-  outcomesInitCli,
-  outcomesReportCli,
+  outcomesInitCliAsync,
+  outcomesReportCliAsync,
   outcomesVerifyCli
 } from "./outcomes/outcomeCli.js";
 import {
-  valueContractApplyCli,
-  valueContractInitCli,
+  valueContractApplyCliAsync as valueContractApplyCli,
+  valueContractInitCliAsync as valueContractInitCli,
   valueContractPrintCli,
   valueContractVerifyCli,
   VALUE_ATTESTED_REMOVED,
-  valueImportCsvCli,
-  valueIngestWebhookCli,
-  valueInitCli,
-  valuePolicyApplyCli,
+  valueImportCsvCliAsync as valueImportCsvCli,
+  valueIngestWebhookCliAsync as valueIngestWebhookCli,
+  valueInitCliAsync as valueInitCli,
+  valuePolicyApplyCliAsync as valuePolicyApplyCli,
   valuePolicyDefaultCli,
-  valuePolicyPrintCli,
+  valuePolicyPrintCliAsync as valuePolicyPrintCli,
   valueReportCli,
-  valueSchedulerEnableCli,
+  valueSchedulerEnableCliAsync as valueSchedulerEnableCli,
   valueSchedulerRunNowCli,
   valueSchedulerStatusCli,
   valueSnapshotCli,
-  valueVerifyPolicyCli,
+  valueVerifyPolicyCliAsync as valueVerifyPolicyCli,
   valueVerifyWorkspaceCli
 } from "./value/valueCli.js";
 import {
-  advisoryAckCli,
+  advisoryAckCliAsync as advisoryAckCli,
   advisoryListCli,
   advisoryShowCli,
-  forecastInitCli,
+  forecastInitCliAsync as forecastInitCli,
   forecastLatestCli,
-  forecastPolicyApplyCli,
+  forecastPolicyApplyCliAsync as forecastPolicyApplyCli,
   forecastPolicyDefaultCli,
   forecastPrintPolicyCli,
-  forecastRefreshCli,
-  forecastSchedulerDisableCli,
-  forecastSchedulerEnableCli,
-  forecastSchedulerRunNowCli,
+  forecastRefreshCliAsync as forecastRefreshCli,
+  forecastSchedulerDisableCliAsync as forecastSchedulerDisableCli,
+  forecastSchedulerEnableCliAsync as forecastSchedulerEnableCli,
+  forecastSchedulerRunNowCliAsync as forecastSchedulerRunNowCli,
   forecastSchedulerStatusCli,
   forecastVerifyCli
 } from "./forecast/forecastCli.js";
 import {
   mechanicGapCli,
-  mechanicInitCli,
+  mechanicInitCliAsync as mechanicInitCli,
   mechanicPlanCreateCli,
   mechanicPlanDiffCli,
-  mechanicPlanExecuteCli,
-  mechanicPlanRequestApprovalCli,
+  mechanicPlanExecuteCliForAuthority as mechanicPlanExecuteCli,
+  mechanicPlanRequestApprovalCliForAuthority as mechanicPlanRequestApprovalCli,
   mechanicPlanShowCli,
-  mechanicProfileApplyCli,
+  mechanicProfileApplyCliAsync as mechanicProfileApplyCli,
   mechanicProfileListCli,
   mechanicProfilesVerifyCli,
   mechanicSimulateCli,
   mechanicSimulationLatestCli,
   mechanicTuneExportCli,
-  mechanicTargetsApplyCli,
-  mechanicTargetsInitCli,
+  mechanicTargetsApplyCliAsync as mechanicTargetsApplyCli,
+  mechanicTargetsInitCliAsync as mechanicTargetsInitCli,
   mechanicTargetsPrintCli,
-  mechanicTargetsSetCli,
+  mechanicTargetsSetCliAsync as mechanicTargetsSetCli,
   mechanicTargetsVerifyCli,
-  mechanicTuningApplyCli,
-  mechanicTuningInitCli,
+  mechanicTuningApplyCliAsync as mechanicTuningApplyCli,
+  mechanicTuningInitCliAsync as mechanicTuningInitCli,
   mechanicTuningPrintCli,
-  mechanicTuningSetCli,
+  mechanicTuningSetCliAsync as mechanicTuningSetCli,
   mechanicTuningVerifyCli,
   mechanicVerifyCli
 } from "./mechanic/mechanicCli.js";
 import {
-  casebookAddFromWorkOrderCli,
-  casebookInitCli,
+  casebookAddFromWorkOrderCliAsync as casebookAddFromWorkOrderCli,
+  casebookInitCliAsync as casebookInitCli,
   casebookListCli,
   casebookVerifyCli
 } from "./casebooks/casebookCli.js";
 import {
-  experimentAnalyzeCli,
+  experimentAnalyzeCommandCli,
   experimentCreateCli,
   experimentGateCli,
   experimentListCli,
   experimentOptimizeCli,
   experimentOptimizerListCli,
   experimentOptimizerShowCli,
-  experimentRunCli,
+  experimentRunCommandCli,
   experimentSetBaselineCli,
   experimentSetCandidateCli
 } from "./experiments/experimentCli.js";
@@ -589,16 +597,16 @@ import {
 } from "./experiments/experimentGatePolicy.js";
 import { experimentGateSchema } from "./experiments/experimentSchema.js";
 import {
-  orgAddNodeCli,
-  orgAssignCli,
-  orgCommitCli,
+  orgAddNodeCliAsync,
+  orgAssignCliAsync,
+  orgCommitCliAsync,
   orgCompareCli,
-  orgInitCli,
-  orgLearnCli,
-  orgOwnCli,
+  orgInitCliAsync,
+  orgLearnCliAsync,
+  orgOwnCliAsync,
   orgReportCli,
-  orgScoreCli,
-  orgUnassignCli,
+  orgScoreCliAsync,
+  orgUnassignCliAsync,
   orgVerifyCli
 } from "./org/orgCli.js";
 import { listOrgRuns, loadOrgRun, orgRunRoleDefinitions, orgRunSummaryForUi, parseOrgRoleList, runOrg } from "./org/orgRun.js";
@@ -607,10 +615,8 @@ import {
   exportRuntimeFirewallDecisions,
   inspectRuntimeFirewallPolicy,
   listRuntimeFirewallDecisions,
-  migrateRuntimeFirewallPolicySignature,
   renderRuntimeFirewallStatusText,
   runtimeFirewallStatus,
-  writeRuntimeFirewallPolicy,
   type RuntimeFirewallDirection,
   type RuntimeFirewallMode
 } from "./runtime/firewall.js";
@@ -630,35 +636,36 @@ import {
   type RuntimeRunSource
 } from "./runtime/runManager.js";
 import {
-  transformAttestCli,
+  transformAttestCliAsync,
   transformAttestVerifyCli,
-  transformInitCli,
-  transformMapApplyCli,
+  transformInitCliAsync,
+  transformMapApplyCliAsync,
   transformMapReadCli,
-  transformPlanCli,
+  transformPlanCliAsync,
   transformReportCli,
   transformStatusCli,
-  transformTrackCli,
+  transformTrackCliAsync,
   transformVerifyCli
 } from "./transformation/transformCli.js";
 import {
-  notaryAttestCli,
+  notaryAttestCliAsync as notaryAttestCli,
   notaryInitCli,
   notaryInitInteractiveCli,
   notaryLogVerifyCli,
-  notaryPubkeyCli,
-  notarySignCli,
-  notaryStatusCli,
+  notaryPubkeyCliAsync as notaryPubkeyCli,
+  notarySignCliAsync as notarySignCli,
+  notaryStatusCliAsync as notaryStatusCli,
   notaryVerifyAttestCli
 } from "./notary/notaryCli.js";
 import { registerNotaryStartCommand } from "./cli-notary-commands.js";
 import {
   checkNotaryTrust,
-  enableNotaryTrust,
-  initTrustConfig,
+  enableNotaryTrustAsync as enableNotaryTrust,
+  initTrustConfigAsync,
   loadTrustConfig,
   verifyTrustConfigSignature
 } from "./trust/trustConfig.js";
+import { registerTrustResignCommand } from "./cli-trust-resign-command.js";
 import {
   computeTemporalDecayReport,
   decayConfigSchema,
@@ -668,11 +675,12 @@ import {
   type TemporalDecaySourceRun
 } from "./trust/temporalDecay.js";
 import {
-  adaptersCapabilitiesCli,
-  adaptersConfigureCli,
+  adaptersCapabilitiesCliAsync,
+  adaptersCapabilitiesWithOutputCliAsync,
+  adaptersConfigureCliAsync,
   adaptersDetectCli,
   adaptersEnvCli,
-  adaptersInitCli,
+  adaptersInitCliAsync,
   adaptersInitProjectCli,
   adaptersListCli,
   adaptersRunCli,
@@ -703,7 +711,7 @@ import {
 import {
   normalizePluginRef,
   pluginExecuteCli,
-  pluginInitCli,
+  pluginInitCliAsync,
   pluginInstallCli,
   pluginKeygenCli,
   pluginListCli,
@@ -738,62 +746,62 @@ import {
   hostWorkspacePurgeCli
 } from "./workspaces/hostCli.js";
 import { bootstrapHostFromEnv } from "./workspaces/hostBootstrap.js";
-import { canonInitCli, canonPrintCli, canonVerifyCli } from "./canon/canonCli.js";
-import { cgxBuildCli, cgxInitCli, cgxShowCli, cgxVerifyCli } from "./cgx/cgxCli.js";
+import { canonInitCliAsync as canonInitCli, canonPrintCli, canonVerifyCli } from "./canon/canonCli.js";
+import { cgxBuildCliAsync as cgxBuildCli, cgxInitCliAsync as cgxInitCli, cgxShowCli, cgxVerifyCli } from "./cgx/cgxCli.js";
 import { simulateImpact, renderSimulationMarkdown } from "./cgx/cgxSimulator.js";
 import { loadAndDiffSnapshots, renderGraphDiffMarkdown } from "./cgx/cgxDiff.js";
 import { loadLatestCgxGraph } from "./cgx/cgxStore.js";
 import { saveL5DeltaReport } from "./diagnostic/l5DeltaReport.js";
 import { classifyControls, renderControlClassificationMarkdown } from "./diagnostic/controlClassification.js";
-import { diagnosticBankInitCli, diagnosticBankVerifyCli } from "./diagnostic/bank/bankCli.js";
-import { contextualizedDiagnosticRenderCli } from "./diagnostic/contextualizer/contextualizerCli.js";
+import { diagnosticBankInitCliAsync as diagnosticBankInitCli, diagnosticBankVerifyCli } from "./diagnostic/bank/bankCli.js";
+import { contextualizedDiagnosticRenderCliAsync as contextualizedDiagnosticRenderCli } from "./diagnostic/contextualizer/contextualizerCli.js";
 import { truthguardValidateCli } from "./truthguard/truthguardCli.js";
 import { domainProofCheckCli } from "./domainProof/domainProofCli.js";
 import { toErrorMessage } from "./utils/errors.js";
 import { registerLateStageCliCommands } from "./cli-late-stage-commands.js";
-import { registerLeaseCliCommands } from "./cli-lease-commands.js";
+import { registerLeaseCliCommands, registerWorkloadTrustCommands } from "./cli-lease-commands.js";
 import { registerDomainProductCliCommands } from "./cli-domain-product-commands.js";
 import { registerGuardrailControlCommands } from "./enforce/guardrailCli.js";
 import { registerControlInspectionCommands } from "./enforce/controlInspectionCli.js";
 import { registerScopeTemplateCommands } from "./enforce/scopeTemplateCli.js";
 import { registerActionEvidenceLogicCommands } from "./enforce/actionEvidenceLogicCli.js";
 import {
-  promptInitCli,
-  promptPackBuildCli,
+  promptInitCliAsync as promptInitCli,
+  promptPackBuildCliAsync as promptPackBuildCli, assertPromptCliOwnerMode,
   promptPackDiffCli,
   promptPackShowCli,
   promptPackVerifyCli,
-  promptPolicyApplyCli,
-  promptPolicyPrintCli,
-  promptSchedulerDisableCli,
-  promptSchedulerEnableCli,
-  promptSchedulerRunNowCli,
+  promptPolicyApplyCliAsync as promptPolicyApplyCli,
+  promptPolicyPrintCliAsync as promptPolicyPrintCli,
+  promptSchedulerDisableCliAsync as promptSchedulerDisableCli,
+  promptSchedulerEnableCliAsync as promptSchedulerEnableCli,
+  promptSchedulerRunNowCliAsync as promptSchedulerRunNowCli,
   promptSchedulerStatusCli,
-  promptStatusCli,
+  promptStatusCliAsync as promptStatusCli,
   promptVerifyCli
 } from "./prompt/promptPackCli.js";
 import {
-  passportBadgeCli,
-  passportCompareCli,
-  passportCreateCli,
-  passportExportLatestCli,
-  passportInitCli,
-  passportPolicyApplyCli,
+  passportBadgeCliAsync as passportBadgeCli,
+  passportCompareCliAsync as passportCompareCli,
+  passportCreateCliAsync as passportCreateCli,
+  passportExportLatestCliAsync as passportExportLatestCli,
+  passportInitCliAsync as passportInitCli,
+  passportPolicyApplyCliAsync as passportPolicyApplyCli,
   passportPolicyPrintCli,
-  passportShareCli,
+  passportShareCliAsync as passportShareCli,
   passportShowCli,
   passportVerifyCli,
   passportVerifyPolicyCli
 } from "./passport/passportCli.js";
 import {
-  standardGenerateCli,
+  standardGenerateCliAsync as standardGenerateCli,
   standardListCli,
   standardPrintCli,
   standardValidateCli,
-  standardVerifyCli
+  standardVerifyCliAsync as standardVerifyCli
 } from "./standard/standardCli.js";
 import { runRedTeam, renderRedTeamMarkdown, listStrategies } from "./redteam/index.js";
-
+import { registerA4Commands } from "./cli-a4-commands.js";
 async function readStdinAll(): Promise<string> {
   return new Promise((resolve) => {
     let data = "";
@@ -1084,34 +1092,44 @@ async function wrapWithBridgeToken(params: {
   };
   process.stdin.on("data", stdinHandler);
 
-  child.stdout.on("data", (chunk: Buffer) => {
-    const text = redactBridgeText(chunk.toString("utf8"));
-    process.stdout.write(text);
-    queueTelemetry(
-      postBridgeTelemetry(base, leaseToken, {
-        sessionId: wrapSessionId,
-        eventType: "agent_stdout",
-        correlationId,
-        runId,
-        provider: params.provider,
-        payload: text
-      })
-    );
-  });
-  child.stderr.on("data", (chunk: Buffer) => {
-    const text = redactBridgeText(chunk.toString("utf8"));
-    process.stderr.write(text);
-    queueTelemetry(
-      postBridgeTelemetry(base, leaseToken, {
-        sessionId: wrapSessionId,
-        eventType: "agent_stderr",
-        correlationId,
-        runId,
-        provider: params.provider,
-        payload: text
-      })
-    );
-  });
+  // A telemetry row ends at a newline (or past 64 KiB), not at a write, so a value the agent prints over two writes reaches
+  // the bridge's evidence redaction in one row (P2-02). A partial line (a token stream, a spinner) waits at most 250 ms. The
+  // rest is flushed, and every row settled, before the exit row, or before amc exits on SIGINT or SIGTERM.
+  const telemetryLines = (eventType: "agent_stdout" | "agent_stderr", out: NodeJS.WriteStream) => {
+    let pending = "";
+    let timer: NodeJS.Timeout | undefined;
+    const post = (payload: string) => {
+      if (payload) queueTelemetry(postBridgeTelemetry(base, leaseToken, { sessionId: wrapSessionId, eventType, correlationId, runId, provider: params.provider, payload }));
+    };
+    const flush = () => { clearTimeout(timer); timer = undefined; post(pending); pending = ""; };
+    return {
+      write: (chunk: Buffer) => {
+        const text = redactBridgeText(chunk.toString("utf8"));
+        out.write(text);
+        pending += text;
+        const cut = pending.length > 65_536 ? pending.length : pending.lastIndexOf("\n") + 1;
+        post(pending.slice(0, cut));
+        pending = pending.slice(cut);
+        if (cut > 0) { clearTimeout(timer); timer = undefined; }
+        if (pending !== "") timer ??= setTimeout(flush, 250);
+      },
+      flush
+    };
+  };
+  const stdoutLines = telemetryLines("agent_stdout", process.stdout);
+  const stderrLines = telemetryLines("agent_stderr", process.stderr);
+  child.stdout.on("data", stdoutLines.write);
+  child.stderr.on("data", stderrLines.write);
+  // Ctrl+C or a supervisor's SIGTERM: post what is pending and settle it (at most 1 s), then die of the same signal.
+  const onSignal = (signal: NodeJS.Signals): void => {
+    stdoutLines.flush();
+    stderrLines.flush();
+    void Promise.race([Promise.allSettled(pendingTelemetry), new Promise((settle) => setTimeout(settle, 1_000))]).then(() => {
+      process.kill(process.pid, signal);
+    });
+  };
+  process.once("SIGINT", onSignal);
+  process.once("SIGTERM", onSignal);
 
   const exitCode = await new Promise<number>((resolvePromise, rejectPromise) => {
     child.on("error", rejectPromise);
@@ -1119,6 +1137,9 @@ async function wrapWithBridgeToken(params: {
   }).finally(() => {
     process.stdin.off("data", stdinHandler);
   });
+  stdoutLines.flush();
+  stderrLines.flush();
+  await Promise.allSettled(pendingTelemetry);
 
   await postBridgeTelemetry(base, leaseToken, {
     sessionId: wrapSessionId,
@@ -1131,6 +1152,8 @@ async function wrapWithBridgeToken(params: {
     }
   }).catch(() => {});
   await Promise.allSettled(pendingTelemetry);
+  process.off("SIGINT", onSignal);
+  process.off("SIGTERM", onSignal);
 
   console.log(chalk.hex('#4AEF79')("Unified Clarity"));
   console.log(`agent=${decoded.agentId} workspace=${decoded.workspaceId} provider=${params.provider}`);
@@ -1199,36 +1222,6 @@ function findImmediatePackDirectories(parentDir: string): string[] {
     }
   }
   return out.sort((a, b) => a.localeCompare(b));
-}
-
-function latestRunSummary(workspace: string, agentId: string): { runId: string; integrityIndex: number; trustLabel: string } | null {
-  const runsDir = join(workspace, ".amc", "agents", agentId, "runs");
-  if (!pathExists(runsDir)) {
-    return null;
-  }
-  const files = readdirSync(runsDir)
-    .filter((name) => name.endsWith(".json"))
-    .sort((a, b) => a.localeCompare(b));
-  if (files.length === 0) {
-    return null;
-  }
-  try {
-    const parsed = JSON.parse(readUtf8(join(runsDir, files[files.length - 1]!))) as {
-      runId?: string;
-      integrityIndex?: number;
-      trustLabel?: string;
-    };
-    if (!parsed.runId) {
-      return null;
-    }
-    return {
-      runId: parsed.runId,
-      integrityIndex: Number(parsed.integrityIndex ?? 0),
-      trustLabel: String(parsed.trustLabel ?? "UNKNOWN")
-    };
-  } catch {
-    return null;
-  }
 }
 
 function readCurrentAgentScore(workspace: string, agentId: string): { score0to1: number; source: string } | null {
@@ -1354,19 +1347,13 @@ function renderAssuranceRemediationPriority(report: AssuranceReport, opts: {
 }
 
 function loadTemporalDecayRuns(workspace: string, agentId: string, lookbackDays: number, nowTs: number): TemporalDecaySourceRun[] {
-  const runsDir = join(workspace, ".amc", "agents", agentId, "runs");
-  if (!pathExists(runsDir)) {
-    return [];
-  }
   const minTs = nowTs - Math.max(1, lookbackDays) * 24 * 60 * 60 * 1000;
-  const files = readdirSync(runsDir)
-    .filter((name) => name.endsWith(".json"))
-    .sort((a, b) => a.localeCompare(b));
+  const files = agentRunFiles(workspace, agentId);
 
   const rows: TemporalDecaySourceRun[] = [];
   for (const file of files) {
     try {
-      const parsed = JSON.parse(readUtf8(join(runsDir, file))) as {
+      const parsed = JSON.parse(readUtf8(file)) as {
         runId?: string;
         ts?: number;
         integrityIndex?: number;
@@ -1785,25 +1772,29 @@ function printEuAiActNotEvaluated(): void {
 }
 
 async function runInstantFullScoreForAgent(params: { workspace: string; agentId: string; json?: boolean }): Promise<void> {
+  params = { ...params };
   const started = Date.now();
   const releaseLock = await acquireInstantScoreLock(params.workspace);
   const previousNoSign = process.env.AMC_NO_SIGN;
   let state: InstantWorkspaceState | null = null;
   let onboarding: OnboardingState | null = null;
+  let initialized: Awaited<ReturnType<NonNullable<ReturnType<typeof captureInstantWorkspaceDiagnostic>>["initialize"]>> | null = null;
   try {
-    state = ensureInstantWorkspace(params.workspace, params.agentId);
+    const continuation = captureInstantWorkspaceDiagnostic(params.workspace, params.agentId);
+    initialized = continuation === null ? null : await continuation.initialize();
+    state = initialized === null ? ensureInstantWorkspace(params.workspace, params.agentId) : initialized.state;
     onboarding = startInstantOnboarding(params.workspace, params.agentId, state);
     if (state.vault.noSign) {
       process.env.AMC_NO_SIGN = "1";
     }
-    const report = await runDiagnostic({
+    const report = initialized === null ? await runDiagnostic({
       workspace: params.workspace,
       window: "30d",
       targetName: "default",
       agentId: params.agentId,
       claimMode: "auto",
       noSign: state.vault.noSign
-    });
+    }) : await initialized.diagnose();
     const elapsedMs = Date.now() - started;
     const resourceManifest = writeEnforceResourceManifest({
       workspace: params.workspace,
@@ -1888,7 +1879,7 @@ async function runInstantFullScoreForAgent(params: { workspace: string; agentId:
     });
   } catch (error: unknown) {
     const message = toErrorMessage(error);
-    if (state && !state.vault.noSign && /Vault unlock failed|Vault locked|passphrase/i.test(message)) {
+    if (initialized === null && state && !state.vault.noSign && /Vault unlock failed|Vault locked|passphrase/i.test(message)) {
       process.env.AMC_NO_SIGN = "1";
       const unsignedState: InstantWorkspaceState = {
         ...state,
@@ -2014,18 +2005,16 @@ function normalizeCliErrorMessage(error: unknown): string {
       "  amc up"
     ].join("\n");
   }
-  return message;
+  // Publication errors wrap the actual refusal; show its cause chain so the reason is not hidden.
+  const causes: string[] = [], seen = new Set<unknown>();
+  for (let cause = error instanceof Error ? error.cause : undefined; cause instanceof Error && !seen.has(cause) && causes.length < 8; cause = cause.cause) {
+    seen.add(cause); causes.push(`  cause: ${cause.message}`);
+  }
+  return [message, ...causes].join("\n");
 }
 
-// Global crash handlers — catch unhandled promise rejections and exceptions
-process.on("unhandledRejection", (reason) => {
-  console.error(chalk.red(`[AMC] Unhandled rejection: ${reason instanceof Error ? reason.message : String(reason)}`));
-  process.exit(1);
-});
-process.on("uncaughtException", (err) => {
-  console.error(chalk.red(`[AMC] Uncaught exception: ${err.message}`));
-  process.exit(1);
-});
+// Global crash handlers: a bounded diagnostic with the original stack and causes, then a nonzero exit (DXA-10).
+installFatalHandlers((line) => console.error(chalk.red(line)));
 
 const program = new Command();
 program
@@ -2183,7 +2172,7 @@ async function initializeMinimalStartupWorkspace(opts: {
     process.env.AMC_VAULT_PASSPHRASE = generatedPassphrase;
   }
 
-  const init = initWorkspace({
+  const init = await initWorkspaceAsync({
     trustBoundaryMode: opts.trustBoundary,
     agentName: "Startup Agent",
     role: "assistant",
@@ -2198,7 +2187,7 @@ async function initializeMinimalStartupWorkspace(opts: {
   if (opts.trustBoundary) {
     profiled.security.trustBoundaryMode = opts.trustBoundary;
   }
-  saveAMCConfig(process.cwd(), profiled);
+  await saveAMCConfigAsync(process.cwd(), profiled);
 
   const fmt = await import("./cliFormat.js");
   console.log(fmt.logo());
@@ -2229,7 +2218,15 @@ program
   .option("--force", "Force re-initialization, overwrite existing .amc directory", false)
   .option("--skip-vault", "Skip vault setup (useful for CI/headless init)", false)
   .option("--minimal", "Startup-friendly setup without vault prompt or immediate full score", false)
-  .action(async (opts: { trustBoundary?: "isolated" | "shared"; profile: "dev" | "ci" | "prod"; force: boolean; skipVault: boolean; minimal: boolean }) => {
+  .option("--coding", "Starter profile: signed coding tools, a contained shell without network, firewall warn (P1-40)")
+  .option("--regulated", "Starter profile: deny-by-default egress, firewall block, approvals on, a signed Layer 0 plan (P1-40)")
+  .option("--web-allow-host <host>", "--coding only: also grant web_fetch and web_search this exact host or origin in the signed tools policy; repeatable (P2-13)", (v: string, p: string[] = []) => [...p, v])
+  .action(async (opts: { trustBoundary?: "isolated" | "shared"; profile: "dev" | "ci" | "prod"; force: boolean; skipVault: boolean; minimal: boolean; coding?: boolean; regulated?: boolean; webAllowHost?: string[] }) => {
+    const { starterProfileFlag, runStarterInit } = await import("./setup/starterProfiles.js");
+    try {
+      const starter = starterProfileFlag(opts);
+      if (starter) { await runStarterInit(process.cwd(), starter, opts.force, opts.webAllowHost); return; }
+    } catch (error) { console.error(chalk.red(toErrorMessage(error))); process.exit(1); }
     // Force mode: delete existing .amc directory before re-init
     if (opts.force) {
       const { rmSync, existsSync } = await import("fs");
@@ -2292,12 +2289,12 @@ program
       }
     }
 
-    const init = initWorkspace({ trustBoundaryMode: opts.trustBoundary });
+    const init = await initWorkspaceAsync({ trustBoundaryMode: opts.trustBoundary });
     const profiled = applyAMCConfigProfile(opts.profile, loadAMCConfig(process.cwd()));
     if (opts.trustBoundary) {
       profiled.security.trustBoundaryMode = opts.trustBoundary;
     }
-    saveAMCConfig(process.cwd(), profiled);
+    await saveAMCConfigAsync(process.cwd(), profiled);
     const fmt = await import("./cliFormat.js");
     console.log(fmt.logo());
     console.log(fmt.pass("Workspace initialized"));
@@ -3626,7 +3623,7 @@ program
       return;
     }
     await ensureUpVaultPassphrase(workspace, opts.remember !== false);
-    initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+    await initWorkspaceAsync({ workspacePath: workspace, trustBoundaryMode: "isolated" });
     const actionPolicyFile = join(workspace, ".amc", "action-policy.yaml");
     if (!pathExists(actionPolicyFile)) {
       if (process.stdin.isTTY) {
@@ -3974,6 +3971,7 @@ program
       pinnedFingerprint: null,
       currentFingerprint: null,
       attestationLevel: null,
+      attestationBasis: null,
       requiredAttestationLevel: null,
       lastAttestationTs: null
     }));
@@ -3982,7 +3980,7 @@ program
     if (trustCheck.mode === "NOTARY") {
       console.log(`Notary reachable: ${trustCheck.notaryReachable ? "yes" : "no"}`);
       console.log(`Notary fingerprint: pinned=${trustCheck.pinnedFingerprint ?? "n/a"} current=${trustCheck.currentFingerprint ?? "n/a"}`);
-      console.log(`Notary attestation: current=${trustCheck.attestationLevel ?? "n/a"} required=${trustCheck.requiredAttestationLevel ?? "n/a"}`);
+      console.log(`Notary attestation: current=${trustCheck.attestationLevel ?? "n/a"} basis=${trustCheck.attestationBasis ?? "unknown"} required=${trustCheck.requiredAttestationLevel ?? "n/a"}`);
       if (trustCheck.lastAttestationTs) {
         console.log(`Notary last attestation: ${new Date(trustCheck.lastAttestationTs).toISOString()}`);
       }
@@ -4032,33 +4030,33 @@ configCmd
 configCmd
   .command("validate")
   .description("Validate amcconfig.yaml without running anything")
-  .option("--config <path>", "config file path")
-  .action(async (opts: { config?: string }) => {
+  .option("--config <path>", "explicit config overlay path (highest file precedence)")
+  .option("--user-config [path]", "opt in to a user config overlay (default path ~/.amc/amcconfig.yaml)").option("--no-user-config", "no user config overlay (the default; kept as an alias)")
+  .option("--json", "emit resolved declarative config and provenance as JSON", false).option("--schema [name]", "dump boot-free JSON Schema (declarative|agent) without loading config")
+  .action(async (opts: { config?: string; userConfig?: string | boolean; json: boolean; schema?: string | boolean }) => {
     try {
       const { configValidate } = await import("./config/amcConfigCli.js");
-      configValidate({ workspace: process.cwd(), config: opts.config });
+      configValidate({ workspace: process.cwd(), ...opts });
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 
 configCmd
   .command("run")
   .description("Run the evaluation pipeline declared in amcconfig.yaml")
-  .option("--config <path>", "config file path")
+  .option("--config <path>", "explicit config overlay path (highest file precedence)")
+  .option("--user-config [path]", "opt in to a user config overlay (default path ~/.amc/amcconfig.yaml)").option("--no-user-config", "no user config overlay (the default; kept as an alias)")
   .option("--window <window>", "evidence window override")
   .option("--format <format>", "json|html|terminal|markdown")
   .option("--output <path>", "report output path")
   .option("--dry-run", "resolve and report without executing", false)
   .option("--verbose", "print the resolved configuration", false)
   .option("--json", "emit the machine-readable result", false)
-  .action(async (opts: {
-    config?: string; window?: string; format?: string; output?: string;
-    dryRun: boolean; verbose: boolean; json: boolean;
-  }) => {
+  .action(async (opts: { config?: string; userConfig?: string | boolean; window?: string; format?: string; output?: string; dryRun: boolean; verbose: boolean; json: boolean }) => {
     try {
       const { runFromConfig } = await import("./config/amcConfigRunner.js");
       const result = await runFromConfig({
         workspace: process.cwd(),
-        configPath: opts.config,
+        configPath: opts.config, userConfig: opts.userConfig,
         window: opts.window,
         format: opts.format as "json" | "html" | "terminal" | "markdown" | undefined,
         outputPath: opts.output,
@@ -4074,7 +4072,7 @@ configCmd
 configCmd
   .command("profile [name]")
   .description("Print or apply workspace config profile (dev|ci|prod)")
-  .action((name?: "dev" | "ci" | "prod") => {
+  .action(async (name?: "dev" | "ci" | "prod") => {
     const current = loadAMCConfig(process.cwd());
     if (!name) {
       console.log(chalk.hex('#4AEF79')(`Active workspace config profile: ${current.profile ?? "dev"}`));
@@ -4084,7 +4082,7 @@ configCmd
       return;
     }
     const next = applyAMCConfigProfile(name, current);
-    saveAMCConfig(process.cwd(), next);
+    await saveAMCConfigAsync(process.cwd(), next);
     console.log(chalk.green(`✓ Applied workspace config profile: ${name}`));
     console.log(chalk.gray(`  Wrote .amc/amc.config.yaml`));
     console.log(chalk.gray(`  trustBoundaryMode=${next.security.trustBoundaryMode}`));
@@ -4297,17 +4295,12 @@ studioLan
   .option("--port <port>", "port", "3212")
   .option("--cidr <cidr...>", "allowed CIDRs")
   .action(async (opts: { bind: string; port: string; cidr?: string[] }) => {
-    const workspace = process.cwd();
+    const workspace = process.cwd(), params = { workspace, bind: opts.bind, port: Number(opts.port), allowedCIDRs: opts.cidr === undefined ? undefined : [...opts.cidr], requirePairing: true };
+    const original = captureLanModeEnableBeforeUnlock(params);
     if (!vaultStatusNow(workspace).unlocked) {
       await unlockVaultInteractive(workspace);
     }
-    const out = enableLanMode({
-      workspace,
-      bind: opts.bind,
-      port: Number(opts.port),
-      allowedCIDRs: opts.cidr,
-      requirePairing: true
-    });
+    const out = original === null ? await enableLanMode(params) : await original.publish();
     console.log(chalk.green(`LAN mode enabled: ${out.path}`));
     console.log(`Signature: ${out.sigPath}`);
   });
@@ -4316,11 +4309,11 @@ studioLan
   .command("disable")
   .description("Disable LAN mode and revert to localhost-only")
   .action(async () => {
-    const workspace = process.cwd();
+    const workspace = process.cwd(), original = captureLanModeDisableBeforeUnlock(workspace);
     if (!vaultStatusNow(workspace).unlocked) {
       await unlockVaultInteractive(workspace);
     }
-    const out = disableLanMode(workspace);
+    const out = original === null ? await disableLanMode(workspace) : await original.publish();
     console.log(chalk.green(`LAN mode disabled: ${out.path}`));
     console.log(`Signature: ${out.sigPath}`);
   });
@@ -4479,8 +4472,8 @@ const adapters = program.command("adapters").description("Built-in adapter syste
 adapters
   .command("init")
   .description("Create signed adapters.yaml defaults")
-  .action(() => {
-    const out = adaptersInitCli(process.cwd());
+  .action(async () => {
+    const out = await adaptersInitCliAsync(process.cwd());
     console.log(chalk.green(`Adapters config created: ${out.configPath}`));
     console.log(`Signature: ${out.sigPath}`);
   });
@@ -4530,18 +4523,11 @@ adapters
   .requiredOption("--adapter <adapterId>", "adapter ID")
   .option("--out <path>", "write the signed receipt to a JSON file")
   .option("--json", "print the complete signed receipt as JSON")
-  .action((opts: { agent: string; adapter: string; out?: string; json?: boolean }) => {
-    const receipt = adaptersCapabilitiesCli({
-      workspace: process.cwd(),
-      agentId: opts.agent,
-      adapterId: opts.adapter
-    });
-    if (opts.out) {
-      const outPath = resolve(opts.out);
-      mkdirSync(dirname(outPath), { recursive: true });
-      writeFileSync(outPath, `${JSON.stringify(receipt, null, 2)}\n`, { encoding: "utf8", mode: 0o644 });
-      if (!opts.json) console.log(chalk.green(`Adapter capability receipt: ${outPath}`));
-    }
+  .action(async (opts: { agent: string; adapter: string; out?: string; json?: boolean }) => {
+    const params = { workspace: process.cwd(), agentId: opts.agent, adapterId: opts.adapter };
+    const output = opts.out ? await adaptersCapabilitiesWithOutputCliAsync(params, opts.out) : null;
+    const receipt = output?.receipt ?? await adaptersCapabilitiesCliAsync(params);
+    if (output !== null && !opts.json) console.log(chalk.green(`Adapter capability receipt: ${output.outPath}`));
     if (opts.json) {
       console.log(JSON.stringify(receipt, null, 2));
       return;
@@ -4580,8 +4566,8 @@ adapters
   .requiredOption("--model <model>", "preferred model id")
   .option("--mode <mode>", "SUPERVISE|SANDBOX", "SUPERVISE")
   .option("--launch-config <file>", "DSH only: JSON with approved executable/entrypoint paths and SHA-256 hashes")
-  .action((opts: { agent: string; adapter: string; route: string; model: string; mode: "SUPERVISE" | "SANDBOX"; launchConfig?: string }) => {
-    const out = adaptersConfigureCli({
+  .action(async (opts: { agent: string; adapter: string; route: string; model: string; mode: "SUPERVISE" | "SANDBOX"; launchConfig?: string }) => {
+    const out = await adaptersConfigureCliAsync({
       workspace: process.cwd(),
       agentId: opts.agent,
       adapterId: opts.adapter,
@@ -4730,8 +4716,8 @@ plugin
 plugin
   .command("init")
   .description("Initialize signed plugin workspace files")
-  .action(() => {
-    const out = pluginInitCli(process.cwd());
+  .action(async () => {
+    const out = await pluginInitCliAsync(process.cwd());
     console.log(chalk.green("Plugin workspace initialized"));
     console.log(`registries: ${out.registriesPath}`);
     console.log(`registries.sig: ${out.registriesSigPath}`);
@@ -4953,6 +4939,7 @@ plugin
       approvalRequestId: opts.approvalRequest
     });
     console.log(chalk.green(`Plugin action executed: ${out.action}`));
+    console.log(`outcome: ${out.outcome}`);
     console.log(`plugin: ${out.pluginId}@${out.version ?? "removed"}`);
     console.log(`installed.lock: ${out.installedLockPath}`);
     console.log(`installed.lock.sig: ${out.installedLockSigPath}`);
@@ -6228,7 +6215,7 @@ withTrustFlags(verifyCmd, { expectMonitor: true, ledgerOnly: true })
   .option("--dry-run", "With --relabel-legacy: print what would be recorded and write nothing", false)
   .option("--path <file>", "With --relabel-legacy: also classify this file (repeatable)", (value: string, previous: string[]) => [...previous, value], [] as string[])
   .action(async (opts: { repair: boolean; apply: boolean; yes: boolean; signConfig: boolean; relabelLegacy: boolean; dryRun: boolean; path: string[] } & TrustFlags) => {
-    if (opts.signConfig) { console.log(`Signed amc.config.yaml: ${signAmcConfig(process.cwd())}`); return; }
+    if (opts.signConfig) { console.log(`Signed amc.config.yaml: ${await signAmcConfigAsync(process.cwd())}`); return; }
     if (opts.relabelLegacy && opts.repair) { console.error("--relabel-legacy cannot be combined with --repair"); process.exit(2); }
     if (!opts.relabelLegacy && (opts.dryRun || opts.path.length > 0)) { console.error("--dry-run and --path only work with --relabel-legacy"); process.exit(2); }
     if (opts.repair) {
@@ -6257,12 +6244,15 @@ withTrustFlags(verifyCmd, { expectMonitor: true, ledgerOnly: true })
     } else {
       console.log(chalk.red("Ledger verification FAILED — configuration signatures"));
       console.log(chalk.gray("  The evidence chain itself verified; the failures below are unsigned or edited configs."));
+      if (!result.trustRoot.anchored && result.trustRoot.monitorAdmission?.status === "not-pinned") {
+        console.log(chalk.yellow("  Trust root: UNANCHORED. The monitor key was read from the workspace being verified and has no independent admission."));
+      }
     }
     const sigErrors = result.errors.filter((e: string) => e.includes("signature invalid"));
     const otherErrors = result.errors.filter((e: string) => !e.includes("signature invalid"));
     if (sigErrors.length > 0 && sigErrors.length === result.errors.length) {
       console.log(chalk.yellow(`  ${sigErrors.length} signatures are invalid.`));
-      console.log(chalk.gray("  Every event signature failed. A re-initialized vault and altered evidence look the same here; keep the files and run amc verify --repair to see the options."));
+      console.log(chalk.gray("  The reported signature checks failed; keep the files and run amc verify --repair to see the options."));
     } else {
       for (const error of result.errors.slice(0, 10)) {
         console.log(`- ${error}`);
@@ -6305,7 +6295,7 @@ withTrustFlags(verifyCmd
       }
       process.exit(1);
     }
-    if (out.status !== "PASS") {
+    if (out.status === "FAIL") {
       process.exit(1);
     }
     verifyAllExit(out, trust);
@@ -6943,6 +6933,7 @@ const mode = program.command("mode").description("Switch CLI role mode");
 const loop = program.command("loop").description("Continuous self-serve maturity loop");
 const user = program.command("user").description("Multi-user RBAC account management");
 const identity = program.command("identity").description("Enterprise identity (OIDC/SAML) configuration");
+registerWorkloadTrustCommands(identity);
 const sso = program.command("sso").description("SSO setup shortcuts for OIDC and SAML providers");
 const scim = program.command("scim").description("SCIM token management");
 const pair = program.command("pair").description("LAN pairing code operations");
@@ -7477,7 +7468,7 @@ withTrustFlags(evidence
         }
       }
     }
-    if (out.status !== "PASS") {
+    if (out.status === "FAIL") {
       process.exit(1);
     }
     verifyAllExit(out, trust);
@@ -7574,8 +7565,8 @@ registerActionEvidenceLogicCommands(policyAction);
 policyAction
   .command("init")
   .description("Create and sign .amc/action-policy.yaml")
-  .action(() => {
-    const created = initActionPolicy(process.cwd());
+  .action(async () => {
+    const created = await initActionPolicyAsync(process.cwd());
     console.log(chalk.green(`Action policy created: ${created.policyPath}`));
     console.log(`Signature: ${created.signaturePath}`);
   });
@@ -7673,7 +7664,7 @@ policyPack
       console.log("Policy pack apply cancelled.");
       return;
     }
-    const applied = policyPackApplyCli({
+    const applied = await policyPackApplyCliAsync({
       workspace: process.cwd(),
       agentId: opts.agent ?? activeAgent(program),
       packId
@@ -7954,7 +7945,8 @@ incident
   .description("Show incident details, or write its regulator evidence packet with --packet")
   .option("--packet <dir>", "write <id>.packet.json and <id>.packet.md (needs --station)")
   .option("--station <station>", "station whose regulatory clocks the packet lists")
-  .action((id: string, opts: { packet?: string; station?: string }) => {
+  .option("--clocks", "print the clocks recorded when the incident opened, with notice drafts (P2-26); with --packet, write the drafts there")
+  .action((id: string, opts: { packet?: string; station?: string; clocks?: boolean }) => {
     const workspace = process.cwd();
     const ledger = openLedger(workspace);
     try {
@@ -7968,6 +7960,7 @@ incident
       }
       const transitions = store.getIncidentTransitions(id);
       const edges = store.getCausalEdges(id);
+      if (opts.clocks) return printIncidentClocks(workspace, ledger.db, id, opts.packet);
       if (opts.packet) {
         if (!opts.station) throw new Error("--packet needs --station <station>");
         const station = parseStation(opts.station);
@@ -7976,7 +7969,7 @@ incident
         const packet = buildEvidencePacket({
           incident: found, station, generatedTs, clocks, transitions, causalEdges: edges,
           oversightRecords: readOversightRecords(oversightRecordPath(workspace, id)),
-          oversightPublicKeys: getPublicKeyHistory(workspace, "auditor")
+          oversightPublicKeys: workspaceOversightPublicKeys(workspace)
         });
         const dir = resolve(workspace, opts.packet);
         mkdirSync(dir, { recursive: true });
@@ -8033,7 +8026,7 @@ incident
 
       const incidentHash = computeIncidentHash(incidentBase as unknown as Parameters<typeof computeIncidentHash>[0]);
       const signatureDigest = sha256Hex(canonicalize({ ...incidentBase, incident_hash: incidentHash }));
-      const signature = signHexDigest(signatureDigest, getPrivateKeyPem(workspace, "monitor"));
+      const signature = signHexDigest(signatureDigest, getSigningKey(workspace, "ledger-row"));
 
       store.insertIncident({
         ...incidentBase,
@@ -8042,6 +8035,7 @@ incident
       } as unknown as Parameters<typeof store.insertIncident>[0]);
 
       console.log(chalk.green(`Incident created: ${incidentId}`));
+      console.log(`clocks=${startIncidentClocks({ workspace, db: ledger.db, incidentId, nowTs: now }).status}`);
       console.log(`agent=${agentId}`);
       console.log(`severity=${opts.severity.toLowerCase()}`);
     } finally {
@@ -8089,7 +8083,7 @@ incident
         evidence: [opts.evidence],
         addedTs: now,
         addedBy: "OWNER",
-        signature: signHexDigest(edgeDigest, getPrivateKeyPem(workspace, "monitor"))
+        signature: signHexDigest(edgeDigest, getSigningKey(workspace, "ledger-row"))
       });
 
       console.log(chalk.green(`Linked evidence ${opts.evidence} to incident ${incidentId}`));
@@ -8141,7 +8135,7 @@ incident
         toState: "RESOLVED",
         reason: opts.resolution,
         ts: now,
-        signature: signHexDigest(transitionDigest, getPrivateKeyPem(workspace, "monitor"))
+        signature: signHexDigest(transitionDigest, getSigningKey(workspace, "ledger-row"))
       });
 
       console.log(chalk.green(`Incident closed: ${id}`));
@@ -8182,7 +8176,7 @@ incident
           triggerOrClockId: (opts.trigger ?? opts.notified)!,
           ts: parseIsoTimestamp(opts.at!, "--at"),
           recordedBy: "cli",
-          privateKeyPem: getPrivateKeyPem(workspace, "monitor"),
+          privateKeyPem: getSigningKey(workspace, "ledger-row"),
           publicKeys
         });
         if (!opts.json) console.log(chalk.green(`Recorded ${event.kind} ${event.triggerOrClockId}: ${event.eventId}`));
@@ -8215,37 +8209,29 @@ incident
   .requiredOption("--reviewer <id>", "reviewer id, stored as stated")
   .requiredOption("--rationale <text>", "why the reviewer decided this")
   .option("--clock <clockId...>", "clock ids the decision covers")
-  .action((id: string, opts: { decision: string; reviewer: string; rationale: string; clock?: string[] }) => {
+  .action(async (id: string, opts: { decision: string; reviewer: string; rationale: string; clock?: string[] }) => {
     const workspace = process.cwd();
-    const ledger = openLedger(workspace);
-    try {
-      const store = createIncidentStore(ledger.db);
-      store.initTables();
-      const found = store.getIncident(id);
-      if (!found) {
-        console.log(chalk.red(`Incident not found: ${id}`));
-        process.exit(1);
-        return;
-      }
-      const record = recordWorkspaceOversight({
-        workspace, incident: found, reviewerId: opts.reviewer, decision: opts.decision, rationale: opts.rationale,
-        clockIds: opts.clock ?? [], reviewedTs: Date.now(), privateKeyPem: getPrivateKeyPem(workspace, "auditor"),
-        publicKeys: getPublicKeyHistory(workspace, "auditor")
-      });
-      console.log(chalk.green(`Oversight record ${record.recordId} appended (${record.decision})`));
-      console.log(`recordHash=${record.recordHash}`);
-      console.log(`file=${oversightRecordPath(workspace, id)}`);
-      console.log(chalk.gray("Signed with this workspace's auditor key and chained to the file's verified records: a local audit trail of which workspace wrote it, not proof of who reviewed."));
-    } finally {
-      ledger.close();
-    }
+    const found = (() => {
+      const ledger = openLedger(workspace);
+      try { const store = createIncidentStore(ledger.db); store.initTables(); return store.getIncident(id); }
+      finally { ledger.close(); }
+    })();
+    if (!found) { console.log(chalk.red(`Incident not found: ${id}`)); process.exit(1); return; }
+    const record = await recordWorkspaceOversightAsync({
+      workspace, incident: found, reviewerId: opts.reviewer, decision: opts.decision, rationale: opts.rationale,
+      clockIds: opts.clock ?? [], reviewedTs: Date.now()
+    });
+    console.log(chalk.green(`Oversight record ${record.recordId} appended (${record.decision})`));
+    console.log(`recordHash=${record.recordHash}`);
+    console.log(`file=${oversightRecordPath(workspace, id)}`);
+    console.log(chalk.gray("Signed with this workspace's auditor key and chained to the file's verified records: a local audit trail of which workspace wrote it, not proof of who reviewed."));
   });
 
 ops
   .command("init")
   .description("Create and sign .amc/ops-policy.yaml")
-  .action(() => {
-    const created = initOpsPolicy(process.cwd());
+  .action(async () => {
+    const created = await initOpsPolicyAsync(process.cwd());
     console.log(chalk.green(`Ops policy created: ${created.configPath}`));
     console.log(`Signature: ${created.sigPath}`);
   });
@@ -8253,10 +8239,10 @@ ops
 ops
   .command("sign")
   .description("Re-sign an edited .amc/ops-policy.yaml so the ledger, retention and payload caps apply it")
-  .action(() => {
+  .action(async () => {
     const workspace = process.cwd();
     const policy = loadOpsPolicy(workspace);
-    const sigPath = signOpsPolicy(workspace);
+    const sigPath = await signOpsPolicyAsync(workspace);
     console.log(chalk.green(`Ops policy signed: ${sigPath}`));
     console.log(`retention.maxPayloadBytesPerEvent: ${policy.opsPolicy.retention.maxPayloadBytesPerEvent}`);
   });
@@ -8395,9 +8381,9 @@ ops
 canon
   .command("init")
   .description("Create and sign .amc/canon/canon.yaml")
-  .action(() => {
+  .action(async () => {
     assertOwnerMode(process.cwd(), "canon init");
-    const out = canonInitCli(process.cwd());
+    const out = await canonInitCli(process.cwd());
     console.log(chalk.green("Compass Canon initialized"));
     console.log(`Path: ${out.path}`);
     console.log(`Signature: ${out.sigPath}`);
@@ -8429,9 +8415,9 @@ canon
 cgx
   .command("init")
   .description("Create and sign .amc/cgx/policy.yaml")
-  .action(() => {
+  .action(async () => {
     assertOwnerMode(process.cwd(), "cgx init");
-    const out = cgxInitCli(process.cwd());
+    const out = await cgxInitCli(process.cwd());
     console.log(chalk.green("CGX policy initialized"));
     console.log(`Path: ${out.path}`);
     console.log(`Signature: ${out.sigPath}`);
@@ -8442,13 +8428,13 @@ cgx
   .description("Build deterministic signed context graph")
   .requiredOption("--scope <scope>", "workspace|agent")
   .option("--id <id>", "agent id when --scope agent")
-  .action((opts: { scope: string; id?: string }) => {
+  .action(async (opts: { scope: string; id?: string }) => {
     assertOwnerMode(process.cwd(), "cgx build");
     const scope = opts.scope.toLowerCase();
     if (scope !== "workspace" && scope !== "agent") {
       throw new Error("scope must be workspace|agent");
     }
-    const out = cgxBuildCli({
+    const out = await cgxBuildCli({
       workspace: process.cwd(),
       scope: scope as "workspace" | "agent",
       id: opts.id
@@ -8620,9 +8606,9 @@ const prompt = program.command("prompt").description("Northstar prompt policy + 
 prompt
   .command("init")
   .description("Create and sign .amc/prompt/policy.yaml")
-  .action(() => {
+  .action(async () => {
     assertOwnerMode(process.cwd(), "prompt init");
-    const out = promptInitCli(process.cwd());
+    const out = await promptInitCli(process.cwd());
     console.log(chalk.green("Prompt policy initialized"));
     console.log(`Path: ${out.path}`);
     console.log(`Signature: ${out.sigPath}`);
@@ -8649,8 +8635,8 @@ const promptPolicy = prompt.command("policy").description("Prompt policy operati
 promptPolicy
   .command("print")
   .description("Print prompt policy")
-  .action(() => {
-    console.log(JSON.stringify(promptPolicyPrintCli(process.cwd()), null, 2));
+  .action(async () => {
+    console.log(JSON.stringify(await promptPolicyPrintCli(process.cwd()), null, 2));
   });
 
 promptPolicy
@@ -8658,9 +8644,9 @@ promptPolicy
   .description("Apply prompt policy from YAML file and sign")
   .requiredOption("--file <path>", "policy yaml path")
   .option("--reason <reason>", "change reason", "prompt policy update")
-  .action((opts: { file: string; reason: string }) => {
+  .action(async (opts: { file: string; reason: string }) => {
     assertOwnerMode(process.cwd(), "prompt policy apply");
-    const out = promptPolicyApplyCli({
+    const out = await promptPolicyApplyCli({
       workspace: process.cwd(),
       file: opts.file,
       reason: opts.reason,
@@ -8674,8 +8660,8 @@ promptPolicy
 prompt
   .command("status")
   .description("List per-agent prompt pack status")
-  .action(() => {
-    const out = promptStatusCli(process.cwd());
+  .action(async () => {
+    const out = await promptStatusCli(process.cwd());
     console.log(JSON.stringify(out, null, 2));
   });
 
@@ -8686,13 +8672,13 @@ promptPack
   .description("Build and sign .amcprompt for an agent")
   .option("--agent <agentId>", "agent id", "default")
   .option("--out <file>", "output .amcprompt file")
-  .action((opts: { agent: string; out?: string }) => {
-    assertOwnerMode(process.cwd(), "prompt pack build");
-    const out = promptPackBuildCli({
+  .action(async (opts: { agent: string; out?: string }) => {
+    assertPromptCliOwnerMode(process.cwd(), "prompt pack build");
+    const out = await promptPackBuildCli({
       workspace: process.cwd(),
       agentId: opts.agent,
       outFile: opts.out
-    });
+    }, { beforePublish: () => assertPromptCliOwnerMode(process.cwd(), "prompt pack build") });
     console.log(chalk.green("Prompt pack created"));
     console.log(`agent=${out.agentId}`);
     console.log(`packId=${out.pack.packId}`);
@@ -8761,37 +8747,37 @@ promptScheduler
   .command("run-now")
   .description("Run prompt scheduler now for one agent or all")
   .option("--agent <agentId>", "agent id or all", "all")
-  .action((opts: { agent: string }) => {
-    assertOwnerMode(process.cwd(), "prompt scheduler run-now");
-    const out = promptSchedulerRunNowCli({
+  .action(async (opts: { agent: string }) => {
+    assertPromptCliOwnerMode(process.cwd(), "prompt scheduler run-now");
+    const out = await promptSchedulerRunNowCli({
       workspace: process.cwd(),
       agent: opts.agent === "all" ? "all" : opts.agent
-    });
+    }, { beforePublish: () => assertPromptCliOwnerMode(process.cwd(), "prompt scheduler run-now") });
     console.log(JSON.stringify(out, null, 2));
   });
 
 promptScheduler
   .command("enable")
   .description("Enable prompt scheduler")
-  .action(() => {
+  .action(async () => {
     assertOwnerMode(process.cwd(), "prompt scheduler enable");
-    console.log(JSON.stringify(promptSchedulerEnableCli(process.cwd()), null, 2));
+    console.log(JSON.stringify(await promptSchedulerEnableCli(process.cwd()), null, 2));
   });
 
 promptScheduler
   .command("disable")
   .description("Disable prompt scheduler")
-  .action(() => {
+  .action(async () => {
     assertOwnerMode(process.cwd(), "prompt scheduler disable");
-    console.log(JSON.stringify(promptSchedulerDisableCli(process.cwd()), null, 2));
+    console.log(JSON.stringify(await promptSchedulerDisableCli(process.cwd()), null, 2));
   });
 
 passport
   .command("init")
   .description("Create and sign .amc/passport/policy.yaml")
-  .action(() => {
+  .action(async () => {
     assertOwnerMode(process.cwd(), "passport init");
-    const out = passportInitCli(process.cwd());
+    const out = await passportInitCli(process.cwd());
     console.log(chalk.green("Passport policy initialized"));
     console.log(`Signature valid: ${out.signature.valid}`);
   });
@@ -8825,9 +8811,9 @@ passportPolicy
   .command("apply")
   .description("Apply passport policy from JSON/YAML file")
   .requiredOption("--file <path>", "policy file")
-  .action((opts: { file: string }) => {
+  .action(async (opts: { file: string }) => {
     assertOwnerMode(process.cwd(), "passport policy apply");
-    const out = passportPolicyApplyCli({
+    const out = await passportPolicyApplyCli({
       workspace: process.cwd(),
       file: opts.file
     });
@@ -8843,13 +8829,13 @@ passport
   .requiredOption("--scope <scope>", "workspace|node|agent")
   .requiredOption("--out <file.amcpass>", "output passport path")
   .option("--id <id>", "scope id for node/agent")
-  .action((opts: { scope: string; out: string; id?: string }) => {
+  .action(async (opts: { scope: string; out: string; id?: string }) => {
     assertOwnerMode(process.cwd(), "passport create");
     const scope = opts.scope.toLowerCase();
     if (scope !== "workspace" && scope !== "node" && scope !== "agent") {
       throw new Error("scope must be workspace|node|agent");
     }
-    const out = passportCreateCli({
+    const out = await passportCreateCli({
       workspace: process.cwd(),
       scope: scope as "workspace" | "node" | "agent",
       id: opts.id,
@@ -8902,14 +8888,15 @@ passport
   .description("Print deterministic single-line badge from latest cache")
   .requiredOption("--scope <scope>", "agent")
   .requiredOption("--id <agentId>", "agent id")
-  .action((opts: { scope: string; id: string }) => {
+  .action(async (opts: { scope: string; id: string }) => {
     if (opts.scope.toLowerCase() !== "agent") {
       throw new Error("badge currently supports --scope agent only");
     }
-    const out = passportBadgeCli({
+    const attempt = await passportBadgeCli({
       workspace: process.cwd(),
       agentId: resolveAgentId(process.cwd(), opts.id)
     });
+    attempt.assertCurrent(); const out = attempt.result;
     console.log(out.badge);
     printClaimResult(unverifiedClaim("passport:badge", 1), { stderr: true });
   });
@@ -8920,18 +8907,19 @@ passport
   .requiredOption("--scope <scope>", "workspace|node|agent")
   .requiredOption("--out <file.amcpass>", "output passport path")
   .option("--id <id>", "scope id for node/agent")
-  .action((opts: { scope: string; out: string; id?: string }) => {
+  .action(async (opts: { scope: string; out: string; id?: string }) => {
     assertOwnerMode(process.cwd(), "passport export-latest");
     const scope = opts.scope.toLowerCase();
     if (scope !== "workspace" && scope !== "node" && scope !== "agent") {
       throw new Error("scope must be workspace|node|agent");
     }
-    const out = passportExportLatestCli({
+    const passportAttempt = await passportExportLatestCli({
       workspace: process.cwd(),
       scope: scope as "workspace" | "node" | "agent",
       id: opts.id,
       outFile: opts.out
     });
+    const out = passportAttempt.result; passportAttempt.assertCurrent();
     console.log(chalk.green("Passport exported"));
     printClaimResult(artifactClaim("passport"), {});
     console.log(`File: ${out.outFile}`);
@@ -8946,18 +8934,19 @@ passport
   .requiredOption("--format <format>", "url|qr|json|pdf")
   .option("--base-url <url>", "public base URL", "http://localhost:8787")
   .option("--out <path>", "output file path for pdf format")
-  .action((opts: { agent: string; format: string; baseUrl: string; out?: string }) => {
+  .action(async (opts: { agent: string; format: string; baseUrl: string; out?: string }) => {
     const format = opts.format.toLowerCase();
     if (format !== "url" && format !== "qr" && format !== "json" && format !== "pdf") {
       throw new Error("format must be url|qr|json|pdf");
     }
-    const out = passportShareCli({
+    const attempt = await passportShareCli({
       workspace: process.cwd(),
       agentId: resolveAgentId(process.cwd(), opts.agent),
       format: format as "url" | "qr" | "json" | "pdf",
       baseUrl: opts.baseUrl,
       outFile: opts.out
     });
+    attempt.assertCurrent(); const out = attempt.result;
     const claim = artifactClaim("passport");
     if (format !== "json") printClaimResult(claim, {});
     if (format === "url") {
@@ -8985,10 +8974,10 @@ passport
   .description("Compare two agents by passport maturity dimensions")
   .argument("<agentIdA>")
   .argument("<agentIdB>")
-  .action((agentIdA: string, agentIdB: string) => {
+  .action(async (agentIdA: string, agentIdB: string) => {
     const first = resolveAgentId(process.cwd(), agentIdA);
     const second = resolveAgentId(process.cwd(), agentIdB);
-    const out = passportCompareCli({
+    const out = await passportCompareCli({
       workspace: process.cwd(),
       agentA: first,
       agentB: second
@@ -9015,9 +9004,9 @@ passport
 standard
   .command("generate")
   .description("Generate signed Open Compass schema bundle under .amc/standard/")
-  .action(() => {
+  .action(async () => {
     assertOwnerMode(process.cwd(), "standard generate");
-    const out = standardGenerateCli(process.cwd());
+    const out = await standardGenerateCli(process.cwd(), { beforePublish: () => assertOwnerMode(process.cwd(), "standard generate") });
     console.log(chalk.green("Standard schemas generated"));
     console.log(`Root: ${out.root}`);
     console.log(`Meta: ${out.metaPath}`);
@@ -9028,8 +9017,8 @@ standard
 standard
   .command("verify")
   .description("Verify schema bundle signatures and manifest digests")
-  .action(() => {
-    const out = standardVerifyCli(process.cwd());
+  .action(async () => {
+    const out = await standardVerifyCli(process.cwd());
     if (!out.ok) {
       console.log(chalk.red("Standard schema verify failed"));
       for (const error of out.errors) {
@@ -9083,14 +9072,14 @@ standard
     console.log(JSON.stringify(standardListCli(process.cwd()), null, 2));
   });
 
-const diagnosticBank = diagnostic.command("bank").description("Signed diagnostic 126-question bank operations");
+const diagnosticBank = diagnostic.command("bank").description("Signed default diagnostic question bank operations");
 
 diagnosticBank
   .command("init")
   .description("Create and sign .amc/diagnostic/bank/bank.yaml")
-  .action(() => {
+  .action(async () => {
     assertOwnerMode(process.cwd(), "diagnostic bank init");
-    const out = diagnosticBankInitCli(process.cwd());
+    const out = await diagnosticBankInitCli(process.cwd());
     console.log(chalk.green("Diagnostic bank initialized"));
     console.log(`Path: ${out.path}`);
     console.log(`Signature: ${out.sigPath}`);
@@ -9114,16 +9103,16 @@ diagnosticBank
 
 diagnostic
   .command("render")
-  .description("Render contextualized 126-question diagnostic for an agent")
+  .description("Render the contextualized default diagnostic question bank for an agent")
   .requiredOption("--agent <agentId>", "agent id")
   .option("--format <format>", "md|json", "json")
   .option("--out <file>", "output file")
-  .action((opts: { agent: string; format: string; out?: string }) => {
+  .action(async (opts: { agent: string; format: string; out?: string }) => {
     const format = opts.format.toLowerCase();
     if (format !== "json" && format !== "md") {
       throw new Error("format must be md|json");
     }
-    const out = contextualizedDiagnosticRenderCli({
+    const out = await contextualizedDiagnosticRenderCli({
       workspace: process.cwd(),
       agentId: opts.agent,
       format: format as "json" | "md",
@@ -9224,16 +9213,16 @@ const blobKeys = blobs.command("key").description("Blob key management");
 blobKeys
   .command("init")
   .description("Initialize encrypted blob key material")
-  .action(() => {
-    const key = blobKeyInitCli(process.cwd());
+  .action(async () => {
+    const key = await blobKeyInitCli(process.cwd());
     console.log(chalk.green(`Blob key initialized (version ${key.keyVersion})`));
   });
 
 blobKeys
   .command("rotate")
   .description("Rotate encrypted blob key material")
-  .action(() => {
-    const rotated = blobKeyRotateCli(process.cwd());
+  .action(async () => {
+    const rotated = await blobKeyRotateCli(process.cwd());
     console.log(chalk.green(`Blob key rotated: ${rotated.fromVersion} -> ${rotated.toVersion}`));
   });
 
@@ -9243,8 +9232,8 @@ blobs
   .requiredOption("--from <version>", "source key version")
   .requiredOption("--to <version>", "target key version")
   .option("--limit <n>", "max blobs to process", "1000")
-  .action((opts: { from: string; to: string; limit: string }) => {
-    const result = blobsReencryptCli(process.cwd(), {
+  .action(async (opts: { from: string; to: string; limit: string }) => {
+    const result = await blobsReencryptCli(process.cwd(), {
       fromVersion: Number(opts.from),
       toVersion: Number(opts.to),
       limit: Math.max(1, Number(opts.limit) || 1000)
@@ -9265,8 +9254,8 @@ retention
   .command("run")
   .description("Run archival + payload prune lifecycle")
   .option("--dry-run", "simulate without modifying data", false)
-  .action((opts: { dryRun: boolean }) => {
-    const result = retentionRunCli(process.cwd(), opts.dryRun);
+  .action(async (opts: { dryRun: boolean }) => {
+    const result = await retentionRunCliAsync(process.cwd(), opts.dryRun);
     console.log(JSON.stringify(result, null, 2));
   });
 
@@ -9290,8 +9279,8 @@ backup
   .command("create")
   .description("Create signed encrypted backup bundle")
   .requiredOption("--out <file>", "output backup file, e.g. backup.amcbackup")
-  .action((opts: { out: string }) => {
-    const created = backupCreateCli(process.cwd(), opts.out);
+  .action(async (opts: { out: string }) => {
+    const created = await backupCreateCliAsync(process.cwd(), opts.out);
     console.log(chalk.green(`Backup created: ${created.outFile}`));
     console.log(`backupId=${created.backupId}`);
   });
@@ -9319,7 +9308,7 @@ withTrustFlags(backup
       pubkeyPath: opts.pubkey,
       trust: trustFromFlags(opts, ["artifact-seal"])
     });
-    console.log(chalk.green(`Backup restored to ${restored.restoredTo}`));
+    console.log(chalk.green(`Backup restored to ${restored.restoredTo}`) + (restored.replacedTo ? `\nThe replaced workspace files are kept in ${restored.replacedTo}` : ""));
     if (!restored.trusted) {
       console.log(chalk.yellow("Restore completed with warnings:"));
       for (const warning of restored.warnings) {
@@ -9472,7 +9461,7 @@ workorder
       ]);
       description = answer.description;
     }
-    const created = createWorkOrder({
+    const created = await createWorkOrderAsync({
       workspace: process.cwd(),
       agentId: opts.agent ?? activeAgent(program),
       title: opts.title!,
@@ -9544,8 +9533,8 @@ workorder
   .argument("<workOrderId>")
   .option("--reason <text>", "reason")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .action((workOrderId: string, opts: { reason?: string; agent?: string }) => {
-    const expired = expireWorkOrder({
+  .action(async (workOrderId: string, opts: { reason?: string; agent?: string }) => {
+    const expired = await expireWorkOrderAsync({
       workspace: process.cwd(),
       agentId: opts.agent ?? activeAgent(program),
       workOrderId,
@@ -9564,9 +9553,9 @@ ticket
   .option("--tool <name>", "restrict ticket to a tool")
   .option("--ttl <ttl>", "ticket TTL (e.g. 15m, 1h)", "15m")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .action((opts: { workorder: string; action: string; tool?: string; ttl: string; agent?: string }) => {
+  .action(async (opts: { workorder: string; action: string; tool?: string; ttl: string; agent?: string }) => {
     const agentId = resolveAgentId(process.cwd(), opts.agent ?? activeAgent(program));
-    const issued = issueExecTicket({
+    const issued = await issueExecTicketAsync({
       workspace: process.cwd(),
       agentId,
       workOrderId: opts.workorder,
@@ -9625,7 +9614,7 @@ firewall
   .option("--mode <mode>", "observe, warn, or block", "warn")
   .option("--fail-open", "do not fail closed when a required runtime policy is missing", false)
   .option("--json", "emit JSON output", false)
-  .action((opts: { mode: string; failOpen?: boolean; json?: boolean }) => {
+  .action(async (opts: { mode: string; failOpen?: boolean; json?: boolean }) => {
     const workspace = process.cwd();
     const requested = {
       mode: parseRuntimeFirewallModeCli(opts.mode),
@@ -9661,7 +9650,7 @@ firewall
       console.log("To change the mode deliberately: amc firewall enable --mode observe|warn|block. To inspect: amc firewall status.");
       return;
     }
-    const out = writeRuntimeFirewallPolicy({ workspace, ...requested });
+    const out = await writeRuntimeFirewallPolicyAsync({ workspace, ...requested });
     if (opts.json) {
       console.log(JSON.stringify({ changed: true, previousIntegrity: before.integrity, ...out }, null, 2));
       return;
@@ -9687,8 +9676,8 @@ firewall
   .command("disable")
   .description("Disable Runtime Firewall for this workspace")
   .option("--json", "emit JSON output", false)
-  .action((opts: { json?: boolean }) => {
-    const out = writeRuntimeFirewallPolicy({
+  .action(async (opts: { json?: boolean }) => {
+    const out = await writeRuntimeFirewallPolicyAsync({
       workspace: process.cwd(),
       mode: "observe",
       enabled: false,
@@ -9707,8 +9696,8 @@ firewall
   .description("Preserve and journal an existing verified Runtime Firewall policy")
   .option("--approve-legacy-kind", "acknowledge that legacy sidecars did not bind artifactKind", false)
   .option("--json", "emit JSON output", false)
-  .action((opts: { approveLegacyKind?: boolean; json?: boolean }) => {
-    const out = migrateRuntimeFirewallPolicySignature({
+  .action(async (opts: { approveLegacyKind?: boolean; json?: boolean }) => {
+    const out = await migrateRuntimeFirewallPolicySignatureAsync({
       workspace: process.cwd(),
       approveLegacyArtifactKind: opts.approveLegacyKind === true
     });
@@ -10070,7 +10059,7 @@ runtime
 
 runtime
   .command("resume <runId>")
-  .description("Resume a running or degraded runtime run from persisted state")
+  .description("Record a runtime run resume (record-only; does not resume native execution)")
   .option("--agent <agentId>", "agent id")
   .option("--stage <stage>", "stage after resume")
   .option("--message <text>", "resume message")
@@ -10087,12 +10076,12 @@ runtime
       console.log(JSON.stringify(written, null, 2));
       return;
     }
-    console.log(chalk.green(`Runtime run resumed: ${written.run.runId}`));
+    console.log(chalk.green(`Runtime run resume recorded (record-only; no process or native session resumed): ${written.run.runId}`));
   });
 
 runtime
   .command("cancel <runId>")
-  .description("Cancel a runtime run cleanly")
+  .description("Record a runtime run cancellation (record-only; does not cancel native execution)")
   .option("--agent <agentId>", "agent id")
   .option("--reason <text>", "cancel reason")
   .option("--json", "emit JSON output", false)
@@ -10107,7 +10096,7 @@ runtime
       console.log(JSON.stringify(written, null, 2));
       return;
     }
-    console.log(chalk.yellow(`Runtime run canceled: ${written.run.runId}`));
+    console.log(chalk.yellow(`Runtime run cancellation recorded (record-only; no process or native session canceled): ${written.run.runId}`));
   });
 
 runtime
@@ -10197,7 +10186,7 @@ gateway
   .option("--header <name>", "header name for header_env", "x-api-key")
   .option("--param <name>", "query param for query_env", "key")
   .action(
-    (opts: {
+    async (opts: {
       provider: string;
       baseUrl?: string;
       authType: "bearer_env" | "header_env" | "query_env" | "none";
@@ -10230,7 +10219,7 @@ gateway
         };
       }
 
-      const created = initGatewayConfig(process.cwd(), config);
+      const created = await initGatewayConfigAsync(process.cwd(), config);
       console.log(chalk.green(`Gateway config created: ${created.configPath}`));
       console.log(chalk.green(`Gateway config signature: ${created.sigPath}`));
     }
@@ -10329,11 +10318,8 @@ gateway
   .requiredOption("--route <prefix>", "route prefix, e.g. /openai")
   .requiredOption("--agent <agentId>", "agent ID to bind")
   .option("--config <path>", "gateway config path", ".amc/gateway.yaml")
-  .action((opts: { route: string; agent: string; config: string }) => {
-    const cfg = loadGatewayConfig(process.cwd(), opts.config);
-    const updated = bindAgentRoute(cfg, opts.route, opts.agent);
-    saveGatewayConfig(process.cwd(), updated, opts.config);
-    signGatewayConfig(process.cwd(), opts.config);
+  .action(async (opts: { route: string; agent: string; config: string }) => {
+    await bindGatewayAgentAsync(process.cwd(), opts.route, opts.agent, opts.config);
     console.log(chalk.green(`Bound route ${opts.route} -> agent ${opts.agent}`));
   });
 
@@ -10343,14 +10329,17 @@ bundle
   .requiredOption("--run <runId>", "run ID")
   .requiredOption("--out <file>", "output .amcbundle file")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .action((opts: { run: string; out: string; agent?: string }) => {
+  .option("--attest", "add the agent's CycloneDX AIBOM and a DSSE-signed in-toto statement about the run (artifact-seal key)")
+  .action((opts: { run: string; out: string; agent?: string; attest?: boolean }) => {
     const result = exportEvidenceBundle({
       workspace: process.cwd(),
       runId: opts.run,
       outFile: opts.out,
-      agentId: opts.agent ?? activeAgent(program)
+      agentId: opts.agent ?? activeAgent(program),
+      attest: opts.attest === true
     });
     console.log(chalk.green(`Bundle exported: ${result.outFile}`));
+    if (opts.attest) console.log("Attested: attestations/aibom.cdx.json and attestations/control-results.sigstore.json (DSSE, workspace artifact-seal key: a local audit trail until a trust list pins that key)");
     printClaimResult(runIdClaim(opts.run, opts.agent ?? activeAgent(program)), {});
     console.log(`Files: ${result.fileCount}, Events: ${result.eventCount}, Sessions: ${result.sessionCount}`);
   });
@@ -10500,15 +10489,19 @@ ci
   .description("Generate GitHub workflow and gate policy")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
   .option("--no-sign", "Generate unsigned workflow and policy without requiring a vault")
-  .action((opts: { agent?: string; sign?: boolean }) => {
+  .action(async (opts: { agent?: string; sign?: boolean }) => {
     try {
-      const agentId = resolveAgentId(process.cwd(), opts.agent ?? activeAgent(program));
-      const signPolicy = opts.sign !== false;
-      const created = initCiForAgent({
-        workspace: process.cwd(),
-        agentId,
-        signPolicy
-      });
+      const workspace = process.cwd(), agentId = resolveAgentId(workspace, opts.agent ?? activeAgent(program));
+      const signPolicy = opts.sign !== false, selectedAsync = signPolicy && process.env.AMC_NO_SIGN !== "1";
+      const request = { workspace, agentId, signPolicy };
+      let created: ReturnType<typeof initCiForAgent>;
+      if (selectedAsync) {
+        const completed = await initCiForAgentAttemptAsync({ workspace, agentId }, () => {
+          if (process.cwd() !== workspace) throw new Error("original CI command workspace changed");
+          assertOwnerMode(workspace, "ci init");
+        });
+        completed.assertCurrent(); created = completed.result;
+      } else created = initCiForAgent(request);
       console.log(chalk.green(`CI workflow created: ${created.workflowPath}`));
       console.log(`Gate policy: ${created.policyPath}`);
       if (created.signed) {
@@ -10755,6 +10748,11 @@ archetype
       console.log(`- ... ${preview.targetChanges.length - 20} more changes`);
     }
 
+    const publication = captureArchetypeApply({
+      workspace: process.cwd(),
+      agentId: opts.agent ?? activeAgent(program),
+      archetypeId
+    });
     const confirm = await inquirer.prompt([
       {
         type: "confirm",
@@ -10768,15 +10766,15 @@ archetype
       return;
     }
 
-    const applied = applyArchetype({
-      workspace: process.cwd(),
-      agentId: opts.agent ?? activeAgent(program),
-      archetypeId
-    });
+    const applied = await publication.apply();
+    publication.assertCurrent();
     console.log(chalk.green(`Archetype applied to agent ${applied.agentId}`));
+    publication.assertCurrent();
     console.log(`Target: ${applied.targetPath}`);
+    publication.assertCurrent();
     console.log(`Audit session: ${applied.auditSessionId}`);
     for (const file of applied.changedFiles) {
+      publication.assertCurrent();
       console.log(`- ${file}`);
     }
   });
@@ -10976,8 +10974,8 @@ assurance
 assurance
   .command("init")
   .description("Initialize signed assurance policy")
-  .action(() => {
-    const out = assuranceInitCli(process.cwd());
+  .action(async () => {
+    const out = await assuranceInitCli(process.cwd());
     console.log(chalk.green(`Initialized assurance policy: ${out.path}`));
     console.log(`sig=${out.sigPath}`);
   });
@@ -11000,16 +10998,16 @@ assurance
 assurance
   .command("policy")
   .description("Print current assurance policy")
-  .action(() => {
-    console.log(JSON.stringify(assurancePrintPolicyCli(process.cwd()), null, 2));
+  .action(async () => {
+    console.log(JSON.stringify(await assurancePrintPolicyCli(process.cwd()), null, 2));
   });
 
 assurance
   .command("policy-apply")
   .description("Apply assurance policy from YAML/JSON file")
   .requiredOption("--file <path>", "policy file path")
-  .action((opts: { file: string }) => {
-    const out = assuranceApplyPolicyCli({
+  .action(async (opts: { file: string }) => {
+    const out = await assuranceApplyPolicyCli({
       workspace: process.cwd(),
       file: resolve(process.cwd(), opts.file)
     });
@@ -11017,7 +11015,7 @@ assurance
     console.log(`sig=${out.sigPath}`);
   });
 
-assurance
+withExecutedAssuranceOptions(assurance
   .command("run")
   .description("Run assurance pack(s) with deterministic validation")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
@@ -11033,24 +11031,10 @@ assurance
   .option("--format <format>", "output format: text|sarif", "text")
   .option("--verbose", "show full scenario-level detail with payloads and reasons", false)
   .option("--model <modelId>", "model id of the agent under test (or set AMC_ASSURANCE_MODEL)")
-  .option("--no-sign", "skip vault/artifact signing (packs still run)")
+  .option("--no-sign", "skip vault/artifact signing (packs still run)"))
   .action(
-    async (opts: {
-      agent?: string;
-      scope?: "workspace" | "node" | "agent";
-      id?: string;
-      pack?: string;
-      format: string;
-      verbose: boolean;
-      all: boolean;
-      demo: boolean;
-      mode: "supervise" | "sandbox";
-      window: string;
-      windowDays?: string;
-      out?: string;
-      model?: string;
-      sign: boolean; // Commander inverts --no-sign to sign=false
-    }) => {
+    async (opts: AssuranceRunCliOptions) => {
+      const executedSelection = selectExecutedAssuranceOptions(opts);
       // Non-TTY detection: assurance run needs agent ID. If missing and non-interactive, exit cleanly.
       if (!process.stdin.isTTY && !opts.demo && !opts.all && !opts.pack && !opts.id && !opts.agent && !activeAgent(program)) {
         console.error(chalk.red("This command requires an interactive terminal or explicit --agent/--id flags in non-interactive mode."));
@@ -11101,10 +11085,11 @@ assurance
       let report: Awaited<ReturnType<typeof runAssurance>>;
       try {
         report = await runAssurance({
+          ...executedSelection,
           workspace: process.cwd(),
           agentId: opts.id ?? opts.agent ?? activeAgent(program),
           packId: opts.pack,
-          packIds: demoPackIds,
+          packIds: demoPackIds ?? executedSelection.packIds,
           runAll: opts.all,
           mode: opts.mode,
           window: opts.window,
@@ -11129,20 +11114,7 @@ assurance
       const claim = assuranceClaim(report, true);
       // SARIF output
       if (opts.format === "sarif") {
-        const sarifRules = (report.packResults ?? []).map((p, i) => ({
-          id: p.packId,
-          name: p.title,
-          shortDescription: { text: `AMC Assurance Pack: ${p.title}` },
-          properties: { score: p.score0to100, pass: p.passCount, fail: p.failCount }
-        }));
-        const sarifResults = (report.packResults ?? []).flatMap(p =>
-          p.scenarioResults.map(s => ({
-            ruleId: p.packId,
-            level: s.pass ? ("note" as const) : ("error" as const),
-            message: { text: `${s.title}: ${s.pass ? "PASS" : "FAIL"} — ${s.reasons.join("; ")}` },
-            properties: { scenarioId: s.scenarioId, score: s.score0to100, category: s.category }
-          }))
-        );
+        const { rules: sarifRules, results: sarifResults } = assuranceSarifEntries(report.packResults ?? []);
         const sarif = {
           $schema: "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/main/sarif-2.1/schema/sarif-schema-2.1.0.json",
           version: "2.1.0",
@@ -11164,24 +11136,21 @@ assurance
       }
       console.log(`TrustTier: ${report.trustTier}`);
       console.log(`IntegrityIndex: ${report.integrityIndex.toFixed(3)} (${report.trustLabel})`);
-      console.log(`Overall score: ${report.overallScore0to100.toFixed(2)}`);
+      console.log(`Overall score: ${renderAssuranceOverallScore(report)}`);
 
       // Per-pack breakdown
       if (report.packResults && report.packResults.length > 0) {
         console.log("");
         console.log(chalk.bold("  Pack Results:"));
         for (const pack of report.packResults) {
-          const passIcon = pack.failCount === 0 ? chalk.green("✓") : chalk.red("✗");
-          const scoreColor = pack.score0to100 >= 70 ? chalk.green : pack.score0to100 >= 40 ? chalk.yellow : chalk.red;
-          console.log(`  ${passIcon} ${chalk.hex('#4AEF79')(pack.packId.padEnd(30))} ${scoreColor(pack.score0to100.toFixed(0).padStart(3))}%  ${chalk.green(String(pack.passCount))} pass / ${chalk.red(String(pack.failCount))} fail  (${pack.scenarioCount} scenarios)`);
+          console.log(renderAssurancePackLine(pack));
         }
         console.log("");
-        const totalPass = report.packResults.reduce((s, p) => s + p.passCount, 0);
-        const totalFail = report.packResults.reduce((s, p) => s + p.failCount, 0);
-        console.log(chalk.gray(`  Total: ${totalPass + totalFail} scenarios — ${chalk.green(String(totalPass))} passed, ${chalk.red(String(totalFail))} failed`));
+        console.log(renderAssuranceTotalLine(report.packResults));
         const rerunCommand = [
           "amc assurance run",
           demoPackIds ? "--demo" : opts.all ? "--all" : opts.pack ? `--pack ${opts.pack}` : "",
+          ...executedRerunFlags(opts),
           noSign ? "--no-sign" : "",
           "--verbose"
         ].filter(Boolean).join(" ");
@@ -11197,8 +11166,7 @@ assurance
           for (const pack of report.packResults) {
             console.log(`\n  ${chalk.bold.cyan(pack.packId)} (${pack.title ?? pack.packId})`);
             for (const s of (pack as any).scenarioResults ?? []) {
-              const icon = s.pass ? chalk.green("✓") : chalk.red("✗");
-              console.log(`    ${icon} ${s.title ?? s.scenarioId}`);
+              console.log(renderAssuranceScenarioHeading(s));
               if (s.payload) console.log(chalk.gray(`      Payload: ${typeof s.payload === "string" ? s.payload.substring(0, 120) : JSON.stringify(s.payload).substring(0, 120)}`));
               if (s.reasons?.length) {
                 for (const r of s.reasons) console.log(chalk.gray(`      → ${r}`));
@@ -11286,8 +11254,8 @@ assuranceScheduler
 assuranceScheduler
   .command("enable")
   .description("Enable assurance scheduler")
-  .action(() => {
-    const out = assuranceSchedulerEnableCli({
+  .action(async () => {
+    const out = await assuranceSchedulerEnableCli({
       workspace: process.cwd(),
       enabled: true
     });
@@ -11297,8 +11265,8 @@ assuranceScheduler
 assuranceScheduler
   .command("disable")
   .description("Disable assurance scheduler")
-  .action(() => {
-    const out = assuranceSchedulerEnableCli({
+  .action(async () => {
+    const out = await assuranceSchedulerEnableCli({
       workspace: process.cwd(),
       enabled: false
     });
@@ -11327,16 +11295,16 @@ assuranceWaiver
 assuranceWaiver
   .command("status")
   .description("Show waiver status (activates approved pending waivers)")
-  .action(() => {
-    console.log(JSON.stringify(assuranceWaiverStatusCli(process.cwd()), null, 2));
+  .action(async () => {
+    console.log(JSON.stringify(await assuranceWaiverStatusCli(process.cwd()), null, 2));
   });
 
 assuranceWaiver
   .command("revoke")
   .description("Revoke active or specific waiver")
   .option("--waiver <id>", "waiver ID")
-  .action((opts: { waiver?: string }) => {
-    const out = assuranceWaiverRevokeCli({
+  .action(async (opts: { waiver?: string }) => {
+    const out = await assuranceWaiverRevokeCli({
       workspace: process.cwd(),
       waiverId: opts.waiver
     });
@@ -11465,7 +11433,7 @@ cert
       throw new Error("--valid-days must be a positive number.");
     }
     const preview = opts.sign === false || opts.preview === true;
-    const generated = generateTrustCertificate({
+    const generated = await generateTrustCertificateAsync({
       workspace: process.cwd(),
       agentId: opts.agent,
       outputPath: opts.output,
@@ -11569,7 +11537,7 @@ cert
     const certPath = resolve(process.cwd(), file);
     const envelope = readTrustCertificateEnvelope(certPath);
     if (envelope) {
-      console.log(JSON.stringify(withClaimFields(envelope, artifactClaim("trust-certificate")), null, 2));
+      console.log(JSON.stringify(withClaimFields(envelope, artifactClaim("trust-certificate", { sealVerified: false /* inspect checks no signature */ })), null, 2));
       return;
     }
     const inspected = inspectCertificate(certPath);
@@ -11595,8 +11563,8 @@ cert
   .requiredOption("--reason <text>", "revocation reason")
   .requiredOption("--cert <file>", "certificate file")
   .requiredOption("--out <file>", "output .amcrevoke file")
-  .action((opts: { reason: string; cert: string; out: string }) => {
-    const revoked = revokeCertificate({
+  .action(async (opts: { reason: string; cert: string; out: string }) => {
+    const revoked = await revokeCertificateAsync({
       workspace: process.cwd(),
       certFile: resolve(process.cwd(), opts.cert),
       reason: opts.reason,
@@ -11658,7 +11626,7 @@ vault
     }
   });
 
-registerVaultRotationCommand(vault);
+registerVaultRotationCommand(vault); registerKeysCommands(program); // P1-08 freeze exception: amc keys list|rotate|revoke|export-public
 
 notary
   .command("init")
@@ -11692,8 +11660,8 @@ notary
   .command("status")
   .description("Show notary backend and log status")
   .option("--notary-dir <dir>", "notary data directory")
-  .action((opts: { notaryDir?: string }) => {
-    const status = notaryStatusCli({ notaryDir: opts.notaryDir });
+  .action(async (opts: { notaryDir?: string }) => {
+    const status = await notaryStatusCli({ notaryDir: opts.notaryDir });
     console.log(`notaryDir=${status.notaryDir}`);
     console.log(`config=${status.configPath}`);
     console.log(`backend=${status.backend}`);
@@ -11712,8 +11680,8 @@ notary
   .command("pubkey")
   .description("Print notary public key and fingerprint")
   .option("--notary-dir <dir>", "notary data directory")
-  .action((opts: { notaryDir?: string }) => {
-    const out = notaryPubkeyCli({ notaryDir: opts.notaryDir });
+  .action(async (opts: { notaryDir?: string }) => {
+    const out = await notaryPubkeyCli({ notaryDir: opts.notaryDir });
     console.log(`notaryDir=${out.notaryDir}`);
     console.log(`fingerprint=${out.fingerprint}`);
     console.log(out.pubkeyPem);
@@ -11725,8 +11693,8 @@ notary
   .requiredOption("--out <file>", "output file path")
   .option("--notary-dir <dir>", "notary data directory")
   .option("--workspace <dir>", "workspace path for config snapshot", process.cwd())
-  .action((opts: { out: string; notaryDir?: string; workspace?: string }) => {
-    const out = notaryAttestCli({
+  .action(async (opts: { out: string; notaryDir?: string; workspace?: string }) => {
+    const out = await notaryAttestCli({
       notaryDir: opts.notaryDir,
       workspace: opts.workspace ?? process.cwd(),
       outFile: opts.out
@@ -11741,8 +11709,8 @@ withTrustFlags(notary
   .argument("<file>"), { pubkey: "pin the notary public key (notary)", json: true })
   .action((file: string, opts: TrustFlags) => {
     const result = notaryVerifyAttestCli(file, trustFromFlags(opts, ["notary"]), opts.pubkey);
-    printClaimResult(artifactClaim("notary:attestation"), { json: opts.json });
-    finishVerify("Notary attestation", result.report, { json: opts.json, result });
+    // finishVerify prints the claim, downgraded when verification fails.
+    finishVerify("Notary attestation", result.report, { json: opts.json, result, claim: artifactClaim("notary:attestation") });
   });
 
 notary
@@ -11752,8 +11720,8 @@ notary
   .requiredOption("--in <file>", "input file")
   .requiredOption("--out <file>", "output signature JSON")
   .option("--notary-dir <dir>", "notary data directory")
-  .action((opts: { kind: string; in: string; out: string; notaryDir?: string }) => {
-    const out = notarySignCli({
+  .action(async (opts: { kind: string; in: string; out: string; notaryDir?: string }) => {
+    const out = await notarySignCli({
       notaryDir: opts.notaryDir,
       kind: opts.kind,
       inFile: opts.in,
@@ -11799,9 +11767,15 @@ Example workflow:
   amc trust enable-notary --base-url <url> \\  # switch to NOTARY mode
     --pin ./notary-pubkey.pem
 `)
-  .action(() => {
-    assertOwnerMode(process.cwd(), "trust init");
-    const created = initTrustConfig(process.cwd());
+  .action(async () => {
+    const workspace = process.cwd();
+    assertOwnerMode(workspace, "trust init");
+    const assertCurrent = () => {
+      if (process.cwd() !== workspace) throw new Error("original trust initialization workspace changed");
+      assertOwnerMode(workspace, "trust init");
+    };
+    const created = await initTrustConfigAsync(workspace, assertCurrent);
+    assertCurrent();
     console.log(chalk.green(`Trust config created: ${created.path}`));
     console.log(`Signature: ${created.sigPath}`);
     console.log(`Mode: ${created.config.trust.mode}`);
@@ -11809,6 +11783,8 @@ Example workflow:
     console.log(chalk.gray("Next: amc trust status   — verify the config is valid and signed"));
     console.log(chalk.gray("Docs: amc trust init --help   — see concepts and workflow"));
   });
+
+registerTrustResignCommand(trust);
 
 trust
   .command("enable-notary")
@@ -11818,15 +11794,22 @@ trust
   .option("--require <level>", "SOFTWARE|HARDWARE", "HARDWARE")
   .option("--unix-socket <path>", "optional unix socket path")
   .action(async (opts: { baseUrl: string; pin: string; require: string; unixSocket?: string }) => {
-    assertOwnerMode(process.cwd(), "trust enable-notary");
-    const required = opts.require.toUpperCase() === "SOFTWARE" ? "SOFTWARE" : "HARDWARE";
+    const workspace = process.cwd(), fixed = { ...opts };
+    const assertCurrent = () => {
+      if (process.cwd() !== workspace || opts.baseUrl !== fixed.baseUrl || opts.pin !== fixed.pin
+        || opts.require !== fixed.require || opts.unixSocket !== fixed.unixSocket) throw new Error("original notary enablement CLI inputs changed");
+      assertOwnerMode(workspace, "trust enable-notary");
+    };
+    assertCurrent();
+    const required = fixed.require.toUpperCase() === "SOFTWARE" ? "SOFTWARE" : "HARDWARE";
     const enabled = await enableNotaryTrust({
-      workspace: process.cwd(),
-      baseUrl: opts.baseUrl,
-      pinPubkeyPath: opts.pin,
+      workspace,
+      baseUrl: fixed.baseUrl,
+      pinPubkeyPath: fixed.pin,
       requiredAttestationLevel: required,
-      unixSocketPath: opts.unixSocket ?? null
-    });
+      unixSocketPath: fixed.unixSocket ?? null
+    }, assertCurrent);
+    assertCurrent();
     console.log(chalk.green("Notary trust mode enabled."));
     console.log(`Trust config: ${enabled.path}`);
     console.log(`Signature: ${enabled.sigPath}`);
@@ -11849,6 +11832,7 @@ trust
       pinnedFingerprint: trustCfg.trust.mode === "NOTARY" ? trustCfg.trust.notary.pinnedPubkeyFingerprint : null,
       currentFingerprint: null,
       attestationLevel: null,
+      attestationBasis: null,
       requiredAttestationLevel: trustCfg.trust.mode === "NOTARY" ? trustCfg.trust.notary.requiredAttestationLevel : null,
       lastAttestationTs: null
     }));
@@ -11862,6 +11846,7 @@ trust
     console.log(`pinnedFingerprint=${status.pinnedFingerprint ?? "n/a"}`);
     console.log(`currentFingerprint=${status.currentFingerprint ?? "n/a"}`);
     console.log(`attestationLevel=${status.attestationLevel ?? "n/a"}`);
+    console.log(`attestationBasis=${status.attestationBasis ?? "unknown"}`);
     console.log(`requiredAttestationLevel=${status.requiredAttestationLevel ?? "n/a"}`);
     if (status.lastAttestationTs) {
       console.log(`lastAttestationTs=${new Date(status.lastAttestationTs).toISOString()}`);
@@ -11920,9 +11905,9 @@ trust
 
 mode
   .command("owner")
-  .description("Switch to owner mode (configuration + signing allowed)")
-  .action(() => {
-    setMode(process.cwd(), "owner");
+  .description("Switch to owner mode (configuration + signing allowed); from agent mode asks for the vault passphrase")
+  .action(async () => {
+    await leaveAgentMode(process.cwd(), getMode(process.cwd()) === "agent" ? await promptPassphrase("Vault passphrase to leave agent mode:") : ""); // DXA-49: prompted, never from env
     console.log(chalk.green("Mode set to owner"));
   });
 
@@ -11952,7 +11937,7 @@ user
         mask: "*"
       }
     ]);
-    const created = userInitCli({
+    const created = await userInitCli({
       workspace: process.cwd(),
       username: opts.username,
       password: passwordAnswer.password
@@ -11976,7 +11961,7 @@ user
         mask: "*"
       }
     ]);
-    const created = userAddCli({
+    const created = await userAddCli({
       workspace: process.cwd(),
       username: opts.username,
       roles: parseRolesCsv(opts.role),
@@ -12004,8 +11989,8 @@ user
   .command("revoke")
   .description("Revoke a user account")
   .argument("<username>")
-  .action((username: string) => {
-    const out = userRevokeCli({
+  .action(async (username: string) => {
+    const out = await userRevokeCli({
       workspace: process.cwd(),
       username
     });
@@ -12019,8 +12004,8 @@ user
   .description("Replace roles for a user")
   .argument("<username>")
   .requiredOption("--roles <roles>", "comma-separated roles")
-  .action((username: string, opts: { roles: string }) => {
-    const out = userRoleSetCli({
+  .action(async (username: string, opts: { roles: string }) => {
+    const out = await userRoleSetCli({
       workspace: process.cwd(),
       username,
       roles: parseRolesCsv(opts.roles)
@@ -12479,8 +12464,7 @@ withTrustFlags(transparency
   .action((file: string, opts: TrustFlags) => {
     const verified = verifyTransparencyBundle(resolve(process.cwd(), file), trustFromFlags(opts, ["artifact-seal"]),
       opts.pubkey ? readFileSync(resolve(opts.pubkey), "utf8") : null);
-    printClaimResult(artifactClaim("transparency:log"), { json: opts.json });
-    finishVerify("Transparency bundle", verified.report, { json: opts.json, result: verified });
+    finishVerify("Transparency bundle", verified.report, { json: opts.json, result: verified, claim: artifactClaim("transparency:log") });
   });
 
 transparencyMerkle
@@ -12488,8 +12472,8 @@ transparencyMerkle
   .description("Rebuild Merkle leaves/roots from transparency log")
   .addOption(new Option("--algorithm <algorithm>", "migrate the log's tree (only amc-legacy-v1 to rfc9162-sha256; signs a migration record)")
     .choices(["amc-legacy-v1", "rfc9162-sha256"]))
-  .action((opts: { algorithm?: "amc-legacy-v1" | "rfc9162-sha256" }) => {
-    const out = transparencyMerkleRebuildCli(process.cwd(), { algorithm: opts.algorithm });
+  .action(async (opts: { algorithm?: "amc-legacy-v1" | "rfc9162-sha256" }) => {
+    const out = await transparencyMerkleRebuildCliAsync(process.cwd(), { algorithm: opts.algorithm });
     console.log(chalk.green("Transparency Merkle rebuilt"));
     console.log(`algorithm=${out.algorithm}`);
     if (out.migration) console.log(`migration=${out.migration.path} (log entry ${out.migration.entryHash})`);
@@ -12502,8 +12486,8 @@ transparencyMerkle
 transparencyMerkle
   .command("root")
   .description("Show current Merkle root and history")
-  .action(() => {
-    const out = transparencyMerkleRootCli(process.cwd());
+  .action(async () => {
+    const out = await transparencyMerkleRootCliAsync(process.cwd());
     console.log(
       JSON.stringify(
         {
@@ -12522,8 +12506,8 @@ transparencyMerkle
   .description("Export signed inclusion proof bundle for entry hash")
   .requiredOption("--entry-hash <hash>", "transparency entry hash")
   .requiredOption("--out <file>", "output .amcproof file")
-  .action((opts: { entryHash: string; out: string }) => {
-    const out = transparencyMerkleProofCli({
+  .action(async (opts: { entryHash: string; out: string }) => {
+    const out = await transparencyMerkleProofCliAsync({
       workspace: process.cwd(),
       entryHash: opts.entryHash,
       outFile: opts.out
@@ -12547,8 +12531,8 @@ withTrustFlags(transparencyMerkle
 compliance
   .command("init")
   .description("Create and sign compliance-maps.yaml")
-  .action(() => {
-    const out = initComplianceMapsCli(process.cwd());
+  .action(async () => {
+    const out = await initComplianceMapsCliAsync(process.cwd());
     console.log(chalk.green(`Compliance maps created: ${out.path}`));
     console.log(`Signature: ${out.sigPath}`);
   });
@@ -12936,8 +12920,8 @@ federate
   .command("init")
   .description("Initialize federation identity and signed config")
   .option("--org <name>", "organization name", "AMC Federation")
-  .action((opts: { org: string }) => {
-    const out = federateInitCli({
+  .action(async (opts: { org: string }) => {
+    const out = await federateInitCli({
       workspace: process.cwd(),
       orgName: opts.org
     });
@@ -12967,8 +12951,8 @@ federatePeer
   .requiredOption("--peerId <id>", "peer ID")
   .requiredOption("--name <name>", "peer display name")
   .requiredOption("--pubkey <file>", "publisher public key file")
-  .action((opts: { peerId: string; name: string; pubkey: string }) => {
-    const out = federatePeerAddCli({
+  .action(async (opts: { peerId: string; name: string; pubkey: string }) => {
+    const out = await federatePeerAddCli({
       workspace: process.cwd(),
       peerId: opts.peerId,
       name: opts.name,
@@ -13030,8 +13014,8 @@ withTrustFlags(federate
 integrations
   .command("init")
   .description("Create and sign integrations.yaml with vault-backed secret refs")
-  .action(() => {
-    const out = integrationsInitCli(process.cwd());
+  .action(async () => {
+    const out = await integrationsInitCli(process.cwd());
     console.log(chalk.green(`Integrations config created: ${out.path}`));
     console.log(`Signature: ${out.sigPath}`);
   });
@@ -13102,8 +13086,8 @@ outcomes
   .description("Create and sign outcome contract")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
   .option("--archetype <id>", "optional archetype hint")
-  .action((opts: { agent?: string; archetype?: string }) => {
-    const out = outcomesInitCli({
+  .action(async (opts: { agent?: string; archetype?: string }) => {
+    const out = await outcomesInitCliAsync({
       workspace: process.cwd(),
       agentId: opts.agent ?? activeAgent(program),
       archetype: opts.archetype
@@ -13136,7 +13120,7 @@ outcomes
   .requiredOption("--window <window>", "window (e.g. 14d)")
   .requiredOption("--out <path>", "output path (.md or .json)")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .action((scope: string | undefined, opts: { window: string; out: string; agent?: string }) => {
+  .action(async (scope: string | undefined, opts: { window: string; out: string; agent?: string }) => {
     const outPath = resolve(process.cwd(), opts.out);
     if (scope === "fleet") {
       const out = outcomesFleetReportCli({
@@ -13149,7 +13133,7 @@ outcomes
       return;
     }
 
-    const out = outcomesReportCli({
+    const out = await outcomesReportCliAsync({
       workspace: process.cwd(),
       agentId: opts.agent ?? activeAgent(program),
       window: opts.window,
@@ -13179,9 +13163,9 @@ outcomes
   .option("--workorder <id>", "work order ID")
   .option("--unit <unit>", "unit label")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .action((opts: { metric: string; value: string; reason: string; workorder?: string; unit?: string; agent?: string }) => {
-    assertOwnerMode(process.cwd(), commandPath(outcomes.commands.find((c) => c.name() === "attest") ?? outcomes));
-    const out = outcomesAttestCli({
+  .action(async (opts: { metric: string; value: string; reason: string; workorder?: string; unit?: string; agent?: string }) => {
+    assertOutcomesAttestOwnerMode(process.cwd());
+    const out = await outcomesAttestCliAsync({
       workspace: process.cwd(),
       agentId: opts.agent ?? activeAgent(program),
       metricId: opts.metric,
@@ -13189,7 +13173,7 @@ outcomes
       reason: opts.reason,
       workOrderId: opts.workorder,
       unit: opts.unit
-    });
+    }, { beforePublish: () => assertOutcomesAttestOwnerMode(process.cwd()) });
     console.log(chalk.green(`Outcome signal recorded (${out.trustTier}): ${out.outcomeEventId}`));
     printClaimResult(unverifiedClaim("outcomes:attest", 1), {});
     console.log(`eventHash=${out.eventHash}`);
@@ -13199,9 +13183,9 @@ outcomes
 value
   .command("init")
   .description("Initialize signed value policy, default contract, and scheduler")
-  .action(() => {
+  .action(async () => {
     assertOwnerMode(process.cwd(), "value init");
-    const out = valueInitCli(process.cwd());
+    const out = await valueInitCli(process.cwd());
     console.log(chalk.green(`Value policy created: ${out.policy.path}`));
     console.log(`signature=${out.policy.sigPath}`);
     console.log(`workspaceContract=${out.workspaceContract.path}`);
@@ -13211,8 +13195,8 @@ value
 value
   .command("verify-policy")
   .description("Verify signed value policy")
-  .action(() => {
-    const verify = valueVerifyPolicyCli(process.cwd());
+  .action(async () => {
+    const verify = await valueVerifyPolicyCli(process.cwd());
     if (verify.valid) {
       console.log(chalk.green(`Value policy signature valid: ${verify.sigPath}`));
       return;
@@ -13228,8 +13212,8 @@ const valueScheduler = value.command("scheduler").description("Value scheduler c
 valuePolicy
   .command("print")
   .description("Print effective value policy JSON")
-  .action(() => {
-    console.log(JSON.stringify(valuePolicyPrintCli(process.cwd()), null, 2));
+  .action(async () => {
+    console.log(JSON.stringify(await valuePolicyPrintCli(process.cwd()), null, 2));
   });
 
 valuePolicy
@@ -13244,9 +13228,9 @@ valuePolicy
   .description("Apply signed value policy from YAML/JSON file")
   .requiredOption("--file <path>", "value policy file")
   .option("--reason <text>", "change reason", "value policy update")
-  .action((opts: { file: string; reason?: string }) => {
+  .action(async (opts: { file: string; reason?: string }) => {
     assertOwnerMode(process.cwd(), "value policy apply");
-    const out = valuePolicyApplyCli({
+    const out = await valuePolicyApplyCli({
       workspace: process.cwd(),
       file: opts.file
     });
@@ -13262,13 +13246,13 @@ valueContract
   .option("--id <id>", "scope id (required for node/agent)", "workspace")
   .requiredOption("--type <type>", "code-agent|support-agent|ops-agent|research-agent|sales-agent|other")
   .option("--deployment <deployment>", "single|host|k8s|compose")
-  .action((opts: { scope: string; id: string; type: string; deployment?: string }) => {
+  .action(async (opts: { scope: string; id: string; type: string; deployment?: string }) => {
     assertOwnerMode(process.cwd(), "value contract init");
     const scope = opts.scope.toLowerCase();
     if (!(scope === "workspace" || scope === "node" || scope === "agent")) {
       throw new Error("scope must be workspace|node|agent");
     }
-    const out = valueContractInitCli({
+    const out = await valueContractInitCli({
       workspace: process.cwd(),
       scope: scope as "workspace" | "node" | "agent",
       id: opts.id,
@@ -13287,10 +13271,10 @@ valueContract
   .option("--scope <scope>", "workspace|node|agent")
   .option("--id <id>", "scope id")
   .option("--reason <text>", "change reason", "value contract update")
-  .action((opts: { file: string; scope?: string; id?: string; reason?: string }) => {
+  .action(async (opts: { file: string; scope?: string; id?: string; reason?: string }) => {
     assertOwnerMode(process.cwd(), "value contract apply");
     const scope = opts.scope?.toLowerCase();
-    const out = valueContractApplyCli({
+    const out = await valueContractApplyCli({
       workspace: process.cwd(),
       file: opts.file,
       scope: scope as "workspace" | "node" | "agent" | undefined,
@@ -13353,13 +13337,13 @@ value
   .requiredOption("--file <path>", "payload JSON/YAML file")
   // Removed in 2.0.0 (P0-18 follow-up): kept hidden only to refuse with a pointer instead of commander's unknown-option error.
   .addOption(new Option("--attested").hideHelp())
-  .action((opts: { file: string; attested?: boolean }) => {
+  .action(async (opts: { file: string; attested?: boolean }) => {
     if (opts.attested !== undefined) {
       console.error(VALUE_ATTESTED_REMOVED);
       process.exit(2);
     }
     assertOwnerMode(process.cwd(), "value ingest");
-    const out = valueIngestWebhookCli({
+    const out = await valueIngestWebhookCli({
       workspace: process.cwd(),
       file: opts.file
     });
@@ -13377,7 +13361,7 @@ value
   .option("--id <id>", "scope id", "workspace")
   .requiredOption("--kpi <kpiId>", "kpi id")
   .addOption(new Option("--attested").hideHelp())
-  .action((opts: { csv: string; scope: string; id: string; kpi: string; attested?: boolean }) => {
+  .action(async (opts: { csv: string; scope: string; id: string; kpi: string; attested?: boolean }) => {
     if (opts.attested !== undefined) {
       console.error(VALUE_ATTESTED_REMOVED);
       process.exit(2);
@@ -13387,7 +13371,7 @@ value
     if (!(scope === "workspace" || scope === "node" || scope === "agent")) {
       throw new Error("scope must be workspace|node|agent");
     }
-    const out = valueImportCsvCli({
+    const out = await valueImportCsvCli({
       workspace: process.cwd(),
       file: opts.csv,
       scope: scope as "workspace" | "node" | "agent",
@@ -13474,9 +13458,9 @@ valueScheduler
 valueScheduler
   .command("enable")
   .description("Enable value scheduler")
-  .action(() => {
+  .action(async () => {
     assertOwnerMode(process.cwd(), "value scheduler enable");
-    console.log(JSON.stringify(valueSchedulerEnableCli({
+    console.log(JSON.stringify(await valueSchedulerEnableCli({
       workspace: process.cwd(),
       enabled: true
     }), null, 2));
@@ -13485,9 +13469,9 @@ valueScheduler
 valueScheduler
   .command("disable")
   .description("Disable value scheduler")
-  .action(() => {
+  .action(async () => {
     assertOwnerMode(process.cwd(), "value scheduler disable");
-    console.log(JSON.stringify(valueSchedulerEnableCli({
+    console.log(JSON.stringify(await valueSchedulerEnableCli({
       workspace: process.cwd(),
       enabled: false
     }), null, 2));
@@ -13512,8 +13496,8 @@ value
 forecast
   .command("init")
   .description("Create and sign forecast policy")
-  .action(() => {
-    const out = forecastInitCli(process.cwd());
+  .action(async () => {
+    const out = await forecastInitCli(process.cwd());
     console.log(chalk.green(`Forecast policy created: ${out.path}`));
     console.log(`Signature: ${out.sigPath}`);
   });
@@ -13563,8 +13547,8 @@ forecast
   .requiredOption("--scope <scope>", "workspace|agent|node")
   .option("--id <targetId>", "agentId for scope=agent or nodeId for scope=node")
   .option("--out <path>", "optional output path (.json or .md)")
-  .action((opts: { scope: "workspace" | "agent" | "node"; id?: string; out?: string }) => {
-    const out = forecastRefreshCli({
+  .action(async (opts: { scope: "workspace" | "agent" | "node"; id?: string; out?: string }) => {
+    const out = await forecastRefreshCli({
       workspace: process.cwd(),
       scope: opts.scope,
       targetId: opts.id,
@@ -13597,8 +13581,8 @@ forecastScheduler
   .description("Run scheduler refresh immediately")
   .option("--scope <scope>", "workspace|agent|node")
   .option("--id <targetId>", "agentId for scope=agent or nodeId for scope=node")
-  .action((opts: { scope?: "workspace" | "agent" | "node"; id?: string }) => {
-    const out = forecastSchedulerRunNowCli({
+  .action(async (opts: { scope?: "workspace" | "agent" | "node"; id?: string }) => {
+    const out = await forecastSchedulerRunNowCli({
       workspace: process.cwd(),
       scope: opts.scope,
       targetId: opts.id
@@ -13609,15 +13593,15 @@ forecastScheduler
 forecastScheduler
   .command("enable")
   .description("Enable forecast scheduler")
-  .action(() => {
-    console.log(JSON.stringify(forecastSchedulerEnableCli(process.cwd()), null, 2));
+  .action(async () => {
+    console.log(JSON.stringify(await forecastSchedulerEnableCli(process.cwd()), null, 2));
   });
 
 forecastScheduler
   .command("disable")
   .description("Disable forecast scheduler")
-  .action(() => {
-    console.log(JSON.stringify(forecastSchedulerDisableCli(process.cwd()), null, 2));
+  .action(async () => {
+    console.log(JSON.stringify(await forecastSchedulerDisableCli(process.cwd()), null, 2));
   });
 
 const forecastPolicy = forecast.command("policy").description("Forecast policy operations");
@@ -13626,10 +13610,10 @@ forecastPolicy
   .command("apply")
   .requiredOption("--file <path>", "policy file (json or yaml)")
   .description("Apply and sign forecast policy from file")
-  .action((opts: { file: string }) => {
+  .action(async (opts: { file: string }) => {
     const raw = readUtf8(resolve(process.cwd(), opts.file));
     const parsed = (opts.file.endsWith(".json") ? JSON.parse(raw) : YAML.parse(raw)) as ReturnType<typeof forecastPolicyDefaultCli>;
-    const out = forecastPolicyApplyCli({
+    const out = await forecastPolicyApplyCli({
       workspace: process.cwd(),
       policy: parsed
     });
@@ -13681,8 +13665,8 @@ advisory
   .argument("<advisoryId>")
   .requiredOption("--note <text>", "ack note")
   .option("--by <name>", "actor name (defaults to current user or 'owner')")
-  .action((advisoryId: string, opts: { note: string; by?: string }) => {
-    const out = advisoryAckCli({
+  .action(async (advisoryId: string, opts: { note: string; by?: string }) => {
+    const out = await advisoryAckCli({
       workspace: process.cwd(),
       advisoryId,
       by: opts.by ?? "owner",
@@ -13696,8 +13680,8 @@ casebook
   .description("Create a signed casebook")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
   .option("--casebook <id>", "casebook ID", "default")
-  .action((opts: { agent?: string; casebook: string }) => {
-    const out = casebookInitCli({
+  .action(async (opts: { agent?: string; casebook: string }) => {
+    const out = await casebookInitCli({
       workspace: process.cwd(),
       agentId: opts.agent ?? activeAgent(program),
       casebookId: opts.casebook
@@ -13713,8 +13697,8 @@ casebook
   .requiredOption("--casebook <id>", "casebook ID")
   .requiredOption("--from-workorder <id>", "source workorder ID")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .action((opts: { casebook: string; fromWorkorder: string; agent?: string }) => {
-    const out = casebookAddFromWorkOrderCli({
+  .action(async (opts: { casebook: string; fromWorkorder: string; agent?: string }) => {
+    const out = await casebookAddFromWorkOrderCli({
       workspace: process.cwd(),
       agentId: opts.agent ?? activeAgent(program),
       casebookId: opts.casebook,
@@ -13747,15 +13731,11 @@ casebook
       agentId: opts.agent ?? activeAgent(program),
       casebookId: opts.casebook
     });
-    if (out.valid) {
-      console.log(chalk.green("Casebook verification PASSED"));
-      return;
-    }
-    console.log(chalk.red("Casebook verification FAILED"));
-    for (const reason of out.reasons) {
+    console.log(out.valid ? chalk.green("Casebook verification PASSED") : chalk.red("Casebook verification FAILED"));
+    for (const reason of [...out.reasons, ...out.warnings.map((warning) => `warning: ${warning}`)]) {
       console.log(`- ${reason}`);
     }
-    process.exit(1);
+    if (!out.valid) process.exit(1);
   });
 
 experiment
@@ -13811,42 +13791,44 @@ experiment
 
 experiment
   .command("run")
-  .description("Run deterministic experiment against signed casebook")
+  .description("Run deterministic experiment against signed casebook (exit 0 all candidate cases pass, 1 failure or error, 3 inconclusive)")
   .requiredOption("--experiment <id>", "experiment ID")
   .requiredOption("--mode <mode>", "supervise|sandbox")
+  .option("--candidate-window <window>", "evidence window covering the candidate's actual run (unless --execute-trials)")
+  .option("--candidate-agent <agentId>", "candidate agent, if different from the baseline")
+  .option("--execute-trials", "execute the baseline and admitted candidate here over the held-out cases (native agent path)")
+  .option("--provider <id>", "trial provider for --execute-trials").option("--model <model>", "trial model").option("--max-steps <n>", "steps per trial", Number)
+  .option("--max-executions <n>", "trial executions bound", Number).option("--trial-timeout-ms <ms>", "time per trial", Number).option("--concurrency <n>", "concurrent trials", Number)
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .action((opts: { experiment: string; mode: string; agent?: string }) => {
-    const modeValue = opts.mode === "sandbox" ? "sandbox" : "supervise";
-    const out = experimentRunCli({
-      workspace: process.cwd(),
-      agentId: opts.agent ?? activeAgent(program),
-      experimentId: opts.experiment,
-      mode: modeValue
-    });
-    console.log(chalk.green(`Experiment run recorded: ${out.report.runId}`));
-    console.log(`json=${out.jsonPath}`);
-    console.log(`md=${out.mdPath}`);
+  .action(async (opts: { experiment: string; mode: string; agent?: string; candidateWindow?: string; candidateAgent?: string; executeTrials?: boolean; provider?: string; model?: string; maxSteps?: number; maxExecutions?: number; trialTimeoutMs?: number; concurrency?: number }) => {
+    const limits = { ...(opts.maxExecutions === undefined ? {} : { maxExecutions: opts.maxExecutions }), ...(opts.trialTimeoutMs === undefined ? {} : { trialTimeoutMs: opts.trialTimeoutMs }), ...(opts.concurrency === undefined ? {} : { concurrency: opts.concurrency }) };
+    if (opts.executeTrials && !opts.provider) throw new Error("--execute-trials requires --provider");
+    await experimentRunCommandCli({ workspace: process.cwd(), agentId: opts.agent ?? activeAgent(program), experimentId: opts.experiment,
+      mode: opts.mode as "supervise" | "sandbox", /* the runner refuses any other mode; never coerced */ candidateWindow: opts.candidateWindow, candidateAgentId: opts.candidateAgent,
+      ...(opts.executeTrials ? { executeTrials: { providerId: opts.provider!, ...(opts.model === undefined ? {} : { model: opts.model }), ...(opts.maxSteps === undefined ? {} : { maxSteps: opts.maxSteps }), limits } } : {})
+    }, normalizeCliErrorMessage);
   });
 
 experiment
   .command("analyze")
-  .description("Analyze latest experiment run")
+  .description("Analyze latest experiment run or verified run history (exit 0 all candidate cases pass, 1 failure or error, 3 inconclusive)")
   .requiredOption("--experiment <id>", "experiment ID")
   .requiredOption("--out <path>", "output .md or .json")
+  .option("--all", "verify and tabulate all stored runs without executing trials")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .action((opts: { experiment: string; out: string; agent?: string }) => {
-    const out = experimentAnalyzeCli({
+  .action((opts: { experiment: string; out: string; agent?: string; all?: boolean }) => {
+    experimentAnalyzeCommandCli({
       workspace: process.cwd(),
       agentId: opts.agent ?? activeAgent(program),
       experimentId: opts.experiment,
-      outFile: resolve(process.cwd(), opts.out)
-    });
-    console.log(chalk.green(`Experiment analysis written: ${out.outFile ?? "none"}`));
+      outFile: resolve(process.cwd(), opts.out),
+      all: opts.all
+    }, normalizeCliErrorMessage);
   });
 
 experiment
   .command("gate")
-  .description("Evaluate latest experiment run against gate policy")
+  .description("Evaluate latest experiment run against gate policy (exit 0 pass, 1 fail or error, 3 inconclusive)")
   .requiredOption("--experiment <id>", "experiment ID")
   .requiredOption("--policy <path>", "experiment gate policy JSON")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
@@ -13859,20 +13841,18 @@ experiment
       experimentId: opts.experiment,
       policyPath
     });
-    if (out.pass) {
-      console.log(chalk.green("Experiment gate PASSED"));
-    } else {
-      console.log(chalk.red("Experiment gate FAILED"));
-    }
+    const verdict = { pass: chalk.green("Experiment gate PASSED"), inconclusive: chalk.yellow("Experiment gate INCONCLUSIVE"), fail: chalk.red("Experiment gate FAILED") };
+    console.log(verdict[out.status]);
+    console.log(`Decision: ${out.decision}`);
     console.log("Threshold checks:");
     for (const row of experimentGateComparisonRows(out.report, policy)) {
       console.log(row);
     }
-    if (!out.pass) {
+    if (out.status !== "pass") {
       for (const reason of out.reasons) {
         console.log(`- ${reason}`);
       }
-      process.exit(1);
+      process.exit(out.status === "inconclusive" ? 3 : 1);
     }
   });
 
@@ -13918,9 +13898,9 @@ experiment
       return;
     }
     console.log(chalk.green(`Governed optimizer run: ${out.run.optimizerRunId}`));
-    console.log(`accepted=${out.run.acceptedCandidateId ?? "none"}`);
+    console.log(`accepted=${out.run.acceptedCandidateId ?? "none"} (selected for probing on estimated metrics; no candidate was executed)`);
     console.log(`candidates=${out.run.candidateCount}`);
-    console.log(`receipt=${out.run.validationReceipt.receiptId} status=${out.run.validationReceipt.status}`);
+    console.log(`receipt=${out.run.validationReceipt.receiptId} kind=${out.run.validationReceipt.validationKind} status=${out.run.validationReceipt.status}`);
     console.log(`path=${out.path}`);
   });
 
@@ -13940,9 +13920,10 @@ experiment
       console.log(JSON.stringify(out, null, 2));
       return;
     }
-    for (const run of out) {
-      console.log(`${run.optimizerRunId} accepted=${run.acceptedCandidateId ?? "none"} status=${run.validationReceipt.status}`);
+    for (const run of out.runs) {
+      console.log(`${run.optimizerRunId} accepted=${run.acceptedCandidateId ?? "none"} status=${run.validationReceipt.status} metrics=estimated`);
     }
+    for (const problem of out.problems) console.error(chalk.red(`${problem.optimizerRunId} unreadable: ${problem.reason}`));
   });
 
 experiment
@@ -13963,9 +13944,10 @@ experiment
     }
     console.log(chalk.green(`Governed optimizer run: ${out.optimizerRunId}`));
     console.log(`sourceRca=${out.sourceRcaReportId}`);
-    console.log(`accepted=${out.acceptedCandidateId ?? "none"}`);
+    console.log(`accepted=${out.acceptedCandidateId ?? "none"} (selected for probing on estimated metrics; no candidate was executed)`);
     for (const candidate of out.candidates) {
-      console.log(`- ${candidate.candidateId}: ${candidate.decision} rank=${candidate.rank ?? "-"} pareto=${candidate.paretoFront} reason=${candidate.decisionReason}`);
+      const m = candidate.metrics;
+      console.log(`- ${candidate.candidateId}: ${candidate.decision} rank=${candidate.rank ?? "-"} pareto=${candidate.paretoFront} evaluation=${candidate.evaluationState} reason=${candidate.decisionReason}\n  estimated: scoreGain=${m.scoreGain} risk=${m.risk} cost=${m.cost} latencyMs=${m.latencyMs} confidence=${m.confidence}; observed: none`);
     }
   });
 
@@ -13973,14 +13955,19 @@ program
   .command("fix-signatures")
   .description("Verify and re-sign gateway/fleet/agent configs")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .action((opts: { agent?: string }) => {
+  .action(async (opts: { agent?: string }) => {
     const preview = inspectSignatures(process.cwd(), opts.agent ?? activeAgent(program));
     const invalid = preview.statuses.filter((row) => !row.valid);
     if (invalid.length === 0) {
       console.log(chalk.green("All config signatures are valid."));
       return;
     }
-    const fixed = fixSignatures(process.cwd(), opts.agent ?? activeAgent(program));
+    const fixed = await fixSignaturesAsync(process.cwd(), opts.agent ?? activeAgent(program)).catch((error: unknown) => {
+      if (error instanceof FixSignaturesPublicationError) console.error(JSON.stringify({ phase: error.phase, resigned: error.resigned,
+        publishedPaths: error.publishedPaths, auditEventId: error.auditEventId, auditSessionId: error.auditSessionId,
+        cause: error.cause instanceof Error ? error.cause.message : String(error.cause) }, null, 2));
+      throw error;
+    });
     console.log(chalk.green("Re-signed invalid configs."));
     for (const row of fixed.statuses) {
       console.log(`- ${row.kind}: ${row.valid ? "valid" : "invalid"} (${row.reason ?? "ok"})`);
@@ -14281,8 +14268,8 @@ fleet
   .command("init")
   .description("Create and sign .amc/fleet.yaml")
   .option("--org <name>", "organization name", "AMC Fleet")
-  .action((opts: { org: string }) => {
-    const created = initFleet(process.cwd(), { orgName: opts.org });
+  .action(async (opts: { org: string }) => {
+    const created = await initFleetAsync(process.cwd(), { orgName: opts.org });
     console.log(chalk.green(`Fleet config created: ${created.fleetPath}`));
     console.log(chalk.green(`Fleet config signature: ${created.signaturePath}`));
   });
@@ -15008,12 +14995,9 @@ fleet
       reports.push(report);
     }
 
-    const trustReport = computeTrustComposition(workspace, reports, { noSign });
-    const reportPath = saveTrustCompositionReport(workspace, trustReport);
-    const markdown = renderTrustCompositionMarkdown(trustReport);
+    const { report: trustReport, reportPath } = await generateTrustCompositionReportAsync(workspace, reports, { noSign, markdownFile: opts.output || undefined });
 
     if (opts.output) {
-      writeFileAtomic(resolve(workspace, opts.output), markdown, 0o644);
       console.log(chalk.green(`Trust composition report (markdown): ${opts.output}`));
     }
 
@@ -15118,13 +15102,13 @@ fleet
   .option("--packet <packetId>", "packet ID for verify")
   .option("--receiver <id>", "receiver agent ID for accept")
   .option("--refuse <reason>", "record receiver refusal reason")
-  .action((action: string, opts: { from?: string; to?: string; goal?: string; mode?: string; packet?: string; receiver?: string; refuse?: string }) => {
+  .action(async (action: string, opts: { from?: string; to?: string; goal?: string; mode?: string; packet?: string; receiver?: string; refuse?: string }) => {
     const workspace = process.cwd();
     if (action === "create") {
       if (!opts.from || !opts.to || !opts.goal) {
         throw new Error("--from, --to, and --goal are required for create");
       }
-      const packet = createHandoffPacket(workspace, {
+      const packet = await createHandoffPacketAsync(workspace, {
         fromAgentId: opts.from,
         toAgentId: opts.to,
         goal: opts.goal,
@@ -15167,7 +15151,7 @@ fleet
       if (!packetId) {
         throw new Error("--packet <packetId> required for accept");
       }
-      const receipt = acceptHandoffPacket(workspace, packetId, {
+      const receipt = await acceptHandoffPacketAsync(workspace, packetId, {
         receiverAgentId: opts.receiver,
         accepted: !opts.refuse,
         refusalReason: opts.refuse
@@ -15498,8 +15482,8 @@ program
   .requiredOption("--statement <text>", "what is being attested (e.g. provenance of the exported logs)")
   .option("--attester-signature <file>", "JSON { keyId, sigB64 }: a third party's Ed25519 signature over the bundle hash")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .action((opts: { ingestSession: string; agent?: string; attestedBy: string; statement: string; attesterSignature?: string }) => {
-    const attested = attestIngestSession({
+  .action(async (opts: { ingestSession: string; agent?: string; attestedBy: string; statement: string; attesterSignature?: string }) => {
+    const attested = await attestIngestSessionAsync({
       workspace: process.cwd(),
       ingestSessionId: opts.ingestSession,
       agentId: opts.agent ?? activeAgent(program),
@@ -15799,66 +15783,20 @@ program
 // ── Architecture Experiment CLI ────────────────────────────────────────
 program
   .command("experiment-architecture")
-  .description("Run a controlled architecture comparison experiment")
+  .description("Run a controlled architecture comparison experiment (exit 0 measured pass, 1 failure or error, 3 inconclusive or simulated)")
   .requiredOption("--name <name>", "experiment name")
   .requiredOption("--model <modelId>", "model ID (must be same for both)")
   .requiredOption("--baseline-file <path>", "path to baseline architecture artifact")
-  .requiredOption("--candidate-file <path>", "path to candidate architecture artifact")
+  .requiredOption("--candidate-file <path>", "path to candidate architecture artifact (signed, for --execute-trials)")
   .option("--baseline-kind <kind>", "architecture kind", "POLICY_FRAME")
   .option("--candidate-kind <kind>", "architecture kind", "POLICY_FRAME")
-  .action(async (opts: {
-    name: string;
-    model: string;
-    baselineFile: string;
-    candidateFile: string;
-    baselineKind: string;
-    candidateKind: string;
-  }) => {
-    const { quickArchitectureComparison, simulateProbeOutcomes } = await import(
-      "./experiments/architectureExperiment.js"
-    );
-    // Architecture comparison needs a probe runner that invokes the real model.
-    // Until one is wired, refuse rather than reporting LCG-generated scores as
-    // a measured comparison.
-    if (!process.env.AMC_ARCHITECTURE_ALLOW_SIMULATED) {
-      console.error(
-        chalk.red("Architecture comparison aborted — no real probe runner is configured.")
-      );
-      console.error(
-        chalk.gray(
-          "This command previously reported deterministic pseudo-random scores, tokens and latencies as a measured comparison."
-        )
-      );
-      console.error(
-        chalk.cyan(
-          "Set AMC_ARCHITECTURE_ALLOW_SIMULATED=1 to run it explicitly as a simulation for pipeline testing."
-        )
-      );
-      process.exitCode = 2;
-      return;
-    }
-    const fs = await import("node:fs");
-    let baselineContent = "{}";
-    let candidateContent = "{}";
-    try { baselineContent = fs.readFileSync(opts.baselineFile, "utf-8"); } catch { /* use default */ }
-    try { candidateContent = fs.readFileSync(opts.candidateFile, "utf-8"); } catch { /* use default */ }
-    const validKinds = ["POLICY_FRAME", "PROMPT_STRUCTURE", "IDENTITY_DOC", "GUARDRAIL_SET", "TOOL_PERMISSION_SET", "CUSTOM"] as const;
-    const baselineKind = (validKinds as readonly string[]).includes(opts.baselineKind) ? opts.baselineKind as typeof validKinds[number] : "POLICY_FRAME";
-    const candidateKind = (validKinds as readonly string[]).includes(opts.candidateKind) ? opts.candidateKind as typeof validKinds[number] : "POLICY_FRAME";
-    const { markdown } = quickArchitectureComparison({
-      name: opts.name,
-      modelId: opts.model,
-      baselineName: `Baseline (${opts.baselineFile})`,
-      baselineKind,
-      baselineContent,
-      baselineDescription: `Loaded from ${opts.baselineFile}`,
-      candidateName: `Candidate (${opts.candidateFile})`,
-      candidateKind,
-      candidateContent,
-      probeRunner: simulateProbeOutcomes,
-      candidateDescription: `Loaded from ${opts.candidateFile}`,
-    });
-    console.log(markdown);
+  .option("--execute-trials", "execute both artifacts on the model over the casebook's held-out cases (measured, bound report)")
+  .option("--casebook <id>", "signed casebook for --execute-trials").option("--provider <id>", "trial provider for --execute-trials")
+  .option("--mode <mode>", "supervise|sandbox for --execute-trials", "supervise").option("--max-steps <n>", "steps per trial", Number)
+  .option("--agent <agentId>", "agent ID (overrides global --agent)")
+  .action(async (opts: import("./experiments/architectureCli.js").ArchitectureCommandOptions) => {
+    const { architectureCommandCli } = await import("./experiments/architectureCli.js");
+    await architectureCommandCli({ ...opts, workspace: process.cwd(), agentId: opts.agent ?? activeAgent(program) }, normalizeCliErrorMessage);
   });
 
 program
@@ -15963,35 +15901,31 @@ program
   .requiredOption("--reason <reason>", "reason for creating the rollback pack")
   .option("--policy-file <path>", "path to policy file", "amc-policy.yml")
   .action(async (opts: { agent?: string; reason: string; policyFile: string }) => {
-    const { createRollbackPack } = await import("./governor/policyCanary.js");
+    const { createRollbackPackAsync } = await import("./governor/policyCanary.js");
     const fs = await import("node:fs");
     const agentId = opts.agent ?? activeAgent(program) ?? "default";
     let policyContent = "{}";
     try { policyContent = fs.readFileSync(opts.policyFile, "utf-8"); } catch { /* use default */ }
-    const pack = createRollbackPack(agentId, policyContent, opts.reason, process.cwd());
+    const pack = await createRollbackPackAsync(agentId, policyContent, opts.reason, process.cwd());
     console.log(chalk.green(`Rollback pack created: ${pack.packId}`));
     console.log(`  Policy SHA256: ${pack.policyFileSha256.slice(0, 16)}…`);
   });
 
 program
   .command("emergency-override")
-  .description("Activate an emergency policy override with strict TTL")
+  .description("Request a signed break-glass record (as governor-override); after one bound approval rerun with --activate")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .requiredOption("--reason <reason>", "reason for the emergency override")
-  .requiredOption("--action <desc>", "description of what the override allows")
-  .option("--ttl <ms>", "TTL in milliseconds", "3600000")
-  .action(async (opts: { agent?: string; reason: string; action: string; ttl: string }) => {
-    const { activateEmergencyOverride } = await import("./governor/policyCanary.js");
-    const agentId = opts.agent ?? activeAgent(program) ?? "default";
-    const override = activateEmergencyOverride({
-      agentId,
-      reason: opts.reason,
-      actionDescription: opts.action,
-      ttlMs: parseInt(opts.ttl, 10),
-    }, process.cwd());
-    console.log(chalk.yellow(`Emergency override activated: ${override.overrideId}`));
-    console.log(`  Expires: ${new Date(override.expiresTs).toISOString()}`);
-    console.log(chalk.red("  ⚠  Postmortem required after expiry."));
+  .option("--reason <reason>", "reason for the break-glass (>= 10 chars)")
+  .option("--action <desc>", "description of what the override allows (recorded in the reason)")
+  .option("--ttl <ms>", "TTL in milliseconds, at most 24h", "3600000")
+  .option("--tools <names>", "comma-separated tool names it covers").option("--action-classes <classes>", "comma-separated action classes it covers")
+  .option("--controls <ids>", "comma-separated control ids it deviates from").option("--activate <breakGlassId>", "activate this requested break-glass")
+  .option("--approval <approvalRequestId>", "the approval request holding its bound decision")
+  .option("--session-token-file <file>", "the requester's amc approvals login token (required to request)")
+  .action(async (opts: { agent?: string; reason?: string; action?: string; ttl: string } & Record<string, string | undefined>) => {
+    const { breakGlassCommand } = await import("./governor/breakGlassCommand.js");
+    console.log(chalk.yellow(await breakGlassCommand(process.cwd(), { ...opts, agent: opts.agent ?? activeAgent(program) ?? "default",
+      reason: [opts.reason, opts.action].filter(Boolean).join(" — "), ttlMs: Number(opts.ttl) })));
   });
 
 program
@@ -16003,7 +15937,7 @@ program
   .requiredOption("--expires <ts>", "expiry timestamp (epoch ms) or duration e.g. 7d")
   .option("--created-by <who>", "who created this waiver", "operator")
   .action(async (opts: { agent?: string; requirement: string; justification: string; expires: string; createdBy: string }) => {
-    const { registerPolicyDebt } = await import("./governor/policyCanary.js");
+    const { registerPolicyDebtAsync } = await import("./governor/policyCanary.js");
     const agentId = opts.agent ?? activeAgent(program) ?? "default";
     let expiresTs: number;
     if (/^\d+$/.test(opts.expires)) {
@@ -16019,7 +15953,7 @@ program
         expiresTs = Date.now() + 86400000; // default 1 day
       }
     }
-    const entry = registerPolicyDebt({
+    const entry = await registerPolicyDebtAsync({
       agentId,
       waivedRequirement: opts.requirement,
       justification: opts.justification,
@@ -16164,7 +16098,7 @@ program
     const db = ledger.db;
     initLessonTables(db);
     const agentId = opts.agent ?? activeAgent(program) ?? "default";
-    const advisories = buildLessonAdvisories(db, agentId);
+    const advisories = buildLessonAdvisories(db, agentId, undefined, process.cwd());
     ledger.close();
     if (advisories.length === 0) {
       console.log("No active lessons to inject. Run memory-extract first.");
@@ -16202,7 +16136,7 @@ program
     const db = ledger.db;
     initLessonTables(db);
     const agentId = opts.agent ?? activeAgent(program) ?? "default";
-    const expired = expireStaleLessons(db, agentId);
+    const expired = expireStaleLessons(db, agentId, process.cwd());
     ledger.close();
     if (expired.length === 0) {
       console.log("No stale lessons found.");
@@ -16407,8 +16341,8 @@ freeze
   .requiredOption("--agent <agentId>", "agent ID")
   .requiredOption("--incident <id>", "incident ID")
   .requiredOption("--reason <text>", "reason for lifting freeze")
-  .action((opts: { agent: string; incident: string; reason: string }) => {
-    const out = freezeLiftCli({
+  .action(async (opts: { agent: string; incident: string; reason: string }) => {
+    const out = await freezeLiftCli({
       workspace: process.cwd(),
       agentId: opts.agent,
       incidentId: opts.incident,
@@ -16421,8 +16355,8 @@ const alerts = program.command("alerts").description("Signed drift alert configu
 
 alerts
   .command("init")
-  .action(() => {
-    const out = initAlertsConfig(process.cwd());
+  .action(async () => {
+    const out = await initAlertsConfig(process.cwd());
     console.log(chalk.green(`Alerts initialized: ${out.configPath}`));
     console.log(`Signature: ${out.sigPath}`);
   });
@@ -16476,8 +16410,8 @@ bom
   .command("sign")
   .requiredOption("--in <file>", "input BOM JSON")
   .requiredOption("--out <file>", "signature output file")
-  .action((opts: { in: string; out: string }) => {
-    const signed = signBomFile({
+  .action(async (opts: { in: string; out: string }) => {
+    const signed = await signBomFileAsync({
       workspace: process.cwd(),
       inputFile: opts.in,
       outputSigFile: opts.out
@@ -16551,8 +16485,8 @@ const transform = program.command("transform").description("Transformation OS (4
 transform
   .command("init")
   .description("Initialize signed .amc/transform-map.yaml")
-  .action(() => {
-    const out = transformInitCli(process.cwd());
+  .action(async () => {
+    const out = await transformInitCliAsync(process.cwd());
     console.log(chalk.green(`Transform map initialized: ${out.path}`));
     console.log(`Signature: ${out.sigPath}`);
   });
@@ -16586,10 +16520,10 @@ transformMap
 transformMap
   .command("apply")
   .requiredOption("--file <path>", "transform map file (yaml/json)")
-  .action((opts: { file: string }) => {
+  .action(async (opts: { file: string }) => {
     const raw = readUtf8(resolve(process.cwd(), opts.file));
     const parsed = (opts.file.endsWith(".json") ? JSON.parse(raw) : YAML.parse(raw)) as ReturnType<typeof transformMapReadCli>;
-    const out = transformMapApplyCli({
+    const out = await transformMapApplyCliAsync({
       workspace: process.cwd(),
       map: parsed
     });
@@ -16605,7 +16539,7 @@ transform
   .option("--window <window>", "e.g. 14d", "14d")
   .option("--preview", "do not persist plan")
   .option("--target-file <path>", "custom target mapping json")
-  .action((opts: { agent?: string; node?: string; to: string; window: string; preview?: boolean; targetFile?: string }) => {
+  .action(async (opts: { agent?: string; node?: string; to: string; window: string; preview?: boolean; targetFile?: string }) => {
     if (!opts.agent && !opts.node) {
       throw new Error("Provide either --agent <id> or --node <id>");
     }
@@ -16616,7 +16550,7 @@ transform
     const targetOverride = opts.targetFile
       ? (JSON.parse(readUtf8(resolve(process.cwd(), opts.targetFile))) as Record<string, number>)
       : undefined;
-    const out = transformPlanCli({
+    const out = await transformPlanCliAsync({
       workspace: process.cwd(),
       scope: opts.node ? { type: "NODE", nodeId: opts.node } : { type: "AGENT", agentId: opts.agent! },
       to,
@@ -16658,11 +16592,11 @@ transform
   .option("--agent <agentId>", "agent ID")
   .option("--node <nodeId>", "org node ID")
   .option("--window <window>", "e.g. 14d")
-  .action((opts: { agent?: string; node?: string; window?: string }) => {
+  .action(async (opts: { agent?: string; node?: string; window?: string }) => {
     if (!opts.agent && !opts.node) {
       throw new Error("Provide either --agent <id> or --node <id>");
     }
-    const out = transformTrackCli({
+    const out = await transformTrackCliAsync({
       workspace: process.cwd(),
       scope: opts.node ? { type: "NODE", nodeId: opts.node } : { type: "AGENT", agentId: opts.agent! },
       window: opts.window
@@ -16702,7 +16636,7 @@ transform
   .option("--role <role>", "OWNER|AUDITOR", "OWNER")
   .option("--files <paths...>", "related file paths")
   .option("--evidence-links <refs...>", "evidence links")
-  .action((opts: {
+  .action(async (opts: {
     agent?: string;
     node?: string;
     task: string;
@@ -16718,7 +16652,7 @@ transform
     if (role !== "OWNER" && role !== "AUDITOR") {
       throw new Error(`Invalid role '${opts.role}', expected OWNER or AUDITOR`);
     }
-    const out = transformAttestCli({
+    const out = await transformAttestCliAsync({
       workspace: process.cwd(),
       scope: opts.node ? { type: "NODE", nodeId: opts.node } : { type: "AGENT", agentId: opts.agent! },
       taskId: opts.task,
@@ -16872,8 +16806,8 @@ org
 org
   .command("init")
   .option("--enterprise <name>", "enterprise display name", "AMC Enterprise")
-  .action((opts: { enterprise: string }) => {
-    const out = orgInitCli({
+  .action(async (opts: { enterprise: string }) => {
+    const out = await orgInitCliAsync({
       workspace: process.cwd(),
       enterpriseName: opts.enterprise
     });
@@ -16900,13 +16834,13 @@ org
   .requiredOption("--id <id>", "node ID")
   .requiredOption("--name <name>", "node name")
   .option("--parent <id>", "parent node ID")
-  .action((opts: { type: string; id: string; name: string; parent?: string }) => {
+  .action(async (opts: { type: string; id: string; name: string; parent?: string }) => {
     const allowed = new Set(["ENTERPRISE", "TEAM", "FUNCTION", "PROCESS", "ECOSYSTEM"]);
     const type = opts.type.toUpperCase();
     if (!allowed.has(type)) {
       throw new Error(`Invalid node type: ${opts.type}`);
     }
-    const out = orgAddNodeCli({
+    const out = await orgAddNodeCliAsync({
       workspace: process.cwd(),
       id: opts.id,
       type: type as "ENTERPRISE" | "TEAM" | "FUNCTION" | "PROCESS" | "ECOSYSTEM",
@@ -16923,8 +16857,8 @@ org
   .requiredOption("--agent <id>", "agent ID")
   .requiredOption("--node <id>", "node ID")
   .option("--weight <n>", "membership weight", "1")
-  .action((opts: { agent: string; node: string; weight: string }) => {
-    const out = orgAssignCli({
+  .action(async (opts: { agent: string; node: string; weight: string }) => {
+    const out = await orgAssignCliAsync({
       workspace: process.cwd(),
       agentId: opts.agent,
       nodeId: opts.node,
@@ -16939,8 +16873,8 @@ org
   .command("unassign")
   .requiredOption("--agent <id>", "agent ID")
   .requiredOption("--node <id>", "node ID")
-  .action((opts: { agent: string; node: string }) => {
-    const out = orgUnassignCli({
+  .action(async (opts: { agent: string; node: string }) => {
+    const out = await orgUnassignCliAsync({
       workspace: process.cwd(),
       agentId: opts.agent,
       nodeId: opts.node
@@ -16953,8 +16887,8 @@ org
 org
   .command("score")
   .option("--window <window>", "e.g. 14d", "14d")
-  .action((opts: { window: string }) => {
-    const out = orgScoreCli({
+  .action(async (opts: { window: string }) => {
+    const out = await orgScoreCliAsync({
       workspace: process.cwd(),
       window: opts.window
     });
@@ -17004,8 +16938,8 @@ org
   .command("learn")
   .requiredOption("--node <id>", "node ID")
   .requiredOption("--out <file>", "output markdown path")
-  .action((opts: { node: string; out: string }) => {
-    const out = orgLearnCli({
+  .action(async (opts: { node: string; out: string }) => {
+    const out = await orgLearnCliAsync({
       workspace: process.cwd(),
       nodeId: opts.node,
       outFile: opts.out
@@ -17018,8 +16952,8 @@ org
   .command("own")
   .requiredOption("--node <id>", "node ID")
   .requiredOption("--out <file>", "output markdown path")
-  .action((opts: { node: string; out: string }) => {
-    const out = orgOwnCli({
+  .action(async (opts: { node: string; out: string }) => {
+    const out = await orgOwnCliAsync({
       workspace: process.cwd(),
       nodeId: opts.node,
       outFile: opts.out
@@ -17033,8 +16967,8 @@ org
   .requiredOption("--node <id>", "node ID")
   .option("--days <n>", "14|30|90", "30")
   .requiredOption("--out <file>", "output markdown path")
-  .action((opts: { node: string; days: string; out: string }) => {
-    const out = orgCommitCli({
+  .action(async (opts: { node: string; days: string; out: string }) => {
+    const out = await orgCommitCliAsync({
       workspace: process.cwd(),
       nodeId: opts.node,
       days: Number(opts.days),
@@ -17047,9 +16981,9 @@ org
 audit
   .command("init")
   .description("Initialize signed audit policy and compliance maps")
-  .action(() => {
-    assertOwnerMode(process.cwd(), "audit init");
-    const out = auditInitCli(process.cwd());
+  .action(async () => {
+    assertAuditCliOwnerMode(process.cwd(), "audit init");
+    const out = await auditInitCliAsync(process.cwd());
     console.log(chalk.green("Audit policy and maps initialized"));
     console.log(`Policy: ${out.policy.path}`);
     console.log(`Policy signature: ${out.policy.sigPath}`);
@@ -17060,8 +16994,8 @@ audit
 audit
   .command("verify-policy")
   .description("Verify signed audit policy")
-  .action(() => {
-    const verify = auditVerifyPolicyCli(process.cwd());
+  .action(async () => {
+    const verify = await auditVerifyPolicyCliAsync(process.cwd());
     if (!verify.valid) {
       console.log(chalk.red("Audit policy verification failed"));
       console.log(`Reason: ${verify.reason ?? "unknown"}`);
@@ -17109,17 +17043,17 @@ const auditScheduler = audit.command("scheduler").description("Audit binder cach
 auditPolicy
   .command("print")
   .description("Print effective audit policy")
-  .action(() => {
-    console.log(JSON.stringify(auditPrintPolicyCli(process.cwd()), null, 2));
+  .action(async () => {
+    console.log(JSON.stringify(await auditPrintPolicyCliAsync(process.cwd()), null, 2));
   });
 
 auditPolicy
   .command("apply")
   .description("Apply and sign audit policy from file")
   .requiredOption("--file <path>", "audit policy file (yaml/json)")
-  .action((opts: { file: string }) => {
-    assertOwnerMode(process.cwd(), "audit policy apply");
-    const out = auditApplyPolicyCli({
+  .action(async (opts: { file: string }) => {
+    assertAuditCliOwnerMode(process.cwd(), "audit policy apply");
+    const out = await auditApplyPolicyCliAsync({
       workspace: process.cwd(),
       file: opts.file
     });
@@ -17132,8 +17066,8 @@ auditPolicy
 auditMap
   .command("list")
   .description("List builtin/active audit maps")
-  .action(() => {
-    const rows = auditMapListCli(process.cwd());
+  .action(async () => {
+    const rows = await auditMapListCliAsync(process.cwd());
     for (const row of rows) {
       console.log(`- ${row.source}: ${row.id} (${row.name})`);
     }
@@ -17143,9 +17077,9 @@ auditMap
   .command("show")
   .description("Show audit map")
   .option("--id <id>", "builtin|active", "active")
-  .action((opts: { id: string }) => {
+  .action(async (opts: { id: string }) => {
     const id = opts.id === "builtin" ? "builtin" : "active";
-    console.log(JSON.stringify(auditMapShowCli({
+    console.log(JSON.stringify(await auditMapShowCliAsync({
       workspace: process.cwd(),
       id
     }), null, 2));
@@ -17155,9 +17089,9 @@ auditMap
   .command("apply")
   .description("Apply active audit map from file")
   .requiredOption("--file <path>", "audit map file (yaml/json)")
-  .action((opts: { file: string }) => {
-    assertOwnerMode(process.cwd(), "audit map apply");
-    const out = auditMapApplyCli({
+  .action(async (opts: { file: string }) => {
+    assertAuditCliOwnerMode(process.cwd(), "audit map apply");
+    const out = await auditMapApplyCliAsync({
       workspace: process.cwd(),
       file: opts.file
     });
@@ -17192,7 +17126,7 @@ auditBinder
   .option("--id <id>", "scope id for node/agent")
   .option("--request-id <id>", "restricted evidence request id")
   .action(async (opts: { scope: string; out: string; id?: string; requestId?: string }) => {
-    assertOwnerMode(process.cwd(), "audit binder create");
+    assertAuditCliOwnerMode(process.cwd(), "audit binder create");
     const scope = opts.scope.toLowerCase();
     if (!["workspace", "node", "agent"].includes(scope)) {
       throw new Error(`invalid scope: ${opts.scope}`);
@@ -17203,7 +17137,7 @@ auditBinder
       id: opts.id,
       outFile: opts.out,
       requestId: opts.requestId
-    });
+    }, { beforePublish: () => assertAuditCliOwnerMode(process.cwd(), "audit binder create") });
     if (!("outFile" in out) || !("sha256" in out)) {
       throw new Error("audit binder create did not produce an export artifact");
     }
@@ -17221,7 +17155,7 @@ withTrustFlags(auditBinder
   .action((file: string, opts: TrustFlags) => {
     const verify = auditBinderVerifyCli({ workspace: process.cwd(), file, pubkeyPath: opts.pubkey, trust: trustFromFlags(opts, ["artifact-seal"]) });
     if ("audit" in verify) {
-      finishVerify("Industry-pack audit", verify.report, { json: opts.json, result: verify,
+      finishVerify("Industry-pack audit", verify.report, { json: opts.json, result: verify, claim: artifactClaim("audit:industry-pack"),
         details: [`Industry-pack audit verified: signer ${verify.keyFingerprint}, checksum ok`, `sha256: ${verify.fileSha256}`] });
       return;
     }
@@ -17269,11 +17203,11 @@ auditBinder
   .description("Execute previously approved external binder export")
   .requiredOption("--approval <id>", "approval request id")
   .action(async (opts: { approval: string }) => {
-    assertOwnerMode(process.cwd(), "audit binder export-execute");
+    assertAuditCliOwnerMode(process.cwd(), "audit binder export-execute");
     const out = await auditBinderExportExecuteCli({
       workspace: process.cwd(),
       approvalRequestId: opts.approval
-    });
+    }, { beforePublish: () => assertAuditCliOwnerMode(process.cwd(), "audit binder export-execute") });
     console.log(chalk.green("Audit binder export executed"));
     console.log(`File: ${out.outFile}`);
     console.log(`sha256: ${out.sha256}`);
@@ -17286,12 +17220,12 @@ auditRequest
   .requiredOption("--items <csv>", "e.g. control:ACCESS_CONTROL.SSO_SCIM,proof:inc_abc")
   .option("--id <id>", "scope id for node/agent")
   .option("--requester <id>", "requester user id", "auditor")
-  .action((opts: { scope: string; items: string; id?: string; requester: string }) => {
+  .action(async (opts: { scope: string; items: string; id?: string; requester: string }) => {
     const scope = opts.scope.toLowerCase();
     if (!["workspace", "node", "agent"].includes(scope)) {
       throw new Error(`invalid scope: ${opts.scope}`);
     }
-    const out = auditRequestCreateCli({
+    const out = await auditRequestCreateCli({
       workspace: process.cwd(),
       scope: scope as "workspace" | "node" | "agent",
       id: opts.id,
@@ -17332,9 +17266,9 @@ auditRequest
   .command("reject")
   .description("Reject evidence request")
   .argument("<requestId>")
-  .action((requestId: string) => {
-    assertOwnerMode(process.cwd(), "audit request reject");
-    const out = auditRequestRejectCli({
+  .action(async (requestId: string) => {
+    assertAuditCliOwnerMode(process.cwd(), "audit request reject");
+    const out = await auditRequestRejectCli({
       workspace: process.cwd(),
       requestId
     });
@@ -17347,12 +17281,12 @@ auditRequest
   .argument("<requestId>")
   .requiredOption("--out <file.amcaudit>", "output artifact path")
   .action(async (requestId: string, opts: { out: string }) => {
-    assertOwnerMode(process.cwd(), "audit request fulfill");
+    assertAuditCliOwnerMode(process.cwd(), "audit request fulfill");
     const out = await auditRequestFulfillCli({
       workspace: process.cwd(),
       requestId,
       outFile: opts.out
-    });
+    }, { beforePublish: () => assertAuditCliOwnerMode(process.cwd(), "audit request fulfill") });
     console.log(chalk.green("Evidence request fulfilled"));
     console.log(`requestId: ${out.request.requestId}`);
     console.log(`binder sha256: ${out.export.sha256}`);
@@ -17372,7 +17306,7 @@ auditScheduler
   .option("--scope <scope>", "workspace|node|agent", "workspace")
   .option("--id <id>", "scope id for node/agent")
   .action(async (opts: { scope: string; id?: string }) => {
-    assertOwnerMode(process.cwd(), "audit scheduler run-now");
+    assertAuditCliOwnerMode(process.cwd(), "audit scheduler run-now");
     const scope = opts.scope.toLowerCase();
     if (!["workspace", "node", "agent"].includes(scope)) {
       throw new Error(`invalid scope: ${opts.scope}`);
@@ -17381,7 +17315,7 @@ auditScheduler
       workspace: process.cwd(),
       scope: scope as "workspace" | "node" | "agent",
       id: opts.id
-    });
+    }, { beforePublish: () => assertAuditCliOwnerMode(process.cwd(), "audit scheduler run-now") });
     console.log(chalk.green("Audit scheduler refresh completed"));
     console.log(`binderId: ${out.binder.binderId}`);
     console.log(`cache: ${out.cache.path}`);
@@ -17390,23 +17324,23 @@ auditScheduler
 auditScheduler
   .command("enable")
   .description("Enable audit scheduler")
-  .action(() => {
-    assertOwnerMode(process.cwd(), "audit scheduler enable");
-    console.log(JSON.stringify(auditSchedulerEnableCli({
+  .action(async () => {
+    assertAuditCliOwnerMode(process.cwd(), "audit scheduler enable");
+    console.log(JSON.stringify(await auditSchedulerEnableCliAsync({
       workspace: process.cwd(),
       enabled: true
-    }), null, 2));
+    }, { beforePublish: () => assertAuditCliOwnerMode(process.cwd(), "audit scheduler enable") }), null, 2));
   });
 
 auditScheduler
   .command("disable")
   .description("Disable audit scheduler")
-  .action(() => {
-    assertOwnerMode(process.cwd(), "audit scheduler disable");
-    console.log(JSON.stringify(auditSchedulerEnableCli({
+  .action(async () => {
+    assertAuditCliOwnerMode(process.cwd(), "audit scheduler disable");
+    console.log(JSON.stringify(await auditSchedulerEnableCliAsync({
       workspace: process.cwd(),
       enabled: false
-    }), null, 2));
+    }, { beforePublish: () => assertAuditCliOwnerMode(process.cwd(), "audit scheduler disable") }), null, 2));
   });
 
 audit
@@ -17433,9 +17367,9 @@ registerHarnessComparisonCommands(bench);
 bench
   .command("init")
   .description("Initialize signed bench policy")
-  .action(() => {
+  .action(async () => {
     assertOwnerMode(process.cwd(), "bench init");
-    const out = benchInitCli(process.cwd());
+    const out = await benchInitCli(process.cwd());
     console.log(chalk.green("Bench policy initialized"));
     console.log(`Policy: ${out.path}`);
     console.log(`Signature: ${out.sigPath}`);
@@ -17476,7 +17410,7 @@ bench
   .option("--industry <value>", "software|fintech|health|manufacturing|other")
   .option("--agent-type <value>", "code-agent|support-agent|ops-agent|research-agent|sales-agent|other")
   .option("--deployment <value>", "single|host|k8s|compose")
-  .action((opts: {
+  .action(async (opts: {
     scope: string;
     out: string;
     id?: string;
@@ -17486,12 +17420,12 @@ bench
     agentType?: "code-agent" | "support-agent" | "ops-agent" | "research-agent" | "sales-agent" | "other";
     deployment?: "single" | "host" | "k8s" | "compose";
   }) => {
-    assertOwnerMode(process.cwd(), "bench create");
+    assertBenchCreateOwnerMode(process.cwd());
     const scope = opts.scope.toLowerCase();
     if (!["workspace", "node", "agent"].includes(scope)) {
       throw new Error(`Invalid scope: ${opts.scope}`);
     }
-    const out = benchCreateCli({
+    const out = await benchCreateCli({
       workspace: process.cwd(),
       scope: scope as "workspace" | "node" | "agent",
       id: opts.id,
@@ -17503,7 +17437,7 @@ bench
         agentType: opts.agentType,
         deployment: opts.deployment
       }
-    });
+    }, { beforePublish: () => assertBenchCreateOwnerMode(process.cwd()) });
     console.log(chalk.green("Bench artifact created"));
     console.log(`File: ${out.outFile}`);
     console.log(`sha256: ${out.sha256}`);
@@ -17543,7 +17477,7 @@ benchRegistry
       dir: opts.dir,
       registryId: opts.id,
       registryName: opts.name
-    });
+    }, { beforePublish: () => assertOwnerMode(process.cwd(), "bench registry init") });
     console.log(chalk.green("Bench registry initialized"));
     console.log(`Index: ${out.indexPath}`);
     console.log(`Signature: ${out.sigPath}`);
@@ -17563,7 +17497,7 @@ benchRegistry
       benchFile: opts.file,
       registryKeyPath: opts.registryKey,
       version: opts.version
-    });
+    }, { beforePublish: () => assertOwnerMode(process.cwd(), "bench registry publish") });
     console.log(chalk.green("Bench published to registry"));
     console.log(`Bench: ${out.benchId}@${out.version}`);
     console.log(`Path: ${out.targetPath}`);
@@ -17625,7 +17559,7 @@ bench
       workspace: process.cwd(),
       registryId: opts.registryId,
       benchRef: opts.bench
-    });
+    }, { beforePublish: () => assertOwnerMode(process.cwd(), "bench import") });
     console.log(chalk.green("Bench imported"));
     console.log(`Bench: ${out.benchId}@${out.version}`);
     console.log(`File: ${out.filePath}`);
@@ -17653,18 +17587,18 @@ bench
   .requiredOption("--scope <scope>", "workspace|node|agent")
   .requiredOption("--id <id>", "scope id (workspace for workspace scope)")
   .option("--against <mode>", "imported|registry:<id>", "imported")
-  .action((opts: { scope: string; id: string; against: string }) => {
+  .action(async (opts: { scope: string; id: string; against: string }) => {
     assertOwnerMode(process.cwd(), "bench compare");
     const scope = opts.scope.toLowerCase();
     if (!["workspace", "node", "agent"].includes(scope)) {
       throw new Error(`Invalid scope: ${opts.scope}`);
     }
-    const out = benchCompareCli({
+    const out = await benchCompareCli({
       workspace: process.cwd(),
       scope: scope as "workspace" | "node" | "agent",
       id: opts.id,
       against: opts.against as "imported" | `registry:${string}`
-    });
+    }, { beforePublish: () => assertOwnerMode(process.cwd(), "bench compare") });
     console.log(chalk.green("Bench comparison updated"));
     console.log(`Path: ${out.path}`);
     console.log(`Warnings: ${out.comparison.warnings.length}`);
@@ -17681,8 +17615,8 @@ bench
 bench
   .command("registries")
   .description("Print signed bench registry allowlist")
-  .action(() => {
-    const out = benchRegistriesCli(process.cwd());
+  .action(async () => {
+    const out = await benchRegistriesCli(process.cwd());
     console.log(JSON.stringify(out, null, 2));
   });
 
@@ -17690,10 +17624,10 @@ bench
   .command("registries-apply")
   .description("Apply bench registries config from JSON file")
   .requiredOption("--in <file>", "JSON file matching benchRegistries schema")
-  .action((opts: { in: string }) => {
+  .action(async (opts: { in: string }) => {
     assertOwnerMode(process.cwd(), "bench registries-apply");
-    const config = JSON.parse(readUtf8(resolve(process.cwd(), opts.in))) as ReturnType<typeof benchRegistriesCli>["registries"];
-    const out = benchRegistriesApplyCli({
+    const config = JSON.parse(readUtf8(resolve(process.cwd(), opts.in))) as Awaited<ReturnType<typeof benchRegistriesCli>>["registries"];
+    const out = await benchRegistriesApplyCli({
       workspace: process.cwd(),
       config
     });
@@ -17730,12 +17664,12 @@ benchPublish
 benchPublish
   .command("execute")
   .requiredOption("--approval-request <id>", "approval request id")
-  .action((opts: { approvalRequest: string }) => {
+  .action(async (opts: { approvalRequest: string }) => {
     assertOwnerMode(process.cwd(), "bench publish execute");
-    const out = benchPublishExecuteCli({
+    const out = await benchPublishExecuteCli({
       workspace: process.cwd(),
       approvalRequestId: opts.approvalRequest
-    });
+    }, { beforePublish: () => assertOwnerMode(process.cwd(), "bench publish execute") });
     console.log(chalk.green("Bench published"));
     console.log(`bench: ${out.benchId}@${out.version}`);
     console.log(`target: ${out.targetPath}`);
@@ -17751,15 +17685,17 @@ benchmark
   .requiredOption("--out <file.amcbench>", "output benchmark artifact")
   .option("--publisher <org>", "publisher org")
   .option("--public-agent-id <id>", "public agent id override")
-  .action((opts: { agent: string; run: string; out: string; publisher?: string; publicAgentId?: string }) => {
-    const out = exportBenchmarkArtifact({
-      workspace: process.cwd(),
+  .action(async (opts: { agent: string; run: string; out: string; publisher?: string; publicAgentId?: string }) => {
+    const workspace = process.cwd();
+    assertBenchmarkExportOwnerMode(workspace);
+    const out = await exportBenchmarkArtifactAsync({
+      workspace,
       agentId: opts.agent,
       runId: opts.run,
       outFile: opts.out,
       publisherOrgName: opts.publisher,
       publicAgentId: opts.publicAgentId ?? null
-    });
+    }, { beforePublish: () => assertBenchmarkExportOwnerMode(workspace) });
     console.log(chalk.green(`Benchmark exported: ${out.outFile}`));
   });
 
@@ -18030,9 +17966,9 @@ mechanic
   .command("init")
   .option("--scope <scope>", "workspace|agent|node", "workspace")
   .option("--id <id>", "scope id")
-  .action((opts: { scope: "workspace" | "agent" | "node"; id?: string }) => {
+  .action(async (opts: { scope: "workspace" | "agent" | "node"; id?: string }) => {
     assertOwnerMode(process.cwd(), "mechanic init");
-    const out = mechanicInitCli({
+    const out = await mechanicInitCli({
       workspace: process.cwd(),
       scope: opts.scope,
       id: opts.id
@@ -18048,9 +17984,9 @@ mechanicTargets
   .requiredOption("--scope <scope>", "workspace|agent|node")
   .option("--id <id>", "scope id")
   .option("--mode <mode>", "DESIRED|EXCELLENCE", "DESIRED")
-  .action((opts: { scope: "workspace" | "agent" | "node"; id?: string; mode: "DESIRED" | "EXCELLENCE" }) => {
+  .action(async (opts: { scope: "workspace" | "agent" | "node"; id?: string; mode: "DESIRED" | "EXCELLENCE" }) => {
     assertOwnerMode(process.cwd(), "mechanic targets init");
-    const out = mechanicTargetsInitCli({
+    const out = await mechanicTargetsInitCli({
       workspace: process.cwd(),
       scope: opts.scope,
       id: opts.id,
@@ -18065,13 +18001,13 @@ mechanicTargets
   .requiredOption("--q <qid>", "question id, e.g. AMC-3.2.4")
   .requiredOption("--value <n>", "target value 0..5")
   .requiredOption("--reason <text>", "reason for change")
-  .action((opts: { q: string; value: string; reason: string }) => {
+  .action(async (opts: { q: string; value: string; reason: string }) => {
     assertOwnerMode(process.cwd(), "mechanic targets set");
     const value = Number(opts.value);
     if (!Number.isInteger(value) || value < 0 || value > 5) {
       throw new Error("--value must be an integer 0..5");
     }
-    const out = mechanicTargetsSetCli({
+    const out = await mechanicTargetsSetCli({
       workspace: process.cwd(),
       qid: opts.q,
       value,
@@ -18085,9 +18021,9 @@ mechanicTargets
   .command("apply")
   .requiredOption("--file <path>", "targets yaml/json path")
   .requiredOption("--reason <text>", "reason for change")
-  .action((opts: { file: string; reason: string }) => {
+  .action(async (opts: { file: string; reason: string }) => {
     assertOwnerMode(process.cwd(), "mechanic targets apply");
-    const out = mechanicTargetsApplyCli({
+    const out = await mechanicTargetsApplyCli({
       workspace: process.cwd(),
       filePath: opts.file,
       reason: opts.reason,
@@ -18135,9 +18071,9 @@ mechanicProfile
   .option("--id <id>", "scope id")
   .option("--mode <mode>", "DESIRED|EXCELLENCE", "DESIRED")
   .requiredOption("--reason <text>", "reason for profile apply")
-  .action((profileId: string, opts: { scope: "workspace" | "agent" | "node"; id?: string; mode: "DESIRED" | "EXCELLENCE"; reason: string }) => {
+  .action(async (profileId: string, opts: { scope: "workspace" | "agent" | "node"; id?: string; mode: "DESIRED" | "EXCELLENCE"; reason: string }) => {
     assertOwnerMode(process.cwd(), "mechanic profile apply");
-    const out = mechanicProfileApplyCli({
+    const out = await mechanicProfileApplyCli({
       workspace: process.cwd(),
       profileId,
       scope: opts.scope,
@@ -18169,9 +18105,9 @@ mechanicTuning
   .command("init")
   .requiredOption("--scope <scope>", "workspace|agent|node")
   .option("--id <id>", "scope id")
-  .action((opts: { scope: "workspace" | "agent" | "node"; id?: string }) => {
+  .action(async (opts: { scope: "workspace" | "agent" | "node"; id?: string }) => {
     assertOwnerMode(process.cwd(), "mechanic tuning init");
-    const out = mechanicTuningInitCli({
+    const out = await mechanicTuningInitCli({
       workspace: process.cwd(),
       scope: opts.scope,
       id: opts.id
@@ -18185,9 +18121,9 @@ mechanicTuning
   .requiredOption("--key <key>", "dot path in tuning object, e.g. knobs.maxTokensPerRun")
   .requiredOption("--value <value>", "value (number/bool/json/csv/string)")
   .requiredOption("--reason <text>", "reason for change")
-  .action((opts: { key: string; value: string; reason: string }) => {
+  .action(async (opts: { key: string; value: string; reason: string }) => {
     assertOwnerMode(process.cwd(), "mechanic tuning set");
-    const out = mechanicTuningSetCli({
+    const out = await mechanicTuningSetCli({
       workspace: process.cwd(),
       keyPath: opts.key,
       value: opts.value,
@@ -18201,9 +18137,9 @@ mechanicTuning
   .command("apply")
   .requiredOption("--file <path>", "tuning yaml/json path")
   .requiredOption("--reason <text>", "reason for change")
-  .action((opts: { file: string; reason: string }) => {
+  .action(async (opts: { file: string; reason: string }) => {
     assertOwnerMode(process.cwd(), "mechanic tuning apply");
-    const out = mechanicTuningApplyCli({
+    const out = await mechanicTuningApplyCli({
       workspace: process.cwd(),
       filePath: opts.file,
       reason: opts.reason,
@@ -18293,14 +18229,14 @@ mechanicPlan
   .command("request-approval")
   .argument("<planId>")
   .requiredOption("--reason <text>", "reason for request")
-  .action((planId: string, opts: { reason: string }) => {
+  .action(async (planId: string, opts: { reason: string }) => {
     assertOwnerMode(process.cwd(), "mechanic plan request-approval");
-    const out = mechanicPlanRequestApprovalCli({
+    const out = await mechanicPlanRequestApprovalCli({
       workspace: process.cwd(),
       planId,
       actor: "owner",
       reason: opts.reason
-    });
+    }, () => assertOwnerMode(process.cwd(), "mechanic plan request-approval"));
     console.log(chalk.green(`Approval requests created: ${out.approvalRequests.length}`));
     console.log(JSON.stringify(out.approvalRequests, null, 2));
   });
@@ -18313,7 +18249,7 @@ mechanicPlan
     const out = await mechanicPlanExecuteCli({
       workspace: process.cwd(),
       planId
-    });
+    }, () => assertOwnerMode(process.cwd(), "mechanic plan execute"));
     console.log(chalk.green(`Plan executed: ${out.plan.planId}`));
     console.log(JSON.stringify(out.executed, null, 2));
   });
@@ -18520,13 +18456,17 @@ release
   .requiredOption("--out <file>", "output .amcrelease file")
   .option("--private-key <path>", "release signing private key path override")
   .option("--skip-install-build", "use current built artifacts without frozen source install/build", false)
-  .action((opts: { out: string; privateKey?: string; skipInstallBuild?: boolean }) => {
+  .option("--npm-tarball <file>", "embed this gated npm tarball as is; nothing is installed, built or packed")
+  .option("--sbom <file>", "embed this gated CycloneDX SBOM instead of regenerating it")
+  .option("--licenses <file>", "embed this gated licence inventory instead of regenerating it")
+  .action((opts: { out: string; privateKey?: string; skipInstallBuild?: boolean; npmTarball?: string; sbom?: string; licenses?: string }) => {
     assertOwnerMode(process.cwd(), "release pack");
     const out = releasePackCli({
       workspace: process.cwd(),
       outFile: resolve(process.cwd(), opts.out),
       privateKeyPath: opts.privateKey,
-      skipInstallBuild: opts.skipInstallBuild
+      skipInstallBuild: opts.skipInstallBuild,
+      npmTarball: opts.npmTarball, sbomFile: opts.sbom, licensesFile: opts.licenses
     });
     console.log(chalk.green("Release bundle created"));
     console.log(`File: ${out.outFile}`);
@@ -18736,7 +18676,7 @@ program
   .option("--description <desc>", "experiment description", "")
   .action(async (opts: { kind: string; name: string; model: string; description: string }) => {
     const lab = await import("./lab/cognitionLab.js");
-    const experiment = lab.createLabExperiment({
+    const experiment = await lab.createLabExperimentAsync({
       kind: opts.kind as never,
       name: opts.name,
       description: opts.description || `${opts.kind} experiment on ${opts.model}`,
@@ -18753,7 +18693,7 @@ program
   .requiredOption("--experiment <id>", "experiment ID")
   .action(async (opts: { experiment: string }) => {
     const lab = await import("./lab/cognitionLab.js");
-    const results = lab.simulateExperiment(opts.experiment);
+    const results = await lab.simulateExperimentAsync(opts.experiment, process.cwd());
     if (results.length === 0) {
       console.log(chalk.red("No results — experiment not found or has no probes."));
       process.exitCode = 1;
@@ -18778,11 +18718,13 @@ program
   .requiredOption("--experiment <id>", "experiment ID")
   .action(async (opts: { experiment: string }) => {
     const lab = await import("./lab/cognitionLab.js");
-    const report = lab.generateLabReport(opts.experiment);
-    if (!report) {
-      console.log(chalk.red("Experiment not found."));
-      return;
-    }
+    const report = lab.generateLabReport(opts.experiment, process.cwd());
+    if (!report) { console.log(chalk.red("Experiment not found.")); process.exitCode = 1; return; }
+    // The CLI records only lab-simulate placeholders, so a stored lab score is never a measurement.
+    const { EXAMPLE_BANNER, exampleEnvelope } = await import("./claims/eligibility/exampleMode.js");
+    console.log(chalk.bold.yellow(EXAMPLE_BANNER));
+    printClaimResult(exampleEnvelope("lab:simulate"), {});
+    if (report.probeResults.length > 0) console.log(chalk.yellow("No model was called. Scores are deterministic placeholders derived from ids, not measurements."));
     console.log(lab.renderLabReportMarkdown(report));
   });
 
@@ -18793,19 +18735,17 @@ program
   .requiredOption("--candidate <id>", "candidate experiment ID")
   .action(async (opts: { baseline: string; candidate: string }) => {
     const lab = await import("./lab/cognitionLab.js");
-    const pairs = lab.compareExperiments(opts.baseline, opts.candidate);
-    if (pairs.length === 0) {
-      console.log(chalk.yellow("No matching probes to compare."));
-      return;
-    }
+    const pairs = lab.compareExperiments(opts.baseline, opts.candidate, process.cwd());
+    if (pairs.length === 0) { console.log(chalk.yellow("No probe results to compare.")); process.exitCode = 1; return; }
+    const { EXAMPLE_BANNER, exampleEnvelope } = await import("./claims/eligibility/exampleMode.js");
+    console.log(chalk.bold.yellow(EXAMPLE_BANNER));
+    printClaimResult(exampleEnvelope("lab:simulate"), {});
     console.log(chalk.bold(`\nComparison: ${opts.baseline} vs ${opts.candidate}\n`));
-    for (const p of pairs) {
-      console.log(`  ${p.probeId}:`);
-      for (const [dim, delta] of Object.entries(p.deltas)) {
-        const color = delta > 0.05 ? chalk.green : delta < -0.05 ? chalk.red : chalk.white;
-        console.log(color(`    ${dim}: ${delta > 0 ? "+" : ""}${(delta * 100).toFixed(1)}%`));
-      }
-    }
+    for (const line of lab.labRecordEvidence(process.cwd()).unverifiedRecords) console.log(chalk.yellow(line));
+    const { printLabComparison } = await import("./lab/labComparisonCli.js");
+    printLabComparison(pairs);
+    // Unmatched rows are reported, but a comparison with no matched probe is not a successful comparison.
+    if (!pairs.some(pair => pair.status === "matched")) { console.log(chalk.yellow("No matching probes to compare.")); process.exitCode = 1; }
   });
 
 program
@@ -18909,7 +18849,7 @@ program
   .option("--reporter <name>", "who is filing", "cli-user")
   .action(async (opts: { scenario: string; pack: string; run: string; justification: string; reporter: string }) => {
     const fp = await import("./assurance/falsePositiveTracker.js");
-    const report = fp.submitFPReport({
+    const report = await fp.submitFPReportAsync({
       scenarioId: opts.scenario,
       packId: opts.pack,
       assuranceRunId: opts.run,
@@ -18928,7 +18868,7 @@ program
   .requiredOption("--reason <text>", "resolution reason")
   .action(async (opts: { id: string; status: string; reason: string }) => {
     const fp = await import("./assurance/falsePositiveTracker.js");
-    const result = fp.resolveFPReport(opts.id, {
+    const result = await fp.resolveFPReportAsync(opts.id, {
       status: opts.status as "confirmed" | "rejected",
       reason: opts.reason,
     }, process.cwd());
@@ -18950,10 +18890,8 @@ program
       packId: opts.pack,
       status: opts.status as "open" | "confirmed" | "rejected" | undefined,
     }, process.cwd());
-    if (reports.length === 0) {
-      console.log(chalk.green("No false positive reports found."));
-      return;
-    }
+    for (const line of fp.fpReportEvidence(process.cwd()).unverifiedRecords) console.log(chalk.yellow(line));
+    if (reports.length === 0) { console.log(chalk.green("No false positive reports found.")); return; }
     for (const r of reports) {
       const color = r.status === "confirmed" ? chalk.yellow : r.status === "rejected" ? chalk.dim : chalk.white;
       console.log(color(`  [${r.status.toUpperCase()}] ${r.reportId} — ${r.packId}/${r.scenarioId}`));
@@ -18967,15 +18905,14 @@ program
   .option("--pack <id>", "filter by pack ID")
   .action(async (opts: { pack?: string }) => {
     const fp = await import("./assurance/falsePositiveTracker.js");
-    const summaries = fp.computeFPCostSummary(opts.pack, process.cwd());
-    if (summaries.length === 0) {
-      console.log(chalk.green("No FP cost data available."));
-      return;
-    }
+    const summaries = fp.computeFPCostSummary(opts.pack, process.cwd()), evidence = fp.fpReportEvidence(process.cwd());
+    for (const line of evidence.unverifiedRecords) console.log(chalk.yellow(line));
+    if (summaries.length === 0) { console.log(chalk.green("No FP cost data available.")); return; }
     console.log(chalk.bold("\nFalse Positive Cost Summary:\n"));
     for (const s of summaries) {
-      console.log(`  ${chalk.bold(s.packId)} — ${s.confirmedFPs} confirmed FPs, $${s.totalCostUsd.toFixed(2)} total cost, ${(s.fpRate * 100).toFixed(1)}% FP rate`);
+      console.log(`  ${chalk.bold(s.packId)} — ${s.confirmedFPs} confirmed FPs, $${s.totalCostUsd.toFixed(2)} total cost, ${s.outcome === "measured" ? `${(s.fpRate * 100).toFixed(1)}% FP rate` : "FP rate not evaluated (no resolved reports)"}`);
     }
+    console.log(`  Evidence: ${evidence.evidenceStatus}`);
   });
 
 program
@@ -18990,7 +18927,7 @@ program
       windowStartTs: Date.now() - windowMs,
       windowEndTs: Date.now(),
       fpRateThreshold: parseFloat(opts.threshold),
-    });
+    }, process.cwd());
     console.log(fp.renderFPTuningReportMarkdown(report));
   });
 
@@ -19083,7 +19020,7 @@ program
       console.log(chalk.red("Provide --region or --list."));
       return;
     }
-    const policy = dr.createResidencyPolicy({
+    const policy = await dr.createResidencyPolicyAsync({
       region: opts.region as never,
       isolationLevel: opts.isolation as never,
       keyCustodyMode: opts.custody as never,
@@ -19100,7 +19037,7 @@ program
   .option("--isolation <level>", "isolation level", "strict")
   .action(async (opts: { tenant: string; workspace: string; region: string; isolation: string }) => {
     const dr = await import("./compliance/dataResidency.js");
-    const boundary = dr.registerTenant({
+    const boundary = await dr.registerTenantAsync({
       tenantId: opts.tenant,
       workspaceId: opts.workspace,
       region: opts.region as never,
@@ -19204,6 +19141,16 @@ program
   });
 
 // ── Operator UX CLI ──────────────────────────────────────────────────
+/** Display-only latest run (labelled when unverified); without one, say so instead of fabricating scores. */
+function latestRunOrHint(workspace: string, agentId: string): DiagnosticReport | null {
+  const report = latestRunForDisplay(workspace, agentId);
+  if (!report) {
+    console.log(chalk.yellow(`No diagnostic run found for agent '${agentId}'.`));
+    console.log(chalk.cyan("Run 'amc run' to produce one, then re-run this command."));
+  }
+  return report;
+}
+
 program
   .command("operator-dashboard")
   .description("Generate operator dashboard showing why questions are capped and how to unlock")
@@ -19220,21 +19167,11 @@ program
     const workspace = process.cwd();
     const agentId = activeAgent(program) ?? "default";
     const currentReport = opts.run && opts.run !== "latest"
-      ? loadRunReport(workspace, opts.run, agentId)
-      : (() => {
-      const existing = latestRunForAgent(workspace, agentId);
-      if (!existing) {
-        // No run exists. Rendering fabricated scores here previously showed a
-        // "VALID / HIGH TRUST" diagnostic for an agent that was never assessed.
-        console.log(chalk.yellow(`No diagnostic run found for agent '${agentId}'.`));
-        console.log(chalk.cyan("Run 'amc run' to produce one, then re-run this command."));
-        return null;
-      }
-      return existing;
-    })();
+      ? namedRunForDisplay(workspace, opts.run, agentId)
+      : latestRunOrHint(workspace, agentId);
     if (!currentReport) return;
     const previousReport = opts.previousRun
-      ? loadRunReport(workspace, opts.previousRun, agentId)
+      ? namedRunForDisplay(workspace, opts.previousRun, agentId)
       : null;
     const dashboard = opux.generateOperatorDashboard(currentReport, opts.role as typeof validRoles[number], previousReport);
     console.log(opux.renderOperatorDashboardMarkdown(dashboard));
@@ -19248,17 +19185,7 @@ program
     const opux = await import("./ops/operatorUx.js");
     const workspace = process.cwd();
     const agentId = activeAgent(program) ?? "default";
-    const report = (() => {
-      const existing = latestRunForAgent(workspace, agentId);
-      if (!existing) {
-        // No run exists. Rendering fabricated scores here previously showed a
-        // "VALID / HIGH TRUST" diagnostic for an agent that was never assessed.
-        console.log(chalk.yellow(`No diagnostic run found for agent '${agentId}'.`));
-        console.log(chalk.cyan("Run 'amc run' to produce one, then re-run this command."));
-        return null;
-      }
-      return existing;
-    })();
+    const report = latestRunOrHint(workspace, agentId);
     // No run: nothing was evaluated, and the claim line says so.
     printClaimResult(report ? runClaimEnvelope(report, workspace) : unverifiedClaim("diagnostic:why-capped", 0), {});
     if (!report) return;
@@ -19286,17 +19213,7 @@ program
     const opux = await import("./ops/operatorUx.js");
     const workspace = process.cwd();
     const agentId = activeAgent(program) ?? "default";
-    const report = (() => {
-      const existing = latestRunForAgent(workspace, agentId);
-      if (!existing) {
-        // No run exists. Rendering fabricated scores here previously showed a
-        // "VALID / HIGH TRUST" diagnostic for an agent that was never assessed.
-        console.log(chalk.yellow(`No diagnostic run found for agent '${agentId}'.`));
-        console.log(chalk.cyan("Run 'amc run' to produce one, then re-run this command."));
-        return null;
-      }
-      return existing;
-    })();
+    const report = latestRunOrHint(workspace, agentId);
     if (!report) return;
     const whyCaps = opux.computeWhyCaps(report);
     const queue = opux.computeActionQueue(whyCaps);
@@ -19320,17 +19237,7 @@ program
     const opux = await import("./ops/operatorUx.js");
     const workspace = process.cwd();
     const agentId = activeAgent(program) ?? "default";
-    const report = (() => {
-      const existing = latestRunForAgent(workspace, agentId);
-      if (!existing) {
-        // No run exists. Rendering fabricated scores here previously showed a
-        // "VALID / HIGH TRUST" diagnostic for an agent that was never assessed.
-        console.log(chalk.yellow(`No diagnostic run found for agent '${agentId}'.`));
-        console.log(chalk.cyan("Run 'amc run' to produce one, then re-run this command."));
-        return null;
-      }
-      return existing;
-    })();
+    const report = latestRunOrHint(workspace, agentId);
     if (!report) return;
     const heatmap = opux.computeConfidenceHeatmap(report);
     console.log(chalk.bold(`\nConfidence Heatmap — Avg: ${(heatmap.avgConfidence * 100).toFixed(1)}%  Low: ${heatmap.lowConfidenceCount} questions\n`));
@@ -19659,7 +19566,7 @@ program
   .option("--risk <risk>", "LOW|MEDIUM|HIGH|CRITICAL", "MEDIUM")
   .option("--created-by <who>", "who created this", "operator")
   .action(async (opts: { agent?: string; type: string; reason: string; expiry: string; policies: string; risk: string; createdBy: string }) => {
-    const { addDebtEntry } = await import("./governor/policyDebt.js");
+    const { addDebtEntryAsync } = await import("./governor/policyDebt.js");
     const agentId = opts.agent ?? activeAgent(program) ?? "default";
     let expiryTs: number;
     if (/^\d+$/.test(opts.expiry)) {
@@ -19667,7 +19574,7 @@ program
     } else {
       expiryTs = Date.now() + parseWindowToMs(opts.expiry);
     }
-    const entry = addDebtEntry(process.cwd(), {
+    const entry = await addDebtEntryAsync(process.cwd(), {
       type: opts.type as never,
       reason: opts.reason,
       expiryTs,
@@ -19695,24 +19602,17 @@ program
 // ── Emergency Override CLI ──────────────────────────────────────────────
 program
   .command("governor-override")
-  .description("Activate an emergency governance override with TTL")
+  .description("Request a signed break-glass record; after one bound approval rerun with --activate and --approval")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .requiredOption("--reason <reason>", "reason for the emergency override (>= 10 chars)")
-  .option("--ttl <ttl>", "TTL (e.g., 4h)", "4h")
-  .option("--mode <mode>", "execute or dry-run", "dry-run")
-  .action(async (opts: { agent?: string; reason: string; ttl: string; mode: string }) => {
-    const { activateOverride, renderOverrideMarkdown } = await import("./governor/emergencyOverride.js");
-    const agentId = opts.agent ?? activeAgent(program) ?? "default";
-    const ttlMs = parseWindowToMs(opts.ttl);
-    const entry = activateOverride(process.cwd(), {
-      agentId,
-      reason: opts.reason,
-      ttlMs,
-      mode: opts.mode as never,
-    });
-    console.log(chalk.yellow(`Emergency override activated: ${entry.overrideId}`));
-    console.log(renderOverrideMarkdown(entry));
-    console.log(chalk.red("⚠  Postmortem required within 48h of override expiry."));
+  .option("--reason <reason>", "reason for the break-glass (>= 10 chars)")
+  .option("--ttl <ttl>", "TTL, at most 24h (e.g., 4h)", "4h")
+  .option("--tools <names>", "comma-separated tool names it covers").option("--action-classes <classes>", "comma-separated action classes it covers")
+  .option("--controls <ids>", "comma-separated control ids it deviates from").option("--activate <breakGlassId>", "activate this requested break-glass")
+  .option("--approval <approvalRequestId>", "the approval request holding its bound decision")
+  .option("--session-token-file <file>", "the requester's amc approvals login token (required to request)")
+  .action(async (opts: { agent?: string; ttl: string } & Record<string, string | undefined>) => {
+    const { breakGlassCommand } = await import("./governor/breakGlassCommand.js");
+    console.log(chalk.yellow(await breakGlassCommand(process.cwd(), { ...opts, agent: opts.agent ?? activeAgent(program) ?? "default", ttlMs: parseWindowToMs(opts.ttl) })));
   });
 
 program
@@ -19811,7 +19711,7 @@ program
     const agentId = opts.agent ?? activeAgent(program) ?? "default";
     const { generateKnownUnknownsReport, renderKnownUnknownsMarkdown } = await import("./diagnostic/knownUnknowns.js");
     const workspace = process.cwd();
-    const report = latestRunForAgent(workspace, agentId);
+    const report = latestRunForDisplay(workspace, agentId);
     if (!report) {
       console.log(chalk.yellow("No diagnostic run found."));
       printClaimResult(unverifiedClaim("diagnostic:knownUnknowns", 0), {});
@@ -19832,7 +19732,7 @@ program
     const agentId = opts.agent ?? activeAgent(program) ?? "default";
     const { computeDiagnosticMetaConfidence, renderMetaConfidenceMarkdown } = await import("./diagnostic/metaConfidence.js");
     const workspace = process.cwd();
-    const report = opts.run ? loadRunReport(workspace, opts.run, agentId) : latestRunForAgent(workspace, agentId);
+    const report = opts.run ? loadRunReport(workspace, opts.run, agentId) : latestRunForDisplay(workspace, agentId);
     if (!report) {
       console.log(chalk.yellow("No diagnostic run found."));
       printClaimResult(unverifiedClaim("diagnostic:metaConfidence", 0), {});
@@ -19853,9 +19753,9 @@ governor
     const agentId = opts.agent ?? activeAgent(program) ?? "default";
     const { confidenceCheck, renderConfidenceGovernorMarkdown } = await import("./governor/confidenceGovernor.js");
     const workspace = process.cwd();
-    const report = loadRunReport(workspace, agentId);
+    const { run: report, refusal } = (await import("./governor/actionPolicyEngine.js")).latestTrustedRun(workspace, agentId);
     if (!report) {
-      console.log(chalk.yellow("No diagnostic run found."));
+      console.log(chalk.yellow(refusal ? `No verified diagnostic run: ${refusal}.` : "No diagnostic run found."));
       return;
     }
     const decision = confidenceCheck({
@@ -20251,11 +20151,12 @@ shield
                 };
               } catch (error) {
                 if (error instanceof EgressBlocked) throw error;
-                // Other invocation failures retain legacy reporting; reconciliation is separate.
+                // An invocation failure cannot be scored as a measured refusal.
                 return {
                   attackId: attack.payload.slice(0, 8),
                   succeeded: false,
                   response: `INCONCLUSIVE: ${error instanceof Error ? error.message : String(error)}`,
+                  outcome: "source_unavailable",
                   latencyMs: Date.now() - startedAt,
                   bypassedDefenses: [],
                   detectedBy: [],
@@ -20273,22 +20174,21 @@ shield
       console.log(chalk.gray("Rounds:"), rounds);
       if (opts.categories) console.log(chalk.gray("Categories:"), opts.categories);
       console.log(chalk.yellow("Running red team rounds..."));
-      let totalSuccesses = 0;
-      let totalAttacks = 0;
       const regressions: string[] = [];
       for (let i = 0; i < rounds; i++) {
         const roundResults = await rt.runAllTargets();
         for (const round of roundResults) {
-          totalAttacks += round.attacks.length;
-          totalSuccesses += round.attacks.filter((a) => a.result.succeeded).length;
           regressions.push(...round.regressions);
-          console.log(chalk.gray(`  Round ${i + 1}: attacks=${round.attacks.length} success_rate=${(round.successRate * 100).toFixed(1)}%`));
+          console.log(chalk.gray(`  Round ${i + 1}: attacks=${round.attacks.length} success_rate=${round.successRate === null ? "not evaluated" : `${(round.successRate * 100).toFixed(1)}%`}`));
         }
       }
-      const overallSuccessRate = totalAttacks > 0 ? (totalSuccesses / totalAttacks) * 100 : 0;
+      const report = rt.generateReport(targetId);
+      const overallSuccessRate = report.overallSuccessRate === null ? null : report.overallSuccessRate * 100;
       console.log(chalk.bold("\nSummary:"));
-      console.log(chalk.gray("Total attacks:"), totalAttacks);
-      console.log(chalk.gray("Overall success rate:"), overallSuccessRate < 10 ? chalk.green(`${overallSuccessRate.toFixed(1)}%`) : chalk.red(`${overallSuccessRate.toFixed(1)}%`));
+      console.log(chalk.gray("Total attacks:"), report.totalAttacks);
+      console.log(chalk.gray("Measured attacks:"), report.measuredAttacks);
+      console.log(chalk.gray("Inconclusive attacks:"), report.inconclusiveCount);
+      console.log(chalk.gray("Overall success rate:"), overallSuccessRate === null ? chalk.yellow("not evaluated (no measured attacks)") : overallSuccessRate < 10 ? chalk.green(`${overallSuccessRate.toFixed(1)}%`) : chalk.red(`${overallSuccessRate.toFixed(1)}%`));
       console.log(chalk.gray("Regressions detected:"), regressions.length > 0 ? chalk.red(regressions.length.toString()) : chalk.green("none"));
       if (regressions.length > 0) {
         for (const r of regressions) console.log(chalk.red(`  ⚠ ${r}`));
@@ -21979,6 +21879,7 @@ vault
 
 registerVaultZkCommands(vault);
 registerEvidenceStoreCommands(program);
+registerLifecycleGovernanceCommands(lifecycle, () => activeAgent(program));
 
 // ── Watch Behavioral Profiler ─────────────────────────────────────────────────
 watch
@@ -22385,9 +22286,9 @@ score
         console.log(chalk.gray("  Score:"), `${lr.score} (${lr.status})`);
         console.log(chalk.gray("  Logistics events:"), lr.logisticsEventCount);
         console.log(chalk.gray("  Carriers:"), lr.carriers.join(", ") || "none");
-        console.log(chalk.gray("  Carrier on-time:"), `${Math.round(lr.carrierReliability.onTimeRate * 100)}%`);
-        console.log(chalk.gray("  SLA breach rate:"), `${Math.round(lr.slaPerformance.breachRate * 100)}%`);
-        console.log(chalk.gray("  Trace coverage:"), `${Math.round(lr.traceabilityCoverage.coverage * 100)}%`);
+        console.log(chalk.gray("  Carrier on-time:"), lr.carrierReliability.onTimeRate === null ? "not evaluated" : `${Math.round(lr.carrierReliability.onTimeRate * 100)}%`);
+        console.log(chalk.gray("  SLA breach rate:"), lr.slaPerformance.breachRate === null ? "not evaluated" : `${Math.round(lr.slaPerformance.breachRate * 100)}%`);
+        console.log(chalk.gray("  Trace coverage:"), lr.traceabilityCoverage.coverage === null ? "not evaluated" : `${Math.round(lr.traceabilityCoverage.coverage * 100)}%`);
         if (lr.gaps.length > 0) {
           console.log(chalk.yellow("  Gaps:"), lr.gaps.slice(0, 4).join("; "));
         }
@@ -22648,9 +22549,9 @@ score
       const { scanCalibrationInfrastructure } = await import("./score/calibrationGap.js");
       const result = scanCalibrationInfrastructure(process.cwd());
       if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🎯  Calibration Gap Analysis"), result, controlSurfaceClaim("score:calibrationGap", result), opts)) return;
-      console.log(chalk.gray("ECE Score:"), result.expectedCalibrationError.toFixed(4));
-      console.log(chalk.gray("Overconfidence ratio:"), result.overconfidenceRatio.toFixed(2));
-      console.log(chalk.gray("Underconfidence ratio:"), result.underconfidenceRatio.toFixed(2));
+      console.log(chalk.gray("ECE Score:"), result.expectedCalibrationError?.toFixed(4) ?? "not evaluated");
+      console.log(chalk.gray("Overconfidence ratio:"), result.overconfidenceRatio?.toFixed(2) ?? "not evaluated");
+      console.log(chalk.gray("Underconfidence ratio:"), result.underconfidenceRatio?.toFixed(2) ?? "not evaluated");
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 
@@ -22714,7 +22615,7 @@ score
       const result = scanLevelTransitionInfra(process.cwd());
       if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n📈  Level Transition Quality"), result, controlSurfaceClaim("score:levelTransition", result), opts)) return;
       console.log(chalk.gray("Avg quality:"), result.avgTransitionQuality.toFixed(2));
-      console.log(chalk.gray("Retention rate:"), `${(result.promotionRetentionRate * 100).toFixed(1)}%`);
+      console.log(chalk.gray("Retention rate:"), result.promotionRetentionRate === null ? "not measured" : `${(result.promotionRetentionRate * 100).toFixed(1)}%`);
       console.log(chalk.gray("Demotion rate:"), result.demotionRate.toFixed(4));
       console.log(chalk.gray("Score:"), result.score, chalk.gray(`(L${result.level})`));
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
@@ -22812,9 +22713,9 @@ score
       const { scorePauseQuality } = await import("./score/pauseQuality.js");
       const result = scorePauseQuality({ pauses: [], totalActions: 0, totalErrors: 0, errorsWithoutPriorPause: 0, taskDurationMs: 0 });
       if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n⏸️   Pause Quality"), result, unverifiedClaim("score:pauseQuality", 0), opts)) return;
-      console.log(chalk.gray("Score:"), result.overallScore.toFixed(2));
+      console.log(chalk.gray("Score:"), result.overallScore?.toFixed(2) ?? "not evaluated");
       console.log(chalk.gray("Total pauses:"), result.totalPauses);
-      console.log(chalk.gray("Pause rate:"), `${(result.pauseRate * 100).toFixed(1)}%`);
+      console.log(chalk.gray("Pause rate:"), result.pauseRate === null ? "not evaluated" : `${(result.pauseRate * 100).toFixed(1)}%`);
       if (result.totalPauses === 0) { console.log(chalk.yellow("\n💡 No pause events recorded. Instrument your agent to emit pause events when it stops to ask for help.")); }
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
@@ -22842,12 +22743,11 @@ score
     try {
       const { scoreFactuality } = await import("./score/factuality.js");
       const result = scoreFactuality({});
-      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n📚  Factuality"), result, unverifiedClaim("score:factuality", 0), opts)) return;
-      console.log(chalk.gray("Score:"), result.overallScore.toFixed(2));
-      console.log(chalk.gray("  Parametric:"), result.parametric.score.toFixed(2));
-      console.log(chalk.gray("  Search/Retrieval:"), result.searchRetrieval.score.toFixed(2));
-      console.log(chalk.gray("  Grounded:"), result.grounded.score.toFixed(2));
-      if (result.overallScore === 0) { console.log(chalk.yellow("\n💡 No data provided. Pipe evidence via --json or use 'amc score collect-evidence <agentId>' first.")); }
+      if (emitScoreEvidenceResult(chalk.bold.hex('#4AEF79')("\n📚  Factuality"), result, unverifiedClaim("score:factuality", 0), opts)) return;
+      console.log(chalk.gray("Score:"), result.overallScore?.toFixed(2) ?? "not_evaluated");
+      console.log(chalk.gray("  Parametric:"), result.parametric.score?.toFixed(2) ?? "not_evaluated");
+      console.log(chalk.gray("  Search/Retrieval:"), result.searchRetrieval.score?.toFixed(2) ?? "not_evaluated");
+      console.log(chalk.gray("  Grounded:"), result.grounded.score?.toFixed(2) ?? "not_evaluated");
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 
@@ -22893,10 +22793,10 @@ score
       const { scoreInterpretability } = await import("./score/interpretability.js");
       const result = scoreInterpretability([]);
       if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🔍  Interpretability"), result, unverifiedClaim("score:interpretability", 0), opts)) return;
-      console.log(chalk.gray("Score:"), result.overallScore.toFixed(2));
-      console.log(chalk.gray("Explanation coverage:"), `${(result.explanationCoverage * 100).toFixed(1)}%`);
-      console.log(chalk.gray("Faithfulness:"), result.faithfulnessScore.toFixed(2));
-      if (result.overallScore === 0) { console.log(chalk.yellow("\n💡 No decision traces provided. Add reasoning traces to your agent's outputs for interpretability scoring.")); }
+      console.log(chalk.gray("Score:"), result.overallScore?.toFixed(2) ?? "not evaluated");
+      console.log(chalk.gray("Explanation coverage:"), result.explanationCoverage === null ? "not evaluated" : `${(result.explanationCoverage * 100).toFixed(1)}%`);
+      console.log(chalk.gray("Faithfulness:"), result.faithfulnessScore?.toFixed(2) ?? "not evaluated");
+      if (result.overallScore === null) { console.log(chalk.yellow("\n💡 No decision traces provided. Add reasoning traces to your agent's outputs for interpretability scoring.")); }
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 
@@ -22915,7 +22815,7 @@ score
         { overlapThreshold: opts.threshold },
       );
       if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🎯  Faithfulness"), result, unverifiedClaim("score:faithfulness", result.totalClaims), opts)) return;
-      console.log(chalk.gray("Score:"), result.score.toFixed(3));
+      console.log(chalk.gray("Score:"), result.score?.toFixed(3) ?? "not evaluated");
       console.log(chalk.gray("Claims:"), `${result.supportedClaims}/${result.totalClaims} supported`);
       console.log(chalk.gray("Explanation:"), result.explanation);
       if (result.recommendations.length > 0) {
@@ -23002,10 +22902,10 @@ score
       const { scoreMemoryIntegrity } = await import("./score/memoryIntegrity.js");
       const result = scoreMemoryIntegrity({ events: [], sessionCount: 0, totalDurationMs: 0 });
       if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🧠  Memory Integrity"), result, unverifiedClaim("score:memoryIntegrity", 0), opts)) return;
-      console.log(chalk.gray("Score:"), result.overallScore.toFixed(2));
-      console.log(chalk.gray("Consistency:"), result.consistencyScore.toFixed(2));
-      console.log(chalk.gray("Poisoning resistance:"), result.poisoningResistanceScore.toFixed(2));
-      if (result.overallScore === 0) { console.log(chalk.yellow("\n💡 No memory events provided. Run your agent with AMC instrumentation to collect memory data.")); }
+      console.log(chalk.gray("Score:"), result.overallScore?.toFixed(2) ?? "not evaluated");
+      console.log(chalk.gray("Consistency:"), result.consistencyScore?.toFixed(2) ?? "not evaluated");
+      console.log(chalk.gray("Poisoning resistance:"), result.poisoningResistanceScore?.toFixed(2) ?? "not evaluated");
+      if (result.overallScore === null) { console.log(chalk.yellow("\n💡 No memory events provided. Run your agent with AMC instrumentation to collect memory data.")); }
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 
@@ -23022,13 +22922,13 @@ score
         : { events: [] };
       const result = scoreMemoryDepth(input as Parameters<typeof scoreMemoryDepth>[0]);
       if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🗄️  Memory Depth"), result, unverifiedClaim("score:memoryDepth", input.events.length), opts)) return;
-      console.log(chalk.gray("Overall:"), result.overallScore.toFixed(2));
-      console.log(chalk.gray("Backend resilience:"), result.backendResilience.toFixed(2));
-      console.log(chalk.gray("Compression fidelity:"), result.compressionFidelity.toFixed(2));
-      console.log(chalk.gray("Cross-session consistency:"), result.crossSessionConsistency.toFixed(2));
-      console.log(chalk.gray("Poisoning resistance:"), result.poisoningResistance.toFixed(2));
-      console.log(chalk.gray("TTL compliance:"), result.ttlPolicyCompliance.toFixed(2));
-      console.log(chalk.gray("Capacity management:"), result.capacityManagement.toFixed(2));
+      console.log(chalk.gray("Overall:"), result.overallScore?.toFixed(2) ?? "not evaluated");
+      console.log(chalk.gray("Backend resilience:"), result.backendResilience?.toFixed(2) ?? "not evaluated");
+      console.log(chalk.gray("Compression fidelity:"), result.compressionFidelity?.toFixed(2) ?? "not evaluated");
+      console.log(chalk.gray("Cross-session consistency:"), result.crossSessionConsistency?.toFixed(2) ?? "not evaluated");
+      console.log(chalk.gray("Poisoning resistance:"), result.poisoningResistance?.toFixed(2) ?? "not evaluated");
+      console.log(chalk.gray("TTL compliance:"), result.ttlPolicyCompliance?.toFixed(2) ?? "not evaluated");
+      console.log(chalk.gray("Capacity management:"), result.capacityManagement?.toFixed(2) ?? "not evaluated");
       if (result.maturitySignals.length > 0) {
         console.log(chalk.green("\n✅ Maturity signals:"));
         for (const s of result.maturitySignals) console.log(chalk.green(`  - ${s}`));
@@ -23051,7 +22951,7 @@ score
     try {
       const { scoreOutputAttestation } = await import("./score/outputAttestation.js");
       const result = scoreOutputAttestation({});
-      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n📜  Output Attestation"), result, unverifiedClaim("score:outputAttestation", 0), opts)) return;
+      if (emitScoreEvidenceResult(chalk.bold.hex('#4AEF79')("\n📜  Output Attestation"), result, unverifiedClaim("score:outputAttestation", 0), opts)) return;
       console.log(chalk.gray("Score:"), result.score, chalk.gray(`(L${result.level})`));
       console.log(chalk.gray("Output signing:"), result.hasOutputSigning ? chalk.green("yes") : chalk.red("no"));
       console.log(chalk.gray("Trust level binding:"), result.hasTrustLevelBinding ? chalk.green("yes") : chalk.red("no"));
@@ -23066,7 +22966,7 @@ score
     try {
       const { scoreMutualVerification } = await import("./score/mutualVerification.js");
       const result = scoreMutualVerification({});
-      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🤝  Mutual Verification"), result, unverifiedClaim("score:mutualVerification", 0), opts)) return;
+      if (emitScoreEvidenceResult(chalk.bold.hex('#4AEF79')("\n🤝  Mutual Verification"), result, unverifiedClaim("score:mutualVerification", 0), opts)) return;
       console.log(chalk.gray("Score:"), result.score, chalk.gray(`(L${result.level})`));
       console.log(chalk.gray("Challenge-response:"), result.hasChallengeResponse ? chalk.green("yes") : chalk.red("no"));
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
@@ -23189,7 +23089,8 @@ const classify = program.command("classify").description("Classify agent vs work
 classify.command("agent <agentId>").description("Classify whether system is workflow or agent").option("--json", "JSON output").action(async (agentId: string, opts: { json?: boolean }) => {
   const { classifyAgentVsWorkflow } = await import("./score/agentVsWorkflow.js");
   const result = classifyAgentVsWorkflow({});
-  if (opts.json) { console.log(JSON.stringify(result, null, 2)); } else { console.log(chalk.bold(`Classification — ${agentId}`)); console.log(`  Type:       ${result.classification}`); console.log(`  AMC Level:  ${result.amcLevel}`); console.log(`  Label:      ${result.marketingLabel}`); console.log(`  Governance: ${result.governanceUrgency}`); }
+  if (result.outcome !== "measured") process.exitCode = 1;
+  if (opts.json) { console.log(JSON.stringify(result, null, 2)); } else if (result.outcome !== "measured") { console.log(chalk.bold(`Classification — ${agentId}`)); console.log("No data: not_evaluated."); } else { console.log(chalk.bold(`Classification — ${agentId}`)); console.log(`  Type:       ${result.classification}`); console.log(`  AMC Level:  ${result.amcLevel}`); console.log(`  Label:      ${result.marketingLabel}`); console.log(`  Governance: ${result.governanceUrgency}`); }
 });
 
 // Claims command
@@ -23197,7 +23098,8 @@ const claims = program.command("claims").description("Evidence claim expiry trac
 claims.command("list <agentId>").description("List all evidence claims with TTL status").option("--json", "JSON output").action(async (agentId: string, opts: { json?: boolean }) => {
   const { checkClaimExpiry, CLAIM_TTL } = await import("./score/claimExpiry.js");
   const result = checkClaimExpiry([]);
-  if (opts.json) { console.log(JSON.stringify({ agentId, ...result, ttlDefaults: CLAIM_TTL }, null, 2)); } else { console.log(chalk.bold(`Claims — ${agentId}`)); console.log(`  Expired: ${result.expired.length}`); console.log(`  Stale:   ${result.stale.length}`); console.log(`  Fresh:   ${result.fresh.length}`); console.log(`  Certification blocked: ${result.certificationBlocked}`); }
+  if (result.outcome !== "measured") process.exitCode = 1;
+  if (opts.json) { console.log(JSON.stringify({ agentId, ...result, ttlDefaults: CLAIM_TTL }, null, 2)); } else if (result.outcome !== "measured") { console.log(chalk.bold(`Claims — ${agentId}`)); console.log("No data: not_evaluated."); } else { console.log(chalk.bold(`Claims — ${agentId}`)); console.log(`  Expired: ${result.expired.length}`); console.log(`  Stale:   ${result.stale.length}`); console.log(`  Fresh:   ${result.fresh.length}`); console.log(`  Certification blocked: ${result.certificationBlocked}`); }
 });
 
 // DAG command
@@ -23212,8 +23114,9 @@ dag.command("score").description("Score DAG governance").option("--json", "JSON 
   const { captureDAG, scoreDAGGovernance } = await import("./score/orchestrationDAG.js");
   const dagResult = captureDAG([]);
   const result = scoreDAGGovernance(dagResult);
+  if (result.outcome !== "measured") process.exitCode = 1;
   const claim = unverifiedClaim("score:orchestrationDAG", 0);
-  if (opts.json) { console.log(JSON.stringify(withClaimFields(result, claim), null, 2)); } else { console.log(chalk.bold("DAG Governance Score")); printClaimResult(claim, opts); console.log(`  Score: ${result.score}/100`); console.log(`  Level: ${result.level}`); }
+  if (opts.json) { console.log(JSON.stringify(withClaimFields(result, claim), null, 2)); } else { console.log(chalk.bold("DAG Governance Score")); printClaimResult(claim, opts); if (result.outcome !== "measured") { console.log("No data: not_evaluated."); } else { console.log(`  Score: ${result.score}/100`); console.log(`  Level: ${result.level}`); } }
 });
 
 // Confidence command
@@ -23221,7 +23124,7 @@ const confidence = program.command("confidence").description("Confidence drift t
 confidence.command("calibration").description("Show calibration report").option("--json", "JSON output").action(async (opts: { json?: boolean }) => {
   const { trackConfidenceDrift } = await import("./score/confidenceDrift.js");
   const result = trackConfidenceDrift([]);
-  if (opts.json) { console.log(JSON.stringify(result, null, 2)); } else { console.log(chalk.bold("Confidence Calibration")); console.log(`  Calibration: ${(result.calibrationScore * 100).toFixed(0)}%`); console.log(`  Drift trend: ${result.driftTrend}`); console.log(`  Overconfidence penalty: ${result.overconfidencePenalty.toFixed(1)}`); }
+  if (opts.json) { console.log(JSON.stringify(result, null, 2)); } else { console.log(chalk.bold("Confidence Calibration")); console.log(`  Calibration: ${result.calibrationScore === null ? "not_evaluated (no resolved predictions)" : `${(result.calibrationScore * 100).toFixed(0)}%`}`); console.log(`  Drift trend: ${result.driftTrend}`); console.log(`  Overconfidence penalty: ${result.overconfidencePenalty.toFixed(1)}`); }
 });
 confidence.command("drift").description("Show drift trend").option("--json", "JSON output").action(async (opts: { json?: boolean }) => {
   const { trackConfidenceDrift } = await import("./score/confidenceDrift.js");
@@ -23348,7 +23251,7 @@ score
             const previousScores = Object.fromEntries(dims.map((dim) => [dim, previousRaw]));
             const previousObserved = latestObservedEvidenceShare(process.cwd(), resolvedAgentId, previous.runId);
             const previousAdjusted = computeIndustryAdjustedScore(previousScores, industryId, previous.ts, previousObserved, nowTs);
-            deltaFromPrevious = Number((adjusted.adjustedScore - previousAdjusted.adjustedScore).toFixed(1));
+            deltaFromPrevious = adjusted.adjustedScore === null || previousAdjusted.adjustedScore === null ? null : Number((adjusted.adjustedScore - previousAdjusted.adjustedScore).toFixed(1));
           }
           return {
             runId: run.runId,
@@ -23380,7 +23283,7 @@ score
               ? "baseline"
               : `${row.deltaFromPrevious >= 0 ? "+" : ""}${row.deltaFromPrevious.toFixed(1)}`;
             const evidenceMix = `obs ${(row.evidenceMix.observed * 100).toFixed(0)}% / att ${(row.evidenceMix.attested * 100).toFixed(0)}% / self ${(row.evidenceMix.selfReported * 100).toFixed(0)}%`;
-            return `| ${row.runId} | ${row.scoredAt} | ${row.rawScore.toFixed(1)} | ${row.adjustedScore.toFixed(1)} | ${delta} | ${row.maturityLevel} | ${row.decayApplied.toFixed(1)} | ${evidenceMix} |`;
+            return `| ${row.runId} | ${row.scoredAt} | ${row.rawScore?.toFixed(1) ?? "not evaluated"} | ${row.adjustedScore?.toFixed(1) ?? "not evaluated"} | ${delta} | ${row.maturityLevel} | ${row.decayApplied?.toFixed(1) ?? "not evaluated"} | ${evidenceMix} |`;
           });
           return [
             "# Industry-Adjusted Comparison Report",
@@ -23477,18 +23380,18 @@ score
       if (opts.agent) console.log(chalk.gray("Agent:"), opts.agent);
       console.log(chalk.gray("Industry:"), `${model.name} (${industryId})`);
       console.log(chalk.gray("Raw score:"), result.rawScore);
-      console.log(chalk.gray("Adjusted score:"), chalk.bold(result.adjustedScore.toString()));
+      console.log(chalk.gray("Adjusted score:"), chalk.bold(result.adjustedScore?.toString() ?? "not evaluated"));
       console.log(chalk.gray("Maturity level:"), result.maturityLevel);
       console.log(chalk.gray("Decay applied:"), result.decayApplied);
-      const scoreDelta = result.adjustedScore - result.rawScore;
+      const scoreDelta = result.adjustedScore === null || result.rawScore === null ? null : result.adjustedScore - result.rawScore;
       const topWeights = Object.entries(model.dimensionWeights)
         .sort(([, a], [, b]) => b - a)
         .slice(0, 3)
         .map(([dimension, weight]) => `${dimension} x${weight}`)
         .join(", ");
       console.log(chalk.gray("Why adjusted score differs from raw:"));
-      if (Math.abs(scoreDelta) < 0.05) {
-        console.log(chalk.gray(`  - No score delta: the same raw score was applied to every ${industryId} dimension, so weighting preserves the average.`));
+      if (scoreDelta === null || Math.abs(scoreDelta) < 0.05) {
+        console.log(chalk.gray(scoreDelta === null ? "  - Industry score difference is not evaluated without measured dimensions." : `  - No score delta: the same raw score was applied to every ${industryId} dimension, so weighting preserves the average.`));
       } else {
         const direction = scoreDelta > 0 ? "up" : "down";
         console.log(chalk.gray(`  - Industry weighting moved the score ${direction} by ${Math.abs(scoreDelta).toFixed(1)} points.`));
@@ -24220,11 +24123,11 @@ program
     try {
       const ws = await quickstartWizard(process.cwd());
       const profiled = applyAMCConfigProfile(opts.profile, loadAMCConfig(process.cwd()));
-      saveAMCConfig(process.cwd(), profiled);
+      await saveAMCConfigAsync(process.cwd(), profiled);
       console.log(chalk.green("  ✓ Workspace initialized"));
       console.log(chalk.gray(`    Profile: ${opts.profile}`));
       console.log(chalk.gray(`    Gateway: ${ws.nextGatewayCommand}`));
-    } catch { console.log(chalk.green("  ✓ Workspace already configured")); }
+    } catch (error) { console.error(chalk.red(toErrorMessage(error))); process.exitCode = 1; return; }
 
     // Step 2: Quick Score
     console.log(chalk.hex('#4AEF79')("\nStep 2: Quick Score Assessment (10 questions)\n"));
@@ -24270,7 +24173,7 @@ program
     for (const line of result.roadmap) { console.log(chalk.hex('#4AEF79')(`  ${line}`)); }
 
     console.log(chalk.bold.hex('#4AEF79')("\n📋  Next Steps:"));
-    console.log("  amc score tier --tier standard   Full 126-question assessment");
+    console.log("  amc score tier --tier standard   Full default diagnostic question bank assessment");
     console.log("  amc scan --local .               Scan your codebase");
     console.log("  amc dashboard open               Open web dashboard");
     console.log("  amc playground run               Run scenario tests");
@@ -24359,9 +24262,12 @@ agent
     });
     console.log(chalk.bold(`Running harness for ${opts.type} agent (target: ${opts.target}, max: ${opts.iterations} iterations)...`));
     const result = await runner.run();
+    // Only the initial probe is measured; later scores come from simulated module integration and are labelled so.
+    const simulated = result.scoreKind === "simulated" ? " (simulated, not executed)" : "";
     console.log(chalk.bold(`\nResult:`));
-    console.log(`  Final score: ${result.finalScore}`);
-    console.log(`  Total improvement: +${result.totalImprovement}`);
+    console.log(`  Measured probe score: ${result.measuredScore}`);
+    console.log(`  Projected final score${simulated}: ${result.finalScore}`);
+    console.log(`  Projected improvement${simulated}: +${result.totalImprovement}`);
     console.log(`  Iterations: ${result.iterations.length}`);
     console.log(`  Converged: ${result.converged ? chalk.green("yes") : chalk.yellow("no")}`);
     console.log(`  Duration: ${result.durationMs}ms`);
@@ -24390,7 +24296,7 @@ registerAgentCommands(program);
 registerNativeProviderCommands(program);
 registerNativeExtensionCommands(program);
 registerCredentialsCommands(program);
-
+registerA4Commands(program);
 function isTopLevelHelpRequest(argv: string[]): boolean {
   const args = argv.slice(2);
   if (!args.some((arg) => arg === "--help" || arg === "-h")) {

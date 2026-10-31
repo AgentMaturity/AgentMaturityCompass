@@ -1,0 +1,45 @@
+{
+  "schema": "p125ec-independent-chain-review-seal/1",
+  "at": "2026-10-17T01:13:41.815209+00:00",
+  "blockers": [],
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-control-runtime-review/review.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-control-runtime-review/review.json",
+      "bytes": 6817,
+      "sha256": "50e62439cf933124580654d910db988859de02a055995cb1b086611fb87a4619",
+      "dev": 16777231,
+      "inode": 543908757,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-control-runtime-review/README.md",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-control-runtime-review/README.md",
+      "bytes": 1583,
+      "sha256": "cda6d655ead37267af57fc690b9f8e9355433c58ff70f0c507e2b7c22669dff6",
+      "dev": 16777231,
+      "inode": 543908758,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-control-runtime-review/observations.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-control-runtime-review/observations.json",
+      "bytes": 223731,
+      "sha256": "18030677f7f40e8d823134ac0c769a3193a8531319faed8780b175e3d0132a63",
+      "dev": 16777231,
+      "inode": 543908756,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-control-runtime-review/input-pins.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-control-runtime-review/input-pins.json",
+      "bytes": 231415,
+      "sha256": "66fa954047410afc28254074dae8822b120c9f30edf2ec87c804034d1fd8ccc1",
+      "dev": 16777231,
+      "inode": 543908759,
+      "nlink": 1
+    }
+  ],
+  "inputCount": 537,
+  "boundary": "Finite read/hash/stat and read-only Git; no product execution or source/index/QA mutation."
+}

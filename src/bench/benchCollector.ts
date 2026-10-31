@@ -1,19 +1,22 @@
+import { median as arithmeticMedian } from "../experiments/stats.js";
+import { countBenchAuditRows, countReadonlyBenchAuditEvents, latestReadonlyBenchAssuranceByPack } from "./benchReadOnlyInputs.js";
 import { readdirSync } from "node:fs";
 import { join } from "node:path";
-import type { LayerName, OutcomeReport } from "../types.js";
+import type { DiagnosticReport, LayerName, OutcomeReport } from "../types.js";
 import { parseWindowToMs } from "../utils/time.js";
 import { pathExists, readUtf8 } from "../utils/fs.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
-import { loadRunReport } from "../diagnostic/runner.js";
+import { listTrustedRuns } from "../governor/runTrust.js";
 import { computeFailureRiskIndices } from "../assurance/indices.js";
 import { latestAssuranceByPack } from "../assurance/assuranceRunner.js";
 import { verifyPluginWorkspace } from "../plugins/pluginApi.js";
 import { loadTrustConfig } from "../trust/trustConfig.js";
 import { loadLatestOrgScorecard } from "../org/orgScorecard.js";
-import { collectForecastSignals } from "../forecast/forecastSignals.js";
+import { collectForecastSignals, captureForecastSignals, type ForecastSignalBundle } from "../forecast/forecastSignals.js";
 import { loadLatestForecastArtifact } from "../forecast/forecastStore.js";
 import { openLedger } from "../ledger/ledger.js";
 import { readTransparencyEntries } from "../transparency/logChain.js";
+import { canonicalize } from "../utils/json.js";
 import { hashId } from "./benchRedaction.js";
 import { benchArtifactSchema, type BenchArtifact, type BenchBuildMeta } from "./benchSchema.js";
 import type { BenchPolicy } from "./benchPolicySchema.js";
@@ -34,22 +37,9 @@ function parseOutcomeReport(file: string): OutcomeReport | null {
   }
 }
 
-function listAgentRuns(workspace: string, agentId: string): Array<ReturnType<typeof loadRunReport>> {
-  const dir = getAgentPaths(workspace, agentId).runsDir;
-  if (!pathExists(dir)) {
-    return [];
-  }
-  return readdirSync(dir)
-    .filter((name) => name.endsWith(".json"))
-    .map((name) => {
-      try {
-        return JSON.parse(readUtf8(join(dir, name))) as ReturnType<typeof loadRunReport>;
-      } catch {
-        return null;
-      }
-    })
-    .filter((row): row is ReturnType<typeof loadRunReport> => row !== null)
-    .sort((a, b) => a.ts - b.ts);
+/** Trusted runs only, oldest first: an edited, copied or unanchored run, or a thinned history, refuses a signed bench. */
+function listAgentRuns(workspace: string, agentId: string): DiagnosticReport[] {
+  return listTrustedRuns(workspace, agentId).reverse();
 }
 
 function listAgentOutcomeReports(workspace: string, agentId: string): OutcomeReport[] {
@@ -77,7 +67,7 @@ function latestInWindow<T extends { ts: number }>(rows: T[], startTs: number, en
   return latest;
 }
 
-function layerMapFromRun(run: ReturnType<typeof loadRunReport>): Record<"strategicOps" | "leadership" | "culture" | "resilience" | "skills", number> {
+function layerMapFromRun(run: DiagnosticReport): Record<"strategicOps" | "leadership" | "culture" | "resilience" | "skills", number> {
   const base = {
     strategicOps: 0,
     leadership: 0,
@@ -166,18 +156,6 @@ function valueDimensionsFromOutcome(report: OutcomeReport | null): {
   };
 }
 
-function parseMeta(metaJson: string): Record<string, unknown> {
-  try {
-    const parsed = JSON.parse(metaJson) as unknown;
-    if (parsed && typeof parsed === "object") {
-      return parsed as Record<string, unknown>;
-    }
-    return {};
-  } catch {
-    return {};
-  }
-}
-
 function countAuditEvents(params: {
   workspace: string;
   startTs: number;
@@ -186,31 +164,15 @@ function countAuditEvents(params: {
 }): number {
   const ledger = openLedger(params.workspace);
   try {
-    const events = ledger.getEventsBetween(params.startTs, params.endTs);
-    const auditSet = new Set(params.auditTypes);
-    return events
-      .filter((event) => event.event_type === "audit")
-      .filter((event) => {
-        const meta = parseMeta(event.meta_json);
-        const auditType = typeof meta.auditType === "string" ? meta.auditType : null;
-        return Boolean(auditType && auditSet.has(auditType));
-      })
-      .length;
+    return countBenchAuditRows(ledger.getEventsBetween(params.startTs, params.endTs), params.auditTypes);
   } finally {
     ledger.close();
   }
 }
 
+// Bench artifacts retain six-decimal serialization around experiments/stats.ts midpoint median.
 function median(values: number[]): number {
-  if (values.length === 0) {
-    return 0;
-  }
-  const sorted = values.slice().sort((a, b) => a - b);
-  const mid = Math.floor(sorted.length / 2);
-  if (sorted.length % 2 === 0) {
-    return Number((((sorted[mid - 1] ?? 0) + (sorted[mid] ?? 0)) / 2).toFixed(6));
-  }
-  return Number((sorted[mid] ?? 0).toFixed(6));
+  return Number(arithmeticMedian(values).toFixed(6));
 }
 
 function resolveWindow(windowDays: number): { startTs: number; endTs: number; days: number } {
@@ -226,13 +188,17 @@ function resolveWindow(windowDays: number): { startTs: number; endTs: number; da
 function latestSeriesValue(
   series:
     | Array<{ ts: number; value: number }>
-    | undefined
+    | undefined,
+  missing = 0
 ): number {
   if (!series || series.length === 0) {
-    return 0;
+    return missing;
   }
-  return Number((series[series.length - 1]?.value ?? 0).toFixed(6));
+  return Number((series[series.length - 1]?.value ?? missing).toFixed(6));
 }
+
+/** A risk index with no series is unmeasured: score it as worst-case risk, never as risk 0 (= a perfect 100) (WP37). */
+const UNMEASURED_RISK = 100;
 
 function determineIncludedEventKinds(workspace: string, startTs: number, endTs: number): string[] {
   const allow = new Set([
@@ -288,7 +254,7 @@ export interface CollectedBenchData {
   runRefs: string[];
 }
 
-export function collectBenchData(params: {
+type BenchCollectionInput = {
   workspace: string;
   scopeType: "WORKSPACE" | "NODE" | "AGENT";
   scopeId: string;
@@ -300,16 +266,24 @@ export function collectBenchData(params: {
     agentType?: "code-agent" | "support-agent" | "ops-agent" | "research-agent" | "sales-agent" | "other";
     deployment?: "single" | "host" | "k8s" | "compose";
   };
-}): CollectedBenchData {
-  const window = resolveWindow(params.windowDays);
-  const scopeIdHash = hashId(params.scopeId, params.policy.benchPolicy.privacy.hashTruncBytes);
-  const workspaceHash = hashId(params.workspace, params.policy.benchPolicy.privacy.hashTruncBytes);
+};
+export function collectBenchData(params: BenchCollectionInput): CollectedBenchData {
+  const window = resolveWindow(params.windowDays), identity = collectionIdentity(params), signals = collectForecastSignals({workspace:params.workspace,scope:{type:params.scopeType,id:params.scopeId},lookbackDays:Math.max(90,params.windowDays)});
+  return collectBenchDataWithInputs(params,window,signals,identity);
+}
+/** Internal selected-value capture: original window and actual forecast selector are retained, not refreshed after signing. */
+export function captureBenchData(input: BenchCollectionInput) {
+  const params = structuredClone(input);
+  const window = resolveWindow(params.windowDays), identity = collectionIdentity(params);
+  const signals = captureForecastSignals({workspace:params.workspace,scope:{type:params.scopeType,id:params.scopeId},lookbackDays:Math.max(90,params.windowDays)});
+  const collected = collectBenchDataWithInputs(params,window,signals.signals,identity,true), selected = canonicalize(collected);
+  return {collected,assertCurrent(){signals.assertCurrent();if(canonicalize(collectBenchDataWithInputs(params,window,signals.signals,identity,true))!==selected)throw new Error("selected bench inputs changed while signing");}};
+}
+function collectionIdentity(params:BenchCollectionInput){return {scopeIdHash:hashId(params.scopeId,params.policy.benchPolicy.privacy.hashTruncBytes),workspaceHash:hashId(params.workspace,params.policy.benchPolicy.privacy.hashTruncBytes)};}
+function collectBenchDataWithInputs(params: BenchCollectionInput, window: ReturnType<typeof resolveWindow>, signals: ForecastSignalBundle, identity:ReturnType<typeof collectionIdentity>, readOnly = false): CollectedBenchData {
+  const {scopeIdHash,workspaceHash} = identity;
+  const countSelectedAudit = readOnly ? countReadonlyBenchAuditEvents : countAuditEvents, selectedAssurance = readOnly ? latestReadonlyBenchAssuranceByPack : latestAssuranceByPack;
   const scope = { type: params.scopeType, id: params.scopeId };
-  const signals = collectForecastSignals({
-    workspace: params.workspace,
-    scope,
-    lookbackDays: Math.max(90, params.windowDays)
-  });
   const latestForecast = loadLatestForecastArtifact(params.workspace, scope);
 
   const evidenceGateReasons: string[] = [];
@@ -394,11 +368,11 @@ export function collectBenchData(params: {
   }
 
   const risk = {
-    ecosystemFocusRisk: latestSeriesValue(signals.points.indices.EcosystemFocusRisk),
-    clarityPathRisk: latestSeriesValue(signals.points.indices.ClarityPathRisk),
-    economicSignificanceRisk: latestSeriesValue(signals.points.indices.EconomicSignificanceRisk),
-    riskAssuranceRisk: latestSeriesValue(signals.points.indices.RiskAssuranceRisk),
-    digitalDualityRisk: latestSeriesValue(signals.points.indices.DigitalDualityRisk)
+    ecosystemFocusRisk: latestSeriesValue(signals.points.indices.EcosystemFocusRisk, UNMEASURED_RISK),
+    clarityPathRisk: latestSeriesValue(signals.points.indices.ClarityPathRisk, UNMEASURED_RISK),
+    economicSignificanceRisk: latestSeriesValue(signals.points.indices.EconomicSignificanceRisk, UNMEASURED_RISK),
+    riskAssuranceRisk: latestSeriesValue(signals.points.indices.RiskAssuranceRisk, UNMEASURED_RISK),
+    digitalDualityRisk: latestSeriesValue(signals.points.indices.DigitalDualityRisk, UNMEASURED_RISK)
   };
 
   let values = {
@@ -424,18 +398,20 @@ export function collectBenchData(params: {
     }
   }
 
-  const pluginState = verifyPluginWorkspace({ workspace: params.workspace });
+  const pluginState = verifyPluginWorkspace({ workspace: params.workspace, readonly: readOnly });
   const operating = {
     approvalsBacklogCount: Math.max(0, Math.round(latestSeriesValue(signals.points.operating.approval_backlog_size))),
     approvalsMedianAgeHours: Number(latestSeriesValue(signals.points.operating.approval_backlog_age_hours).toFixed(6)),
-    budgetExceedEvents: countAuditEvents({
+    budgetExceedEvents: countSelectedAudit({
       workspace: params.workspace,
       startTs: window.startTs,
       endTs: window.endTs,
       auditTypes: ["BUDGET_EXCEEDED", "LEASE_RATE_LIMITED"]
     }),
-    toolhubDenialRate: Number(latestSeriesValue(signals.points.operating.toolhub_denial_rate).toFixed(6)),
-    freezeEvents: countAuditEvents({
+    // No run in the window measured a denial rate (no ToolHub actions): not measured, not a clean 0.
+    toolhubDenialRate: signals.points.operating.toolhub_denial_rate?.length
+      ? Number(latestSeriesValue(signals.points.operating.toolhub_denial_rate).toFixed(6)) : null,
+    freezeEvents: countSelectedAudit({
       workspace: params.workspace,
       startTs: window.startTs,
       endTs: window.endTs,
@@ -459,7 +435,7 @@ export function collectBenchData(params: {
 
   if (params.scopeType === "AGENT") {
     const agentId = resolveAgentId(params.workspace, params.scopeId);
-    const assurance = latestAssuranceByPack({
+    const assurance = selectedAssurance({
       workspace: params.workspace,
       agentId,
       windowStartTs: window.startTs,

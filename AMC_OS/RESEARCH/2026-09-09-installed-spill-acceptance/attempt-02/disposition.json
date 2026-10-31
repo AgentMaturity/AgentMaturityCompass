@@ -1013,7 +1013,7 @@
     },
     {
       "flag": "OBSIDIAN-PENDING",
-      "target": "/Users/sid/Documents/AMC",
+      "target": "~/Documents/AMC",
       "body": "Evidence/current update pending because bridge explicitly refused vault outside approved root. Before later material rewrite checkpoint Home/Now/Roadmap. No local vault changes claimed."
     }
   ]

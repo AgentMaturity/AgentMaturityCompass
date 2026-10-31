@@ -33,7 +33,7 @@
       "npm": "11.10.1",
       "pnpm": "10.33.0"
     },
-    "clone": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-retained-output-public-history-01/candidate-02/source",
+    "clone": "~/AgentMaturityCompass/tmp/cos-installed-retained-output-public-history-01/candidate-02/source",
     "steps": [
       {
         "name": "helper-commit",
@@ -178,7 +178,7 @@
     {
       "source": "130c2d0087cf574016411fdc7d91067d3eddd637",
       "package": {
-        "path": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-retained-output-public-history-01/package/agent-maturity-compass-1.2.0.tgz",
+        "path": "~/AgentMaturityCompass/tmp/cos-installed-retained-output-public-history-01/package/agent-maturity-compass-1.2.0.tgz",
         "sha256": "889258079cd7ec94644f6e2b2c3cb0c2f31226597ddb06ec22cd0de24b52fb35",
         "bytes": 6014480
       },
@@ -932,7 +932,7 @@
     {
       "source": "33481a72aba1b11d4f3d63f14c8ab4f7ea1f7afd",
       "package": {
-        "path": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-retained-output-public-history-01/candidate-02/package/agent-maturity-compass-1.2.0.tgz",
+        "path": "~/AgentMaturityCompass/tmp/cos-installed-retained-output-public-history-01/candidate-02/package/agent-maturity-compass-1.2.0.tgz",
         "sha256": "cddd6be614fef3a7d34910fd10d5b73654ed59e9b9ef8ee6cad31160f0da65e9",
         "bytes": 6014747
       },

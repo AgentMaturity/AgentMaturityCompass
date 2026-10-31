@@ -1,0 +1,103 @@
+{
+  "schema": "p119-private-oracle-source-v3/1",
+  "state": "closed-unexecuted",
+  "allReadsFinished": true,
+  "allWritesFinished": true,
+  "formalAcceptanceClosed": false,
+  "files": [
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v3/examples/lighthouse-finance/oracle.mjs",
+      "bytes": 20151,
+      "sha256": "3b1ba99969949ebf2bcde9a25718216f362993272527f0828121b667d730c021"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v3/examples/lighthouse-finance/oracleEvidence.mjs",
+      "bytes": 29506,
+      "sha256": "d7c2bf58e7cac21e36bf12117c237e840903d1aa0316a44b15f9a9671e31c921"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v3/v2-to-v3.patch",
+      "bytes": 6422,
+      "sha256": "fe8ad3cc7c730a45d942638e1b8e3a26a8cf87c4b3e6d859cd2879d3342ccd8e"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v3/diagnosis.json",
+      "bytes": 7479,
+      "sha256": "8f085b9c13cf8bf73d2124ad8e1250c9a0a06600c29b1dde50bc3dfa9c1787be"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v3/README.md",
+      "bytes": 2502,
+      "sha256": "a6f4f36395167c987a394dc7670982541c88f7d88eab9cf67a61345fbc8b45af"
+    }
+  ],
+  "closedEvidenceReferences": [
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v2-tests-v4-initial/raw.json",
+      "bytes": 10219,
+      "sha256": "fb59655cfac82613cbfbbdedaf12fd30ed442bf8e59d109f764c505cb3a2cc93"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v2-tests-v4-initial/observer.json",
+      "bytes": 20987,
+      "sha256": "1231f47e723cbdac903e3f63a30ee089d6c633d3b58af07c8b41313dfbc383bc"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v2-tests-v4-initial/command.json",
+      "bytes": 2786,
+      "sha256": "b502f7bda089cc3966dba866708aa205989587f21f58fa71db353cfb1dde4b85"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v2-tests-v4-initial/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "dce336a0bd17ba1bae09e7cf55c88cbc4ffd527b416d6e78ffcf74a87394cf0a"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v2-tests-v4-initial/stdout-stderr.log",
+      "bytes": 276235,
+      "sha256": "ff395adf08d0be9d897f26a18829c05b41c601efdc440c3f16ac8c5690646555"
+    },
+    {
+      "path": "/private/tmp/lhfo-u44EX3/public-observations.json",
+      "bytes": 17751,
+      "sha256": "e019b5e4ae25a21854ba59dedc79f16e306f88f2684816bc966e4b84d13502de"
+    },
+    {
+      "path": "/private/tmp/lhfo-u44EX3/operator/pins.json",
+      "bytes": 1806,
+      "sha256": "fca78172be188f571083558524283e4ec9e98bfdc507ab61a2bb3799b43ac03d"
+    },
+    {
+      "path": "/private/tmp/lhfo-u44EX3/oracle-1.stdout.log",
+      "bytes": 4583,
+      "sha256": "34f19a9e664a4494726f2c443cac5970a762c99d305afc6255d51df8e6d78033"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/root-empty-wal-diagnosis.json",
+      "bytes": 3870,
+      "sha256": "1a6f9dada0deea88e01074046ac5345b91766fa81a3a923a14441170cfb96231"
+    }
+  ],
+  "v2SourcePins": [
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v2/examples/lighthouse-finance/oracle.mjs",
+      "bytes": 19441,
+      "sha256": "90a24dd18f8695efb2bdcee5ece5605c507690d3fe940edb3e7a4911e3eb43a8"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v2/examples/lighthouse-finance/oracleEvidence.mjs",
+      "bytes": 28475,
+      "sha256": "4df67b11e019797c5b485bc91ed428d7f8c3f38b9da3f3cad08ba7c8a9e6526b"
+    }
+  ],
+  "checksNotRun": [
+    "syntax",
+    "types",
+    "imports",
+    "SQL",
+    "CLI",
+    "test",
+    "service"
+  ],
+  "qualifiedRuntimeClaim": false
+}

@@ -1,0 +1,85 @@
+[
+  {
+    "mutation": "M1 composer lease passthrough dropped",
+    "file": "src/leases/runLease.ts",
+    "exit": 1,
+    "caught": true,
+    "failingTests": [
+      "an ACP process Studio handed a lease keeps it: no second lease, and the task's principal, not the OS user's"
+    ],
+    "summary": "1 failed | 6 passed (7)"
+  },
+  {
+    "mutation": "M2 workspace-tools scope dropped",
+    "file": "src/leases/runLease.ts",
+    "exit": 1,
+    "caught": true,
+    "failingTests": [
+      "an ACP session without workspace tools mints no lease and is not refused"
+    ],
+    "summary": "1 failed | 6 passed (7)"
+  },
+  {
+    "mutation": "M3 plan gate dropped (mint without an identity-binding plan)",
+    "file": "src/leases/runLease.ts",
+    "exit": 1,
+    "caught": true,
+    "failingTests": [
+      "CLI and ACP runs mint no lease, and their tool calls run as before"
+    ],
+    "summary": "1 failed | 6 passed (7)"
+  },
+  {
+    "mutation": "M4 OS username match dropped (any active user)",
+    "file": "src/leases/runLease.ts",
+    "exit": 1,
+    "caught": true,
+    "failingTests": [
+      "amc agent-loop run refuses PRINCIPAL_UNRESOLVED before any session row or lease when the OS user is not active",
+      "an ACP session/new is refused PRINCIPAL_UNRESOLVED, coded, before any session row or lease"
+    ],
+    "summary": "2 failed | 5 passed (7)"
+  },
+  {
+    "mutation": "M5 ACP coded refusal dropped",
+    "file": "src/acp/acpStdioMain.ts",
+    "exit": 1,
+    "caught": true,
+    "failingTests": [
+      "an ACP session/new is refused PRINCIPAL_UNRESOLVED, coded, before any session row or lease"
+    ],
+    "summary": "1 failed | 6 passed (7)"
+  },
+  {
+    "mutation": "M6 CLI call site removed",
+    "file": "src/cli-agent-commands.ts",
+    "exit": 1,
+    "caught": true,
+    "failingTests": [
+      "amc agent-loop run mints a lease naming the OS user's users.yaml user, and the ledger rows carry it",
+      "amc agent-loop run refuses PRINCIPAL_UNRESOLVED before any session row or lease when the OS user is not active"
+    ],
+    "summary": "2 failed | 5 passed (7)"
+  },
+  {
+    "mutation": "M7 ACP call site reverted to the handed-down lease only",
+    "file": "src/acp/acpStdioMain.ts",
+    "exit": 1,
+    "caught": true,
+    "failingTests": [
+      "an ACP session (the SDK native client's runtime) mints the lease at session/new and binds it to every call",
+      "an ACP session/new is refused PRINCIPAL_UNRESOLVED, coded, before any session row or lease"
+    ],
+    "summary": "2 failed | 5 passed (7)"
+  },
+  {
+    "mutation": "M8 ACP fork factory handed the params without the run lease",
+    "file": "src/acp/acpStdioMain.ts",
+    "exit": 1,
+    "caught": true,
+    "failingTests": [
+      "hands the fork factory the child's own lease, naming the OS user's users.yaml user",
+      "refuses session/fork PRINCIPAL_UNRESOLVED, coded, before the factory runs and before any lease or session row"
+    ]
+  }
+]

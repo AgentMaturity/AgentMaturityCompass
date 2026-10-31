@@ -3,14 +3,28 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { parseNativeChatResult, type NativeChatChildSummary } from "../src/setup/nativeChatResult.js";
 import { runNativeInteractiveSession, type NativeChatOptions } from "../src/setup/nativeInteractiveSession.js";
 import * as usage from "../src/agent/nativeRunUsage.js";
+import { mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { initWorkspace } from "../src/workspace.js";
+import { initToolsConfig, loadToolsConfig } from "../src/toolhub/toolhubValidators.js";
+import { nativeMcpToolName } from "../src/mcp/nativeMcpClient.js";
+import { sha256Hex } from "../src/utils/hash.js";
 
-// Authored, UNEXECUTED. Synthetic readline, child and setup seams exercise chat
-// composition without a real terminal, credentials, signed session or provider.
+// Synthetic readline, child and setup seams exercise chat composition without
+// a real terminal, credentials, signed session or provider. The separate measured
+// terminal suite covers public CLI workflows.
+// Operational command audit has its own signed-publication regression suite.
+vi.mock("../src/setup/nativeInteractiveCommandAudit.js", () => ({
+  runNativeInteractiveCommand: async (_input: unknown, run: () => Promise<unknown>) => run()
+}));
+
 const seam = vi.hoisted(() => ({
   answers: [] as string[], commands: [] as string[][], results: [] as { body: unknown; code: number }[],
   signals: [] as unknown[], cancelWhileApproving: false, abortedAtKill: false,
   questionSignal: undefined as AbortSignal | undefined,
-  cancelApproval: vi.fn(), closeApproval: vi.fn(), preview: ""
+  cancelApproval: vi.fn(), closeApproval: vi.fn(), preview: "", selectionChecks: 0, changedSelectionAt: 0,
+  withdrawCalls: [] as string[], withdrawStatus: "withdrawn"
 }));
 
 vi.mock("node:readline", async importOriginal => {
@@ -84,6 +98,28 @@ vi.mock("../src/extensions/nativeExtensionRuntime.js", () => ({
   loadNativeExtensions: () => ({ list: () => [], prepareTurn: () => ({ commands: [] }), unloadAll: () => {} }),
   nativeExtensionRunArgv: () => []
 }));
+vi.mock("../src/setup/nativeInteractiveNavigation.js", () => {
+  const row = { sessionId: "known-session", source: "native", state: "released", canResume: true, agentId: "reviewer",
+    parentSessionId: null, headEventId: "head", headEventHash: "a".repeat(64), updatedAt: 1, turns: 1 };
+  return {
+    listNativeInteractiveSessions: () => [row], renderNativeInteractiveSession: () => "Session known-session · released",
+    assertNativeInteractiveSelection: () => {
+      seam.selectionChecks++;
+      if (seam.changedSelectionAt === seam.selectionChecks) throw new Error("Session changed since selection. Use /resume again; no task was sent.");
+      return row;
+    }
+  };
+});
+vi.mock("../src/setup/nativeInteractiveWithdraw.js", () => ({
+  listNativeQueuedSubmissions: (_workspace: string, sessionId: string) => {
+    seam.withdrawCalls.push(`list:${sessionId}`);
+    return { headEventId: "listed-head", pending: [{ messageId: "queued-1", target: "next-turn", origin: "followup" }] };
+  },
+  withdrawNativeQueuedSubmission: (_workspace: string, sessionId: string, messageId: string, head: string) => {
+    seam.withdrawCalls.push(`withdraw:${sessionId}:${messageId}:${head}`);
+    return { status: seam.withdrawStatus, messageId };
+  }
+}));
 vi.mock("../src/skills/skillTurn.js", () => ({ workspaceSkillRoots: () => [], prepareSkillTurn: () => ({ ok: false, reason: "No synthetic skill" }) }));
 vi.mock("../src/skills/skillCatalog.js", () => ({ buildSkillCatalog: () => ({ skills: [], problems: [] }) }));
 
@@ -138,13 +174,15 @@ describe("P01 connected native chat behavior", () => {
   let logs: string[], errors: string[], streams: string[], sequence: string[];
   const fail = vi.fn();
   beforeEach(() => {
+    vi.stubEnv("TERM", "xterm-256color");
     inputTTY = Object.getOwnPropertyDescriptor(process.stdin, "isTTY");
     outputTTY = Object.getOwnPropertyDescriptor(process.stdout, "isTTY");
     Object.defineProperty(process.stdin, "isTTY", { configurable: true, value: true });
     Object.defineProperty(process.stdout, "isTTY", { configurable: true, value: true });
     seam.answers = []; seam.commands = []; seam.results = []; seam.signals = [];
     seam.cancelWhileApproving = false; seam.abortedAtKill = false; seam.questionSignal = undefined;
-    seam.preview = ""; seam.cancelApproval.mockClear(); seam.closeApproval.mockClear();
+    seam.preview = ""; seam.selectionChecks = 0; seam.changedSelectionAt = 0; seam.cancelApproval.mockClear(); seam.closeApproval.mockClear();
+    seam.withdrawCalls = []; seam.withdrawStatus = "withdrawn";
     logs = []; errors = []; streams = []; sequence = []; fail.mockReset();
     vi.spyOn(process.stderr, "write").mockImplementation(chunk => {
       streams.push(String(chunk)); sequence.push(`stream:${String(chunk)}`); return true;
@@ -153,7 +191,7 @@ describe("P01 connected native chat behavior", () => {
   afterEach(() => {
     if (inputTTY) Object.defineProperty(process.stdin, "isTTY", inputTTY); else Reflect.deleteProperty(process.stdin, "isTTY");
     if (outputTTY) Object.defineProperty(process.stdout, "isTTY", outputTTY); else Reflect.deleteProperty(process.stdout, "isTTY");
-    vi.restoreAllMocks();
+    vi.restoreAllMocks(); vi.unstubAllEnvs();
   });
   const option = (args: readonly string[], flag: string) => { const at = args.indexOf(flag); return at < 0 ? undefined : args[at + 1]; };
   async function run(extra: Partial<NativeChatOptions> = {}) {
@@ -161,6 +199,50 @@ describe("P01 connected native chat behavior", () => {
       log: line => { logs.push(line); sequence.push(`log:${line}`); }, error: line => errors.push(line), fail
     });
   }
+
+  it("rechecks selected history before task dispatch and refuses a newly stale session", async () => {
+    seam.answers = ["/resume", "1", "resume", "explicit task", "/exit"];
+    seam.changedSelectionAt = 3;
+    seam.results = [{ code: 0, body: { inspected: true } }];
+    await run();
+    expect(seam.selectionChecks).toBe(3);
+    expect(seam.commands).toHaveLength(1);
+    expect(seam.commands[0]).toEqual(expect.arrayContaining(["session", "show", "--", "known-session"]));
+    expect(errors.join("\n")).toContain("Session changed since selection");
+    expect(logs.join("\n")).not.toContain("Running stub/");
+  });
+
+  it("keeps plain terminal help honest about unsupported completion and history keys", async () => {
+    vi.stubEnv("TERM", "dumb"); seam.answers = ["/exit"];
+    await run();
+    expect(logs.join("\n")).toContain("/help lists commands");
+    expect(logs.join("\n")).not.toContain("Tab completes");
+    expect(logs.join("\n")).not.toContain("Up/Down");
+  });
+
+  it("lists described built-ins without sending help to the model", async () => {
+    seam.answers = ["/help", "/exit"];
+    await run();
+    expect(seam.commands).toEqual([]);
+    expect(logs.join("\n")).toContain("/resume — Inspect and select");
+    expect(logs.join("\n")).toContain("Tab completes");
+    expect(fail).not.toHaveBeenCalled();
+  });
+
+  it.each([" /exit", "/EXIT", "/help extra"])("refuses noncanonical slash input before dispatch: %s", async input => {
+    seam.answers = [input, "/exit"];
+    await run();
+    expect(seam.commands).toEqual([]);
+    expect(errors.length).toBeGreaterThan(0);
+  });
+
+  it("refuses non-terminal input before provider setup or child execution", async () => {
+    Object.defineProperty(process.stdin, "isTTY", { configurable: true, value: false });
+    await run();
+    expect(seam.commands).toEqual([]);
+    expect(errors.join("\n")).toContain("Interactive chat requires a terminal");
+    expect(fail).toHaveBeenCalledTimes(1);
+  });
 
   it("stops approval input before the cancellation signal, drains the reply and does not retry", async () => {
     seam.cancelWhileApproving = true; seam.answers = ["task", "/exit"];
@@ -251,5 +333,79 @@ describe("P01 connected native chat behavior", () => {
     expect(errors.join("\n")).toContain("RESULT_HISTORY_CHANGED");
     expect(logs.join("\n")).not.toContain("Rewritten reply");
     expect(fail).toHaveBeenCalledTimes(1);
+  });
+
+  it("refuses /withdraw before any session exists without reading or writing history", async () => {
+    seam.answers = ["/withdraw", "/exit"];
+    await run();
+    expect(seam.withdrawCalls).toEqual([]); expect(seam.commands).toEqual([]);
+    expect(errors.join("\n")).toContain("before withdrawing a queued submission");
+  });
+
+  it.each([
+    ["withdrawn", "Withdrawn: queued-1 was removed from the queue by a signed cancel row"],
+    ["dispatched", "Not withdrawn: queued-1 was already dispatched to a recorded turn"],
+    ["in-flight", "Not withdrawn: queued-1 was already dispatched to a turn that has no recorded ending; it is in flight or its outcome is TOOL_OUTCOME_UNKNOWN"],
+    ["already-withdrawn", "Not changed: queued-1 was already withdrawn."],
+    ["unknown", "Not withdrawn: no queued submission queued-1 exists"]
+  ])("/withdraw lists queued work and reports a %s outcome without dispatching a turn", async (status, expected) => {
+    seam.withdrawStatus = status; seam.answers = ["/withdraw", "queued-1", "/exit"];
+    await run({ session: "known-session" });
+    expect(seam.withdrawCalls).toEqual(["list:known-session", "withdraw:known-session:queued-1:listed-head"]);
+    expect(seam.commands).toEqual([]);
+    expect(logs.join("\n")).toContain("queued-1 · next-turn · from followup");
+    expect(logs.join("\n")).toContain(expected);
+    if (status !== "withdrawn") expect(logs.join("\n")).not.toContain("Withdrawn:");
+  });
+
+  it("/withdraw with a blank ID cancels without a withdrawal attempt", async () => {
+    seam.answers = ["/withdraw", "", "/exit"];
+    await run({ session: "known-session" });
+    expect(seam.withdrawCalls).toEqual(["list:known-session"]);
+  });
+
+  describe("WP21c several reviewed MCP servers per chat", () => {
+    const roots: string[] = [];
+    afterEach(() => { for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true }); });
+    // Review only: the run child repeats it and mounts. No server starts here.
+    function reviewed() {
+      vi.stubEnv("AMC_VAULT_PASSPHRASE", "wp21c-chat-mcp");
+      const workspace = realpathSync(mkdtempSync(join(tmpdir(), "amc-wp21c-chat-mcp-"))); roots.push(workspace);
+      initWorkspace({ workspacePath: workspace, agentId: "reviewer", trustBoundaryMode: "isolated" });
+      const paths: string[] = [], pins: string[] = [];
+      for (const [id, actionClass] of [["first", "READ_ONLY"], ["second", "WRITE_HIGH"]] as const) {
+        const path = join(workspace, `${id}.json`);
+        writeFileSync(path, JSON.stringify({ schemaVersion: 1, server: { id, command: process.execPath, args: ["-e", ""] },
+          expectedCatalogDigest: "c".repeat(64), grants: [{ name: "lookup", actionClass }] }));
+        paths.push(path); pins.push(sha256Hex(readFileSync(path)));
+      }
+      const config = loadToolsConfig(workspace);
+      initToolsConfig(workspace, { ...config, tools: { ...config.tools, allowedTools: [{ name: "tool_search", actionClass: "READ_ONLY" },
+        { name: nativeMcpToolName("first", "lookup"), actionClass: "READ_ONLY" }, { name: nativeMcpToolName("second", "lookup"), actionClass: "WRITE_HIGH" }] } });
+      return { workspace, paths, pins };
+    }
+    const chat = (f: ReturnType<typeof reviewed>, extra: Partial<NativeChatOptions> = {}) =>
+      run({ workspace: f.workspace, tools: "workspace", approveTools: "READ_ONLY", mcpConfig: f.paths, mcpConfigSha256: f.pins, ...extra });
+
+    it("forwards every reviewed config with its pin to the turn child and the printed resume", async () => {
+      const f = reviewed(); seam.answers = ["task", "/exit"]; seam.results = [{ code: 0, body: summary() }];
+      await chat(f);
+      const pairs = (args: readonly string[]) => args.flatMap((arg, at) => arg === "--mcp-config" ? [[args[at + 1], args[at + 3]]] : []);
+      expect(errors).toEqual([]); expect(seam.commands).toHaveLength(1);
+      expect(pairs(seam.commands[0]!)).toEqual([[f.paths[0], f.pins[0]], [f.paths[1], f.pins[1]]]);
+      expect(pairs(logs.find(line => line.startsWith("Resume in this workspace:"))!.split(/\s+/))).toEqual(pairs(seam.commands[0]!));
+    });
+
+    it.each([
+      ["tampered", /changed from its pinned digest/, (f: ReturnType<typeof reviewed>) => writeFileSync(f.paths[1]!, readFileSync(f.paths[1]!, "utf8") + "\n")],
+      ["unreviewed", /explicit grants/, (f: ReturnType<typeof reviewed>) => { writeFileSync(f.paths[1]!, readFileSync(f.paths[1]!, "utf8").replace(/,"grants":\[[^\]]*\]/, "")); f.pins[1] = sha256Hex(readFileSync(f.paths[1]!)); }],
+      ["unsigned-class", /exact generated name and action class/, (f: ReturnType<typeof reviewed>) => { writeFileSync(f.paths[1]!, readFileSync(f.paths[1]!, "utf8").replace("WRITE_HIGH", "READ_ONLY")); f.pins[1] = sha256Hex(readFileSync(f.paths[1]!)); }],
+      ["unpaired", /one --mcp-config-sha256 per --mcp-config/, (f: ReturnType<typeof reviewed>) => { f.pins.pop(); }],
+      ["duplicate", /distinct server id/, (f: ReturnType<typeof reviewed>) => { f.paths[1] = f.paths[0]!; f.pins[1] = f.pins[0]!; }]
+    ])("refuses a %s server before any child or server starts", async (_case, reason, damage) => {
+      const f = reviewed(); damage(f); seam.answers = ["task", "/exit"];
+      await chat(f);
+      expect(seam.commands).toEqual([]); expect(errors).toEqual([expect.stringMatching(reason)]); expect(fail).toHaveBeenCalledTimes(1);
+    });
   });
 });

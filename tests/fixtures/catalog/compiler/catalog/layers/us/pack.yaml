@@ -1,0 +1,32 @@
+{
+  "id": "amc.fixture.us",
+  "version": "0.1.0",
+  "compilerCompat": "^1.2.0",
+  "publisher": "Synthetic compiler qualification fixture only",
+  "maintainers": [
+    {
+      "name": "synthetic-fixture-maintainer",
+      "role": "test-fixture"
+    }
+  ],
+  "licence": "MIT",
+  "layer": 2,
+  "title": "Synthetic us compiler fixture",
+  "stations": [
+    "wealth",
+    "technology"
+  ],
+  "jurisdictions": [
+    "US"
+  ],
+  "support": "experimental",
+  "controls": [
+    "L2-FIX-US-01"
+  ],
+  "stewardship": {
+    "partner": null,
+    "updatePlan": null,
+    "triageTargetDays": null,
+    "coverageDoc": null
+  }
+}

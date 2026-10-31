@@ -1,0 +1,11 @@
+{
+  "schema": "amc-qualification-lossless-original/1",
+  "encoding": "base64",
+  "original": {
+    "relativePath": "evidence/producer-claims/commands/p125pc-audit-restore2-public/stdout-stderr.log",
+    "bytes": 179,
+    "sha256": "003d756755372bd74a4f56abde45bda641f07bfae2eaafe8fca83d0905a02452"
+  },
+  "dataBase64": "eyJwaGFzZSI6ICJwMTI1cGMtcmVzdG9yZTIiLCAiZ3JhbnRQdWJsaWNDb3VudCI6IDcsICJjaGVja3BvaW50UHVibGljQ291bnQiOiA1LCAiY2hpbGRyZW4iOiA0NiwgImV4cGxpY2l0Q2hpbGRTdHJlYW1IYXNoQ291bnQiOiA5MiwgImNsb3NlZFNvY2tldHMiOiAxMiwgImNsb3NlZExlZGdlck93bmVycyI6IDM4fQo=",
+  "boundary": "Exact original bytes retained losslessly; decode and verify bytes/SHA256 before use. No command result changes."
+}

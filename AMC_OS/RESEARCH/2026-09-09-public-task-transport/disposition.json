@@ -10,7 +10,7 @@
     "machine": "arm64",
     "nodePath": "/opt/homebrew/Cellar/node/25.5.0/bin/node",
     "nodeSha256": "0c45beedbde68e147083ffed066aadbab5df99a9fa661e62bd2950cfee36c6e9",
-    "browserExecutable": "/Users/sid/Library/Caches/ms-playwright/chromium_headless_shell-1217/chrome-headless-shell-mac-arm64/chrome-headless-shell",
+    "browserExecutable": "~/Library/Caches/ms-playwright/chromium_headless_shell-1217/chrome-headless-shell-mac-arm64/chrome-headless-shell",
     "browserSha256": "a8a0ac2829aeaa132389b001640fb835bdc93a49fb7f26af0c3de0df3ee4d66f",
     "node-version": "v25.5.0",
     "pnpm-version": "10.33.0",
@@ -38,19 +38,19 @@
         {
           "name": "actual HTTP admitted follow-up lost acknowledgement remains exact across restart and stale controls refuse",
           "messages": [
-            "TypeError: fetch failed\n    at node:internal/deps/undici/undici:16416:13\n    at request (/Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-01/source/tests/helpers/publicTaskHttpFixture.ts:86:24)\n    at Object.poll (/Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-01/source/tests/helpers/publicTaskHttpFixture.ts:96:24)\n    at /Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-01/source/tests/publicTaskTransport.test.ts:57:35\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-01/source/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            "TypeError: fetch failed\n    at node:internal/deps/undici/undici:16416:13\n    at request (~/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-01/source/tests/helpers/publicTaskHttpFixture.ts:86:24)\n    at Object.poll (~/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-01/source/tests/helpers/publicTaskHttpFixture.ts:96:24)\n    at ~/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-01/source/tests/publicTaskTransport.test.ts:57:35\n    at file://~/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-01/source/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
           ]
         },
         {
           "name": "JSONL HTTP cold history never grants writer resume or retains a verified badge after tampering",
           "messages": [
-            "TypeError: fetch failed\n    at node:internal/deps/undici/undici:16416:13\n    at request (/Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-01/source/tests/helpers/publicTaskHttpFixture.ts:86:24)\n    at Object.poll (/Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-01/source/tests/helpers/publicTaskHttpFixture.ts:96:24)\n    at /Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-01/source/tests/publicTaskTransport.test.ts:69:30\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-01/source/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            "TypeError: fetch failed\n    at node:internal/deps/undici/undici:16416:13\n    at request (~/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-01/source/tests/helpers/publicTaskHttpFixture.ts:86:24)\n    at Object.poll (~/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-01/source/tests/helpers/publicTaskHttpFixture.ts:96:24)\n    at ~/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-01/source/tests/publicTaskTransport.test.ts:69:30\n    at file://~/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-01/source/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
           ]
         },
         {
           "name": "real Chromium public validation, lost-ACK and evidence reconnect controls",
           "messages": [
-            "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n3 !== 4\n\n    at runPublicTaskBrowser (/Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-01/source/tests/e2e/public-task-transport-browser.mjs:73:16)\n    at /Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-01/source/tests/publicTaskTransport.test.ts:95:9\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-01/source/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n3 !== 4\n\n    at runPublicTaskBrowser (~/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-01/source/tests/e2e/public-task-transport-browser.mjs:73:16)\n    at ~/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-01/source/tests/publicTaskTransport.test.ts:95:9\n    at file://~/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-01/source/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
           ]
         }
       ],
@@ -71,7 +71,7 @@
         {
           "name": "real Chromium public validation, lost-ACK and evidence reconnect controls",
           "messages": [
-            "AssertionError [ERR_ASSERTION]: {\"error\":\"invalid approval denial\"}\n\n400 !== 200\n\n    at Object.settle (/Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-02/source/tests/helpers/publicTaskHttpFixture.ts:113:20)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at runPublicTaskBrowser (/Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-02/source/tests/e2e/public-task-transport-browser.mjs:36:18)\n    at /Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-02/source/tests/publicTaskTransport.test.ts:95:9\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-02/source/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            "AssertionError [ERR_ASSERTION]: {\"error\":\"invalid approval denial\"}\n\n400 !== 200\n\n    at Object.settle (~/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-02/source/tests/helpers/publicTaskHttpFixture.ts:113:20)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at runPublicTaskBrowser (~/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-02/source/tests/e2e/public-task-transport-browser.mjs:36:18)\n    at ~/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-02/source/tests/publicTaskTransport.test.ts:95:9\n    at file://~/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-02/source/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
           ]
         }
       ],
@@ -308,7 +308,7 @@
           {
             "name": "native Studio authenticated API admission strict transport query contracts refuse duplicates and ignored authority fields before dispatch",
             "messages": [
-              "AssertionError: expected 200 to be 400 // Object.is equality\n    at /Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-03/source/tests/studioNativeTaskAdmission.test.ts:110:89\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+              "AssertionError: expected 200 to be 400 // Object.is equality\n    at ~/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-03/source/tests/studioNativeTaskAdmission.test.ts:110:89\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file://~/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
             ]
           }
         ],
@@ -324,7 +324,7 @@
           {
             "name": "JSONL HTTP cold history never grants writer resume or retains a verified badge after tampering",
             "messages": [
-              "AssertionError: expected 200 to be 409 // Object.is equality\n    at /Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-03/source/tests/publicTaskTransport.test.ts:74:26\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+              "AssertionError: expected 200 to be 409 // Object.is equality\n    at ~/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-03/source/tests/publicTaskTransport.test.ts:74:26\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file://~/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
             ]
           }
         ],
@@ -340,7 +340,7 @@
           {
             "name": "a successful HTTP verifier label is withdrawn on evidence loss and is not restored by a metadata read",
             "messages": [
-              "AssertionError: expected 'workspace-key-consistency' to be 'not-verified' // Object.is equality\n    at /Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-03/source/tests/publicTaskTransport.test.ts:111:43\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+              "AssertionError: expected 'workspace-key-consistency' to be 'not-verified' // Object.is equality\n    at ~/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-03/source/tests/publicTaskTransport.test.ts:111:43\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file://~/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
             ]
           }
         ],
@@ -356,7 +356,7 @@
           {
             "name": "real Chromium public validation, lost-ACK and evidence reconnect controls",
             "messages": [
-              "Error: expect(locator).toBeDisabled() failed\n\nLocator:  locator('#nativeTaskSubmit')\nExpected: disabled\nReceived: enabled\nTimeout:  15000ms\n\nCall log:\n  - Expect \"to.be.disabled\" with timeout 15000ms\n  - waiting for locator('#nativeTaskSubmit')\n    34 \u00d7 locator resolved to <button type=\"submit\" id=\"nativeTaskSubmit\">Send follow-up</button>\n       - unexpected value \"enabled\"\n\n    at captureRawStack (/Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-03/source/node_modules/playwright-core/lib/coreBundle.js:9681:17)\n    at callMatcherAsStep (/Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-03/source/node_modules/playwright/lib/matchers/expect.js:13310:57)\n    at Object.toBeDisabled (/Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-03/source/node_modules/playwright/lib/matchers/expect.js:13300:23)\n    at runPublicTaskBrowser (/Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-03/source/tests/e2e/public-task-transport-browser.mjs:87:57)\n    at /Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-03/source/tests/publicTaskTransport.test.ts:95:9\n    at /Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+              "Error: expect(locator).toBeDisabled() failed\n\nLocator:  locator('#nativeTaskSubmit')\nExpected: disabled\nReceived: enabled\nTimeout:  15000ms\n\nCall log:\n  - Expect \"to.be.disabled\" with timeout 15000ms\n  - waiting for locator('#nativeTaskSubmit')\n    34 \u00d7 locator resolved to <button type=\"submit\" id=\"nativeTaskSubmit\">Send follow-up</button>\n       - unexpected value \"enabled\"\n\n    at captureRawStack (~/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-03/source/node_modules/playwright-core/lib/coreBundle.js:9681:17)\n    at callMatcherAsStep (~/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-03/source/node_modules/playwright/lib/matchers/expect.js:13310:57)\n    at Object.toBeDisabled (~/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-03/source/node_modules/playwright/lib/matchers/expect.js:13300:23)\n    at runPublicTaskBrowser (~/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-03/source/tests/e2e/public-task-transport-browser.mjs:87:57)\n    at ~/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-03/source/tests/publicTaskTransport.test.ts:95:9\n    at ~/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
             ]
           }
         ],

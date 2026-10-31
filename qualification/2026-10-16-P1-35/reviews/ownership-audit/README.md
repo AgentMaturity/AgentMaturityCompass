@@ -1,0 +1,11 @@
+# P1-35 exact-scope ownership audit
+
+No observed overlap was found for the new migration suite, fixture generator, genuine1.1.1 fixture directory and dated qualification packet. The refreshed three-registry union contains170 registered roots; all five retained fresh roots, including P1-39 Y4x60y, bring this audit to175 physical roots. All700 proposed-path presence checks are absent, all selected statuses are empty, target history is empty in each registry, and reads completed without errors. Absence and cleanliness do not release any existing ownership.
+
+All1044 prior migration-source presence states still match:444 exact file pins and600 absent states. The six new-Q source pins match S. All six production files match S/R/Claude. Claude's four distinct docs/CLI/signing/trust variants retain their prior pins. S remains the clean P1-39 branch at metadata721e60d75cb45d116391091d83505a1a276968a3. Held R retains its exact18 status rows, empty index and26 source/protection/archive/patch/count-overlay pins. The reservation file is unchanged; its CLI notification instruction remains relevant only if that excluded path is later allocated.
+
+No existing generator, requested test, genuine1.1.1 corpus or P1-35 packet was found. The unchanged ledgerLegacyReadOnly suite is synthetic schema-reader coverage, not tag-generated migration proof. Local v1.1.1 resolves toff53902225ff276c55558d5ca17a8fc60b780655 in S/R/Claude; official remote provenance and actual generation remain root work.
+
+The existing public APIs fit bounded qualification. Preserve real trust/integrity admission, explicit unversioned-artifact skips, original file/ledger bytes, signed receipt coverage and hash-based idempotence. A second run appends no log lines but still writes a receipt. Do not fabricate ledgerCheck or expand into CLI/signing/source fixes automatically. The exact rule and API details are in review.json.
+
+Only private artifacts and read-only Git/filesystem observations were produced. No compiler, tests, helper/product/runtime, native/SQL/network/process probes, checkout/index/QA mutation or Claude message occurred. Root retains ordinary hosted/WIP, D15, freeze, quality and deadline checks before materialization. No acceptance, waiver or Done claim follows.

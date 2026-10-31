@@ -1,6 +1,6 @@
 # IMPL-9 — queued inbox inputs and audio attachments through the signed spill store
 
-**Commit:** cb251cbe06e1e3aae4d42b0ea06724d60f09d1fb (worktree `/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_8777d01c-fc6-1`, own branch fast-forwarded from 3d6b8d4a with `git merge --ff-only`; no commit made).
+**Commit:** cb251cbe06e1e3aae4d42b0ea06724d60f09d1fb (worktree `~/AgentMaturityCompass/.claude/worktrees/wf_8777d01c-fc6-1`, own branch fast-forwarded from 3d6b8d4a with `git merge --ff-only`; no commit made).
 **Environment:** Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0, vitest 4.1.11, `pnpm install --frozen-lockfile --prefer-offline`, `pnpm build` (needed only by tests/nativeValidationOutcomeSurfaces.test.ts).
 
 ## What was done (all five steps of the brief)

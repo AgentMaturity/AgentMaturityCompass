@@ -9,7 +9,7 @@ import hashlib
 import tarfile
 import re
 
-ROOT = pathlib.Path('/Users/sid/AgentMaturityCompass')
+ROOT = pathlib.Path('~/AgentMaturityCompass')
 RECORD = pathlib.Path(__file__).resolve().parent
 SOURCE = 'a5987643ef6c26b01f687226fbc6a6709fc182cb'
 BASE = pathlib.Path('/private/tmp/amc-a5987643-package-01')

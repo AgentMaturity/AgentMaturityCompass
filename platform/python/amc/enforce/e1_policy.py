@@ -15,7 +15,7 @@ Usage:
         tool_name="exec",
         tool_category=ToolCategory.EXEC,
         parameters={"command": "rm -rf /"},
-        context={"workspace": "/Users/sid/.openclaw/workspace"},
+        context={"workspace": "~/.openclaw/workspace"},
     )
 
     result = firewall.evaluate(request)
@@ -157,8 +157,8 @@ BUILTIN_RULES: list[PolicyRule] = [
         applies_to_categories={ToolCategory.EXEC},
         applies_to_trusts={SessionTrust.UNTRUSTED, SessionTrust.HOSTILE},
         evaluator=_param_outside_scope([
-            "/Users/sid/.openclaw/workspace",
-            "/Users/sid/crypto-bot",
+            "~/.openclaw/workspace",
+            "~/crypto-bot",
             "/tmp/amc-",
         ]),
         decision=PolicyDecision.DENY,

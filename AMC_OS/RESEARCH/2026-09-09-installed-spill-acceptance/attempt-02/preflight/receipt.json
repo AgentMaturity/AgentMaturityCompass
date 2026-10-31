@@ -8,7 +8,7 @@
         "/Library/Developer/CommandLineTools/usr/bin/python3",
         "-c",
         "import ast,pathlib,sys;ast.parse(pathlib.Path(sys.argv[1]).read_text());print('Python source parsed; not imported or executed')",
-        "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-09-installed-spill-acceptance/run.py"
+        "~/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-09-installed-spill-acceptance/run.py"
       ],
       "startedAt": "2026-09-09T15:34:12.866738+00:00",
       "timeoutSeconds": 30,
@@ -53,7 +53,7 @@
       "command": [
         "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
         "--check",
-        "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-09-installed-spill-acceptance/native-case.mjs"
+        "~/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-09-installed-spill-acceptance/native-case.mjs"
       ],
       "startedAt": "2026-09-09T15:34:13.435598+00:00",
       "timeoutSeconds": 30,
@@ -99,8 +99,8 @@
         "/Library/Developer/CommandLineTools/usr/bin/python3",
         "-c",
         "import importlib.util,json,pathlib,sys;sys.dont_write_bytecode=True;s=importlib.util.spec_from_file_location('reviewed_helper',sys.argv[1]);m=importlib.util.module_from_spec(s);s.loader.exec_module(m);c=json.loads(pathlib.Path(sys.argv[2]).read_text());print(m.validate(c))",
-        "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-09-installed-spill-acceptance/run.py",
-        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/config.json"
+        "~/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-09-installed-spill-acceptance/run.py",
+        "~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/config.json"
       ],
       "startedAt": "2026-09-09T15:34:13.996209+00:00",
       "timeoutSeconds": 30,
@@ -168,7 +168,7 @@
   "failures": [
     {
       "error": "Preflight refused: config-validation",
-      "traceback": "Traceback (most recent call last):\n  File \"/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/preflight.py\", line 60, in <module>\n    raise RuntimeError(\"Preflight refused: \" + label)\nRuntimeError: Preflight refused: config-validation\n"
+      "traceback": "Traceback (most recent call last):\n  File \"~/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/preflight.py\", line 60, in <module>\n    raise RuntimeError(\"Preflight refused: \" + label)\nRuntimeError: Preflight refused: config-validation\n"
     }
   ],
   "qualified": false,

@@ -1,0 +1,10 @@
+{
+  "schema": "amc.recovery-targets/1",
+  "rpoSeconds": null,
+  "rtoSeconds": null,
+  "backupCadenceSeconds": null,
+  "agreedBy": null,
+  "agreedOn": null,
+  "partner": null,
+  "status": "unagreed"
+}

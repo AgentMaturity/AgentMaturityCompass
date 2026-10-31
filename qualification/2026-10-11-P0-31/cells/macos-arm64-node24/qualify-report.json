@@ -1,0 +1,166 @@
+{
+  "schema": "amc.platform-qualification",
+  "version": 1,
+  "generatedAt": "2026-10-11T07:33:29.398Z",
+  "platform": "darwin",
+  "arch": "arm64",
+  "osRelease": "25.6.0",
+  "node": "v24.21.0",
+  "supportedNode": true,
+  "package": "agent-maturity-compass@1.2.0",
+  "sourceCommit": "756bd6977dce19f4ef781bdb492c38d6777964f7",
+  "sourceDirty": false,
+  "packageSha256": "21190c7da41e9fc5bf87e168416b34085f223df8cf80425e420557011ebc0340",
+  "steps": [
+    {
+      "id": "pack",
+      "status": "passed",
+      "startedAt": "2026-10-11T07:33:29.445Z",
+      "durationMs": 3594.841583,
+      "exitCode": 0,
+      "signal": null,
+      "expectedFailure": false,
+      "artifact": "00-pack.json",
+      "artifactSha256": "4221a801fbd3ed4e55dec7ef80c9b5dbbf9865223a8e73f1d5110beaa9533ddd"
+    },
+    {
+      "id": "fresh-install",
+      "status": "passed",
+      "startedAt": "2026-10-11T07:33:33.049Z",
+      "durationMs": 8020.059832999999,
+      "exitCode": 0,
+      "signal": null,
+      "expectedFailure": false,
+      "artifact": "01-fresh-install.json",
+      "artifactSha256": "3fb54dc73d2e003a33062719ec6520a5e37c7d70165bcd8cc9271e0c3b18f566"
+    },
+    {
+      "id": "private-kernel-absent",
+      "status": "passed",
+      "startedAt": "2026-10-11T07:33:41.084Z",
+      "durationMs": 43.514250000000175,
+      "exitCode": 0,
+      "signal": null,
+      "expectedFailure": false,
+      "artifact": "02-private-kernel-absent.json",
+      "artifactSha256": "f2cdc9e1b80657136926755a4861e2155f686c7ec3b17fa88e0edb7ba46d1232"
+    },
+    {
+      "id": "help",
+      "status": "passed",
+      "startedAt": "2026-10-11T07:33:41.128Z",
+      "durationMs": 1585.0883329999997,
+      "exitCode": 0,
+      "signal": null,
+      "expectedFailure": false,
+      "artifact": "03-help.json",
+      "artifactSha256": "c962f8f17554ce9e5d71b80f798faea6ecdaeb5abf731d2fb38c90e7e6e32007"
+    },
+    {
+      "id": "read-only-guide",
+      "status": "passed",
+      "startedAt": "2026-10-11T07:33:42.713Z",
+      "durationMs": 1201.012208,
+      "exitCode": 0,
+      "signal": null,
+      "expectedFailure": false,
+      "artifact": "04-read-only-guide.json",
+      "artifactSha256": "a70c98f428d56a7c9f9213e27d04f99d0363ab9d470d802adb268efdfbece493"
+    },
+    {
+      "id": "initialize",
+      "status": "passed",
+      "startedAt": "2026-10-11T07:33:43.915Z",
+      "durationMs": 1166.7032909999998,
+      "exitCode": 0,
+      "signal": null,
+      "expectedFailure": false,
+      "artifact": "05-initialize.json",
+      "artifactSha256": "5e1bbac5a8f25cb73ce427b27e4bae1797480b9a0e45fc4073ec2c4162f25447"
+    },
+    {
+      "id": "native-keyless-task",
+      "status": "passed",
+      "startedAt": "2026-10-11T07:33:45.082Z",
+      "durationMs": 1303.665750000002,
+      "exitCode": 0,
+      "signal": null,
+      "expectedFailure": false,
+      "artifact": "06-native-keyless-task.json",
+      "artifactSha256": "e1ebc9df8771ed8e112f9654848ef936d20e6e63f22d8237fce8d91552c49bfc"
+    },
+    {
+      "id": "amc session verify --json",
+      "status": "passed",
+      "startedAt": "2026-10-11T07:33:46.387Z",
+      "durationMs": 782.9515410000022,
+      "exitCode": 0,
+      "signal": null,
+      "expectedFailure": false,
+      "artifact": "07-amc-session-verify---json.json",
+      "artifactSha256": "ef0a6b7811cd7a91c8d419da58a1d0a74d4e34a808ec0ba5a456913dc4714565"
+    },
+    {
+      "id": "amc agent-loop verify --json",
+      "status": "passed",
+      "startedAt": "2026-10-11T07:33:47.171Z",
+      "durationMs": 935.9417500000018,
+      "exitCode": 0,
+      "signal": null,
+      "expectedFailure": false,
+      "artifact": "08-amc-agent-loop-verify---json.json",
+      "artifactSha256": "e6d067a52fa286d741a5313870a042301de2a421b687c38c1dac284623541128"
+    },
+    {
+      "id": "missing-launcher-refuses",
+      "status": "passed",
+      "startedAt": "2026-10-11T07:33:48.108Z",
+      "durationMs": 49.70254200000272,
+      "exitCode": 1,
+      "signal": null,
+      "expectedFailure": true,
+      "artifact": "09-missing-launcher-refuses.json",
+      "artifactSha256": "d0b179cbeec49fe0eeab63998abaed01619895e79090f7b17bd914640adbd650"
+    },
+    {
+      "id": "restored-launcher",
+      "status": "passed",
+      "startedAt": "2026-10-11T07:33:48.158Z",
+      "durationMs": 767.6026660000025,
+      "exitCode": 0,
+      "signal": null,
+      "expectedFailure": false,
+      "artifact": "10-restored-launcher.json",
+      "artifactSha256": "c962f8f17554ce9e5d71b80f798faea6ecdaeb5abf731d2fb38c90e7e6e32007"
+    },
+    {
+      "id": "amc session verify --json",
+      "status": "passed",
+      "startedAt": "2026-10-11T07:33:48.925Z",
+      "durationMs": 832.0929159999978,
+      "exitCode": 0,
+      "signal": null,
+      "expectedFailure": false,
+      "artifact": "11-amc-session-verify---json.json",
+      "artifactSha256": "ef0a6b7811cd7a91c8d419da58a1d0a74d4e34a808ec0ba5a456913dc4714565"
+    },
+    {
+      "id": "amc agent-loop verify --json",
+      "status": "passed",
+      "startedAt": "2026-10-11T07:33:49.758Z",
+      "durationMs": 1078.771667000001,
+      "exitCode": 0,
+      "signal": null,
+      "expectedFailure": false,
+      "artifact": "12-amc-agent-loop-verify---json.json",
+      "artifactSha256": "e6d067a52fa286d741a5313870a042301de2a421b687c38c1dac284623541128"
+    }
+  ],
+  "status": "passed",
+  "cleanup": "removed",
+  "scratch": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-platform-0BDm4B",
+  "scope": "local npm artifact, Node entry point, keyless native SQLite/signing and cold verification",
+  "limitations": [
+    "No real-provider task, desktop installer, OS shell sandbox, global npm shim or published release qualification."
+  ]
+}

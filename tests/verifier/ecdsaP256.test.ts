@@ -1,0 +1,95 @@
+/** P2-08: ECDSA P-256 (IEEE P1363) is accepted by AMC's trust lists, admission and the standalone verifier; DER never is. */
+import { createHash, generateKeyPairSync, sign, type KeyObject } from "node:crypto";
+import { describe, expect, test } from "vitest";
+import { validateRecord, verifyArtifact } from "../../packages/verifier/src/index.js";
+import { scopedAttestationV2Schema } from "../../src/contracts/v2/scopedAttestation.js";
+import { verifySignatureEnvelope } from "../../src/crypto/signing/signatureEnvelope.js";
+import { loadCase } from "./fixtures.js";
+import { admitKey, verifySignedTrustList } from "../../src/trust/index.js";
+import { canonicalize } from "../../src/utils/json.js";
+import { lowS } from "../../src/keys/algorithmPolicy.js";
+import { context } from "../trust/trustFixtures.js";
+
+function p256() {
+  const pair = generateKeyPairSync("ec", { namedCurve: "P-256" });
+  const publicKeyPem = pair.publicKey.export({ format: "pem", type: "spki" }).toString();
+  return { privateKey: pair.privateKey, publicKeyPem, keyId: createHash("sha256").update(publicKeyPem, "utf8").digest("hex") };
+}
+const tagged = (tag: string, value: unknown) => Buffer.concat([Buffer.from(tag, "ascii"), Buffer.from([0]), Buffer.from(canonicalize(value), "utf8")]);
+// The canonical ECDSA encoding: P1363 with low S.
+const p1363 = (bytes: Buffer, key: KeyObject) => lowS(sign("sha256", bytes, { key, dsaEncoding: "ieee-p1363" })).toString("base64");
+const der = (bytes: Buffer, key: KeyObject) => sign("sha256", bytes, key).toString("base64");
+
+const root = p256();
+const revoker = p256();
+const asOf = new Date("2026-10-01T00:00:00.000Z");
+const list = {
+  type: "amc.trust-list", version: 1, listId: "ecdsa-p256", sequence: 1, issuedAt: "2026-09-01T00:00:00.000Z", expiresAt: "2027-09-01T00:00:00.000Z",
+  entries: [{ keyId: revoker.keyId, algorithm: "ecdsa-p256-sha256", publicKeyPem: revoker.publicKeyPem, purposes: ["revocation-list"], subject: "TEST ONLY P-256 revocation key",
+    validFrom: "2026-01-01T00:00:00.000Z", validTo: "2028-01-01T00:00:00.000Z", source: "operator" }],
+  distrust: []
+};
+const signedList = (encode: typeof p1363) => ({ list, signatures: [{ keyId: root.keyId, publicKeyPem: root.publicKeyPem, signature: encode(tagged("AMC_TRUST_LIST_V1", list), root.privateKey) }] });
+const revocations = { type: "amc.revocation-list", version: 1, listId: "leases:ws-ecdsa", sequence: 1, previousSha256: null, issuedAt: "2026-09-05T00:00:00.000Z",
+  revoked: [{ id: "lease-1", kind: "lease", reason: "TEST ONLY", revokedAt: "2026-09-05T00:00:00.000Z" }] };
+const revocationArtifact = (encode: typeof p1363) => Buffer.from(canonicalize({ anchor: null, list: revocations,
+  signature: { keyId: revoker.keyId, signature: encode(tagged("AMC_REVOCATION_LIST_V1", revocations), revoker.privateKey) } }));
+
+describe("ECDSA P-256 keys in trust lists and verifiers (P2-08)", () => {
+  test("a scoped attestation accepts admitted P-256 in P1363 and refuses DER, high-S and an algorithm label that disagrees with the key", () => {
+    const fixture = loadCase("valid-attestation");
+    const original = scopedAttestationV2Schema.parse(JSON.parse(fixture.bytes.toString("utf8")));
+    const { signature: _signature, ...body } = { ...original, issuerKeyId: revoker.keyId };
+    const digest = createHash("sha256").update(tagged("AMC_SCOPED_ATTESTATION_V2", body)).digest();
+    const make = (signature: string, alg: "ed25519" | "ecdsa-p256-sha256" = "ecdsa-p256-sha256") => ({
+      ...body,
+      signature: { ...original.signature, alg, pubkeyB64: Buffer.from(revoker.publicKeyPem).toString("base64"),
+        fingerprint: revoker.keyId, sigB64: signature, signedTs: Date.parse(body.issuedAt) }
+    });
+    const authorityList = { ...list, entries: [{ ...list.entries[0]!, purposes: ["independent-attestation"] }] };
+    const options = { ...fixture.options, trustRoots: [root.keyId],
+      trustLists: [{ list: authorityList, signatures: [{ keyId: root.keyId, publicKeyPem: root.publicKeyPem,
+        signature: p1363(tagged("AMC_TRUST_LIST_V1", authorityList), root.privateKey) }] }] };
+    const canonical = make(p1363(digest, revoker.privateKey));
+    expect(scopedAttestationV2Schema.safeParse(canonical).success).toBe(true);
+    expect(validateRecord("scoped-attestation", canonical)).toEqual({ ok: true });
+    expect(verifySignatureEnvelope(digest.toString("hex"), canonical.signature)).toBe(true);
+    const report = verifyArtifact(Buffer.from(canonicalize(canonical)), options);
+    expect(report.integrity.status).toBe("pass");
+    expect(report.issuerAdmission.status).toBe("pass");
+    // A P-256 signature's other S is mathematically valid but forbidden by the canonical encoding policy.
+    const raw = Buffer.from(canonical.signature.sigB64, "base64");
+    const order = BigInt("0xffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632551");
+    const highS = order - BigInt(`0x${raw.subarray(32).toString("hex")}`);
+    const high = Buffer.concat([raw.subarray(0, 32), Buffer.from(highS.toString(16).padStart(64, "0"), "hex")]);
+    for (const invalid of [make(der(digest, revoker.privateKey)), make(high.toString("base64")), make(canonical.signature.sigB64, "ed25519")]) {
+      expect(verifySignatureEnvelope(digest.toString("hex"), invalid.signature)).toBe(false);
+      expect(verifyArtifact(Buffer.from(canonicalize(invalid)), options).integrity.status).toBe("fail");
+    }
+    const unpinned = verifyArtifact(Buffer.from(canonicalize(canonical)), { ...options, trustLists: [], trustRoots: [] });
+    expect(unpinned.issuerAdmission.status).toBe("fail");
+  });
+
+  test("AMC verifies a P-256 root's trust list and admits its P-256 entry; a DER root signature is refused", () => {
+    expect(verifySignedTrustList(signedList(p1363), { pinnedRootKeyIds: [root.keyId], now: asOf }).entries[0]!.algorithm).toBe("ecdsa-p256-sha256");
+    expect(() => verifySignedTrustList(signedList(der), { pinnedRootKeyIds: [root.keyId], now: asOf })).toThrow();
+    const admitted = admitKey({ publicKeyPem: revoker.publicKeyPem, purpose: "revocation-list", signature: "list", context: context({ asOf, lists: [list as never] }) });
+    expect(admitted).toMatchObject({ status: "admitted", keyId: revoker.keyId });
+    // An entry whose algorithm is not its key's is refused when the list is parsed.
+    const mislabelled = { ...list, entries: [{ ...list.entries[0]!, algorithm: "ed25519" }] };
+    expect(() => verifySignedTrustList({ list: mislabelled, signatures: [{ keyId: root.keyId, publicKeyPem: root.publicKeyPem, signature: p1363(tagged("AMC_TRUST_LIST_V1", mislabelled), root.privateKey) }] },
+      { pinnedRootKeyIds: [root.keyId], now: asOf })).toThrow(/algorithm/);
+  });
+
+  test("the standalone verifier accepts the same list and a P-256 revocation list, and refuses DER", () => {
+    const trustListReport = verifyArtifact(Buffer.from(canonicalize(signedList(p1363))), { trustLists: [], trustRoots: [root.keyId], asOf });
+    expect(trustListReport.integrity.status).toBe("pass");
+    expect(trustListReport.issuerAdmission.status).toBe("pass");
+    expect(verifyArtifact(Buffer.from(canonicalize(signedList(der))), { trustLists: [], trustRoots: [root.keyId], asOf }).integrity.status).toBe("fail");
+
+    const report = verifyArtifact(revocationArtifact(p1363), { trustLists: [signedList(p1363)], trustRoots: [root.keyId], asOf });
+    expect(report.integrity.status).toBe("pass");
+    expect(report.issuerAdmission.status).toBe("pass");
+    expect(verifyArtifact(revocationArtifact(der), { trustLists: [signedList(p1363)], trustRoots: [root.keyId], asOf }).integrity.status).toBe("fail");
+  });
+});

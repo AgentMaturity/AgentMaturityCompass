@@ -6,6 +6,7 @@ import { join, resolve } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { openLedger, verifyLedgerIntegrity } from "../src/ledger/ledger.js";
 import { issueLeaseForCli } from "../src/leases/leaseCli.js";
+import { setMode } from "../src/mode/mode.js";
 import { initWorkspace } from "../src/workspace.js";
 
 /**
@@ -145,3 +146,50 @@ describe("amc wire", () => {
       .rejects.toThrow(/must be a positive integer/);
   }, 60_000);
 });
+
+describe("amc wire owner execution", () => {
+  it("executes newly accepted work on the operator-selected native route", async () => {
+    const root = workspace(); const socketPath = shortSocket();
+    const { child } = await startServer(root, ["--socket", socketPath, "--execute-accepted", "--provider", "stub"]);
+    const token = issueLeaseForCli({ workspace: root, agentId: "default", ttl: "60m", scopes: "wire:submit",
+      routes: "/wire", models: "amc-stub-1", rpm: 500, tpm: 1_000_000, maxCostUsdPerDay: null }).token;
+    const accepted = await ask(socketPath, { jsonrpc: "2.0", id: 1, method: "work/accept", lease: token,
+      params: { prompt: "hello wire execution", providerId: "stub" } });
+    const result = accepted["result"] as { receipt: string; workSessionId: string };
+    let state = "not-started";
+    for (let attempt = 0; attempt < 100 && state !== "finished"; attempt++) {
+      const described = await ask(socketPath, { jsonrpc: "2.0", id: 2, method: "work/describe", lease: token, params: { receipt: result.receipt } });
+      state = (described["result"] as { state: string }).state;
+      if (state !== "finished") await new Promise(resolvePromise => setTimeout(resolvePromise, 50));
+    }
+    expect(state).toBe("finished");
+    await stop(child);
+    const ledger = openLedger(root);
+    const first = ledger.getAllEvents().find(row => row.session_id === result.workSessionId);
+    expect(first?.event_type).toBe("session/open");
+    expect(JSON.parse(first!.meta_json)).toMatchObject({ acceptedWork: { receipt: result.receipt } });
+    expect(JSON.stringify(ledger.getAllEvents())).not.toContain(token);
+    expect((await verifyLedgerIntegrity(root)).errors).toEqual([]);
+    ledger.close();
+  }, 60_000);
+});
+
+it("rejects a native step ceiling above 1024 before accepting work", async () => {
+  const root = workspace();
+  await expect(startServer(root, ["--socket", shortSocket(), "--execute-accepted", "--provider", "stub", "--max-steps", "1025"]))
+    .rejects.toThrow(/1 through 1024/);
+}, 60_000);
+
+it("requires owner mode before starting wire execution", async () => {
+  const root = workspace(); setMode(root, "agent");
+  await expect(startServer(root, ["--socket", shortSocket(), "--execute-accepted", "--provider", "stub"]))
+    .rejects.toThrow("Wire work execution requires owner mode.");
+}, 60_000);
+it("requires a provider when the owner enables accepted work execution", async () => {
+  await expect(startServer(workspace(), ["--socket", shortSocket(), "--execute-accepted"]))
+    .rejects.toThrow("--execute-accepted requires an operator-selected --provider.");
+}, 60_000);
+it("refuses execution route options when the consumer is not enabled", async () => {
+  await expect(startServer(workspace(), ["--socket", shortSocket(), "--provider", "stub"]))
+    .rejects.toThrow("Wire execution route options require --execute-accepted.");
+}, 60_000);

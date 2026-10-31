@@ -1,0 +1,14 @@
+{
+  "at": "2026-10-16T23:06:34.202687+00:00",
+  "helper": "receipt-extension-preparation/v2/assemble-extension.py.source.txt",
+  "executedImportedCompiledOrParsed": false,
+  "blockers": [
+    "Original-preservation files is the actual897-row list; V2 expected integer897.",
+    "Actual independent review has flat actualSixPhaseChain, separate phaseEvidence and existing protocol/operations; V2 retained prospective Five/nested tests/flags.",
+    "Actual whole-issue gaps use explicit wholeP1_25Complete:false andplanComplete:false; V2 expected a nonexistent alias."
+  ],
+  "resolutionRequested": "Minimal preferred V3 direct actual-schema adaptation; preserve V2, all guards, exact old packet and publication boundaries. No wrapper report or synthetic aliases.",
+  "sourceRuntimeAndControlEvidenceChanged": false,
+  "sourceMetadataMutation": false,
+  "privateAssemblyAdmitted": false
+}

@@ -1,0 +1,10 @@
+Using configuration from root-ca.cnf
+Warning: -enddate or -not_after option overriding -days option
+Check that the request matches the signature
+Signature ok
+The Subject's Distinguished Name is as follows
+commonName            :ASN.1 12:'AMC P1-25 root TEST ONLY'
+Certificate is to be certified until Jan  1 00:00:00 2036 GMT (3363 days)
+
+Write out database with 1 new entries
+Database updated

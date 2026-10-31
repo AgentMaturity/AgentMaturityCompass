@@ -206,14 +206,22 @@
           ]
         },
         "enforcementBoundary": {
-          "enum": [
-            "tool_pipeline",
-            "hook:PreToolUse",
-            "pi:tool_call",
-            "gateway",
-            "none"
-          ],
-          "type": "string"
+          "anyOf": [
+            {
+              "enum": [
+                "tool_pipeline",
+                "hook:PreToolUse",
+                "pi:tool_call",
+                "gateway",
+                "none"
+              ],
+              "type": "string"
+            },
+            {
+              "pattern": "^acs:[A-Za-z][A-Za-z0-9_]{0,63}$",
+              "type": "string"
+            }
+          ]
         },
         "evidenceTier": {
           "enum": [
@@ -281,6 +289,30 @@
     "kind": {
       "const": "a4-agent-package",
       "type": "string"
+    },
+    "leases": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "leaseId": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "scope": {
+            "enum": [
+              "staging",
+              "production"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "leaseId",
+          "scope"
+        ],
+        "type": "object"
+      },
+      "type": "array"
     },
     "package": {
       "additionalProperties": false,
@@ -451,6 +483,51 @@
         "pubkeyFingerprint"
       ],
       "type": "object"
+    },
+    "versionManifest": {
+      "additionalProperties": false,
+      "properties": {
+        "manifest": {
+          "anyOf": [
+            {
+              "additionalProperties": {},
+              "propertyNames": {
+                "type": "string"
+              },
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "manifestDigest": {
+          "anyOf": [
+            {
+              "pattern": "^sha256:[a-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source": {
+          "enum": [
+            "lifecycle_bound",
+            "lifecycle_observed",
+            "not_governed",
+            "not_observed"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "manifest",
+        "manifestDigest",
+        "source"
+      ],
+      "type": "object"
     }
   },
   "required": [
@@ -460,6 +537,7 @@
     "files",
     "artifacts",
     "approvals",
+    "leases",
     "integration",
     "quality",
     "provenance",

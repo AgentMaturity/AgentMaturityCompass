@@ -1,0 +1,41 @@
+{
+  "schema": "p125f-root-control-classification/1",
+  "at": "2026-10-16T22:24:45.613459+00:00",
+  "phase": "p125f-m2",
+  "sourceCommit": "d8b5c3250138a10078c21886642595f669c4a73c",
+  "operator": "F2-no-continue",
+  "outcomeSha256": "af314348219a7363186b5fed3c6471d5f29278928db3ee89975f362455479629",
+  "rootAllFailuresRead": true,
+  "allFailuresClassified": true,
+  "firstSensitiveAssertionRead": true,
+  "noHookOrEnvironmentFailure": true,
+  "firstSensitiveAssertion": "Actual ORDER dispatch witness at tsaFallback.test.ts:261:61 observed only single-positive,http-first after genuine positive verification and single-positive500. Actual TIMEOUT-CONTINUE287:61 observed only stall-first after the unchanged10000ms default abort, proving inserted catch break prevents next dispatch.",
+  "masking": [
+    "ORDER261 fails before264 grant null,265-267 exact HTTP/malformed/imprint failures and268 method/body assertion; no credit for masked later assertions.",
+    "TIMEOUT287 fails before288 exact abort-plus-next500 result. Actual abort message logged; no typed AbortError/code inference.",
+    "NO-ANCHOR passes because unmatched branch continue is unchanged and actual last matching500 completes its configured loop."
+  ],
+  "actualFirstFailureLines": [
+    261,
+    287
+  ],
+  "actualTests": {
+    "total": 21,
+    "passed": 19,
+    "failed": 2,
+    "skipped": 0
+  },
+  "lifecycle": {
+    "allFourRecordsRead": true,
+    "cleanupErrorCounts": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "ownedErrors": [],
+    "allFiveSocketsClosed": true,
+    "bodyFailuresOnlyTwoIntendedAssertions": true
+  },
+  "restoreAdmission": "Exact captured original source only in owned fresh checkout. No retry, deadline, fixture, compiled/native or guard changes."
+}

@@ -7,7 +7,7 @@ import platform
 import signal
 import hashlib
 
-ROOT = pathlib.Path('/Users/sid/AgentMaturityCompass')
+ROOT = pathlib.Path('~/AgentMaturityCompass')
 RECORD = pathlib.Path(__file__).resolve().parent
 SOURCE = 'c16492c10592112fe610bd2e59f216f8f7f310b4'
 BASE = pathlib.Path('/private/tmp/amc-c164-vendor-yaml-01')

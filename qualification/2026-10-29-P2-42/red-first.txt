@@ -1,0 +1,13 @@
+     × the project crosses Adapt; every Adapt row binds the plan by sha256 and fits Build's room 12593ms
+     × the project crosses Adapt; every Adapt row binds the plan by sha256 and fits Build's room 10960ms
+     × a missing, changed or substituted plan fails verifyA4Chain and every route that loads the project; restoring it heals 10862ms
+     × an exported record verifies offline without a key and says the plans are bound by digest 10711ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  tests/a4/p242ShippedCatalog.test.ts > P2-42 · Adapt on the shipped catalog (technology) > the project crosses Adapt; every Adapt row binds the plan by sha256 and fits Build's room
+ FAIL  tests/a4/p242ShippedCatalog.test.ts > P2-42 · Adapt on the shipped catalog (wealth) > the project crosses Adapt; every Adapt row binds the plan by sha256 and fits Build's room
+Error: /stages/adapt/propose: 413 {"ok":false,"error":"INPUT_TOO_LARGE: The proposal leaves Build no room under the 256 KiB specification limit; shorten the answers.","code":"INPUT_TOO_LARGE"}
+ FAIL  tests/a4/p242ShippedCatalog.test.ts > P2-42 · the plan file is part of the record > a missing, changed or substituted plan fails verifyA4Chain and every route that loads the project; restoring it heals
+Error: /stages/adapt/propose: 413 {"ok":false,"error":"INPUT_TOO_LARGE: The proposal leaves Build no room under the 256 KiB specification limit; shorten the answers.","code":"INPUT_TOO_LARGE"}
+ FAIL  tests/a4/p242ShippedCatalog.test.ts > P2-42 · the plan file is part of the record > an exported record verifies offline without a key and says the plans are bound by digest
+Error: /stages/adapt/propose: 413 {"ok":false,"error":"INPUT_TOO_LARGE: The proposal leaves Build no room under the 256 KiB specification limit; shorten the answers.","code":"INPUT_TOO_LARGE"}
+      Tests  4 failed (4)

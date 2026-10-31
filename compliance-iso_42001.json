@@ -1,7 +1,7 @@
 {
   "reportId": "ca8f02db-b740-445c-83a3-005dac08ee78",
   "ts": 1787322794997,
-  "workspace": "/Users/sid/AgentMaturityCompass",
+  "workspace": "~/AgentMaturityCompass",
   "framework": "ISO_42001",
   "agentId": "default",
   "windowStartTs": 1784730794997,

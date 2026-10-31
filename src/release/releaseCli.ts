@@ -37,6 +37,9 @@ export function releasePackCli(params: {
   outFile: string;
   privateKeyPath?: string;
   skipInstallBuild?: boolean;
+  npmTarball?: string;
+  sbomFile?: string;
+  licensesFile?: string;
 }): {
   outFile: string;
   manifestPathHint: string;
@@ -49,7 +52,10 @@ export function releasePackCli(params: {
     workspace,
     outFile: resolve(params.outFile),
     privateKeyPath: params.privateKeyPath,
-    skipInstallBuild: params.skipInstallBuild
+    skipInstallBuild: params.skipInstallBuild,
+    npmTarball: params.npmTarball,
+    sbomFile: params.sbomFile,
+    licensesFile: params.licensesFile
   });
   return {
     outFile: packed.outFile,

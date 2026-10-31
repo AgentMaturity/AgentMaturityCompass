@@ -1,0 +1,76 @@
+{
+  "schema": "p125pc-independent-inert-receipt-helper-static-review/1",
+  "at": "2026-10-17T02:02:50.066315+00:00",
+  "blockers": [],
+  "preferredHelper": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-extension-preparation/v2/assemble-extension.py.source.txt",
+    "bytes": 40872,
+    "sha256": "4d825f2a41ae308837c1093c1db4636677b897e906aed3a9a98a6980b914f733"
+  },
+  "preferredSeal": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-extension-preparation/v2/seal.json",
+    "bytes": 5057,
+    "sha256": "80d02b94f4c2c40d2311bcd7b086a93fcbcd448d0ec2803af51194a622aa4de0"
+  },
+  "checks": {
+    "full40872ByteHelperAnd28544ByteC39DeltaRead": true,
+    "fullV1ToV2DeltaReadAndBothDeltasReproducedExactly": true,
+    "twentyOneUniqueSealedAndInputPhysicalPinsExact": true,
+    "preservedBaseEqualsActualC39Assembler": true,
+    "safeSourceDigestEncodedPinnedFunctionsByteExact": true,
+    "finalOneMiBCapPrivateMarkerAndForbiddenNameGuardByteExact": true,
+    "literalMarkerRejectedOnWholeSelectedSourceBeforeAnyEnvelopeEncoding": true,
+    "activeAssemblerExactPathAndHashOnlyRequired": true,
+    "safeCodeInertAndLogsPatchesLosslessOnly": true,
+    "explicitPublicRolesAndNoRawPemKeyPrivateStreamNativeBytecodeLargeObservationPayloads": true,
+    "onlyThreeOldMetadataSuccessorsAndProducerClaimsPrefixPermitted": true,
+    "actualSourceCheckpointAnd175RuntimePinHashesExact": true,
+    "actualIntegerSource24AndTwelveChecks0SchemaNoInventedSourceRoot": true,
+    "175Protected102Names23Compiled204PhysicalAnd12PlusFresh13NativeRequirements": true,
+    "sameCanonical24IdentityHooksAcrossSixActualPhasesRequiredNoSums": true,
+    "bothRedControlsFullActualManualErrorsMasksNaturalActionsAndExactSameInodeRestoresRequired": true,
+    "controlRecipesReconstructOnlyUniqueAppendEvidenceDetailedSlice": true,
+    "activeControlHelperV3ExactHashRequired": true,
+    "rootAndIndependentCompletedRuntimeReviewAndActualFinalPreservationRequired": true,
+    "fiveTemplateFlagsFalseFutureInputsNullSelectionsEmpty": true
+  },
+  "basePreservation": {
+    "contractFiles": 2378,
+    "actualReceiptArtifacts": 2377,
+    "nonIndexPayloads": 2375,
+    "actualReceiptCommands": 259,
+    "actualAssemblyOrderedPins": 3864,
+    "actualOldAssemblyBytes": 877972,
+    "actualOldAssemblySha256": "b6ccb30242fd6f54ae7490d5d382cd093c0862575c5c88a43deb0996eb069cb0",
+    "priorSemanticSource": "80268079f804ed0ecb7659cd02a75e8b88ee3e0d",
+    "previousMetadata": "8889784782c8f7413e1cccab579ae4b8b6f21cc1",
+    "sourceHeadRequirement": "Actual manifest sourceCommit 5d4e9e8d74bef32e68090369223947691c5fea21; no old-head substitution.",
+    "rawOldAssemblyRetainedAt": "evidence/producer-claims/historical-base/assembly-inputs.json",
+    "compactChange": "Only the new active assembly-inputs.json is serialized compactly. Parsed equality retains the exact original manifest, all3864 old inputs in order and complete suffix [actual manifest pin] + all accumulated input pins including duplicates. Extension manifest bytes and parsed object also match.",
+    "unchangedLimit": "Every generated payload still must pass1048576-byte cap and marker/name guards; this review predicts no dynamic output size or fit."
+  },
+  "versionAndErrors": {
+    "v1PreservedUnexecuted": true,
+    "v1Errors": "Five inventory comparisons incorrectly changed237* to247*, and two compiled-pair comparisons used24 instead of23.",
+    "v2Correction": "Repairs those comparisons and pins the now-actual source checkpoint/runtime record; evidence was not rewritten.",
+    "authorReadPending": "Immutable seal predates adjacent author-review.json, which explicitly resolves fullAuthorReadPending.",
+    "reviewerReadCommands": "All naturally0; no unresolved session, retry or qualification execution."
+  },
+  "limits": [
+    "Static code/text/metadata review only; no helper import, syntax parser, compilation, product/test, native, OpenSSL, SQL or network execution. No key, private-stream or native-payload read.",
+    "Actual old receipt/assembly metadata counts and hashes were checked. The full2378-file private snapshot, filled selection and dynamic new packet remain later actual review, not claimed here.",
+    "Future outcomes, completed peer/runtime schemas, control action/classification records, public allowlist/cutoff/prose, final physical preservation and generated artifact caps must fit the actual filled manifest. No readiness or execution approval is given.",
+    "No source/index/QA/ownership/reservation mutation, missing-path probe, guard/deadline or validator change, quality waiver, full P1-25/plan/release or F37 credit."
+  ],
+  "readChunks": [
+    "836c4a",
+    "603cbc",
+    "a1c251",
+    "aa8c37",
+    "d2659e",
+    "e68f27",
+    "667eeb",
+    "59e929",
+    "3db5f1"
+  ]
+}

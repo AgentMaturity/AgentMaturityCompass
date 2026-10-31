@@ -1,0 +1,29 @@
+{
+  "schema": "p125pc-root-quality-diagnostic-adapter/1",
+  "at": "2026-10-17T01:46:55.287464+00:00",
+  "unchangedScannerOnlyOutputDirectoryAdapted": true,
+  "priorHelper": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/capture-quality.mjs",
+    "bytes": 915,
+    "sha256": "31c5a641f799a6231da30161c30889a70b414f5c367fd78b25428156a2f43de6"
+  },
+  "helper": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/capture-quality.mjs",
+    "bytes": 916,
+    "sha256": "9a725a770434decf13cb207ff49afd5fc006654a82934c62d58644b1f59508ac"
+  },
+  "actualBeforeSourceBaseline": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/after-metadata-full.json",
+    "bytes": 247260,
+    "sha256": "3f7df6574a5bfc8ad4d7cd3d73081074a411a41463e66c8c2325727be8ccab00"
+  },
+  "actualBeforeSourceDuplicateLog": {
+    "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125ec-metadata-duplicates/stdout-stderr.log",
+    "bytes": 2064,
+    "sha256": "62545f898b95ab3125616ea8bf2872244314dd98d3db67b8ff58c707e6d31e29"
+  },
+  "sourceBase": "8889784782c8f7413e1cccab579ae4b8b6f21cc1",
+  "snapshotRoleLabelsMustRemainDistinct": true,
+  "noScannerOrQualityBaselineRuleChange": true,
+  "noDiagnosticExecutionOrSourceCopyYet": true
+}

@@ -7,7 +7,7 @@
 
 import { z } from "zod";
 import { randomUUID } from "node:crypto";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { readFileSync } from "node:fs";
 import * as YAML from "yaml";
 import { listAgents, loadAgentConfig } from "./registry.js";
@@ -17,7 +17,9 @@ import { parseEvidenceEvent } from "../diagnostic/gates.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
-import { getPrivateKeyPem, signHexDigest } from "../crypto/keys.js";
+import { getSigningKey, signHexDigest } from "../crypto/keys.js";
+import { signWithPurposeKey } from "../keys/purposeProviders.js";
+import { capturePurposePublication, assertPurposePublicationCurrent } from "../keys/purposePublication.js";
 import type { DiagnosticReport, TrustLabel, RiskTier } from "../types.js";
 
 // ---------------------------------------------------------------------------
@@ -26,7 +28,7 @@ import type { DiagnosticReport, TrustLabel, RiskTier } from "../types.js";
 
 export type TrustInheritanceMode = "strict" | "weighted" | "no-inherit";
 
-export const delegationEdgeSchema = z.object({
+const delegationEdgeSchema = z.object({
   id: z.string().min(1),
   fromAgentId: z.string().min(1),
   toAgentId: z.string().min(1),
@@ -40,7 +42,7 @@ export const delegationEdgeSchema = z.object({
 
 export type DelegationEdge = z.infer<typeof delegationEdgeSchema>;
 
-export const trustCompositionConfigSchema = z.object({
+const trustCompositionConfigSchema = z.object({
   schemaVersion: z.literal(1),
   defaultInheritanceMode: z.enum(["strict", "weighted", "no-inherit"]).default("strict"),
   defaultWeight: z.number().min(0).max(1).default(1),
@@ -569,12 +571,11 @@ export function verifyCrossAgentReceipts(
 // Main report generation
 // ---------------------------------------------------------------------------
 
-export function computeTrustComposition(
+function trustCompositionBody(
   workspace: string,
   reports: DiagnosticReport[],
-  options: { noSign?: boolean } = {},
-): TrustCompositionReport {
-  const config = loadTrustCompositionConfig(workspace);
+  config: TrustCompositionConfig,
+): Omit<TrustCompositionReport, "reportJsonSha256" | "reportSealSig"> {
   const snapshots = buildSnapshotMap(workspace, reports);
   const allAgentIds = reports.map((r) => r.agentId);
 
@@ -622,11 +623,20 @@ export function computeTrustComposition(
     fleetWeakestLink: weakest?.agentId ?? null,
   };
 
+  return reportBody;
+}
+
+export function computeTrustComposition(
+  workspace: string,
+  reports: DiagnosticReport[],
+  options: { noSign?: boolean } = {},
+): TrustCompositionReport {
+  const reportBody = trustCompositionBody(workspace, reports, loadTrustCompositionConfig(workspace));
   const reportJsonSha256 = sha256Hex(Buffer.from(canonicalize(reportBody), "utf8"));
   let reportSealSig = "unsigned";
   if (!options.noSign) {
     try {
-      reportSealSig = signHexDigest(reportJsonSha256, getPrivateKeyPem(workspace, "auditor"));
+      reportSealSig = signHexDigest(reportJsonSha256, getSigningKey(workspace, "artifact-seal"));
     } catch {
       reportSealSig = "unsigned";
     }
@@ -637,6 +647,46 @@ export function computeTrustComposition(
     reportJsonSha256,
     reportSealSig,
   };
+}
+
+function reportOutputBytes(file: string): Buffer | null {
+  try { return readFileSync(file); }
+  catch (error) { if ((error as NodeJS.ErrnoException).code === "ENOENT") return null; throw error; }
+}
+function reportOutputMatches(file: string, before: Buffer | null): boolean {
+  const current = reportOutputBytes(file);
+  return before === null ? current === null : current !== null && before.equals(current);
+}
+
+/** Maintained signed producer: signing failure propagates; only explicit noSign creates an unsigned report. */
+export async function generateTrustCompositionReportAsync(
+  workspace: string,
+  reports: DiagnosticReport[],
+  options: { noSign?: boolean; markdownFile?: string } = {},
+): Promise<{ report: TrustCompositionReport; reportPath: string }> {
+  const noSign = options.noSign === true, markdownFile = options.markdownFile, inputs = structuredClone(reports);
+  const publication = noSign ? null : capturePurposePublication(workspace, "artifact-seal");
+  loadTrustCompositionConfig(workspace); // Retain the existing missing-config initializer.
+  const configBytes = readFileSync(configPath(workspace));
+  const config = trustCompositionConfigSchema.parse(YAML.parse(configBytes.toString("utf8")));
+  const reportBody = trustCompositionBody(workspace, inputs, config);
+  const reportJsonSha256 = sha256Hex(Buffer.from(canonicalize(reportBody), "utf8"));
+  const reportsDir = join(fleetRoot(workspace), "reports"), reportPath = join(reportsDir, `trust-composition-${reportBody.reportId}.json`);
+  const markdownPath = markdownFile === undefined ? null : resolve(workspace, markdownFile);
+  if (markdownPath === resolve(reportPath) || markdownPath === resolve(configPath(workspace))) throw new Error("trust composition output aliases protected report inputs");
+  const reportBefore = reportOutputBytes(reportPath), markdownBefore = markdownPath === null ? null : reportOutputBytes(markdownPath);
+  const signed = noSign ? null : await signWithPurposeKey(workspace, "artifact-seal", Buffer.from(reportJsonSha256, "hex"));
+  const report: TrustCompositionReport = { ...reportBody, reportJsonSha256, reportSealSig: signed?.signature.toString("base64") ?? "unsigned" };
+  const json = JSON.stringify(report, null, 2), markdown = markdownFile === undefined ? null : renderTrustCompositionMarkdown(report);
+  ensureDir(reportsDir);
+  let unchanged = false;
+  try { unchanged = configBytes.equals(readFileSync(configPath(workspace))); } catch { /* unreadable current inputs refuse publication */ }
+  if (!unchanged) throw new Error("trust composition inputs changed while signing");
+  if (publication !== null && signed !== null) assertPurposePublicationCurrent(workspace, publication, signed);
+  if (!reportOutputMatches(reportPath, reportBefore) || (markdownPath !== null && !reportOutputMatches(markdownPath, markdownBefore))) throw new Error("trust composition output changed while signing");
+  writeFileAtomic(reportPath, json, 0o644);
+  if (markdownPath !== null && markdown !== null) writeFileAtomic(markdownPath, markdown, 0o644);
+  return { report, reportPath };
 }
 
 // ---------------------------------------------------------------------------

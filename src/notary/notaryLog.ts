@@ -9,8 +9,10 @@ import {
   notarySealPath,
   notarySealSigPath
 } from "./notaryConfigStore.js";
-import type { NotarySigner } from "./notarySigner.js";
-import { verify } from "node:crypto";
+import type { AsyncNotarySigner, NotarySigner } from "./notarySigner.js";
+import { withControlFileLock } from "../lifecycle/controlFileLock.js";
+import { verifyWithKey } from "../keys/algorithmPolicy.js";
+import { notaryAttestationBasisSchema } from "./notaryApiTypes.js";
 
 const notaryLogEntrySchema = z.object({
   v: z.literal(1),
@@ -20,6 +22,7 @@ const notaryLogEntrySchema = z.object({
   payloadSha256: z.string().length(64),
   signerFingerprint: z.string().length(64),
   attestationLevel: z.enum(["SOFTWARE", "HARDWARE"]),
+  attestationBasis: notaryAttestationBasisSchema.optional(),
   prevHash: z.string(),
   entryHash: z.string().length(64)
 });
@@ -79,7 +82,7 @@ function writeSeal(notaryDir: string, signer: NotarySigner, lastHash: string): v
   writeFileAtomic(sealSigPath, JSON.stringify(sig, null, 2), 0o600);
 }
 
-export function initNotaryLog(notaryDir: string, signer: NotarySigner): void {
+function initNotaryLogUnlocked(notaryDir: string, signer: NotarySigner): void {
   const path = notaryLogPath(notaryDir);
   ensureDir(dirname(path));
   if (!pathExists(path)) {
@@ -90,6 +93,10 @@ export function initNotaryLog(notaryDir: string, signer: NotarySigner): void {
   }
 }
 
+export function initNotaryLog(notaryDir: string, signer: NotarySigner): void {
+  withControlFileLock({ root: dirname(notaryLogPath(notaryDir)), name: "notary-log", operation: () => initNotaryLogUnlocked(notaryDir, signer) });
+}
+
 export function appendNotaryLogEntry(params: {
   notaryDir: string;
   signer: NotarySigner;
@@ -97,7 +104,8 @@ export function appendNotaryLogEntry(params: {
   kind: string;
   payloadSha256: string;
 }): z.infer<typeof notaryLogEntrySchema> {
-  initNotaryLog(params.notaryDir, params.signer);
+  return withControlFileLock({ root: dirname(notaryLogPath(params.notaryDir)), name: "notary-log", operation: () => {
+  initNotaryLogUnlocked(params.notaryDir, params.signer);
   const entries = readEntries(params.notaryDir);
   const prevHash = entries.length > 0 ? entries[entries.length - 1]!.entryHash : "";
   const payload = {
@@ -108,6 +116,7 @@ export function appendNotaryLogEntry(params: {
     payloadSha256: params.payloadSha256,
     signerFingerprint: params.signer.pubkeyFingerprint(),
     attestationLevel: params.signer.attestationLevel(),
+    attestationBasis: params.signer.attestationBasis(),
     prevHash
   };
   const entryHash = sha256Hex(canonicalize(payload));
@@ -118,6 +127,75 @@ export function appendNotaryLogEntry(params: {
   appendLine(notaryLogPath(params.notaryDir), JSON.stringify(entry));
   writeSeal(params.notaryDir, params.signer, entryHash);
   return entry;
+  } });
+}
+
+type AsyncLogParams = Omit<Parameters<typeof appendNotaryLogEntry>[0], "signer"> & { signer: AsyncNotarySigner };
+const statePaths = (dir: string) => [notaryLogPath(dir), notarySealPath(dir), notarySealSigPath(dir)];
+function readState(dir: string): Array<Buffer | null> {
+  try { return statePaths(dir).map(path => pathExists(path) ? readFileSync(path) : null); }
+  catch { throw new Error("notary log state unreadable"); }
+}
+const sameState = (a: Array<Buffer | null>, b: Array<Buffer | null>) => a.every((bytes, i) => bytes === null ? b[i] === null : b[i] !== null && bytes.equals(b[i]!));
+function assertCurrentLog(dir: string, state: Array<Buffer | null>, signer: AsyncNotarySigner): void {
+  if (state.some(bytes => bytes === null)) throw new Error("notary log state incomplete");
+  const verified = verifyNotaryLog(dir), sidecar = notarySealSigSchema.parse(JSON.parse(state[2]!.toString("utf8")));
+  const seal = notarySealSchema.parse(JSON.parse(state[1]!.toString("utf8")));
+  if (!verified.ok || !sameState(state, readState(dir)) || sidecar.pubkeyPem !== signer.pubkeyPem()
+    || sidecar.signerFingerprint !== signer.pubkeyFingerprint() || seal.signerFingerprint !== signer.pubkeyFingerprint()
+    || sha256Hex(Buffer.from(sidecar.pubkeyPem, "utf8")) !== sidecar.signerFingerprint) throw new Error("notary log state invalid");
+}
+async function preparedSeal(signer: AsyncNotarySigner, lastHash: string) {
+  const bytes = Buffer.from(JSON.stringify(notarySealSchema.parse({ v: 1, ts: Date.now(), lastHash, signerFingerprint: signer.pubkeyFingerprint() }), null, 2));
+  const digest = sha256Hex(bytes), signed = await signer.sign("NOTARY_LOG_SEAL", Buffer.from(digest, "hex"));
+  if (signed.pubkeyPem !== signer.pubkeyPem() || signed.pubkeyFingerprint !== signer.pubkeyFingerprint()
+    || !verifyWithKey(Buffer.from(digest, "hex"), signer.pubkeyPem(), Buffer.from(signed.signatureB64, "base64"))) throw new Error("notary seal signing response invalid");
+  const signature = Buffer.from(JSON.stringify(notarySealSigSchema.parse({ digestSha256: digest, signature: signed.signatureB64,
+    signedTs: signed.signedTs, signerFingerprint: signed.pubkeyFingerprint, pubkeyPem: signed.pubkeyPem }), null, 2));
+  return { bytes, signature };
+}
+
+/** Async initialization signs outside the synchronous lock, then publishes only its exact captured predecessor. */
+export async function initNotaryLogAsync(dir: string, signer: AsyncNotarySigner): Promise<void> {
+  ensureDir(dirname(notaryLogPath(dir)));
+  for (let attempt = 0; attempt < 8; attempt++) {
+    const before = readState(dir);
+    if (before.every(bytes => bytes !== null)) { assertCurrentLog(dir, before, signer); return; }
+    // Empty log left by the existing initialization crash boundary is resumable; partial authenticated state is not.
+    if (before[1] !== null || before[2] !== null || (before[0] !== null && before[0]!.length !== 0)) throw new Error("notary log state incomplete");
+    const seal = await preparedSeal(signer, "");
+    const committed = withControlFileLock({ root: dirname(notaryLogPath(dir)), name: "notary-log", operation: () => {
+      if (!sameState(before, readState(dir))) return false;
+      writeFileAtomic(notaryLogPath(dir), "", 0o600);
+      writeFileAtomic(notarySealPath(dir), seal.bytes, 0o600); writeFileAtomic(notarySealSigPath(dir), seal.signature, 0o600); return true;
+    } });
+    if (committed) return;
+  }
+  throw new Error("notary log changed while signing; retry");
+}
+
+/** No promise or provider call enters the file lock. A concurrent append forces fresh chain/seal preparation. */
+export async function appendNotaryLogEntryAsync(input: AsyncLogParams): Promise<z.infer<typeof notaryLogEntrySchema>> {
+  const params = { ...input };
+  await initNotaryLogAsync(params.notaryDir, params.signer);
+  for (let attempt = 0; attempt < 8; attempt++) {
+    const before = readState(params.notaryDir); assertCurrentLog(params.notaryDir, before, params.signer);
+    const entries = readEntries(params.notaryDir);
+    if (!sameState(before, readState(params.notaryDir))) continue;
+    const payload = { v: 1 as const, ts: Date.now(), requestId: params.requestId, kind: params.kind, payloadSha256: params.payloadSha256,
+      signerFingerprint: params.signer.pubkeyFingerprint(), attestationLevel: params.signer.attestationLevel(),
+      attestationBasis: params.signer.attestationBasis(), prevHash: entries.at(-1)?.entryHash ?? "" };
+    const entry = notaryLogEntrySchema.parse({ ...payload, entryHash: sha256Hex(canonicalize(payload)) });
+    const seal = await preparedSeal(params.signer, entry.entryHash);
+    const committed = withControlFileLock({ root: dirname(notaryLogPath(params.notaryDir)), name: "notary-log", operation: () => {
+      if (!sameState(before, readState(params.notaryDir))) return false;
+      const current = before[0]!.toString("utf8"), separator = current.length > 0 && !current.endsWith("\n") ? "\n" : "";
+      writeFileAtomic(notaryLogPath(params.notaryDir), current + separator + JSON.stringify(entry) + "\n", 0o600);
+      writeFileAtomic(notarySealPath(params.notaryDir), seal.bytes, 0o600); writeFileAtomic(notarySealSigPath(params.notaryDir), seal.signature, 0o600); return true;
+    } });
+    if (committed) return entry;
+  }
+  throw new Error("notary log changed while signing; retry");
 }
 
 export function tailNotaryLog(notaryDir: string, limit = 50): Array<z.infer<typeof notaryLogEntrySchema>> {
@@ -148,6 +226,7 @@ export function verifyNotaryLog(notaryDir: string): {
         payloadSha256: entry.payloadSha256,
         signerFingerprint: entry.signerFingerprint,
         attestationLevel: entry.attestationLevel,
+        ...(entry.attestationBasis === undefined ? {} : { attestationBasis: entry.attestationBasis }),
         prevHash: entry.prevHash
       })
     );
@@ -171,7 +250,7 @@ export function verifyNotaryLog(notaryDir: string): {
       if (digest !== sig.digestSha256) {
         errors.push("seal digest mismatch");
       } else {
-        const ok = verify(null, Buffer.from(digest, "hex"), sig.pubkeyPem, Buffer.from(sig.signature, "base64"));
+        const ok = verifyWithKey(Buffer.from(digest, "hex"), sig.pubkeyPem, Buffer.from(sig.signature, "base64"));
         if (!ok) {
           errors.push("seal signature invalid");
         }

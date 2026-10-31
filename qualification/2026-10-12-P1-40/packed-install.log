@@ -1,0 +1,25 @@
+node v22.23.3, commit 1246619b3674c866fdedc1c177171b5c41019721, local macOS arm64, not CI
+packed-install check of agent-maturity-compass@1.2.0 in /var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-packed-install-cwKwn9
+note: packing with --ignore-scripts; the prepack release gate is a separate gate, not exercised here
+ok   npm pack --ignore-scripts (same files as publish) (14.5s)
+ok   npm install <tarball> (fresh dir, empty HOME) (151.0s)
+ok   @amc/core is not resolvable from the consumer directory
+ok   installed standalone production API (no dev dependencies) (2.8s)
+ok   installed control catalog loads with loadCatalog() and validates (0.7s)
+ok   amc doctor (5.3s)
+ok   amc init (isolated workspace) (6.1s)
+ok   amc composition (installed kernel, no private packages) (4.8s)
+ok   amc mcp list-tools --json (AMC_A4_PREVIEW unset) (3.0s)
+ok   amc mcp list-tools --json (AMC_A4_PREVIEW 1) (1.4s)
+ok   installed /api/v1/a4 answers 404 A4_PREVIEW_DISABLED without the preview (1.2s)
+ok   A4 preview gate: 0 amc_a4_* tools without it, 5 with it
+ok   amc agent-loop run (stub provider, keyless) (4.2s)
+ok   amc session verify --json (2.1s)
+ok   amc agent-loop verify --json (2.7s)
+ok   installed evidence and request reconstruction
+ok   amc init --coding (installed bin) (6.6s)
+ok   SDK quickstart (installed package; stub provider, synthetic) (9.0s)
+ok   installed quickstart reached a verified synthetic action in 15.6s (amc init --coding included)
+skip real-provider smoke: AMC_PACKED_SMOKE_PROVIDER not set (keyless run only)
+node scripts/packed-install-check.mjs --no-build  33.18s user 25.88s system 23% cpu 4:09.15 total
+exit=0

@@ -1,7 +1,7 @@
 # GAP-0597 source review: shiragannavar/Testing-RAG
 
 Date: 2026-06-20
-Worktree: `/Users/sid/AgentMaturityCompass-worktrees/gap-0597`
+Worktree: `~/AgentMaturityCompass-worktrees/gap-0597`
 Branch: `agent/gap-0597`
 
 ## Gap

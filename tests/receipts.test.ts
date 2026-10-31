@@ -137,6 +137,22 @@ describe("receipt minting and verification", () => {
       expect(result.payload.kind).toBe(kind);
     }
   });
+
+  test("mint and parse agree on which kinds each version may carry: a minted receipt always parses", () => {
+    const kinds = ["llm_request", "llm_response", "tool_action", "tool_result", "guard_check", "work_accepted", "action_state"] as const;
+    const action = { executionId: "exec_1", idempotencyKey: null, authorizationRecordDigest: null, enforcement: { level: "none" as const }, state: "requested" as const };
+    for (const kind of kinds) {
+      for (const members of [undefined, action]) {
+        const mint = () => mintReceipt({ kind, ts: 1, agentId: "a", providerId: "p", model: null, eventHash: "e", bodySha256: "b", sessionId: "s",
+          privateKeyPem: keys.privateKey, ...(members ? { action: members } : {}) });
+        let minted: ReturnType<typeof mintReceipt> | null = null;
+        try { minted = mint(); } catch { minted = null; }
+        // v2 (action members) exactly when the kind is action_state; anything else is refused at mint, never only at parse.
+        expect(minted !== null, `${kind} ${members ? "v2" : "v1"}`).toBe((kind === "action_state") === (members !== undefined));
+        if (minted) expect(() => parseReceipt(minted.receipt)).not.toThrow();
+      }
+    }
+  });
 });
 
 describe("chained receipts and delegation", () => {

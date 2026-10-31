@@ -1,0 +1,93 @@
+{
+  "capturedUtc": "2026-10-15T04:57:47.002720+00:00",
+  "source": "f58d88d80ab490490184354cc8665631d6999cc1",
+  "productionCodeSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "differencesFromCodeSource": {
+    "files": 206,
+    "allEarlierP030P025QualificationOnly": true
+  },
+  "priorValidationContext": {
+    "path": "/private/tmp/p0-30-exact-source-validation-context-20261015.json",
+    "bytes": 6662,
+    "sha256": "0be7f62a6b8d162283927e929abbbdd168126eb3585a0330161734a1117e9a03"
+  },
+  "priorReceiptAndValidationPinsRechecked": true,
+  "sourceValidationLogPins": [
+    {
+      "path": "/private/tmp/p0-18-architecture-20261015.log",
+      "bytes": 95608,
+      "sha256": "4018f5e2630aae3022a5f0beedee9eba6cda82f319f7684d782e9f8a7f5e5225"
+    },
+    {
+      "path": "/private/tmp/p0-18-lint-20261015.log",
+      "bytes": 442,
+      "sha256": "aa78a5d5fc5d46f46c1c40a7b98310707f90f63a2c04efd0829618a43241b88a"
+    },
+    {
+      "path": "/private/tmp/p0-18-production-types-20261015.log",
+      "bytes": 144,
+      "sha256": "c0a0d69b11dfba4c16af3932aa39f713108c2af39b076c10811f48242cd1a65e"
+    },
+    {
+      "path": "/private/tmp/p0-18-final-api-reference-20261015.log",
+      "bytes": 197,
+      "sha256": "f9c6abfc48014ed141dfd10f16f1cb691e33bae76300cfe511d997592c51b0d7"
+    },
+    {
+      "path": "/private/tmp/p0-18-final-docs-20261015.log",
+      "bytes": 200,
+      "sha256": "7b0b9aa327e8458fee26f4b7f18b260e1be0b54826b3d0382432faebd2e8469a"
+    },
+    {
+      "path": "/private/tmp/p0-18-final-counts-20261015.log",
+      "bytes": 234,
+      "sha256": "b8dc707fa16a9b5fda2954010ec85cb96efec2a716157407b31b6c31d42a662d"
+    },
+    {
+      "path": "/private/tmp/p0-18-final-freeze-20261015.log",
+      "bytes": 263,
+      "sha256": "c18bf59edd50d2894962ebec75b3f6384cb367dd9d1eb5772a85d4917f6ef899"
+    },
+    {
+      "path": "/private/tmp/p0-18-source-duplicates-20261015.log",
+      "bytes": 2058,
+      "sha256": "b323562d2c54aee8d44a5d7222018d1a0935c39217ef8ca694f13a0ded16cd3f"
+    },
+    {
+      "path": "/private/tmp/p0-18-source-dead-code-20261015.log",
+      "bytes": 1174,
+      "sha256": "5a4d8465f292740c1259c1ba1c90208ca582b18ab00d79bd94d31e0f7974aa88"
+    },
+    {
+      "path": "/private/tmp/p0-18-final-test-types-20261015.log",
+      "bytes": 156,
+      "sha256": "147e6f11b6a15605efe27bcd7fab5bd05be8e6eb63d97cd86f431d4a38fc46ac"
+    },
+    {
+      "path": "/private/tmp/p0-18-final-clean-source-20261015.log",
+      "bytes": 932,
+      "sha256": "ebe54af1624f21cf74ea939ea046d991151562dca63481516f9b62ff339b20eb"
+    }
+  ],
+  "currentFreshSourceChecks": [
+    "no-fabrication",
+    "architecture",
+    "docs",
+    "counts",
+    "normal-freeze"
+  ],
+  "reusedNotNewExecutions": [
+    "production-types",
+    "final-test-types",
+    "lint",
+    "final-clean-source",
+    "source-duplicates",
+    "source-dead-code"
+  ],
+  "unwaivedSourceQuality": {
+    "duplicateFindings": 1269,
+    "deadCodeFindings": 2751,
+    "status": "failed, not rerun or waived in P021"
+  },
+  "boundary": "Original nonqualification tracked source/test/config/package/lock content is exactly source58; fresh compiled4529 also match prior unchanged code. Prior type/lint/clean-source results retain their original command/source attribution. These are not new P021 runs, full suite, coverage, Node24, hosted CI or release acceptance."
+}

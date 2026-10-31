@@ -3,7 +3,7 @@
   "startedAt": "2026-09-29T08:46:23.853Z",
   "release": "1.1.1",
   "runtime": "v22.22.0",
-  "sourceWrapper": "/Users/sid/AgentMaturityCompass/website/install.sh",
+  "sourceWrapper": "~/AgentMaturityCompass/website/install.sh",
   "sourceWrapperSha256": "3151f42b013ec890b5c2625951ded63c73d6fa157fb350b8dd3eb385f5e07b07",
   "archive": {
     "releaseUrl": "https://github.com/AgentMaturity/AgentMaturityCompass/releases/tag/v1.1.1",

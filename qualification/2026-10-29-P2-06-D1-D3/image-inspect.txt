@@ -1,0 +1,15 @@
+# image modes before start
+700 amc:amc /home/amc/.config/amc
+700 amc:amc /home/amc/.config/amc/state
+# packaged non-dist files
+catalog/catalog.yaml
+deploy/apparmor
+docs/NATIVE_SANDBOX_UBUNTU.md
+dist/adapter-claims/docs/adapters/manifests/claude-code.json
+dist/adapter-claims/docs/adapters/manifests/codex.json
+dist/adapter-claims/docs/adapters/manifests/dsh.json
+dist/adapter-claims/docs/adapters/manifests/pi.json
+dist/adapter-claims/qualification/2026-10-18-P1-22/pi-conformance.json
+dist/adapter-claims/qualification/2026-10-18-P1-22/receipt.json
+dist/adapter-claims/qualification/2026-10-18-P1-23/claude-code-conformance.json
+dist/adapter-claims/qualification/2026-10-18-P1-23/receipt.json

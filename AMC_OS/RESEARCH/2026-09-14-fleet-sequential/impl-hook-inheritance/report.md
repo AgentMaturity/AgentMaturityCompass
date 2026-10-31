@@ -1,6 +1,6 @@
 ## IMPL-3 — subagent hook-control inheritance
 
-**Commit:** 2eed9bee49587e1e7a2197d3b2c1c973b0e61728 (amc/gap-register-execution) + uncommitted edits in worktree `/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_453236ab-c47-1`
+**Commit:** 2eed9bee49587e1e7a2197d3b2c1c973b0e61728 (amc/gap-register-execution) + uncommitted edits in worktree `~/AgentMaturityCompass/.claude/worktrees/wf_453236ab-c47-1`
 **Environment:** Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0, vitest 4.1.11; `pnpm install --frozen-lockfile --prefer-offline` exit 0.
 **Worktree note:** the worktree was handed over at 3d6b8d4a (scoped files absent). Fast-forwarded my own worktree branch to 2eed9bee with `git merge --ff-only` (ancestor confirmed). No commit, no other tree touched.
 

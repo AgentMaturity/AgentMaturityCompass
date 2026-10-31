@@ -29,6 +29,8 @@ import {
 import type { ToolIntentResponse } from "../src/toolhub/toolhubServer.js";
 import type { DiagnosticReport } from "../src/types.js";
 import type { ActionClass } from "../src/types.js";
+import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
+import { writeAnchoredRun } from "./helpers/sealedRun.js";
 
 // IMPL-2: agent bearer tokens carry only what the signed action policy (or an
 // issuing lease) grants, and the execute grant is per action class. Loopback
@@ -69,6 +71,7 @@ function workspaceFixture(policy: ActionPolicy) {
   const workspace = realpathSync(mkdtempSync(join(tmpdir(), "amc-agent-token-scopes-")));
   roots.push(workspace);
   initWorkspace({ workspacePath: workspace, agentId: A, trustBoundaryMode: "isolated" });
+  writeRuntimeFirewallPolicy({ workspace: workspace, mode: "observe" }); // AXR-01: ToolHub and hook control apply the runtime firewall as the native pipeline does; unsigned, it blocks every call.
   initFleet(workspace, { orgName: "Token scope fixture" });
   for (const agentId of [A, C]) {
     scaffoldAgent(workspace, buildAgentConfig({
@@ -121,12 +124,11 @@ function syntheticGovernorControlInput(workspace: string): void {
   const now = Date.now();
   const report: Partial<DiagnosticReport> & { fixtureKind: string } = {
     fixtureKind: "SYNTHETIC_TOKEN_SCOPE_CONTROL_INPUT_NOT_A_MEASUREMENT", agentId: A, runId: "synthetic-token-scope-control",
-    ts: now, windowStartTs: now - 1000, windowEndTs: now, integrityIndex: 1, trustLabel: "HIGH TRUST", correlationRatio: 0,
+    ts: now, windowStartTs: now - 1000, windowEndTs: now, status: "VALID", integrityIndex: 1, trustLabel: "HIGH TRUST", correlationRatio: 0,
     questionScores: [], evidenceTrustCoverage: { observed: 0, attested: 0, selfReported: 1 }
   };
-  const runsDir = getAgentPaths(workspace, A).runsDir;
-  mkdirSync(runsDir, { recursive: true });
-  writeFileSync(join(runsDir, "synthetic-token-scope-control.json"), JSON.stringify(report), "utf8");
+  // The governor reads only sealed, ledger-anchored runs, so the control input is published as the runner would.
+  writeAnchoredRun(workspace, getAgentPaths(workspace, A).runsDir, report as Parameters<typeof writeAnchoredRun>[2]);
 }
 async function approvedWriteLow(f: Fixture, leaseToken: string) {
   syntheticGovernorControlInput(f.workspace);

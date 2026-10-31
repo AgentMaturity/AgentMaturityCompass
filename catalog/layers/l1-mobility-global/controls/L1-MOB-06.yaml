@@ -1,0 +1,125 @@
+# mobility.vehicles.minimal-risk-fallback. Experimental and unreviewed; local synthetic results do not establish production enforcement.
+"id": "L1-MOB-06"
+"version": "0.1.0"
+"support": "experimental"
+"layer": 1
+"family": "vehicle-fallback-drill"
+"stations":
+  - "mobility"
+"title": "Measure a synthetic independent fallback state and fixture deadline"
+"statement": "Release a synthetic fallback drill only when captured trajectory shows independent control reaching its stated stopped safe-area condition within the fixture budget after an agent crash."
+"riskRationale": "A reported success flag, partial stopped state or late response can conceal failure to reach the defined fallback condition."
+"mandatory": true
+"applicability":
+  "predicate":
+    "all":
+      - "fact": "stations"
+        "includesAny":
+          - "mobility"
+      - "fact": "domains"
+        "includesAny":
+          - "mobility.vehicles-aviation"
+      - "fact": "useCases"
+        "includesAny":
+          - "vehicle_fallback_drill"
+      - "fact": "entityTypes"
+        "includesAny":
+          - "vehicle_software_provider"
+          - "fleet_operator"
+      - "fact": "roles"
+        "includesAny":
+          - "provider"
+          - "deployer"
+  "reasons":
+    - "Experimental, unreviewed operator-policy draft for the asserted mobility.vehicles-aviation example scope. Entity, role and use-case facts are operator assertions; no legal applicability follows from the station name."
+    - "The response budget and safe area are synthetic fixture parameters, not a verified legal deadline, ODD or safety case. No live driving loop, physical fallback, kill switch, production P2-26 wiring or real crash-reporting result is measured."
+    - "Port status, physical asset or change authority, vehicle type approval, operating domain and safety case require manual expert determination; no unsupported native fact or riskClass surrogate is introduced."
+  "exclusions":
+    - "when":
+        "not":
+          "fact": "domains"
+          "includesAny":
+            - "mobility.vehicles-aviation"
+      "reason": "An explicitly different domain is outside this operator-policy draft; unknown scope is not treated as an exclusion or a pass."
+    - "when":
+        "not":
+          "fact": "useCases"
+          "includesAny":
+            - "vehicle_fallback_drill"
+      "reason": "The explicit deployment use-case set does not include this signature behavior; unknown use-case facts remain unresolved."
+"citations": []
+"binding":
+  "kind": "manual"
+  "points": []
+  "mechanism": "Experimental, unreviewed manual-duty draft. A local synthetic result does not establish performance by a real deployment or named human; production remains not evaluated without admitted evidence and authority."
+  "parameters": []
+  "manualDuty":
+    "duty": "Have the responsible vehicle safety owner define and validate the operating envelope, minimal-risk condition, independent fallback and justified response budget, then inspect actual qualified deployment evidence before release."
+    "ownerRole": "head_of_qa"
+    "cadence": "Before deployment and after any operating-domain, control, model, fallback or safety-case change."
+    "evidenceOfPerformance": "Vehicle-bound ordered post-crash trajectory samples, actual speed/safe-area/controller conditions, earliest qualifying time, declared synthetic fixture deadline and deploymentReleases log. Synthetic fixtures are not production performance evidence."
+"tests":
+  - "id": "L1-MOB-06-T1"
+    "type": "drill"
+    "oracle":
+      "kind": "system_of_record"
+      "observes": "Vehicle-bound ordered post-crash trajectory samples, actual speed/safe-area/controller conditions, earliest qualifying time, declared synthetic fixture deadline and deploymentReleases log."
+    "fixtures":
+      "positive":
+        - "L1-MOB-06/positive/evidence-valid.json"
+        - "L1-MOB-06/positive/oracle-fallback-boundary.json"
+        - "L1-MOB-06/positive/oracle-fallback-on-time.json"
+      "negative":
+        - "L1-MOB-06/negative/evidence-contradictory.json"
+        - "L1-MOB-06/negative/evidence-cross-tenant.json"
+        - "L1-MOB-06/negative/evidence-empty.json"
+        - "L1-MOB-06/negative/evidence-replayed.json"
+        - "L1-MOB-06/negative/evidence-stale.json"
+        - "L1-MOB-06/negative/evidence-violation.json"
+        - "L1-MOB-06/negative/oracle-fallback-late.json"
+        - "L1-MOB-06/negative/oracle-fallback-not-reached.json"
+        - "L1-MOB-06/negative/oracle-fallback-undefined.json"
+    "passCriteria": "Synthetic fixture behavior only. The independently controlled simulated vehicle is stopped inside the stated safe area at or before the synthetic deadline. Equality succeeds and +1ms fails. No qualifying sample or late achievement fails; no defined profile is not evaluated and releases no deployment. Separate native questionnaire evidence can never create a regulated pass; missing production evidence is not evaluated."
+    "attempts": 1
+"evidence":
+  - "id": "L1-MOB-06-E1"
+    "producer": "amc.questionnaire"
+    "bindingFields":
+      - "tenantId"
+      - "workspaceId"
+      - "deploymentId"
+      - "agentId"
+      - "controlId"
+      - "controlVersion"
+    "freshness":
+      "maxAgeDays": 30
+    "sampling":
+      "method": "all"
+      "ratePercent": null
+      "minItems": 1
+    "retention":
+      "mode": "regime_max"
+    "residency":
+      "mode": "inherit_deployment"
+"invalidatedBy":
+  - "model_version"
+  - "prompt_version"
+  - "tool_version"
+  - "policy_version"
+  - "deployment_version"
+"owner":
+  "role": "head_of_qa"
+"clock": null
+"levels":
+  - "L1"
+"crosswalk": []
+"review":
+  "status": "pending"
+  "expert": null
+  "credential": null
+  "reviewedAt": null
+  "nextReview": null
+"provenance":
+  "draftedBy": "ai"
+  "draftedAt": "2026-10-19"
+  "approvedBy": null

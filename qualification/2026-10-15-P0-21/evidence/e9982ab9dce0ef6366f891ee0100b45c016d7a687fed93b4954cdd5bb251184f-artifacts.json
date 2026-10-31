@@ -1,0 +1,47 @@
+[
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--baseline/classification.json",
+    "bytes": 229,
+    "sha256": "e8e68f8574b185caf06434b728c6f0b183061d0a1229ef6297c02b106c4fabbc"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--baseline/command.json",
+    "bytes": 1941,
+    "sha256": "7e4cd1ae7048689945c670c8e793c0bda69cfef0cd6d293580946f005d30e613"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--baseline/inputs-after.json",
+    "bytes": 830,
+    "sha256": "d8b01c1b542cfe22cea9ed557c7925a2768675a72d982565dbcc5fa5b75308c9"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--baseline/inputs-before.json",
+    "bytes": 830,
+    "sha256": "8bb8a25d5093d566b94ce68984646d3e4508e0764d71a4bff4c248b0bf5af4a1"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--baseline/observer.json",
+    "bytes": 20517,
+    "sha256": "4727d687970323ab6a6e9e944ee68c9bf1b86f74fed75454cf7756aa9b4b0aee"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--baseline/owned-group-after-exit.json",
+    "bytes": 520,
+    "sha256": "f3faabb208b18f7a02605371e472ec6cc1294a1246bb5383ed1c20c0d8a07fe3"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--baseline/owned-process.json",
+    "bytes": 1566,
+    "sha256": "377108356174a85a172a8b02b0106db8e351ad7b459dcca00fecdec22d0beb98"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--baseline/raw.json",
+    "bytes": 13476,
+    "sha256": "a874b7bd62349cf3dce9f5a1d61c174314ae0304b8855fa537c89ec8bdaa13ae"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--baseline/stdout-stderr.log",
+    "bytes": 803,
+    "sha256": "bd5fc90885610f8002a8a2f27841c07bc961be69722cee57b5b2baafea4f4fe7"
+  }
+]

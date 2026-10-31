@@ -1,0 +1,92 @@
+{
+  "schema": "p125pc-root-explicit-public-output-review/1",
+  "at": "2026-10-17T02:14:02.561845+00:00",
+  "allowlistPin": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/public-output-allowlist.json",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-output-allowlist.json",
+    "bytes": 340585,
+    "sha256": "923373ef519e24ee9fa25f2f0d63bf60988a52d0fb5896035ad24bf129a8ad91",
+    "dev": 16777231,
+    "inode": 544002476,
+    "nlink": 1
+  },
+  "all218ExplicitSelectedByteAndSingleLinkPhysicalPinsVerified": true,
+  "roles": {
+    "public-lifecycle": 42,
+    "public-certificates": 42,
+    "public-query": 52,
+    "public-response": 52,
+    "public-checkpoint": 30
+  },
+  "publicCertificateBundles": 42,
+  "decodedPublicCertificateDerPinsExact": 84,
+  "producerBindings": [
+    {
+      "phase": "p125pc-source-combined",
+      "proofs": 2,
+      "producerAcceptance": true,
+      "reachedStages": [
+        "first-checkpoint",
+        "backdated-appended",
+        "postdated-appended",
+        "second-checkpoint"
+      ]
+    },
+    {
+      "phase": "p125pc-fresh-canonical",
+      "proofs": 2,
+      "producerAcceptance": true,
+      "reachedStages": [
+        "first-checkpoint",
+        "backdated-appended",
+        "postdated-appended",
+        "second-checkpoint"
+      ]
+    },
+    {
+      "phase": "p125pc-m1",
+      "proofs": 1,
+      "producerAcceptance": false,
+      "reachedStages": [
+        "first-checkpoint",
+        "backdated-appended"
+      ]
+    },
+    {
+      "phase": "p125pc-restore1",
+      "proofs": 2,
+      "producerAcceptance": true,
+      "reachedStages": [
+        "first-checkpoint",
+        "backdated-appended",
+        "postdated-appended",
+        "second-checkpoint"
+      ]
+    },
+    {
+      "phase": "p125pc-m2",
+      "proofs": 1,
+      "producerAcceptance": false,
+      "reachedStages": [
+        "first-checkpoint",
+        "backdated-appended",
+        "postdated-appended"
+      ]
+    },
+    {
+      "phase": "p125pc-restore2",
+      "proofs": 2,
+      "producerAcceptance": true,
+      "reachedStages": [
+        "first-checkpoint",
+        "backdated-appended",
+        "postdated-appended",
+        "second-checkpoint"
+      ]
+    }
+  ],
+  "noPrivateKeysPemStreamsSigningRootTraversalOrNewCryptoExecution": true,
+  "wholeP1_25Complete": false,
+  "planComplete": false,
+  "metadataPublicationCredit": false
+}

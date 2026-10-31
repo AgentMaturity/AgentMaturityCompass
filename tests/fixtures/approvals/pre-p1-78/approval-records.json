@@ -1,0 +1,110 @@
+{
+  "note": "Built from int 8d1e8e7d7 (before any P1-78 edit) by the approvals engine and, for the A4-shaped request, approvalRequestSchema.parse as src/a4/a4Gates.ts does. Never regenerate: these are the bytes records written before P1-78 carry.",
+  "engineRequest": {
+    "record": {
+      "v": 1,
+      "approvalRequestId": "apprreq_1be761739e3540f0aa70be5ef5e886d3",
+      "agentId": "default",
+      "intentId": "intent-pre-p1-78",
+      "toolName": "fixture.pay",
+      "actionClass": "FINANCIAL",
+      "workOrderId": null,
+      "requestedMode": "EXECUTE",
+      "effectiveMode": "EXECUTE",
+      "riskTier": "high",
+      "createdTs": 1791750625276,
+      "expiresTs": 1791751225276,
+      "status": "PENDING",
+      "requiredApprovals": 2,
+      "requireDistinctUsers": true,
+      "rolesAllowed": [
+        "OWNER",
+        "AUDITOR"
+      ],
+      "boundHashes": {
+        "intentHash": "bdfd76cc06886d02abf5f0b85ec3364caf07d08849ac9613f7e180f593784cfb",
+        "workOrderHash": null,
+        "policyHash": "9c8c51f1a6162459d67eb349abbbc3ac7e1253eea1ae7975a41bd4b2c87fa104",
+        "toolsHash": "5c905e75193056ed990b41424c28c79ae10920f70682141e58d9dad1b7d83549",
+        "budgetsHash": "eadcd79d9ac72fa608dcbeb5b9ffa2f77430dcd687d0ec96d2f45e87d1cbea52",
+        "leaseConstraintsHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+      },
+      "authorizationIntent": {
+        "schema": "amc.authorization-intent/v1",
+        "toolName": "fixture.pay",
+        "adapterId": "native",
+        "actionClass": "FINANCIAL",
+        "argumentsDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "bindings": {
+          "amount": {
+            "value": "125.00",
+            "currency": "USD"
+          },
+          "recipient": "acct-1",
+          "destination": null,
+          "resourceId": null,
+          "resourceVersion": null
+        },
+        "deploymentDigest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "workspaceId": "default"
+      }
+    },
+    "bindingDigest": "b545f15b0b8bf48d423c2d6f2c82b2d949d0d1dd04fa9bd7dc2ec8173cdcad83"
+  },
+  "engineDecision": {
+    "record": {
+      "v": 1,
+      "approvalDecisionId": "apprdec_1cf05af884904f7fa42fdb8c9067465d",
+      "approvalRequestId": "apprreq_1be761739e3540f0aa70be5ef5e886d3",
+      "agentId": "default",
+      "userId": "approver-1",
+      "username": "approver-1",
+      "roles": [
+        "OWNER"
+      ],
+      "decision": "APPROVE_EXECUTE",
+      "reason": "pre-P1-78 fixture decision",
+      "requestDigestSha256": "b545f15b0b8bf48d423c2d6f2c82b2d949d0d1dd04fa9bd7dc2ec8173cdcad83",
+      "decisionTs": 1791750625283
+    }
+  },
+  "a4Request": {
+    "record": {
+      "v": 1,
+      "approvalRequestId": "a4g_fixture",
+      "agentId": "default",
+      "intentId": "a4-p1-ask-direction-r1",
+      "toolName": "a4.ask.direction",
+      "actionClass": "DEPLOY",
+      "requestedMode": "EXECUTE",
+      "effectiveMode": "EXECUTE",
+      "riskTier": "medium",
+      "createdTs": 1760000000000,
+      "expiresTs": 1760600000000,
+      "status": "PENDING",
+      "requiredApprovals": 1,
+      "requireDistinctUsers": true,
+      "rolesAllowed": [
+        "OWNER",
+        "APPROVER"
+      ],
+      "boundHashes": {
+        "intentHash": "c63643ee98d31ca6718efe2b9d586e35ca3f50d67fc5224fada75df6249111ab",
+        "policyHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "toolsHash": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "budgetsHash": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+        "leaseConstraintsHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+      },
+      "authorizationIntent": {
+        "schema": "amc.a4-intent/v1",
+        "projectId": "p1",
+        "gate": "direction",
+        "requesterKey": "LOCAL_USER:alice",
+        "excludedKeys": [
+          "LOCAL_USER:alice"
+        ]
+      }
+    },
+    "bindingDigest": "ee6fd9fd357b12ffc26e36435eb0cacbc063c86f91bdd4344a3e5ff2cd5a9c8f"
+  }
+}

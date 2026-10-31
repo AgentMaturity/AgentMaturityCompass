@@ -1,0 +1,88 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L0-DAT-04",
+  "polarity": "negative",
+  "evidenceClass": "unknown_authority",
+  "setup": {
+    "harness": "residency_egress",
+    "registry": {
+      "schemaVersion": "amc.residency-destinations/v1",
+      "profile": null,
+      "destinations": [
+        {
+          "destinationId": "eu-processor",
+          "match": {
+            "hosts": [
+              "eu.processor.example"
+            ]
+          },
+          "channels": [
+            "provider"
+          ],
+          "region": {
+            "jurisdiction": "EU",
+            "code": "eu-west-1"
+          },
+          "transferBasis": null
+        },
+        {
+          "destinationId": "us-processor",
+          "match": {
+            "hosts": [
+              "us.processor.example"
+            ]
+          },
+          "channels": [
+            "provider"
+          ],
+          "region": {
+            "jurisdiction": "US",
+            "code": "us-east-1"
+          },
+          "transferBasis": null
+        },
+        {
+          "destinationId": "unknown-region",
+          "match": {
+            "hosts": [
+              "somewhere.processor.example"
+            ]
+          },
+          "channels": [
+            "provider"
+          ],
+          "region": null,
+          "transferBasis": null
+        }
+      ],
+      "rules": [
+        {
+          "ruleId": "pii-eu-only",
+          "controlId": "L0-DAT-04",
+          "appliesTo": {
+            "dataClasses": [
+              "pii"
+            ],
+            "jurisdictions": [
+              "EU"
+            ]
+          },
+          "allowedJurisdictions": [
+            "EU"
+          ],
+          "acceptsTransferBasis": false
+        }
+      ]
+    },
+    "registryState": "edited_after_signing",
+    "channel": "provider",
+    "url": "https://eu.processor.example/v1/chat",
+    "dataClasses": [
+      "pii"
+    ]
+  },
+  "expected": {
+    "result": "deny",
+    "reasonCode": "registry_unverifiable"
+  }
+}

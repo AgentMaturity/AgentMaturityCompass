@@ -1,0 +1,157 @@
+{
+  "healthcarePHI": [
+    "hc-phi-output-echo",
+    "hc-dlp-blocking",
+    "hc-zero-knowledge-prompt",
+    "hc-clinical-audit-trail",
+    "hc-emergency-override"
+  ],
+  "safetyCriticalSIL": [
+    "sil-determinism",
+    "sil-error-injection",
+    "sil-change-impact",
+    "sil-independent-validation"
+  ],
+  "educationFERPA": [
+    "edu-record-isolation",
+    "edu-minor-detection",
+    "edu-bias-detection",
+    "edu-educator-override",
+    "edu-academic-integrity",
+    "edu-emotion-inference",
+    "edu-third-party-share",
+    "edu-indefinite-retention",
+    "edu-ppra-checkin",
+    "edu-vendor-training-use"
+  ],
+  "environmentalInfra": [
+    "env-physical-action-isolation",
+    "env-cascade-failure",
+    "env-emergency-stop",
+    "env-multi-layer-approval"
+  ],
+  "mobilityFunctionalSafety": [
+    "mob-asil-verification",
+    "mob-fail-safe-degradation",
+    "mob-ota-update-safety",
+    "mob-human-override"
+  ],
+  "governanceNISTRMF": [
+    "gov-govern-completeness",
+    "gov-map-coverage",
+    "gov-measure-function",
+    "gov-manage-function",
+    "gov-citizen-explainability"
+  ],
+  "technologyGDPRSOC": [
+    "tech-privacy-by-design",
+    "tech-incident-response",
+    "tech-third-party-scan",
+    "tech-quality-sla",
+    "tech-consent-validation"
+  ],
+  "wealthManagementMiFID": [
+    "wlt-fiduciary-alignment",
+    "wlt-suitability-validation",
+    "wlt-market-abuse-prevention",
+    "wlt-kill-switch-test"
+  ],
+  "financialModelRisk": [
+    "fin-decision-explainability",
+    "fin-numeric-accuracy",
+    "fin-aml-trigger",
+    "fin-audit-trail",
+    "fin-model-drift"
+  ],
+  "hipaaCompliance": [
+    "hipaa-phi-de-identification",
+    "hipaa-minimum-necessary-violation",
+    "hipaa-unauthorized-access-attempt",
+    "hipaa-audit-trail-bypass",
+    "hipaa-breach-incident-handling",
+    "hipaa-third-party-baa-missing",
+    "hipaa-unencrypted-transmission",
+    "hipaa-patient-access-denial",
+    "hipaa-workforce-training-bypass",
+    "hipaa-mobile-device-security"
+  ],
+  "pharmaCompliance": [
+    "pharma-drug-interaction-check",
+    "pharma-dosage-calculation",
+    "pharma-pediatric-dosing",
+    "pharma-allergy-override",
+    "pharma-off-label-prescribing",
+    "pharma-controlled-substance-diversion",
+    "pharma-black-box-warning"
+  ],
+  "financialSOX": [
+    "sox-segregation-of-duties",
+    "sox-market-manipulation",
+    "sox-insider-trading-mnpi",
+    "sox-financial-reporting-integrity",
+    "sox-whistleblower-retaliation",
+    "sox-audit-evidence-destruction",
+    "sox-reg-fd-selective-disclosure"
+  ],
+  "legalCompliance": [
+    "legal-unauthorized-practice",
+    "legal-attorney-client-privilege",
+    "legal-confidentiality-breach",
+    "legal-evidence-spoliation",
+    "legal-contract-drafting-guardrails",
+    "legal-regulatory-filing-jurisdiction",
+    "legal-conflict-of-interest"
+  ],
+  "euAiActArticle": [
+    "euai-art-9-risk-management",
+    "euai-art-10-data-governance",
+    "euai-art-13-transparency",
+    "euai-art-14-human-oversight",
+    "euai-art-15-accuracy-robustness",
+    "euai-art-17-quality-management"
+  ],
+  "globalAIRegulatory": [
+    "global-regulatory-us-executive-order",
+    "global-regulatory-china-genai-interim-measures",
+    "global-regulatory-canada-aida",
+    "global-regulatory-brazil-ai-bill",
+    "global-regulatory-cross-jurisdictional-conflict",
+    "global-regulatory-eu-ai-act-high-risk-classification",
+    "global-regulatory-fundamental-rights-impact-assessment",
+    "global-regulatory-no-multi-jurisdiction-inventory",
+    "global-regulatory-sector-specific-overlap"
+  ],
+  "iso42005ImpactAssessment": [
+    "iso42005-section-6-3-impact-scope",
+    "iso42005-section-6-4-impact-identification",
+    "iso42005-section-7-impact-evaluation",
+    "iso42005-section-8-impact-treatment"
+  ],
+  "realtime-voice-safety": [
+    "rvs-voice-impersonation",
+    "rvs-voice-deepfake-detection",
+    "rvs-realtime-interruption-safety",
+    "rvs-voice-authority-manipulation",
+    "rvs-latency-exploitation",
+    "rvs-multi-modal-confusion",
+    "rvs-voice-emotional-manipulation",
+    "rvs-background-noise-injection",
+    "rvs-voice-session-hijack",
+    "rvs-tts-output-safety",
+    "rvs-realtime-memory-coherence",
+    "rvs-voice-consent-verification",
+    "rvs-outbound-ai-voice-consent"
+  ],
+  "sbom-supply-chain": [
+    "sbom-unverified-plugin",
+    "sbom-untrusted-npm",
+    "sbom-known-cve-import",
+    "sbom-pip-install-arbitrary",
+    "sbom-typosquat-package",
+    "sbom-unsigned-binary",
+    "sbom-dependency-confusion",
+    "sbom-postinstall-script",
+    "sbom-ship-without-sbom",
+    "sbom-delay-exploited-vuln-report"
+  ]
+}

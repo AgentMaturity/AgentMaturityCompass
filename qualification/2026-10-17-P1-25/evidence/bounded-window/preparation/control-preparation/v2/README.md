@@ -1,0 +1,7 @@
+# Controls V2: actual initial151 pin field
+
+This distinct inert successor changes only the three accesses to the runtime pinset's nonexistent `prechangeProtectedPin` field into accesses to its actual `initial151Pinset` field. All other V1 helper bytes remain exact. V1 code, seal, patches and report remain preserved and inert. The runtime pinset is immutable and was not changed.
+
+The full root-binding interface remains the V1 README, with this one correction: the runtime pinset must carry `initial151Pinset`, the full exact pin of initial `protected-inputs.json`. The later root `control-root-bindings.json` stays under the parent `control-preparation/` directory. Root maps actual `twoAdmittedOwnSourceSuccessors` entries into that later binding's `sourceSuccessors`, including `originalPreservedPin` mapped from the actual `original` field and the verified original Git commits. No root binding or future result was supplied here.
+
+This is an author correction, not independent review. No helper was imported, parsed, compiled or executed for V2. No product, checkout, index, QA, freeze or quality change occurred. Root must read the full V1 helper plus this exact three-access delta, independently review and adopt the preferred successor, and supply actual source/fresh evidence before use. All previous explicit restore, all-failure classification, native, physical pin and held-decision guards remain intact.

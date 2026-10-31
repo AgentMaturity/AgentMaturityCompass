@@ -1,0 +1,56 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-WLT-US-10",
+  "polarity": "negative",
+  "evidenceClass": "violation",
+  "setup": {
+    "harness": "evidence",
+    "window": {
+      "start": "2025-01-01T00:00:00.000Z",
+      "end": "2026-09-30T23:59:59.000Z"
+    },
+    "subject": {
+      "tenantId": "tenant-a",
+      "workspaceId": "ws-a",
+      "deploymentId": "dep-a",
+      "agentId": "agent-1",
+      "subjectId": null
+    },
+    "plan": {
+      "applicability": "applicable",
+      "policyDigest": "sha256:fixture-policy",
+      "mode": "enforce"
+    },
+    "items": [
+      {
+        "ref": {
+          "kind": "receipt",
+          "id": "L1-WLT-US-10-versionManifest-1"
+        },
+        "producerId": "amc.versionManifest",
+        "provenance": {
+          "verified": true,
+          "producerId": "amc.versionManifest",
+          "trustTier": "OBSERVED"
+        },
+        "recordedAt": "2026-09-20T10:00:00.000Z",
+        "binding": {
+          "workspaceId": "ws-a",
+          "agentId": "agent-1",
+          "controlId": "L1-WLT-US-10"
+        },
+        "verdict": "violates",
+        "attributes": {
+          "receiptId": "L1-WLT-US-10-versionManifest-1-receipt",
+          "observationKey": "L1-WLT-US-10-observation-1",
+          "observation": "violates"
+        }
+      }
+    ],
+    "priorUses": []
+  },
+  "expected": {
+    "result": "not_evaluated",
+    "reasonCode": "producer_not_admitted"
+  }
+}

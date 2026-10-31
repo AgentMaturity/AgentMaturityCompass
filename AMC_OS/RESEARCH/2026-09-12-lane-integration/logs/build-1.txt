@@ -1,5 +1,5 @@
 
-> agent-maturity-compass@1.2.0 prebuild /Users/sid/AgentMaturityCompass
+> agent-maturity-compass@1.2.0 prebuild ~/AgentMaturityCompass
 > npm run clean
 
 npm warn Unknown env config "npm-globalconfig". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
@@ -12,7 +12,7 @@ npm warn Unknown env config "link-workspace-packages". This will stop working in
 > node scripts/clean-dist.mjs
 
 
-> agent-maturity-compass@1.2.0 build /Users/sid/AgentMaturityCompass
+> agent-maturity-compass@1.2.0 build ~/AgentMaturityCompass
 > tsc -p tsconfig.json && npm run copy-assets && node scripts/bundle-kernel.mjs
 
 npm warn Unknown env config "npm-globalconfig". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.

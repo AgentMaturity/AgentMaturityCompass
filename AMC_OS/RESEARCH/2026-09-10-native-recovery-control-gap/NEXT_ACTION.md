@@ -1,7 +1,7 @@
 # Native recovery/control gap — instruction-needed safe checkpoint
 
 Task: `native-recovery-control-gap-batch`. Checkpoint: `2026-09-09T21:40:51.909515+00:00`.
-Repo/branch: `/Users/sid/AgentMaturityCompass`, `amc/gap-register-execution`.
+Repo/branch: `~/AgentMaturityCompass`, `amc/gap-register-execution`.
 Owner: `cos-native-recovery-control-gap-prime`, **released**.
 
 ## Delivered implementation

@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { vaultStatus } from "../vault/vault.js";
 import { mkdtempSync, readdirSync, readFileSync, rmSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
@@ -12,7 +13,7 @@ import { runBundleGate, parseGatePolicy, evaluateGatePolicy } from "../ci/gate.j
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
-import { getPrivateKeyPem, signHexDigest, verifyHexDigest } from "../crypto/keys.js";
+import { getSigningKey, getSigningPublicKeyPem, signHexDigest, verifyHexDigest } from "../crypto/keys.js";
 import { verifyKeyHistoryEnvelope, type KeyHistoryEnvelope } from "../crypto/keyHistoryEnvelope.js";
 import { verifyLedgerIntegrity } from "../ledger/ledger.js";
 import { computeFailureRiskIndices } from "./indices.js";
@@ -28,6 +29,14 @@ import { carriedLedgerAnchoring, claimedTime, fileSha256 } from "../trust/signat
 import { assertNotExample } from "../claims/eligibility/exampleMode.js";
 import { timestampDigest } from "../time/tsaClient.js";
 import { artifactTime } from "../time/verifyTimestamp.js";
+import { boundProviderKey, keysetIdentity } from "../keys/keyset.js";
+import { signWithPurposeKey } from "../keys/purposeProviders.js";
+import { assertSigningKeyUsable, assertVaultMaySign } from "../keys/signingKeys.js";
+import { signingKeyId } from "../keys/algorithmPolicy.js";
+import { keyPolicy, loadKeysConfig } from "../keys/keysConfig.js";
+import { KeyProviderError } from "../keys/provider.js";
+import { publicKeyFromPrivate } from "../crypto/keyHistoryEnvelope.js";
+import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import type { VerifierReportInput } from "../trust/verifierReport.js";
 
 /**
@@ -362,7 +371,7 @@ export async function issueCertificate(params: {
     const certSha = sha256Hex(readFileSync(join(certRoot, "cert.json")));
     const certSig: CertSignature = {
       certSha256: certSha,
-      signature: signHexDigest(certSha, getPrivateKeyPem(workspace, "auditor")),
+      signature: signHexDigest(certSha, getSigningKey(workspace, "artifact-seal")),
       signedTs: Date.now(),
       signer: "auditor"
     };
@@ -647,8 +656,8 @@ export function revokeCertificate(params: {
 }): { outFile: string; certId: string } {
   const inspect = inspectCertificate(params.certFile);
   const certId = inspect.cert.certId;
-  const auditorPubPath = join(params.workspace, ".amc", "keys", "auditor_ed25519.pub");
-  const auditorPub = readUtf8(auditorPubPath);
+  // P1-08: the field keeps its name; it carries the revocation-list key that signs the revocation.
+  const auditorPub = getSigningPublicKeyPem(params.workspace, "revocation-list");
   const payloadBase = {
     certId,
     reason: params.reason,
@@ -657,18 +666,25 @@ export function revokeCertificate(params: {
     auditorPub
   };
   const digest = sha256Hex(canonicalize(payloadBase));
-  const signature = signHexDigest(digest, getPrivateKeyPem(params.workspace, "auditor"));
+  const signature = signHexDigest(digest, getSigningKey(params.workspace, "revocation-list"));
   const payload: RevocationPayload = {
     ...payloadBase,
     signature
   };
+  return withControlFileLock({ root: join(params.workspace, ".amc"), name: "certificate-revocations",
+    operation: () => publishCertificateRevocation(params, payload, inspect.cert.agentId) });
+}
+
+/** The existing signed-file/log order, shared by sync vault callers and the async provider runtime. */
+function publishCertificateRevocation(params: { workspace: string; outFile: string }, payload: RevocationPayload, agentId: string): { outFile: string; certId: string } {
+  const certId = payload.certId;
   const outFile = resolve(params.workspace, params.outFile);
   ensureDir(dirname(outFile));
   writeFileAtomic(outFile, JSON.stringify(payload, null, 2), 0o644);
   appendTransparencyEntry({
     workspace: params.workspace,
     type: "CERT_REVOKED",
-    agentId: inspect.cert.agentId,
+    agentId,
     artifact: {
       kind: "amccert",
       sha256: sha256Hex(readFileSync(outFile)),
@@ -679,6 +695,42 @@ export function revokeCertificate(params: {
     outFile,
     certId
   };
+}
+
+/** Provider-capable certificate revocation; the synchronous private-key API stays unchanged. */
+export async function revokeCertificateAsync(params: Parameters<typeof revokeCertificate>[0]): Promise<ReturnType<typeof revokeCertificate>> {
+  params = { ...params };
+  const certificateSha256 = sha256Hex(readFileSync(params.certFile));
+  const inspect = inspectCertificate(params.certFile);
+  if (sha256Hex(readFileSync(params.certFile)) !== certificateSha256) throw new Error("certificate input changed while it was inspected; retry");
+  const generation = canonicalize(keysetIdentity(params.workspace));
+  // Authenticated committed public state selects metadata; editable refs never choose the signer.
+  const auditorPub = boundProviderKey(params.workspace, "revocation-list")?.publicKeyPem ?? getSigningPublicKeyPem(params.workspace, "revocation-list");
+  const payloadBase = { certId: inspect.cert.certId, reason: params.reason, ts: Date.now(), issuerFingerprint: sha256Hex(auditorPub), auditorPub };
+  const outFile = resolve(params.workspace, params.outFile);
+  const before = pathExists(outFile) ? sha256Hex(readFileSync(outFile)) : null;
+  const signed = await signWithPurposeKey(params.workspace, "revocation-list", Buffer.from(sha256Hex(canonicalize(payloadBase)), "hex"));
+  if (signed.publicKeyPem !== auditorPub || signed.keyId !== signingKeyId(auditorPub)) {
+    throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", signed.provider, "the revocation signer differs from its signed issuer metadata");
+  }
+  return withControlFileLock({ root: join(params.workspace, ".amc"), name: "certificate-revocations", operation: () => {
+    const now = pathExists(outFile) ? sha256Hex(readFileSync(outFile)) : null;
+    if (canonicalize(keysetIdentity(params.workspace)) !== generation || now !== before
+      || sha256Hex(readFileSync(params.certFile)) !== certificateSha256) throw new Error("certificate revocation inputs changed while signing; retry");
+    const policy = keyPolicy(loadKeysConfig(params.workspace));
+    if (!policy.allowed.includes(signed.algorithm) || (signed.provider === "file" && policy.requireNonExportable)) {
+      throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", signed.provider, "the current key policy refuses the certificate revocation signer");
+    }
+    assertSigningKeyUsable(params.workspace, "revocation-list", signed.publicKeyPem, signed.provider);
+    if (signed.provider === "file") {
+      if (!vaultStatus(params.workspace).unlocked) throw new Error("🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup. Use --no-sign to skip signing where supported.");
+      assertVaultMaySign(params.workspace, "revocation-list");
+      if (publicKeyFromPrivate(getSigningKey(params.workspace, "revocation-list")) !== auditorPub) {
+        throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", "file", "the vault revocation key changed while signing");
+      }
+    }
+    return publishCertificateRevocation(params, { ...payloadBase, signature: signed.signature.toString("base64") }, inspect.cert.agentId);
+  } });
 }
 
 /** Integrity of a revocation file, plus the admission of its issuer for revocation-list. Its auditorPub never vouches. */

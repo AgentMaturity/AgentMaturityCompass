@@ -1,0 +1,15 @@
+{
+  "schema": "p125-checkpoint-private-receipt-v2-author-static-review/1",
+  "at": "2026-10-16T23:40:13.171963+00:00",
+  "blockers": [],
+  "fullAddedCodeAndExactDeltaRead": true,
+  "v1Preserved": true,
+  "sourceCheckpoint": "e49e21348e454ba8f1556cb6dfd3ed69e0e883c2",
+  "originalAndFinalSourceObservationsDistinct": true,
+  "actualEofOnlyByteDeltaIndependentlyVerified": true,
+  "noCompilerOrBuildAfterEofClaim": true,
+  "readyForPrivateAssembly": false,
+  "futureFreshControlsPeerQualityOutcomesInvented": false,
+  "helperImportedParsedCompiledExecuted": false,
+  "sourceIndexQaWrites": false
+}

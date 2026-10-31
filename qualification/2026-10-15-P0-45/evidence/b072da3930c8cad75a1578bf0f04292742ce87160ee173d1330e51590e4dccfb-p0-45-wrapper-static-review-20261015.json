@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-45",
+  "capturedUtc": "2026-10-15T05:45:26.808579+00:00",
+  "reviewType": "Independent static review of unexecuted private wrapper",
+  "wrapper": {
+    "path": "/private/tmp/p0-45-run-command-20261015.py",
+    "bytes": 10488,
+    "sha256": "2e7a5cfc4c9f4d6b80af42060c934f168a889461a07c7fb8fd3bebb6b3cb13fb"
+  },
+  "frozenReporter": {
+    "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+    "bytes": 2110,
+    "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+  },
+  "findings": [],
+  "disposition": "No actionable static blocker found within the assigned metadata-wrapper scope. This is not runtime qualification or approval of actual product outcomes.",
+  "checked": [
+    {
+      "topic": "Interface and argv",
+      "evidence": "main parses optional --observe then PHASE22CWD and cmd as an argument list; Popen receives cmd unchanged. No shell, reporter injection, test selection rewrite, deadline flag or source restoration is added. shlex.join is metadata only.",
+      "limit": "Actual original argv and future command contents still require per-phase review."
+    },
+    {
+      "topic": "Environment",
+      "evidence": "env=dict(os.environ), overriding PATH with Node22 prefix, HOME to the assigned private home, GIT_NO_LAZY_FETCH=1 and only for observed commands the legacy AMC_P021_RUNTIME_OBSERVER_PATH.",
+      "limit": "Inherited environment is preserved; this is not a seven-key allowlist, credential-free, network-isolated or independent-dependency environment."
+    },
+    {
+      "topic": "Observed executable/reporter",
+      "evidence": "Observed mode requires direct cmd[0] resolving to opt/node@22/bin/node, cmd[1] resolving to the assigned Vitest CLI, cmd[2]=run, one explicit exact frozen reporter and one JSON reporter. Frozen reporter digest is checked before launch.",
+      "limit": "This is resolver-path and reporter-byte validation, not an independent Node ABI/native load measurement. The reporter is reused unchanged and records run-end before global teardown."
+    },
+    {
+      "topic": "Process lifecycle",
+      "evidence": "Popen uses start_new_session=True, records actual PID and observed PGID, then child.wait() without an added outer timeout. Normal exit must be0or1; observed PGID must be child PID or already gone.",
+      "limit": "An indefinitely hanging command remains blocked; no automatic kill or timeout cleanup is promised. Original test/helper deadlines are not modified."
+    },
+    {
+      "topic": "Owned-group observations",
+      "evidence": "After normal leader exit, probes os.killpg(child.pid,0), retains each observation, polls at most5seconds/50ms and requires last absentByESRCH=true. Only errnoESRCH makes a positive absent fact. No terminating signals are sent.",
+      "limit": "The original owned group is measured; detached descendants, body completion and universal teardown health are not inferred."
+    },
+    {
+      "topic": "Write-once phase metadata",
+      "evidence": "New phase directory required; phase names are constrained. ACTIVE uses exclusive creation; log, owned-process/group/command metadata use x; raw snapshot uses xb. ACTIVE/HALTED block future commands.",
+      "limit": "The command journal intentionally appends actual rows. Parent must prepare owned BASE/HOME/repository first; this review did not create them."
+    },
+    {
+      "topic": "Uncertainty handling",
+      "evidence": "Any BaseException after the ACTIVE marker preserves it and writes a new HALTED record when absent. No retry, terminating signal, generic cleanup or automatic source restoration occurs. ACTIVE removal happens only after normal process/group checks, head equality and command/journal writing.",
+      "limit": "Pre-launch validation failures before ACTIVE do not represent launched runtime. Root must not reinterpret retained incomplete artifacts as kills."
+    },
+    {
+      "topic": "Fresh Vitest producer and snapshot",
+      "evidence": "Exactly one explicit outputFile[.json] argument must resolve to a fresh owned BASE destination outside home/store and reserved metadata. Vitest writes its original producer unchanged. Only after exit0/1 and owned-group absence does wrapper require a nonempty regular producer, require observer PID/cwd match, create raw.json exclusively and compare SHA256 of producer and snapshot.",
+      "limit": "The producer itself uses Vitest write semantics; wx applies to the separate snapshot. This is byte retention, not JSON/report correctness or assertion classification."
+    },
+    {
+      "topic": "Outcome attribution",
+      "evidence": "Command row explicitly says process metadata only; raw/observer/late diagnostics require review. It records code1 rather than treating it as a pass/kill. Known late-close, hook/body, counts and semantic classification are deferred to the actual evidence audit.",
+      "limit": "No product success, mutation sensitivity, zero pending, source-preservation universe, whole process-tree cleanup or full gate follows from the wrapper alone."
+    }
+  ],
+  "staticBoundaries": {
+    "wrapperImported": false,
+    "syntaxCompiledOrParsed": false,
+    "wrapperExecuted": false,
+    "productImportedOrExecuted": false,
+    "testsOrFingerprintsRun": false,
+    "laneOrBaseCreated": false,
+    "sourceEdited": false,
+    "writes": "Only this new private review JSON/Markdown pair."
+  },
+  "allReadsFinished": true
+}

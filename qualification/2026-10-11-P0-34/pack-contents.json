@@ -1,0 +1,9 @@
+{
+  "tarball": "agent-maturity-compass-2.0.0.tgz",
+  "sha256": "3c9b49883c001f18efe96286915c486fd45d87e38c95f9485d97043aba469b06",
+  "size": 7983838,
+  "unpackedSize": null,
+  "files": 4548,
+  "forbidden": [],
+  "secretScan": "PASS"
+}

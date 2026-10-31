@@ -1,0 +1,64 @@
+{
+  "schema": "p125ec-inert-fresh-binder-v2-author-seal/1",
+  "at": "2026-10-17T01:02:45.894018+00:00",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/v2/bind-fresh.py.source.txt",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/v2/bind-fresh.py.source.txt",
+      "bytes": 8794,
+      "sha256": "bda011325cac08d92fcb56ac5314754075920e78d21e7b7a9999df724273fa6a",
+      "dev": 16777231,
+      "inode": 543898369,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/v2/v1-to-v2.patch.txt",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/v2/v1-to-v2.patch.txt",
+      "bytes": 2011,
+      "sha256": "ef6e76d17c7cc30099893b8cd39c92690b591f8f03f83c93898ab2a4a0aa06f3",
+      "dev": 16777231,
+      "inode": 543898370,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/v2/fields.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/v2/fields.json",
+      "bytes": 3417,
+      "sha256": "b75451d8890643f7b4d3e4abc65b8be89a966e2cc73d5d3ea148cf273c7ef089",
+      "dev": 16777231,
+      "inode": 543898371,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/v2/input-pins.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/v2/input-pins.json",
+      "bytes": 2209,
+      "sha256": "ebc5d6a33c5309b03f655ca77d7ba364de3db414205033b7ecc6882b2ebcbe55",
+      "dev": 16777231,
+      "inode": 543898372,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/v2/report.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/v2/report.json",
+      "bytes": 1506,
+      "sha256": "1d3f996eb4b422d4078b3e83b5132fcd71f0bb18a31462897dac212906469d3e",
+      "dev": 16777231,
+      "inode": 543898373,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/v2/README.md",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/v2/README.md",
+      "bytes": 861,
+      "sha256": "0346ce2f25aa2c3507cc8dbe2770592d05a070ff05b7eb0c8adf5b70aa286a22",
+      "dev": 16777231,
+      "inode": 543898374,
+      "nlink": 1
+    }
+  ],
+  "allOutputFilesCompleteAndClosed": true,
+  "allOtherV1CodeByteExact": true,
+  "noHelperImportParseCompileOrExecution": true,
+  "noSourceIndexQaPriorArtifactOrReservationWrites": true
+}

@@ -1,0 +1,12 @@
+--- a/src/time/verifyTimestamp.ts
++++ b/src/time/verifyTimestamp.ts
+@@ -208,9 +208,6 @@
+     const signer = essSigner(attributes, [...parsed.certificates, ...anchors.map(({ cert }) => cert)]);
+     checkSignature(parsed, signer, attributes);
+     const { info } = parsed;
+-    if (info.imprintAlgorithm !== "2.16.840.1.101.3.4.2.1" || info.imprint !== input.expectedDigestHex.toLowerCase()) {
+-      fail("TST_IMPRINT_MISMATCH", "the token's messageImprint is not the expected sha256");
+-    }
+     if (input.nonceHex !== undefined && (info.nonce === null || BigInt(`0x${input.nonceHex}`) !== BigInt(`0x${info.nonce}`))) {
+       fail("TST_NONCE_MISMATCH", "the token's nonce is not the request nonce");
+     }

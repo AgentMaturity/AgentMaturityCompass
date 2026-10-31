@@ -1,0 +1,11 @@
+{
+  "id": "OV-2",
+  "scenario": "Offline WORM check",
+  "status": "not_run",
+  "reason": "WORM export needs an object-lock bucket (or a stand-in) reachable from the cluster",
+  "blockedBy": [
+    "P2-09",
+    "P2-06 follow-up"
+  ],
+  "durationMs": 0
+}

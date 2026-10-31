@@ -1,0 +1,9 @@
+# M1 launch chronology correction
+
+No blocker was found in the correction. The active root binding changes exactly one JSON field and one literal text occurrence: phases.mutants[0] becomes p125w-m1-sequential. The old binding is preserved byte-for-byte. All source/fresh/runtime/helper/outcome pins and every other binding field remain exact; no future outcome hash was added. The historical apply records still bind the preserved old bytes, rather than being silently rewritten to the successor.
+
+The original test launched at00:15:30.351354UTC; the apply helper closed at00:15:30.398453UTC. The test therefore preceded helper closure by47,099microseconds, exactly47.099ms. The helper subsequently recorded exit0. The original test naturally closed exit1 with its owned group absent and no nonzero signals. Its retained raw evidence has22total,21pass,1fail,0skip; the failure first frame is checkpointWindow.test.ts445. These facts are diagnostic only. The early at field in an apply record does not prove the dependent launch obeyed the required closure ordering.
+
+The new name refers to a separate sequential phase of the same already-applied expected mutant. Root's diagnosis retains its preservation check and the original command/raw/observer/log. This narrow review reads those records and unchanged helper/runtime/fresh pins; it does not rerun all151physical/11native/94path/19compiled checks. No helper, source, compiled output, native, deadline, guard or test was changed by the correction.
+
+At assignment root reported session69121 active. This review does not probe its command, outputs or process and grants no successor closure or runtime credit. Root must later review actual natural closure, all errors and masking, manual classification, exact restoration and the identical GREEN cohort. No product command, source/index/QA write, missing-reservation probe or Claude message was performed.

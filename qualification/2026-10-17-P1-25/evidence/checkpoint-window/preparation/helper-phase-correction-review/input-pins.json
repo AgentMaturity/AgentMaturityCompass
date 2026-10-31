@@ -1,0 +1,47 @@
+[
+  {
+    "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/fresh-control-preparation/source-control-v2-admission-proposal.json",
+    "bytes": 1327,
+    "sha256": "49486f3b16d6a6a92c6143e4e01a33ed4901f20d9e9ffd13b0f57dd84ca69def"
+  },
+  {
+    "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/fresh-control-preparation/source-control.py",
+    "bytes": 19265,
+    "sha256": "7aecaaa15175013ccf6b2c4d2f54b6a4ca7921a3af407cfed57e0fcbf2c37be0"
+  },
+  {
+    "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/fresh-control-preparation/source-control-v2.py",
+    "bytes": 19281,
+    "sha256": "585b761a615a4fed59c1961ccd15b353728b73ab8c583dc5d83cbc4df89f6f27"
+  },
+  {
+    "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/fresh-control-preparation/source-control-v2.patch.txt",
+    "bytes": 926,
+    "sha256": "4bf775358ade747466f5292cfe3c62a4a6fb4f3e934a5e749eb3763b05acb0ce"
+  },
+  {
+    "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/fresh-launcher-path-diagnosis.json",
+    "bytes": 6985,
+    "sha256": "b988395576e96f525b6f9891dde570eda8128529c00468013863d22789822cbf"
+  },
+  {
+    "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/helper-static-review/seal.json",
+    "bytes": 917,
+    "sha256": "9295633e3294aa02e065a9ee9faba7166f71235fd204b82790cd7b28031f82d1"
+  },
+  {
+    "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/helper-static-review/review.json",
+    "bytes": 9888,
+    "sha256": "8df0b3a546e8d62b14f0aa29dc6cf1b358e7359047f00305479456a8537d35d4"
+  },
+  {
+    "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/helper-static-review/README.md",
+    "bytes": 2932,
+    "sha256": "484a4cdc5eeed82ed1f1d8dd54b051afd7e88fba1824d2516bad7be6618fc5fe"
+  },
+  {
+    "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/helper-static-review/input-pins.json",
+    "bytes": 42808,
+    "sha256": "d550e59f582c15d8c8e28be72abf04cedbbf21b71898d2f7a3d5d56030775110"
+  }
+]

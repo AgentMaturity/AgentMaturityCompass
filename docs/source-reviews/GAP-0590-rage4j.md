@@ -1,7 +1,7 @@
 # GAP-0590 source review: explore-de/rage4j
 
 Date: 2026-06-20
-Worktree: `/Users/sid/AgentMaturityCompass-worktrees/gap-0590`
+Worktree: `~/AgentMaturityCompass-worktrees/gap-0590`
 Branch: `agent/gap-0590`
 
 ## Relevance decision

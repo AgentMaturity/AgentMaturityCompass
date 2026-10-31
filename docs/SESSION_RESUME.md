@@ -10,7 +10,34 @@ Governed workspace tools and delegated children record their audits through that
 
 After a demonstrably dead local owner, recovery acknowledges a pending unsealed turn before resume. A recorded `turn/end` without its `turn/seal` still needs this acknowledgement; the existing end and tool outcomes are preserved. Unanswered tool calls receive synthetic unknown-outcome results and are never dispatched again. Recovery seals its acknowledgement and releases its claim. A failed recovery attempts a token-checked release so a retry in the same process can continue safely. If storage also prevents that release, AMC reports the combined failure instead of claiming recovery succeeded.
 
-`force` and a zero staleness window can bypass the recovery age wait; they cannot bypass a live or unknown owner. Dropping a service/database handle, including the test helper `simulateCrash()`, is not proof that its process died. A foreign-host owner and an owner whose local liveness cannot be established are refused. PID reuse may conservatively require waiting for that process to exit; AMC does not claim cross-host lease coordination.
+`force` and a zero staleness window can bypass the recovery age wait; they cannot bypass a live or unknown owner. Dropping a service/database handle, including the test helper `simulateCrash()`, is not proof that its process died. A foreign-host owner and an owner whose local liveness cannot be established are refused unless an operator takes the session over explicitly (below). PID reuse may conservatively require waiting for that process to exit.
+
+## Writer fencing, leases and takeover (P2-12)
+
+Every native row's signed writer meta is version 2: `{ v: 2, token, pid, hostId, state, epoch, leaseMs }`. It is the session's fencing token, signed with the row by the workspace `ledger-row` key and chained to the head it follows.
+
+- **Epochs.** `session/open` claims epoch 1. Every later claim (`session/resume`, `session/recovery-claim`) must raise the epoch of the signed row it follows by exactly one; the store checks this inside the same immediate transaction (SQLite) or writer mutex (JSONL) as the append. A row written by a version-1 writer reads as epoch 0.
+- **Fence at append.** An append whose writer is no longer the one the last signed row names is refused `STALE_EPOCH` ("a newer writer claimed this session; no further effects are dispatched by this process") before anything is written. An unreadable writer meta (an unknown token version) is refused `UNSUPPORTED_OWNER`. A version-1 row after a version-2 writer is refused `INVALID_FENCE`: the epoch cannot be downgraded.
+- **Fence at dispatch.** Before every model request (`src/agent/stepRunner.ts`) and before every governed tool body (the toolset's writer check, after any approval wait), the writer re-reads the session's last signed row and refuses `STALE_EPOCH` unless it still names this writer at its own epoch. A paused process that wakes after a takeover dispatches nothing and appends nothing.
+- **Refusals are recorded.** A fence refusal at dispatch, and a `STALE_EPOCH` or `UNSUPPORTED_OWNER` refusal at append, writes a signed `SESSION_WRITER_FENCE_REFUSED` audit row (session, code, stage, both writers' tokens and epochs) in its own sealed ledger session, because the refused writer cannot append to the session. If that row cannot be written, the refusal still stands and its message says so.
+- **Leases.** A writer's lease (`leaseMs`, default 60,000 ms) is live while the session's last signed row is younger than it. An idle live writer appends a signed `session/heartbeat` row at half the lease, only between turns. A writer inside a long turn writes no heartbeat; its lease can lapse, and only an explicit takeover can then replace it.
+- **Takeover.** A released owner, or a local owner whose process is demonstrably dead, is claimed as before. A remote owner, a local owner whose liveness cannot be established, or a live but unresponsive local owner is claimed only with `amc agent-loop run --session <id> --takeover-expired-writer "<reason>"`, and only once its lease has been expired for one more lease by the claimant's clock (one full lease of grace for clock skew). The claim row records the reason, the replaced owner, its epoch, its last row's time (its own clock) and the lease expiry; the claim row's own time is the claimant's clock. The store re-derives the takeover from the row it replaces and refuses a claim whose recorded takeover does not match. Without the option the refusal is `LIVE_WRITER` and names the time after which a takeover is possible. JSONL sessions keep their process-lifetime writer mutex and are not taken over.
+- **Anti-rollback.** A passing dispatch check, and a resume, raise this machine's high-water mark for the session journal (`session-journal:<sessionId>@<workspace scope>` in `<AMC home>/state/high-water.json`, the P1-08 store outside every workspace). Resume and recovery refuse a journal whose head is older than the mark (`ROLLBACK_DETECTED`, recovery reports `TAMPERED`) or whose row at the marked sequence holds other bytes (`FORK_DETECTED`). The mark is per machine: a fresh machine starts at none.
+- **Migration receipt.** The first version-2 claim on a session whose last writer meta is version 1 is followed by one signed `session/migration` row: `fromVersion` 1, `toVersion` 2, the source head's event id and hash, and the reason. Earlier rows are never rewritten.
+
+Signatures are checked against the workspace's own keys: a local audit trail, not a portable verdict.
+
+## Resume rules for interrupted calls (P2-12)
+
+Resume never runs a tool call again. After recovery has answered each unanswered call with a synthetic `TOOL_OUTCOME_UNKNOWN` result, `reconcileInterruptedCalls` (run by `runComposedTurn` before the resumed turn's first request) applies `resumeRuleFor` (`src/session/resumeRules.ts`) to each such call and appends one signed `tool/reconciled` row with the rule and the result (`completed`, `denied`, `not-found` or `unknown`).
+
+| Call | Rule | On resume |
+| --- | --- | --- |
+| `READ_ONLY`, not MCP | `may-repeat` | Not reconciled; nothing blocks a new call |
+| `fs.write` / `fs.edit` (`WRITE_LOW`, `WRITE_HIGH`) whose file still has its recorded `beforeSha256` (P1-36) | `repeat-with-same-idempotency-key` | Not reconciled; a journaled execution stays blocking until settled |
+| `NETWORK_EXTERNAL`, `FINANCIAL`, `DEPLOY`, `DATA_EXPORT`, `IDENTITY`, `SECURITY`, every MCP tool, any other write, an unknown class | `reconcile-first` | An `outcome_unknown` execution is asked of its system of record through `reconcile()` (P1-04) |
+
+The class and execution come from the call's verified receipt chain (P1-03), never from the journal's index row. A crash between an effect and its receipt leaves the execution `started`; recovery records it `outcome_unknown` (`process_died`), never as not run. While any journaled outcome stays unknown the action journal blocks the agent's later consequential calls (`blocked_by_unreconciled`) until `reconcile()` settles it or an operator resolves it with `amc action resolve`. `amc agent-loop run` composes no reconcile adapters, so there an interrupted `reconcile-first` call stays `unknown` and blocking; SDK callers pass `resume.reconcileAdapters`. A `tool/reconciled` row is recorded again on a later resume until the call is settled. A call AMC did not journal has no receipt to reconcile against and is reported `not-found`; under a compiled policy every class is journaled. The model still sees the recovery's unknown-outcome result for an interrupted call.
 
 ## Compatibility
 
@@ -32,7 +59,7 @@ or unsettled preparation/cleanup is never replaced on a timeout assumption.
 
 | Session state/backend | Read and verify | Resume/recovery | Fork |
 | --- | --- | --- | --- |
-| SQLite with supported signed ownership | Supported | Signed release or confirmed dead local owner required | Supported |
+| SQLite with supported signed ownership | Supported | Signed release, confirmed dead local owner, or an explicit recorded takeover after lease expiry required | Supported |
 | Legacy native SQLite without signed ownership | Supported; original bytes unchanged | Refused; no implicit ownership migration | Supported with verified parent hash |
 | Closed SQLite session | Supported | Resume refused; recovery is a read-only no-op | Supported |
 | JSONL with supported signed ownership and complete original evidence | Supported | Explicit release or confirmed dead local owner, original settings, authentic accounting and exclusive local writer required | Verified parent with available JSONL workspace writer |

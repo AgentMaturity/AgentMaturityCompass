@@ -1,0 +1,5 @@
+The quality count change is explained by actual evidence. Q111 and S have identical bytes for all 4,108 preexisting configured project files and the scanner/config/package inputs; S adds only the new helper test. The same Knip 6.39.0 scanner reports exactly one removed finding, the unused export compiledPolicyDenial, and no additions. That test directly imports and calls the unchanged export. This supports the test-import cause, with no production reachability or enforcement claim.
+
+Duplicates remain 1,268. Dead-code findings move from 2,724 to 2,723. All four actual quality gate commands exit 1 and remain RED; the separate diagnostic exits 0 only for successful comparison. No baseline, waiver, guard or source-quality policy changed.
+
+The precommit metadata assumption stop remains retained. Only the private metadata predicate needs to reflect the actual count. This review used read/hash/stat/JSON comparison only; it executed no scanner/product command and wrote no source, index or QA file.

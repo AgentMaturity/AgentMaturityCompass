@@ -1,0 +1,35 @@
+{
+  "at": "2026-10-16T23:02:20.220863+00:00",
+  "sourceCommit": "188681b32dc472983404dce19e7833cd76ee7576",
+  "boundedGrantLane": "Two genuine fresh-query grant and HTTP500-to-grant cases; actual nineteen-case source/fresh cohort plus two source-only causal controls and same-cohort exact-restoration greens.",
+  "wholeP1_25Complete": false,
+  "planComplete": false,
+  "priorGapsRetained": {
+    "path": "/private/tmp/p1-25-fallback-qualification-20261017/whole-issue-gaps.json",
+    "bytes": 2436,
+    "sha256": "a6fb6cb52d296fd50a9a2ea4c85bbbddb23d01e76fd2f1affb2aef5c9158cc83"
+  },
+  "currentGaps": [
+    "P1-01 published schema dependency and recorded gaps",
+    "Existing package/library approval criterion and held manual-generator scope",
+    "Two-bound checkpoint windows, cadence, automatic seal integration and other attestation issuance",
+    "Certificate/report/CLI integration and independently qualified trust-list loading",
+    "Full suite, coverage, CI/interoperability matrix, release and global RED quality",
+    "F37 explicit skip and all other held decisions; no whole-issue, plan or goal completion"
+  ],
+  "additionalFiniteGaps": [
+    "No direct timeout-to-genuine-grant proof: timeout-to500 and500-to-grant are separate cohorts.",
+    "No signed trust-list loader admission from the caller-provided test anchor used here."
+  ],
+  "nextComponentAfterThisClosure": "Real checkpoint pending-to-timestamped and required-refusal component qualification",
+  "nextTestNotAllocated": "tests/time/checkpointWindow.test.ts",
+  "humanOrOwnershipHoldsInventedForTechnicalWork": false,
+  "allHeldDecisionsAndF37Retained": true,
+  "quality": {
+    "duplicates": 1268,
+    "deadCodeFindings": 2719,
+    "status": "RED",
+    "waived": false
+  },
+  "rootReadCurrentSpecAndRouting": true
+}

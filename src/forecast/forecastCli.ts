@@ -1,4 +1,9 @@
-import { dirname, resolve } from "node:path";
+import { readFileSync } from "node:fs";
+import { forecastPolicyPath } from "./forecastStore.js";
+import { initForecastPolicyAsync, ForecastPublicationError } from "./forecastPublication.js";
+import { prepareForecastRefreshForOutput, ackAdvisoryForApiAsync, applyForecastPolicyForApiAsync,
+  forecastSchedulerRunNowForApiAsync, forecastSchedulerSetEnabledForApiAsync } from "./forecastApi.js";
+import { dirname, resolve, join, relative } from "node:path";
 import { ensureDir, writeFileAtomic } from "../utils/fs.js";
 import type { ForecastPolicy } from "./forecastSchema.js";
 import {
@@ -173,3 +178,27 @@ export function forecastPolicyDefaultCli(): ForecastPolicy {
   return defaultForecastPolicy();
 }
 
+
+export async function forecastInitCliAsync(workspace: string) { return initForecastPolicyAsync(workspace); }
+export async function forecastRefreshCliAsync(input: Parameters<typeof forecastRefreshCli>[0]): Promise<ReturnType<typeof forecastRefreshCli>> {
+  const params = { ...input }, target = params.outFile ? resolve(params.outFile) : null;
+  const read = (): Buffer | null => { if (target === null) return null; try { return readFileSync(target); } catch (error) { if ((error as NodeJS.ErrnoException).code === "ENOENT") return null; throw error; } };
+  if (target !== null && [forecastPolicyPath(params.workspace), join(params.workspace, ".amc", "amc.config.yaml"), join(params.workspace, ".amc", "trust.yaml")]
+    .some(path => target === resolve(path) || target === resolve(`${path}.sig`))) throw new Error("forecast output aliases a selected signing or forecast policy input");
+  const expected = read(), prepared = await prepareForecastRefreshForOutput(params), refreshed = prepared.result;
+  let outFile: string | null = null;
+  if (target !== null) try {
+    const body = target.endsWith(".json") ? JSON.stringify(refreshed.forecast, null, 2) : renderForecastMarkdown(refreshed.forecast);
+    if ([refreshed.latestPath, refreshed.snapshotPath].some(path => path !== null && (target === resolve(path) || target === resolve(`${path}.sig`))))
+      throw new Error("forecast output aliases a published forecast pair");
+    prepared.assertCurrent();
+    const current = read(); if (expected === null ? current !== null : current === null || !expected.equals(current)) throw new Error("forecast output destination changed while signing");
+    outFile = writeOutFile(target, body);
+  } catch (cause) { throw new ForecastPublicationError(Object.freeze([refreshed.latestPath, refreshed.snapshotPath].filter((path): path is string => path !== null).map(path => relative(params.workspace, path))), "cli-output", null, null, cause); }
+  return { status: refreshed.forecast.status, latestPath: refreshed.latestPath, snapshotPath: refreshed.snapshotPath, advisories: refreshed.advisories.length, outFile };
+}
+export async function advisoryAckCliAsync(input: Parameters<typeof advisoryAckCli>[0]) { return ackAdvisoryForApiAsync({ ...input }); }
+export async function forecastSchedulerRunNowCliAsync(input: Parameters<typeof forecastSchedulerRunNowCli>[0]) { return forecastSchedulerRunNowForApiAsync({ ...input }); }
+export async function forecastSchedulerEnableCliAsync(workspace: string) { return forecastSchedulerSetEnabledForApiAsync({ workspace, enabled: true }); }
+export async function forecastSchedulerDisableCliAsync(workspace: string) { return forecastSchedulerSetEnabledForApiAsync({ workspace, enabled: false }); }
+export async function forecastPolicyApplyCliAsync(input: Parameters<typeof forecastPolicyApplyCli>[0]) { return applyForecastPolicyForApiAsync(input); }

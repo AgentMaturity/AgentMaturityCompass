@@ -73,6 +73,7 @@ interface ProfileOptions {
   agent?: string;
   persona?: string;
   approvalGated?: boolean;
+  missionContext?: boolean;
   at?: string;
   json?: boolean;
 }
@@ -95,6 +96,7 @@ function profileOptionsFrom(opts: ProfileOptions): AgentPromptProfileOptions | n
     workspace: opts.workspace ?? process.cwd(),
     agentId: opts.agent ?? "default",
     approvalGated: opts.approvalGated === true,
+    ...(opts.missionContext === true ? { missionContext: true } : {}),
     ...(opts.persona === undefined ? {} : { persona: opts.persona }),
     ...(at === undefined ? {} : { now: (): number => at })
   };
@@ -110,6 +112,7 @@ function withProfileOptions(command: Command): Command {
       "--approval-gated",
       "assemble as a composition whose tool calls really are gated on a signed approval"
     )
+    .option("--mission-context", "include the agent's validated mission and constraints as attributed runtime context")
     .option("--at <iso>", "pin the clock, so the output is comparable between runs")
     .option("--json", "Output as JSON");
 }

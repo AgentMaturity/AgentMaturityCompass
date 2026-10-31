@@ -1,0 +1,47 @@
+{
+  "schema": "p107-fresh-control-peer-seal/1",
+  "state": "ACTUAL_FRESH_CANONICAL_AND_THREE_SOURCE_CONTROLS_CLOSED",
+  "blockers": [],
+  "inputCount": 239,
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/fresh-control-chain-review/review.json",
+      "bytes": 28151,
+      "sha256": "fcbc38e58d4a30a2f17e7d33bd95e3b53d54fc4bb8641cd1f2de93037317a11d"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/fresh-control-chain-review/identity-joins.json",
+      "bytes": 357779,
+      "sha256": "f82fd40e594e9f6a75599c9b5cd3d230e038430419d980e87ade84b78e7b4670"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/fresh-control-chain-review/failure-evidence.json",
+      "bytes": 91284,
+      "sha256": "769b9896c8992340d4a331acbf1ea7a157391d1901e4216db0b1d18d42226611"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/fresh-control-chain-review/public-evidence-review.json",
+      "bytes": 54559,
+      "sha256": "48cb2e362104316b4157fd405492ef236a03ac81bc811a0eb71b911bfb58c7ff"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/fresh-control-chain-review/preservation-checks.json",
+      "bytes": 34785,
+      "sha256": "ef73d73c73d65124c295cd9418c9011dd12cc59a913652124496c54c229467d7"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/fresh-control-chain-review/README.md",
+      "bytes": 1835,
+      "sha256": "fce2907afd4e75682ff1d0c087932df4a152c87ab211a00ae88534be92a1fe82"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/fresh-control-chain-review/pins.json",
+      "bytes": 79432,
+      "sha256": "058d6658a99bc68caaccc580b0ef05db934f0e6240a44968e7dcba4c62a0942c"
+    }
+  ],
+  "canonicalCases": 971,
+  "phases": 7,
+  "noExecution": true,
+  "checkoutIndexQaWrites": false
+}

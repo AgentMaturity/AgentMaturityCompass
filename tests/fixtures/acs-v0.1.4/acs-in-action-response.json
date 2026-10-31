@@ -1,0 +1,49 @@
+{
+  "jsonrpc": "2.0",
+  "id": "req-001",
+  "result": {
+    "type": "final",
+    "acs_version": "0.1.0",
+    "request_id": "550e8400-e29b-41d4-a716-446655440000",
+    "decision": "allow",
+    "reasoning": "Recipient is trusted (user_input); body lineage is untrusted but the trusted recipient + possibly-tainted body combination is permitted by FIDES P-F under acme-baseline version v1.",
+    "reason_codes": [
+      "fides_p_f_check_passed",
+      "ibac_capability_match"
+    ],
+    "policy_references": [
+      {
+        "policy_id": "acme-baseline",
+        "policy_version": "v1",
+        "rule_id": "allow-trusted-recipients"
+      },
+      {
+        "policy_id": "acme-ibac",
+        "policy_version": "v1",
+        "rule_id": "email-send-in-intent"
+      }
+    ],
+    "policy_data": {
+      "fides": {
+        "recipient_trust": "trusted",
+        "body_trust": "untrusted",
+        "p_f_passed": true
+      },
+      "ibac": {
+        "matched_capability": {
+          "tool": "email.send",
+          "resource": "manager@example.com"
+        }
+      }
+    },
+    "cited_provenance_ids": [
+      "p1",
+      "p3"
+    ],
+    "metadata": {
+      "evaluator": "deterministic",
+      "evaluator_version": "opa-0.65",
+      "evaluation_duration_ms": 12
+    }
+  }
+}

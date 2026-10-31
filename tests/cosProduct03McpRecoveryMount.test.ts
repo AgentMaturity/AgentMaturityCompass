@@ -12,6 +12,7 @@ import { agentToolset } from "../src/agent/agentToolset.js";
 import { SessionService } from "../src/session/sessionService.js";
 import { discoverNativeMcpCatalog, mountNativeMcpServer, nativeMcpToolName, type MountedNativeMcpServer } from "../src/mcp/nativeMcpClient.js";
 import type { NativeMcpHttpServer } from "../src/mcp/nativeMcpHttpTransport.js";
+import { removeActionPolicy } from "./helpers/actionPolicyFixtures.js";
 
 // Loopback-only executable regression fixtures. Authoring these tests does not
 // execute them, initialize a workspace, resolve credentials or start a server.
@@ -36,6 +37,7 @@ async function fixture() {
   vi.stubEnv("AMC_VAULT_PASSPHRASE", "p03-synthetic-test-vault-passphrase");
   const workspace = mkdtempSync(join(tmpdir(), "amc-p03-mcp-recovery-"));
   initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+  removeActionPolicy(workspace); // AXR-02: no Action Policy configured, as before; this file is not about it (amc init signs one).
   initBudgets(workspace); writeRuntimeFirewallPolicy({ workspace, mode: "observe" });
   const name = nativeMcpToolName("p03", "mutate"), config = loadToolsConfig(workspace);
   initToolsConfig(workspace, { ...config, tools: { ...config.tools,
@@ -217,7 +219,7 @@ describe("P03 governed native MCP recovery", () => {
   test("an ambiguous tool POST failure explains uncertainty and never automatically dispatches again", async () => {
     const f = await fixture(); await f.mount(); f.state.toolMode = "drop";
     const result = await f.call();
-    expect(result.outcome).toBe("ERROR"); expect(String(result.content)).toContain("remote tool may have executed");
+    expect(result.outcome).toBe("TOOL_OUTCOME_UNKNOWN"); expect(String(result.content)).toContain("remote tool may have executed");
     expect(String(result.content)).toContain("not replayed"); expect(String(result.content)).not.toContain(SECRET);
     expect((await f.call()).outcome).toBe("DENIED"); expect(f.posts("tools/call")).toHaveLength(1);
     expect(f.calls.filter(call => call.cursor?.startsWith("tool:"))).toHaveLength(0);
@@ -227,7 +229,8 @@ describe("P03 governed native MCP recovery", () => {
     const f = await fixture(); await f.mount(); f.state.toolMode = "resume"; f.state.holdToolRecovery = true;
     const controller = new AbortController(), calling = f.call(controller.signal);
     await vi.waitFor(() => expect([...f.held].some(item => item.kind === "tool")).toBe(true));
-    controller.abort(new Error("synthetic cancellation reason")); expect((await calling).outcome).toBe("CANCELLED");
+    // WP16: the tools/call was dispatched before recovery was cancelled, so its remote effect is unknown, not cancelled.
+    controller.abort(new Error("synthetic cancellation reason")); expect((await calling).outcome).toBe("TOOL_OUTCOME_UNKNOWN");
     await vi.waitFor(() => expect([...f.held].some(item => item.kind === "tool")).toBe(false));
     expect((await f.call()).outcome).toBe("DENIED"); await new Promise<void>(resolve => setTimeout(resolve, 400));
     expect(f.posts("tools/call")).toHaveLength(1); expect(f.calls.filter(call => call.cursor?.startsWith("tool:"))).toHaveLength(1);
@@ -244,7 +247,7 @@ describe("P03 governed native MCP recovery", () => {
 
   test.each([401, 403, 404] as const)("HTTP %s during recovery requires explicit repair/remount and preserves the no-replay warning", async status => {
     const f = await fixture(); await f.mount(); f.state.toolMode = "resume"; f.state.resumeStatus = status;
-    const result = await f.call(); expect(result.outcome).toBe("ERROR");
+    const result = await f.call(); expect(result.outcome).toBe("TOOL_OUTCOME_UNKNOWN");
     expect(String(result.content)).toContain(status === 404 ? "session expired" : "headerRefs");
     expect(String(result.content)).toContain("not replayed"); expect(String(result.content)).not.toContain(SECRET);
     expect((await f.call()).outcome).toBe("DENIED"); expect(f.posts("tools/call")).toHaveLength(1); expect(f.posts("initialize")).toHaveLength(2);

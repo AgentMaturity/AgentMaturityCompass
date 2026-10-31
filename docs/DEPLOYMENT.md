@@ -43,13 +43,22 @@ Open:
 
 ## Kubernetes (Helm)
 
+Chart 0.2.0 renders no Secret by default and refuses `replicaCount` other than 1 (the workspace has a single writer). Create the `amc-bootstrap` Secret first, from files only you can read, then install:
+
 ```bash
-helm lint deploy/helm/amc
-helm template amc deploy/helm/amc
-helm install amc deploy/helm/amc
+node scripts/deploy/deploy-pack-check.mjs   # helm lint, renders and kubeconform when installed
+kubectl create namespace amc-system
+kubectl -n amc-system create secret generic amc-bootstrap \
+  --from-file=vaultPassphrase=./vault-passphrase.txt \
+  --from-file=ownerUsername=./owner-username.txt \
+  --from-file=ownerPassword=./owner-password.txt
+helm upgrade --install amc deploy/helm/amc --namespace amc-system --atomic --wait \
+  --set image.repository=<registry>/amc-studio --set image.digest=sha256:<64 hex> --set image.requireDigest=true
 ```
 
-Full operator guide: `docs/KUBERNETES_HELM_DEPLOYMENT.md`.
+Then pin the monitor key and run `helm test` as [Verify Runtime](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/KUBERNETES_HELM_DEPLOYMENT.md#verify-runtime) describes: the test needs a one-time pairing code, and in a running deployment its verdict is a verified prefix (`verified-prefix`), never a complete-ledger verification.
+
+Full operator guide, including the notary keys, the chart-created Secret option and upgrading from chart 0.1.0: [`docs/KUBERNETES_HELM_DEPLOYMENT.md`](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/KUBERNETES_HELM_DEPLOYMENT.md).
 
 Example values profiles:
 
@@ -112,6 +121,6 @@ Use the secret-file configuration and `AMC_TLS_HOST` in the Compose guide. Caddy
 
 Studio owns `/console`, `/api/v1/*`, native Studio API routes and gateway traffic. The standalone API owns `/api/health`, `/api/quickscore`, `/api/badge/*` and `/api/industry-packs/*`. Its internal port 3220 avoids Studio ToolHub's port 3213. Studio authentication and RBAC remain in force. Legacy quickscore remains unauthenticated self-reporting, marked `evidenceVerified: false`; it does not produce an evidence-verified maturity assessment. The badge remains a placeholder, identified by its response header.
 
-For a Node host, `pnpm build` includes the compiled standalone API. Run `PORT=3220 pnpm api:start:production` alongside Studio. The production API requires runtime dependencies, neither TypeScript source nor `tsx`. Existing Railway and Vercel configurations serve only the standalone API.
+For a Node host, `pnpm build` includes the compiled standalone API. Run `PORT=3220 pnpm api:start:production` alongside Studio. The production API requires runtime dependencies, neither TypeScript source nor `tsx`. Existing Railway and Vercel configurations serve only the standalone API. They stay documented but unqualified (decision D-03): neither serves Studio or the gateway, so neither can pass the post-deploy verifier in [`DEPLOYMENT_CONFIRMATION_RUNBOOK.md`](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/DEPLOYMENT_CONFIRMATION_RUNBOOK.md).
 
 Qualify installed packages, containers, TLS, restart and rollback on the chosen host before exposure. Hosting identity and required key-rotation proof remain operator prerequisites. These commands are instructions, not evidence of an executed deployment.

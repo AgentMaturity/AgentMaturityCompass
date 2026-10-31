@@ -907,7 +907,7 @@ lines = [
 for i, (name, status, detail) in enumerate(results, 1):
     icon = "✅" if status == "PASS" else ("❌" if status == "FAIL" else "⚠️")
     lines.append(f"| {i} | {name} | {icon} {status} | {str(detail)[:100]} |")
-report_path = "/Users/sid/.openclaw/workspace/AMC_OS/PLATFORM/STRESS_TEST_REPORT.md"
+report_path = "~/.openclaw/workspace/AMC_OS/PLATFORM/STRESS_TEST_REPORT.md"
 with open(report_path, "w") as f:
     f.write("\n".join(lines))
 print(f"Report: {report_path}")

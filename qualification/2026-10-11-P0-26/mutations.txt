@@ -1,0 +1,28 @@
+M1: remove EDU-SE-11 from src/domains/industryPacks.ts (decision defer) -> expect FAIL
+     × kept and deferred questions stay in their pack; only confirmed drops are gone 4ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  tests/f5DropDecisions.test.ts > F5 drop decisions (P0-26) > kept and deferred questions stay in their pack; only confirmed drops are gone
+AssertionError: EDU-SE-11 (defer): expected undefined to be 'specialized-education' // Object.is equality
+      Tests  1 failed | 3 passed (4)
+exit=1
+M2: set EDU-SE-11 decision to drop with reviewedBy null (question still present) -> expect FAIL
+     × a keep or drop exists only with Sid's logged review and floor policy 3ms
+     × kept and deferred questions stay in their pack; only confirmed drops are gone 0ms
+     × the latest P0-26 receipt carries the same decisions P1-42 reads 3ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+AssertionError: expected null to be 'Sid' // Object.is equality
+AssertionError: EDU-SE-11 (drop): expected 'specialized-education' to be undefined // Object.is equality
+M3: Sid-reviewed drop of EDU-SE-11 while the question is still in the registry (re-added) -> expect FAIL
+     × kept and deferred questions stay in their pack; only confirmed drops are gone 3ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+AssertionError: EDU-SE-11 (drop): expected 'specialized-education' to be undefined // Object.is equality
+      Tests  1 failed | 3 passed (4)
+M3b control: Sid-reviewed drop of EDU-SE-11 and the question removed -> expect PASS
+      Tests  4 passed (4)
+M4: receipt decisions.json differs from docs/program/f5/decisions.json -> expect FAIL
+     × the latest P0-26 receipt carries the same decisions P1-42 reads 5ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+AssertionError: expected { issue: 'P0-26', …(7) } to deeply equal { issue: 'P0-26', …(7) }
+      Tests  1 failed | 3 passed (4)
+Restored: expect PASS
+      Tests  4 passed (4)

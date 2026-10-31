@@ -52,4 +52,18 @@ export class NativeMcpOAuthTokenStore {
   save(grant: NativeMcpOAuthGrant): Promise<void> {
     return this.with(store => store.set(nativeMcpOAuthGrantRef(grant.issuer, grant.resource), JSON.stringify(grant)));
   }
+
+  /**
+   * Re-reads the grant under the credential store's cross-process lock and
+   * stores what `compute` returns before releasing it (PXA-18). A peer's
+   * rotation is therefore seen instead of redeeming the old refresh token again.
+   */
+  modify<T>(issuer: string, resource: string,
+    compute: (grant: NativeMcpOAuthGrant | null) => Promise<{ readonly grant?: NativeMcpOAuthGrant; readonly result: T }>,
+    lockTimeoutMs?: number): Promise<T> {
+    return this.with(store => store.modify(nativeMcpOAuthGrantRef(issuer, resource), async current => {
+      const { grant, result } = await compute(parse(current, issuer, resource));
+      return { result, ...(grant ? { value: JSON.stringify(grant) } : {}) };
+    }, lockTimeoutMs === undefined ? {} : { lockTimeoutMs }));
+  }
 }

@@ -26,6 +26,7 @@ import { defaultGatewayConfig, initGatewayConfig } from "../src/gateway/config.j
 import { startGateway } from "../src/gateway/server.js";
 import { initBudgets } from "../src/budgets/budgets.js";
 import { issueLeaseForCli } from "../src/leases/leaseCli.js";
+import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 
 const roots: string[] = [];
 
@@ -35,6 +36,7 @@ function newWorkspace(): string {
   const _savedVaultPass = process.env.AMC_VAULT_PASSPHRASE;
   process.env.AMC_VAULT_PASSPHRASE = "governor-test-passphrase";
   initWorkspace({ workspacePath: dir, trustBoundaryMode: "isolated" });
+  writeRuntimeFirewallPolicy({ workspace: dir, mode: "observe" }); // AXR-01: ToolHub and hook control apply the runtime firewall as the native pipeline does; unsigned, it blocks every call.
   initBudgets(dir, "default");
   return dir;
 }
@@ -259,6 +261,7 @@ describe("governor + toolhub + workorders", () => {
     mkdirSync(join(workspace, "workspace"), { recursive: true });
     writeFileSync(join(workspace, "workspace", "readme.txt"), "hello");
     const intent = service.createIntent({
+      initiator: "test-operator",
       agentId: "default",
       toolName: "fs.read",
       args: { path: "./workspace/readme.txt" },
@@ -349,6 +352,7 @@ describe("governor + toolhub + workorders", () => {
     const service = new ToolHubService(workspace);
 
     const intentA = service.createIntent({
+      initiator: "test-operator",
       agentId: "default",
       toolName: "fs.read",
       args: { path: ".amc/amc.config.yaml" },
@@ -359,6 +363,7 @@ describe("governor + toolhub + workorders", () => {
     expect(deniedPath.result.auditType).toBe("TOOLHUB_BYPASS_ATTEMPTED");
 
     const intentB = service.createIntent({
+      initiator: "test-operator",
       agentId: "default",
       toolName: "process.spawn",
       args: {
@@ -398,6 +403,7 @@ describe("governor + toolhub + workorders", () => {
     }).ticket;
 
     const intentValid = service.createIntent({
+      initiator: "test-operator",
       agentId: "default",
       workOrderId: workOrder.workOrderId,
       toolName: "process.spawn",
@@ -435,6 +441,7 @@ describe("governor + toolhub + workorders", () => {
     const forgedExpired = `${expiredPayloadB64}.${signatureB64}`;
 
     const intentInvalid = service.createIntent({
+      initiator: "test-operator",
       agentId: "default",
       workOrderId: workOrder.workOrderId,
       toolName: "process.spawn",
@@ -554,6 +561,7 @@ describe("governor + toolhub + workorders", () => {
     }).workOrder;
 
     const intent = service.createIntent({
+      initiator: "test-operator",
       agentId: "default",
       workOrderId: workOrder.workOrderId,
       toolName: "process.spawn",

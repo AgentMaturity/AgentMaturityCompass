@@ -7,7 +7,7 @@ approvers decided on. A4 produces signed, `self_reported` records of how the age
 statement that the agent is safe, correct or lawful.
 
 Status: preview. Every A4 route and Studio page is absent unless the operator sets `AMC_A4_PREVIEW=1` in the Studio
-process environment (D-20). The spine (store, gates, readiness, verification, Studio shell) has landed; each stage's
+process environment (D-20), and every `amc a4` command refuses without it in its own environment. The spine (store, gates, readiness, verification, Studio shell) has landed; each stage's
 producers land with its own plan item (Aspire P1-59, Assemble P1-60, Adapt P1-61, Activate P1-62), and until then a
 stage records human-authored content through the "no producer registered" path, labelled as such. The decisions behind
 the design are in `docs/adr/013-a4-forge-spine.md`; the verifier rules are in `spec/ACCEPTANCE_RULES.md`
@@ -20,7 +20,12 @@ them, confirmed by a person), **explained** (choices at the reader's level), **p
 specification), **direction approved** (the direction gate), **built**, **reviewed**, and **completion approved** (the
 completion gate, which moves the project to the next stage). A change of specification is a new revision; any open
 gate on the old one goes stale. An owner can hold, resume, reopen an earlier stage, tune a released agent or retire the
-project; each is a transition in the chain.
+project; each is a transition in the chain. While a project is held, every write but comments, members, `RESUME` and
+a rollback is refused with `409 A4_ON_HOLD` naming `ON_HOLD`, a second hold included; under an incident freeze the
+code is `409 FREEZE_ACTIVE`. When a project's records fail verification it reads BLOCKED: every route that loads it,
+readiness included, answers `409 A4_INTEGRITY_FAILED` with `detail: { status: "BLOCKED", reasonCodes:
+["A4_INTEGRITY_FAILED"] }` and names no row, because no readiness is evaluated over those records and the member rows
+that decide who may read the project can be among what failed. Only `GET …/verify` reports the problems.
 
 ## Glossary
 
@@ -35,6 +40,11 @@ project; each is a transition in the chain.
 | lane | `recommendation`, `implementation`, `observed` or `verified`: derived from the claim kind and the referenced row's trust tier, never chosen by the writer | scoring lanes |
 | SoD-distinct | a second principal in the same auth plane whom the separation-of-duties rules accept as a different person; satisfies a quorum, and the decision stays `self_reported` | independent |
 | independently reviewed | the claim kind reachable only from an admitted external record whose issuer key is outside the workspace and on the operator's trust list (P2-24, P3-21; not available yet) | a second member's APPROVE; AMC checking its own signatures |
+
+**Three lifecycle axes.** An agent moves on three axes that never share a word: the A4 **stage** above (`aspire` to
+`activate`, then `retired`), the `lifecycle.ts` **deployment stage** (`development`, `testing`, `staging`, `production`,
+`deprecated`), and the P2-23 **governance state** (`proposed`, `approved`, `active`, `suspended`, `retired`). A4 moves
+the deployment stage only through its bridge and reads and calls P2-23; it never re-keys either.
 
 **SoD-distinct is not independent.** Two members of one workspace sign under one workspace signing authority. Their two
 approvals meet a two-person quorum; they are not two independent reviews.
@@ -65,14 +75,18 @@ A signature proves who wrote a record and that it is unchanged since, never that
 | every transition | its `audit` ledger row (monitor key, hash-chained) with a receipt over the transition's bytes | this workspace wrote these bytes and has not changed them; the chain names every side row, so a deleted or altered row shows |
 | gate request, decision, release, deployment and rollback | additionally an `A4_RECORD` envelope (auditor key) | an auditor-key statement a verifier can admit from its own pinned trust list |
 | gate request | `binding_digest` over the request, stored in the signed row | the exact bytes approvers decided on; a decision with another digest counts for nothing |
-| stage output files | an `a4-stage-output` artifact signature | the file is unchanged since it was produced |
+| stage output files, Activate's monitor records and value claims | an `a4-stage-output` artifact signature (a value claim also carries its own `A4_RECORD` envelope) | the file is unchanged since it was produced |
 | binder slice | an `a4-binder` artifact signature over its manifest, plus a transparency entry | the slice's files are the ones exported |
 
 **Notary mode.** In `NOTARY` mode with the default `trust.enforcement.denyLocalVaultSigningIfNotaryEnabled: true`, every
-`A4_RECORD` envelope is a notary call, so each gate decision adds one. Today the readiness item `signing.notary_route`
-reports the `A4_RECORD` route only. `A4_PACKAGE` is not a sign kind yet: once Activate (P1-62) adds it, an operator whose
-`trust.yaml` lists `requireNotaryFor` explicitly keeps that list and must add `A4_PACKAGE` to it and re-sign
-`trust.yaml`.
+`A4_RECORD` envelope is a notary call, so each gate decision adds one. At Activate the readiness item
+`signing.notary_route` reports the `A4_RECORD` and `A4_PACKAGE` routes (see Activate below). AMC's own notary signs
+only the kinds its notary config lists in `allowedSignKinds`, and its default list names neither `A4_RECORD` nor
+`A4_PACKAGE`: add both there, or every A4 signature fails as `NOTARY_UNREACHABLE`. A4's own checks of an `A4_RECORD` or
+`A4_PACKAGE` signature (a release record's `envelopeValid`, the packaged update policy, a value claim's envelope) accept
+the auditor key history or the notary the signed trust config pins. Artifact signatures (`.sig` files) are a known
+limit: in NOTARY mode they are signed by the notary, and AMC's artifact verifier admits only the auditor keys, so those
+files read unsigned until that verifier admits the pinned notary.
 
 ## Approvals and separation of duties
 
@@ -102,8 +116,10 @@ self-approved decision is recorded with `self_approved = 1` and its facts, and a
 
 An owner may acknowledge some WAITING items (for example `sod.self_provisioned`). The item stays WAITING with
 `OWNER_ACKNOWLEDGED`, is bound into the next gate when it is one of the stage's bound items, lapses after 90 days and is
-never cleared. A BLOCKED item cannot be acknowledged. Acknowledge before requesting the gate: an acknowledgement
-supersedes an open gate on the same revision. Adapt's `plan_unresolved` (an owner's out of scope; never on a regulated
+never cleared. A BLOCKED item cannot be acknowledged. An item is acknowledged only at the project's current stage
+(`409 A4_STEP_ORDER` at any other, and Studio offers Acknowledge only there, and only for an item whose acknowledgement
+would count, by the same rule as the server). Acknowledge before requesting the gate: an
+acknowledgement supersedes an open gate on the same revision. Adapt's `plan_unresolved` (an owner's out of scope; never on a regulated
 project, `409 A4_NOT_ACKNOWLEDGEABLE`, and one recorded earlier does not count there), `regulatory_sources_status`,
 `context_probe_unavailable` (a JSONL session store) and `plan_activated` (only from Review on while its activation is
 deferred, `PLAN_ACTIVATION_DEFERRED`: each step before Review records a new revision, and an acknowledgement counts only
@@ -119,8 +135,18 @@ merge, so across projects a lock change renders as `scope_changed` ("catalog loc
 and re-approve.
 
 An activated compiled plan whose identity binding requires a lease used to deny every native tool call from Studio
-tasks, which carry none. P1-67 has Studio mint a lease per native task runtime; Adapt (P1-61) models the remaining
-cases as the readiness item `adapt.plan.nativeSessionsAllowed` (`PLAN_DENIES_NATIVE_SESSION`) rather than hiding them.
+tasks, which carry none. P1-67 has Studio mint a lease per native task runtime, and P1-79 has CLI agent runs
+(`amc agent-loop run`, and a native schedule pass), SDK native client sessions, `amc acp` sessions and an in-process
+`openAgentSession` given no lease, with workspace tools, mint their own (`src/leases/runLease.ts`) while the plan
+requires a principal; their delegated children inherit it. Adapt (P1-61) models the remaining cases as the readiness
+item `adapt.plan.nativeSessionsAllowed` (`PLAN_DENIES_NATIVE_SESSION`, `NATIVE_TASK_LEASE:P1-67`, `RUN_LEASE:P1-79`,
+`DELEGATED_CHILDREN_INHERIT_LEASE`) rather than hiding them: tasks started before activation carry no lease and are
+denied every call.
+`L0-IDN-01` also requires a principal, and since P1-78 the lease names the task's signed-in principal, so Studio refuses
+at start (409 `PRINCIPAL_UNRESOLVED`) a task whose principal is not an active local `users.yaml` user, a workspace-router
+session or the admin token included. A run's lease names the active `users.yaml` user whose username is the OS account,
+so a run whose OS account is not one is refused `PRINCIPAL_UNRESOLVED` before its session opens or a delegated child
+starts (the CLI exits non-zero, ACP answers -32602). The item lists `PRINCIPAL_REQUIRED` and `NON_LOCAL_USER_SESSIONS_DENIED` and says so.
 Every revision now binds `plan.journalEntrySha256` (the active compiled-plan journal's head; any activation, in A4 or
 from the CLI, makes an open gate `RESOURCE_DRIFTED`) and `plan.lockDigest` (the shipped catalog's lock, digested without
 `generatedBy`, the AMC version that built it, which `verifyCatalogLock` ignores too: an AMC upgrade with an unchanged
@@ -132,8 +158,10 @@ revision. The same holds for the context slots (`context.contextPluginSha256`, `
 activation record of the agent). Those files sit outside `.amc/`: an entry that is not a regular file (a link, a FIFO)
 or a profile directory that is a link reads `RESOURCE_UNREADABLE`. A prompt pack rebuilt by the prompt
 scheduler moves `context.promptPackSha256`, so an open gate reads `RESOURCE_DRIFTED` until it is requested again.
-Under an active plan, Studio mints a native task's lease with the workspace lease key, which the vault holds: while the
-vault is locked, `adapt.plan.nativeSessionsAllowed` reads WAITING (`LEASE_NOT_ISSUED`, `VAULT_LOCKED`). The item decides
+Under an active plan, Studio mints a native task's lease with the workspace lease key, which Studio's vault holds: while
+that vault is locked, `adapt.plan.nativeSessionsAllowed` reads WAITING (`LEASE_NOT_ISSUED`, `VAULT_LOCKED`). A CLI, SDK,
+ACP or in-process run with workspace tools signs its own lease with the vault of its own process (`AMC_VAULT_PASSPHRASE`),
+which the item does not read; a run whose process cannot unlock it mints no lease and is refused. The item decides
 from the journal head the head revision bound only while that head is current: a head moved since (an activation from
 the CLI, another project or this one) or a journal that no longer verifies reads NOT_EVALUATED
 (`PLAN_HEAD_MOVED_OR_UNREADABLE`), never `NO_ACTIVE_PLAN`.
@@ -164,7 +192,8 @@ framework through a scaffold, connect instructions and a trace import.
   through `spawnSubagent` (depth limit, signed handoff packet, declared scope, a started/completed pair); AMC never
   starts helper agents on its own. Studio's native build sessions compose no delegation, so the plan lists the workflow
   as unsupported (`NATIVE_TASKS_NO_DELEGATION`) and it stays listed until an owner acknowledges it out of scope. Once a
-  compiled plan is active its default `visibleTools` hides the tool, and the plan names that denial
+  compiled plan is active its `visibleTools` hide the tool unless the signed tools.yaml it was compiled from lists it
+  (the built-in default list does not), and the plan names that denial
   (`C6_COMPILED_POLICY_DENIES`, with the plan revision and its tool-pipeline controls); an unreadable plan counts as
   hiding it.
 - **Build** (an owner) signs the agent's preset into `.amc/agents.yaml` (the presets file is verified and parsed from
@@ -174,13 +203,21 @@ framework through a scaffold, connect instructions and a trace import.
   tasks page as the session's owner; the Build card loads the owner's build log with the same cursor contract. Build
   refuses, before any write, a session start Studio's native tasks would refuse (`ANSWER_INVALID:validation` or
   `ANSWER_INVALID:capabilities`): a check missing from the operator's config, checks without the signed workspace
-  `bash`, or more than 8 or duplicate check ids. Propose already leaves such checks out of the plan and lists them as
+  `bash`, or more than 8 or duplicate check ids. It also refuses, before any write, a native workspace-tools session
+  whose lease would name no active `users.yaml` user under a plan that requires one (P1-78): under a plan whose identity
+  binding requires an agent lease and a principal (`L0-IDN-01`), Studio's native service names the session's own
+  `users.yaml` user in that lease and refuses anyone who is not an active local user, a workspace-router session
+  included, so Build answers 409 `PRINCIPAL_UNRESOLVED` first instead of journaling a session that could never start.
+  Other lease-mint failures, a revoked or unreadable `lease` key (`LEASE_UNAVAILABLE`) or a plan that does not verify
+  (`POLICY_UNVERIFIED`), still surface as the session's start error after the step is recorded. Propose already leaves such checks out of the plan and lists them as
   unsupported (`NOT_IN_VALIDATION_CONFIG`, `VALIDATION_SCOPE_REQUIRED`), and builds the prompt from the capabilities with
   control characters removed, cut by code point.
 - **External path.** After Build and before Review, an owner can write the path's scaffold, the bridge contract tests
   and the agent's policy pack into a new workspace directory outside `.amc/` (the record binds a manifest of every
   file's sha256; the files are written after it commits), get connect instructions (the lease token is shown once and
-  never stored; the record keeps the leaseId), and import the agent's traces through the neutral importer (originals
+  never stored; the record keeps the leaseId; the lease names the owner who asked for it when they are an active
+  `users.yaml` user, and under a plan whose identity binding requires a principal anyone else is refused 409
+  `PRINCIPAL_UNRESOLVED` before a lease is minted, P1-78), and import the agent's traces through the neutral importer (originals
   retained; imported traces are self-reported). A source already imported is refused (`IMPORT_EXISTS`): an existing
   import, which an earlier record may name, is never rewritten or rolled back. Whoever scaffolds, connects or imports
   counts as a builder of the stage: they cannot approve its completion gate or the `a4.assemble.apply` request. The scaffold directory and the import source are workspace paths of
@@ -235,7 +272,10 @@ the agent's prompt pack.
   stations are carried), excluded uses, data residency, retention and processors, and deployment needs. Understand
   carries `markets` and `stations` from Aspire. An empty or `unknown` fact stays unknown (null) and is never guessed;
   `jurisdictions` left empty uses the carried markets. Every fact is the member's assertion (`provenance: asserted`,
-  source `a4:<projectId>@r<revision>`). Understand compiles the plan with `compilePlan` on that profile and records the
+  source `a4:<projectId>@r<revision>`). Understand compiles the plan with `compilePlan` on that profile and the
+  workspace's signed `.amc/tools.yaml` (`signedTools`, read and verified by `compileInputs`, as `amc catalog
+  compile` reads it: its tools are the plan's visible tools and the plan binds its SHA-256; with no tools.yaml, the
+  built-in default list; one that does not verify is the compile refusal `TOOLS_CONFIG_UNVERIFIED`) and records the
   applicability per requirement with its reasons and missing facts, each citation's `appliesWhen`, the register entries
   of the stations with `verified` as recorded, the reporting-clock candidates (each `NEEDS_CLASSIFICATION`, with
   `CLOCK_REVIEW_STATUS`), the signed configs' states and the active plan's head. The missing facts name the questions
@@ -248,14 +288,35 @@ the agent's prompt pack.
   approval is an acknowledgement, not an expert review), activation and the lockout, and what is declared but not
   enforced (data handling: P2-01, P2-02; reporting clocks: P3-23).
 - **Propose** freezes the profile, the plan, the diff against this project's previous proposal, the operating scope
-  and the declared data handling (`enforcement: none`). **Build** signs the plan (`CONTROL_PLAN`, checked against this
+  and the declared data handling (`enforcement: none`). Adapt's catalog-sized parts are stored once, outside the revision rows (P2-42): on
+  the shipped catalog the compiled plan alone is about 140 to 150 KiB (the catalog lock, the evidence plan, the
+  requirements), and the why-view, the register entries, the clock candidates, the explanation and Review's control
+  lists grow with every station, past the 256 KiB specification limit. Each Adapt row binds them by a ref,
+  `{ schema: "amc.a4-derived-ref/v1", kind, sha256, digest }`: kind `compiled-plan` for the plan (at `plan` and
+  `understanding.facts.plan`; `digest` is the plan's own digest) and kind `json` (`digest: null`) for
+  `understanding.facts.requirements`, `.register` and `.clocks`, `explanation.facts`, and
+  `review.conformance.controls` and `review.statement.controls` when larger than 1 KiB. The canonical bytes are written,
+  after the release secret scan, to `a4-projects/<projectId>/derived/<sha256>.json` (plain directories, no link on the
+  way). Every reader (readiness, Build, Review, activation, the producers) gets each part back checked against its ref;
+  a missing file, other bytes, a ref that does not parse or a ref of the wrong kind for its place is
+  `409 A4_INTEGRITY_FAILED` on every route that loads the project, never an empty part, and `verifyA4Chain` reports it
+  as `A4_DERIVED_MISSING`, `A4_DERIVED_MISMATCH` or `A4_DERIVED_REF_INVALID` with the sha256. Restoring the file (any
+  copy with the same bytes) heals it. `GET …/revisions/:n` answers the stored form, so its `spec` still hashes to
+  `specDigest`; `GET …/revisions/:n/resolved` (`amc.a4-revision-resolved/v1`) answers the spec with every part put
+  back and checked exactly as above (fail closed), with the stored form's `specDigest`, and is what the Studio pages
+  read. The parts hold AMC's compilation of the catalog, the register and the explanation renderings of it, with no
+  member free text, so they are stored plain: erasure leaves them and a verifier needs no key to read them. A revision
+  recorded before P2-42 carries its parts inline and is read as it is. The 256 KiB limit is unchanged; a project on
+  all seven stations stores about 15 KiB per Adapt row (about 810 KiB resolved). **Build** signs the plan (`CONTROL_PLAN`, checked against this
   workspace's keys: a local audit trail). Build is an owner's, as at Aspire and Assemble: it signs the plan and re-signs
   the agent's Enforce manifest. Before it writes, the agent's resources must match its signed Enforce manifest (else
   `409 ENFORCE_DRIFTED`: review the drift in Enforce and re-baseline it there), and it re-writes the manifest only when
   its own writes moved nothing but the agent's memory directory, signed: a manifest that cannot be written or signed is
   refused before anything is published (`requireSignature`), and Build is refused with 409 and that code
   (`MANIFEST_SIGNATURE_INVALID`, for example) with its writes put back. A plan weaker than the plan this project put in force
-  is refused (`POLICY_WIDENING_REFUSED`). Every refusal comes before Build writes, including the router's own size
+  is refused (`POLICY_WIDENING_REFUSED`); when the weakening is the tools.yaml binding (its digest dropped, more visible
+  tools or a wider tools entry) it adds `TOOLS_CONFIG_CHANGED` and says to re-sign tools.yaml or rebuild the plan instead
+  of changing the answers. Every refusal comes before Build writes, including the router's own size
   (256 KiB) and credential checks of the record Build makes (`413 INPUT_TOO_LARGE`; Propose already refuses a proposal
   that leaves Build no room). When a write fails, or the step is not recorded after Build returned (the head moved, the
   transition was refused, a replay answered), the memory policy, the context plugin and the Enforce manifest and its
@@ -282,7 +343,8 @@ the agent's prompt pack.
   plugin in its frame.
 - **Context probe.** `POST /api/v1/a4/projects/:id/stages/adapt/probe` (after Build; owner; owner mode) runs one
   in-process turn on the stub provider, with no network and no credential, with the plugin as an extra context. A4
-  composes the turn and writes nothing into its session: no tools and no receipt of its own. The runtime writes an
+  composes the turn and writes nothing into its session: no tools and no receipt of its own, and no lease, which no
+  call needs: the identity binding of an active plan is checked per tool call, and the turn makes none. The runtime writes an
   effective-policy receipt only before a governed tool call, and this turn makes none, so there is no receipt to cite.
   The probe checks that the run's signed `user/message` row carries the plugin's exact text and reads the turn's signed
   `turn/end` reason, and records the session's own signed `session/open` row (which names the agent) as a `ledger_event`
@@ -343,7 +405,10 @@ the agent's prompt pack.
   verifies that grant and re-checks separation of duties and membership; `activateControlPlan` then consumes it itself
   (`activate-<digest32>`, recorded on `EFFECT_FINISHED`). A failed activation is not retried in place: re-open the
   effect gate (only after a failed, unfinished attempt; on a consumed gate anything else is `409 A4_GATE_STALE`,
-  `consumed`). Only a ready plan activates: opening the review on a blocked plan is `409 PLAN_BLOCKED`. Whenever
+  `consumed`). Only a ready plan activates: opening the review on a blocked plan is `409 PLAN_BLOCKED`, and on a plan
+  whose bound tools.yaml digest is not the workspace's verified tools.yaml now (re-signed, added or removed since Build;
+  absent on both sides matches) `409 TOOLS_CONFIG_CHANGED`: build the plan again. A weaker plan whose weakening is the
+  tools.yaml binding adds `TOOLS_CONFIG_CHANGED` to `PLAN_WEAKENS_ACTIVE_PLAN`. Whenever
   activation is due or opened, `plan_activated` is BLOCKED from Review on for a plan `activateControlPlan` would refuse
   (`PLAN_BLOCKED`, `PLAN_WEAKENS_ACTIVE_PLAN`, `ACTIVE_PLAN_UNREADABLE`); before Review the same codes show on a WAITING
   item that is not mandatory, so it never holds the direction gate. A workspace has one active plan for every agent:
@@ -364,12 +429,380 @@ the agent's prompt pack.
   does at once, and every project's next revision in the workspace records the active plan's head. That stays the
   remaining limit: a project whose revisions recorded another project's active plan keeps the regulated quorum and
   identity floors (two distinct keys, live-checked identities) although its own plan is not activated. Under an active plan, Studio native tasks with workspace tools started after activation run under a lease
-  (P1-67); tasks started before it, CLI agent sessions and delegated children are denied every call.
+  (P1-67), and CLI agent runs, SDK native client sessions, ACP sessions and in-process sessions with workspace tools
+  mint their own for the OS account's active `users.yaml` user, which their delegated children inherit (P1-79); tasks
+  started before it are denied every call.
 - **Lifecycle bridge.** Adapt's rows (`testing → staging`) are the only source of `controlsSatisfied` for that advance:
   `integration_tests_passing` from executed checks that all passed on a non-stub provider, `security_review_signed`
   only from a `review_record` entry met by an admitted external record (an AUDITOR role vote alone leaves it
   `not_evaluated` with `REVIEW_NOT_INDEPENDENT`), `deployment_plan_approved` from the consumed Activate direction gate.
   Adapt never advances the lifecycle; the A4 lifecycle wrapper (P1-62) does.
+
+## Activate: the release, the package and the leases
+
+Activate asks where and how the release runs: the target (`compose` or `helm`, both recordable in v1), the
+`destinationRef` host that a receipt and AMC's check must name (a host name and port, never a URL with credentials), the
+lease scopes, action classes, staging and production routes, models and caps, release ownership, the update policy,
+outcomes, monitoring expectations and rollback acceptance. Adapt's `deploymentNeeds` is carried as an answer, and the
+destination questions depend on it. Understand reads the lifecycle stage and the controls staging and production
+require, the deploy base files, image identity (null: the bootstrap report records no image digest, so
+`GET /api/v1/a4/options` answers `imageDigest: null` with its reason), where this Studio runs, freeze, the signing route
+of `A4_RECORD` and `A4_PACKAGE`, the DEPLOY approval rule and earlier releases. Explain renders them at three levels.
+Propose freezes the release draft (the eight-surface table, package, lease, update, monitoring, rollback and value
+plans) and copies the agent's context files and the signed configs into `a4-projects/<projectId>/<revision>/<sha256>`.
+
+The release approval is Activate's direction gate (DEPLOY floor). Once it has its quorum, an owner opens the effect gate
+`a4.activate.release` (a second, separately decided DEPLOY request), and `POST …/releases { gateId, expectedHeadSeq,
+clientRequestId }` (owner) consumes the release approval and runs the effect inside the request:
+
+1. The package is built only from content-addressed inputs: the Enforce snapshot that the bound resources digest names
+   (`snapshots/<manifestId>/files`, each resource digested as Enforce digests it and equal to the signed snapshot) and
+   the captured files read by the digest the gate bound. A file edited after the gate opened is
+   `EFFECT_FAILED: RESOURCE_DRIFTED <slot>` and no package is written.
+2. The package must scan `PASS` for secrets. Only then is the staging lease minted: `WRITE_LOW` at most, the staging
+   routes, 24 hours, bound to this workspace and agent, with the release as its work order, naming the owner who ran
+   the release when they are an active `users.yaml` user (P1-78; see the principal rule below).
+3. The manifest (`amc.a4-package/v1`, no absolute path; it names the staging lease by id and scope, never its token)
+   is signed `A4_PACKAGE` and the tarball `a4-package`.
+   `RELEASE`'s own refusals (`RELEASE_STEP_MOVED`, `RELEASE_STAGE_REDONE`, `RELEASE_ATTEMPT_SETTLED`) are checked before
+   anything is minted or signed. A failure that records no release revokes the lease it minted and removes the release
+   directory and its tarball files.
+4. `RELEASE` records the release (`amc.a4-release/v1`): the eight-surface table (Score, Shield, Enforce, Vault, Watch,
+   Comply, Fleet, Passport; Passport reads `not_evaluated` until P0-55), the previous and base release (TUNE lineage),
+   the rollback target (the release running in production now: the newest one with a succeeded production deploy row
+   that was not rolled back, which the deploy plan's prepared rollback steps also name), the staging lease id and its
+   own `A4_RECORD` envelope.
+5. Only after `RELEASE` commits does the transparency log get an `a4-package` entry, so a refused release attests nothing
+   there. `EFFECT_FINISHED` names the entry; a retry reuses the entry of the same release and package, and
+   `GET …/releases/:rid` reads the entry from the log, or shows the reason it is missing. When the append fails the
+   release still finishes, but readiness item `package.transparency` is BLOCKED (`TRANSPARENCY_NOT_APPENDED`, or
+   `TRANSPARENCY_LOG_UNREADABLE`) until an entry in the log names the release's exact package digest, so the deployment
+   approval cannot be requested on an unanchored package. `POST …/releases/:rid/transparency { expectedHeadSeq,
+   clientRequestId }` (owner, owner mode; the Activate card's "Append the transparency entry") appends it: idempotent,
+   refused `EFFECT_RUNNING` while the release effect still runs.
+
+The response carries the staging token once. AMC stores it nowhere: the request's replay row keeps only the attempt id,
+and a replay answers from the chain: `token: null` with `TOKEN_ALREADY_DELIVERED` once that attempt finished, the
+attempt's own failure code when it failed, and `EFFECT_NOT_SETTLED` while it has not settled. A failed attempt revokes the lease it minted, and a
+retry revokes every lease an earlier attempt of the release minted before minting again. `GET …/releases/:rid` shows the
+record with its envelope checked now, each lease's live status and a reason for every surface not evaluated.
+
+The deployment approval is Activate's completion gate. Consuming it runs `a4.activate.production_lease` on its own
+quorum and answers the production lease's token once (the answered scopes, routes and caps). The token goes to the
+caller, so an owner that gate's quorum counted cannot complete it (409 `SOD_VIOLATION`): an effect's quorum excludes its
+caller, as the release effect's engine request already does. A retry of a failed effect applies the same rule against
+the keys its consumed grant or gate quorum counted. An effect step that finds the vault locked (the lease key, an
+artifact signature) answers 423 `A4_VAULT_LOCKED`. Both effects read the vault's `lease` and `revocation-list` purpose keys (P1-08)
+before their first side effect (a revocation, a file, a lease or a signature), so a locked vault (423 `A4_VAULT_LOCKED`) or a
+revoked key (409 `A4_KEY_REVOKED`, naming the purpose and the recovery, `amc keys rotate --purpose <purpose>`) fails
+them before the effect itself changes anything, and revoking an earlier attempt's lease with the vault locked answers the same code rather than `LEASE_REVOKE_FAILED`.
+Any other failure to read those keys (an unreadable or unverifiable key revocation list, an incomplete key set) is 409
+`SIGNING_FAILED` with its reason.
+The same pre-flight resolves the principal each lease names (P1-78): the owner who ran the effect, keyed as A4 keys
+its principals and never read from a body. Layer 0's mandatory `L0-IDN-01` makes every plan Adapt activates require a
+principal for every tool call, and a call under a lease that names no active `users.yaml` user is refused; so under
+such a plan (or one that does not verify) `complete`, `POST …/releases` and a retry refuse anyone else, a
+workspace-router session included, with 409 `PRINCIPAL_UNRESOLVED` before the gate or the engine grant is consumed:
+readiness lists `PRINCIPAL_UNRESOLVED` under that caller's `progress` and `retryEffect` at Activate, and the effect's
+pre-flight resolves the principal again inside the transaction that would consume the gate or start the retry, so
+neither `GATE_CONSUMED` nor `EFFECT_STARTED` is written and step 0 never runs. The effect resolves the principal once
+more beside the key reads, before anything is revoked, written, minted or signed, and the lease is minted through
+`issueLeaseForPrincipal`, which resolves it again; a refusal inside the effect happens only when `users.yaml` or the
+plan changed after the gate was consumed, and it spends the attempt. Under any other plan the lease names that user
+when they resolve, and no one otherwise. Readiness item `lease.principal` shows this before anyone approves: READY
+(`PRINCIPAL_NOT_REQUIRED`) when the plan requires no principal; otherwise WAITING (`PRINCIPAL_REQUIRED`, never
+mandatory) with the rule as its next action, and BLOCKED, mandatory, while no active `users.yaml` user holds the
+workspace role OWNER or `users.yaml` does not read (`NO_ACTIVE_LOCAL_OWNER`, `USERS_UNREADABLE`) and a lease is still
+to be minted this cycle, so neither approval is requested or approved for an effect no one could run; it does not refuse a
+`DENY`, which mints nothing (on the completion gate the `DENY` revokes the staging lease). Once the production lease is
+recorded it reads READY (`PRINCIPAL_EFFECTS_DONE`), never mandatory.
+A vault that is already locked when `complete`, `POST …/releases` or a retry is sent is refused before anything is
+consumed: readiness reads `signing.available` WAITING `VAULT_LOCKED` (409 `A4_NOT_READY`). A `DENY` on an unconsumed
+completion gate revokes the staging lease of the release that gate binds; a decision on a consumed gate is refused
+(`A4_GATE_STALE: consumed`) and revokes nothing. The revocation is signed with the vault's `revocation-list` key, even in
+NOTARY mode, so such a `DENY` is refused with 423 `A4_VAULT_LOCKED` while the vault is locked and 409 `A4_KEY_REVOKED`
+while that key is revoked, rather than recorded with the staging lease left live. If a revocation still fails after the `DENY` is recorded, the `DENY` stands and the answer is
+409 `LEASE_REVOKE_FAILED` naming the lease ids, never a success (423 `A4_VAULT_LOCKED`, also naming them, when the vault
+locked meanwhile, and on a replay sent while it is locked): sending the same request again (same
+`clientRequestId`) retries the revocation, or the operator revokes the lease with `amc lease revoke`. The staging lease lasts 24 hours and a completion gate lasts at least a day after it is requested, so
+the staging lease has expired before such a gate can.
+
+Readiness at Activate: `ask_complete`, `understanding_confirmed`, `release_proposed`, `package.inputs`,
+`package.transparency` (BLOCKED while the current release's package has no transparency entry), `deployment.same_host` (BLOCKED `DEPLOYMENT_NOT_SAME_HOST`, naming P2-40, unless this Studio runs under the chosen
+target: v1 deploys by restarting it), `deployment.topology` (`TOPOLOGY_QUALIFIED_LOCALLY_ONLY` for Helm,
+`TOPOLOGY_NOT_QUALIFIED` for Compose, each with `CI_QUALIFICATION_PENDING`) and
+`deployment.image_pinned` (`IMAGE_TAG_ONLY`), both WAITING and never mandatory, `lease.scope` (`LEASE_STAGING_ONLY`
+until the production lease), `lease.principal` (`PRINCIPAL_REQUIRED` under an identity-binding plan, see above), `deployment.amc_check` (`DEPLOYMENT_UNCHECKED`) and `monitoring.source`
+(`MONITOR_NO_SOURCE`). `signing.notary_route` names both routes as `A4_RECORD:<route>` and `A4_PACKAGE:<route>`. In
+NOTARY mode, with the default `denyLocalVaultSigningIfNotaryEnabled: true`, both kinds route to the notary. The
+`requireNotaryFor` default (which now lists `A4_PACKAGE`) applies only to a `trust.yaml` that omits the field. An
+operator whose `trust.yaml` lists `requireNotaryFor` explicitly and sets that flag to `false` adds `A4_PACKAGE` to the
+list and re-signs the file. Expect one notary call for every gate decision. With AMC's own notary, also add
+`A4_RECORD` and `A4_PACKAGE` to the notary config's `allowedSignKinds`: its default list names neither, and it refuses
+a kind it does not list, which A4 reports as `NOTARY_UNREACHABLE`.
+
+## Activate: deployment, AMC's check, rollback and the lifecycle bridge
+
+The package also carries the prepared deployment under `deploy/`: the Compose overlay
+`docker-compose.a4-<releaseId>.yml` or the Helm values overlay `values.a4-<releaseId>.yaml`, and `deploy/plan.json` with
+the steps (pre-flight `amc doctor --strict --json`, deploy, verification, rollback), the receipt form and the gaps. The plan
+is signed `a4-deployment-plan`. `GET …/releases/:rid` shows its steps only while that signature verifies and the
+verified package manifest lists the plan's digest (`plan: null` with the reason otherwise). AMC never runs these commands. Both targets are recordable in v1.
+Decision D-03 (option C, 2026-10-11) keeps all four topologies documented (Helm, Compose, Railway and Vercel), and A4 v1
+prepares Compose and Helm only (D-18). Neither is qualified in CI yet: Helm passed its qualification checks locally only
+(kind on macOS arm64, 2026-10-11; `TOPOLOGY_QUALIFIED_LOCALLY_ONLY`), Compose is documented but not qualified
+(`TOPOLOGY_NOT_QUALIFIED`), and Railway and Vercel stay documented but unqualified. The image is pinned by tag
+(`IMAGE_TAG_ONLY`): the bootstrap report records no digest of the image the Studio runs, so the Helm overlay leaves the
+chart's `image.digest` unset. The overlay, the plan's `topology` and `gaps` and the package README state both. Both are
+WAITING items, never blockers. The Compose overlay sets `AMC_CONTROL_CHECKPOINT_DIR` on its own named volume outside the
+workspace; the chart mounts only the workspace, so the Helm overlay cannot and the plan says so. The chart also renders
+a fixed environment list, so the Helm overlay cannot set `AMC_A4_PREVIEW=1` (`A4_PREVIEW_NOT_SET_BY_CHART`): the plan's
+deploy step sets it on the Studio container after the upgrade. The lease token is mounted
+as an operator-supplied secret file. The update policy is `update-policy.yaml`, signed beside it (`A4_PACKAGE`); nothing
+enforces it yet (P2-34).
+
+`POST …/releases/:rid/deployments` (owner, owner mode) records the operator's receipt
+(`amc.a4-deployment-receipt/v1`, signed `a4-deployment-receipt`, `self_reported`): `kind` (`deploy`, or `rollback` after
+a rollback), `environment`, `target`, `packageDigest`, `imageDigest`, `overlayDigest`, `restartedAt` (operator-stated),
+`helmRevision` (a Helm target only), `leaseIds`, `destinationRef` and `operatorStated.status`. It lists what changed and
+nothing more. It is refused with `DEPLOYMENT_NOT_SAME_HOST` (naming P2-40) unless this Studio runs under the target, and
+with `PACKAGE_DIGEST_MISMATCH`, `LEASE_NOT_OF_RELEASE` (a staging receipt names the staging lease, a production receipt the
+production lease), `DESTINATION_MISMATCH` (a deploy receipt names another destination than the release was packaged for)
+or `TARGET_MISMATCH`. A production deploy receipt is also refused `ROLLBACK_TARGET_ROLLED_BACK` once the release's
+recorded rollback target was rolled back, and `ROLLBACK_TARGET_ROLLBACK_PENDING` while a production rollback of that
+target has started and is not recorded (see Rollback below). No lease is issued and no runtime run is created. A succeeded production receipt
+moves the project's `deployedReleaseId`; a succeeded production rollback row moves it to the release rolled back to. A
+rollback row records the one rollback the approvers approved, found in any cycle (a reopen or tune recorded after the
+rollback leaves its row recordable): it names that rollback's environment (`ROLLBACK_ENVIRONMENT_MISMATCH` otherwise),
+its `leaseIds` name only leases the release rolled back to minted (in any cycle), and it is refused once a succeeded row
+of that rollback is recorded (`ROLLBACK_ROW_RECORDED`). A production rollback row is also refused once the release it
+rolled back to was itself rolled back (`ROLLBACK_TARGET_ROLLED_BACK`), and is `ROLLBACK_SUPERSEDED` once any succeeded production row (a deploy, or another release's rollback row) followed the
+rollback, and unless the rolled-back release is the one production ran (read without that rollback), so it never moves
+`deployedReleaseId` back past a later production row or to a rolled-back release. A staging row moves nothing, so
+production rows never refuse it, and neither does a later rollback of the release it rolled back to. Whoever
+records a deploy receipt counts as a builder of the revision: the deployment approval rests on their statement, so they
+cannot approve it (`builder_not_completion_approver`) and are among its excluded keys.
+
+`POST …/releases/:rid/verify { environment }` (owner, owner mode) is AMC's own check of the newest receipt's
+`destinationRef`. It sends no credential, and a body naming a URL is 400. A receipt whose destination is not the one the
+release was packaged for (its own revision's proposal, which the signed `deploy/plan.json` records; never a later
+revision's answers) fails at once (`DESTINATION_MISMATCH`). The host goes through `resolveAndCheck`: a destination that
+resolves to a private, link-local or mapped address is refused (409 `VERIFY_EGRESS_REFUSED`, naming the address), and
+nothing is recorded. AMC lists no private address, and no signed opt-in exists in v1. The connection is pinned to the
+checked address. TLS verifies against the system CA set, any 3xx fails, and the check is bounded at 5 s and 256 KiB.
+`/readyz` READY gives `reachable`; a 503, a redirect, a refused certificate or a mismatch gives `failed`. The image,
+package and plan-head checks are `not_evaluated` ("no unauthenticated digest source at the destination (P2-40)"), so
+`passed` is unreachable in v1. No probe turn runs. The row keeps the operator's `recorded_status` untouched and adds
+`amc_check_status`, the resolved address, the response digest and a VerifierReportV1. The status text composes both
+columns, for example "recorded: succeeded; AMC check: reachable, release identity not evaluated at the destination
+(P2-40)".
+
+Rollback is its own effect gate. `POST …/releases/:rid/rollback/preview { environment }` (owner) previews it and opens
+`a4.activate.rollback`, a DEPLOY engine request on the release's direction gate that approvers decide under A4's
+separation of duties. Only the release running in the chosen environment rolls back: in production the newest one
+with a succeeded production deploy that was not rolled back, in staging this cycle's release (409
+`ROLLBACK_RELEASE_NOT_RUNNING` otherwise, so a release a later one superseded never restores an older snapshot). The
+preview names the rollback target from the release record (the release that ran in production when this one was built,
+never merely the previous release), its Enforce manifest, the leases, the prepared commands and whether a freeze comes first. A
+recorded target that was itself rolled back since can never be restored, and its prepared commands would re-pin it, so
+the preview then names no target: no Enforce manifest, Compose's base file as its one prepared command (it re-pins no
+release) and no command on Helm (a Helm rollback re-pins whatever release its chosen revision deployed, and the revision
+before this release's upgrade normally deployed the rolled-back target), only the revocations (and the freeze for a high
+or critical risk tier), with a restore note naming the recorded target, saying it was rolled back and saying the same. Studio shows that note and marks the plan's own rollback steps superseded. The engine request binds
+that preview, so its approvers see it. A target rolled back after the preview refuses the confirmation (409
+`ROLLBACK_TARGET_ROLLED_BACK`); preview again. Such a release never reaches production, so only a staging preview names
+no target: once its target was rolled back its deployment approval is BLOCKED, and its production lease and a production
+deploy receipt are refused (`ROLLBACK_TARGET_ROLLED_BACK`, `deployment.receipt` below), and so they are while a
+production rollback of its target has started and is not recorded (`ROLLBACK_TARGET_ROLLBACK_PENDING`: a release built
+then names the same target, so that rollback is finished first, run again in production if it failed). A staging attempt
+of the target's rollback does not bar the release. A production lease minted before the target's production rollback started is
+revoked by it (step 4 below). `POST …/releases/:rid/rollback { environment, toReleaseId, confirmManifestId, reason }`
+then confirms the exact ids the preview bound. The rollback is journaled like every A4 effect: `EFFECT_STARTED` (owner
+pid and host, heartbeat) commits first, pinned to `expectedHeadSeq`, once the vault's `artifact-seal` and
+`revocation-list` keys read (423 `A4_VAULT_LOCKED` while it is locked, 409 `A4_KEY_REVOKED` for a revoked one, before anything), on rows that still pass both preview refusals
+above, and a second attempt while one runs is refused (`EFFECT_RUNNING`). So is a rollback while the deployment approval's production-lease effect runs, and that effect refuses
+to mint (`RELEASE_ROLLED_BACK`) once a rollback of the release has started (any attempt, settled or not: a failed one may
+already have consumed its grant and restored the Enforce snapshot), so no lease is minted beside a rollback. Then
+it runs these steps:
+
+1. The engine grant, consumed by this rollback's execution.
+2. An incident freeze, first, for a high or critical risk tier.
+3. `restoreEnforceResourceSnapshot({ apply: true, confirmManifestId })`.
+4. Every lease of the release revoked, read again at this point: the preview's, a production lease minted after the
+   preview, and any lease a failed attempt journaled. A production rollback also revokes the production lease of every
+   release, in any cycle, whose recorded rollback target this release is, which can then never deploy to production. The
+   receipt and `ROLLBACK` list them all.
+5. The prepared operator commands answered.
+6. A signed `a4-rollback-receipt` written, and `ROLLBACK` with `EFFECT_FINISHED` recorded in one transaction. The
+   receipt states AMC's own steps (`amcSteps`: the restore receipt and the freeze; `leaseIdsRevoked`), and its
+   `recordedStatus` is null: the operator's statement of what they ran is their rollback row, never AMC's step outcome. The project
+   holds when a freeze was raised.
+
+A step that throws is `EFFECT_FAILED` with its code, and readiness names the rollback route to run it again. An attempt
+whose outcome could not be written reads as lost (`PROCESS_LOST`). The next request settles it first, then re-runs the
+steps on the grant this rollback's execution already consumed, whose quorum is not asked again (a grant another
+execution consumed is refused `GRANT_ALREADY_USED`). Each attempt records the approver keys its quorum counted on
+`EFFECT_STARTED`, and a confirmer among them is refused `SOD_VIOLATION`. The restore and the revocations are idempotent. Before it settles,
+the rollback reads the lease journal again and revokes any lease minted after its first read. A replay of the request answers that attempt's outcome. A
+rollback may run on a held or frozen project, and the operator's rollback row after it may be recorded there too. The lifecycle is never moved backwards. The project's
+`deployedReleaseId` moves only when the operator records a production rollback row.
+
+The lifecycle bridge runs after `RELEASE` and after the deployment approval's production lease. After `RELEASE` it moves
+an agent still at development to testing (the Aspire charter gate, an executed non-stub validation and the brief's misuse
+section), then testing → staging. After the production lease it moves staging → production. Each step advances only when
+every control of the bridge table has a ref, and records each control's ref, claim kind, `satisfiedBy` and reason: the
+release record keeps the release bridge's rows, and the deployment approval's effect record keeps the production
+bridge's, which `GET …/releases/:rid` shows beside the production rows as they stand now. In v1 `rollback_plan_validated` and `operator_handoff_acknowledged` need a `passed` AMC check,
+so the agent stays at staging (P2-40). `assurance_pack_passing` needs an assurance run artifact.
+`monitoring_slo_enabled` stays not evaluated: the SLO report is process-wide and labels no agent, so a monitor ref's SLO
+measurements are context, never this agent's SLO monitoring.
+
+Readiness adds these items:
+
+- `deployment.receipt`: the newest receipt recorded `succeeded`, its signed file resolving. It is bound with its id, so
+  a later receipt stales an open deployment approval. Once this cycle's release is rolled back it is BLOCKED
+  `RELEASE_ROLLED_BACK`, which stales an open deployment approval, and it reads BLOCKED `RELEASE_ROLLBACK_STARTED` once
+  any attempt of its rollback has started (even one that failed), so the deployment approval is refused before it is
+  consumed. A new `deploy` receipt for that release is refused with `RELEASE_ROLLED_BACK`, and so is its production lease,
+  both already once a rollback attempt started. It is also BLOCKED `ROLLBACK_TARGET_ROLLED_BACK` (naming
+  `ROLLBACK_TARGET:<id>`) once the release's recorded rollback target was rolled back, and BLOCKED
+  `ROLLBACK_TARGET_ROLLBACK_PENDING` (naming the target and the route that runs its rollback again) while a production
+  rollback of that target has started and is not recorded: the release could never restore it, so the production-lease
+  effect and a production deploy receipt refuse it with the same code. Reopen or tune Activate to release again, once a
+  pending rollback of the target is recorded (a release built before that names the same target).
+- `deployment.amc_check`: bound to the receipt and its newest check (`CHECK:none` before one). A later check stales the
+  approval. It is BLOCKED while the release's newest check `failed`: a newer receipt alone does not clear it, only a
+  later check that does not fail. It is WAITING `DEPLOYMENT_UNCHECKED` or `DEPLOYMENT_IDENTITY_NOT_EVALUATED` otherwise,
+  and from Review on, once it names a receipt, an owner may acknowledge either WAITING form (before that the
+  acknowledgement could never count, so it is refused `A4_NOT_ACKNOWLEDGEABLE`). The acknowledgement records the receipt and check ids it saw and
+  counts only while the item names the same ones, so it never carries over to a new receipt or check.
+- `backup.include_paths` (not mandatory): WAITING until the signed ops policy backs up `a4-releases/` and
+  `a4-projects/`. Fix it before proposing, because the release binds the signed ops policy.
+- `lifecycle.production_controls` (not mandatory): names the controls that keep the agent at staging.
+- `regulatory_sources_status` (D-21's regulated-production rule): on a regulated project it stays WAITING
+  `EXPERT_REVIEW_PENDING` (`KEY:D-08`), mandatory from Review on and bound, until an owner acknowledges it at Activate
+  before requesting the deployment approval. The acknowledgement counts on Activate's own revision only; one recorded at
+  Adapt does not carry over, and one before Review is refused `A4_NOT_ACKNOWLEDGEABLE` (every earlier step records a
+  new revision). The production lease effect refuses a regulated release without it (`EXPERT_REVIEW_PENDING`)
+  and records it; `GET …/releases/:rid` shows it as `expertReview`, and the Activate conformance statement lists it. An
+  unregulated project reads READY `NOT_REGULATED`.
+
+## Activate: review, monitoring and value
+
+Review at Activate (`POST …/stages/activate/review`, after `RELEASE`) reviews results; it approves nothing. It records:
+
+- The deployment rows in two columns, the production bridge as it stands and the remaining limitations, as a
+  self-reported output.
+- One monitor record of the release (`amc.a4-monitor/v1`, signed `a4-stage-output` under
+  `a4-releases/<projectId>/monitors/<releaseId>/`), as a `monitor` ref beside the step. A4 wrote it, so the ref is lane
+  implementation, `self_reported`, whatever its sources say. Each field is `{ value, source, trustTier, window }`, and each
+  source has its own claim envelope from the eligibility service:
+  - `slo`: the SLO state held by this process (`generateSloReport`). It is `self_reported` with evidence `incomplete`
+    (in-memory measurements, unsigned). The report covers the whole Studio process and labels no agent, so it cannot be
+    scoped to this project, and the record is served to every project viewer. The record therefore keeps only
+    `sloSummary` (scope `process_wide`, not scoped to this agent: the measurement count, the window, the report's sha256
+    and `overallStatus`) and the field `alertCounts` (the alerts already emitted, counted by severity). The report's
+    metrics, definitions, violations, alert bodies and cost-of-trust and ROI figures are never copied.
+  - `actionJournal`: the agent's open `outcome_unknown` executions, and its executions started since the release's
+    succeeded deploy receipt was recorded (that window is on the field), outside A4's own probe sessions, at the newest
+    such row's own tier.
+  - `approvals`: the counted approvals of the release and deployment approvals (human statements).
+  - `freeze`: the freeze and its incidents.
+  - `amcCheck`: AMC's newest check of the release's destination.
+  - `runtime` and `backup`: always `source_unavailable` in v1, with `value: null`.
+
+  `evaluateSloAlerts` is not called, because it advances the process's shared alert state; the record counts the alerts
+  already emitted by severity. The record's `killSwitch` field states the hold rule: an active P2-26 kill switch that covers the agent holds the
+  project, naming the kill and its incident id, until it is released and an owner resumes (P2-34). Only a source that observed the deployed
+  agent counts toward `monitoring.source`, and nothing does before the release's bound deploy receipt is recorded
+  `succeeded`. After it, a source counts when it is an execution in the action journal started since that receipt (at
+  its row's own tier; a row of A4's own probe session has none), or AMC's check of that receipt that connected and found
+  the destination reachable. A failed or unconnected check, A4's own approvals, the freeze reading and the process-wide
+  SLO report (it labels no agent and is not limited to the time since that receipt) are context and never count, so a
+  record with neither leaves the item WAITING `MONITOR_NO_SOURCE`. Each
+  source envelope carries the project's regulated flag.
+
+Once the review step has committed (never on a replay or a refusal), Review runs `createValueReport` once for the agent.
+Then one transition by `amc-runtime` records:
+
+- One `amc.a4-value-claim/v1` per KPI of the agent's value contract (signed `a4-stage-output`, with an `A4_RECORD`
+  envelope; a `value_claim` ref, `self_reported`).
+- The action journal's newest row of this agent since the deploy receipt, when that source counted, as its own
+  `ledger_event` ref, whose lane derives from that row.
+
+`GET …/value` never runs the report and never appends a value event. A missing value contract records no claim
+(`VALUE_CONTRACT_MISSING`), and the review still stands.
+
+A value claim keeps four lanes side by side:
+
+- recommended: the contract's `minGood` bound.
+- implemented: the value contract, only when its signature verifies; `none` otherwise.
+- observed: the value snapshot's number, only while every ledger ref behind it resolves to a row of this agent and none
+  dangles. A value event with no ledger ref, or a ref past the 256th, counts as dangling. A dangling ref makes the value
+  `null` and is counted, never dropped. AMC checks that the rows resolve, not that the number recomputes from them.
+- independently reviewed: `not_evaluated` (`ATTESTATION_SCOPE_EXCLUDES_KPI`) until an admitted external record names
+  the KPI and its window (P2-24, P3-21).
+
+`GET …/value` resolves every claim's refs again on each read. It also lists the members' other objectives
+(self-reported, not evaluated), the ROI worksheet (not evaluated; numeric self-answers) and the PMF hypotheses, each
+shown predicted, observed (the row's value, lane observed only while its ref resolves there) and verdict
+(self-reported). A hypothesis leaves `proposed` only through `POST …/hypotheses/:id/observe`. `GET …/monitor` returns the
+newest monitor record of the current release while its signed file resolves.
+
+Readiness and the bridge read the monitor record only while its file resolves:
+
+- `monitoring.source` is READY when the newest monitor ref of the current release has a source with a value. It is
+  WAITING `MONITOR_NO_SOURCE` before Review, and BLOCKED `MONITOR_REF_UNRESOLVED` when the signed record is missing or
+  changed.
+- `monitoring_slo_enabled` stays not evaluated while the SLO report labels no agent: a monitor ref's SLO measurements
+  are process-wide context.
+  `GET …/releases/:rid` shows the production bridge rows as they stand now, beside the rows recorded at release.
+- `release_effect` and `rollback_effect` (governance, not mandatory) name the open engine request of the release and
+  of the rollback, so the Studio cards can decide them bound to their digests.
+
+The Studio cards on the Activate page:
+
+- Release: the draft, the release request and the release, the deployment approval, and each lease token shown once
+  in that page only. The generic Complete button does not complete Activate, because it would drop the token.
+- The release record: the eight-surface table, the lifecycle provenance and the package file list.
+- The prepared plan, with a copy button for each command (the lease secret is a placeholder), the receipt form for
+  either target, and AMC's check beside the operator's status. Once the release's recorded rollback target was rolled
+  back (`rollbackTargetRolledBack` on `GET …/releases/:rid`), the plan's rollback steps read superseded, without copy
+  buttons: the rollback preview says what runs instead (Compose's base file; no Helm command).
+- The rollback preview, with its restore note, and its confirmation.
+- The monitor tiles.
+- The four-column value table and the hypotheses, with the observe form.
+
+The release, value and monitor views are read when you press Load, never on render.
+
+## Running agents: governance, envelopes, the kill switch and retention floors
+
+A4 consumes P2-23's governed lifecycle and P2-26's regulatory runtime (P2-34); it changes neither engine.
+
+- **Runtime changes.** A deployed project at Activate consumes the change records the runtime wrote since its release
+  last settled (a later `TUNE`, `REOPEN`, `RELEASE`, deployment or rollback row), once, as `amc-runtime`, before the next
+  write on the project. A change P2-23 recorded as passed (inside a P2-26 change envelope, or no mandatory control
+  invalidated) is a `TUNE` from the deployed release, at Assemble or Adapt as an owner's tune would derive it, without
+  reopening Adapt. A change P2-23 left open (a mandatory invalidated control, or a change outside the envelope, which
+  P2-23 suspends) is a `REOPEN` to Adapt followed by that `TUNE`. An overdue scheduled review is a `TUNE` only. For an
+  agent P2-23 does not govern, P2-26's envelope rows say the same: an applied envelope is covered, a required
+  reassessment is not. Both rows carry `automatic: true` and the runtime refs. A held project, or one already being
+  tuned, keeps the changes waiting.
+- **Kill switch.** An active kill switch that covers the agent (workspace, agent or action-class scope) is a freeze, so
+  the project is held automatically on the freeze path, naming the kill and its incident. `RESUME` is refused until the
+  kill is released and then needs an owner. Break-glass never lifts an A4 hold: A4 does not read break-glass records.
+- **Retention floors.** Adapt's readiness item `memory_policy_retention_floor` compares the memory policy's retention
+  (`memoryRetentionDays`) with P2-26's largest `logs` minimum for the active plan's regimes. Below it the item is
+  BLOCKED; a plan that cannot be read leaves it NOT_EVALUATED. The rules are experimental until the D-08 experts review
+  them.
+- **Version manifest.** The package embeds P2-23's `AgentVersionManifest` under `versionManifest` (the approval-bound
+  manifest, else the one observed at the agent's last session open) with the `manifestDigest` P2-23's signed row
+  carries; a digest that does not match refuses the release. An agent P2-23 does not govern is `not_governed`.
+- **Activation and retirement.** The deployment approval's effect moves an `approved` agent to `active` in P2-23 before
+  the production lease, its note naming the gate and its `binding_digest`: one human decision, two records. Any state
+  but `approved` or `active` refuses the effect. `RETIRE` of a deployed project retires the agent through P2-23 first
+  (leases revoked, open `outcome_unknown` receipts refused without the owner's acceptance note), then records `RETIRE`
+  naming that row.
 
 ## Deployment boundary
 
@@ -377,8 +810,8 @@ AMC prepares deployment plans and records what the operator says happened; it ne
 credentials and never merges the operator's statement with its own check. A deployment row has two columns:
 `recorded_status` (the operator's statement, `self_reported`) and `amc_check_status` (`not_evaluated`, `reachable`,
 `passed` or `failed`; AMC's own probe). In v1 the deployment is a same-host restart of the hosted Studio that built the
-agent, from a pinned image (D-18); the first real deployment target is P2-40. "Verified" is reserved for the
-independently reviewed lane.
+agent, from a pinned image (D-18); the first real deployment target is P2-40. The only outbound connection A4 makes is
+the owner's token-less check of a receipt's destination. "Verified" is reserved for the independently reviewed lane.
 
 ## Private text and erasure
 
@@ -388,15 +821,88 @@ ledger keeps a salted hash and the ciphertext's hash. Pasted text is retained un
 destruction is effective only after every backup, WORM segment or mirror older than it has been rotated out. Back up
 `a4-projects/` and `a4-releases/` with the workspace: a restore without them orphans every blob reference in the chain.
 
+**What carries `a4-projects/`.** `amc backup create` (src/ops/backup/backupEngine.ts) archives the paths the signed ops
+policy's `backups.includePaths` lists, and the default list is `.amc` only: add `a4-projects` and `a4-releases` and
+re-sign the policy (Activate's readiness item `backup.include_paths` reads WAITING with `BACKUP_PATH_MISSING:<dir>/`
+until both are listed). A WORM export (src/ops/retention/wormSideTables.ts) and the Postgres mirror carry ledger rows
+only, never `a4-projects/`. Since P2-42 that directory also holds Adapt's derived parts (`derived/<sha256>.json`), so a
+restore of the ledger alone (a database backup, a WORM restore, a Postgres failover to a host without the workspace
+files) leaves every Adapt revision of a project unreadable: each route that loads it answers `409 A4_INTEGRITY_FAILED`.
+To restore: put back `a4-projects/` from an `amc backup` archive whose policy listed it (or any copy of the workspace
+files), then run `amc verify all` or `GET …/verify`. Each part still missing is named `A4_DERIVED_MISSING: <kind>
+<sha256>`; the files are content-addressed, so any copy with that name and those bytes heals it, and a copy with other
+bytes is refused (`A4_DERIVED_MISMATCH`).
+
+**Erasure.** A project owner erases the private text with `POST /api/v1/a4/projects/:id/private/erase` (body `reason`,
+`expectedHeadSeq`, `clientRequestId`; owner mode). AMC destroys the project's key: a tombstone first, then the vault wrap
+secret and `key.enc`. Every `private/*.enc` blob stays on disk and becomes unreadable (`GET .../comments` answers
+`reasonCode: PROJECT_KEY_DESTROYED`), and no new private text is accepted. The destruction runs inside the P2-01 deletion
+gate (executor `a4-private-erase`, target `blobs`): an acknowledged `DELETION_ALLOWED` audit row comes first, and a legal
+hold or an unreadable hold registry refuses it with 409 `DELETION_DENIED` before anything is destroyed. The action is
+recorded as an `ERASED` transition. The inline rows keep their salted hashes, so the chain still verifies. A hold, a
+freeze or retirement does not block erasure; read-only mode does. Erasure is effective only once every backup, WORM
+segment and mirror older than it has been rotated out: each still holds the key file and the vault envelope with the
+wrap secret. The `ERASED` record states this in its `effective` field.
+
+**Deletion.** `scripts/deletion-executors.json` lists `a4-projects/` and `a4-releases/` as never deleted. AMC removes no
+file there except the erasure above and a failed release attempt's own outputs that no `RELEASE` names. Any future A4
+cleanup must go through `assertDeletionAllowed` or `withDeletionGate`.
+
+**Ledger backends.** A4 keeps its `a4_*` tables, and the action journal its `action_*` tables, in the SQLite ledger. On
+a workspace pinned to the Postgres session store (P2-09d) every A4 commit writes its project's rows through to Postgres,
+inside the SQLite transaction and committed before it, so a Postgres write that cannot commit leaves no A4 transition
+(503 `LEDGER_MIRROR_UNAVAILABLE`). Each write is logged in a hash-chained mirror log under a head the workspace signs.
+Before every write, `snapshot` reads, `amc a4 verify` and readiness's integrity item check the project's Postgres rows
+against that log, against the SQLite rows and against the signed head; divergence, rows changed outside AMC and a log
+cut back below the signed head are refused with `LEDGER_MIRROR_DIVERGED`. An unreachable mirror, or a project Postgres
+has never held (`LEDGER_MIRROR_BEHIND`, healed by its next write), fails verification but not reads. `amc evidence-stores migrate --to postgres` carries existing A4 rows and compares them row by row. A WORM
+export (P2-09b) carries A4's audit rows in its retention segments and every side-table row in a signed side-table
+segment, so a WORM restore covers A4 state. Details: [EVIDENCE_STORAGE.md](EVIDENCE_STORAGE.md).
+`LEDGER_BACKEND_INCOMPLETE` remains for one case: a later `a4_*` or `action_*` table the ledger holds that the Postgres
+mirror does not declare. Then every A4 write is refused with 503 `LEDGER_BACKEND_INCOMPLETE`, readiness lists
+`store.ledger_backend` BLOCKED with one `NOT_MIRRORED:<table>` code per missing table, and the Adapt context probe gives
+the same refusal. Reads still work. Behaviour against a real Postgres is the pending drill in
+`docs/runbooks/POSTGRES_FAILOVER.md`.
+
+**Ledger encryption.** With `ledgerEncryptionEnabled`, each transition's audit row stores its payload as ciphertext.
+The store and `verifyA4Chain` open it through the ledger cipher and compare it with the transition body. Where the key
+is out of reach (a locked vault, an unreachable provider, or a verifier with no ledger key), the ciphertext stands on
+the signed row: the row hash covers it, and its `payload_sha256` is the body digest. A row encrypted after it was hashed
+(`amc evidence-stores encrypt`) needs the key to verify in place.
+
+**Signing algorithms.** A4 envelopes and A4-signed digests verify only under a key whose algorithm the workspace's P2-08
+policy allows (`keys.algorithmPolicy.allowed` in `.amc/amc.config.yaml`; `ed25519` and `ecdsa-p256-sha256` by default).
+An envelope signed by a refused algorithm fails integrity with `A4_ENVELOPE_ALGORITHM_REFUSED`. An offline verifier
+applies the default policy.
+
+**Data classes.** Every native session, build sessions included, is wrapped by P2-02's redacting session. It redacts
+before commit once the workspace opts in. Adapt's Propose records `dataClassesEnforcement`: `enforced at redaction`
+when the workspace has opted in and its processor registry verifies, otherwise `none`. The Data handling card shows that
+value. Redaction is P2-02's experimental, heuristic detector set. It is not de-identification, and it does not enforce
+residency or retention.
+
 ## Exports and verification
 
 - **Verify in place.** `GET /api/v1/a4/projects/:id/verify` returns a `VerifierReportV1` under the server operator's
   trust list. It takes no query parameter and no body: `?trustList=` is 400 `QUERY_INVALID`, and any trust a request
-  names is refused. The report is the same for every reader allowed to see it. `amc verify all` runs the same check
+  names is refused. The report is the same for every reader allowed to see it: a workspace OWNER or AUDITOR, the admin
+  token, or a member proven by member rows that verify. When the member rows themselves fail, any other reader gets
+  `409 A4_INTEGRITY_FAILED` with the fixed BLOCKED detail. `amc verify all` runs the same check
   (`a4-projects`) for every project.
 - **Export.** With `AMC_A4_PREVIEW=1`, `amc bundle export` adds each A4 project of the run's agent to the `.amcbundle`
   as an `amc.a4-record/v1` file, `a4/<projectId>.json`: the project rows as stored and the ledger rows they name.
   `a4/index.json` names each project's head and `containsSyntheticExamples`, and the signed manifest lists every file.
+  The records are plaintext: the structured brief is included so that a verifier can recompute every digest without a
+  key. Keep the bundle under the operator's control. `a4/index.json` says so in `plaintext.note`. Its
+  `protectedDataFindings` counts P2-02 detector matches in the exported rows by class; they are reported, not rewritten.
+  A credential match refuses the export with 409 `A4_BUNDLE_REFUSED`. Every payload decrypted for the export is scanned
+  too. The project's own audit rows may have been encrypted after they were hashed. Those rows are exported as their
+  plaintext, decrypted under the operator's key, and `plaintext.decryptedLedgerRows` counts them. Their payload is the
+  transition body the record already carries. Without the key the export is refused with 503 `A4_EXPORT_KEY_UNAVAILABLE`.
+  Other evidence that an evidence ref names may also have been encrypted after it was hashed. That evidence is never
+  decrypted into an export. It would verify only with the key, so the export is refused with 409
+  `A4_EXPORT_REF_ENCRYPTED`. Rows written under encryption are exported as stored. The record files are written
+  owner-only (0600).
   A project is the agent's by the receipt signed for its first audit row, never by the head row's editable `agent_id`.
   Each project's chain is verified whole before it is exported. A project that does not verify, has lost its head row,
   or names two agents refuses the export with `A4_INTEGRITY_FAILED`. Only the store writes in the `a4-` session
@@ -406,16 +912,51 @@ destruction is effective only after every backup, WORM segment or mirror older t
   certification (`A4_INTEGRITY_FAILED`); the certificate itself copies none of the A4 records.
 - **Verify offline.** `verifyA4Bundle` (`src/a4/a4Verify.ts`) checks a bundle or an `amc.a4-record/v1` JSON export
   without AMC's keys: every digest recomputes from the exported bytes, and keys count only when the caller's pinned
-  trust list admits them. It is a library function for now: the CLI entry point is `amc a4 verify --trust-list`
-  (P1-65). With no trust list the report states integrity only. In a bundle, a record whose `CREATED` body or signed
+  trust list admits them. An export carries the rows as stored, so an Adapt row's derived parts are there as their sha256
+  ref; the report warns `DERIVED_BOUND_BY_DIGEST` with the count (the files stay under the workspace's
+  `a4-projects/<projectId>/derived/`, which `verifyA4Chain` checks in place). Run it with `amc a4 verify <file> --trust-list <file>` (exit 0 trusted, 1 failed, 2
+  integrity-only under `--allow-unpinned` or `--allow-unanchored`). With no trust list the report states integrity only. In a bundle, a record whose `CREATED` body or signed
   seq-0 receipt names another agent than the manifest's fails scope (`A4_SCOPE_AGENT`). Seven normative fixtures,
   with their expected verdicts, are in `tests/fixtures/contracts/a4-record/`.
 - **Binder slice.** `buildA4BinderSlice` (`src/a4/a4Binder.ts`) writes a project's revisions, gates, transitions,
   evidence refs and verifier summary under `.amc/audit/binders/exports/` only: digests, statuses and hashed principals,
   never specification text, comment bodies or decision reasons. Only ledger row ids are kept as they are; every other
-  ref id (a file name, a receipt or external id) is hashed with its kind. The slice is scanned for personal data and
-  key material, then staged, signed and moved into place, so a refused slice leaves nothing behind. It is a library
+  ref id (a file name, a receipt or external id) is hashed with its kind. P2-02's detectors then run over every string,
+  and each match is replaced by its hash. A credential match refuses the slice. The slice is then scanned for personal
+  data and key material, staged, signed and moved into place, so a refused slice leaves nothing behind. It is a library
   function for now, absent without `AMC_A4_PREVIEW=1` (404 `A4_PREVIEW_DISABLED`): no route or command serves it yet.
+
+## The `amc a4` command line
+
+`amc a4` (P1-65) runs the same routes as the API, in process: the same body schemas, refusals, gate functions,
+separation of duties, quorum, request deduplication, audits and effects. Without `AMC_A4_PREVIEW=1` every command is
+refused with `A4_PREVIEW_DISABLED` and exit code 1. Projects are created and stages are built in Studio; the command line
+reads them, decides gates, completes them and runs the release, deployment and rollback steps.
+
+- **Who acts.** Writes need `--session-token-file`, the file `amc approvals login` wrote: a regular, private (0600)
+  file, never a symbolic link. Its user is re-read from the signed `users.yaml` and recorded with admission
+  `native_login_token` and identity check `users_yaml`. A user who is no longer ACTIVE is refused, and so is a token
+  holding a role `users.yaml` no longer grants. `--username`, `--roles` and `--user-id` are refused. Reads without a
+  token answer as the admin token does: every project, reads only. Writes are refused while the workspace is read-only,
+  and `amc mode agent` blocks the owner-gated commands.
+- **Reading.** `amc a4 list`, `amc a4 show <projectId>` and `amc a4 readiness <projectId> [--stage <stage>]` print the
+  API's answer with its claim label (`--json` adds `claimKind`, `statusDimensions` and `claimLabel`). `amc a4 guide
+  [projectId]` prints the stage model, the project's next action and, for every open gate, the decision command with
+  the gate's pins. Text output prints a control character in a name, reason or refusal as `\uXXXX`, so a project
+  name cannot print a line beside the claim label; the API refuses a project name that holds one.
+- **Deciding.** `amc a4 approve|deny|request-changes --gate <id> --reason <text> --expect-binding-digest <sha256>
+  --expect-gate-seq <n>` binds the decision to the gate you reviewed. Approve and deny also take
+  `--expect-readiness-digest`.
+- **Progressing.** `amc a4 complete`, `hold`, `resume`, `reopen`, `tune`, `retire`, `members` and `gate-policy` take
+  `--expect-head-seq`, the head you reviewed. `amc a4 release` consumes Activate's release approval and prints the
+  staging lease token once. `amc a4 deploy prepare` prints the signed plan; `deploy record --receipt <file>` records the
+  operator's receipt (the plan's `receiptForm` body); `deploy verify` runs AMC's own check; `amc a4 rollback --preview`
+  then `amc a4 rollback --reason …` rolls a release back. An effect left running finishes before the command returns,
+  and one that fails exits 1. A retry with the same `--request-id` looks that attempt's outcome up on the chain and
+  exits 1 too when the attempt failed or was lost.
+- **Verifying and exporting.** `amc a4 verify <projectId|file>` checks a chain or an export under your own
+  `--trust-list`, the only A4 surface where the caller names a trust list. `amc a4 export <projectId> --run <runId>
+  --out <file>` is `amc bundle export` for the project's agent; `--out` must lie inside the workspace.
 
 ## Using the API before the Studio pages
 

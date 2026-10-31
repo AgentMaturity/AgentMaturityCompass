@@ -1,0 +1,51 @@
+{
+  "source": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "references": 5087,
+  "shards": [
+    {
+      "path": "private-references-01.json",
+      "sha256": "e3392d4628fbdf96141fd2b93d36b3004193d5a8b4d3c3acb0208dc7306cd3a3"
+    },
+    {
+      "path": "private-references-02.json",
+      "sha256": "2c6524c3107d7d429386eb881ce1304a770c163a7aca6d6e6e6a88e330f978eb"
+    },
+    {
+      "path": "private-references-03.json",
+      "sha256": "a5687bfc3e5079c63e66c0213b0b464cf056f11fcc0e7ad86a9470e76418318c"
+    },
+    {
+      "path": "private-references-04.json",
+      "sha256": "3de9c7e0a25e18e93c132b6b31af4819e590f15c2e5f1ea1e55850e2acc5201b"
+    },
+    {
+      "path": "private-references-05.json",
+      "sha256": "5e601f37e37c1437c09e459505764f631965e0e36bc7cea8d23c04a4774842eb"
+    },
+    {
+      "path": "private-references-06.json",
+      "sha256": "d6c3576d695a16d8dc75cb35c46c4b57e232558d06d22f9c5a71c114de1b8bd5"
+    },
+    {
+      "path": "private-references-07.json",
+      "sha256": "cc187b415336f6ab2b986d7c24b455990eaeccad6136d7c1895648c5694bc939"
+    },
+    {
+      "path": "private-references-08.json",
+      "sha256": "4e216427c1f3a9547b12ab05be63f874ba55d82c7f0bf803bf0a5e975b0ab7b6"
+    },
+    {
+      "path": "private-references-09.json",
+      "sha256": "30fce0b4bafbb754d4cf8ec54570a25caeb3f7dfc5fd3740e615d224a5bcec61"
+    },
+    {
+      "path": "private-references-10.json",
+      "sha256": "c73095e98ca5ed6785d0258dad9e88ad610e36df82a2a6dff95a6699200c9691"
+    },
+    {
+      "path": "private-references-11.json",
+      "sha256": "1079d6e426d5e9bd4feda60f2f6241bd08a4333fb820de1d379dfbb13e1eb33a"
+    }
+  ],
+  "boundary": "Point-in-time source/preservation evidence before this new metadata packet and the later authorized role-inbox append. Historical paths/hashes are not a universal future immutability claim; each new lane must record authorized deltas. Large indices/full closures stay at their pinned private paths."
+}

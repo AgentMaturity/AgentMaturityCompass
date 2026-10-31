@@ -1,0 +1,56 @@
+{
+  "schema": "p125ec-inert-binder-author-static-analysis/1",
+  "blockers": [],
+  "baseExactPin": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/bind-fresh.py",
+    "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/bind-fresh.py",
+    "bytes": 4948,
+    "sha256": "aa3eca5d09af75a3c12cc3062a81ae72d091b9da03f49d8c18a04bac05a64898",
+    "dev": 16777231,
+    "inode": 543750156,
+    "nlink": 1
+  },
+  "runtimePin": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/runtime-protected-inputs.json",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/runtime-protected-inputs.json",
+    "bytes": 80498,
+    "sha256": "78523e735a11a6aef300a4609d2ee79f45a1b56a0edc1bfd8536bb52b7abb49f",
+    "dev": 16777231,
+    "inode": 543829387,
+    "nlink": 1
+  },
+  "sourceSelectionPin": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/source-selection.json",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/source-selection.json",
+    "bytes": 8137,
+    "sha256": "02552fd970f0aff01496e9d954da4f554275a0aec076a461087c156662ce6083",
+    "dev": 16777231,
+    "inode": 543835908,
+    "nlink": 1
+  },
+  "prior94Names19PairsOrderRetained": true,
+  "twoReadonlyPairsAddFourNamesAndTwoPairs": true,
+  "derivedSelectionCounts": {
+    "paths": 98,
+    "compiledPairs": 21
+  },
+  "newRequiredGuards": [
+    "Exact actual runtime schema, initial161 pinset and one admitted source successor with original/candidate bytes and every other160 row unchanged.",
+    "All161 active rows use full physical verification, rather than the predecessor byte-only verification call.",
+    "Future selected S/Q files are byte-equal, regular single-link, distinct physical files; identities/counts derive from actual selected sets.",
+    "All11 prior natives keep full physical pins and actual fresh native is byte-equal plus additional/distinct from prior natives and selected files.",
+    "Actual later checkpoint commit, clean-source closed0/ESRCH/no-signal/exact argv/log/runner provenance; both source/fresh Git HEADs match and trees/indexes are empty.",
+    "Exact held R HEAD/status/index, current four active/halted markers absent, ordinary Git optional locks disabled, exclusive private output."
+  ],
+  "noFutureClaim": {
+    "sourceCommit": null,
+    "freshRoot": null,
+    "binding": null,
+    "vitestCreditFromHelper": false,
+    "universalIsolationClaim": false
+  },
+  "readOnlyLookupFailureRetained": "read-only-lookup-diagnosis.json; optional absent branch-adoption.json supplies zero authority.",
+  "rootSoleExecutorAndSourceWriter": true,
+  "noHelperImportParseCompileOrExecution": true,
+  "noSourceIndexQaPriorArtifactOrReservationAction": true
+}

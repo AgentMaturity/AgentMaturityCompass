@@ -1,0 +1,22 @@
+{
+  "schema": "p124-control-audit-pins/1",
+  "files": [
+    {
+      "path": "/private/tmp/p1-24-qualification-20261016/control-audit/review.json",
+      "bytes": 41947,
+      "sha256": "00023cc06b8ec2ca9b0552d557b76a40757679ebdea294e39a47ec44227c562b"
+    },
+    {
+      "path": "/private/tmp/p1-24-qualification-20261016/control-audit/README.md",
+      "bytes": 3009,
+      "sha256": "71e7f65e630def5e89cb35a94b84e81ee9bde3fc88ad534dbc2813e784fb6287"
+    },
+    {
+      "path": "/private/tmp/p1-24-qualification-20261016/control-audit/field-public-proofs.json",
+      "bytes": 59895,
+      "sha256": "4044f82bbcff61098e5aa9e4d1c0eadde30fcd9f6f8478a2223743fda898b5b2"
+    }
+  ],
+  "allReadsFinished": true,
+  "allWritesFinished": true
+}

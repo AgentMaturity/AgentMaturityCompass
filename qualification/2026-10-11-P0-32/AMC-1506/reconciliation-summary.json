@@ -1,0 +1,55 @@
+{
+  "note": "Summary of the 2026-09-14 reconciliation record. The original is not in main's git history; it is a file in candidate commit 37c1466b (branch amc/regulated-platform-20261003), read with git show. Facts only; no claim below is used as Done evidence unless the README re-measures it.",
+  "original": {
+    "candidateCommit": "37c1466b32ed878ed89877fdcae2e3145d82d546",
+    "gitBlob": "cbc197eacb6d5304434671a5585cdd8909dd01eb",
+    "sha256": "a45f78261a94ed34edcf85e49d2739a86803fa9a2cff73043a1a0e2dd0514f53",
+    "bytes": 15016
+  },
+  "measuredAt": "6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f",
+  "verdict": "PARTIAL",
+  "claimsHeld": 9,
+  "claimsNotHeld": [
+    "Issue-time verification: 33 tests across eight affected suites pass.",
+    "Before/after receipts exist: <untracked>/RESEARCH/2026-09-08-dsh-pi/pi-import-reproduction.json and pi-import-after-amc1506.json.",
+    "Phase A reconciliation record <untracked>/RESEARCH/2026-09-09-phase-a-reconciliation/reconciliation.json (row AMC-1506) exists.",
+    "Isolated source CLI import verified (issue description).",
+    "Obsidian completion note exists for AMC-1506."
+  ],
+  "testsRun": [
+    {
+      "command": "npx vitest run tests/importProvenance.test.ts tests/neutralImporter.test.ts tests/piSessionImport.test.ts tests/piSessionImportBoundaries.test.ts tests/neutralImportMapping.test.ts tests/neutralImportReview.test.ts tests/lifecycle/episodeRecord.test.ts tests/lifecycle/lifecycleRunArtifact.test.ts tests/firstRunEvidenceReadiness.test.ts (before pnpm build)",
+      "passed": 60,
+      "failed": 1,
+      "skipped": 0
+    },
+    {
+      "command": "pnpm build (exit 0), then npx vitest run <same 9 files> — per file: importProvenance 3, neutralImporter 10, piSessionImport 11, piSessionImportBoundaries 14, neutralImportMapping 10, neutralImportReview 4, lifecycle/episodeRecord 3, lifecycle/lifecycleRunArtifact 4, firstRunEvidenceReadiness 2",
+      "passed": 61,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "command": "Mutation check: sed integrityIndex 0→0.72 and observed 0→0.166667 in src/importers/neutralImportPresentation.ts; npx vitest run tests/importProvenance.test.ts; then git checkout -- the file (diff clean afterwards)",
+      "passed": 0,
+      "failed": 3,
+      "skipped": 0
+    },
+    {
+      "command": "pnpm typecheck (tsc -p tsconfig.json --noEmit) — completed with no diagnostics; recorded as 1 pass",
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0
+    }
+  ],
+  "missingForDone": [
+    "A receipt for AMC-1506 at 6e7875f2 in a tracked path (<untracked>/ is gitignored at .gitignore:81, so it must be force-added like other RESEARCH receipts) naming commit, Darwin 25.6.0 arm64 / Node v25.5.0 / pnpm 10.33.0, the 9 files and 61/61 result, the mutation RED result, typecheck, and what was not exercised.",
+    "The historical receipts named by the issue (pi-import-reproduction.json, pi-import-after-amc1506.json under <untracked>/RESEARCH/2026-09-08-dsh-pi/, and the 2026-09-09 reconciliation.json) are unreachable from the integration commit; either commit them with -f or re-cite them with an explicit not-in-history boundary.",
+    "An end-to-end `amc import` run of the built CLI (dist/cli.js) on the Pi v3 and config fixtures, recorded in the receipt — only the source string at src/cli-import-commands.ts:58 was read here.",
+    "A Linear comment on AMC-1506 recording the measured result at 6e7875f2 (proposed text below).",
+    "An Obsidian note for AMC-1506 — none is present in tracked files.",
+    "Refresh the issue description's stale code reference: the builder is src/importers/neutralImportPresentation.ts:19-77, not neutralImporter.ts:665–722.",
+    "Full-suite single-commit acceptance is outside this scoped run; commit 3439cda6's record claims candidate E 6e7875f2 at 14,101/14,101 with gate 14/14, which this agent did not re-run and does not vouch for."
+  ],
+  "defectsFound": []
+}

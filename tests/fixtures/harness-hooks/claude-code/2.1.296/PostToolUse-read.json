@@ -1,0 +1,24 @@
+{
+  "session_id": "00000000-0000-4000-8000-000000000001",
+  "transcript_path": "/__HOME__/.claude/projects/__PROJECT_SLUG__/00000000-0000-4000-8000-000000000001.jsonl",
+  "cwd": "/__PROJECT__",
+  "prompt_id": "00000000-0000-4000-9000-000000000001",
+  "permission_mode": "bypassPermissions",
+  "hook_event_name": "PostToolUse",
+  "tool_name": "Read",
+  "tool_input": {
+    "file_path": "/__PROJECT__/notes.txt"
+  },
+  "tool_response": {
+    "type": "text",
+    "file": {
+      "filePath": "/__PROJECT__/notes.txt",
+      "content": "line one\nline two\n",
+      "numLines": 3,
+      "startLine": 1,
+      "totalLines": 3
+    }
+  },
+  "tool_use_id": "toolu_01AmcScriptedCall0001",
+  "duration_ms": 4
+}

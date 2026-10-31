@@ -293,7 +293,7 @@
       "id": "AMC-1542",
       "title": "P0: Recover authenticated managed-hook revocation checks and missing-list refusal",
       "status": "In Progress",
-      "description": "Phase A step 0 recovered a real unmerged security fix from /Users/sid/AgentMaturityCompass/.claude/worktrees/stoic-faraday-20e4ee, branch claude/stoic-faraday-20e4ee, HEAD 3d6b8d4a0c010c9fcd6e0abd410cb4635a218268. The worktree is preserved read-only. Audit against integration 7bd1e8ce8e0b38c71f2d9792cd2e2043a1c3c544 found:\n\n1. src/adapters/hookIntegration.ts imports and calls raw loadLeaseRevocations in verifyManagedLease (around lines 45/822). … (truncated, use `get_issue` for full description)",
+      "description": "Phase A step 0 recovered a real unmerged security fix from ~/AgentMaturityCompass/.claude/worktrees/stoic-faraday-20e4ee, branch claude/stoic-faraday-20e4ee, HEAD 3d6b8d4a0c010c9fcd6e0abd410cb4635a218268. The worktree is preserved read-only. Audit against integration 7bd1e8ce8e0b38c71f2d9792cd2e2043a1c3c544 found:\n\n1. src/adapters/hookIntegration.ts imports and calls raw loadLeaseRevocations in verifyManagedLease (around lines 45/822). … (truncated, use `get_issue` for full description)",
       "url": "https://linear.app/agentmaturitycompass/issue/AMC-1542/p0-recover-authenticated-managed-hook-revocation-checks-and-missing"
     }
   ],

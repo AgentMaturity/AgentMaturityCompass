@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { openLedger } from "../ledger/ledger.js";
 import { sha256Hex } from "../utils/hash.js";
 
@@ -8,11 +9,13 @@ export function appendOpsAuditEvent(params: {
   severity?: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
 }): { eventId: string; eventHash: string } {
   const ledger = openLedger(params.workspace);
-  const sessionId = `ops-${params.auditType.toLowerCase()}-${Date.now()}`;
+  // A random suffix: two audits of one type in the same millisecond must not collide on the session primary key.
+  const sessionId = `ops-${params.auditType.toLowerCase()}-${Date.now()}-${randomUUID()}`;
   const json = JSON.stringify({
     auditType: params.auditType,
     ...(params.payload ?? {})
   });
+  let failed = false, primary: unknown;
   try {
     ledger.startSession({
       sessionId,
@@ -46,8 +49,11 @@ export function appendOpsAuditEvent(params: {
       eventId: event.id,
       eventHash: event.eventHash
     };
-  } finally {
-    ledger.close();
+  } catch (cause) { failed = true; primary = cause; throw cause; }
+  finally {
+    try { ledger.close(); }
+    // oxlint-disable-next-line no-unsafe-finally -- A cleanup failure must surface, with any primary failure, instead of reporting success.
+    catch (cleanup) { if (failed) throw new AggregateError([primary, cleanup], "ops audit and ledger close failed", { cause: primary }); throw cleanup; }
   }
 }
 

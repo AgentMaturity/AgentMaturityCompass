@@ -221,4 +221,109 @@ export const EU_INSTRUMENTS: readonly RegulatoryInstrument[] = [
     "No EU regulation by this name was identified in this review; the citation needs an owner to confirm or replace it."),
   unverified("eu-epr", "Extended Producer Responsibility (see Directive 2008/98/EC Arts. 8-8a)", "EU", "law", ["Extended Producer Responsibility (EPR) Directive"],
     "There is no single EPR directive; EPR is set by Directive 2008/98/EC and product-specific acts."),
+  verified("etsi-en-301-549", "ETSI EN 301 549 V3.2.1 (2021-03) Accessibility requirements for ICT products and services", "EU", "standard", "in-force",
+    "https://accessible-eu-centre.ec.europa.eu/content-corner/news/european-accessibility-standard-en-301-549-has-been-updated-2026-09-07_en",
+    ["ETSI EN 301 549", "EN 301 549"], { lastReviewed: "2026-10-04", retrievedAt: "2026-10-04", note: "AccessibleEU (European Commission) page of 2026-09-07: V4.1.1 was published in September 2026; until it is cited in the Official Journal the reference remains V3.2.1 (2021), based on WCAG 2.1 Level AA. ETSI's own page was not read." }),
+  verified("eu-ecgt", "Directive (EU) 2024/825 (empowering consumers for the green transition; amends Directives 2005/29/EC and 2011/83/EU)", "EU", "law", "in-force",
+    "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024L0825",
+    ["Directive (EU) 2024/825"], { lastReviewed: "2026-10-04", retrievedAt: "2026-10-04", milestones: milestones(["2026-09-27", "Member State measures apply (Art. 4(1)), incl. Annex I points 2a and 4a of Directive 2005/29/EC"]),
+    note: "EUR-Lex CELEX HTML read 2026-10-04 (Annex I points 2a, 4a; Art. 4(1)). Entry-into-force date not recorded here." }),
+  verified("eu-gsr", "Regulation (EU) 2019/2144 (General Safety Regulation for motor vehicles)", "EU", "law", "in-force",
+    "https://publications.europa.eu/resource/celex/32019R2144", ["Regulation (EU) 2019/2144", "EU General Safety Regulation"], {
+      milestones: milestones(["2026-07-07", "Advanced safety requirements apply to all new passenger cars and vans (Commission news of 2026-07-08)"]),
+      note: "Arts. 6 and 11 read; entry-into-force date not recorded here. Provisions read from the Official Journal text on the review date (mobility station research, round 2).",
+    }),
+  verified("eu-ads-ir", "Commission Implementing Regulation (EU) 2022/1426 (automated driving systems of fully automated vehicles)", "EU", "law", "in-force",
+    "https://publications.europa.eu/resource/celex/32022R1426", ["Implementing Regulation (EU) 2022/1426", "Commission Implementing Regulation (EU) 2022/1426"], {
+      note: "Original OJ text read (Annex III Part 5 in-service reporting, points 2.1-2.2); a consolidated version (2026-03-24) was not read.",
+    }),
+  verified("eu-efti", "Regulation (EU) 2020/1056 (electronic freight transport information, eFTI)", "EU", "law", "in-force",
+    "https://publications.europa.eu/resource/celex/32020R1056", ["Regulation (EU) 2020/1056", "eFTI Regulation"], {
+      effectiveDate: "2024-08-21",
+      milestones: milestones(["2027-07-09", "Competent authorities must accept regulatory information made available through certified eFTI platforms (Art. 5(1); date from the Commission eFTI page, transport.ec.europa.eu)"]),
+      note: "Arts. 4, 5, 9 and 18 read. Provisions read from the Official Journal text on the review date (mobility station research, round 2).",
+    }),
+  verified("eu-cpr-2024", "Regulation (EU) 2024/3110 (Construction Products Regulation)", "EU", "law", "in-force",
+    "https://publications.europa.eu/resource/celex/32024R3110", ["Regulation (EU) 2024/3110", "EU Construction Products Regulation 2024/3110"], {
+      effectiveDate: "2026-01-08",
+      milestones: milestones(["2025-01-07", "Arts. 1-4 and the other provisions listed in Art. 96 apply"], ["2027-01-08", "Art. 92 applies (Art. 96)"]),
+      note: "The construction digital product passport (Arts. 75-79) depends on Commission delegated acts under Art. 75(1). Provisions read from the Official Journal text on the review date (mobility station research, round 2).",
+    }),
+  verified("eu-gdp-guidelines", "Guidelines of 5 November 2013 on Good Distribution Practice of medicinal products for human use (2013/C 343/01)", "EU", "guidance", "in-force",
+    "https://health.ec.europa.eu/system/files/2016-11/2013_c343_01_en_0.pdf", ["Guidelines on Good Distribution Practice 2013/C 343/01", "EU GDP Guidelines"], {
+      note: "Commission PDF of OJ C 343/1 (23.11.2013) read; Chapter 9 (transportation).",
+    }),
+  verified("edpb-gl-4-2019", "EDPB Guidelines 4/2019 on Article 25 Data Protection by Design and by Default, version 2.0", "EU", "guidance", "in-force",
+    "https://www.edpb.europa.eu/our-work-tools/our-documents/guidelines/guidelines-42019-article-25-data-protection-design-and_en", ["EDPB Guidelines 4/2019"], {
+      note: "Version 2.0 adopted 20 October 2020 (EDPB page read).",
+  }),
+
+  // Governance station round 2 (2026-10-04): read on the Commission's digital-strategy pages on that date.
+  verified("eu-disinfo-conduct", "Code of Conduct on Disinformation (Code of Practice converted to a DSA code of conduct)", "EU", "framework", "in-force",
+    "https://digital-strategy.ec.europa.eu/en/library/code-conduct-disinformation", ["Code of Conduct on Disinformation"], {
+      lastReviewed: "2026-10-04", retrievedAt: "2026-10-04", effectiveDate: "2025-07-01",
+      note: "Read 2026-10-04: integration into the DSA framework endorsed 13 Feb 2025; effective and auditable from 1 Jul 2025. Replaces the 2022 Code of Practice (eu-disinfo-code).",
+    }),
+  verified("eu-ai-content-cop", "Code of Practice on Transparency of AI-generated Content (10 Jun 2026)", "EU", "framework", "in-force",
+    "https://digital-strategy.ec.europa.eu/en/policies/code-practice-ai-generated-content",
+    ["Code of Practice on Transparency of AI-generated Content", "Code of Practice on transparency of AI-generated content"], {
+      lastReviewed: "2026-10-04", retrievedAt: "2026-10-04", effectiveDate: "2026-06-10",
+      note: "Read 2026-10-04: final code published 10 Jun 2026; supports AI Act Art. 50(2), (4) and (5).",
+    }),
+  // Technology station round 2 (2026-10-04): cited by TECH-INF-7.
+  {
+    id: "eu-eprivacy", citation: "Directive 2002/58/EC (ePrivacy Directive), as amended by Directive 2009/136/EC", jurisdiction: "EU", kind: "law",
+    status: "in-force", lastReviewed: "2026-10-04", url: "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:02002L0058-20091219",
+    retrievedAt: "2026-10-04", effectiveDate: "2002-07-31", aliases: ["ePrivacy Directive", "Directive 2002/58/EC"],
+    note: "Art. 5(3) consent wording read in the EUR-Lex consolidated text (19.12.2009) by the technology round-2 content pass; in force on publication, OJ L 201, 31.7.2002.",
+  },
+
+  // Wealth station, round-2 review (2026-10-04): article text read as Publications Office CELLAR text
+  // (publications.europa.eu/resource/celex/<CELEX>); receipt round2/content/wealth/questions.json catalogueAdditions.
+  {
+    id: "eu-sca-rts", citation: "Commission Delegated Regulation (EU) 2018/389 (RTS on strong customer authentication)", jurisdiction: "EU", kind: "law",
+    status: "in-force", lastReviewed: "2026-10-04", url: "https://data.europa.eu/eli/reg_del/2018/389/oj", retrievedAt: "2026-10-03",
+    aliases: ["Commission Delegated Regulation (EU) 2018/389", "EBA RTS on SCA"],
+    note: "Art. 4 (authentication code) and Art. 5 (dynamic linking) read as CELLAR text of CELEX 32018R0389.",
+  },
+  {
+    id: "eu-dora-rts-incident-reporting", citation: "Commission Delegated Regulation (EU) 2025/301 (DORA incident reporting content and time limits)", jurisdiction: "EU", kind: "law",
+    status: "in-force", lastReviewed: "2026-10-04", url: "https://data.europa.eu/eli/reg_del/2025/301/oj", retrievedAt: "2026-10-04",
+    aliases: ["Commission Delegated Regulation (EU) 2025/301"],
+    note: "Art. 5(1)(a)-(c) read as CELLAR text of CELEX 32025R0301: initial notification within 4 hours of classification as major and 24 hours of awareness; intermediate report within 72 hours; final report within one month.",
+  },
+  {
+    id: "eu-pay-transparency", citation: "Directive (EU) 2023/970 (Pay Transparency Directive)", jurisdiction: "EU", kind: "law",
+    status: "in-force", lastReviewed: "2026-10-04", url: "https://data.europa.eu/eli/dir/2023/970/oj", retrievedAt: "2026-10-03",
+    aliases: ["Directive (EU) 2023/970"],
+    milestones: milestones(["2026-06-07", "Transposition deadline (Art. 34(1))"], ["2027-06-07", "First gender pay gap reports, employers with 150 or more workers (Art. 9(2)-(3))"]),
+    note: "Arts 6, 7, 9 and 34 read as CELLAR text of CELEX 32023L0970.",
+  },
+  {
+    id: "eu-ccd2", citation: "Directive (EU) 2023/2225 (Consumer Credit Directive)", jurisdiction: "EU", kind: "law",
+    status: "in-force", lastReviewed: "2026-10-04", url: "https://data.europa.eu/eli/dir/2023/2225/oj", retrievedAt: "2026-10-03",
+    aliases: ["Directive (EU) 2023/2225"],
+    milestones: milestones(["2026-11-20", "National measures apply; Directive 2008/48/EC repealed (Art. 48(1), Art. 49)"]),
+    note: "Arts 18(1), 18(8) and 48(1) read as CELLAR text of CELEX 32023L2225.",
+  },
+  {
+    id: "eu-working-time", citation: "Directive 2003/88/EC (Working Time Directive)", jurisdiction: "EU", kind: "law",
+    status: "in-force", lastReviewed: "2026-10-04", url: "https://data.europa.eu/eli/dir/2003/88/oj", retrievedAt: "2026-10-03",
+    aliases: ["Directive 2003/88/EC", "EU Working Time Directive 2003/88/EC"],
+    note: "Arts 3, 4, 5, 6(b) and 8 read as Publications Office text/html of CELEX 32003L0088.",
+  },
+  {
+    id: "eu-eba-esg-gl", citation: "EBA Guidelines on the management of ESG risks (EBA/GL/2025/01)", jurisdiction: "EU", kind: "guidance",
+    status: "in-force", lastReviewed: "2026-10-04",
+    url: "https://www.eba.europa.eu/activities/single-rulebook/regulatory-activities/sustainable-finance/guidelines-management-esg-risks", retrievedAt: "2026-10-04",
+    effectiveDate: "2026-01-11", aliases: ["EBA/GL/2025/01"],
+    note: "EBA page read 2026-10-04: status Applicable, application date 11/01/2026. Date for small and non-complex institutions not confirmed.",
+  },
+  {
+    id: "eu-omnibus-i", citation: "Directive (EU) 2026/470 (Omnibus I, amending the sustainability reporting and due diligence directives)", jurisdiction: "EU", kind: "law",
+    status: "in-force", lastReviewed: "2026-10-04", url: "https://data.europa.eu/eli/dir/2026/470/oj", retrievedAt: "2026-10-04",
+    aliases: ["Directive (EU) 2026/470"],
+    milestones: milestones(["2027-03-19", "Transposition of Arts 1-3 (Art. 5(1)); the value-chain cap does not apply before national measures"]),
+    note: "CELLAR text of CELEX 32026L0470 read 2026-10-04: Directive of 24 February 2026; reporting limited to undertakings with net turnover above EUR 450 000 000 and more than 1 000 employees; value-chain cap and right to decline for protected undertakings. Transposition date confirmed by the Fable refuter (review.json, 2026-10-04).",
+  },
 ];

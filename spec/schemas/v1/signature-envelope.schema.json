@@ -3,7 +3,10 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "properties": {
     "alg": {
-      "const": "ed25519",
+      "enum": [
+        "ed25519",
+        "ecdsa-p256-sha256"
+      ],
       "type": "string"
     },
     "fingerprint": {
@@ -26,6 +29,14 @@
     },
     "signer": {
       "properties": {
+        "attestationBasis": {
+          "enum": [
+            "configured",
+            "provider-metadata",
+            "provider-reported"
+          ],
+          "type": "string"
+        },
         "attestationLevel": {
           "enum": [
             "SOFTWARE",

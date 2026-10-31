@@ -16,6 +16,9 @@ import { sha256Hex } from "../utils/hash.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { openLedger } from "../ledger/ledger.js";
 import type { MonitoringEvent } from "./continuousMonitor.js";
+import { attributeUsage, normalizeSpanUsage, buildTrace } from "./observabilityUsage.js";
+
+export { estimateCost } from "./observabilityUsage.js";
 
 /* ── Trace types (normalized from any provider) ─────────────────── */
 
@@ -34,7 +37,10 @@ export interface NormalizedSpan {
   model?: string;
   provider?: string;
   tokenUsage?: { prompt: number; completion: number; total: number };
+  /** Measured total when the provider did not report both token components. */
+  reportedTotalTokens?: number;
   costUsd?: number;
+  costSource?: "reported" | "estimated" | "unknown";
   error?: { type: string; message: string; stack?: string };
   input?: unknown;
   output?: unknown;
@@ -55,6 +61,9 @@ export interface NormalizedTrace {
   spans: NormalizedSpan[];
   totalTokens: number;
   totalCostUsd: number;
+  /** Totals are known subtotals when these flags are false. */
+  tokenUsageComplete?: boolean;
+  costUsageComplete?: boolean;
   modelBreakdown: Record<string, { tokens: number; costUsd: number; calls: number }>;
   errorCount: number;
   toolCallCount: number;
@@ -83,43 +92,6 @@ export interface ProviderAdapter {
   fetchTraces(since: number, limit: number): Promise<NormalizedTrace[]>;
   fetchTrace(traceId: string): Promise<NormalizedTrace | null>;
   isConnected(): boolean;
-}
-
-/* ── Model cost lookup (real pricing as of March 2026) ───────────── */
-
-const MODEL_COSTS_PER_1K: Record<string, { input: number; output: number }> = {
-  "gpt-4o": { input: 0.0025, output: 0.01 },
-  "gpt-4o-mini": { input: 0.00015, output: 0.0006 },
-  "gpt-4-turbo": { input: 0.01, output: 0.03 },
-  "gpt-4": { input: 0.03, output: 0.06 },
-  "gpt-3.5-turbo": { input: 0.0005, output: 0.0015 },
-  "claude-opus-4": { input: 0.015, output: 0.075 },
-  "claude-sonnet-4": { input: 0.003, output: 0.015 },
-  "claude-haiku-3.5": { input: 0.0008, output: 0.004 },
-  "claude-3-opus": { input: 0.015, output: 0.075 },
-  "claude-3-sonnet": { input: 0.003, output: 0.015 },
-  "claude-3-haiku": { input: 0.00025, output: 0.00125 },
-  "gemini-2.0-flash": { input: 0.0001, output: 0.0004 },
-  "gemini-1.5-pro": { input: 0.00125, output: 0.005 },
-  "gemini-1.5-flash": { input: 0.000075, output: 0.0003 },
-  "command-r-plus": { input: 0.003, output: 0.015 },
-  "command-r": { input: 0.0005, output: 0.0015 },
-  "llama-3.1-70b": { input: 0.00059, output: 0.00079 },
-  "llama-3.1-8b": { input: 0.00006, output: 0.00006 },
-  "mistral-large": { input: 0.002, output: 0.006 },
-  "mixtral-8x7b": { input: 0.0006, output: 0.0006 },
-};
-
-export function estimateCost(model: string | undefined, tokens: { prompt: number; completion: number }): number {
-  if (!model) return 0;
-  const normalizedModel = model.toLowerCase().replace(/[-_]/g, "-");
-  for (const [key, costs] of Object.entries(MODEL_COSTS_PER_1K)) {
-    if (normalizedModel.includes(key)) {
-      return (tokens.prompt / 1000) * costs.input + (tokens.completion / 1000) * costs.output;
-    }
-  }
-  // Fallback: assume mid-range pricing
-  return ((tokens.prompt + tokens.completion) / 1000) * 0.002;
 }
 
 /* ── OTLP Adapter (OpenTelemetry Protocol) ───────────────────────── */
@@ -240,13 +212,8 @@ export class OTLPAdapter implements ProviderAdapter {
     const startMs = startNano / 1_000_000;
     const endMs = endNano / 1_000_000;
     const model = attrs["gen_ai.request.model"] ?? attrs["llm.model"] ?? attrs["ai.model"];
-    const promptTokens = Number(attrs["gen_ai.usage.prompt_tokens"] ?? attrs["llm.token_count.prompt"] ?? 0);
-    const completionTokens = Number(attrs["gen_ai.usage.completion_tokens"] ?? attrs["llm.token_count.completion"] ?? 0);
+    const usage = attributeUsage(model, attrs);
     const kind = classifySpanKind(span.name, attrs);
-    const costAttr = attrs["gen_ai.usage.cost"] ?? attrs["llm.cost"];
-    const costUsd = costAttr
-      ? Number(costAttr)
-      : estimateCost(model, { prompt: promptTokens, completion: completionTokens });
 
     const status: TraceStatus = span.status?.code === 2 ? "error"
       : span.status?.code === 1 ? "ok"
@@ -264,8 +231,7 @@ export class OTLPAdapter implements ProviderAdapter {
       status,
       model,
       provider: attrs["gen_ai.system"] ?? attrs["llm.provider"],
-      tokenUsage: (promptTokens || completionTokens) ? { prompt: promptTokens, completion: completionTokens, total: promptTokens + completionTokens } : undefined,
-      costUsd,
+      ...usage,
       error: status === "error" ? { type: span.status?.message ?? "error", message: attrs["exception.message"] ?? span.status?.message ?? "unknown" } : undefined,
       toolName: attrs["tool.name"] ?? attrs["gen_ai.tool.name"],
       toolSuccess: attrs["tool.success"] !== undefined ? attrs["tool.success"] === "true" : undefined,
@@ -279,8 +245,7 @@ export class OTLPAdapter implements ProviderAdapter {
       const startMs = s.startTime / 1000;
       const endMs = (s.startTime + s.duration) / 1000;
       const model = tags["gen_ai.request.model"] ?? tags["llm.model"];
-      const promptTokens = Number(tags["gen_ai.usage.prompt_tokens"] ?? 0);
-      const completionTokens = Number(tags["gen_ai.usage.completion_tokens"] ?? 0);
+      const usage = attributeUsage(model, tags);
 
       return {
         spanId: s.spanID,
@@ -293,8 +258,7 @@ export class OTLPAdapter implements ProviderAdapter {
         durationMs: endMs - startMs,
         status: tags["otel.status_code"] === "ERROR" ? "error" as TraceStatus : "ok" as TraceStatus,
         model,
-        tokenUsage: (promptTokens || completionTokens) ? { prompt: promptTokens, completion: completionTokens, total: promptTokens + completionTokens } : undefined,
-        costUsd: estimateCost(model, { prompt: promptTokens, completion: completionTokens }),
+        ...usage,
       };
     });
     return buildTrace(jaeger.traceID, spans);
@@ -380,9 +344,9 @@ export class LangfuseAdapter implements ProviderAdapter {
       const startMs = new Date(obs.startTime).getTime();
       const endMs = obs.endTime ? new Date(obs.endTime).getTime() : startMs;
       const model = obs.model ?? undefined;
-      const promptTokens = obs.usage?.input ?? obs.usage?.promptTokens ?? 0;
-      const completionTokens = obs.usage?.output ?? obs.usage?.completionTokens ?? 0;
-      const totalCost = obs.calculatedTotalCost ?? obs.usage?.totalCost ?? estimateCost(model, { prompt: promptTokens, completion: completionTokens });
+      const usage = normalizeSpanUsage(model, obs.usage?.input ?? obs.usage?.promptTokens,
+        obs.usage?.output ?? obs.usage?.completionTokens, obs.usage?.total ?? obs.usage?.totalTokens,
+        obs.calculatedTotalCost ?? obs.usage?.totalCost);
 
       let kind: NormalizedSpan["kind"] = "unknown";
       if (obs.type === "GENERATION") kind = "llm_call";
@@ -401,8 +365,7 @@ export class LangfuseAdapter implements ProviderAdapter {
         status: obs.level === "ERROR" ? "error" as TraceStatus : "ok" as TraceStatus,
         model,
         provider: obs.model ? guessProvider(obs.model) : undefined,
-        tokenUsage: (promptTokens || completionTokens) ? { prompt: promptTokens, completion: completionTokens, total: promptTokens + completionTokens } : undefined,
-        costUsd: totalCost,
+        ...usage,
         error: obs.level === "ERROR" ? { type: "error", message: obs.statusMessage ?? "unknown" } : undefined,
         input: obs.input,
         output: obs.output,
@@ -475,9 +438,7 @@ export class HeliconeAdapter implements ProviderAdapter {
     const startMs = new Date(req.request_created_at).getTime();
     const endMs = req.response_created_at ? new Date(req.response_created_at).getTime() : startMs;
     const model = req.model ?? req.request_model ?? undefined;
-    const promptTokens = req.prompt_tokens ?? 0;
-    const completionTokens = req.completion_tokens ?? 0;
-    const cost = req.cost_usd ?? estimateCost(model, { prompt: promptTokens, completion: completionTokens });
+    const usage = normalizeSpanUsage(model, req.prompt_tokens, req.completion_tokens, undefined, req.cost_usd);
 
     return {
       spanId: req.request_id ?? randomUUID(),
@@ -490,8 +451,7 @@ export class HeliconeAdapter implements ProviderAdapter {
       status: req.response_status && req.response_status >= 400 ? "error" : "ok",
       model,
       provider: req.provider ?? (model ? guessProvider(model) : undefined),
-      tokenUsage: { prompt: promptTokens, completion: completionTokens, total: promptTokens + completionTokens },
-      costUsd: cost,
+      ...usage,
       error: req.response_status && req.response_status >= 400 ? { type: `HTTP ${req.response_status}`, message: req.response_body?.error?.message ?? "unknown" } : undefined,
       metadata: req.properties,
     };
@@ -737,6 +697,8 @@ export class ObservabilityBridge extends EventEmitter {
     totalSpans: number;
     totalCostUsd: number;
     totalTokens: number;
+    tokenUsageComplete: boolean;
+    costUsageComplete: boolean;
     providerCount: number;
     connectedProviders: string[];
     errorRate: number;
@@ -766,6 +728,8 @@ export class ObservabilityBridge extends EventEmitter {
       totalSpans,
       totalCostUsd: totalCost,
       totalTokens,
+      tokenUsageComplete: this.traces.length > 0 && this.traces.every(trace => trace.tokenUsageComplete === true),
+      costUsageComplete: this.traces.length > 0 && this.traces.every(trace => trace.costUsageComplete === true),
       providerCount: this.adapters.size,
       connectedProviders: connected,
       errorRate: this.traces.length > 0 ? totalErrors / this.traces.length : 0,
@@ -823,6 +787,8 @@ export class ObservabilityBridge extends EventEmitter {
           traceId: trace.traceId,
           totalCostUsd: trace.totalCostUsd,
           totalTokens: trace.totalTokens,
+          tokenUsageComplete: trace.tokenUsageComplete === true,
+          costUsageComplete: trace.costUsageComplete === true,
           errorCount: trace.errorCount,
           durationMs: trace.durationMs,
           llmCalls: trace.llmCallCount,
@@ -869,6 +835,8 @@ export class ObservabilityBridge extends EventEmitter {
             durationMs: trace.durationMs,
             totalTokens: trace.totalTokens,
             totalCostUsd: trace.totalCostUsd,
+            tokenUsageComplete: trace.tokenUsageComplete === true,
+            costUsageComplete: trace.costUsageComplete === true,
             llmCalls: trace.llmCallCount,
             toolCalls: trace.toolCallCount,
             errorCount: trace.errorCount,
@@ -911,60 +879,6 @@ export function createObservabilityBridge(config: ObservabilityBridgeConfig): Ob
 }
 
 /* ── Helpers ─────────────────────────────────────────────────────── */
-
-function buildTrace(traceId: string, spans: NormalizedSpan[], sessionId?: string, name?: string): NormalizedTrace {
-  if (spans.length === 0) {
-    return {
-      traceId, sessionId, name, startTimeMs: 0, endTimeMs: 0, durationMs: 0,
-      status: "unknown", spans: [], totalTokens: 0, totalCostUsd: 0,
-      modelBreakdown: {}, errorCount: 0, toolCallCount: 0, llmCallCount: 0,
-    };
-  }
-
-  const startTimeMs = Math.min(...spans.map((s) => s.startTimeMs));
-  const endTimeMs = Math.max(...spans.map((s) => s.endTimeMs));
-  const modelBreakdown: Record<string, { tokens: number; costUsd: number; calls: number }> = {};
-  let totalTokens = 0;
-  let totalCost = 0;
-  let errorCount = 0;
-  let toolCallCount = 0;
-  let llmCallCount = 0;
-
-  for (const span of spans) {
-    if (span.tokenUsage) totalTokens += span.tokenUsage.total;
-    if (span.costUsd) totalCost += span.costUsd;
-    if (span.status === "error") errorCount++;
-    if (span.kind === "tool_call") toolCallCount++;
-    if (span.kind === "llm_call") llmCallCount++;
-
-    if (span.model) {
-      const key = span.model;
-      if (!modelBreakdown[key]) modelBreakdown[key] = { tokens: 0, costUsd: 0, calls: 0 };
-      modelBreakdown[key]!.tokens += span.tokenUsage?.total ?? 0;
-      modelBreakdown[key]!.costUsd += span.costUsd ?? 0;
-      modelBreakdown[key]!.calls += 1;
-    }
-  }
-
-  const hasError = spans.some((s) => s.status === "error");
-
-  return {
-    traceId,
-    sessionId,
-    name,
-    startTimeMs,
-    endTimeMs,
-    durationMs: endTimeMs - startTimeMs,
-    status: hasError ? "error" : "ok",
-    spans,
-    totalTokens,
-    totalCostUsd: totalCost,
-    modelBreakdown,
-    errorCount,
-    toolCallCount,
-    llmCallCount,
-  };
-}
 
 function classifySpanKind(name: string, attrs: Record<string, string | undefined>): NormalizedSpan["kind"] {
   const n = name.toLowerCase();

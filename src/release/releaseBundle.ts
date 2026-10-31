@@ -1,6 +1,6 @@
 import { createPublicKey } from "node:crypto";
 import { copyFileSync, readdirSync, readFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { basename, dirname, join, resolve } from "node:path";
 import { releaseManifestSchema, type ReleaseManifest } from "./releaseSchema.js";
 import { buildReleaseManifest, packageMeta } from "./releaseManifest.js";
 import { loadReleasePrivateKey, releasePublicKeyFingerprint, signReleaseManifest } from "./releaseSigner.js";
@@ -18,6 +18,13 @@ interface PackOptions {
   outFile: string;
   privateKeyPath?: string;
   skipInstallBuild?: boolean;
+  /**
+   * P0-34: the gated npm tarball to embed byte for byte; nothing is installed, built or packed. With `sbomFile` and
+   * `licensesFile` the gated SBOM and licence inventory are embedded too instead of being regenerated.
+   */
+  npmTarball?: string;
+  sbomFile?: string;
+  licensesFile?: string;
   /** @deprecated Release scans are mandatory. Passing true is refused. */
   skipSecretScan?: boolean;
 }
@@ -131,7 +138,7 @@ export function createReleaseBundle(options: PackOptions): {
     NPM_CONFIG_CACHE: npmCacheDir
   };
 
-  if (!options.skipInstallBuild) {
+  if (!options.skipInstallBuild && !options.npmTarball) {
     if (pathExists(join(workspace, "pnpm-lock.yaml"))) {
       runChecked("pnpm", ["install", "--frozen-lockfile"], workspace, npmEnv);
       runChecked("pnpm", ["run", "build"], workspace, npmEnv);
@@ -141,7 +148,9 @@ export function createReleaseBundle(options: PackOptions): {
     }
   }
 
-  const pack = npmPack(workspace, npmEnv);
+  const pack = options.npmTarball
+    ? { tgzPath: resolve(options.npmTarball), fileName: basename(options.npmTarball) }
+    : npmPack(workspace, npmEnv);
   const root = mkTmp("amc-release-pack-");
   try {
     verifyNpmTgzSafety(pack.tgzPath);
@@ -150,6 +159,7 @@ export function createReleaseBundle(options: PackOptions): {
     const pubFingerprint = releasePublicKeyFingerprint(pubPem);
     const pkg = packageMeta(workspace);
     const expectedTgz = `agent-maturity-compass-${pkg.version}.tgz`;
+    if (options.npmTarball && pack.fileName !== expectedTgz) throw new Error(`npm tarball ${pack.fileName} is not ${expectedTgz}`);
     const stage = join(root, "amc-release");
     for (const directory of ["keys", "checks", "artifacts/npm", "artifacts/sbom", "artifacts/licenses", "artifacts/provenance", "artifacts/docker"]) {
       ensureDir(join(stage, directory));
@@ -159,11 +169,13 @@ export function createReleaseBundle(options: PackOptions): {
     const npmSha = writeShaFile(`${npmTarget}.sha256`, readFileSync(npmTarget));
 
     const sbomPath = join(stage, "artifacts", "sbom", "sbom.cdx.json");
-    writeSbom(workspace, sbomPath);
+    if (options.sbomFile) copyFileSync(resolve(options.sbomFile), sbomPath);
+    else writeSbom(workspace, sbomPath);
     const sbomSha = writeShaFile(`${sbomPath}.sha256`, readFileSync(sbomPath));
 
     const licensesPath = join(stage, "artifacts", "licenses", "licenses.json");
-    writeLicenseInventory(workspace, licensesPath);
+    if (options.licensesFile) copyFileSync(resolve(options.licensesFile), licensesPath);
+    else writeLicenseInventory(workspace, licensesPath);
     const licensesSha = writeShaFile(`${licensesPath}.sha256`, readFileSync(licensesPath));
 
     const docker = writeDockerMetadata(stage);
@@ -222,6 +234,6 @@ export function createReleaseBundle(options: PackOptions): {
     };
   } finally {
     cleanupDir(root);
-    cleanupDir(dirname(pack.tgzPath));
+    if (!options.npmTarball) cleanupDir(dirname(pack.tgzPath));
   }
 }

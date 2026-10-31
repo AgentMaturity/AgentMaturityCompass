@@ -22,8 +22,8 @@ import { listApprovalInbox } from "../approvals/approvalInbox.js";
 import { benchmarkStats } from "../benchmarks/benchStats.js";
 import { latestOutcomeReport, outcomeTrend, topValueGaps } from "../outcomes/outcomeDashboard.js";
 import { listDomainMetadata } from "../domains/domainRegistry.js";
-import { listIndustryPacks } from "../domains/industryPacks.js";
-import { getIndustryPackEntitlement, toIndustryPackCatalogItem } from "../domains/industryPackEntitlement.js";
+import { listIndustryPacks, type IndustryPack } from "../domains/industryPacks.js";
+import { getIndustryPackEntitlement } from "../domains/industryPackEntitlement.js";
 import { listGuardrailsWithRuntimeStatus } from "../enforce/guardrailRuntimeBindings.js";
 
 export interface DashboardBuildInput {
@@ -216,7 +216,8 @@ function getDomainSummaries(): Array<{
   }));
 }
 
-function getPackSummaries(workspace: string): Array<{
+/** Names, descriptions and regulatory basis are public; a licence gates pack questions and runs, never these (P1-51). */
+function getPackSummaries(locked: boolean): Array<{
   id: string;
   name: string;
   domain: string;
@@ -225,17 +226,18 @@ function getPackSummaries(workspace: string): Array<{
   description: string;
   regulatoryBasis: string[];
   locked: boolean;
+  contentStatus: IndustryPack["contentStatus"];
 }> {
-  const entitlement = getIndustryPackEntitlement(workspace);
   return listIndustryPacks().map((pack) => ({
     id: pack.id,
     name: pack.name,
     domain: pack.stationId,
     riskTier: pack.riskTier,
     questionCount: pack.questions.length,
-    description: toIndustryPackCatalogItem(pack, entitlement).description,
-    regulatoryBasis: entitlement.active ? pack.regulatoryBasis : [],
-    locked: !entitlement.active
+    description: pack.description,
+    regulatoryBasis: pack.regulatoryBasis,
+    locked,
+    contentStatus: pack.contentStatus
   }));
 }
 
@@ -351,6 +353,7 @@ export function buildDashboard(input: DashboardBuildInput): DashboardBuildResult
   const latestOutcome = latestOutcomeReport(input.workspace, agentId);
   const valueTrend = outcomeTrend(input.workspace, agentId, 20);
 
+  const packAccess = getIndustryPackEntitlement(input.workspace);
   const data = {
     generatedTs: Date.now(),
     agentId,
@@ -361,7 +364,8 @@ export function buildDashboard(input: DashboardBuildInput): DashboardBuildResult
     trends,
     assurance,
     domains: getDomainSummaries(),
-    industryPacks: getPackSummaries(input.workspace),
+    industryPacks: getPackSummaries(!packAccess.active),
+    industryPacksAccess: { active: packAccess.active, message: packAccess.message },
     guardrails: getGuardrailsList(input.workspace),
     trustGraph: dashboardTrustGraph(input.workspace),
     approvalsSummary: {

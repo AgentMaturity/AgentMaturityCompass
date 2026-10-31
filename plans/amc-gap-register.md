@@ -586,7 +586,7 @@ This is the product's crown-jewel failure: the audit root-of-trust is a world-re
 
 ## G7 — Test quality & coverage gaps
 
-AMC sells evidence integrity: maturity scores, signed receipts, and a headline "8,604 passing Vitest tests" that a buyer reads as proof the scoring engine is trustworthy. That headline is the product's own quality attestation, so a test suite that inflates its block count with markdown-prose assertions and vacuous bounds while the real CLI runtime adapters and the shipped `amc fix` backend go entirely untested is not a hygiene problem — it is the same class of facade the tool exists to detect, turned inward. The suite's structure also actively hides the gaps: coverage thresholds pinned to 0, whole directories excluded, and a dead product cluster imported purely to pad coverage numbers. Every claim below was re-verified against the repo at `/Users/sid/AgentMaturityCompass`.
+AMC sells evidence integrity: maturity scores, signed receipts, and a headline "8,604 passing Vitest tests" that a buyer reads as proof the scoring engine is trustworthy. That headline is the product's own quality attestation, so a test suite that inflates its block count with markdown-prose assertions and vacuous bounds while the real CLI runtime adapters and the shipped `amc fix` backend go entirely untested is not a hygiene problem — it is the same class of facade the tool exists to detect, turned inward. The suite's structure also actively hides the gaps: coverage thresholds pinned to 0, whole directories excluded, and a dead product cluster imported purely to pad coverage numbers. Every claim below was re-verified against the repo at `~/AgentMaturityCompass`.
 
 ### Table A — Suite composition & assertion quality
 
@@ -679,7 +679,7 @@ AMC sells itself as an evidence-integrity and agent-trust product: its whole val
 
 | # | Gap | Location (path) | Evidence | Severity | Disposition |
 |---|---|---|---|---|---|
-| G8-22 | Three gitignored non-product workspaces inside the worktree | `AMC_OS/` (55MB, 1,293-file INBOX), `memory/`, `amc_ai_army/` | Ignored but in-tree; `AMC_OS/README` itself names `/Users/sid/Documents/AMC` as its real home; bloats scans, risks accidental un-ignore | MEDIUM | RELOCATE outside repo |
+| G8-22 | Three gitignored non-product workspaces inside the worktree | `AMC_OS/` (55MB, 1,293-file INBOX), `memory/`, `amc_ai_army/` | Ignored but in-tree; `AMC_OS/README` itself names `~/Documents/AMC` as its real home; bloats scans, risks accidental un-ignore | MEDIUM | RELOCATE outside repo |
 | G8-23 | Tracked synthetic marketing "simulation" mistakable for real research | `mirofish-simulation/` (index.html, data.js, mirofish-report*.md) | Chinese-language "100 AI personas react to AMC" report + HTML viewer, tracked in the product repo — fabricated persona reactions presented as findings | MEDIUM | DELETE / RELOCATE to marketing |
 | G8-24 | Six tracked ad-hoc debug scratch scripts | `internal/debug/{debug_hipaa.js,debug_hipaa2.js,debug_hipaa3.js,test-compare-models.js,test-model-scanner.cjs,test-model-scanner.mjs}` | Committed scratch; `.cjs`/`.mjs` are duplicates of the same scanner | LOW | DELETE (or convert to tests) |
 | G8-25 | Complete standalone service embedded at repo top level | `qa/` (30 files: Express + Postgres + WebSocket + Claude bot engine, own lockfile, 7 migrations, 1 test) | Full independent app with a single test for six routes/five bot modules — far below the 80% standard, wrong boundary | MEDIUM | RELOCATE to own repo |

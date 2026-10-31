@@ -163,6 +163,7 @@ export const RESULT_COMMANDS: readonly ResultCommand[] = [
   self("compliance roadmap", "compliance:euAiActRoadmap"),
   self("comms-check", "comms-check"),
   self("audit binder create", "audit:binder"),
+  // An .amcaudit binder carries "audit:binder"; a signed industry-pack audit (.json) verifies as "audit:industry-pack".
   self("audit binder verify", "audit:binder"),
   self("audit verify", "audit:workspace"),
   self("residency-report", "residency"),
@@ -207,6 +208,15 @@ export const RESULT_COMMANDS: readonly ResultCommand[] = [
   self("verify all", "verify:workspace"),
   self("session verify", "ledger:sessions"),
 
+  // A4 Forge (P1-65): the API's own claim (readiness's, or the route's unbound one); a verify is integrity only.
+  self("a4 list", "a4:list"),
+  self("a4 show", "a4"),
+  self("a4 readiness", "a4"),
+  self("a4 verify", "a4"),
+  self("a4 release", "a4"),
+  self("a4 deploy verify", "a4"),
+  self("a4 export", "diagnostic"),
+
   // Imports: what the source reported, never observed by AMC.
   self("eval import", "eval:import"),
   self("import", "import:neutral"),
@@ -219,12 +229,19 @@ export const RESULT_COMMANDS: readonly ResultCommand[] = [
   example("mirofish run", "mirofish:run"),
   example("mirofish compare", "mirofish:compare"),
   example("mirofish stress", "mirofish:stress"),
-  example("lab-simulate", "lab:simulate")
+  example("lab-simulate", "lab:simulate"),
+  // The CLI stores only lab-simulate placeholders, so a lab report or comparison is never a measurement.
+  example("lab-report", "lab:simulate"),
+  example("lab-compare", "lab:simulate")
 ];
 
 const GROUP = "command group: lists its subcommands";
 
 export const NON_RESULT_COMMANDS: readonly NonResultCommand[] = [
+  non("a4", GROUP),
+  non("a4 deploy", GROUP),
+  non("a4 guide", "prints the A4 stage model, a project's next action and the pins a gate decision needs; no result"),
+  non("a4 deploy prepare", "prints the deployment plan AMC prepared and signed; instructions, never evidence of a deployment"),
   non("history", "lists run IDs, times and signature statuses; no score or level (amc report <runId> labels each run)"),
   non("assurance history", "lists assurance run IDs, modes and signature statuses; no score (amc assurance runs labels them)"),
   non("score lean-profile", "describes AMC's lean module profile; no agent is assessed"),
@@ -274,6 +291,7 @@ export const NON_RESULT_COMMANDS: readonly NonResultCommand[] = [
   non("fleet slo define", "defines a fleet SLO"),
   non("fp-submit", "files a false-positive report"),
   non("identity init", "creates the host identity configuration"),
+  non("identity workload-trust", GROUP),
   non("leaderboard", GROUP),
   non("lint", "lints configuration files for schema errors; no maturity or compliance result"),
   non("monitor live", "a long-running monitor; per-event output, no final result"),

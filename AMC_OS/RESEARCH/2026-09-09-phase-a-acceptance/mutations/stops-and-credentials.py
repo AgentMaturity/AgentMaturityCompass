@@ -14,7 +14,7 @@ import sys
 import time
 
 AUTHOR_SOURCE = 'd9d55034b1e856513eea1c68b09e50ecd433063e'
-ROOT = Path('/Users/sid/AgentMaturityCompass').resolve()
+ROOT = Path('~/AgentMaturityCompass').resolve()
 STOP = 'tests/subagentStopConditions.test.ts'
 DELEGATE = 'tests/delegateTool.test.ts'
 KERNEL = 'tests/kernelDelegationGrant.test.ts'
