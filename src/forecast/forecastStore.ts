@@ -96,6 +96,12 @@ export function captureVerifiedForecastArtifact(workspace: string, scope: Foreca
   }
 }
 export function verifyLatestForecastArtifact(workspace: string, scope: ForecastScope): SignedFileVerification { return captureVerifiedForecastArtifact(workspace, scope).file; }
+/** The latest forecast only when its signature verifies over the bytes parsed; an invalid file is absent. */
+export function loadVerifiedForecastArtifact(workspace: string, scope: ForecastScope): ForecastArtifact | null {
+  const captured = captureVerifiedForecastArtifact(workspace, scope);
+  if (!captured.file.valid) return null;
+  try { return captured.parse(); } catch { return null; }
+}
 export function saveAdvisory(workspace: string, advisory: AdvisoryRecord) { return publishOrgPairs(workspace, advisoryWrites(workspace, advisory))[0]!; }
 export function captureAdvisory(workspace: string, advisoryId: string) {
   const path = forecastAdvisoryPath(workspace, advisoryId), captured = pairVerification(workspace, path);

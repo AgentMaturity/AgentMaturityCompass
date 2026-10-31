@@ -15,10 +15,10 @@ import { cgxLatestGraphPath, cgxLatestPackPath } from "../cgx/cgxStore.js";
 import { promptLatestPackPath, loadPromptPolicy } from "../prompt/promptPolicyStore.js";
 import { mechanicTargetsPath } from "../mechanic/targetsStore.js";
 import { latestAssuranceCertificateSummary } from "../assurance/assuranceStore.js";
-import { loadLatestForecastArtifact } from "../forecast/forecastStore.js";
+import { loadVerifiedForecastArtifact } from "../forecast/forecastStore.js";
 import { listExportedBenchArtifacts } from "../bench/benchArtifact.js";
 import { loadBinderCache } from "../audit/binderStore.js";
-import { loadValueSnapshot } from "../value/valueStore.js";
+import { loadValueSnapshot, verifyValueSnapshotSignature } from "../value/valueStore.js";
 import { loadBridgeConfig, verifyBridgeConfigSignature } from "../bridge/bridgeConfigStore.js";
 import { loadToolsConfig, verifyToolsConfigSignature } from "../toolhub/toolhubValidators.js";
 import { verifyApprovalPolicySignature } from "../approvals/approvalPolicyEngine.js";
@@ -108,7 +108,7 @@ function latestForecastRisk(
   digitalDualityRisk: number | null;
   evidenceCoverage: { observedShare: number; attestedShare: number; selfReportedShare: number } | null;
 } {
-  const forecast = loadLatestForecastArtifact(workspace, scope);
+  const forecast = loadVerifiedForecastArtifact(workspace, scope); // an unsigned or tampered forecast is absent
   if (!forecast) {
     return {
       ecosystemFocusRisk: null,
@@ -211,10 +211,10 @@ function collectPassportLocalData(params: {
     ? report.questionScores.filter((row) => !Array.isArray(row.evidenceEventIds) || row.evidenceEventIds.length === 0).length
     : questionBank.length;
 
-  const valueSnapshot = loadValueSnapshot(params.workspace, {
-    type: scope.type,
-    id: scope.id
-  }) ?? loadValueSnapshot(params.workspace, { type: "WORKSPACE", id: "workspace" });
+  // Signed value snapshots only: an unsigned or tampered one leaves the dimensions unknown.
+  const signedValueSnapshot = (target: { type: "WORKSPACE" | "NODE" | "AGENT"; id: string }) =>
+    verifyValueSnapshotSignature(params.workspace, target).valid ? loadValueSnapshot(params.workspace, target) : null;
+  const valueSnapshot = signedValueSnapshot({ type: scope.type, id: scope.id }) ?? signedValueSnapshot({ type: "WORKSPACE", id: "workspace" });
   const valueDimensions = valueSnapshot?.valueDimensions ?? {
     emotional: null,
     functional: null,
@@ -527,7 +527,7 @@ function collectPassportLocalData(params: {
     evalScoreExplainabilityFailClosed: evalScoreExplainabilityPack?.failClosed ?? null,
     questionExplainabilityReplayable: questionExplainabilityReplayable ?? null,
     questionExplainabilityFailClosed: questionExplainabilityFailClosed ?? null,
-    forecastGeneratedTs: loadLatestForecastArtifact(params.workspace, { type: scope.type, id: scope.id })?.generatedTs ?? null,
+    forecastGeneratedTs: loadVerifiedForecastArtifact(params.workspace, { type: scope.type, id: scope.id })?.generatedTs ?? null,
     generatedTs
   };
 

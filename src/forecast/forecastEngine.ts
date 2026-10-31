@@ -124,6 +124,8 @@ function evidenceGateFailures(policy: ForecastPolicy, signals: ForecastSignalBun
       `SELF_REPORTED_SHARE_ABOVE_MAX:${signals.evidence.selfReportedShare.toFixed(3)}>${gates.maxSelfReportedShare.toFixed(3)}`
     );
   }
+  // An unsigned or tampered input was left out; the forecast names it rather than standing as if the input were absent by choice.
+  for (const input of signals.ignoredInputs) reasons.push(`UNVERIFIED_INPUT_IGNORED:${input}`);
   return reasons;
 }
 

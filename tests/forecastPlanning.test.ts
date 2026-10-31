@@ -19,7 +19,7 @@ import type { ForecastArtifact } from "../src/forecast/forecastSchema.js";
 import { rotatePurposeKeys } from "../src/keys/purposeKeys.js";
 import { getSigningKey, signHexDigest } from "../src/crypto/keys.js";
 import { sha256Hex } from "../src/utils/hash.js";
-import { verifySignedFileWithAuditor } from "../src/org/orgSigner.js";
+import { signFileWithAuditor, verifySignedFileWithAuditor } from "../src/org/orgSigner.js";
 import { calculateForecast } from "../src/forecast/forecastEngine.js";
 import { renderForecastMarkdown } from "../src/forecast/forecastReports.js";
 import { startStudioApiServer } from "../src/studio/studioServer.js";
@@ -152,6 +152,7 @@ function writeTransformHistory(workspace: string, agentId: string): void {
   for (let i = 0; i < snapshots.length; i += 1) {
     const path = join(snapshotsDir, `${now - (5 - i) * 60_000}.json`);
     writeFileSync(path, JSON.stringify(snapshots[i], null, 2));
+    signFileWithAuditor(workspace, path); // forecasts read signed transform snapshots only
   }
   writeFileSync(
     join(baseDir, "latest.json"),

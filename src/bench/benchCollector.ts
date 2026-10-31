@@ -11,9 +11,9 @@ import { computeFailureRiskIndices } from "../assurance/indices.js";
 import { latestAssuranceByPack } from "../assurance/assuranceRunner.js";
 import { verifyPluginWorkspace } from "../plugins/pluginApi.js";
 import { loadTrustConfig } from "../trust/trustConfig.js";
-import { loadLatestOrgScorecard } from "../org/orgScorecard.js";
+import { loadVerifiedLatestOrgScorecard, type loadLatestOrgScorecard } from "../org/orgScorecard.js";
 import { collectForecastSignals, captureForecastSignals, type ForecastSignalBundle } from "../forecast/forecastSignals.js";
-import { loadLatestForecastArtifact } from "../forecast/forecastStore.js";
+import { forecastScopeLatestPath, loadVerifiedForecastArtifact } from "../forecast/forecastStore.js";
 import { openLedger } from "../ledger/ledger.js";
 import { readTransparencyEntries } from "../transparency/logChain.js";
 import { canonicalize } from "../utils/json.js";
@@ -284,9 +284,10 @@ function collectBenchDataWithInputs(params: BenchCollectionInput, window: Return
   const {scopeIdHash,workspaceHash} = identity;
   const countSelectedAudit = readOnly ? countReadonlyBenchAuditEvents : countAuditEvents, selectedAssurance = readOnly ? latestReadonlyBenchAssuranceByPack : latestAssuranceByPack;
   const scope = { type: params.scopeType, id: params.scopeId };
-  const latestForecast = loadLatestForecastArtifact(params.workspace, scope);
-
-  const evidenceGateReasons: string[] = [];
+  // Signed inputs only: an unsigned or tampered forecast, scorecard or signal file is absent and named as a gate reason.
+  const latestForecast = loadVerifiedForecastArtifact(params.workspace, scope);
+  const evidenceGateReasons: string[] = signals.ignoredInputs.map((input) => `UNVERIFIED_INPUT_IGNORED:${input}`);
+  if (latestForecast === null && pathExists(forecastScopeLatestPath(params.workspace, scope))) evidenceGateReasons.push("UNVERIFIED_INPUT_IGNORED:latest forecast");
   const observedShare = Number((signals.evidence.observedShare ?? 0).toFixed(6));
   const attestedShare = Number((signals.evidence.attestedShare ?? 0).toFixed(6));
   const selfReportedShare = Number((signals.evidence.selfReportedShare ?? 0).toFixed(6));
@@ -343,7 +344,8 @@ function collectBenchDataWithInputs(params: BenchCollectionInput, window: Return
       }
     }
   } else {
-    const scorecard = loadLatestOrgScorecard(params.workspace);
+    const { scorecard, ignored } = loadVerifiedLatestOrgScorecard(params.workspace);
+    if (ignored !== null) evidenceGateReasons.push(`UNVERIFIED_INPUT_IGNORED:${ignored}`);
     const node =
       params.scopeType === "WORKSPACE"
         ? scorecard?.summary.enterpriseRollup
@@ -599,7 +601,7 @@ function collectBenchDataWithInputs(params: BenchCollectionInput, window: Return
     },
     sourceRefs: {
       runId: runRefs[runRefs.length - 1] ?? null,
-      orgScorecardComputedTs: params.scopeType === "AGENT" ? null : loadLatestOrgScorecard(params.workspace)?.computedAt ?? null,
+      orgScorecardComputedTs: params.scopeType === "AGENT" ? null : loadVerifiedLatestOrgScorecard(params.workspace).scorecard?.computedAt ?? null,
       outcomeReportId: null,
       forecastGeneratedTs: latestForecast?.generatedTs ?? null
     }

@@ -1,8 +1,10 @@
-import { readdirSync } from "node:fs";
-import { join } from "node:path";
+import { readFileSync, readdirSync } from "node:fs";
+import { join, relative } from "node:path";
 import YAML from "yaml";
 import type { DiagnosticReport, OutcomeReport } from "../types.js";
 import type { OrgScorecard } from "../org/orgSchema.js";
+import { loadVerifiedOrgScorecardFile } from "../org/orgScorecard.js";
+import { verifySignedFileWithAuditor } from "../org/orgSigner.js";
 import { getAgentPaths } from "../fleet/paths.js";
 import { listTrustedRuns } from "../governor/runTrust.js";
 import { listAgents } from "../fleet/registry.js";
@@ -48,6 +50,8 @@ export interface ForecastSignalBundle {
     remainingEffort: number;
     throughputHistoryPerDay: number[];
   };
+  /** Workspace-relative files read as unsigned or tampered and so left out: absent, never measured. */
+  ignoredInputs: string[];
 }
 
 function parseJsonFile<T>(path: string): T | null {
@@ -218,11 +222,16 @@ function computeFourCForRun(workspace: string, run: DiagnosticReport): Record<"C
   };
 }
 
-function loadOrgScorecards(workspace: string, earliestTs: number): OrgScorecard[] {
+/** Signed history scorecards only (the pair check over one read); each unsigned or tampered file is named in `ignored`. */
+function loadOrgScorecards(workspace: string, earliestTs: number, ignored: string[]): OrgScorecard[] {
   const dir = join(workspace, ".amc", "org", "scorecards", "history");
   const files = listJsonFiles(dir);
   return files
-    .map((file) => parseJsonFile<OrgScorecard>(file))
+    .map((file) => {
+      const row = loadVerifiedOrgScorecardFile(workspace, file);
+      if (row === null) ignored.push(relative(workspace, file));
+      return row;
+    })
     .filter((row): row is OrgScorecard => row !== null && Number(row.computedAt) >= earliestTs)
     .sort((a, b) => a.computedAt - b.computedAt);
 }
@@ -281,7 +290,7 @@ function valueFromOutcome(report: OutcomeReport | null): Record<(typeof FORECAST
   };
 }
 
-function computeTargetProgress(workspace: string, agentId: string, runs: DiagnosticReport[], latestPlan: TransformPlan | null): {
+function computeTargetProgress(workspace: string, agentId: string, runs: DiagnosticReport[], latestPlan: TransformPlan | null, ignored: string[]): {
   gapPoints: number;
   remainingEffort: number;
   throughputHistoryPerDay: number[];
@@ -300,13 +309,16 @@ function computeTargetProgress(workspace: string, agentId: string, runs: Diagnos
     : gapPoints;
 
   const snapshotsDir = join(workspace, ".amc", "agents", agentId, "transform", "snapshots");
+  // Signed snapshots only, verified over the bytes parsed: an unsigned one is named and left out of the throughput.
   const snapshots = listJsonFiles(snapshotsDir)
-    .map((file) =>
-      parseJsonFile<{
-        createdTs?: number;
-        tasks?: Array<{ taskId: string; effort: number; status: string }>;
-      }>(file)
-    )
+    .map((file) => {
+      let bytes: Buffer;
+      try { bytes = readFileSync(file); } catch { ignored.push(relative(workspace, file)); return null; }
+      if (!verifySignedFileWithAuditor(workspace, file, bytes).valid) { ignored.push(relative(workspace, file)); return null; }
+      try {
+        return JSON.parse(bytes.toString("utf8")) as { createdTs?: number; tasks?: Array<{ taskId: string; effort: number; status: string }> };
+      } catch { ignored.push(relative(workspace, file)); return null; }
+    })
     .filter((row): row is { createdTs?: number; tasks?: Array<{ taskId: string; effort: number; status: string }> } => Boolean(row))
     .sort((a, b) => Number(a.createdTs ?? 0) - Number(b.createdTs ?? 0));
   const throughputByDay = new Map<string, number>();
@@ -360,6 +372,7 @@ function collectForecastSignalsAt(params: {
   let latestIntegrityIndex = 0;
   let latestCorrelationRatio = 0;
   let orgQuestionCount = 67;
+  const ignoredInputs: string[] = [];
   let targetProgress = {
     gapPoints: 0,
     remainingEffort: 0,
@@ -375,7 +388,7 @@ function collectForecastSignalsAt(params: {
     })
       .filter((report) => report.generatedTs >= earliestTs)
       .sort((a, b) => a.generatedTs - b.generatedTs);
-    targetProgress = computeTargetProgress(params.workspace, params.scope.id, runs, transformPlan);
+    targetProgress = computeTargetProgress(params.workspace, params.scope.id, runs, transformPlan, ignoredInputs);
 
     for (const run of runs) {
       const trustTier = runTrustTier(run);
@@ -436,7 +449,7 @@ function collectForecastSignalsAt(params: {
       latestCorrelationRatio = run.correlationRatio;
     }
   } else {
-    const scorecards = loadOrgScorecards(params.workspace, earliestTs);
+    const scorecards = loadOrgScorecards(params.workspace, earliestTs, ignoredInputs);
     const memberAgents = scopeAgentsFromOrg(params.workspace, params.scope);
     const outcomesByAgent = new Map<string, OutcomeReport[]>(
       memberAgents.map((agentId) => [agentId, loadAgentOutcomeReports(params.workspace, agentId, earliestTs)])
@@ -496,9 +509,10 @@ function collectForecastSignalsAt(params: {
 
       for (const indexId of FORECAST_INDEX_IDS) {
         const item = node.riskIndices.find((row) => row.id === indexId);
+        if (item === undefined) continue; // an absent index is no point, never a risk of 0
         points.indices[indexId].push({
           ts,
-          value: Number((item?.score0to100 ?? 0).toFixed(6)),
+          value: Number(item.score0to100.toFixed(6)),
           runId: `${scorecard.computedAt}`,
           trustTier
         });
@@ -577,7 +591,8 @@ function collectForecastSignalsAt(params: {
     },
     runRefs: [...new Set(runRefs)],
     transformPlanInput,
-    targetProgress
+    targetProgress,
+    ignoredInputs
   };
 }
 
