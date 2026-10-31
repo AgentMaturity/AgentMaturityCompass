@@ -12,16 +12,10 @@
         "events": {
           "items": {
             "additionalProperties": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "number"
-                },
-                {
-                  "type": "null"
-                }
+              "type": [
+                "string",
+                "number",
+                "null"
               ]
             },
             "propertyNames": {
@@ -35,16 +29,10 @@
         "sessions": {
           "items": {
             "additionalProperties": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "number"
-                },
-                {
-                  "type": "null"
-                }
+              "type": [
+                "string",
+                "number",
+                "null"
               ]
             },
             "propertyNames": {
@@ -142,16 +130,10 @@
         "a4_comments": {
           "items": {
             "additionalProperties": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "number"
-                },
-                {
-                  "type": "null"
-                }
+              "type": [
+                "string",
+                "number",
+                "null"
               ]
             },
             "propertyNames": {
@@ -165,16 +147,10 @@
         "a4_decisions": {
           "items": {
             "additionalProperties": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "number"
-                },
-                {
-                  "type": "null"
-                }
+              "type": [
+                "string",
+                "number",
+                "null"
               ]
             },
             "propertyNames": {
@@ -188,16 +164,10 @@
         "a4_deployments": {
           "items": {
             "additionalProperties": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "number"
-                },
-                {
-                  "type": "null"
-                }
+              "type": [
+                "string",
+                "number",
+                "null"
               ]
             },
             "propertyNames": {
@@ -211,16 +181,10 @@
         "a4_evidence_refs": {
           "items": {
             "additionalProperties": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "number"
-                },
-                {
-                  "type": "null"
-                }
+              "type": [
+                "string",
+                "number",
+                "null"
               ]
             },
             "propertyNames": {
@@ -234,16 +198,10 @@
         "a4_gates": {
           "items": {
             "additionalProperties": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "number"
-                },
-                {
-                  "type": "null"
-                }
+              "type": [
+                "string",
+                "number",
+                "null"
               ]
             },
             "propertyNames": {
@@ -257,16 +215,10 @@
         "a4_members": {
           "items": {
             "additionalProperties": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "number"
-                },
-                {
-                  "type": "null"
-                }
+              "type": [
+                "string",
+                "number",
+                "null"
               ]
             },
             "propertyNames": {
@@ -280,16 +232,10 @@
         "a4_projects": {
           "items": {
             "additionalProperties": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "number"
-                },
-                {
-                  "type": "null"
-                }
+              "type": [
+                "string",
+                "number",
+                "null"
               ]
             },
             "propertyNames": {
@@ -303,16 +249,10 @@
         "a4_releases": {
           "items": {
             "additionalProperties": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "number"
-                },
-                {
-                  "type": "null"
-                }
+              "type": [
+                "string",
+                "number",
+                "null"
               ]
             },
             "propertyNames": {
@@ -326,16 +266,10 @@
         "a4_revisions": {
           "items": {
             "additionalProperties": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "number"
-                },
-                {
-                  "type": "null"
-                }
+              "type": [
+                "string",
+                "number",
+                "null"
               ]
             },
             "propertyNames": {
@@ -349,16 +283,10 @@
         "a4_transitions": {
           "items": {
             "additionalProperties": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "number"
-                },
-                {
-                  "type": "null"
-                }
+              "type": [
+                "string",
+                "number",
+                "null"
               ]
             },
             "propertyNames": {

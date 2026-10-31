@@ -141,13 +141,9 @@
               "type": "string"
             },
             "maturityDeltaShort": {
-              "anyOf": [
-                {
-                  "type": "number"
-                },
-                {
-                  "type": "null"
-                }
+              "type": [
+                "number",
+                "null"
               ]
             },
             "reasons": {
@@ -158,13 +154,9 @@
               "type": "array"
             },
             "riskDeltaShort": {
-              "anyOf": [
-                {
-                  "type": "number"
-                },
-                {
-                  "type": "null"
-                }
+              "type": [
+                "number",
+                "null"
               ]
             },
             "status": {

@@ -8,13 +8,9 @@
       "type": "string"
     },
     "baseReleaseId": {
-      "anyOf": [
-        {
-          "type": "string"
-        },
-        {
-          "type": "null"
-        }
+      "type": [
+        "string",
+        "null"
       ]
     },
     "createdByKey": {
@@ -27,13 +23,9 @@
       "type": "integer"
     },
     "deployedReleaseId": {
-      "anyOf": [
-        {
-          "type": "string"
-        },
-        {
-          "type": "null"
-        }
+      "type": [
+        "string",
+        "null"
       ]
     },
     "headDigest": {
@@ -49,13 +41,9 @@
       "type": "boolean"
     },
     "holdReason": {
-      "anyOf": [
-        {
-          "type": "string"
-        },
-        {
-          "type": "null"
-        }
+      "type": [
+        "string",
+        "null"
       ]
     },
     "members": {

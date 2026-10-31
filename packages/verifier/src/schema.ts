@@ -25,16 +25,28 @@ export function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
 
-// zod's z.iso.datetime(): a real calendar date, hh:mm with optional seconds and fraction, and "Z".
+// AMC's isoTimeSchema (src/contracts/v1/common.ts): a real calendar date, hh:mm with optional seconds and fraction, and "Z".
 const DATE = "(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))";
 const ISO_DATETIME = new RegExp(`^${DATE}T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$`);
+
+/** Code points, a surrogate pair counting once, without the string iterator's allocation on a large hostile string. */
+function codePoints(value: string): number {
+  let count = value.length;
+  for (let i = 0; i < value.length - 1; i += 1) {
+    if ((value.charCodeAt(i) & 0xfc00) === 0xd800 && (value.charCodeAt(i + 1) & 0xfc00) === 0xdc00) { count -= 1; i += 1; }
+  }
+  return count;
+}
 
 export function str(opts: { min?: number; max?: number; length?: number; regex?: RegExp; check?: (value: string) => boolean; what?: string } = {}): Check<string> {
   return (value, path) => {
     if (typeof value !== "string") return invalid(path, "expected a string");
-    if (opts.min !== undefined && value.length < opts.min) invalid(path, `shorter than ${opts.min}`);
-    if (opts.max !== undefined && value.length > opts.max) invalid(path, `longer than ${opts.max}`);
-    if (opts.length !== undefined && value.length !== opts.length) invalid(path, `length is not ${opts.length}`);
+    // Bounds count code points, as zod (4.5 on) and JSON Schema's minLength and maxLength do. A code point is one or two
+    // UTF-16 units, so only a string between a bound and twice it needs counting.
+    const size = (bound: number) => (value.length < bound || value.length > 2 * bound ? value.length : codePoints(value));
+    if (opts.min !== undefined && size(opts.min) < opts.min) invalid(path, `shorter than ${opts.min}`);
+    if (opts.max !== undefined && size(opts.max) > opts.max) invalid(path, `longer than ${opts.max}`);
+    if (opts.length !== undefined && size(opts.length) !== opts.length) invalid(path, `length is not ${opts.length}`);
     if (opts.regex && !opts.regex.test(value)) invalid(path, `does not match ${opts.what ?? opts.regex.source}`);
     if (opts.check && !opts.check(value)) invalid(path, opts.what ?? "invalid value");
     return value;

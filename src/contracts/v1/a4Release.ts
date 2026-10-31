@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { claimEnvelopeSchema, claimKindSchema } from "../../claims/eligibility/schemas.js";
 import { signatureEnvelopeSchema } from "../../crypto/signing/signatureEnvelope.js";
-import { nonEmpty, sha256HexSchema } from "./common.js";
+import { isoTimeSchema, nonEmpty, sha256HexSchema } from "./common.js";
 import { a4IntegrationClaimV1Schema } from "./a4IntegrationClaim.js";
 import { a4ApprovalRefSchema, a4QualitySpecSchema } from "./a4Package.js";
 import { a4PrincipalSchema } from "./a4Project.js";
@@ -45,7 +45,7 @@ export const a4ReleaseV1Schema = z.strictObject({
   rollback: z.strictObject({ releaseId: z.string().nullable(), enforceManifestId: z.string().nullable(), leaseIds: z.array(nonEmpty), preparedCommands: z.array(nonEmpty) }),
   /** Lease ids and status only; a token is never part of a release record. */
   leases: z.array(z.strictObject({
-    leaseId: nonEmpty, scope: z.enum(["staging", "production"]), scopes: z.array(nonEmpty), expiresAt: z.iso.datetime(), status: z.enum(["active", "revoked"])
+    leaseId: nonEmpty, scope: z.enum(["staging", "production"]), scopes: z.array(nonEmpty), expiresAt: isoTimeSchema, status: z.enum(["active", "revoked"])
   })),
   lifecycle: z.strictObject({
     from: nonEmpty, to: nonEmpty,
@@ -77,7 +77,7 @@ export const a4ReleaseV1Schema = z.strictObject({
   enforcementBoundaries: z.array(z.strictObject({ boundary: nonEmpty, status: z.enum(["enforced", "observed", "none"]), note: z.string() })),
   claim: claimEnvelopeSchema,
   createdBy: a4PrincipalSchema,
-  createdAt: z.iso.datetime(),
+  createdAt: isoTimeSchema,
   envelope: a4SignedDigestSchema
 });
 export type A4ReleaseV1 = z.infer<typeof a4ReleaseV1Schema>;

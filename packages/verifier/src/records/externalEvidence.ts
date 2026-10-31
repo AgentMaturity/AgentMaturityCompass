@@ -8,7 +8,8 @@ import { arr, int, invalid, isRecord, lit, nullable, obj, oneOf, refine, str, ty
 const wellFormed = (value: string) => !/[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/u.test(value);
 const validTime = (value: string) => /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(value) && !Number.isNaN(Date.parse(value))
   && new Date(value).toISOString() === value;
-const text = str({ min: 1, max: 4096, check: wellFormed, what: "well-formed text" });
+// validateExternalEvidenceProfile bounds text in UTF-16 units, not in the code points str() counts.
+const text = str({ check: value => value.length > 0 && value.length <= 4096 && wellFormed(value), what: "well-formed text of 1 to 4096 UTF-16 units" });
 const nullableText = nullable(text);
 const digest = str({ regex: /^[a-f0-9]{64}$/, what: "64 hex" });
 const time = str({ check: validTime, what: "a canonical UTC time" });

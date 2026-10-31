@@ -2606,6 +2606,86 @@ components:
           type: integer
           minimum: 1
           maximum: 32
+    NativeTaskFork:
+      type: object
+      additionalProperties: false
+      required:
+        - clientRequestId
+        - expectedRevision
+      properties:
+        clientRequestId:
+          type: string
+          format: uuid
+        expectedRevision:
+          type: integer
+          minimum: 1
+          maximum: 32
+      description: A new owner-scoped request ID for the child task, and the parent's current revision. The child
+        keeps the parent's pinned provider, model, tools digest, checks and limits, with its own lease; it starts
+        with no inherited model context. A parent that does not verify is refused with code NATIVE_FORK_<reason>.
+    ExecutionStatus:
+      type: object
+      additionalProperties: false
+      required:
+        - sessionId
+        - receiptStates
+        - recheckFailures
+        - phases
+      properties:
+        sessionId:
+          type: string
+        receiptStates:
+          type: array
+          items:
+            type: string
+        recheckFailures:
+          type: array
+          items:
+            type: string
+        phases:
+          type: object
+          additionalProperties: false
+          required:
+            - admission
+            - model-completion
+            - side-effect-completion
+            - evidence-verification
+          properties:
+            admission:
+              type: string
+              enum:
+                - pending
+                - succeeded
+                - failed
+                - refused
+                - unknown
+            model-completion:
+              type: string
+              enum:
+                - pending
+                - succeeded
+                - failed
+                - refused
+                - unknown
+            side-effect-completion:
+              type: string
+              enum:
+                - pending
+                - succeeded
+                - failed
+                - refused
+                - unknown
+            evidence-verification:
+              type: string
+              enum:
+                - pending
+                - succeeded
+                - failed
+                - refused
+                - unknown
+      description: "The four execution phases (P2-13, docs/sdk/EXECUTION_API.md). Each has one source and none
+        implies another: a finished turn whose evidence nobody verified reads model-completion succeeded,
+        evidence-verification pending."
     NativeTask:
       type: object
       additionalProperties: false
@@ -2642,6 +2722,8 @@ components:
         - resumeBlockedReason
         - history
         - recovery
+        - execution
+        - delegation
       properties:
         taskId:
           type: string
@@ -2700,6 +2782,15 @@ components:
           maxItems: 8
           items:
             $ref: "#/components/schemas/NativeTaskValidationOutput"
+        plans:
+          type: array
+          maxItems: 2
+          items:
+            $ref: "#/components/schemas/NativeTaskPlan"
+        usage:
+          type: object
+          description: Bounded NativeRunUsage recorded-session aggregates with issueCount, without per-request reports
+            or issue arrays. Missing usage stays unavailable; it is never filled from configured limits.
         maxSteps:
           type: integer
           minimum: 0
@@ -2780,6 +2871,73 @@ components:
               nullable: true
               enum:
                 - null
+        execution:
+          oneOf:
+            - $ref: "#/components/schemas/ExecutionStatus"
+            - type: object
+              nullable: true
+              enum:
+                - null
+        delegation:
+          oneOf:
+            - $ref: "#/components/schemas/DelegationChain"
+            - type: object
+              nullable: true
+              enum:
+                - null
+    DelegationChain:
+      type: object
+      additionalProperties: false
+      required:
+        - chainDigest
+        - status
+        - reason
+        - links
+      properties:
+        chainDigest:
+          type: string
+          pattern: ^[a-f0-9]{64}$
+        status:
+          type: string
+          enum:
+            - verified
+            - refused
+            - unavailable
+        reason:
+          type: string
+          nullable: true
+        links:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required:
+              - linkId
+              - depth
+              - principal
+              - delegate
+              - scopes
+              - notAfter
+            properties:
+              linkId:
+                type: string
+              depth:
+                type: integer
+                minimum: 0
+              principal:
+                type: string
+              delegate:
+                type: string
+              scopes:
+                type: array
+                items:
+                  type: string
+              notAfter:
+                type: integer
+                minimum: 0
+      description: The signed delegation chain the task runtime's v2 lease binds (P2-25, docs/AGENT_IDENTITY.md),
+        from the human or declared service that authorized it to the runtime, re-verified on every read.
+        Experimental.
     NativeTaskVerificationScope:
       type: object
       additionalProperties: false
@@ -2843,6 +3001,7 @@ components:
           enum:
             - sqlite
             - jsonl
+            - postgres
             - null
           nullable: true
         headEventHash:
@@ -3050,6 +3209,117 @@ components:
       description: Text from the exact authenticated check-result payload after its complete bytes match
         payloadSha256. The display is redacted and capped at 16 KiB; payloadSha256 describes the original bytes,
         not transformed display text. Reads over 2 MiB are withheld.
+    NativeTaskPlan:
+      type: object
+      additionalProperties: false
+      required:
+        - kind
+        - revision
+        - recordSha256
+        - text
+        - evidence
+        - scope
+      properties:
+        kind:
+          type: string
+          enum:
+            - todo
+            - plan
+        revision:
+          type: integer
+          minimum: 1
+        recordSha256:
+          type: string
+          pattern: ^[a-f0-9]{64}$
+        text:
+          type: string
+        evidence:
+          type: string
+          enum:
+            - committed
+        scope:
+          type: string
+          enum:
+            - current-record
+      description: Latest authenticated list state for the current turn, separate from durable transcript replay and
+        approval authority. Model-written text must be HTML-escaped.
+    NativeTaskPage:
+      type: object
+      additionalProperties: false
+      required:
+        - format
+        - sessionId
+        - agentId
+        - committed
+        - backend
+        - headEventHash
+        - headSeq
+        - storeHeadEventHash
+        - firstSeq
+        - nextSeq
+        - nextCursor
+        - resumeCursor
+        - sealed
+        - verification
+        - state
+      properties:
+        format:
+          type: string
+          enum:
+            - amc-session-event-page-v1
+        sessionId:
+          type: string
+        agentId:
+          type: string
+          minLength: 1
+          maxLength: 128
+          pattern: ^[a-z0-9][a-z0-9_-]*$
+        committed:
+          type: boolean
+          enum:
+            - true
+        backend:
+          type: string
+          enum:
+            - sqlite
+            - jsonl
+            - postgres
+        headEventHash:
+          type: string
+          pattern: ^[a-f0-9]{64}$
+        headSeq:
+          type: integer
+          minimum: 0
+        storeHeadEventHash:
+          type: string
+          pattern: ^[a-f0-9]{64}$
+        firstSeq:
+          type: integer
+          minimum: 0
+        nextSeq:
+          type: integer
+          minimum: 0
+        nextCursor:
+          type: string
+          minLength: 1
+          maxLength: 2048
+          nullable: true
+        resumeCursor:
+          type: string
+          minLength: 1
+          maxLength: 2048
+        sealed:
+          type: boolean
+        verification:
+          type: object
+        state:
+          type: object
+      description: Shared verified-session snapshot metadata. Sequences are zero-based raw session rows, including
+        rows without visible updates. nextSeq is exclusive. nextCursor null means this snapshot is exhausted. The
+        complete success response, including current task state and page, is bounded to 2 MiB; oversized state
+        refuses with 409 instead of truncating fields. The same-store page state carries validation, recorded
+        usage, approvals, ending and unknown tool outcomes. Verification reads the complete selected store before
+        slicing; it does not grant payload access or a writer.
     NativeTaskEvent:
       type: object
       additionalProperties: false
@@ -3062,6 +3332,8 @@ components:
         cursor:
           type: integer
           minimum: 0
+          description: Raw source sequence in page mode; legacy projected-update position otherwise. Read page.nextSeq
+            to advance over source rows without visible updates.
         kind:
           type: string
           enum:
@@ -3492,10 +3764,13 @@ components:
               $ref: "#/components/schemas/NativeTask"
             events:
               type: array
+              maxItems: 512
               items:
                 $ref: "#/components/schemas/NativeTaskEvent"
             truncated:
               type: boolean
+            page:
+              $ref: "#/components/schemas/NativeTaskPage"
     # END GENERATED NATIVE TASK SCHEMAS
 
     # BEGIN GENERATED A4 SCHEMAS
@@ -10746,8 +11021,28 @@ paths:
             type: integer
             minimum: 0
             maximum: 999999999999999
-          description: Exclusive event cursor. Retention may truncate earlier updates; this is not a complete evidence
-            verification.
+          description: Legacy exclusive projected-update cursor. Do not combine with pageCursor or limit. Retention may
+            truncate this legacy view.
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 256
+            default: 64
+          description: Negotiate verified native history pages on this route. Bounds delivered source rows, not total
+            verification work.
+        - name: pageCursor
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 2048
+          description: Opaque verified-store position bound to session, agent and authenticated owner. nextCursor
+            continues the fixed snapshot; resumeCursor follows after delivered rows. Omit for the first page.
+            Cursor forgery, a chain gap or tampering fails the whole page. No control or tool is replayed.
       responses:
         "200":
           description: Current owned task state; no-store.
@@ -10862,6 +11157,121 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/NativeTaskTurn"
+      responses:
+        "202":
+          description: Admission recorded; inspect the task for its actual outcome.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NativeTaskResponse"
+        "400":
+          description: Invalid request, unknown or repeated query fields, or bounds exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NativeTaskError"
+        "401":
+          description: A verified human session or bootstrap admin token is required.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NativeTaskError"
+        "403":
+          description: Identity, role, origin, CSRF, demo or read-only policy refused the operation.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NativeTaskError"
+        "404":
+          description: Unknown task or task belongs to another owner/agent.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NativeTaskError"
+        "409":
+          description: Revision, request ID, signed scope or task state conflict. Refresh; do not automatically replay.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NativeTaskError"
+        "413":
+          description: Request body exceeds the server's JSON limit.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NativeTaskError"
+        "429":
+          description: Active task or retained task capacity reached.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NativeTaskError"
+        "500":
+          description: Task status is uncertain. Inspect recorded state before another submission.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NativeTaskError"
+        "503":
+          description: Native task service is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NativeTaskError"
+  /v1/native-tasks/{taskId}/fork:
+    post:
+      summary: "Fork this task's session into a new owned task: a child whose signed open row names the verified
+        parent (P2-13)"
+      tags:
+        - Studio
+        - Native Tasks
+      security:
+        - amcAdminToken: []
+        - amcSessionCookie: []
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^[a-f0-9]{64}$
+        - name: agentId
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 128
+            pattern: ^[a-z0-9][a-z0-9_-]*$
+          description: Selected agent; defaults to the workspace selection. A task remains pinned to its original owner
+            and agent.
+        - name: x-amc-native-intent
+          in: header
+          required: true
+          schema:
+            type: string
+            enum:
+              - task-workspace-v1
+          description: Explicit native task/approval mutation intent.
+        - name: x-amc-native-csrf
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Required with a human session cookie; obtain from options or /auth/me. Never use in a URL.
+        - name: Origin
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Required for cookie mutations; must match a configured browser origin and the request Host.
+            Admin-token clients may omit it.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NativeTaskFork"
       responses:
         "202":
           description: Admission recorded; inspect the task for its actual outcome.
@@ -11039,7 +11449,8 @@ paths:
                 $ref: "#/components/schemas/NativeTaskError"
   /v1/native-tasks/{taskId}/release:
     post:
-      summary: Release the native writer while keeping an eligible session resumable
+      summary: "Dispose: release the native writer, keeping an eligible session resumable, then stop the runtime
+        process"
       tags:
         - Studio
         - Native Tasks
@@ -11381,8 +11792,8 @@ paths:
                 $ref: "#/components/schemas/NativeTaskError"
   /v1/native-tasks/{taskId}/archive:
     post:
-      summary: Archive an owned closed task after authenticating its sealed history; retain evidence and request
-        identities
+      summary: "Studio-only housekeeping, not an execution verb: archive an owned closed task after authenticating
+        its sealed history; retain evidence and request identities"
       tags:
         - Studio
         - Native Tasks
@@ -11540,8 +11951,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -11602,8 +12014,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -11664,8 +12077,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -11752,8 +12166,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -11822,8 +12237,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -11903,8 +12319,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -11984,8 +12401,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -12052,8 +12470,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -12134,8 +12553,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -12208,8 +12628,84 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "423":
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "500":
+          description: The outcome is uncertain; reload the project before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+  /v1/a4/projects/{projectId}/revisions/{revisionNo}/resolved:
+    get:
+      summary: One revision with its derived parts resolved and checked (amc.a4-revision-resolved/v1)
+      tags:
+        - Studio
+        - A4 Forge
+      security:
+        - amcAdminToken: []
+        - amcSessionCookie: []
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^a4p_[0-9a-f]{32}$
+        - name: revisionNo
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        "200":
+          description: Current A4 state; no-store.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Response"
+        "400":
+          description: Invalid body or query, an identity or trust field in the body, SOD_VIOLATION or
+            HYPOTHESIS_SOURCE_MISMATCH.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "401":
+          description: No authenticated Studio session (A4 routes are served only through native Studio admission).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "403":
+          description: DEMO_REFUSED, ADMIN_TOKEN_REFUSED (the admin token reads only), NATIVE_READ_ONLY, role class or
+            project membership refused.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "404":
+          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "409":
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -12283,8 +12779,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -12351,8 +12848,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -12419,8 +12917,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -12512,8 +13011,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -12586,8 +13086,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -12679,8 +13180,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -12773,8 +13275,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -12848,8 +13351,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -12942,8 +13446,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -13016,8 +13521,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -13088,8 +13594,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -13174,8 +13681,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -13244,8 +13752,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -13338,8 +13847,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -13434,8 +13944,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -13546,8 +14057,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -13646,8 +14158,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -13758,8 +14271,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -13826,8 +14340,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -13926,8 +14441,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -14007,8 +14523,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -14082,8 +14599,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -14196,8 +14714,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -14301,8 +14820,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -14405,8 +14925,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -14515,8 +15036,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -14627,8 +15149,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -14726,8 +15249,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -14826,8 +15350,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -14928,8 +15453,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -15024,8 +15550,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -15121,8 +15648,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -15217,8 +15745,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -15315,8 +15844,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -15416,8 +15946,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -15517,8 +16048,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -15617,8 +16149,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -15722,8 +16255,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -15831,8 +16365,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -15943,8 +16478,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -16047,8 +16583,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -16151,8 +16688,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -16255,8 +16793,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -16359,8 +16898,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -16463,8 +17003,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -16571,8 +17112,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -16676,8 +17218,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -16770,8 +17313,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -16864,8 +17408,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -16958,8 +17503,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -17052,8 +17598,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -17146,8 +17693,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -17242,8 +17790,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -17260,8 +17809,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/A4Error"
-  # END GENERATED A4 PATHS
-  # BEGIN GENERATED RESULT ROUTE PATHS
   # END GENERATED A4 PATHS
   # BEGIN GENERATED RESULT ROUTE PATHS
   /v1/score/evidence-drilldown/{runId}/{questionId}:
