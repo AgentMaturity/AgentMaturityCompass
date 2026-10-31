@@ -18,6 +18,11 @@ import { isAbsolute, join, relative, resolve, sep } from "node:path";
 /** Directories never worth walking, and expensive to walk by accident. */
 const SKIP_DIRECTORIES = new Set([".git", "node_modules", ".amc", "dist", "coverage", ".next"]);
 
+/** Case-folded: a case-insensitive volume opens `.amc` for `.AMC`, and the walk's start path is model-chosen. */
+function skipDirectory(name: string): boolean {
+  return SKIP_DIRECTORIES.has(name.normalize("NFC").toLowerCase());
+}
+
 export interface WalkLimits {
   /** Stop after this many files have been yielded. */
   readonly maxFiles: number;
@@ -173,7 +178,7 @@ export function walkWorkspace(workspace: string, limits: WalkLimits): WalkResult
   for (const segment of startPath === "" ? [] : startPath.split(sep)) {
     if (!limits.includeIgnored) inherited.push(...ignoreRules(root, ancestor));
     ancestor = join(ancestor, segment);
-    if (SKIP_DIRECTORIES.has(segment) || ignored(forMatching(relative(root, ancestor)), true, inherited)) {
+    if (skipDirectory(segment) || ignored(forMatching(relative(root, ancestor)), true, inherited)) {
       return { files, truncated: false };
     }
   }
@@ -197,7 +202,7 @@ export function walkWorkspace(workspace: string, limits: WalkLimits): WalkResult
       const path = relative(root, full);
       if (ignored(forMatching(path), entry.isDirectory(), rules)) continue;
       if (entry.isDirectory()) {
-        if (!SKIP_DIRECTORIES.has(entry.name)) queue.push({ dir: full, rules });
+        if (!skipDirectory(entry.name)) queue.push({ dir: full, rules });
         continue;
       }
       if (!entry.isFile()) continue;

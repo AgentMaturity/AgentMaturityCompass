@@ -65,8 +65,10 @@ export function protectedPathGlobs(): string[] {
  * line of work exists to remove — it merely wears code instead of YAML.
  */
 export function isProtectedPath(workspace: string, candidate: string): boolean {
-  const resolved = resolve(candidate);
-  const amcRoot = resolve(join(workspace, ".amc"));
+  // Folded on both sides: a case-insensitive volume opens `.amc` for `.AMC`.
+  const fold = (path: string): string => path.normalize("NFC").toLowerCase();
+  const resolved = fold(resolve(candidate));
+  const amcRoot = fold(resolve(join(workspace, ".amc")));
   if (resolved === amcRoot) return true;
   // `relative`, not a string prefix. `resolved.startsWith(amcRoot)` — which is
   // what this replaced — also matches `.amcx` and `.amc-backup`, refusing

@@ -110,7 +110,9 @@ export function insideWorkspace(workspace: string, path: string): { readonly ful
     throw new Error(`path escapes the workspace: ${path}`);
   }
   for (const segment of rel.split(/[/\\]/)) {
-    if (FORBIDDEN_SEGMENTS.has(segment)) {
+    // Folded: on a case-insensitive volume `.AMC` opens `.amc`, and JS
+    // `realpathSync` keeps the typed case rather than the on-disk name.
+    if (FORBIDDEN_SEGMENTS.has(segment.normalize("NFC").toLowerCase())) {
       throw new Error(`path is inside a protected directory (${segment}): ${path}`);
     }
   }
