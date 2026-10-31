@@ -29,11 +29,11 @@ export function isNativeMcpProtocolVersion(value: unknown): value is string {
   return typeof value === "string" && (value === MCP_STATELESS_PROTOCOL_VERSION || MCP_LEGACY_PROTOCOL_VERSIONS.includes(value));
 }
 
-/** basic/index §_meta: version and capabilities are required on every request; AMC declares no client capabilities. */
-export function statelessRequestMeta(): Record<string, unknown> {
+/** basic/index §_meta: version and capabilities are required on every request; only a mount with a human answerer declares form elicitation. */
+export function statelessRequestMeta(capabilities: Readonly<Record<string, unknown>> = {}): Record<string, unknown> {
   return { [MCP_PROTOCOL_VERSION_META]: MCP_STATELESS_PROTOCOL_VERSION,
     "io.modelcontextprotocol/clientInfo": { ...MCP_CLIENT_INFO },
-    "io.modelcontextprotocol/clientCapabilities": {} };
+    "io.modelcontextprotocol/clientCapabilities": structuredClone(capabilities) };
 }
 
 /** basic/index §Error Codes: HeaderMismatch, MissingRequiredClientCapability, UnsupportedProtocolVersion. */

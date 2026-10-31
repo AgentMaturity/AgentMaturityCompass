@@ -73,6 +73,11 @@ const golden = `(version 1)
 (allow signal (target pgrp))
 (deny process-info* (target others))
 (deny process-exec (literal "/usr/bin/open") (literal "/usr/bin/osascript") (literal "/bin/launchctl") (literal "/usr/bin/at"))
+;; Host state outside the write grants: named POSIX shared memory and System V IPC outlive the shell and reach other processes. The kernel still lets a System V segment be created; attaching it is denied.
+(deny ipc-posix-shm-write-create ipc-posix-shm-write-data ipc-posix-shm-write-unlink)
+(deny ipc-sysv*)
+;; Kernel driver user clients (power management, displays, devices) are host state too; registry reads stay open.
+(deny iokit-open)
 `;
 
 describe("the native Seatbelt shell profile text", () => {

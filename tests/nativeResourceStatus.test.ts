@@ -68,7 +68,8 @@ function mcp() {
     catalog: { serverId: "fixture", digest: "a".repeat(64), protocol, tools: [], instructions: null, resources: [], resourceTemplates: [] },
     toolNames: [toolName], receipt: { serverId: "fixture", catalogDigest: "a".repeat(64), protocol, auth: null },
     serverInstructions: { kind: "mcp-server-instructions", serverId: "fixture", text: "PRIVATE_MCP_INSTRUCTIONS", truncated: false },
-    diagnostics: vi.fn(() => "PRIVATE_MCP_DIAGNOSTICS"), close: vi.fn(async () => { remove(); })
+    diagnostics: vi.fn(() => "PRIVATE_MCP_DIAGNOSTICS"), close: vi.fn(async () => { remove(); }),
+    subscribeResources: vi.fn(async () => { throw new Error("status never subscribes"); })
   };
   return { registry, mount, body, toolName, remove, define };
 }
