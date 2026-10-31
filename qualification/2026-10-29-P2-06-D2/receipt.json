@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "key": "P2-06",
+  "date": "2026-10-29",
+  "commit": "69b45298bfafaa6484c4b3984ab59d2b8937cd3d",
+  "branch": "rtd/w7-d2-value-policy",
+  "node": "not recorded",
+  "pnpm": "not recorded",
+  "os": "not recorded",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npx vitest run tests/valuePolicyFreshReadiness.test.ts",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npx vitest run <30 test files that touch value, Studio supervisor, readiness and init>",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npx vitest run <tests/keys plus the initializer tests>",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run build",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run typecheck",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run typecheck:tests",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run lint",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:gates",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:dead-code",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:duplicates",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:counts",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:api-ref",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 0
+    }
+  ],
+  "tests": null,
+  "artifacts": [
+    {
+      "path": "check-api-ref.txt",
+      "sha256": "b3f05c856b6880ccf5985f87f8939d6948fc30ce3dc70edd6c71e0e1dff3cb2d"
+    },
+    {
+      "path": "check-counts.txt",
+      "sha256": "f22f32c8cce95da49779f77a8612a0ff3f01e55a3673dd741fc91b51cba93f8e"
+    },
+    {
+      "path": "check-dead-code.txt",
+      "sha256": "a0e55a9c0253af9d5ca001797983d205ce8d3c8ab270b3fe40dda2ba9d1bac91"
+    },
+    {
+      "path": "check-docs-drift.txt",
+      "sha256": "2e3dca3a044e9bc68bfdc3cc6fb49191e73288449e27d6093769f3a9ca665a2e"
+    },
+    {
+      "path": "check-duplicates.txt",
+      "sha256": "b543e2fabc40e6524309ff9ce4939dea37d9f77733a1fb488074425e5407839f"
+    },
+    {
+      "path": "check-gates.txt",
+      "sha256": "e59398d6b10bd12bbfdd3ab4f1094f5a49247370760dfafe11996cce02f585f1"
+    },
+    {
+      "path": "lint.txt",
+      "sha256": "b7096a28a4ef9fc9c2b3964e45ba643cee6913af3b85795f8e22294d36c7ec33"
+    },
+    {
+      "path": "receipt.md",
+      "sha256": "8ab739e56bae197000e9dedd5fb37e4f85ac47cebcc3d5a070397cfb76af0c41"
+    },
+    {
+      "path": "tests-keys-initializers.txt",
+      "sha256": "6188a1ff666820689960119e51aaff69803b380b99b3184306a5994a6ee20ab9"
+    },
+    {
+      "path": "typecheck-tests.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "typecheck.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "notes": "P2-06 defect D2: a fresh workspace becomes Ready without a manual amc value init. Base 331f311d6, branch rtd/w7-d2-value-policy; receipt.md is the lane's own receipt (root cause, fix, evidence, pending), and the check outputs are the files beside it. commit is 69b45298b, which holds the fix and this folder (parent 331f311d6). Rows 1-3 write receipt.md's test runs as vitest commands; their command lines were not recorded. Row 1, the green run: 6/6. Row 2: 30 files, 338/338. Row 3 (tests-keys-initializers.txt): 139 files passed and 1 skipped, 1505/1505 tests. Rows 4-13 are the checks receipt.md lists as all exit 0, written as the npm scripts they name; flags were not recorded. check:dead-code shrank 1 stale valueStore exports entry that is now used; check:duplicates found 0 new; check:counts ran after gen-counts --write. Red first: tests/valuePolicyFreshReadiness.test.ts failed 3/3 before the fix, because init never created the policy. Mutation checks (each guard removed in turn, then restored): init creation removed, 4/4 failed and the bootstrap test fails; supervisor creation removed, the Studio-start test fails; supervisor existence guard removed, the unparseable-policy test fails. No new CLI command, audit type, deletion site or key scheme. Pending: re-run the P2-06 kind qualification (INS-1) on a cluster with this commit; it needs real cluster infrastructure. tests is null: the three selections may overlap and are not summed, and rows 1 and 2 recorded no skipped counts. Not recorded: node, pnpm, the OS and the command durations (durationMs 0 means not recorded). arch is not recorded either; arm64 is a same-host inference from the same wave's 2026-10-29 receipt for D5 (darwin 25.6.0, macOS 26.6, arm64), because the schema allows only arm64 or x64."
+}
