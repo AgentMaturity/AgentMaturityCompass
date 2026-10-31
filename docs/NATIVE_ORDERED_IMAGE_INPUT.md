@@ -164,7 +164,7 @@ public ACP, actual registered CLI, TypeScript/Python subprocess, cold SQLite/JSO
 and hostile-input/evidence scenarios. Untrusted peer fixtures test client edges
 only; they are never labelled native-runtime proof.
 
-Task21 evidence: `AMC_OS/RESEARCH/2026-09-10-native-ordered-image-input/`.
+Task21 evidence is an internal research record and is not published.
 Broader task09 full-goal work and all source/package/platform/provider/human/
 comparator/license/security/release gates remain open. Validation begins only
 after all full-goal implementation, at the authorized candidate/clone boundary.
