@@ -55,7 +55,8 @@ for (const path of committed) if (!expected.has(path)) failures.push(`spec/schem
 
 const Ajv2020 = createRequire(import.meta.url)("ajv/dist/2020.js").default;
 // The `pattern` zod emits next to `format: "date-time"` carries the timestamp rule, so formats are not re-checked.
-const ajv = new Ajv2020({ allErrors: true, validateFormats: false });
+// zod 4.5 writes a union of bare types as a `type` array; without allowUnionTypes Ajv logs a strict-mode warning for each.
+const ajv = new Ajv2020({ allErrors: true, validateFormats: false, allowUnionTypes: true });
 const schemaById = new Map(publishedSchemas().map((row) => [row.name, row.schema]));
 let fixtureCount = 0;
 // tests/fixtures/contracts/<name>/ holds v1 fixtures and tests/fixtures/contracts/v2/<name>/ v2 fixtures.

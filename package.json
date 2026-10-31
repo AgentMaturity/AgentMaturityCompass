@@ -203,7 +203,7 @@
     "inquirer": "^13.3.2",
     "semver": "^7.7.4",
     "yaml": "^2.8.3",
-    "zod": "^4.3.6"
+    "zod": "^4.6.6"
   },
   "peerDependencies": {
     "@earendil-works/pi-ai": "1.3.0",
@@ -270,10 +270,12 @@
   "packageManager": "pnpm@10.33.0",
   "pnpm": {
     "overrides": {
-      "qs": ">=6.16.0",
-      "fast-uri": "^3.1.8",
+      "qs": ">=6.16.1",
+      "fast-uri": "^3.1.9",
       "@modelcontextprotocol/sdk>hono": "4.13.11",
-      "ip-address": "^10.7.1",
+      "body-parser": ">=2.4.0",
+      "@hono/node-server": ">=2.1.3",
+      "ip-address": ">=10.7.4",
       "proxy-addr": "^2.0.8"
     }
   }

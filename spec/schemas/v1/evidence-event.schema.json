@@ -159,13 +159,9 @@
       ]
     },
     "rationale": {
-      "anyOf": [
-        {
-          "type": "string"
-        },
-        {
-          "type": "null"
-        }
+      "type": [
+        "string",
+        "null"
       ]
     },
     "rationaleChain": {
