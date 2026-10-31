@@ -133,7 +133,9 @@ export function seatbeltBackend(): SandboxBackend {
           stdout: "capture",
           stderr: "capture",
           maxCaptureBytes: 64_000,
-          scrubValues: [],
+          // Forwarded as bwrap does: dropping them returned unscrubbed output and skipped streaming without saying so.
+          scrubValues: policy.scrubValues ?? [],
+          ...(policy.onOutput ? { onOutput: policy.onOutput } : {}),
           graceMs: 2_000,
           timeoutMs: policy.timeoutMs,
           ...(policy.signal ? { signal: policy.signal } : {})
