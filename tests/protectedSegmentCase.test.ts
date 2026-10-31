@@ -174,6 +174,18 @@ describe("protected segments compare case-insensitively", () => {
     expect(outside).toMatchObject({ ok: false, reason: expect.stringMatching(/outside the workspace/) });
   });
 
+  it("refuses a segment whose fold changes the path's structure (full-width solidus or dots)", () => {
+    // NFKC folds `／` to `/` and `．` to `.`: a fold applied to a whole path would split it differently than the filesystem does.
+    const dir = tempDir("amc-segcase-structure-");
+    for (const path of ["a\uFF0Fb", "\uFF0E\uFF0E", "\uFF0E", "x/\uFF0E\uFF0E/y", "a\uFF3Cb"]) {
+      expect(() => insideWorkspace(dir, path), JSON.stringify(path)).toThrow(/protected directory|separator or dot/);
+    }
+    for (const path of ["a\uFF0Fb", "\uFF0E\uFF0E/sub"]) {
+      expect(protectedPathReason(dir, join(dir, path)), JSON.stringify(path)).not.toBeNull();
+    }
+    expect(protectedPathReason(dir, join(dir, "src", "a.ts"))).toBeNull();
+  });
+
   it("decides the toolhub floor by identity, so a re-cased absolute path to .amc is refused", () => {
     const dir = tempDir("amc-segcase-identity-");
     mkdirSync(join(dir, ".amc"), { recursive: true });

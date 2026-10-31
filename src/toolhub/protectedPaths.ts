@@ -1,5 +1,5 @@
 import { statSync } from "node:fs";
-import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
+import { dirname, join, resolve, sep } from "node:path";
 
 /**
  * The paths no tool policy may reach, declared.
@@ -86,23 +86,32 @@ export function protectedPathStatus(workspace: string, candidate: string): "prot
       if (dirname(current) === current) break;
     }
   }
-  // The name check stays as the second lock, folded on both sides (a re-cased
-  // workspace prefix is the same place on a case-insensitive volume): it holds
-  // where the directory does not exist yet, and against aliases of a missing one.
-  const fromWorkspace = relative(foldName(resolve(workspace)), foldName(resolved));
-  if (fromWorkspace.startsWith("..") || isAbsolute(fromWorkspace)) return "outside";
-  // The first `relative` segment, not a string prefix: `startsWith(amcRoot)`,
-  // which this replaced, also matched `.amcx` and `.amc-backup`. This floor
-  // owns `.amc` alone; `.git` is the tool layer's (fsTools).
-  const first = fromWorkspace.split(sep)[0] ?? "";
+  // The name check stays as the second lock: it holds where the directory does
+  // not exist yet, and against aliases of a missing one. The path is split as
+  // the filesystem splits it and folded one segment at a time, case-folded
+  // (NFC) to compare the workspace prefix, since a re-cased prefix is the same
+  // place on a case-insensitive volume; folding a whole path could make new
+  // separators or dot segments.
+  const rootSegments = resolve(workspace).split(sep), segments = resolved.split(sep);
+  if (segments.length < rootSegments.length || !rootSegments.every((segment, index) => sameSegment(segment, segments[index]!))) return "outside";
+  if (segments.length === rootSegments.length) return "clear";
+  // The first segment inside, not a string prefix: `startsWith(amcRoot)`, which
+  // this replaced, also matched `.amcx` and `.amc-backup`. This floor owns
+  // `.amc` alone; `.git` is the tool layer's (fsTools).
+  const first = segments[rootSegments.length]!;
   return foldName(first) !== ".git" && aliasedSegmentReason(first) !== null ? "protected" : "clear";
 }
 
 const PROTECTED_DIRECTORY_NAMES = new Set([".amc", ".git"]);
 
-/** Case- and compatibility-folded (NFKC, so fullwidth `ａ` is `a`): a case-insensitive volume opens `.amc` for `.AMC`. */
+/** Case- and compatibility-folded (NFKC, so fullwidth `ａ` is `a`), for the alias test only: a case-insensitive volume opens `.amc` for `.AMC`. */
 export function foldName(name: string): string {
   return name.normalize("NFKC").toLowerCase().normalize("NFKC");
+}
+
+/** Whether two path segments name the same entry on a case-insensitive volume: NFC and case only, never compatibility forms. */
+function sameSegment(left: string, right: string): boolean {
+  return left.normalize("NFC").toLowerCase() === right.normalize("NFC").toLowerCase();
 }
 
 /**
@@ -114,7 +123,10 @@ export function foldName(name: string): string {
  */
 export function aliasedSegmentReason(segment: string): string | null {
   if (segment === "" || segment === "." || segment === "..") return null;
-  if (PROTECTED_DIRECTORY_NAMES.has(foldName(segment))) return `path is inside a protected directory (${segment})`;
+  const folded = foldName(segment);
+  if (PROTECTED_DIRECTORY_NAMES.has(folded)) return `path is inside a protected directory (${segment})`;
+  // A fold that makes a separator or a dot entry changes how the path splits.
+  if (/[\\/]/.test(folded) || folded === "." || folded === "..") return `path segment folds to a separator or dot entry (${segment})`;
   if (/[. ]$/.test(segment) || segment.includes(":") || /~\d/.test(segment)) {
     return `path segment may alias a protected directory on some volumes (${segment})`;
   }
