@@ -60,3 +60,7 @@ Pending:
 - **Mutations.** `mutations-advisory-hold.json` records M22 and M23; both were killed.
 - **Checks.** All 11 checks passed.
 - **Related tests.** The full set of 181 files (2,576 tests) passed.
+
+## Receipt repaired 2026-10-31
+
+`receipt.json` did not follow `qualification/receipt.schema.json` (26 problems in `npm run check:qualification`). It lacked `tests` and `notes`, its commands had no `durationMs`, `artifacts` was an object rather than a list, and it carried fields the schema does not allow (`base`, `newTests`, `pending`, `securityReview`, `heldAgents`, `advisoryHold` and per-command counts). The receipt keeps its commit, branch and environment. The checks of the three later rounds (security review fixes, held agents, suspension holds in every workspace) now follow the first round's commands, and each round's related-test run is written as a vitest row from its recorded totals; the notes say which rows ran at which commit. `tests` is null because the runs at four commits overlap. `artifacts` lists all eight evidence files with their hashes; the two the receipt listed keep their recorded hashes. The new-test counts, pending items and round details are kept in `notes`. `date` is now 2026-10-27, the folder's wave-3 date, which the checker requires it to equal; the receipt had recorded 2026-10-28, and its notes say so. The command durations were never recorded; they are written as `durationMs: 0`. The original receipt is in git at `58a328ea8:qualification/2026-10-27-P2-23/receipt.json`.
