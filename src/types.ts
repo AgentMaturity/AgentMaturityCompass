@@ -3683,7 +3683,8 @@ export interface ExperimentReport {
   candidate?: ExperimentSideIdentity;
   /** "paired-cases": rates and statistics use only cases determinate on both sides. */
   pairing?: "paired-cases";
-  counts?: { cases: number; pairedCases: number; excludedCases: number; baselineSuccesses: number; candidateSuccesses: number };
+  /** candidateUnavailable: paired cases the candidate left unavailable, scored as its failures (absent on older reports). */
+  counts?: { cases: number; pairedCases: number; excludedCases: number; candidateUnavailable?: number; baselineSuccesses: number; candidateSuccesses: number };
   costUnit?: "tokens";
   /** Absolute case-value points on a 0..100 scale; success rates remain fractions. */
   valueUnit?: "points";
