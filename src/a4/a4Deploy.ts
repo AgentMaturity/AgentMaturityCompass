@@ -374,7 +374,7 @@ export function recordDeployment(store: A4Store, projectId: string, releaseId: s
   { result: A4TransitionResult; deploymentId: string; receiptPath: string; statusText: string } {
   const { body } = input;
   const principal = livePrincipal(store, input);
-  assertOwnerMode(store.workspace, "a4 deployment record");
+  assertOwnerMode(store.workspace, "a4 deploy record");
   const now = Date.now();
   // A rollback row records what the operator ran after a rollback, which may have raised a freeze and a hold: allowed then.
   const ignored = body.kind === "rollback" ? ["ON_HOLD", "FREEZE_ACTIVE"] : [];

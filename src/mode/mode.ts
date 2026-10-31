@@ -183,6 +183,14 @@ export function assertOwnerMode(workspace: string, commandPath: string): void {
     // A4 Forge owner-gated leaves (P0-54; P1-57 adds acknowledge). The CLI commands land with P1-65; A4 owner actions pass these paths themselves.
     "a4 acknowledge",
     "a4 approve",
+    // Studio-only governed A4 writes (assemble scaffold/connect/import/build/resolve, erase): their gate names, so
+    // agent mode refuses them as it refuses the CLI's (secsweep 2026-10-31).
+    "a4 build",
+    "a4 connect",
+    "a4 erase",
+    "a4 import",
+    "a4 resolve",
+    "a4 scaffold",
     "a4 complete",
     "a4 deny",
     "a4 deploy record",
