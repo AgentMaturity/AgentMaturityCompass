@@ -93,18 +93,18 @@ function paths(value: Json, prefix: Array<string | number> = []): Array<Array<st
 }
 
 /** One mutation of the member at `path`: deleted, given an unknown sibling, or replaced. */
-function mutate(value: Json, path: Array<string | number>, op: number): Json {
+function mutate(value: Json, path: Array<string | number>, op: number, replacements: Json[] = REPLACEMENTS): Json {
   const copy = structuredClone(value);
   const parent = path.slice(0, -1).reduce<Json>((node, key) => (node as Record<string, Json>)[key as string]!, copy) as Record<string, Json> | Json[];
   const key = path[path.length - 1]!;
-  if (op === REPLACEMENTS.length) {
+  if (op === replacements.length) {
     if (Array.isArray(parent)) parent.splice(key as number, 1);
     else delete parent[key as string];
-  } else if (op === REPLACEMENTS.length + 1) {
+  } else if (op === replacements.length + 1) {
     if (Array.isArray(parent)) parent.push(structuredClone(parent[0]!));
     else parent.zz_unknown = 1;
   } else {
-    (parent as Record<string, Json>)[key as string] = structuredClone(REPLACEMENTS[op]!);
+    (parent as Record<string, Json>)[key as string] = structuredClone(replacements[op]!);
   }
   return copy;
 }
@@ -139,6 +139,23 @@ describe("the package and AMC agree", () => {
     expect(compared).toBeGreaterThanOrEqual(200);
     expect(accepted).toBeGreaterThan(0);
     expect(accepted).toBeLessThan(compared);
+  });
+
+  // zod 4.5 made z.iso.datetime() demand seconds and string bounds count code points; the stride above can miss both.
+  test("on a minute-precision time and astral text in every string member", () => {
+    const TARGETED: Json[] = ["2026-10-15T09:00Z", "😀".repeat(32), "😀".repeat(200), "😀".repeat(3000)];
+    const disagreements: string[] = [];
+    for (const record of records) {
+      for (const path of paths(record.value)) {
+        if (typeof path.reduce<Json>((node, key) => (node as Record<string, Json>)[key as string]!, record.value) !== "string") continue;
+        TARGETED.forEach((_, op) => {
+          const mutated = mutate(record.value, path, op, TARGETED);
+          const ours = validateRecord(record.kind, mutated).ok;
+          if (ours !== amcAccepts(record.kind, mutated)) disagreements.push(`${record.from} ${path.join(".")} op ${op}: package ${ours}`);
+        });
+      }
+    }
+    expect(disagreements).toEqual([]);
   });
 
   test("every report the package writes is a valid AMC verifier report", () => {
