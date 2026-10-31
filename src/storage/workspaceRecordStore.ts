@@ -31,7 +31,9 @@ import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { assertPurposePublicationCurrent, capturePurposePublication } from "../keys/purposePublication.js";
 import { signWithPurposeKey } from "../keys/purposeProviders.js";
+import { keysetDeclared } from "../keys/keyset.js";
 import { vaultStatus } from "../vault/vault.js";
+import { purposeKeyPaths, vaultPaths } from "../vault/vaultPaths.js";
 
 /**
  * Where a family of records lives, relative to the workspace root.
@@ -133,8 +135,26 @@ function keepRevision(workspace: string, at: RecordLocation, id: string, previou
 
 export interface WorkspaceRecordFinding {
   file: string;
-  code: "UNREADABLE" | "HASH_MISMATCH" | "UNSIGNED" | "SIGNATURE_INVALID" | "CHAIN_GAP" | "HEAD_MISSING" | "HEAD_UNANCHORED";
+  code: "UNREADABLE" | "HASH_MISMATCH" | "UNSIGNED" | "SIGNATURE_INVALID" | "CHAIN_GAP" | "HEAD_MISSING" | "HEAD_UNANCHORED"
+    | "KEYSET_UNVERIFIABLE";
   detail: string;
+}
+
+/**
+ * The artifact-seal keys records verify under. A key set that fails its own checks (a flipped byte in a pinned public
+ * key or in revocations.signed.json) is unverifiable, never keyless: it still refuses unsigned records, and the reader
+ * says why (KEYSET_UNVERIFIABLE, WP37 review). Keyless means no artifact-seal key material exists at all.
+ */
+function sealKeys(workspace: string): { keys: string[]; keyed: boolean; unverifiable: string | null } {
+  try {
+    const keys = runHashVerificationKeys(workspace);
+    return { keys, keyed: keys.length > 0, unverifiable: null };
+  } catch (error) {
+    let declared = true;
+    try { declared = keysetDeclared(workspace); } catch { /* an unreadable machine mark decides nothing: keyed */ }
+    const keyless = !declared && !pathExists(purposeKeyPaths(workspace, "artifact-seal").publicFile) && !pathExists(vaultPaths(workspace).auditorPublic);
+    return { keys: [], keyed: !keyless, unverifiable: keyless ? null : error instanceof Error ? error.message : String(error) };
+  }
 }
 
 /**
@@ -163,8 +183,10 @@ export function verifyWorkspaceRecords<T>(workspace: string, at: RecordLocation)
       }
     });
   const current = read(dir), revisions = read(join(dir, REVISIONS_DIR)), all = [...current, ...revisions];
-  let keys: string[] = [];
-  try { keys = runHashVerificationKeys(workspace); } catch { /* no verification keys: every signature below is unverifiable */ }
+  const { keys, unverifiable } = sealKeys(workspace);
+  if (unverifiable !== null && all.length > 0) {
+    findings.push({ file: vaultPaths(workspace).keysDir, code: "KEYSET_UNVERIFIABLE", detail: `the workspace key set does not verify (${unverifiable}): no record signature can be checked and unsigned records are refused` });
+  }
   const known = new Set([...genesisHashes(at), ...all.map((row) => row.record.record_hash)]);
   for (const { file, record } of all) {
     const { prev_record_hash: prev, record_hash: hash, signature, storedTs: _storedTs, ...body } = record;
@@ -213,8 +235,7 @@ const RECORD_REFUSALS: ReadonlySet<WorkspaceRecordFinding["code"]> = new Set(["H
  */
 export function readTrustedWorkspaceRecords<T>(workspace: string, at: RecordLocation): { records: T[]; unverified: string[] } {
   const { findings } = verifyWorkspaceRecords<RecordEnvelope>(workspace, at);
-  let keyed = false;
-  try { keyed = runHashVerificationKeys(workspace).length > 0; } catch { /* keyless workspace */ }
+  const { keyed } = sealKeys(workspace);
   const refused = new Set(findings.filter((row) => RECORD_REFUSALS.has(row.code) || (keyed && row.code === "UNSIGNED")).map((row) => row.file));
   const dir = recordDir(workspace, at);
   const records = !pathExists(dir) ? [] : readdirSync(dir).filter((name) => name.endsWith(".json") && !refused.has(join(dir, name)))
