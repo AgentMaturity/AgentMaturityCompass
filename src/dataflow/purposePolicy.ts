@@ -140,8 +140,9 @@ export function purposeResource(workspace: string, toolName: string): PurposeRes
  * Experimental admission for a native prepared model request at its pinned route base. The signed operator binding is
  * the only purpose source. "model.request" is a policy data term, not a ToolHub authorization grant. Active declarations
  * express operator claims only; neither a BAA declaration nor a signature establishes contractual or legal sufficiency.
- * Later envelope URLs, redirects and dispatch policy changes require separate rechecks; gateway/bridge and other
- * transports are outside this boundary. Deterministic detection does not prove absence of protected data.
+ * Later envelope URLs, redirects and dispatch policy changes require separate rechecks; the gateway (and the bridge, which
+ * relays through it) applies it to forwarded provider calls (`admitProviderHttpRequest`), and other transports are outside
+ * this boundary. Deterministic detection does not prove absence of protected data.
  * The classes are the detected ones, `declared` (an issued PHI token in the request) and `phi` when the signed run
  * purpose allows it, because the rest of the text may still be PHI. A registry that is missing or does not verify refuses
  * whatever the request holds.
