@@ -13,8 +13,11 @@ curl -fsSL https://agentmaturity.co/install.sh | sh
 
 ```bash
 cd your-project
-amc init --non-interactive --agent my-agent
+export AMC_VAULT_PASSPHRASE='<a passphrase you keep>'  # signing commands need it later
+amc init --minimal
 ```
+
+This creates the `default` agent, which `--amc-agent-id` scores unless you name another.
 
 ## 3. Run Tests with AMC
 
@@ -86,7 +89,7 @@ which amc  # Should show path
 
 **"Score returns L0"**
 ```bash
-amc init --non-interactive --agent my-agent
+amc init --minimal  # if the project has no .amc workspace yet
 ```
 
 ## Next Steps

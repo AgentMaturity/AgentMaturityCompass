@@ -60,6 +60,8 @@ __pycache__/
 *.egg-info/
 .venv/
 .pytest_cache/
+# setuptools build directory: a stale copy here is what `python -m build` ships
+sdk/python/build/
 
 # Personal / workspace files (NEVER commit these)
 SOUL.md

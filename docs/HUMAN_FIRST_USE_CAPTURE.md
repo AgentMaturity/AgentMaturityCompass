@@ -379,8 +379,7 @@ weakened hash comparison/path rejection, stale-head acceptance and output overwr
 The source-only authored tests do not establish mutation detection or qualification.
 
 The resumable/final worker handoff is
-`AMC_OS/INBOX/REV_IMPLEMENTATION_SPECIALIST.md` inside
-`/Users/sid/AgentMaturityCompass/tmp/cos-study-capture`. No issue Done, passing-test,
+an internal record that is not published. No issue Done, passing-test,
 release or collected-human-evidence claim is made by this implementation batch.
 
 ## 2026-09-10 addendum — capture 2026-09-10.1 / credentials 1

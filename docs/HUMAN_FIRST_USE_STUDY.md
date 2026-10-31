@@ -67,7 +67,7 @@ hash is a signature or an attestation of the source/build provenance.
 ## Standing common-task protocol: version 1
 
 This packet operationalizes the first-use task in
-`AMC_OS/RESEARCH/2026-09-08-dsh-pi/first-use-improvement-design.md` and the measurement
+the first-use improvement design (an internal record that is not published) and the measurement
 requirements of `plans/2026-09-09-amc-execution-brief.md` §7a. The standing target is
 **five real first-use sessions per harness: AMC, DSH and Pi**. It is a recruitment
 target, not evidence already collected. The broader proposal in
@@ -376,7 +376,7 @@ refusal, duplicate detection, human-only cohort filtering, minimum/equality chec
 and exclusive report creation to establish that the authored tests fail for the
 right reason. Retain the exact source/environment and any failures. No earlier
 repository test receipt qualifies this new script. The worker handoff is
-`AMC_OS/INBOX/REV_IMPLEMENTATION_SPECIALIST.md` in the assigned worktree.
+an internal record that is not published.
 
 ## 2026-09-10 addendum — intake 2026-09-10 / credentials 1
 

@@ -1,9 +1,11 @@
 /**
  * Catalog changelog guard (P1-34): when the catalog digest changes, catalog/CHANGELOG.md gains exactly one appended
  * entry naming the new catalog id, version and digest and every added, changed or retired control, with a reason and,
- * for reviewed or qualified content, review record ids. History is append-only. Pure: the caller supplies both locks,
- * both control snapshots and both texts (scripts/check-catalog-changelog.mjs reads them from git). Review ids are
- * declared references here; verifyReviewRecord is what authenticates a review.
+ * for reviewed or qualified content, review record ids. A range carrying several catalog changes may append one entry
+ * per change instead: a chain whose every entry but the last names an intermediate catalog state, each entry checked
+ * for its own step as a single entry is. History is append-only. Pure: the caller supplies both locks, both control
+ * snapshots, both texts and the intermediate states (scripts/check-catalog-changelog.mjs reads them from git). Review
+ * ids are declared references here; verifyReviewRecord is what authenticates a review.
  */
 import { z } from "zod";
 import { canonicalize } from "../../utils/json.js";
@@ -17,7 +19,7 @@ type CatalogChangelogIssueCode =
   | "GOV_CHANGELOG_SNAPSHOT_INVALID" | "GOV_CHANGELOG_SNAPSHOT_DUPLICATE" | "GOV_CHANGELOG_SNAPSHOT_MISMATCH"
   | "GOV_CHANGELOG_BLOCK_INVALID" | "GOV_CHANGELOG_BLOCK_BOUNDARY" | "GOV_CHANGELOG_ENTRY_INVALID"
   | "GOV_CHANGELOG_ENTRY_DUPLICATE" | "GOV_CHANGELOG_ENTRY_CONTROL_DUPLICATE" | "GOV_CHANGELOG_REVIEW_REF_DUPLICATE"
-  | "GOV_CHANGELOG_REMOVAL_UNRESOLVED" | "GOV_CHANGELOG_DIGEST_CONFLICT"
+  | "GOV_CHANGELOG_REMOVAL_UNRESOLVED" | "GOV_CHANGELOG_DIGEST_CONFLICT" | "GOV_CHANGELOG_CHAIN_GAP"
   | "GOV_CHANGELOG_ENTRY_COUNT" | "GOV_CHANGELOG_CATALOG_MISMATCH" | "GOV_CHANGELOG_CONTROL_COVERAGE"
   | "GOV_CHANGELOG_CONTROL_VERSION_MISMATCH" | "GOV_CHANGELOG_CONTROL_CHANGE_MISMATCH" | "GOV_CHANGELOG_REVIEW_REFS_MISSING";
 
@@ -39,6 +41,8 @@ export interface CatalogChangelogInput {
   currentControls: readonly ControlRecord[];
   previousText: string;
   currentText: string;
+  /** Catalog states between the two locks; an appended entry other than the last must name one by its digest. */
+  intermediateStates?: ReadonlyArray<{ lock: CatalogLockfile; controls: readonly ControlRecord[] }>;
 }
 
 const text = z.string().min(1).refine((value) => value.trim().length > 0);
@@ -60,6 +64,7 @@ const entrySchema = z.strictObject({
 export type CatalogChangeEntry = z.infer<typeof entrySchema>;
 type GuardLock = z.infer<typeof lockProjectionSchema>;
 type ParsedEntry = { start: number; entry: CatalogChangeEntry };
+type BoundState = { lock: GuardLock; records: Map<string, ControlRecord> };
 const OPEN = "```amc-catalog-change";
 const CLOSE = "```";
 
@@ -157,8 +162,32 @@ export function checkCatalogChangelog(input: CatalogChangelogInput): CatalogChan
   const appended = allEntries.filter((block) => block.start >= input.previousText.length);
   if (allEntries.length - appended.length !== oldEntries.length) return fail("GOV_CHANGELOG_BLOCK_BOUNDARY");
 
-  const oldPins = new Map(previous.data.controls.map((pin) => [pin.id, pin]));
-  const newPins = new Map(current.data.controls.map((pin) => [pin.id, pin]));
+  // Each appended entry but the last names the intermediate state its step ends at (a range carrying several catalog
+  // changes); an intermediate state that does not parse or bind is absent, so a chain through it fails.
+  const states = new Map<string, BoundState>();
+  for (const state of input.intermediateStates ?? []) {
+    const lock = lockProjectionSchema.safeParse(state?.lock);
+    if (!lock.success) continue;
+    const records = bindControls(lock.data, state.controls);
+    if (typeof records !== "string") states.set(lock.data.catalog.digest, { lock: lock.data, records });
+  }
+  let from: BoundState = { lock: previous.data, records: before };
+  for (const block of appended.slice(0, -1)) {
+    const to = states.get(block.entry.catalog.digest);
+    if (!to) return fail("GOV_CHANGELOG_CHAIN_GAP");
+    const result = checkStep(from, to, block.entry);
+    if (!result.ok) return result;
+    from = to;
+  }
+  return checkStep(from, { lock: current.data, records: after }, appended.at(-1)?.entry);
+}
+
+/** One step from `from` to `to` and the entry appended for it, which a digest change requires. */
+function checkStep(from: BoundState, to: BoundState, entry: CatalogChangeEntry | undefined): CatalogChangelogResult {
+  const { lock: previous, records: before } = from;
+  const { lock: current, records: after } = to;
+  const oldPins = new Map(previous.controls.map((pin) => [pin.id, pin]));
+  const newPins = new Map(current.controls.map((pin) => [pin.id, pin]));
   for (const id of oldPins.keys()) {
     if (!newPins.has(id)) return fail("GOV_CHANGELOG_REMOVAL_UNRESOLVED");
   }
@@ -173,15 +202,14 @@ export function checkCatalogChangelog(input: CatalogChangelogInput): CatalogChan
     }
   }
 
-  const delta = { catalog: current.data.catalog, controls: [...expected].map(([id, e]) => ({ id, ...e })) };
+  const delta = { catalog: current.catalog, controls: [...expected].map(([id, e]) => ({ id, ...e })) };
   const done = (code?: CatalogChangelogIssueCode): CatalogChangelogResult => ({ ...(code ? fail(code) : { ok: true, issues: [] }), expected: delta });
-  const changed = previous.data.catalog.digest !== current.data.catalog.digest;
-  if (!changed && (expected.size > 0 || previous.data.catalog.id !== current.data.catalog.id
-    || previous.data.catalog.version !== current.data.catalog.version)) return done("GOV_CHANGELOG_DIGEST_CONFLICT");
-  if (appended.length > 1 || (changed && appended.length !== 1)) return done("GOV_CHANGELOG_ENTRY_COUNT");
-  if (appended.length === 0) return done();
-  const entry = appended[0]!.entry; // Only after count and duplicate validation.
-  if (canonicalize(entry.catalog) !== canonicalize(current.data.catalog)) return done("GOV_CHANGELOG_CATALOG_MISMATCH");
+  const changed = previous.catalog.digest !== current.catalog.digest;
+  if (!changed && (expected.size > 0 || previous.catalog.id !== current.catalog.id
+    || previous.catalog.version !== current.catalog.version)) return done("GOV_CHANGELOG_DIGEST_CONFLICT");
+  if (changed && !entry) return done("GOV_CHANGELOG_ENTRY_COUNT");
+  if (!entry) return done();
+  if (canonicalize(entry.catalog) !== canonicalize(current.catalog)) return done("GOV_CHANGELOG_CATALOG_MISMATCH");
   if (entry.controls.length !== expected.size) return done("GOV_CHANGELOG_CONTROL_COVERAGE");
   const stronger = (record: ControlRecord | undefined) => record?.support === "reviewed" || record?.support === "qualified";
   for (const control of entry.controls) {

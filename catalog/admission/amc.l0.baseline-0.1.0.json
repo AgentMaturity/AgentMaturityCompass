@@ -4,16 +4,16 @@
     "name": "amc-catalog-check",
     "version": "1.2.0"
   },
-  "checkedAt": "2026-10-18T11:52:19.311Z",
+  "checkedAt": "2026-10-31T12:31:27.610Z",
   "catalog": {
     "id": "amc.catalog",
-    "version": "0.1.0",
-    "digest": "sha256:99a7cf3f9c9fde698da2f4a8845e5c417ab3d0116b04d6ecd99f682d9aa81fba"
+    "version": "0.1.6",
+    "digest": "sha256:0344050d488e78da1cb4cc0b5b8810df4f493e438cb3b14fd5a9db2589149fb7"
   },
   "pack": {
     "id": "amc.l0.baseline",
     "version": "0.1.0",
-    "digest": "sha256:5fbce9ef6ae025335d9c3d59eeda437454ec7cc4fad29afb74bbcf839d11debc",
+    "digest": "sha256:79ae01849dfe1285eb0cd75875d744b09d5e7bc605aba70eec3777bdde582c0b",
     "declaredSupport": "experimental"
   },
   "criteria": [
@@ -36,7 +36,7 @@
         {
           "kind": "lockfile",
           "ref": "packs[amc.l0.baseline]",
-          "sha256": "5fbce9ef6ae025335d9c3d59eeda437454ec7cc4fad29afb74bbcf839d11debc"
+          "sha256": "79ae01849dfe1285eb0cd75875d744b09d5e7bc605aba70eec3777bdde582c0b"
         }
       ]
     },
@@ -540,12 +540,12 @@
         {
           "kind": "lockfile",
           "ref": "controls[L0-DAT-03]",
-          "sha256": "60c0768f7a2b665e2923c2850f188c2aab5c6eb94fdac870d523d3a7db64d46f"
+          "sha256": "cd940ef12e4a40caa68229e59eb7fcea46bb2c11aaec15ee48288f9c73c0b42a"
         },
         {
           "kind": "lockfile",
           "ref": "controls[L0-EXP-01]",
-          "sha256": "71d4c861cf9863b2c6eb826e90dc06da4286c8fdca1888f048a324db4469b560"
+          "sha256": "0c71214276da3d2a9fcaa174b56b80cb04775a9aa93bb37a02a7255602a8a870"
         },
         {
           "kind": "lockfile",
@@ -709,17 +709,17 @@
         {
           "kind": "lockfile",
           "ref": "controls[L0-DAT-01]",
-          "sha256": "05095c64c5403218b12e4207a61f19d3739837f610027966ef90257fcde76d7d"
+          "sha256": "6eb8679503e46772ea6ee1e63a1283143746ff0a4fa9c734594882c5acda6df5"
         },
         {
           "kind": "lockfile",
           "ref": "controls[L0-DAT-02]",
-          "sha256": "129e7cacc4aec1d815a2c7aa260fec63f418ec99806e9aa434c206bbff2854bd"
+          "sha256": "85fe90a0b3473a2b94c2573de6a0fb1f67fef32c59c2787185ecbd3cf27cd025"
         },
         {
           "kind": "lockfile",
           "ref": "controls[L0-DAT-03]",
-          "sha256": "60c0768f7a2b665e2923c2850f188c2aab5c6eb94fdac870d523d3a7db64d46f"
+          "sha256": "cd940ef12e4a40caa68229e59eb7fcea46bb2c11aaec15ee48288f9c73c0b42a"
         },
         {
           "kind": "lockfile",
@@ -729,7 +729,7 @@
         {
           "kind": "lockfile",
           "ref": "controls[L0-EXP-01]",
-          "sha256": "71d4c861cf9863b2c6eb826e90dc06da4286c8fdca1888f048a324db4469b560"
+          "sha256": "0c71214276da3d2a9fcaa174b56b80cb04775a9aa93bb37a02a7255602a8a870"
         },
         {
           "kind": "lockfile",
@@ -824,7 +824,7 @@
         {
           "kind": "lockfile",
           "ref": "controls[L0-MON-01]",
-          "sha256": "1a1629265f6faf0f7bafc8abe6360dc58d5686f10dbd3c0f4ca96cd43ecbeb61"
+          "sha256": "86724eb8cb05e6eea98beecd40ca9923c2a7c2c8cb5cc03e4f825465cd3ada8f"
         },
         {
           "kind": "lockfile",
@@ -954,17 +954,17 @@
         {
           "kind": "lockfile",
           "ref": "controls[L0-DAT-01]",
-          "sha256": "05095c64c5403218b12e4207a61f19d3739837f610027966ef90257fcde76d7d"
+          "sha256": "6eb8679503e46772ea6ee1e63a1283143746ff0a4fa9c734594882c5acda6df5"
         },
         {
           "kind": "lockfile",
           "ref": "controls[L0-DAT-02]",
-          "sha256": "129e7cacc4aec1d815a2c7aa260fec63f418ec99806e9aa434c206bbff2854bd"
+          "sha256": "85fe90a0b3473a2b94c2573de6a0fb1f67fef32c59c2787185ecbd3cf27cd025"
         },
         {
           "kind": "lockfile",
           "ref": "controls[L0-DAT-03]",
-          "sha256": "60c0768f7a2b665e2923c2850f188c2aab5c6eb94fdac870d523d3a7db64d46f"
+          "sha256": "cd940ef12e4a40caa68229e59eb7fcea46bb2c11aaec15ee48288f9c73c0b42a"
         },
         {
           "kind": "lockfile",
@@ -974,7 +974,7 @@
         {
           "kind": "lockfile",
           "ref": "controls[L0-EXP-01]",
-          "sha256": "71d4c861cf9863b2c6eb826e90dc06da4286c8fdca1888f048a324db4469b560"
+          "sha256": "0c71214276da3d2a9fcaa174b56b80cb04775a9aa93bb37a02a7255602a8a870"
         },
         {
           "kind": "lockfile",
@@ -1069,7 +1069,7 @@
         {
           "kind": "lockfile",
           "ref": "controls[L0-MON-01]",
-          "sha256": "1a1629265f6faf0f7bafc8abe6360dc58d5686f10dbd3c0f4ca96cd43ecbeb61"
+          "sha256": "86724eb8cb05e6eea98beecd40ca9923c2a7c2c8cb5cc03e4f825465cd3ada8f"
         },
         {
           "kind": "lockfile",
@@ -1235,17 +1235,17 @@
         {
           "kind": "lockfile",
           "ref": "controls[L0-DAT-01]",
-          "sha256": "05095c64c5403218b12e4207a61f19d3739837f610027966ef90257fcde76d7d"
+          "sha256": "6eb8679503e46772ea6ee1e63a1283143746ff0a4fa9c734594882c5acda6df5"
         },
         {
           "kind": "lockfile",
           "ref": "controls[L0-DAT-02]",
-          "sha256": "129e7cacc4aec1d815a2c7aa260fec63f418ec99806e9aa434c206bbff2854bd"
+          "sha256": "85fe90a0b3473a2b94c2573de6a0fb1f67fef32c59c2787185ecbd3cf27cd025"
         },
         {
           "kind": "lockfile",
           "ref": "controls[L0-DAT-03]",
-          "sha256": "60c0768f7a2b665e2923c2850f188c2aab5c6eb94fdac870d523d3a7db64d46f"
+          "sha256": "cd940ef12e4a40caa68229e59eb7fcea46bb2c11aaec15ee48288f9c73c0b42a"
         },
         {
           "kind": "lockfile",
@@ -1255,7 +1255,7 @@
         {
           "kind": "lockfile",
           "ref": "controls[L0-EXP-01]",
-          "sha256": "71d4c861cf9863b2c6eb826e90dc06da4286c8fdca1888f048a324db4469b560"
+          "sha256": "0c71214276da3d2a9fcaa174b56b80cb04775a9aa93bb37a02a7255602a8a870"
         },
         {
           "kind": "lockfile",
@@ -1350,7 +1350,7 @@
         {
           "kind": "lockfile",
           "ref": "controls[L0-MON-01]",
-          "sha256": "1a1629265f6faf0f7bafc8abe6360dc58d5686f10dbd3c0f4ca96cd43ecbeb61"
+          "sha256": "86724eb8cb05e6eea98beecd40ca9923c2a7c2c8cb5cc03e4f825465cd3ada8f"
         },
         {
           "kind": "lockfile",
@@ -1434,14 +1434,14 @@
       "title": "Negative fixtures run with no false mandatory pass",
       "kind": "mechanical",
       "status": "not_evaluated",
-      "checked": 426,
+      "checked": 441,
       "findings": [
         {
           "code": "ADM6_HARNESS_NOT_REGISTERED",
           "severity": "warning",
           "controlId": null,
           "path": "layers/l0-baseline/pack.yaml",
-          "message": "83 fixture(s) name guard harnesses this process has not registered (agent_config, approval_quorum, bound_approval, compiled_identity, data_admission, deletion_gate, drift, egress_guard, incident_clocks, lease, lease_revocation_drill, ledger_tamper, ledger_trace, residency_egress, tool_allowlist); they run in the test suite, not here"
+          "message": "98 fixture(s) name guard harnesses this process has not registered (, agent_config, approval_quorum, bound_approval, compiled_identity, data_admission, deletion_gate, drift, egress_guard, incident_clocks, lease, lease_revocation_drill, ledger_tamper, ledger_trace, residency_egress, tool_allowlist); they run in the test suite, not here"
         }
       ],
       "evidence": [
@@ -1721,17 +1721,17 @@
         {
           "kind": "lockfile",
           "ref": "controls[L0-DAT-01]",
-          "sha256": "05095c64c5403218b12e4207a61f19d3739837f610027966ef90257fcde76d7d"
+          "sha256": "6eb8679503e46772ea6ee1e63a1283143746ff0a4fa9c734594882c5acda6df5"
         },
         {
           "kind": "lockfile",
           "ref": "controls[L0-DAT-02]",
-          "sha256": "129e7cacc4aec1d815a2c7aa260fec63f418ec99806e9aa434c206bbff2854bd"
+          "sha256": "85fe90a0b3473a2b94c2573de6a0fb1f67fef32c59c2787185ecbd3cf27cd025"
         },
         {
           "kind": "lockfile",
           "ref": "controls[L0-DAT-03]",
-          "sha256": "60c0768f7a2b665e2923c2850f188c2aab5c6eb94fdac870d523d3a7db64d46f"
+          "sha256": "cd940ef12e4a40caa68229e59eb7fcea46bb2c11aaec15ee48288f9c73c0b42a"
         },
         {
           "kind": "lockfile",
@@ -1741,7 +1741,7 @@
         {
           "kind": "lockfile",
           "ref": "controls[L0-EXP-01]",
-          "sha256": "71d4c861cf9863b2c6eb826e90dc06da4286c8fdca1888f048a324db4469b560"
+          "sha256": "0c71214276da3d2a9fcaa174b56b80cb04775a9aa93bb37a02a7255602a8a870"
         },
         {
           "kind": "lockfile",
@@ -1836,7 +1836,7 @@
         {
           "kind": "lockfile",
           "ref": "controls[L0-MON-01]",
-          "sha256": "1a1629265f6faf0f7bafc8abe6360dc58d5686f10dbd3c0f4ca96cd43ecbeb61"
+          "sha256": "86724eb8cb05e6eea98beecd40ca9923c2a7c2c8cb5cc03e4f825465cd3ada8f"
         },
         {
           "kind": "lockfile",
@@ -1920,14 +1920,14 @@
       "title": "Unknown facts fail closed",
       "kind": "mechanical",
       "status": "not_met",
-      "checked": 55,
+      "checked": 60,
       "findings": [
         {
           "code": "ADM8_HARNESS_NOT_REGISTERED",
           "severity": "warning",
           "controlId": null,
           "path": "layers/l0-baseline/pack.yaml",
-          "message": "8 fixture(s) name guard harnesses this process has not registered (compiled_identity, data_admission, deletion_gate, lease, lease_revocation_drill, residency_egress, tool_allowlist); they run in the test suite, not here"
+          "message": "13 fixture(s) name guard harnesses this process has not registered (, compiled_identity, data_admission, deletion_gate, lease, lease_revocation_drill, residency_egress, tool_allowlist); they run in the test suite, not here"
         },
         {
           "code": "ADM8_UNKNOWN_FIXTURE_MISSING",
@@ -2435,5 +2435,5 @@
     "not admissible as reviewed: criterion 9 not met: ADM9_SIGNOFF_MISSING, ADM9_CONTROL_UNREVIEWED",
     "not admissible as reviewed: criterion 10 not met: ADM10_COVERAGE_DOC_MISSING, ADM10_PARTNER_MISSING, ADM10_TRIAGE_TARGET_MISSING, ADM10_UPDATE_PLAN_INCOMPLETE"
   ],
-  "digest": "sha256:c7ed082e754d60b5bbcf9c9163aa3bc2da7d0bf408962c4cb3f4a4ff9183ba3d"
+  "digest": "sha256:cc61df975bcfdff14f3d04d8ffe483d51c402eb8d1d50d54aa91148c02f63cde"
 }

@@ -271,8 +271,8 @@ All data, including affirmative human flags used to reach cohort projection, is
 explicitly synthetic. The cases are **authored, not executed, typechecked, passed
 or mutation-qualified**. No test count is offered as coverage evidence.
 
-The current continuation record is under
-`AMC_OS/RESEARCH/2026-09-10-amc-1512-credential-transition-contract/authoring-completion/`.
+The current continuation record is
+an internal record that is not published.
 Earlier evidence-transfer mappings remain dated legacy artifacts; their next
 version must deliberately bind capture version, migration provenance, actual-use
 events and independent provider/review references without rewriting old evidence.
@@ -319,7 +319,7 @@ transfer mapping/blank-sidecar extension named in the preserved predecessor
 NEXT_ACTION.md, not execution of the examples in this guide.
 
 Recovery receipt and role handoff:
-`AMC_OS/RESEARCH/2026-09-10-amc-1512-credential-transition-contract/authoring-completion/stall-recovery/`.
+an internal record that is not published.
 
 
 ## AMC-1512 terminal credential carry-forward continuation 2026-09-10
@@ -357,7 +357,7 @@ blocked entries, relabel old cohorts, migrate an observed/corrected journal or
 rewrite an earlier receipt. The separately versioned evidence-transfer mapping
 is a next implementation task, not permission to run the capture or test suite.
 Current continuation receipt/handoff location:
-`AMC_OS/RESEARCH/2026-09-10-amc-1512-credential-transition-contract/authoring-completion/terminal-credential-contract-continuation-2026-09-10/`.
+an internal record that is not published.
 
 ## September 11, 2026 — migration correction chronology
 
@@ -402,6 +402,6 @@ It specifies pure-state, actual local append/CLI refusal, cold journal rejection
 legacy/non-migrated compatibility and migrated blocked/complete-roster export
 with synthetic failures and unknown assistance. Existing credential regressions
 are preserved. All regressions remain UNEXECUTED / UNQUALIFIED.
-Receipt: `AMC_OS/RESEARCH/2026-09-11-amc-1512-credential-contract-finalization/`.
+Receipt: an internal record that is not published.
 The next separate implementation remains version-labelled evidence-transfer
 mapping and a blank review sidecar; no execution hold or Done gate is lifted.

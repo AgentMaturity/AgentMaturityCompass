@@ -180,9 +180,12 @@ edited, and the control's digest, the lock and every stored `ControlResult` (whi
 `catalog/CHANGELOG.md` is public and append-only. When the catalog digest changes, the change appends exactly one entry
 naming the new catalog id, version and digest and every added, changed or retired control, with a reason and, for
 content that is reviewed or qualified before or after the change, the review record ids. Experimental content changes
-without review records. Earlier text is never edited, truncated or reordered. `npm run check:catalog-changelog` compares
-the catalog and changelog at the merge base with the PR's base branch against the change and prints the entry it
-expects when one is missing.
+without review records. A pushed range that carries several catalog changes may instead append one entry per change, in
+order: every entry but the last names a catalog state that a commit in the range holds, and each entry is checked for
+its own step exactly as a single entry is, so a skipped step or an out-of-order entry fails, and so does an entry naming
+a state the range never had (`GOV_CHANGELOG_CHAIN_GAP`). Earlier text is never edited, truncated or reordered.
+`npm run check:catalog-changelog` compares the catalog and changelog at the merge base with the PR's base branch against
+the change and prints the entry the failing step calls for.
 
 An entry is a block in the Markdown, fenced exactly like this, with one line of canonical JSON (keys sorted, no spaces,
 as `canonicalize` writes it):
@@ -200,9 +203,9 @@ as `canonicalize` writes it):
 - Each catalog id and version appears once, so a content change bumps `catalog.yaml`'s version.
 - No other fenced block may appear in the changelog; prose and headings may.
 
-The guard's codes (`GOV_CHANGELOG_*`) name the first failure: history changed, a malformed block or entry, a missing or
-extra entry, a catalog or control mismatch, missing review ids or an unresolved removal. Review ids in an entry are
-references; the records behind them are what effectiveSupport checks.
+The guard's codes (`GOV_CHANGELOG_*`) name the first failure: history changed, a malformed block or entry, a missing
+entry or a broken chain, a catalog or control mismatch, missing review ids or an unresolved removal. Review ids in an
+entry are references; the records behind them are what effectiveSupport checks.
 
 ## F5 verdicts
 

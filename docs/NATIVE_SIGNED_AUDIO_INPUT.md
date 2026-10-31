@@ -208,7 +208,7 @@ ALL-full-goal completion or release claim exists.
 
 Broader video/document/output/audio-format/cache/backend/platform/older task09
 FULL_GOAL_COVERAGE residuals remain open, along with all seven Done/license/human/
-security/platform/release gates. Evidence: AMC_OS/RESEARCH/2026-09-10-native-signed-audio-input/.
+security/platform/release gates. Evidence: an internal record that is not published.
 
 ## Dated official references
 

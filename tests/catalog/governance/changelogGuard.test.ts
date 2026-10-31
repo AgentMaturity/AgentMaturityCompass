@@ -2,9 +2,10 @@
  * P1-34 changelog guard: a catalog digest change needs one appended catalog/CHANGELOG.md entry naming the new catalog
  * version and digest and every changed control; history is append-only; reviewed content needs review record ids.
  */
-import { appendFileSync, cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import { appendFileSync, cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { checkCatalogChangelog, type CatalogChangeEntry } from "../../../src/catalog/governance/changelogGuard.js";
 import { defaultCatalogRoot, loadCatalog, type LoadedCatalog } from "../../../src/catalog/loader.js";
@@ -94,6 +95,69 @@ describe("checkCatalogChangelog (P1-34 step 8)", () => {
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
+  });
+
+  describe("a range with several catalog changes appends a chain of entries", () => {
+    const step = (from: LoadedCatalog, version: string, id: string): LoadedCatalog => ({ ...from, manifest: { ...from.manifest!, version },
+      controls: new Map(from.controls).set(id, { ...from.controls.get(id)!, version, statement: `${from.controls.get(id)!.statement} (${version})` }) });
+    const s1 = step(cat, "0.2.0", "L0-ADV-01");
+    const s2 = step(s1, "0.3.0", "L0-ADV-02");
+    const s3 = step(s2, "0.4.0", "L0-CHG-01");
+    const entry = (to: LoadedCatalog, id: string): CatalogChangeEntry => ({ entryVersion: 1, catalog: buildCatalogLock(to).catalog,
+      controls: [{ id, version: to.manifest!.version, change: "changed", reason: "fixture step", reviewRecordIds: [] }] });
+    const [e1, e2, e3] = [entry(s1, "L0-ADV-01"), entry(s2, "L0-ADV-02"), entry(s3, "L0-CHG-01")];
+    const state = (s: LoadedCatalog) => ({ lock: buildCatalogLock(s), controls: [...s.controls.values()] });
+    const chain = (entries: CatalogChangeEntry[], states: Array<ReturnType<typeof state>>) => checkCatalogChangelog({
+      ...input(s3, HISTORY, HISTORY + entries.map((e) => `\n## ${e.catalog.version}\n\n${block(e)}`).join("")), intermediateStates: states });
+
+    it("each entry is checked for its own step, from the base digest to the current one", () => {
+      expect(chain([e1, e2, e3], [state(s1), state(s2)])).toMatchObject({ ok: true, issues: [], expected: { catalog: buildCatalogLock(s3).catalog } });
+      expect(chain([e1, { ...e2, controls: [{ ...e2.controls[0]!, version: "0.2.0" }] }, e3], [state(s1), state(s2)]).issues[0]?.code)
+        .toBe("GOV_CHANGELOG_CONTROL_VERSION_MISMATCH");
+    });
+
+    it("an entry naming a state the range never had, a skipped step or an out-of-order entry fails", () => {
+      expect(chain([e1, e2, e3], [state(s1)]).issues[0]?.code).toBe("GOV_CHANGELOG_CHAIN_GAP");
+      expect(chain([e1, e2, e3], [{ ...state(s1), controls: [...cat.controls.values()] }, state(s2)]).issues[0]?.code).toBe("GOV_CHANGELOG_CHAIN_GAP");
+      expect(chain([e1, e3], [state(s1), state(s2)]).issues[0]?.code).toBe("GOV_CHANGELOG_CONTROL_COVERAGE");
+      expect(chain([e2, e1, e3], [state(s1), state(s2)]).issues[0]?.code).toBe("GOV_CHANGELOG_CONTROL_COVERAGE");
+      expect(chain([e1, e2], [state(s1), state(s2)]).issues[0]?.code).toBe("GOV_CHANGELOG_CATALOG_MISMATCH");
+    });
+
+    it("scripts/check-catalog-changelog.mjs reads the states the entries name from the range's commits", () => {
+      const dir = mkdtempSync(join(tmpdir(), "amc-changelog-range-"));
+      const git = (...args: string[]) => {
+        const result = spawnSync("git", ["-c", "user.name=t", "-c", "user.email=t@example.com", "-c", "commit.gpgsign=false", ...args], {
+          cwd: dir, encoding: "utf8" });
+        expect(result.status, result.stderr).toBe(0);
+        return result.stdout.trim();
+      };
+      try {
+        cpSync(defaultCatalogRoot(), join(dir, "catalog"), { recursive: true });
+        symlinkSync(resolve("dist"), join(dir, "dist"));
+        git("init", "-q");
+        git("add", "catalog");
+        git("commit", "-q", "-m", "base");
+        const base = git("rev-parse", "HEAD");
+        const changelog = join(dir, "catalog", "CHANGELOG.md");
+        const sections: string[] = [];
+        for (const version of ["9.0.0", "9.0.1"]) {
+          const manifest = join(dir, "catalog", "catalog.yaml");
+          writeFileSync(manifest, readFileSync(manifest, "utf8").replace(/^version: ".*"$/m, `version: "${version}"`));
+          const catalog = buildCatalogLock(loadCatalog({ root: join(dir, "catalog") })).catalog;
+          sections.push(`\n## ${version}\n\n${block({ entryVersion: 1, catalog, controls: [] })}`);
+          appendFileSync(changelog, sections.at(-1)!);
+          git("commit", "-q", "-am", version);
+        }
+        const run = () => spawnSync(process.execPath, [resolve("scripts/check-catalog-changelog.mjs"), "--base-ref", base], { cwd: dir, encoding: "utf8" });
+        expect(run()).toMatchObject({ status: 0, stdout: expect.stringContaining("2 appended entries checked step by step") });
+        const text = readFileSync(changelog, "utf8");
+        writeFileSync(changelog, text.slice(0, text.length - sections.join("").length) + sections[1] + sections[0]);
+        expect(run()).toMatchObject({ status: 1, stderr: expect.stringContaining("GOV_CHANGELOG_CATALOG_MISMATCH") });
+      } finally {
+        rmSync(dir, { recursive: true, force: true });
+      }
+    });
   });
 
   it("the committed changelog's last entry pins the shipped catalog digest", () => {
