@@ -1267,7 +1267,8 @@ describe("AMC API routers", () => {
     await assertJsonRoute(handleScoreRoute, { pathname: "/api/v1/score/industry/models", method: "GET", workspace: ws });
     await assertJsonRoute(handleScoreRoute, { pathname: "/api/v1/score/industry/model/finance", method: "GET", workspace: ws });
     expect((await assertJsonRoute(handleScoreRoute, { pathname: "/api/v1/score/trust/verify-claim", method: "POST", body: { claim: { issuedAt: new Date().toISOString(), expiresAt: new Date().toISOString() }, policy: { minimumTrust: 0.5 } }, workspace: ws })).status).toBe("not_evaluated");
-    await assertJsonRoute(handleScoreRoute, { pathname: "/api/v1/score/trust/create-claim", method: "POST", body: { agentId: "agent-1", publicKeyHash: "hash", issuingWorkspace: "ws", audience: "agent-2", sharedSecret: "secret" }, workspace: ws }, 201);
+    // A claim states the agent's latest trusted score; agent-1 has no trusted run, so none is minted (security review 2026-10-31).
+    expect((await callRoute(handleScoreRoute, { pathname: "/api/v1/score/trust/create-claim", method: "POST", body: { agentId: "agent-1", publicKeyHash: "hash", issuingWorkspace: "ws", audience: "agent-2", sharedSecret: "secret-at-least-16-bytes" }, workspace: ws })).status).toBe(409);
     await assertJsonRoute(handleScoreRoute, { pathname: "/api/v1/score/trust/transitive", method: "POST", body: { graph: { nodes: [] }, sourceAgent: "a", targetAgent: "b" }, workspace: ws });
     await assertJsonRoute(handleScoreRoute, { pathname: "/api/v1/score/trust/decay", method: "POST", body: { originalScore: 0.9, establishedAt: Date.now() - 1000, config: { halfLifeDays: 30 } }, workspace: ws });
     await assertJsonRoute(handleScoreRoute, { pathname: "/api/v1/score/trust/inherited", method: "POST", body: { delegatorTrust: { valid: true }, delegateScore: 0.8, policy: { maxDepth: 3 } }, workspace: ws });

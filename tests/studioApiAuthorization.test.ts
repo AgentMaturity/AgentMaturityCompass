@@ -73,6 +73,8 @@ describe("Studio /api/v1 least-privilege authorization", () => {
     await expect(requestedRoles("/api/v1/runtime/runs", "POST")).resolves.toEqual(["OPERATOR", "OWNER"]);
     await expect(requestedRoles("/api/v1/tickets/issue", "POST")).resolves.toEqual(["APPROVER", "OWNER"]);
     await expect(requestedRoles("/api/v1/unknown/future-mutation", "PATCH")).resolves.toEqual(["OPERATOR", "OWNER"]);
+    // Security review 2026-10-31: minting an agent claim is an operator action; a VIEWER (this fixture's principal) is refused.
+    await expect(requestedRoles("/api/v1/score/trust/create-claim", "POST")).resolves.toEqual(["OPERATOR", "OWNER"]);
   });
 
   test("retains auditor verification and attestation without granting broad mutation access", async () => {
