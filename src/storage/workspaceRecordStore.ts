@@ -79,28 +79,42 @@ const REVISIONS_DIR = "revisions";
 /**
  * The newest record_hash, rewritten under the publication lock after every record write. Records name their
  * predecessor, so only this anchor notices a deleted or rolled-back newest record (WP37). `lost` carries forward every
- * anchored head that was already missing when a later record was written, so the next write does not hide it.
+ * anchored head that was already missing when a later record was written, so the next write does not hide it. The
+ * anchor is signed like a record (WP37 review): `signature` covers sha256(canonical {record_hash, lost}) under the
+ * artifact-seal key, in the same file so that one atomic write never leaves an anchor and a signature that disagree.
  */
-const UNREADABLE_ANCHOR = "unreadable";
+const UNREADABLE_ANCHOR = "unreadable", UNVERIFIED_ANCHOR = "unverified";
 interface HeadAnchor { head: string; lost: string[] }
+type StoredAnchor = HeadAnchor | "absent" | typeof UNREADABLE_ANCHOR | typeof UNVERIFIED_ANCHOR;
 
 /** Beside the record directory, never in it: strict readers of a record directory refuse any non-record entry. */
 function headAnchorPath(workspace: string, at: RecordLocation): string {
   return join(workspace, ".amc", ...at.area, `${at.kind}.head.json`);
 }
 
-/** The anchor; "absent" for a store written before anchoring, "unreadable" when it is corrupt. */
-function readHeadAnchor(workspace: string, at: RecordLocation): HeadAnchor | "absent" | typeof UNREADABLE_ANCHOR {
+const anchorDigest = (head: string, lost: readonly string[]): string => sha256Hex(canonicalize({ record_hash: head, lost }));
+
+/**
+ * The anchor; "absent" for a store written before anchoring, "unreadable" when it is corrupt, "unverified" when its
+ * signature does not verify, or it is unsigned in a keyed workspace (the same rule a record's signature meets).
+ */
+function readHeadAnchor(workspace: string, at: RecordLocation, seal: { keys: string[]; keyed: boolean } = sealKeys(workspace)): StoredAnchor {
   const file = headAnchorPath(workspace, at);
   if (!pathExists(file)) return "absent";
+  let anchor: HeadAnchor & { signature: unknown };
   try {
-    const row = JSON.parse(readUtf8(file)) as { record_hash?: unknown; lost?: unknown };
+    const row = JSON.parse(readUtf8(file)) as { record_hash?: unknown; lost?: unknown; signature?: unknown };
     const lost = row.lost ?? [];
-    return typeof row.record_hash === "string" && row.record_hash.length > 0 && Array.isArray(lost) && lost.every((item) => typeof item === "string")
-      ? { head: row.record_hash, lost: lost as string[] } : UNREADABLE_ANCHOR;
+    if (typeof row.record_hash !== "string" || row.record_hash.length === 0 || !Array.isArray(lost)
+      || !lost.every((item) => typeof item === "string")) return UNREADABLE_ANCHOR;
+    anchor = { head: row.record_hash, lost: lost as string[], signature: row.signature };
   } catch {
     return UNREADABLE_ANCHOR;
   }
+  const { head, lost, signature } = anchor;
+  const signed = typeof signature === "string" && signature !== "unsigned";
+  if (signed ? !verifyHexDigestAny(anchorDigest(head, lost), signature, seal.keys) : seal.keyed) return UNVERIFIED_ANCHOR;
+  return { head, lost };
 }
 
 /** record_hash of every stored record of one kind, current and kept revisions; unreadable files are skipped. */
@@ -112,15 +126,40 @@ function storedRecordHashes(workspace: string, at: RecordLocation): Set<string> 
     })));
 }
 
+/** What the next anchor carries forward: an earlier head that is no longer stored, or the marker of a bad anchor. */
+function lostAfter(workspace: string, at: RecordLocation, prior: StoredAnchor): string[] {
+  if (prior === "absent") return [];
+  if (typeof prior === "string") return [prior];
+  return storedRecordHashes(workspace, at).has(prior.head) ? [...prior.lost] : [...prior.lost, prior.head];
+}
+
+/** An anchor signed before the publication lock is taken, so the lock never waits on a signer. */
+export interface PreparedHeadAnchor { readonly first: boolean; readonly lost: readonly string[]; readonly bytes: string }
+
 /**
- * Records `recordHash` as the newest record of one kind. Every publisher calls it right after its record write, under
- * that store's publication lock; a previous head that is no longer stored is carried forward in `lost`.
+ * The anchor naming `recordHash` as the newest record of one kind, signed with the artifact-seal key. `required` is
+ * for the prepared publishers, which never publish unsigned material; the synchronous compatibility writer leaves an
+ * unsigned anchor beside its unsigned record, which a keyed workspace reads as HEAD_UNVERIFIED.
  */
-export function anchorWorkspaceRecordHead(workspace: string, at: RecordLocation, recordHash: string): void {
+export function prepareWorkspaceRecordHead(workspace: string, at: RecordLocation, recordHash: string, required = false): PreparedHeadAnchor {
+  const prior = readHeadAnchor(workspace, at), lost = lostAfter(workspace, at, prior);
+  let signature = "unsigned";
+  try { signature = signHexDigest(anchorDigest(recordHash, lost), getSigningKey(workspace, "artifact-seal")); }
+  catch (error) { if (required) throw error; }
+  return Object.freeze({ first: prior === "absent", lost, bytes: JSON.stringify({ record_hash: recordHash, lost, signature }, null, 2) });
+}
+
+/**
+ * Publishes a prepared anchor around the record write it anchors, under that store's publication lock: refuses before
+ * `writeRecord` runs when the anchor it would replace changed while it was signed.
+ */
+export function anchorWorkspaceRecordHead(workspace: string, at: RecordLocation, prepared: PreparedHeadAnchor, writeRecord: () => void): void {
   const prior = readHeadAnchor(workspace, at);
-  const lost = prior === "absent" ? [] : prior === UNREADABLE_ANCHOR ? [UNREADABLE_ANCHOR] : [...prior.lost];
-  if (typeof prior === "object" && !storedRecordHashes(workspace, at).has(prior.head)) lost.push(prior.head);
-  writeFileAtomic(headAnchorPath(workspace, at), JSON.stringify({ record_hash: recordHash, lost }, null, 2), 0o644);
+  if ((prior === "absent") !== prepared.first || canonicalize(lostAfter(workspace, at, prior)) !== canonicalize(prepared.lost)) {
+    throw new Error("workspace record head anchor changed while signing was prepared; retry");
+  }
+  writeRecord();
+  writeFileAtomic(headAnchorPath(workspace, at), prepared.bytes, 0o644);
 }
 
 function genesisHashes(at: RecordLocation): Set<string> {
@@ -136,7 +175,7 @@ function keepRevision(workspace: string, at: RecordLocation, id: string, previou
 export interface WorkspaceRecordFinding {
   file: string;
   code: "UNREADABLE" | "HASH_MISMATCH" | "UNSIGNED" | "SIGNATURE_INVALID" | "CHAIN_GAP" | "HEAD_MISSING" | "HEAD_UNANCHORED"
-    | "KEYSET_UNVERIFIABLE";
+    | "HEAD_UNVERIFIED" | "KEYSET_UNVERIFIABLE";
   detail: string;
 }
 
@@ -163,9 +202,11 @@ function sealKeys(workspace: string): { keys: string[]; keyed: boolean; unverifi
  * name genesis or a stored record (current or a kept revision), so a deleted or corrupted middle record is a finding
  * rather than a silent omission. The head anchor covers the newest record, which no successor names: an anchored hash
  * that is not a current record means the newest record was deleted or rolled back (HEAD_MISSING), and records with
- * no anchor (a store written before anchoring, or an anchor deleted with the record) are HEAD_UNANCHORED.
- * ponytail: the anchor is unsigned (the async publishers sign exactly once), so a writer who rewrites head.anchor to
- * the previous hash along with the deletion is not caught; anchor heads in the transparency log if that matters.
+ * no anchor (a store written before anchoring, or an anchor deleted with the record) are HEAD_UNANCHORED. An anchor
+ * whose signature does not verify, or an unsigned one in a keyed workspace, is HEAD_UNVERIFIED: a writer who deletes
+ * the newest record and rewrites the anchor to the older hash cannot sign it (WP37 review).
+ * ponytail: an earlier signed anchor replayed from a backup, together with the records it named, still reads clean;
+ * a machine-local high-water mark per store (src/keys/highWater.ts) or the transparency log closes that.
  */
 export function verifyWorkspaceRecords<T>(workspace: string, at: RecordLocation): { records: T[]; findings: WorkspaceRecordFinding[] } {
   const { current, findings } = verifyStoredRecords(workspace, at);
@@ -214,9 +255,11 @@ function verifyStoredRecords(workspace: string, at: RecordLocation): { current: 
       findings.push({ file, code: "CHAIN_GAP", detail: `prev_record_hash ${String(prev).slice(0, 16)}… names no stored record` });
     }
   }
-  const anchor = readHeadAnchor(workspace, at), headFile = headAnchorPath(workspace, at);
+  const anchor = readHeadAnchor(workspace, at, { keys, keyed }), headFile = headAnchorPath(workspace, at);
   if (anchor === UNREADABLE_ANCHOR) {
     findings.push({ file: headFile, code: "UNREADABLE", detail: "the head anchor cannot be read" });
+  } else if (anchor === UNVERIFIED_ANCHOR) {
+    findings.push({ file: headFile, code: "HEAD_UNVERIFIED", detail: "the head anchor is unsigned or its signature does not verify under the workspace artifact-seal keys" });
   } else if (anchor === "absent") {
     if (current.length > 0) findings.push({ file: headFile, code: "HEAD_UNANCHORED", detail: "no head anchor: a deleted newest record cannot be ruled out" });
   } else {
@@ -224,8 +267,9 @@ function verifyStoredRecords(workspace: string, at: RecordLocation): { current: 
       findings.push({ file: headFile, code: "HEAD_MISSING", detail: `the newest record ${anchor.head.slice(0, 16)}… is missing: deleted or rolled back` });
     }
     for (const lost of anchor.lost) {
-      findings.push({ file: headFile, code: "HEAD_MISSING", detail: lost === UNREADABLE_ANCHOR ? "an earlier head anchor could not be read when a later record was written"
-        : `an earlier newest record ${lost.slice(0, 16)}… was already missing when a later record was written` });
+      findings.push(lost === UNVERIFIED_ANCHOR ? { file: headFile, code: "HEAD_UNVERIFIED", detail: "an earlier head anchor did not verify when a later record was written" }
+        : { file: headFile, code: "HEAD_MISSING", detail: lost === UNREADABLE_ANCHOR ? "an earlier head anchor could not be read when a later record was written"
+          : `an earlier newest record ${lost.slice(0, 16)}… was already missing when a later record was written` });
     }
   }
   return { current, findings, keyed };
@@ -308,13 +352,14 @@ export function saveWorkspaceRecord<T extends Record<string, unknown>>(
     // Retained synchronous compatibility: missing/refused signing keys can leave a legacy unsigned record.
   }
   const record = { ...body, prev_record_hash: before.head, record_hash: hash, signature, storedTs: now } as T & RecordEnvelope;
-  const bytes = JSON.stringify(record, null, 2);
+  const bytes = JSON.stringify(record, null, 2), head = prepareWorkspaceRecordHead(workspace, location, hash);
   return withWorkspaceRecordPublicationLock(workspace, location, () => {
     assertPredecessorCurrent(workspace, location, id, before);
     ensureDir(recordDir(workspace, location));
-    keepRevision(workspace, location, id, before.target);
-    writeFileAtomic(before.file, bytes, 0o644);
-    anchorWorkspaceRecordHead(workspace, location, hash);
+    anchorWorkspaceRecordHead(workspace, location, head, () => {
+      keepRevision(workspace, location, id, before.target);
+      writeFileAtomic(before.file, bytes, 0o644);
+    });
     return record;
   });
 }
@@ -355,6 +400,7 @@ export async function prepareWorkspaceRecordAsync<T extends Record<string, unkno
     assertPurposePublicationCurrent(root, captured, signed);
   };
   assertCurrent();
+  const head = prepareWorkspaceRecordHead(root, location, hash, true);
   const record = { ...ownBody, prev_record_hash: before.head, record_hash: hash,
     signature: signed.signature.toString("base64"), storedTs } as T & RecordEnvelope;
   const bytes = JSON.stringify(record, null, 2);
@@ -362,9 +408,10 @@ export async function prepareWorkspaceRecordAsync<T extends Record<string, unkno
     assertCurrent();
     assertPredecessorCurrent(root, location, ownId, before);
     ensureDir(recordDir(root, location));
-    keepRevision(root, location, ownId, before.target);
-    writeFileAtomic(before.file, bytes, 0o644);
-    anchorWorkspaceRecordHead(root, location, hash);
+    anchorWorkspaceRecordHead(root, location, head, () => {
+      keepRevision(root, location, ownId, before.target);
+      writeFileAtomic(before.file, bytes, 0o644);
+    });
     return record;
   } });
 }
