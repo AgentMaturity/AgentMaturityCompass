@@ -20,3 +20,6 @@ check-freeze.log fails only on freeze-exception keys from changesets already on 
 
 ## Pending (Sid)
 Live Postgres drill: docs/runbooks/POSTGRES_FAILOVER.md. Run a refused migration (for example a trigger that alters a copied row) against a real server, check that ROLLBACK leaves the chain empty, then rerun.
+
+## Receipt repaired 2026-10-31
+The folder had no `receipt.json`, which `npm run check:qualification` requires. It was written from this README, the logs beside it and the git history. Its commands are the ten checks listed under Checks, `check:freeze` (exit 1, as `check-freeze.log` records), the two vitest runs in `tests.log` and `tests-mirror-consumers.log` (with the durations vitest reported) and `mutate.py`. The checks are written as the npm scripts their logs name and the test runs as vitest commands, because the exact command lines were not recorded. `commit` is `64c1e2ec9`, which holds the fix and this folder. `tests` is null because the two runs may overlap. Every file in the folder is listed as a hashed artifact. The Node, pnpm and OS versions and the other commands' durations were never recorded; they are written as `not recorded` and `durationMs: 0`. `arch` is `arm64`, a same-host inference from the same wave's D5 receipt of that day, because the schema allows only `arm64` or `x64`.
