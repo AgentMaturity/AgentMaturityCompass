@@ -29,7 +29,7 @@ import {
 } from "../storage/workspaceRecordStore.js";
 
 /** Where false-positive reports live under .amc/. */
-const FP_REPORTS_AT = { area: ["assurance"], kind: "false-positives" };
+const FP_REPORTS_AT = { area: ["assurance"], kind: "false-positives", idField: "reportId" };
 
 // ---------------------------------------------------------------------------
 // Types

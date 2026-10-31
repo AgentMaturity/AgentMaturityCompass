@@ -10,7 +10,7 @@ import { assertOverridePublicationCurrent, BreakGlassSigningError, verifyOverrid
 import type { EmergencyOverride } from "./policyCanary.js";
 
 type PreparedOverride = Awaited<ReturnType<typeof import("./overrideSignature.js").prepareOverrideDigestSignature>>;
-const REL = ".amc/governor/emergency-overrides", AT = { area: ["governor"], kind: "emergency-overrides" };
+const REL = ".amc/governor/emergency-overrides", AT = { area: ["governor"], kind: "emergency-overrides", idField: "overrideId" };
 
 /** The existing canary activation hash, shared by its actual writer and reader. */
 export function canaryOverrideDigest(o: Pick<EmergencyOverride, "overrideId" | "agentId" | "reason" | "actionDescription" | "ttlMs" | "startedTs" | "expiresTs">): string {

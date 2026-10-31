@@ -47,6 +47,8 @@ import { purposeKeyPaths, vaultPaths } from "../vault/vaultPaths.js";
 export interface RecordLocation {
   area: string[];
   kind: string;
+  /** The body field that holds the id a record is filed under (`<id>.json`); a record filed under another name is refused. */
+  idField?: string;
 }
 
 /** Chain and signature fields appended to every stored record. */
@@ -298,7 +300,7 @@ function keepRevision(workspace: string, at: RecordLocation, id: string, previou
 export interface WorkspaceRecordFinding {
   file: string;
   code: "UNREADABLE" | "HASH_MISMATCH" | "UNSIGNED" | "SIGNATURE_INVALID" | "CHAIN_GAP" | "HEAD_MISSING" | "HEAD_UNANCHORED"
-    | "HEAD_UNVERIFIED" | "KEYSET_UNVERIFIABLE";
+    | "HEAD_UNVERIFIED" | "KEYSET_UNVERIFIABLE" | "ID_MISMATCH" | "DUPLICATE" | "SUPERSEDED";
   detail: string;
 }
 
@@ -308,7 +310,8 @@ export const WORKSPACE_RECORD_FINDING_TEXT: Readonly<Record<WorkspaceRecordFindi
   UNSIGNED: "record carries no signature", SIGNATURE_INVALID: "signature does not verify under the workspace artifact-seal keys",
   CHAIN_GAP: "the record names a predecessor that is not stored", HEAD_MISSING: "the newest record or its head anchor was removed",
   HEAD_UNANCHORED: "no head anchor: a deleted newest record cannot be ruled out", HEAD_UNVERIFIED: "the head anchor does not verify",
-  KEYSET_UNVERIFIABLE: "the workspace key set does not verify"
+  KEYSET_UNVERIFIABLE: "the workspace key set does not verify", ID_MISMATCH: "the record is filed under another record's id",
+  DUPLICATE: "the same record is stored under more than one name", SUPERSEDED: "a superseded version is stored as a current record"
 };
 
 /**
@@ -388,6 +391,17 @@ function verifyStoredRecords(workspace: string, at: RecordLocation): { current: 
       findings.push({ file, code: "CHAIN_GAP", detail: `prev_record_hash ${String(prev).slice(0, 16)}… names no stored record` });
     }
   }
+  // A genuinely signed record replayed under another name, twice, or as a superseded version is no current record (WP37 security review).
+  // With an id field the copy filed under its own id is the record; without one every copy is refused.
+  const filed = (row: StoredRecord) => at.idField === undefined || row.record[at.idField] === basename(row.file, ".json");
+  const copies = new Map<string, number>(), superseded = new Set(revisions.map((row) => row.record.record_hash));
+  for (const row of current.filter(filed)) copies.set(row.record.record_hash, (copies.get(row.record.record_hash) ?? 0) + 1);
+  for (const row of current) {
+    const { file, record } = row;
+    if (!filed(row)) findings.push({ file, code: "ID_MISMATCH", detail: `${at.idField} does not name this file` });
+    else if ((copies.get(record.record_hash) ?? 0) > 1) findings.push({ file, code: "DUPLICATE", detail: "the same record_hash is stored under another name" });
+    if (superseded.has(record.record_hash)) findings.push({ file, code: "SUPERSEDED", detail: "record_hash is a kept revision's: a superseded version restored as current" });
+  }
   const headFile = headAnchorPath(workspace, at), anchor = readHeadAnchor(workspace, at, { keys, keyed });
   if (anchor === UNREADABLE_ANCHOR) {
     findings.push({ file: headFile, code: "UNREADABLE", detail: "the head anchor cannot be read" });
@@ -414,7 +428,7 @@ function verifyStoredRecords(workspace: string, at: RecordLocation): { current: 
 }
 
 /** Findings that make a record itself untrusted; the others describe the store around it. */
-const RECORD_REFUSALS: ReadonlySet<WorkspaceRecordFinding["code"]> = new Set(["HASH_MISMATCH", "SIGNATURE_INVALID"]);
+const RECORD_REFUSALS: ReadonlySet<WorkspaceRecordFinding["code"]> = new Set(["HASH_MISMATCH", "SIGNATURE_INVALID", "ID_MISMATCH", "DUPLICATE", "SUPERSEDED"]);
 
 /**
  * The history read for reports and aggregates (DXB-11), the workspace-record counterpart of `scanTrustedRuns`: a

@@ -2,7 +2,7 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
-import { generateResidencyReport, registerTenant, resetDataResidencyState } from "../src/compliance/dataResidency.js";
+import { createResidencyPolicy, generateResidencyReport, registerTenant, resetDataResidencyState } from "../src/compliance/dataResidency.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { canonicalize } from "../src/utils/json.js";
 import { initWorkspace } from "../src/workspace.js";
@@ -56,6 +56,17 @@ describe("the residency report reads only verified residency records (security s
     const report = generateResidencyReport("ghost", {}, ws);
     expect(report.compliant).toBe(false);
     expect(report.violations.join("\n")).toMatch(/ghost has no verified residency registration/);
+  });
+
+  test("two verified policies for the tenant's region leave it unconfigured, never compliant", () => {
+    const ws = keyed();
+    registerTenant({ tenantId: "t1", workspaceId: "w1", region: "eu-west-1" }, ws);
+    createResidencyPolicy({ region: "eu-west-1", denyRegions: [] }, ws);
+    createResidencyPolicy({ region: "eu-west-1", denyRegions: ["us-east-1"] }, ws);
+    resetDataResidencyState();
+    const report = generateResidencyReport("t1", {}, ws);
+    expect(report.compliant).toBe(false);
+    expect(report.violations.join("\n")).toMatch(/eu-west-1 has 2 verified residency policies/);
   });
 
   test("integrity violations carry a fixed message per finding, never the reader's error text", () => {

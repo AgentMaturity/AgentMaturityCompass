@@ -136,9 +136,10 @@ function pushRuntimeFirewallCheck(checks: DoctorCheck[], workspace: string, stri
 
 /** Every workspace record store (WP37): residency, governor canary, false-positive and lab registers. */
 const WORKSPACE_RECORD_STORES: readonly RecordLocation[] = [
-  { area: ["compliance", "residency"], kind: "policies" }, { area: ["compliance", "residency"], kind: "tenants" },
-  { area: ["governor"], kind: "rollback-packs" }, { area: ["governor"], kind: "emergency-overrides" },
-  { area: ["assurance"], kind: "false-positives" }, { area: ["lab"], kind: "experiments" }, { area: ["lab"], kind: "probe-results" }
+  { area: ["compliance", "residency"], kind: "policies", idField: "policyId" }, { area: ["compliance", "residency"], kind: "tenants", idField: "tenantId" },
+  { area: ["governor"], kind: "rollback-packs", idField: "packId" }, { area: ["governor"], kind: "emergency-overrides", idField: "overrideId" },
+  { area: ["assurance"], kind: "false-positives", idField: "reportId" }, { area: ["lab"], kind: "experiments", idField: "experimentId" },
+  { area: ["lab"], kind: "probe-results" }
 ];
 
 /**

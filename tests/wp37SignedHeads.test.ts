@@ -300,3 +300,41 @@ describe("stores written before head anchors are anchored once (WP37 review)", (
     expect(unanchored).toEqual([expect.stringMatching(/^\[MEDIUM\] Residency record history unanchored \(tenants\): HEAD_UNANCHORED /)]);
   });
 });
+
+describe("a replayed signed record is refused (WP37 security review)", () => {
+  const TENANTS = { area: ["compliance", "residency"], kind: "tenants", idField: "tenantId" };
+  const PROBES = { area: ["lab"], kind: "probe-results" };
+  const probeFile = (ws: string, id: string) => join(ws, ".amc", "lab", "probe-results", `${id}.json`);
+  const trusted = (ws: string, at: typeof PROBES) => readTrustedWorkspaceRecords<Record<string, unknown>>(ws, at);
+
+  test("a genuine record copied under another record's file name is ID_MISMATCH and refused", () => {
+    const ws = keyed("amc-wp37s-replay-");
+    saveWorkspaceRecord(ws, TENANTS, "t1", { tenantId: "t1", region: "eu-west-1" }, 1);
+    saveWorkspaceRecord(ws, TENANTS, "t2", { tenantId: "t2", region: "eu-west-1" }, 2);
+    copyFileSync(recordFile(ws, "t1"), recordFile(ws, "t3"));
+    const read = trusted(ws, TENANTS);
+    expect(read.findings.map((row) => [row.code, row.file.endsWith("t3.json")])).toContainEqual(["ID_MISMATCH", true]);
+    expect(read.records.map((row) => row.tenantId)).toEqual(["t1", "t2"]);
+  });
+
+  test("the same signed record under two file names is DUPLICATE and neither copy is read", () => {
+    const ws = keyed("amc-wp37s-replay-");
+    saveWorkspaceRecord(ws, PROBES, "p1", { score: 1 }, 1);
+    saveWorkspaceRecord(ws, PROBES, "p2", { score: 2 }, 2);
+    copyFileSync(probeFile(ws, "p1"), probeFile(ws, "copy"));
+    const read = trusted(ws, PROBES);
+    expect(read.findings.filter((row) => row.code === "DUPLICATE")).toHaveLength(2);
+    expect(read.records.map((row) => row.score)).toEqual([2]);
+  });
+
+  test("a superseded version restored as a current record is SUPERSEDED and refused", () => {
+    const ws = keyed("amc-wp37s-replay-");
+    saveWorkspaceRecord(ws, PROBES, "p1", { score: 1 }, 1);
+    updateWorkspaceRecord(ws, PROBES, "p1", { score: 9 }, 2);
+    const revisions = join(ws, ".amc", "lab", "probe-results", "revisions");
+    copyFileSync(join(revisions, readdirSync(revisions)[0]!), probeFile(ws, "old"));
+    const read = trusted(ws, PROBES);
+    expect(read.findings.map((row) => row.code)).toContain("SUPERSEDED");
+    expect(read.records.map((row) => row.score)).toEqual([9]);
+  });
+});

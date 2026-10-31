@@ -42,8 +42,8 @@ import {
 
 /** Where each residency register lives under .amc/. */
 const RESIDENCY_AREA = ["compliance", "residency"];
-const POLICIES_AT = { area: RESIDENCY_AREA, kind: "policies" };
-const TENANTS_AT = { area: RESIDENCY_AREA, kind: "tenants" };
+const POLICIES_AT = { area: RESIDENCY_AREA, kind: "policies", idField: "policyId" };
+const TENANTS_AT = { area: RESIDENCY_AREA, kind: "tenants", idField: "tenantId" };
 
 // ---------------------------------------------------------------------------
 // Types
@@ -596,10 +596,10 @@ export function generateResidencyReport(
   // unsigned record never sets the region, the policy or an isolation check; its finding is listed below.
   const stored = workspace ? { policies: readTrustedWorkspaceRecords<ResidencyPolicy>(workspace, POLICIES_AT), tenants: readTrustedWorkspaceRecords<TenantBoundary>(workspace, TENANTS_AT) } : null;
   const known = { policies: mergeById(policies, stored?.policies.records ?? [], (p) => p.policyId), tenants: mergeById(tenants, stored?.tenants.records ?? [], (t) => t.tenantId) };
-  const tenant = known.tenants.find((t) => t.tenantId === tenantId) ?? null;
-  // No verified registration: us-east-1 and the strict default are placeholders, and the tenant is unconfigured.
-  const region = tenant?.region ?? "us-east-1";
-  const policy = known.policies.find((p) => p.region === region) ?? createDefaultPolicy(region);
+  // No single verified registration (or policy): us-east-1 and the strict default are placeholders, and it is unconfigured.
+  const registered = known.tenants.filter((t) => t.tenantId === tenantId), tenant = registered.length === 1 ? registered[0]! : null;
+  const region = tenant?.region ?? "us-east-1", regionPolicies = known.policies.filter((p) => p.region === region);
+  const policy = regionPolicies.length === 1 ? regionPolicies[0]! : createDefaultPolicy(region);
   const isolationChecks = known.tenants.filter((t) => t.tenantId !== tenantId).map((t) => checkTenantIsolation(tenantId, t.tenantId, workspace, known));
   const holds = getActiveLegalHolds(tenantId, workspace);
   const keyCustody = getKeyCustodyConfig(tenant?.keyCustodyMode ?? "local");
@@ -610,7 +610,8 @@ export function generateResidencyReport(
   }
 
   // Aggregate violations
-  const violations: string[] = tenant ? [] : [`[HIGH] Tenant ${tenantId} has no verified residency registration: its region and policy are unconfigured.`];
+  const violations: string[] = tenant ? [] : [`[HIGH] Tenant ${tenantId} has ${registered.length === 0 ? "no" : registered.length} verified residency registration${registered.length > 1 ? "s" : ""}: its region and policy are unconfigured.`];
+  if (regionPolicies.length > 1) violations.push(`[HIGH] Region ${region} has ${regionPolicies.length} verified residency policies: its policy is unconfigured.`);
   for (const check of isolationChecks) {
     for (const v of check.violations) {
       violations.push(`[${v.severity.toUpperCase()}] ${v.description}`);
