@@ -73,6 +73,9 @@ describe("governor run trust", () => {
     expect(decision.reasons.join("\n")).not.toMatch(/signature verification failed/);
     expect(decision.requiredEvidence.join("\n")).not.toMatch(/Re-sign/);
     expect(decision.requiredEvidence.join("\n")).toMatch(/integrity >= 0\.6 \(HIGH TRUST\)/);
+    // The signed policy is trusted; the missing run is the READ_ONLY rule's run-integrity condition at the 0.6 default.
+    expect(decision.conditionResults).toContainEqual(expect.objectContaining({ conditionId: "action-policy-signature", passed: true }));
+    expect(decision.conditionResults).toContainEqual(expect.objectContaining({ conditionId: "run-integrity", passed: false, actual: null, expected: 0.6 }));
   });
 
   it("a sealed low-integrity run is named with its integrity", () => {

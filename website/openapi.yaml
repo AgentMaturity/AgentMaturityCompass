@@ -1326,8 +1326,8 @@ components:
         hasAlternatives: { type: boolean }
         mandatoryGates:
           type: array
-          minItems: 9
-          maxItems: 9
+          minItems: 10
+          maxItems: 10
           items: { type: string }
         baseline: { $ref: '#/components/schemas/ActionEvidencePolicyHash' }
 
@@ -1351,8 +1351,8 @@ components:
           items: { $ref: '#/components/schemas/ActionEvidenceGate' }
         mandatoryGates:
           type: array
-          minItems: 9
-          maxItems: 9
+          minItems: 10
+          maxItems: 10
           items: { type: string }
         baseline: { $ref: '#/components/schemas/ActionEvidencePolicyHash' }
         candidate: { $ref: '#/components/schemas/ActionEvidencePolicyHash' }

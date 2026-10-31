@@ -140,6 +140,7 @@ interface CompiledActionEvidenceLogic {
 const MANDATORY_GATES = Object.freeze([
   "policy-signature",
   "trusted-config",
+  "run-integrity",
   "trust-tier",
   "sandbox",
   "execution-ticket",

@@ -6,6 +6,7 @@ import { afterEach, describe, expect, test } from "vitest";
 import { loadApprovalPolicy } from "../src/approvals/approvalPolicyEngine.js";
 import { loadBudgetsConfig } from "../src/budgets/budgets.js";
 import { loadActionPolicy } from "../src/governor/actionPolicyEngine.js";
+import { actionPolicySchema, runIntegrityAtLeast } from "../src/governor/actionPolicySchema.js";
 import { loadOpsPolicy } from "../src/ops/policy.js";
 import { toolsConfigSchema } from "../src/toolhub/toolsSchema.js";
 import { getDomainMetadata, listDomainIds, type Domain } from "../src/domains/domainRegistry.js";
@@ -176,6 +177,13 @@ describe("station operating profiles", () => {
       const firewall = profile.proposedSignedConfigs.firewall as { mode: string; failClosedOnMissingPolicy: boolean; rules: Record<string, unknown> };
       expect(firewall.mode).toBe(profile.firewall.mode.value);
       expect(firewall.failClosedOnMissingPolicy).toBe(profile.firewall.failClosedOnMissingPolicy.value);
+    }
+  });
+
+  test("every station's proposed Action Policy keeps the 0.6 run-integrity default on every rule (G7)", () => {
+    for (const station of listDomainIds()) {
+      const policy = actionPolicySchema.parse(buildOperatingProfile({ station }).proposedSignedConfigs.actionPolicy);
+      expect(policy.actions.map(runIntegrityAtLeast), station).toEqual(policy.actions.map(() => 0.6));
     }
   });
 

@@ -28,10 +28,19 @@ const riskTierDefaultSchema = z.object({
   requireSandboxForExecute: z.boolean()
 });
 
+/** The run-integrity floor a rule gets when it states none: the HIGH TRUST line every policy had before this field. */
+export const DEFAULT_RUN_INTEGRITY_AT_LEAST = 0.6;
+
 export const actionPolicyRuleSchema = z.object({
   actionClass: actionClassSchema,
   minEffectiveQuestionLevels: z.record(z.string().min(1), z.number().int().min(0).max(5)).default({}),
   requireTrustTierAtLeast: trustTierAtLeastSchema.default("OBSERVED"),
+  /**
+   * Minimum integrity index of the agent's latest sealed, ledger-anchored run. Absent means DEFAULT_RUN_INTEGRITY_AT_LEAST.
+   * Below 0.6 is an owner waiver: every decision made under it says so (condition `run-integrity`, reason `RUN INTEGRITY WAIVED:`).
+   * It never waives a refused, unanchored, verification-failed run, nor findings against the agent.
+   */
+  requireRunIntegrityAtLeast: z.number().min(0).max(1).optional(),
   requireAssurancePacks: z.record(z.string().min(1), assurancePackRequirementSchema).default({}),
   evidenceLogic: policyEvidenceLogicSchema.optional(),
   allowExecute: z.boolean().default(false),
@@ -64,3 +73,8 @@ export const actionPolicySchema = z.object({
 export type ActionPolicy = z.infer<typeof actionPolicySchema>;
 export type ActionPolicyRule = z.infer<typeof actionPolicyRuleSchema>;
 export type TrustTierAtLeast = z.infer<typeof trustTierAtLeastSchema>;
+
+/** The rule's effective run-integrity threshold. */
+export function runIntegrityAtLeast(rule: Pick<ActionPolicyRule, "requireRunIntegrityAtLeast">): number {
+  return rule.requireRunIntegrityAtLeast ?? DEFAULT_RUN_INTEGRITY_AT_LEAST;
+}

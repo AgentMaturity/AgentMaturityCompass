@@ -4,7 +4,8 @@ import { join } from "node:path";
 import { versions } from "node:process";
 import { studioStatus } from "../studio/studioSupervisor.js";
 import { vaultStatusNow } from "../vault/vaultCli.js";
-import { verifyActionPolicySignature } from "../governor/actionPolicyEngine.js";
+import { loadActionPolicy, verifyActionPolicySignature } from "../governor/actionPolicyEngine.js";
+import { DEFAULT_RUN_INTEGRITY_AT_LEAST, runIntegrityAtLeast } from "../governor/actionPolicySchema.js";
 import { verifyToolhubConfig } from "../toolhub/toolhubCli.js";
 import { verifyBudgetsConfigSignature } from "../budgets/budgets.js";
 import { verifyApprovalPolicySignature } from "../approvals/approvalPolicyEngine.js";
@@ -227,6 +228,19 @@ export async function runDoctorRules(workspace: string, options: DoctorOptions =
     checks.push({ id: "sig-action-policy", status: "WARN", message: "action policy: not configured (native agent calls are not checked against an Action Policy)",
       fixHint: "Create and sign one with: amc policy action init" });
   } else pushSignatureCheck(checks, "sig-action-policy", "action-policy.yaml", actionPolicySig);
+  // G3: an owner waiver below the run-integrity default, said where an operator who never reads a decision looks.
+  if (actionPolicySig.valid) {
+    try {
+      const waived = loadActionPolicy(workspace).actions.filter((rule) => runIntegrityAtLeast(rule) < DEFAULT_RUN_INTEGRITY_AT_LEAST)
+        .map((rule) => `${rule.actionClass}=${runIntegrityAtLeast(rule)}`);
+      if (waived.length > 0) checks.push({ id: "action-policy-run-integrity-waiver", status: "WARN",
+        message: `action policy: owner waiver — requireRunIntegrityAtLeast below ${DEFAULT_RUN_INTEGRITY_AT_LEAST} on ${waived.join(", ")}; EXECUTE for those classes does not rest on a HIGH TRUST run`,
+        fixHint: `Remove requireRunIntegrityAtLeast from those rules (or set ${DEFAULT_RUN_INTEGRITY_AT_LEAST}), then re-sign: amc fix-signatures` });
+    } catch (error) {
+      checks.push({ id: "action-policy-parse", status: "WARN", message: `action policy: signed but does not parse (${safeDoctorError(error, workspace)}); every governed class is denied`,
+        fixHint: "Fix .amc/action-policy.yaml, then re-sign: amc fix-signatures" });
+    }
+  }
   pushSignatureCheck(checks, "sig-tools", "tools.yaml", verifyToolhubConfig(workspace));
   pushSignatureCheck(checks, "sig-budgets", "budgets.yaml", verifyBudgetsConfigSignature(workspace));
   pushSignatureCheck(checks, "sig-approval-policy", "approval-policy.yaml", verifyApprovalPolicySignature(workspace));

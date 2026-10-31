@@ -21,7 +21,7 @@ import {
   signActionPolicyWithLockHeld,
   verifyActionPolicySignature
 } from "../../governor/actionPolicyEngine.js";
-import { actionPolicySchema, type ActionPolicy } from "../../governor/actionPolicySchema.js";
+import { actionPolicySchema, DEFAULT_RUN_INTEGRITY_AT_LEAST, type ActionPolicy } from "../../governor/actionPolicySchema.js";
 import { withControlFileLock } from "../../lifecycle/controlFileLock.js";
 import { assertOwnerMode } from "../../mode/mode.js";
 import { loadOpsPolicy, opsPolicyPath, opsPolicySchema, signOpsPolicy, verifyOpsPolicySignature } from "../../ops/policy.js";
@@ -130,6 +130,7 @@ const ACTION_RULES: Rules = [
   [/^riskTierDefaults\.\w+\.requireSandboxForExecute$/, FALSE_WEAKER],
   [/\]\.minEffectiveQuestionLevels\.[^.]+$/, FLOOR],
   [/\]\.requireTrustTierAtLeast$/, order("SELF_REPORTED", "ATTESTED", "OBSERVED", "OBSERVED_HARDENED")],
+  [/\]\.requireRunIntegrityAtLeast$/, { kind: "floor", absent: DEFAULT_RUN_INTEGRITY_AT_LEAST }], // absent: the 0.6 default
   [/\]\.allowExecute$/, TRUE_WEAKER],
   [/\]\.requireExecTicket$/, FALSE_WEAKER],
   ...ASSURANCE_RULES

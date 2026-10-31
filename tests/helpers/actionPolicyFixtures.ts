@@ -8,7 +8,7 @@ import { readFileSync, rmSync } from "node:fs";
 import { questionBank } from "../../src/diagnostic/questionBank.js";
 import { getAgentPaths } from "../../src/fleet/paths.js";
 import { actionPolicyPath, actionPolicySigPath, defaultActionPolicy, initActionPolicy } from "../../src/governor/actionPolicyEngine.js";
-import type { DiagnosticReport } from "../../src/types.js";
+import type { ActionClass, DiagnosticReport } from "../../src/types.js";
 import { writeAnchoredRun } from "./sealedRun.js";
 
 /** `report` sealed and ledger-anchored as the runner publishes it; the governor reads only such runs. */
@@ -58,6 +58,37 @@ export function signPermissiveActionPolicy(workspace: string): void {
   }
   for (const tier of Object.values(policy.riskTierDefaults)) tier.requireSandboxForExecute = false;
   initActionPolicy(workspace, policy);
+}
+
+/**
+ * The owner waiver scripts/installed-crash-recovery-check.mjs signs (AXR-02): for `classes`, no evidence gates, tier
+ * SELF_REPORTED, `requireRunIntegrityAtLeast: threshold` (0 by default; 0.6 or above is no waiver), EXECUTE without a
+ * ticket, and no sandbox for the low and medium risk tiers. Every other class keeps the default rule.
+ */
+export function signOwnerWaiverPolicy(workspace: string, classes: readonly ActionClass[] = ["READ_ONLY", "WRITE_LOW"], threshold = 0): void {
+  const policy = defaultActionPolicy();
+  for (const rule of policy.actions) {
+    if (!classes.includes(rule.actionClass)) continue;
+    rule.minEffectiveQuestionLevels = {};
+    rule.requireAssurancePacks = {};
+    rule.requireTrustTierAtLeast = "SELF_REPORTED";
+    rule.requireRunIntegrityAtLeast = threshold;
+    rule.allowExecute = true;
+    rule.requireExecTicket = false;
+  }
+  policy.riskTierDefaults.low.requireSandboxForExecute = false;
+  policy.riskTierDefaults.medium.requireSandboxForExecute = false;
+  initActionPolicy(workspace, policy);
+}
+
+/** The run a fresh workspace's first `amc` seals: sealed and anchored, but it measures nothing (integrity 0, no evidence). */
+export function baselineRunReport(agentId: string): DiagnosticReport {
+  const observed = observedRunReport(agentId);
+  return {
+    ...observed, runId: "run_baseline", integrityIndex: 0, trustLabel: "UNRELIABLE — DO NOT USE FOR CLAIMS", evidenceCoverage: 0,
+    evidenceTrustCoverage: { observed: 0, attested: 0, selfReported: 0 },
+    questionScores: observed.questionScores.map((row) => ({ ...row, claimedLevel: 0, supportedMaxLevel: 0, finalLevel: 0, evidenceEventIds: [] })),
+  };
 }
 
 /** Remove the Action Policy and its signature: the "not configured" state. */

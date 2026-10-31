@@ -108,7 +108,9 @@ async function approvedWrite(f: Fixture, agentId: string) {
     fixtureKind: "SYNTHETIC_CREDENTIAL_AUTHORIZATION_CONTROL_INPUT_NOT_A_MEASUREMENT",
     agentId, runId: "synthetic-credential-binding-http-control", ts: now, windowStartTs: now - 1000, windowEndTs: now,
     integrityIndex: 1, trustLabel: "HIGH TRUST", correlationRatio: 0, questionScores: [],
-    evidenceTrustCoverage: { observed: 0, attested: 0, selfReported: 1 }
+    evidenceTrustCoverage: { observed: 0, attested: 0, selfReported: 1 },
+    // The governor refuses a sealed run that does not record a passed ledger verification inside the trust boundary.
+    verificationPassed: true, trustBoundaryViolated: false, trustBoundaryMessage: null
   };
   mkdirSync(runsDir, { recursive: true });
   writeAnchoredRun(f.workspace, runsDir, { ...report, runId: report.runId!, windowStartTs: report.windowStartTs!, windowEndTs: report.windowEndTs!, status: "VALID" as const });

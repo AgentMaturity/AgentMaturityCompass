@@ -101,7 +101,8 @@ function fixtureSuite(): PolicyFixtureSuite {
         expect: {
           outcome: "simulate",
           matched: true,
-          failClosed: true,
+          // A trusted evaluator: the fresh agent's missing run is the rule's run-integrity condition, not a source failure.
+          failClosed: false,
           matchedRuleIds: ["action:READ_ONLY"],
           matchedControlIds: ["action:READ_ONLY"],
         },
