@@ -66,27 +66,36 @@ export function protectedPathGlobs(): string[] {
  * line of work exists to remove — it merely wears code instead of YAML.
  */
 export function isProtectedPath(workspace: string, candidate: string): boolean {
+  return protectedPathStatus(workspace, candidate) === "protected";
+}
+
+/**
+ * `protected`, `clear`, or `outside`: a candidate the folded name check places
+ * outside the workspace is not judged here, and is never "clear" — the caller's
+ * containment check refuses it (pathAllowedByPatterns).
+ */
+export function protectedPathStatus(workspace: string, candidate: string): "protected" | "clear" | "outside" {
   const resolved = resolve(candidate);
-  const amcRoot = resolve(join(workspace, ".amc"));
   // Names alias on some volumes (`.AMC`, `AMC~1`, `.amc.`), so the location is
   // decided by file identity: the protected directory itself, or any existing
   // ancestor of the candidate that is it.
-  const amc = fileIdentity(amcRoot);
+  const amc = fileIdentity(resolve(join(workspace, ".amc")));
   if (amc !== null) {
     for (let current = resolved; ; current = dirname(current)) {
-      if (fileIdentity(current) === amc) return true;
+      if (fileIdentity(current) === amc) return "protected";
       if (dirname(current) === current) break;
     }
   }
-  // The name check stays as the second lock, folded: it holds where the
-  // directory does not exist yet, and against aliases of a missing one.
-  const fromWorkspace = relative(resolve(workspace), resolved);
-  if (fromWorkspace.startsWith("..") || isAbsolute(fromWorkspace)) return false;
+  // The name check stays as the second lock, folded on both sides (a re-cased
+  // workspace prefix is the same place on a case-insensitive volume): it holds
+  // where the directory does not exist yet, and against aliases of a missing one.
+  const fromWorkspace = relative(foldName(resolve(workspace)), foldName(resolved));
+  if (fromWorkspace.startsWith("..") || isAbsolute(fromWorkspace)) return "outside";
   // The first `relative` segment, not a string prefix: `startsWith(amcRoot)`,
   // which this replaced, also matched `.amcx` and `.amc-backup`. This floor
   // owns `.amc` alone; `.git` is the tool layer's (fsTools).
   const first = fromWorkspace.split(sep)[0] ?? "";
-  return foldName(first) !== ".git" && aliasedSegmentReason(first) !== null;
+  return foldName(first) !== ".git" && aliasedSegmentReason(first) !== null ? "protected" : "clear";
 }
 
 const PROTECTED_DIRECTORY_NAMES = new Set([".amc", ".git"]);
@@ -131,7 +140,9 @@ export function protectedDirectoryIdentities(root: string): ReadonlySet<string> 
 
 /** Why a path was refused, for a message an operator can act on. */
 export function protectedPathReason(workspace: string, candidate: string): string | null {
-  if (!isProtectedPath(workspace, candidate)) return null;
+  const status = protectedPathStatus(workspace, candidate);
+  if (status === "outside") return `path is outside the workspace: ${candidate}`;
+  if (status === "clear") return null;
   const entry = PROTECTED_WORKSPACE_PATHS[0];
   return `access to .amc/vault paths is always denied — ${entry?.reason ?? "protected workspace state"}`;
 }

@@ -161,6 +161,19 @@ describe("protected segments compare case-insensitively", () => {
     expect(protectedPathReason(dir, join(dir, "state", "vault.amcvault"))).not.toBeNull();
   });
 
+  it("folds the workspace prefix in the floor's name check, and refuses a path the fold places outside", () => {
+    // No `.amc` exists, so identity cannot decide: the name check alone must hold against a re-cased workspace prefix.
+    const dir = tempDir("amc-segcase-prefix-");
+    const recasedRoot = dir.toUpperCase();
+    expect(protectedPathReason(dir, join(recasedRoot, ".amc", "vault.amcvault"))).not.toBeNull();
+    expect(protectedPathReason(dir, join(recasedRoot, "AMC~1", "x"))).not.toBeNull();
+    expect(pathAllowedByPatterns(dir, join(recasedRoot, ".amc", "x"), [], []).ok).toBe(false);
+    expect(pathAllowedByPatterns(dir, join(recasedRoot, "src", "x.ts"), [], []).ok).toBe(true);
+    // Outside the workspace even after folding: not "clear", refused by containment.
+    const outside = pathAllowedByPatterns(dir, join(tmpdir(), "elsewhere", ".amc", "x"), [], []);
+    expect(outside).toMatchObject({ ok: false, reason: expect.stringMatching(/outside the workspace/) });
+  });
+
   it("decides the toolhub floor by identity, so a re-cased absolute path to .amc is refused", () => {
     const dir = tempDir("amc-segcase-identity-");
     mkdirSync(join(dir, ".amc"), { recursive: true });
