@@ -26,3 +26,7 @@ Defect D4 from qualification/2026-10-29-P2-06 (BR-3, `tenantChanged: true`). `am
 ## Pending
 
 - Rerun BR-3 on the reference deployment (real cluster). Pending for the P2-06 harness run.
+
+## Receipt repaired 2026-10-31
+
+The folder had no `receipt.json`, which `npm run check:qualification` requires. It was written from this README, `mutations.json` and the git history. Its commands are the two test runs under Evidence, written as vitest commands because their command lines were not recorded, with exit 0 as their results imply. `commit` is `b98565946`, which holds the fix and this folder. The folder records no build, typecheck, lint or repository-check results, so the receipt lists none. `tests` is null because the module run's skipped count was not recorded. `mutations.json` is listed as a hashed artifact. The Node, pnpm and OS versions and the command durations were never recorded; they are written as `not recorded` and `durationMs: 0`. `arch` is `arm64`, a same-host inference from the same wave's D5 receipt of that day, because the schema allows only `arm64` or `x64`.
