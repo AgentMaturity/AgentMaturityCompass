@@ -271,6 +271,17 @@ describe("session/prompt and cancellation", () => {
       data: { reason: expect.stringContaining("ended error"), failureCodes: ["AMC_NATIVE_BUDGET_REFUSED"] } });
   });
 
+  it("names a protected-data refusal's reason, processor and purpose as recorded, never the content (P2-02)", async () => {
+    const { h, sessionId } = await promptingHarness();
+    h.send({ jsonrpc: "2.0", id: 2, method: "session/prompt", params: { sessionId, prompt: [{ type: "text", text: "hi" }] } });
+    await settle();
+    h.finish({ ok: false, reason: "signed turn 1 ended error; idle is not successful completion", failureCodes: ["DATA_FLOW_REFUSED"],
+      dataFlow: { reason: "class_not_permitted", processorId: "proc-clinic", purposeId: "triage" } });
+    await replied(h, 2);
+    expect(replyTo(h.sent, 2)?.["error"]).toMatchObject({ code: -32603, message: "the turn did not complete",
+      data: { failureCodes: ["DATA_FLOW_REFUSED"], dataFlow: { reason: "class_not_permitted", processorId: "proc-clinic", purposeId: "triage" } } });
+  });
+
   it("refuses a second prompt on a session already running one", async () => {
     const { h, sessionId } = await promptingHarness();
     const body = { sessionId, prompt: [{ type: "text", text: "x" }] };

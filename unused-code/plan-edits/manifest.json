@@ -115,6 +115,13 @@
       "sha256": "c37dabc753cd0ede0a1a93af7498d139d4f654ea03a630848baa00a6cef6a34f"
     },
     {
+      "path": "src/agent/agentSession.ts",
+      "issue": "GAP-WP32",
+      "baseCommit": "0cbe7f1c6bd7525961668efa32e7198e3be35227",
+      "archivePath": "unused-code/plan-edits/GAP-WP32/src/agent/agentSession.ts.landed",
+      "sha256": "b4a4c0bfd0c86a8d8793b6a2e530fe50235ae16ebfa1eec833a230174577f701"
+    },
+    {
       "path": "src/agent/agentToolset.ts",
       "issue": "GAP-WP32",
       "baseCommit": "58a328ea821450be9502522a5df52e5770bb08a9",

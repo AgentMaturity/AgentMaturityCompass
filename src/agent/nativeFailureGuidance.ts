@@ -1,4 +1,6 @@
+import { DataFlowRefused } from "../dataflow/purposePolicy.js";
 import { parseRequestHeaderMeta, type RequestHeaderMeta } from "../session/requestHeaderMeta.js";
+import { extractEnvelope } from "../session/sessionTypes.js";
 import { readTurnEndMeta } from "../session/turnLifecycleMeta.js";
 import type { EvidenceEvent } from "../types.js";
 
@@ -16,6 +18,7 @@ const GUIDANCE = {
   EMPTY_RESPONSE: ["The provider returned no usable completed reply.", "Inspect the recorded failed attempt and configured retry policy. No task completion is implied by an empty response."],
   ABORTED: ["The request ended without a completed provider response.", "Inspect the recorded cancellation/termination cause and any partial output before a deliberate continuation. Do not infer zero usage or completion."],
   AMC_NATIVE_BUDGET_REFUSED: ["Signed native budget admission refused this dispatch.", "Inspect amc budgets verify and amc budgets status --agent <recorded-agent>. Preserve pending reservations and unknown usage. budgets reset does not restore allowance; policy changes require explicit review, not an automatic bypass."],
+  DATA_FLOW_REFUSED: ["Protected-data admission refused this model request before it was sent (P2-02).", "Inspect the recorded refusal reason, processor and purpose, then the signed processor registry (.amc/dataflow/processors.yaml) the operator maintains. Do not retry the same request or remove the registry to bypass admission."],
   AMC_EVIDENCE_INTEGRITY: ["Workspace evidence failed verification before budget admission.", "Run amc verify and amc budgets verify. Rows written with AMC_NO_SIGN=1, or edited rows, make signed budgets unverifiable in this workspace. Do not reset budgets to bypass this."],
   METADATA_UNAVAILABLE: ["Recorded failure metadata is missing or inconsistent.", "Inspect amc session show <session-id> and separately run amc agent-loop verify <session-id>. Do not infer a provider failure class or repair history implicitly."],
   UNKNOWN: ["The native operation failed without a supported public failure classification.", "Inspect the session with amc session show <session-id>, then amc agent-loop verify <session-id>; use amc doctor for local setup. Preserve the evidence and avoid automatic retries or policy changes."]
@@ -33,6 +36,8 @@ export interface NativeRunDiagnostic {
   readonly turn: number | null;
   readonly step: number | null;
   readonly guidance: NativeFailureGuidance;
+  /** For DATA_FLOW_REFUSED: the recorded refusal's reason and registry identifiers, never the refused content. */
+  readonly dataFlow?: { readonly reason: string; readonly processorId: string | null; readonly purposeId: string | null };
 }
 function own(value: unknown, key: string): unknown {
   if (value === null || (typeof value !== "object" && typeof value !== "function")) return undefined;
@@ -55,6 +60,7 @@ export function nativeFailureGuidance(code: unknown, status?: unknown): NativeFa
 }
 
 export function liveNativeFailureGuidance(error: unknown): NativeFailureGuidance {
+  if (error instanceof DataFlowRefused) return nativeFailureGuidance(error.code);
   const code = own(error, "code");
   if (code === "AMC_NATIVE_BUDGET_REFUSED") return nativeFailureGuidance(code);
   const failure = own(error, "failure");
@@ -73,10 +79,20 @@ export function projectNativeRunDiagnostics(events: readonly EvidenceEvent[], se
   const headers = new Map<string, RequestHeaderMeta>();
   const invalidHeaders = new Set<string>();
   const settled = new Set<string>(), failureTurns = new Set<number>();
+  // Per turn, the protected-data refusal that ended its latest request attempt; a later request header clears it.
+  const refusals = new Map<number, DataFlowRefused | null>();
   const rows: NativeRunDiagnostic[] = [];
   for (const event of events) {
     if (event.session_id !== sessionId) continue;
+    const at = event.event_type === "request/header" || event.event_type === "audit" ? position(extractEnvelope(event.meta_json)?.turn) : null;
+    if (event.event_type === "audit") {
+      let refusal: DataFlowRefused | null = null;
+      try { refusal = DataFlowRefused.fromEvidence(JSON.parse(event.meta_json)); } catch { /* not a refusal row */ }
+      if (refusal !== null && at !== null) refusals.set(at, refusal);
+      continue;
+    }
     if (event.event_type === "request/header") {
+      if (at !== null) refusals.set(at, null);
       const header = parseRequestHeaderMeta(event.meta_json);
       if (!header || headers.has(event.id) || invalidHeaders.has(event.id)) { invalidHeaders.add(event.id); headers.delete(event.id); }
       else headers.set(event.id, header);
@@ -101,7 +117,14 @@ export function projectNativeRunDiagnostics(events: readonly EvidenceEvent[], se
   for (const event of events) {
     if (event.session_id !== sessionId || event.event_type !== "turn/end") continue;
     const ending = readTurnEndMeta(event.meta_json);
-    if (!ending || ending.reason !== "error" || failureTurns.has(ending.turn)) continue;
+    if (!ending || ending.reason !== "error") continue;
+    const refusal = refusals.get(ending.turn);
+    if (refusal) {
+      rows.push({ eventId: event.id, source: "turn-error", turn: ending.turn, step: null, guidance: nativeFailureGuidance(refusal.code),
+        dataFlow: { reason: refusal.reason, processorId: refusal.processorId, purposeId: refusal.purposeId } });
+      continue;
+    }
+    if (failureTurns.has(ending.turn)) continue;
     rows.push({ eventId: event.id, source: "turn-error", turn: ending.turn, step: null, guidance: nativeFailureGuidance("UNKNOWN") });
   }
   return rows;
@@ -121,6 +144,10 @@ export function renderNativeRunDiagnostics(value: unknown): string {
     lines.push(`  ${source} ${JSON.stringify(eventId)} · turn ${turn ?? "unknown"} · step ${step ?? "unknown"}`);
     const guidance = own(raw, "guidance");
     lines.push(`  ${renderNativeFailureGuidance(nativeFailureGuidance(own(guidance, "code"), own(guidance, "httpStatus")))}`);
+    // Re-validated from the projection, so only a known reason and registry-shaped identifiers reach the terminal.
+    const flow = own(raw, "dataFlow"), refusal = flow === undefined ? null
+      : DataFlowRefused.from({ reason: own(flow, "reason"), processorId: own(flow, "processorId"), purposeId: own(flow, "purposeId") });
+    if (refusal) lines.push(`  refused: ${refusal.reason}; processor ${refusal.processorId ?? "none"}; purpose ${refusal.purposeId ?? "none"}`);
   }
   return lines.join("\n");
 }

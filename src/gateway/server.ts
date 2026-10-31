@@ -27,6 +27,7 @@ import { applyUpstreamAuth, missingUpstreamAuthRefs, upstreamCredentials } from 
 import type { CredentialsService } from "../credentials/credentialsService.js";
 import { AGENT_AUTH_HEADER_KEYS, AGENT_AUTH_QUERY_KEYS, redactBody, redactHeaders, redactRequestTarget } from "./redaction.js";
 import { protectedDataOptedIn } from "../dataflow/processorRegistry.js";
+import { admitProviderHttpRequest, dataFlowRefusalBody } from "../dataflow/providerAdmission.js";
 import { relayGatewayResponse } from "./streamPassthrough.js";
 import { monitorPublicKeyFingerprint } from "../receipts/receipt.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -1429,23 +1430,21 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
           : undefined
       );
       if (strippedAuth.hadCredential) {
-        appendEvidence({
-          eventType: "audit",
-          payload: JSON.stringify({
-            auditType: "AGENT_PROVIDED_KEY_IGNORED",
-            severity: "MED",
-            request_id: requestId,
-            agentId: attributedAgentId,
-            strippedHeaders: strippedAuth.strippedHeaders,
-            strippedQueryKeys: strippedAuth.strippedQueryKeys
-          }),
-          meta: {
-            auditType: "AGENT_PROVIDED_KEY_IGNORED",
-            severity: "MED",
-            request_id: requestId,
-            agentId: attributedAgentId
-          }
-        });
+        const ignored = { auditType: "AGENT_PROVIDED_KEY_IGNORED", severity: "MED", request_id: requestId, agentId: attributedAgentId };
+        appendEvidence({ eventType: "audit", meta: ignored,
+          payload: JSON.stringify({ ...ignored, strippedHeaders: strippedAuth.strippedHeaders, strippedQueryKeys: strippedAuth.strippedQueryKeys }) });
+      }
+      // P2-02: llmRuntime's processor/purpose admission over what the provider would receive (target, headers and body, the
+      // agent's credentials stripped), recorded and decided before the upstream credential is applied or any call is made.
+      const providerId = upstreamConfigured.providerId ?? route.upstream;
+      const dataFlow = admitProviderHttpRequest(options.workspace, providerId, upstreamResolved.baseUrl,
+        { target: `${targetUrl.pathname}${targetUrl.search}`, headers: outboundHeaders, body: requestBody });
+      if (dataFlow?.row) appendEvidence({ ...dataFlow.row, meta: { ...dataFlow.row.meta, request_id: requestId } });
+      if (dataFlow?.refusal) {
+        const refused = { ...dataFlow.refusal.evidence(), severity: "HIGH", request_id: requestId, route: route.prefix, upstreamId: route.upstream, agentId: attributedAgentId };
+        appendEvidence({ eventType: "audit", payload: JSON.stringify(refused), meta: refused });
+        res.writeHead(403, { "content-type": "application/json" }).end(dataFlowRefusalBody(dataFlow.refusal));
+        return;
       }
       const authResult = applyUpstreamAuth(targetUrl, outboundHeaders, upstreamResolved.auth, credentials.resolve);
 
@@ -1481,7 +1480,6 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
       const requestBodyRedaction = redactBody(requestBody, req.headers["content-type"], config.redaction, { protectedData });
       const requestTarget = redactRequestTarget(incomingUrl, protectedData);
       const workOrderId = firstString(req.headers["x-amc-workorder-id"]);
-      const providerId = upstreamConfigured.providerId ?? route.upstream;
       const clientProcess = firstString(req.headers["x-amc-client-process"]);
       const correlationId = firstString(req.headers["x-amc-correlation-id"]);
       const runId = firstString(req.headers["x-amc-run-id"]);

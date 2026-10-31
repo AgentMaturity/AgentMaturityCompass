@@ -151,17 +151,20 @@ function keyedSpan(words: string, value: string, issued: IssuedToken, charge: (l
   const span = detectProtectedText(context, issued).find(found => found.start < prefix.length && found.end > prefix.length);
   return span === undefined ? undefined : { dataClass: span.dataClass, detector: span.detector };
 }
+/** A member name as a reader finally reads it: JSON then web escapes decoded, round by round, until they settle. */
+const decodedName = (key: string, round = 1): string => { const next = decodeWebEscapes(decodeJsonEscapes(key));
+  return next === key || round >= MAX_DECODE_PASSES ? next : decodedName(next, round + 1); };
 /**
- * The detection `value` is under its member, field, header or flag name `key`: a credential by the name alone
+ * The detection `value` is under its member, field, header or flag name `key` (decoded, `decodedName`): a credential by the name alone
  * (`secretMember`; `secretDetector` names it: `secret_json` for a member of parsed JSON, else the rule's), else what the
  * name beside the value completes (`keyedSpan`). Callers replace or tokenize the whole value.
  */
 function memberFinding(key: string | undefined, value: string, issued: IssuedToken, charge: (length: number) => void,
   secretDetector: string): Finding | undefined {
   if (key === undefined || value === "") return undefined;
-  const words = memberWords(key);
+  const name = decodedName(key), words = memberWords(name);
   const rest = value.includes("[[amc:") ? withoutTokens(value, issued) : value;
-  if (secretMember(key, words, rest)) return { dataClass: "credential", detector: secretDetector };
+  if (secretMember(name, words, rest)) return { dataClass: "credential", detector: secretDetector };
   return keyedSpan(words, value, issued, charge);
 }
 /**
@@ -177,11 +180,12 @@ const CREDENTIAL_RULES: readonly { readonly type: string; readonly re: RegExp }[
 ]);
 // Each rule compiled for scanning once (per unit, compiling them again cost more than the scan); `re` stays non-global.
 const CREDENTIAL_SCANS: readonly RegExp[] = CREDENTIAL_RULES.map(rule => new RegExp(rule.re.source, `${rule.re.flags}gd`));
-const MEMBER_KEY = String.raw`(?<k>[A-Za-z0-9_.-]{1,64})`;
+const MEMBER_KEY = String.raw`(?<k>(?:[A-Za-z0-9_.-]|\\+u[0-9A-Fa-f]{4}){1,64})`;
 /**
  * Name and value pairs in exact text: a quoted member (JSON, a Python or JS literal, a string or a number, its quotes
  * escaped once too: JSON in a JSON string), a form, query or command-line field, a multipart form part, and an env or YAML
- * line. Each value is checked with its name (`memberFinding`); only the value is replaced. A decoded view runs only the
+ * line. A name may spell characters as `\uXXXX`, escaped again at each level of nesting. Each value is checked with its
+ * name, decoded (`memberFinding`); only the value is replaced. A decoded view runs only the
  * rules that do not depend on where quotes fall (`exactOnly: false`): decoding an escaped backslash before a closing quote
  * leaves an escaped quote, so a quoted member's value would run on to the next quote.
  */
@@ -204,7 +208,7 @@ export const DETECTOR_SET_DIGEST = sha256Hex(canonicalize({
   secretMembers: SECRET_MEMBER.source, secretMemberNames: SECRET_MEMBER_NAME.source, pageTokenNames: PAGE_TOKEN_NAME.source,
   keyedNames: KEYWORD_BOUND.source, webEscapes: { source: WEB_ESCAPE.source, named: NAMED_REFERENCES },
   base64Runs: { source: BASE64_RUN.source, controls: CONTROL_CHARS.source }, tokenFormat: TOKEN_PATTERN_SOURCE,
-  walk: { revision: "protected-walk-v1", order: "json>base64>web", maxDecodePasses: MAX_DECODE_PASSES, viewRules: "dlp+shape+assign+line" },
+  walk: { revision: "protected-walk-v2", order: "json>base64>web", maxDecodePasses: MAX_DECODE_PASSES, viewRules: "dlp+shape+assign+line" },
   limits: { maxDepth: MAX_DEPTH, maxLeafChars: MAX_PROTECTED_TEXT_CHARS, maxRequestScanChars: MAX_REQUEST_SCAN_CHARS,
     unitCharge: UNIT_CHARGE, keyedContextChars: KEYED_CONTEXT_CHARS }
 }));

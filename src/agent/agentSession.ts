@@ -12,6 +12,7 @@ import { agentToolset, type AgentToolset, type AgentToolsetOptions } from "./age
 import type { NativeToolCapability } from "./nativeToolCapabilities.js";
 import type { ExplicitShellOptIn } from "../sandbox/nativeShellGate.js";
 import type { NativeValidationPlan, NativeValidationResult } from "./nativeValidation.js";
+import type { NativeRunDiagnostic } from "./nativeFailureGuidance.js";
 import { EMPTY_TOOL_SEAM, type AgentToolSeam } from "./toolSeam.js";
 import type { AgentStatus, CompactionConfig, InboxReceipt } from "./loopTypes.js";
 import { resolveCompactionConfig } from "./compaction/promptPressure.js";
@@ -134,6 +135,8 @@ export type AgentPromptResult =
       readonly reason: string;
       /** Recorded failure codes of the failed turn (e.g. AMC_NATIVE_BUDGET_REFUSED), so a client can tell AMC's refusal from a provider's. */
       readonly failureCodes?: readonly string[];
+      /** With DATA_FLOW_REFUSED (P2-02): the recorded refusal's reason, processor and purpose, never the refused content. */
+      readonly dataFlow?: NativeRunDiagnostic["dataFlow"];
       /** Original durable admission when a caller retries an already admitted request id. */
       readonly submission?: InboxReceipt;
     };
@@ -386,9 +389,10 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
           const failed = endings.find(ending => ending.reason === "error" || ending.reason === "interrupted"
             || !knownEndings.some(reason => reason === ending.reason));
           if (failed) {
-            const failureCodes = (summary.diagnostics ?? []).filter(row => row.turn === failed.turn).map(row => row.guidance.code);
+            const diagnostics = (summary.diagnostics ?? []).filter(row => row.turn === failed.turn);
+            const failureCodes = diagnostics.map(row => row.guidance.code), dataFlow = diagnostics.filter(row => row.dataFlow).at(-1)?.dataFlow;
             return { ok: false, reason: `signed turn ${failed.turn} ended ${failed.reason}; idle is not successful completion`,
-              ...(failureCodes.length === 0 ? {} : { failureCodes }) };
+              ...(failureCodes.length === 0 ? {} : { failureCodes }), ...(dataFlow === undefined ? {} : { dataFlow }) };
           }
           const turnEndReason = knownEndings.find(reason => reason === endings.at(-1)?.reason);
           if (turnEndReason === undefined) return { ok: false, reason: "the prompt produced no recorded turn ending" };

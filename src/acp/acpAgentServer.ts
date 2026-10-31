@@ -547,6 +547,7 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
         flush(entry, request.sessionId, false);
         throw new AcpFailure(ACP_ERROR.internal, "the turn did not complete", { reason: outcome.reason,
           ...(outcome.failureCodes?.length ? { failureCodes: [...outcome.failureCodes] } : {}),
+          ...(outcome.dataFlow ? { dataFlow: outcome.dataFlow } : {}),
           ...(outcome.submission ? { submission: outcome.submission } : {}), ...executionOf(request.sessionId, "error") });
       }
 
