@@ -2,8 +2,7 @@ import { randomBytes, timingSafeEqual } from "node:crypto";
 import { lookup } from "node:dns/promises";
 import { createServer, request as httpRequest, type IncomingMessage } from "node:http";
 import { connect, isIP, type Socket } from "node:net";
-import { canonicalHost, decideEgress } from "../../enforce/egressAllowlist.js";
-import { pinnedLookup } from "../../gateway/requestFieldGuard.js";
+import { canonicalHost, decideEgress, pinnedLookup } from "../../enforce/egressAllowlist.js";
 import { checkEgress, isEgressRefusal } from "../../residency/checkEgress.js";
 import type { ShellEgressRow } from "../sandboxTypes.js";
 
