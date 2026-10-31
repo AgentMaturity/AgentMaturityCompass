@@ -8,7 +8,7 @@ import { afterEach, describe, expect, test, vi } from "vitest";
 import { ToolRegistry } from "../src/tools/toolRegistry.js";
 import { ToolPipeline } from "../src/tools/toolPipeline.js";
 import { bashTool } from "../src/tools/builtin/bashTool.js";
-import { stripAmcSecrets, stripProviderKeys } from "../src/utils/providerKeys.js";
+import { runtimeChildEnv, stripAmcSecrets, stripProviderKeys } from "../src/utils/providerKeys.js";
 import { initWorkspace } from "../src/workspace.js";
 import { adaptersConfigureCli } from "../src/adapters/adapterCli.js";
 import { runAdapterCommand } from "../src/adapters/adapterRunner.js";
@@ -59,6 +59,15 @@ describe("DXB-14: the unconfined shell gets an allow-listed environment", () => 
     expect(Object.keys(env).sort()).toEqual(["AMC_TOKEN", "GH_TOKEN", "PATH"]);
     // A diagnosed runtime that calls its provider directly keeps its own key, never AMC's secrets.
     expect(Object.keys(stripAmcSecrets({ ...SECRETS, OPENAI_API_KEY: "k" })).sort()).toEqual(["GH_TOKEN", "OPENAI_API_KEY"]);
+  });
+});
+
+describe("secrets the WP36 name pattern missed (secsweep 2026-10-31)", () => {
+  test("the Postgres URL file and the privacy hash salt reach no launched agent; the AMC runtime child keeps them", () => {
+    const parent = { AMC_POSTGRES_URL_FILE: "/run/secrets/pg-url", AMC_PRIVACY_HASH_SALT: "wp36-salt-value", PATH: "/bin" };
+    expect(Object.keys(stripProviderKeys(parent))).toEqual(["PATH"]);
+    expect(Object.keys(stripAmcSecrets(parent))).toEqual(["PATH"]);
+    expect(runtimeChildEnv(parent)).toMatchObject({ AMC_POSTGRES_URL_FILE: "/run/secrets/pg-url", AMC_PRIVACY_HASH_SALT: "wp36-salt-value" });
   });
 });
 

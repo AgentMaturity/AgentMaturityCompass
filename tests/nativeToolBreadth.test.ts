@@ -29,6 +29,7 @@ import { startAcpStdio } from "../src/acp/acpStdioMain.js";
 import { initBudgets } from "../src/budgets/budgets.js";
 import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 import { registerAgentCommands, type AgentLoopCliIo } from "../src/cli-agent-commands.js";
+import { openSessionEventStore } from "../src/persistence/openSessionEventStore.js";
 
 /**
  * The P1-43 breadth tools (DXC-27, WP40): web_fetch, web_search, ask_user,
@@ -430,8 +431,14 @@ describe("amc agent-loop run flags (D45, DXC-24, DXC-25)", () => {
   it("runs bounded goal rounds through --goal-rounds and reports how they stopped", async () => {
     const { out, failures, errors } = await runCli(["--tools", "workspace", "--delegate", "--goal-rounds", "2", "--json"]);
     expect(failures, errors.join("\n")).toEqual([]);
-    const summary = JSON.parse(out.at(-1)!) as { goalRounds?: { rounds: number; stoppedBy: string } };
+    const summary = JSON.parse(out.at(-1)!) as { sessionId: string; goalRounds?: { rounds: number; stoppedBy: string } };
     expect(summary.goalRounds).toMatchObject({ rounds: 2, stoppedBy: "max-rounds" });
+    // A successful goal-rounds parent is sealed "completed", never "composition_failed".
+    const reader = openSessionEventStore(dir, undefined, { readOnly: true });
+    try {
+      const close = [...reader.readSessionEvents(summary.sessionId)].find((row) => row.event_type === "session/close");
+      expect(JSON.parse(close!.meta_json)).toMatchObject({ reason: "completed" });
+    } finally { reader.close(); }
   }, 60_000);
 
   it("applies the signed child stop conditions to every goal round", async () => {

@@ -2,7 +2,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import type { EvidenceOutcome } from "../types.js";
 import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
-import { readTransparencyEntries, transparencyLogPath, verifyTransparencyLog } from "../transparency/logChain.js";
+import { transparencyLogPath, verifiedTransparencyLog } from "../transparency/logChain.js";
 import { pathExists } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { transformPlanSchema, type TransformPlan } from "../transformation/transformTasks.js";
@@ -52,10 +52,9 @@ export function loadForecastTransformPlan(workspace: string, scope: ForecastScop
  */
 function transformPlanAnchorProblem(workspace: string, scope: ForecastScope, plan: TransformPlan, latestBytes: Buffer): string | null {
   if (!pathExists(transparencyLogPath(workspace))) return "Transform plan has no transparency record.";
-  const log = verifyTransparencyLog(workspace);
+  const log = verifiedTransparencyLog(workspace);
   if (!log.ok) return "Transform plan freshness is unverifiable: the transparency log does not verify.";
-  const entries = readTransparencyEntries(workspace);
-  if ((entries.at(-1)?.hash ?? "") !== log.lastHash) return "Transform plan freshness is unverifiable: the transparency log changed while reading.";
+  const entries = log.entries; // the verified read itself: a second read could be a log swapped after verification
   const agentId = scope.type === "AGENT" ? scope.id : `node:${scope.id}`;
   const anchor = entries.filter((entry) => entry.agentId === agentId
     && (entry.type === "TRANSFORM_PLAN_CREATED" || entry.type === "TRANSFORM_PLAN_UPDATED")).at(-1);

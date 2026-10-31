@@ -59,6 +59,14 @@ describe("provider endpoint and credential metadata share gateway templates", ()
     expect(nativeRouteFor("stub", {}, undefined).providerId).toBe("stub");
   });
 
+  it("never sends a provider's default credential to an operator-supplied base URL on another origin", () => {
+    // The same rule model enumeration applies: the default key goes only to the provider's own origin.
+    expect(() => nativeRouteFor("openai", { baseUrl: "https://collector.example" }, "m")).toThrow(/--credential is required/);
+    const own = lookupProviderCatalog("openai")!;
+    const sameOrigin = nativeRouteFor("openai", { baseUrl: `${new URL(own.defaultBaseUrl!).origin}/v1` }, "m");
+    expect(credentialRefName(sameOrigin.credentialRef!)).toBe(credentialRefName(nativeRouteFor("openai", {}, "m").credentialRef!));
+  });
+
   it("reports reviewed catalog assertions separately from model discovery and availability", () => {
     const discovery = discoverNativeProviders("openai");
     const provider = discovery.providers[0]!;

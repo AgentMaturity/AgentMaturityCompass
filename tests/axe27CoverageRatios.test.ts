@@ -31,6 +31,17 @@ describe("AXE-27 missing coverage", () => {
     const result = new RegulatoryMonitor({ feeds: [] }).assessImpact(change, [{ agentId: "invalid", dimensionScores: { governance: Number.NaN } }]);
     expect(result.scoreImpact[0]).toMatchObject({ currentAvg: null, projectedAvg: null, delta: null, outcome: "not_evaluated" });
   });
+  test("assumed coverage and unevaluated fleets are not labelled measured (secsweep 2026-10-31)", () => {
+    const change: RegulatoryChange = { id: "c", framework: "test", changeType: "guidance_update", title: "c", description: "c", effectiveDate: 1, publishedDate: 1, impactedControls: ["risk_management"], source: "manual", sourceType: "manual", severity: "low", jurisdictions: [], humanReviewed: true, contentHash: "c" };
+    const monitor = new RegulatoryMonitor({ feeds: [] });
+    // No covered list: coverage would be computed from the assumption that every mapped control is covered.
+    expect(monitor.analyzeGap(change).outcome).toBe("not_evaluated");
+    expect(monitor.analyzeGap(change, ["risk_management"]).outcome).toBe("measured");
+    // Every score NaN, or no impacted control mapping to a dimension: nothing was evaluated.
+    expect(monitor.assessImpact(change, [{ agentId: "a", dimensionScores: { governance: Number.NaN } }])).toMatchObject({ complianceRisk: null, outcome: "not_evaluated", sampleSize: 0 });
+    const unmapped = { ...change, impactedControls: ["owned_unmapped_control"] };
+    expect(monitor.assessImpact(unmapped, [{ agentId: "a", dimensionScores: { governance: 10 } }])).toMatchObject({ complianceRisk: null, outcome: "not_evaluated" });
+  });
   test("no MCP attacks cannot pass or yield finite attack metrics", () => {
     const result = analyzeMCPSecurityResilience([]);
     expect(result).toMatchObject({ passed: false, attackSuccessRate: null, performanceUnderAttack: null, outcome: "not_evaluated", sampleSize: 0 });

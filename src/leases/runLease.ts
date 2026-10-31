@@ -18,12 +18,14 @@ const RUN_LEASE_TTL_MS = 60 * 60_000;
  * The OS account is a local binding: whoever runs as it and can unlock the vault's lease key acts as that user.
  */
 export function runLease(input: { readonly workspace: string; readonly agentId: string; readonly model: string; readonly tools: string;
-  readonly leaseToken?: string }): { readonly leaseToken?: string } {
+  readonly leaseToken?: string;
+  /** An authenticated requester's `LOCAL_USER:<userId>` (Studio executed trials), or null for one with no user (the admin token), in place of the OS user. */
+  readonly principalKey?: string | null }): { readonly leaseToken?: string } {
   if (input.leaseToken !== undefined) return { leaseToken: input.leaseToken };
   if (input.tools !== "workspace" || !planRequiresPrincipal(input.workspace)) return {};
   // P2-25: the OS user's users.yaml user roots a signed delegation chain the lease binds (lease v2).
   return { leaseToken: issueSessionLease({ workspace: input.workspace, workspaceId: workspaceIdFromDirectory(input.workspace),
-    agentId: input.agentId, principalKey: osUserPrincipalKey(input.workspace), ttlMs: RUN_LEASE_TTL_MS, scopes: ["toolhub:execute"],
+    agentId: input.agentId, principalKey: input.principalKey !== undefined ? input.principalKey : osUserPrincipalKey(input.workspace), ttlMs: RUN_LEASE_TTL_MS, scopes: ["toolhub:execute"],
     // Gateway-only fields: the lease has no gateway scope, so they grant the least the schema allows.
     routeAllowlist: ["/native-run"], modelAllowlist: [input.model], maxTokensPerMinute: 1, maxRequestsPerMinute: 1, maxCostUsdPerDay: null }).token };
 }

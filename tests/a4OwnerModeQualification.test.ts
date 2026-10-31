@@ -11,6 +11,8 @@ const originalA4Paths = ["a4 approve", "a4 complete", "a4 deny", "a4 deploy reco
   "a4 gate-policy", "a4 hold", "a4 members", "a4 release", "a4 reopen", "a4 request-changes", "a4 resume",
   "a4 retire", "a4 rollback", "a4 tune"] as const;
 const acknowledgePath = "a4 acknowledge"; // Accepted P1-57 addition, preserved alongside the original paths.
+// Governed Studio A4 writes whose gate names were missing from the set (secsweep 2026-10-31): agent mode let them through.
+const studioWritePaths = ["a4 build", "a4 connect", "a4 erase", "a4 import", "a4 resolve", "a4 scaffold"] as const;
 const nonblockedPaths = ["a4 guide", "a4 list", "a4 show", "a4 readiness", "a4 verify", "run", "score run"];
 const roots: string[] = [];
 const records: Array<Record<string, unknown>> = [];
@@ -72,7 +74,17 @@ describe("P0-54 actual owner-mode helper contracts", () => {
     expect(new Set(originalA4Paths).size).toBe(16);
     const source = readFileSync("src/mode/mode.ts", "utf8");
     const current = [...source.matchAll(/^\s*"(a4 [^"]+)"/gm)].map(match => match[1]);
-    expect(current.sort()).toEqual([...originalA4Paths, acknowledgePath].sort());
+    expect(current.sort()).toEqual([...originalA4Paths, acknowledgePath, ...studioWritePaths].sort());
+  });
+
+  test.each(studioWritePaths)("agent mode refuses the Studio A4 write %s", path => {
+    expect(observe(path, "agent")).toBeInstanceOf(Error);
+    expect(observe(path, "owner")).toBeUndefined();
+  });
+
+  test("the deployment receipt and check gates name the paths the set blocks", () => {
+    expect(readFileSync("src/a4/a4Deploy.ts", "utf8")).toContain('assertOwnerMode(store.workspace, "a4 deploy record")');
+    expect(readFileSync("src/a4/a4DeployVerify.ts", "utf8")).toContain('assertOwnerMode(store.workspace, "a4 deploy verify")');
   });
 
   test.each(originalA4Paths)("agent mode refuses the original path %s without changing bytes or links", path => {

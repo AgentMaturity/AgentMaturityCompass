@@ -505,3 +505,13 @@ test("H2X-29: readiness warns about measurement language in task descriptions wi
   expect(preview.ready).toBe(true);
   expect(preview.warnings).toEqual(["task success description: agent-facing text uses measurement language (rubric, scored); the solver may learn it is being evaluated."]);
 });
+
+test("the oracle runs outside the workspace the target just wrote, so cwd-scoped configuration cannot seed it", async () => {
+  // The target writes a file into its own working directory; an oracle reading cwd-scoped config would find it there.
+  const context = fixture(`import fs from 'node:fs'; fs.writeFileSync('.oracle-config', 'planted'); console.log('task-done');`,
+    `import fs from 'node:fs'; let text=''; for await (const chunk of process.stdin) text+=chunk;
+const planted=fs.existsSync('.oracle-config'); const passed=!planted;
+console.log(JSON.stringify({schemaVersion:'2026-09-08',verdict:passed?'pass':'fail',checks:[{id:'cwd-isolated',passed,evidence:'The oracle cwd holds no file the target wrote.'}]}));`);
+  const report = await context.run();
+  expect(report.trials[0]!.oracle).toMatchObject({ verdict: "pass" });
+}, 20_000);

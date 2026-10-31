@@ -3,7 +3,8 @@ import { z } from "zod";
 export const experimentSchema = z.object({
   experiment: z.object({
     version: z.literal(1),
-    experimentId: z.string().min(1),
+    // Also an HTML attribute and a path segment in the Studio console: never markup or a separator.
+    experimentId: z.string().regex(/^[A-Za-z0-9_-]+$/),
     agentId: z.string().min(1),
     name: z.string().min(1),
     casebookId: z.string().min(1),

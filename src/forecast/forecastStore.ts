@@ -96,6 +96,17 @@ export function captureVerifiedForecastArtifact(workspace: string, scope: Foreca
   }
 }
 export function verifyLatestForecastArtifact(workspace: string, scope: ForecastScope): SignedFileVerification { return captureVerifiedForecastArtifact(workspace, scope).file; }
+/**
+ * The latest forecast only when its signature verifies over the bytes parsed and it is this scope's: an invalid file, or
+ * a signed forecast copied from another scope, is absent.
+ */
+export function loadVerifiedForecastArtifact(workspace: string, scope: ForecastScope): ForecastArtifact | null {
+  const captured = captureVerifiedForecastArtifact(workspace, scope);
+  if (!captured.file.valid) return null;
+  let artifact: ForecastArtifact;
+  try { artifact = captured.parse(); } catch { return null; }
+  return artifact.scope.type === scope.type && artifact.scope.id === scope.id ? artifact : null;
+}
 export function saveAdvisory(workspace: string, advisory: AdvisoryRecord) { return publishOrgPairs(workspace, advisoryWrites(workspace, advisory))[0]!; }
 export function captureAdvisory(workspace: string, advisoryId: string) {
   const path = forecastAdvisoryPath(workspace, advisoryId), captured = pairVerification(workspace, path);

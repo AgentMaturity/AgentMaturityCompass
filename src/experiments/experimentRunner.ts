@@ -147,7 +147,7 @@ function toMarkdown(report: ExperimentReport): string {
     `- Mode: ${report.mode}`,
     `- Casebook: ${report.casebookId}`,
     `- Schema: ${report.schemaVersion === 2 ? `v2 (${report.methodVersion ?? "unknown method"})` : "legacy (not promotion-eligible)"}`,
-    ...(counts ? [`- Cases: ${counts.cases} (paired ${counts.pairedCases}, excluded ${counts.excludedCases})`] : []),
+    ...(counts ? [`- Cases: ${counts.cases} (paired ${counts.pairedCases}, excluded ${counts.excludedCases}, candidate unavailable ${counts.candidateUnavailable ?? 0})`] : []),
     `- Baseline success rate: ${report.baselineSuccessRate.toFixed(4)}`,
     `- Candidate success rate: ${report.candidateSuccessRate.toFixed(4)}`,
     `- Uplift success rate: ${report.upliftSuccessRate.toFixed(4)}`,
@@ -383,22 +383,23 @@ function prepareExperimentReport(params: ExperimentRunParams) {
     if (trials && row.execution?.caseSha256 !== candidate.execution?.caseSha256) {
       throw new Error(`Case '${row.caseId}' differs between the baseline and candidate casebooks.`);
     }
+    // Baseline determined, candidate unavailable (max_steps, timeout): a candidate failure, never an exclusion it could choose.
+    const dropped = row.status !== "unavailable" && candidate.status === "unavailable";
     return {
-      caseId: row.caseId,
-      title: row.title,
+      caseId: row.caseId, title: row.title,
       baselineSuccess: row.success,
-      candidateSuccess: candidate.success,
+      candidateSuccess: dropped ? false : candidate.success,
       baselineValuePoints: row.valuePoints,
-      candidateValuePoints: candidate.valuePoints === null ? null : Number(candidate.valuePoints.toFixed(4)),
+      candidateValuePoints: dropped ? 0 : candidate.valuePoints === null ? null : Number(candidate.valuePoints.toFixed(4)),
       baselineSuccessPoints: row.successPoints,
-      candidateSuccessPoints: candidate.successPoints,
+      candidateSuccessPoints: dropped ? 0 : candidate.successPoints,
       baselineCost: row.costTokens,
       candidateCost: candidate.costTokens === null ? null : Number(candidate.costTokens.toFixed(6)),
       reasons: row.reasons,
       baselineStatus: row.status,
       candidateStatus: candidate.status,
       candidateReasons: candidate.reasons,
-      paired: row.status !== "unavailable" && candidate.status !== "unavailable",
+      paired: row.status !== "unavailable",
       baselineExecution: executionOf(row),
       candidateExecution: executionOf(candidate)
     };
@@ -428,6 +429,7 @@ function prepareExperimentReport(params: ExperimentRunParams) {
   const warnings: string[] = ["Value scores use points on a 0..100 scale; success rates use fractions and cost uses tokens, not currency."];
   if (paired.length < DEFAULT_MIN_PAIRED_CASES) warnings.push(`${paired.length} paired case(s); at least ${DEFAULT_MIN_PAIRED_CASES} required by the default gate. Small samples do not establish a reliable uplift.`);
   if (paired.length < cases.length) warnings.push(`${cases.length - paired.length} case(s) excluded because evidence was unavailable on one or both sides; conditional averages cover only ${paired.length} paired cases.`);
+  const candidateUnavailable = paired.filter(row => row.candidateStatus === "unavailable").length; if (candidateUnavailable > 0) warnings.push(`${candidateUnavailable} case(s) the baseline determined were left unavailable by the candidate and are scored as candidate failures.`);
   if (baselineSuccesses === 0) warnings.push("Baseline has zero successful cases; tokens per success are unavailable.");
   if (candidateSuccesses === 0) warnings.push("Candidate has zero successful cases; tokens per success are unavailable.");
   if (paired.some(row => row.baselineCost === null || row.candidateCost === null)) warnings.push("Token usage is missing for at least one paired case; cost per success is unavailable on the affected side.");
@@ -447,7 +449,7 @@ function prepareExperimentReport(params: ExperimentRunParams) {
     baseline: sideIdentity(baselineRun),
     candidate: sideIdentity(candidateRun),
     pairing: "paired-cases" as const,
-    counts: { cases: cases.length, pairedCases: paired.length, excludedCases: cases.length - paired.length, baselineSuccesses, candidateSuccesses },
+    counts: { cases: cases.length, pairedCases: paired.length, excludedCases: cases.length - paired.length, candidateUnavailable, baselineSuccesses, candidateSuccesses },
     costUnit: "tokens" as const,
     valueUnit: "points" as const,
     warnings,

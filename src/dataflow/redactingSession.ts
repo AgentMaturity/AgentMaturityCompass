@@ -22,6 +22,7 @@ import { NATIVE_AUDIO_INPUT_FORMAT } from "../attachments/nativeAudioInput.js";
 import { NATIVE_IMAGE_INPUT_FORMAT } from "../attachments/nativeImageInput.js";
 import { NATIVE_ORDERED_INPUT_FORMAT } from "../attachments/nativeOrderedInput.js";
 import { OUTCOME_UNKNOWN_NOTICES } from "../agent/pipelineToolSeam.js";
+import { requestFingerprint } from "../agent/inbox.js";
 import type { SessionEventRef, SessionService } from "../session/sessionService.js";
 import { findToolDefinition, loadVerifiedToolsConfigSnapshot } from "../toolhub/toolhubValidators.js";
 import { RUN_CODE_TOOL } from "../tools/toolPipeline.js";
@@ -190,7 +191,7 @@ const MEDIA_INPUT_PREFIXES = [NATIVE_IMAGE_INPUT_FORMAT, NATIVE_ORDERED_INPUT_FO
  * Every other member is the session's own.
  */
 export function createRedactingSession(session: SessionService, redactor: Redactor, active: () => boolean = () => true): SessionService {
-  const spilledDescriptors = new Set<string>();
+  const spilledDescriptors = new Map<string, Buffer>(); // descriptor -> the redacted bytes it commits
   const redact = (text: string, source: RedactionReceiptV1["source"], callId: string | null, declared?: DeclaredFields,
     unparseable?: "refuse" | "detectors"): string => redactWithReceipt(session, redactor, text, source, callId, declared, unparseable);
   /**
@@ -295,8 +296,11 @@ export function createRedactingSession(session: SessionService, redactor: Redact
     recordLoopEvent(record: Parameters<SessionService["recordLoopEvent"]>[0]): SessionEventRef {
       if (!active() || record.kind !== "inbox" || record.op !== "insert" || record.text === null) return session.recordLoopEvent(record);
       if (record.payloadFormat !== undefined) throw new RedactionRefused("attachment_not_redactable");
-      if (spilledDescriptors.has(record.text)) return session.recordLoopEvent(record);
-      return session.recordLoopEvent({ ...record, text: redact(record.text, "loop/inbox", null) });
+      const spilled = spilledDescriptors.get(record.text), text = spilled === undefined ? redact(record.text, "loop/inbox", null) : record.text;
+      // The request digest covers the committed bytes, never the raw text: a digest of a short protected value is
+      // brute-forced from evidence, and replay recomputes it over what was stored.
+      return session.recordLoopEvent({ ...record, text, ...(record.clientRequestId === undefined || record.origin === null ? {} : {
+        clientRequestSha256: requestFingerprint(record.target, record.origin, record.wake, record.demotedFrom, undefined, spilled ?? Buffer.from(text, "utf8")) }) });
     },
     retainOversizeInput(...[what, bytes, cap, subject]: Parameters<SessionService["retainOversizeInput"]>): ReturnType<SessionService["retainOversizeInput"]> {
       if (!active() || subject.subject !== "loop/inbox") return session.retainOversizeInput(what, bytes, cap, subject);
@@ -304,7 +308,7 @@ export function createRedactingSession(session: SessionService, redactor: Redact
       if (MEDIA_INPUT_PREFIXES.some(prefix => bytes.subarray(0, prefix.length).equals(prefix))) throw new RedactionRefused("attachment_not_redactable");
       const redacted = Buffer.from(redact(decodeText(bytes, "content_not_text"), "loop/inbox", null), "utf8");
       const retained = session.retainOversizeInput(what, redacted, cap, subject);
-      spilledDescriptors.add(retained.descriptor.toString("utf8"));
+      spilledDescriptors.set(retained.descriptor.toString("utf8"), redacted);
       return retained;
     }
   };

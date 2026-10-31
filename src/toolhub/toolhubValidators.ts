@@ -51,13 +51,13 @@ export interface VerifiedToolsConfigSnapshot {
   config: ToolsConfig | null;
 }
 
-function globToRegex(glob: string): RegExp {
+function globToRegex(glob: string, flags = ""): RegExp {
   const escaped = glob
     .replace(/[.+^${}()|[\]\\]/g, "\\$&")
     .replace(/\*\*/g, "::GLOBSTAR::")
     .replace(/\*/g, "[^/]*")
     .replace(/::GLOBSTAR::/g, ".*");
-  return new RegExp(`^${escaped}$`);
+  return new RegExp(`^${escaped}$`, flags);
 }
 
 export function toolsConfigPath(workspace: string): string {
@@ -367,7 +367,8 @@ export function pathAllowedByPatterns(workspace: string, candidatePath: string, 
   }
 
   if (deny.length > 0) {
-    const denied = deny.some((pattern) => globToRegex(normalizePattern(pattern)).test(relWithDot));
+    // Case-insensitive, so a deny holds against `.AMC` on a case-insensitive volume; it can only deny more.
+    const denied = deny.some((pattern) => globToRegex(normalizePattern(pattern), "i").test(relWithDot));
     if (denied) {
       return { ok: false, reason: `path '${relWithDot}' blocked by denylist`, resolvedPath };
     }

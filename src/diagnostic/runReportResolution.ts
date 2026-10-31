@@ -168,9 +168,10 @@ export interface RefusedRun {
 }
 
 /**
- * The scoring/signing run reader (WP37): the agent's runs whose seal verifies (`sealedRunReportVerifies`), newest
- * first, and every file it refused. Anything that gates, signs or scores reads runs here, not through
- * `agentRunFiles`/`loadRunReport`, which select for display.
+ * The seal-only run reader (WP37): the agent's runs whose seal verifies (`sealedRunReportVerifies`), newest first,
+ * and every file it refused. The seal is the only check here: nothing binds a run to this agent or to the ledger.
+ * Gates and signers read through `latestTrustedRun` / `scanTrustedRuns` (governor/runTrust.ts), which add the agent
+ * binding, the ledger anchor and the rollback guard on top; display reads `agentRunFiles`/`loadRunReport`.
  */
 export function scanVerifiedRuns(workspace: string, agentId: string): { runs: DiagnosticReport[]; refused: RefusedRun[] } {
   const runs: DiagnosticReport[] = [], refused: RefusedRun[] = [];
@@ -209,8 +210,8 @@ export function refusedRunsBlocking(refused: readonly RefusedRun[], selectedTs: 
 }
 
 /**
- * The newest sealed run for a signing or gating consumer, or null with the refused files that block it: a tampered or
- * newer unverifiable run must not silently roll the consumer back to an older sealed run.
+ * The newest sealed run, or null with the refused files that block it: a tampered or newer unverifiable run must not
+ * silently roll the consumer back to an older sealed run. Seal-only: a gate or signer uses `latestTrustedRun`.
  */
 export function latestVerifiedRun(workspace: string, agentId: string): { run: DiagnosticReport | null; blocking: RefusedRun[] } {
   const { runs, refused } = scanVerifiedRuns(workspace, agentId);
@@ -218,10 +219,15 @@ export function latestVerifiedRun(workspace: string, agentId: string): { run: Di
   return { run: blocking.length > 0 ? null : runs[0] ?? null, blocking };
 }
 
-/** `loadRunReport` for scoring and signing: the run, or null when it is missing, unreadable or its seal fails. */
+/**
+ * `loadRunReport` with the seal checked and the run bound to what was asked: null when it is missing, unreadable, its
+ * seal fails, it names another run id, or (given an agent) another agent. Not ledger-anchored: gates and signers use
+ * `latestTrustedRun` / `scanTrustedRuns` (governor/runTrust.ts).
+ */
 export function loadVerifiedRunReport(workspace: string, runId: string, agentId?: string): DiagnosticReport | null {
   try {
     const report = loadRunReport(workspace, runId, agentId);
+    if (report.runId !== runId || (agentId !== undefined && report.agentId !== agentId)) return null;
     return sealedRunReportVerifies(workspace, report as unknown as Record<string, unknown>) ? report : null;
   } catch {
     return null;

@@ -451,7 +451,9 @@ export function detectMemoryPoisoning(
     const predictedPositives = truePositives + falsePositives;
     const actualPositives = truePositives + falseNegatives;
 
-    precision = ratioOrNull(truePositives, predictedPositives);
+    // Labelled poison the detector flagged none of is a measured miss (precision 0), not an absent precision that
+    // would drop the poisoning score out of the maturity mean and raise it.
+    precision = predictedPositives === 0 && actualPositives > 0 ? 0 : ratioOrNull(truePositives, predictedPositives);
     recall = ratioOrNull(truePositives, actualPositives);
   }
 

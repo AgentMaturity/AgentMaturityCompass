@@ -19,12 +19,18 @@ import type { ForecastArtifact } from "../src/forecast/forecastSchema.js";
 import { rotatePurposeKeys } from "../src/keys/purposeKeys.js";
 import { getSigningKey, signHexDigest } from "../src/crypto/keys.js";
 import { sha256Hex } from "../src/utils/hash.js";
-import { verifySignedFileWithAuditor } from "../src/org/orgSigner.js";
+import { signFileWithAuditor, verifySignedFileWithAuditor } from "../src/org/orgSigner.js";
 import { calculateForecast } from "../src/forecast/forecastEngine.js";
 import { renderForecastMarkdown } from "../src/forecast/forecastReports.js";
 import { startStudioApiServer } from "../src/studio/studioServer.js";
 
 afterEach(() => { vi.useRealTimers(); });
+// Real by default; one test makes a second, unverified read of the log return a different (swapped) log.
+const transparencyReads = vi.hoisted(() => ({ swapped: null as unknown[] | null }));
+vi.mock("../src/transparency/logChain.js", async (importOriginal) => {
+  const original = await importOriginal<typeof import("../src/transparency/logChain.js")>();
+  return { ...original, readTransparencyEntries: (workspace: string) => transparencyReads.swapped ?? original.readTransparencyEntries(workspace) };
+});
 
 const roots: string[] = [];
 
@@ -151,7 +157,9 @@ function writeTransformHistory(workspace: string, agentId: string): void {
   ];
   for (let i = 0; i < snapshots.length; i += 1) {
     const path = join(snapshotsDir, `${now - (5 - i) * 60_000}.json`);
-    writeFileSync(path, JSON.stringify(snapshots[i], null, 2));
+    // Forecasts read only signed snapshots whose plan scope names this agent.
+    writeFileSync(path, JSON.stringify({ ...snapshots[i], scope: { type: "AGENT", agentId } }, null, 2));
+    signFileWithAuditor(workspace, path);
   }
   writeFileSync(
     join(baseDir, "latest.json"),
@@ -305,6 +313,18 @@ describe("forecast planning", () => {
     const out = forecastRefreshCli({ workspace, scope: "agent", targetId: "default" });
     const latest = JSON.parse(readFileSync(out.latestPath!, "utf8")) as ForecastArtifact;
     expect(latest.transformPlanInput).toEqual({ outcome: "source_unavailable", reason: "Transform plan is signed for a different scope." });
+  });
+
+  test("the plan anchor is searched in the log entries that verified, not in a second read", () => {
+    const workspace = newWorkspace();
+    recordTransformPlan(workspace, validPlanFixture(workspace));
+    // A log swapped after verification: an unverified re-read sees a forged history.
+    transparencyReads.swapped = [];
+    try {
+      const out = forecastRefreshCli({ workspace, scope: "agent", targetId: "default" });
+      const latest = JSON.parse(readFileSync(out.latestPath!, "utf8")) as ForecastArtifact;
+      expect(latest.transformPlanInput?.outcome).not.toBe("source_unavailable");
+    } finally { transparencyReads.swapped = null; }
   });
 
   test("an older signed latest.json restored over a newer plan is a rollback", () => {

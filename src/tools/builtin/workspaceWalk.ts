@@ -1,5 +1,6 @@
 import { closeSync, constants, fstatSync, lstatSync, openSync, readSync, readdirSync, realpathSync, statSync } from "node:fs";
 import { isAbsolute, join, relative, resolve, sep } from "node:path";
+import { aliasedSegmentReason, fileIdentity, foldName, protectedDirectoryIdentities } from "../../toolhub/protectedPaths.js";
 
 /**
  * A bounded workspace walker (P4.3).
@@ -17,6 +18,17 @@ import { isAbsolute, join, relative, resolve, sep } from "node:path";
 
 /** Directories never worth walking, and expensive to walk by accident. */
 const SKIP_DIRECTORIES = new Set([".git", "node_modules", ".amc", "dist", "coverage", ".next"]);
+
+/**
+ * The start path is model-chosen and names alias (`.AMC` on a case-insensitive
+ * volume, `AMC~1` on Windows), so `.amc` and `.git` are refused by identity
+ * and, as the second lock, by folded name or alias shape.
+ */
+function skipDirectory(name: string, full: string, protectedIds: ReadonlySet<string>): boolean {
+  if (SKIP_DIRECTORIES.has(foldName(name)) || aliasedSegmentReason(name) !== null) return true;
+  const id = protectedIds.size === 0 ? null : fileIdentity(full);
+  return id !== null && protectedIds.has(id);
+}
 
 export interface WalkLimits {
   /** Stop after this many files have been yielded. */
@@ -157,14 +169,15 @@ function ignored(path: string, isDirectory: boolean, rules: readonly IgnoreRule[
 
 /** Walk workspace-relative paths, pruning ignored directories before they consume the file cap. */
 export function walkWorkspace(workspace: string, limits: WalkLimits): WalkResult {
-  const root = realpathSync(workspace);
+  const root = realpathSync.native(workspace);
+  const protectedIds = protectedDirectoryIdentities(root);
   const files: string[] = [];
   const start = resolve(root, limits.path ?? ".");
   const startPath = relative(root, start);
   if (startPath === ".." || startPath.startsWith(`..${sep}`) || isAbsolute(startPath)) {
     throw new Error(`search path escapes the workspace: ${limits.path}`);
   }
-  if (realpathSync(start) !== start || !statSync(start).isDirectory()) {
+  if (realpathSync.native(start) !== start || !statSync(start).isDirectory()) {
     throw new Error(`search path must be a workspace directory: ${limits.path}`);
   }
   // A scoped walk inherits ignore rules from each ancestor without visiting unrelated files.
@@ -173,7 +186,7 @@ export function walkWorkspace(workspace: string, limits: WalkLimits): WalkResult
   for (const segment of startPath === "" ? [] : startPath.split(sep)) {
     if (!limits.includeIgnored) inherited.push(...ignoreRules(root, ancestor));
     ancestor = join(ancestor, segment);
-    if (SKIP_DIRECTORIES.has(segment) || ignored(forMatching(relative(root, ancestor)), true, inherited)) {
+    if (skipDirectory(segment, ancestor, protectedIds) || ignored(forMatching(relative(root, ancestor)), true, inherited)) {
       return { files, truncated: false };
     }
   }
@@ -197,7 +210,7 @@ export function walkWorkspace(workspace: string, limits: WalkLimits): WalkResult
       const path = relative(root, full);
       if (ignored(forMatching(path), entry.isDirectory(), rules)) continue;
       if (entry.isDirectory()) {
-        if (!SKIP_DIRECTORIES.has(entry.name)) queue.push({ dir: full, rules });
+        if (!skipDirectory(entry.name, full, protectedIds)) queue.push({ dir: full, rules });
         continue;
       }
       if (!entry.isFile()) continue;

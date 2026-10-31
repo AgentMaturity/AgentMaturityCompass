@@ -340,6 +340,12 @@ export function forkSession(params: ForkSessionParams): { service: SessionServic
         if (params.inheritConversation !== undefined && typeof params.inheritConversation !== "boolean") {
           throw new SessionResumeRefused("UNSUPPORTED_FORMAT", "inheritConversation must be a boolean");
         }
+        // Continuing the conversation keeps the controls resume enforces: a session a parent or hook stopped, a
+        // delegated one, or one with an unresolved child is refused. A lineage-only fork carries no conversation.
+        if (params.inheritConversation !== false) {
+          try { assertSessionContinuationControls(loadSessionEventHistory({ workspace: params.workspace }), params.parentSessionId); }
+          catch (error) { throw error instanceof SessionContinuationControlRefused ? new SessionResumeRefused(error.code, error.message) : error; }
+        }
         const selected = params.inheritConversation === false ? { rows: all, forkTurn: undefined } : selectForkPrefix(all, params.forkTurn);
         const parts = params.inheritConversation === false ? [] : prepareForkConversation(params.workspace, selected.rows);
         const last = selected.rows.at(-1)!;

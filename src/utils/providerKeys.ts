@@ -18,11 +18,11 @@ export const PROVIDER_KEY_ENV_NAMES = [
 
 /**
  * AMC's own secrets read from the environment (vault, notary, backup and bootstrap passphrases, signing, private,
- * license and API keys, admin and session tokens, auth secrets, credential files, a parent's lease) and the `_FILE`
- * variants that point at them. No launched agent needs them; the one agent-facing name is AGENT_FACING_AMC_ENV.
+ * license and API keys, admin and session tokens, auth secrets, credential files, a parent's lease, the Postgres
+ * connection string, hash salts) and the `_FILE` variants that point at them. No launched agent needs them; the one agent-facing name is AGENT_FACING_AMC_ENV.
  */
 const AMC_SECRET_ENV_PATTERN =
-  /^AMC_[A-Z0-9_]*(PASSPHRASE|PASSWORD|SECRET|SIGNING_KEY|PRIVATE_KEY|API_KEY|LICENSE_KEY|TOKEN|AUTH|CREDENTIAL|LEASE)[A-Z0-9_]*$/;
+  /^AMC_[A-Z0-9_]*(PASSPHRASE|PASSWORD|SECRET|SIGNING_KEY|PRIVATE_KEY|API_KEY|LICENSE_KEY|TOKEN|AUTH|CREDENTIAL|LEASE|POSTGRES_URL|SALT)[A-Z0-9_]*$/;
 
 /**
  * Deliberately inherited by a wrapped agent: AMC_TOKEN is the agent's own bridge bearer token (sdk/amcClient.ts reads
@@ -79,7 +79,8 @@ export function dummyProviderKeyEnv(): Record<string, string> {
  * AMC secrets the runtime child itself needs: it signs its evidence with the workspace vault and reads AMC's credential
  * store. The child is AMC, not a model command; its shells get an allow-listed environment without these.
  */
-const RUNTIME_CHILD_AMC_SECRETS: readonly string[] = ["AMC_VAULT_PASSPHRASE", "AMC_VAULT_PASSPHRASE_FILE", "AMC_CREDENTIALS_FILE"];
+const RUNTIME_CHILD_AMC_SECRETS: readonly string[] = ["AMC_VAULT_PASSPHRASE", "AMC_VAULT_PASSPHRASE_FILE", "AMC_CREDENTIALS_FILE",
+  "AMC_POSTGRES_URL_FILE", "AMC_PRIVACY_HASH_SALT"]; // its evidence store, and the salt its own trace hashes use
 
 /** The SDK child's default environment (WP36, DXC-38): an allow-list, AMC's non-secret settings and the vault. */
 export function runtimeChildEnv(parent: NodeJS.ProcessEnv): NodeJS.ProcessEnv {

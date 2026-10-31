@@ -240,9 +240,9 @@ describe("paired statistics (WP05)", () => {
 });
 
 describe("experiment promotion verifies its inputs and keeps the baseline eligible (WP07)", () => {
-  function setup(candidateWins: boolean, caseCount = 4, options: { excludeLast?: boolean; partialUsage?: boolean; varyValues?: boolean; baselineAllFail?: boolean } = {}) {
+  function setup(candidateWins: boolean, caseCount = 4, options: { excludeLast?: boolean; partialUsage?: boolean; varyValues?: boolean; baselineAllFail?: boolean; candidateDrops?: number } = {}) {
     const ws = newWorkspace();
-    const caseIds = ["case_a", "case_b", "case_c", "case_d"].slice(0, caseCount);
+    const caseIds = ["case_a", "case_b", "case_c", "case_d", "case_e", "case_f"].slice(0, caseCount);
     writeCasebook(ws, "exp", caseIds);
     if (options.varyValues) {
       const file = join(casebookDir(ws, "exp"), "cases", `${caseIds.at(-1)!}.json`);
@@ -263,6 +263,11 @@ describe("experiment promotion verifies its inputs and keeps the baseline eligib
     caseIds.forEach((caseId, index) => {
       if (options.excludeLast && index === caseIds.length - 1) return;
       const strong = { tool: "fs.read" }, weak = { tool: candidateWins && index === 0 ? "fs.read" : "fs.write" };
+      // The candidate leaves the case without evidence (it looped to max_steps or timed out); the baseline passed it.
+      if (index >= caseIds.length - (options.candidateDrops ?? 0)) {
+        execute(ws, ref(ws, "exp", caseId, "base-1", baselineDigest), strong);
+        return;
+      }
       execute(ws, ref(ws, "exp", caseId, "base-1", baselineDigest), options.baselineAllFail ? { tool: "fs.write" } : candidateWins ? weak : strong);
       execute(ws, ref(ws, "exp", caseId, "cand-1", candidateDigest), { ...(candidateWins ? strong : weak), ...(options.partialUsage ? { usage: { input_tokens: 5 } } : {}) });
     });
@@ -290,6 +295,18 @@ describe("experiment promotion verifies its inputs and keeps the baseline eligib
     writeFileSync(candidateFile, "candidate: tampered\n");
     expect(() => runExperiment({ workspace: ws, agentId: "default", experimentId: created.experimentId, mode: "sandbox",
       candidateWindow: "1d", baselineTrialId: "base-1", candidateTrialId: "cand-1" })).toThrow(/candidate config is missing or unsigned/);
+  });
+
+  test("a case the candidate leaves unavailable is scored as a candidate failure, not dropped", () => {
+    // Before: only cases determinate on both sides were scored, so a candidate
+    // that made the three cases it would lose unavailable compared 3/3 against
+    // the baseline's 1/3 and was promoted.
+    const { run, gate } = setup(true, 6, { candidateDrops: 3 });
+    expect(run.report.counts).toMatchObject({ cases: 6, pairedCases: 6, excludedCases: 0, candidateUnavailable: 3, baselineSuccesses: 4, candidateSuccesses: 3 });
+    expect(run.report.cases.at(-1)).toMatchObject({ candidateStatus: "unavailable", candidateSuccess: false, candidateValuePoints: 0 });
+    expect(run.report.upliftSuccessRate).toBeLessThan(0);
+    expect(run.report.warnings?.join("\n")).toMatch(/3 case.*unavailable.*candidate.*scored as candidate failures/i);
+    expect(gate().status).toBe("fail");
   });
 
   test("small samples carry an explicit comparability warning", () => {

@@ -1,13 +1,11 @@
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { initWorkspace } from "../src/workspace.js";
-import { openLedger } from "../src/ledger/ledger.js";
-import { canonicalize } from "../src/utils/json.js";
-import { sha256Hex } from "../src/utils/hash.js";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
 import { scoreISO42001Coverage, scoreRegulatoryReadiness } from "../src/score/regulatoryReadiness.js";
 import { markAsAmcCheckout } from "./helpers/amcCheckout.js";
+import { writeAnchoredRun } from "./helpers/sealedRun.js";
 
 const roots: string[] = [];
 
@@ -35,17 +33,11 @@ function writeArtifact(workspace: string, relPath: string): void {
 }
 
 function writeRun(workspace: string, agentId: string, runId: string, ts: number, integrityIndex: number | null,
-  extra: Record<string, unknown> = {}): void {
-  const runPath = join(workspace, ".amc", "agents", agentId, "runs", `${runId}.json`);
-  mkdirSync(dirname(runPath), { recursive: true });
-  // Sealed the way the diagnostic writer seals: since G9-05, an unsealed run
-  // file is refused as a scoring input, so the fixture must be a real one.
-  const base = { runId, ts, ...(integrityIndex === null ? {} : { integrityIndex }), ...extra, reportJsonSha256: "", runSealSig: "" };
-  const hash = sha256Hex(canonicalize(base));
-  const ledger = openLedger(workspace);
-  const sig = ledger.signRunHash(hash);
-  ledger.close();
-  writeFileSync(runPath, `${JSON.stringify({ ...base, reportJsonSha256: hash, runSealSig: sig }, null, 2)}\n`);
+  extra: Record<string, unknown> = {}, anchor = true): void {
+  // Sealed and anchored in the ledger the way the diagnostic writer publishes a run: the readiness verdict quotes only
+  // the agent's trusted run (latestTrustedRun), so a sealed file alone is not enough.
+  writeAnchoredRun(workspace, join(workspace, ".amc", "agents", agentId, "runs"), { runId, ts, agentId, windowStartTs: ts - 1, windowEndTs: ts,
+    status: "VALID" as const, ...(integrityIndex === null ? {} : { integrityIndex }), ...extra }, { anchor });
 }
 
 function populateHighCoverageArtifacts(workspace: string): void {
@@ -146,6 +138,15 @@ describe("scoreRegulatoryReadiness", () => {
     const score = scoreRegulatoryReadiness({ workspace, agentId: "agent-reg" });
     expect(score.latestRunId).toBe("run-high");
     expect(score.latestIntegrityIndex).toBe(0.9);
+  });
+
+  test("does not quote a sealed run the ledger does not anchor, or one sealed for another agent", () => {
+    const workspace = newWorkspace();
+    writeRun(workspace, "agent-reg", "run-unanchored", 1000, 0.95, {}, false);
+    writeRun(workspace, "agent-reg", "run-foreign", 2000, 0.99, { agentId: "agent-other" });
+    const score = scoreRegulatoryReadiness({ workspace, agentId: "agent-reg" });
+    expect(score.latestRunId).toBeNull();
+    expect(score.latestIntegrityIndex).toBeNull();
   });
 
   test("ignores unsealed and malformed run files", () => {

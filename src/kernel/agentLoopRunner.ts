@@ -681,6 +681,7 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
           promptSections: prompt.assemble().sections.map(section => section.name) };
       }
       if (options.goalRounds !== undefined) {
+        composed = true; // composition succeeded: a goal-rounds parent is not sealed composition_failed
         const goalRounds = await runGoalRounds({
           workspace: options.workspace, parent: rootIdentity(options.agentId), session, runner,
           mintSessionId: randomUUID, runAs: "goal-round", goal: options.prompt, maxRounds: options.goalRounds.maxRounds,

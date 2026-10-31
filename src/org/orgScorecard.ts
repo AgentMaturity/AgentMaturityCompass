@@ -135,6 +135,26 @@ export function loadLatestOrgScorecard(workspace: string): OrgScorecard | null {
   return JSON.parse(readUtf8(path)) as OrgScorecard;
 }
 
+/**
+ * A scorecard file (latest or history) only when its `.sig` verifies over the same captured bytes, or null: a missing,
+ * unsigned or tampered file is absent to forecasts and benches, never a measurement.
+ */
+export function loadVerifiedOrgScorecardFile(workspace: string, path: string): OrgScorecard | null {
+  try {
+    const captured = captureOrgPairs([path]), body = orgPairBytes(captured, path), signature = orgPairBytes(captured, `${path}.sig`);
+    if (body === null || signature === null || !verifyAuditorSignatureBytes(workspace, "ORG_SCORECARD", body, signature).valid) return null;
+    return JSON.parse(body.toString("utf8")) as OrgScorecard;
+  } catch {
+    return null;
+  }
+}
+
+/** The latest scorecard only when signed (loadVerifiedOrgScorecardFile); `ignored` names a present file that is not. */
+export function loadVerifiedLatestOrgScorecard(workspace: string): { scorecard: OrgScorecard | null; ignored: string | null } {
+  const path = latestOrgScorecardPath(workspace), scorecard = loadVerifiedOrgScorecardFile(workspace, path);
+  return { scorecard, ignored: scorecard === null && pathExists(path) ? relative(workspace, path) : null };
+}
+
 export function verifyLatestOrgScorecardSignature(workspace: string): SignedFileVerification {
   const path = latestOrgScorecardPath(workspace), sigPath = `${path}.sig`;
   try {

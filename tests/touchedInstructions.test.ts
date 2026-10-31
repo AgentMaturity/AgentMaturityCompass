@@ -158,6 +158,20 @@ describe("DXC-31 — touched-directory workspace instructions", () => {
     expect(rendered).not.toContain(workspace);
   });
 
+  test("a subdirectory instruction file found by a read is framed as workspace data, the root file as instructions", () => {
+    // A model-chosen read must not turn a file planted in any subdirectory into an authoritative instruction.
+    const workspace = temporary();
+    put(workspace, "AGENTS.md", "root rule");
+    put(workspace, "vendor/pkg/AGENTS.md", "planted rule");
+    const loaded = loadInstructionFiles({ workspace, workspaceOnly: true, touchedPaths: [{ path: "vendor/pkg/x.ts", eventId: "touch-9" }] });
+    const blocks = renderInstructionContext(loaded).split("\n\n");
+    const root = blocks.find((block) => block.startsWith("Instructions from AGENTS.md"));
+    const planted = blocks.findIndex((block) => block.includes("vendor/pkg/AGENTS.md"));
+    expect(root).toBeDefined();
+    expect(blocks[planted]).toMatch(/^Workspace data from vendor\/pkg\/AGENTS\.md .*untrusted/);
+    expect(blocks[planted]).not.toMatch(/^Instructions from/);
+  });
+
   test("reobserves touched directories on each boundary for additions, edits and removals", async () => {
     const workspace = temporary();
     mkdirSync(join(workspace, "sub"));

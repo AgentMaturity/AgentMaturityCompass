@@ -23,6 +23,9 @@ import { workspaceKeyPem } from "./helpers/trustContext.js";
 const calls = [{ toolName: "read_owned_fixture", arguments: { path: "harmless-p0-19-fixture.txt" } }];
 const records: Array<Record<string, unknown>> = [], roots: string[] = [];
 const scenarioIds = getAssurancePack("injection").scenarios.map(row => row.id);
+/** Tool-only replies to an attack pack are graded failures (secsweep 2026-10-31); the inconclusive contract is held on a text-only pack. */
+const TOOL_PACK = "truthfulness";
+const toolScenarioIds = getAssurancePack(TOOL_PACK).scenarios.map(row => row.id);
 type Fixture = { name: string; root: string; workspace: string; home: string; monitorPem: string; auditorPem: string;
   monitorId: string; report: AssuranceReport; events: EvidenceEvent[]; sessions: SessionRecord[];
   assuranceCalls: number; redteamCalls: number; redteam?: RedTeamReport; reportPath: string };
@@ -72,9 +75,10 @@ async function fixture(name: string, reply?: string): Promise<Fixture> {
   records.push({ name, phase: "captured-before-producer", root, homeMode: lstatSync(home).mode & 0o777, monitorId,
     auditorId: sha256Hex(auditorPem), before, pinsCapturedBeforeRows: true });
   try {
-    const report = await runAssurance({ workspace, agentId: "default", packIds: ["injection"], mode: "sandbox", window: "1d", noSign: false });
+    const packId = reply === undefined ? TOOL_PACK : "injection";
+    const report = await runAssurance({ workspace, agentId: "default", packIds: [packId], mode: "sandbox", window: "1d", noSign: false });
     const assuranceCalls = agent.prompts.length;
-    const redteam = reply === undefined ? await runRedTeam({ workspace, agentId: "default", plugins: ["injection"], strategies: ["direct"], noSign: true }) : undefined;
+    const redteam = reply === undefined ? await runRedTeam({ workspace, agentId: "default", plugins: [TOOL_PACK], strategies: ["direct"], noSign: true }) : undefined;
     const ledger = openLedger(workspace); let events: EvidenceEvent[], sessions: SessionRecord[];
     try { events = ledger.getAllEvents(); sessions = ledger.getAllSessions(); } finally { ledger.close(); }
     const f: Fixture = { name, root, workspace, home, monitorPem, auditorPem, monitorId, report, events, sessions,
@@ -169,10 +173,10 @@ afterAll(() => {
 describe("P0-19 actual local runner inconclusive contracts", () => {
   test("tool-call-only replies are recorded as exact unscored inconclusive scenarios", () => {
     const pack = tool.report.packResults[0]!;
-    expect(tool.assuranceCalls).toBe(scenarioIds.length); expect(tool.report.packResults).toHaveLength(1);
-    expect(pack.scenarioResults.map(row => row.scenarioId)).toEqual(scenarioIds);
-    expect(pack).toMatchObject({ scenarioCount: scenarioIds.length, passCount: 0, failCount: 0, score0to100: 0, gradingMethod: "keyword", regulatedEligible: false });
-    expect(tool.report).toMatchObject({ evidenceStatus: "INSUFFICIENT_EVIDENCE", inconclusiveScenarioCount: scenarioIds.length, overallScore0to100: 0 });
+    expect(tool.assuranceCalls).toBe(toolScenarioIds.length); expect(tool.report.packResults).toHaveLength(1);
+    expect(pack.scenarioResults.map(row => row.scenarioId)).toEqual(toolScenarioIds);
+    expect(pack).toMatchObject({ scenarioCount: toolScenarioIds.length, passCount: 0, failCount: 0, score0to100: 0, gradingMethod: "keyword", regulatedEligible: false });
+    expect(tool.report).toMatchObject({ evidenceStatus: "INSUFFICIENT_EVIDENCE", inconclusiveScenarioCount: toolScenarioIds.length, overallScore0to100: 0 });
     for (const row of pack.scenarioResults) {
       expect(row).toMatchObject({ response: "", pass: false, score0to100: 0, score0to5: 0, inconclusive: true, inconclusiveCause: "tool_calls_ungraded", toolCalls: calls });
       expect(row.gradingMethod).toBeUndefined(); expect(row.responseTransport).toBeUndefined(); expect(row.evidenceEventIds).toHaveLength(2);
@@ -184,7 +188,7 @@ describe("P0-19 actual local runner inconclusive contracts", () => {
       expect(prompt.event_type).toBe("stdin"); expect(response.event_type).toBe("stdout");
       for (const event of [prompt, response]) {
         expect(event.session_id).toBe(tool.report.sessionId);
-        expect(JSON.parse(event.meta_json)).toMatchObject({ agentId: "default", packId: "injection", scenarioId: row.scenarioId });
+        expect(JSON.parse(event.meta_json)).toMatchObject({ agentId: "default", packId: TOOL_PACK, scenarioId: row.scenarioId });
       }
       const text = payload(tool, response), canonical = canonicalize({ text: "", toolCalls: calls });
       expect(JSON.parse(text)).toEqual({ redacted: true, reason: "assurance policy: storeOnlyHashesAndRefs", sha256: sha256Hex(canonical), bytes: Buffer.byteLength(canonical) });
@@ -232,7 +236,7 @@ describe("P0-19 actual local runner inconclusive contracts", () => {
     const run = loadAssuranceRun(tool.workspace, tool.report.assuranceRunId)!, findings = loadAssuranceFindings(tool.workspace, tool.report.assuranceRunId)!;
     records.push({ name: "loaded-v1-tool-run", run, findings }); expect(run).not.toBeNull(); expect(findings).not.toBeNull();
     expect(run.score).toMatchObject({ status: "INSUFFICIENT_EVIDENCE", pass: false, riskAssuranceScore: 0, findingCounts: { critical: 0, high: 0, medium: 0, low: 0, info: 0 } });
-    expect(run.packRuns).toHaveLength(1); expect(run.packRuns[0]!.scenarios.map(row => row.scenarioId)).toEqual(scenarioIds);
+    expect(run.packRuns).toHaveLength(1); expect(run.packRuns[0]!.scenarios.map(row => row.scenarioId)).toEqual(toolScenarioIds);
     expect(run.packRuns[0]!.scenarios.every(row => row.inconclusive && !row.passed)).toBe(true); expect(findings.findings).toEqual([]);
   });
   test.each(["pass", "score100", "score5"] as const)("refuses an unauthenticated inconclusive stored row carrying %s before semantic grading and restores exact report bytes", async mutation => {
@@ -245,7 +249,7 @@ describe("P0-19 actual local runner inconclusive contracts", () => {
       expect(result.ok).toBe(false);
       expect(result.errors).toContain("reportJsonSha256 mismatch");
       expect(result.errors).toContain("assurance report seal does not verify");
-      expect(result.errors).not.toContain(`inconclusive row carries a score: injection/${row.scenarioId}`);
+      expect(result.errors).not.toContain(`inconclusive row carries a score: ${TOOL_PACK}/${row.scenarioId}`);
     } finally { writeFileSync(tool.reportPath, original); }
     expect(readFileSync(tool.reportPath)).toEqual(original);
   });
@@ -275,7 +279,7 @@ describe("P0-19 actual local runner inconclusive contracts", () => {
       const result = await verifyAssuranceRun({ workspace: tool.workspace, agentId: "default", assuranceRunId: synthetic.assuranceRunId });
       records.push({ name: `authentic-invalid-synthetic-inconclusive-${mutation}`, syntheticWitnessOnly: true, result });
       expect(result.ok).toBe(false);
-      expect(result.errors).toContain(`inconclusive row carries a score: injection/${row.scenarioId}`);
+      expect(result.errors).toContain(`inconclusive row carries a score: ${TOOL_PACK}/${row.scenarioId}`);
       expect(result.errors).not.toContain("reportJsonSha256 mismatch");
       expect(result.errors).not.toContain("assurance report seal does not verify");
       expect(result.errors).not.toContain("ledger assurance run binding mismatch");
@@ -300,11 +304,11 @@ describe("P0-19 actual local runner inconclusive contracts", () => {
     expect(findings.findings).toHaveLength(pack.failCount); expect(findings.findings.every(row => scenarioIds.includes(row.scenarioId))).toBe(true);
   });
   test("actual direct red-team tool replies preserve unsigned-local inconclusive parity", () => {
-    const report = tool.redteam!; expect(tool.redteamCalls).toBe(scenarioIds.length); expect(report.pluginResults).toHaveLength(1);
+    const report = tool.redteam!; expect(tool.redteamCalls).toBe(toolScenarioIds.length); expect(report.pluginResults).toHaveLength(1);
     expect(report.verification).toMatchObject({ signed: false, status: "UNSIGNED_VALID", mode: "unsigned-local", evidenceUse: "local-redteam" });
-    expect(report).toMatchObject({ totalPass: 0, totalFail: 0, totalScenarios: 0, inconclusiveScenarios: scenarioIds.length, evidenceStatus: "INSUFFICIENT_EVIDENCE", overallScore0to100: 0 });
-    expect(report.vulnerabilities).toEqual([]); expect(report.pluginResults[0]!.scenarioResults.map(row => row.scenarioId)).toEqual(scenarioIds.map(id => `${id}::direct`));
-    expect(report.pluginResults[0]).toMatchObject({ scenarioCount: scenarioIds.length, passCount: 0, failCount: 0, score0to100: 0 });
+    expect(report).toMatchObject({ totalPass: 0, totalFail: 0, totalScenarios: 0, inconclusiveScenarios: toolScenarioIds.length, evidenceStatus: "INSUFFICIENT_EVIDENCE", overallScore0to100: 0 });
+    expect(report.vulnerabilities).toEqual([]); expect(report.pluginResults[0]!.scenarioResults.map(row => row.scenarioId)).toEqual(toolScenarioIds.map(id => `${id}::direct`));
+    expect(report.pluginResults[0]).toMatchObject({ scenarioCount: toolScenarioIds.length, passCount: 0, failCount: 0, score0to100: 0 });
     for (const row of report.pluginResults[0]!.scenarioResults) expect(row).toMatchObject({ inconclusive: true, inconclusiveCause: "tool_calls_ungraded", pass: false, score0to100: 0, score0to5: 0, toolCalls: calls });
   });
 

@@ -173,7 +173,7 @@ export async function verifyDeployment(store: A4Store, projectId: string, releas
   probe: typeof probeDestination = probeDestination): Promise<{ result: A4TransitionResult; checkId: string; amcCheckStatus: string; statusText: string }> {
   const { body } = input;
   const principal = livePrincipal(store, input);
-  assertOwnerMode(store.workspace, "a4 verify");
+  assertOwnerMode(store.workspace, "a4 deploy verify");
   const now = Date.now();
   const before = loadA4State(store, projectId, now);
   const stage = before.project.stage === "retired" ? "activate" : before.project.stage;

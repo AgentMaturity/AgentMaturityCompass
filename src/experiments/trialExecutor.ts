@@ -103,7 +103,9 @@ function executorCaseView(kase: ReturnType<typeof loadCase>): ExecutorCaseView {
 }
 
 function resolveLimits(limits: Partial<TrialLimits> | undefined): TrialLimits {
-  const out = { ...DEFAULT_TRIAL_LIMITS, ...limits };
+  // Only the three enforced limits: any other key would be sealed into the report as if it had bound the run.
+  const out = { maxExecutions: limits?.maxExecutions ?? DEFAULT_TRIAL_LIMITS.maxExecutions,
+    trialTimeoutMs: limits?.trialTimeoutMs ?? DEFAULT_TRIAL_LIMITS.trialTimeoutMs, concurrency: limits?.concurrency ?? DEFAULT_TRIAL_LIMITS.concurrency };
   const int = (value: number, max: number) => Number.isSafeInteger(value) && value >= 1 && value <= max;
   if (!int(out.maxExecutions, 10_000) || !int(out.trialTimeoutMs, MAX_TRIAL_TIMEOUT_MS) || !int(out.concurrency, MAX_CONCURRENCY)) {
     throw new Error(`Trial limits must be positive integers: executions <= 10000, timeout <= ${MAX_TRIAL_TIMEOUT_MS} ms, concurrency <= ${MAX_CONCURRENCY}.`);

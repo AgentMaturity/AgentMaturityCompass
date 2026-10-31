@@ -267,6 +267,22 @@ export function loadValueSnapshot(workspace: string, scope: { type: "WORKSPACE" 
   return valueSnapshotSchema.parse(JSON.parse(readUtf8(path)) as unknown);
 }
 
+/**
+ * The latest value snapshot from one capture: the signature verified over those bytes, the same bytes parsed, and the
+ * body's scope equal to the one asked for (a signed snapshot copied from another scope is refused). Null on any failure.
+ */
+export function loadVerifiedValueSnapshot(workspace: string, scope: { type: "WORKSPACE" | "NODE" | "AGENT"; id: string }): ValueSnapshot | null {
+  const path = valueSnapshotLatestPath(workspace, scope);
+  try {
+    const captured = captureOrgPairs([path]), body = orgPairBytes(captured, path), sidecar = orgPairBytes(captured, `${path}.sig`);
+    if (body === null || sidecar === null || !verifyAuditorSignatureBytes(workspace, "BUNDLE", body, sidecar).valid) return null;
+    const snapshot = valueSnapshotSchema.parse(JSON.parse(body.toString("utf8")) as unknown);
+    return snapshot.scope.type === scope.type && snapshot.scope.id === scope.id ? snapshot : null;
+  } catch {
+    return null;
+  }
+}
+
 export function verifyValueSnapshotSignature(workspace: string, scope: { type: "WORKSPACE" | "NODE" | "AGENT"; id: string }) {
   return verifyValuePair(workspace, valueSnapshotLatestPath(workspace, scope));
 }

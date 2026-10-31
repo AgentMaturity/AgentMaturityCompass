@@ -38,6 +38,8 @@ import { openLedger } from "../src/ledger/ledger.js";
 import { issueLeaseForPrincipal, LeasePrincipalRefused } from "../src/leases/leasePrincipal.js";
 import { issueLeaseToken } from "../src/leases/leaseSigner.js";
 import { runLease } from "../src/leases/runLease.js";
+import { providerTrialRunner } from "../src/experiments/nativeTrialRunner.js";
+import { startStudioApiServer } from "../src/studio/studioServer.js";
 import { AdapterRegistry } from "../src/llm/adapter/adapterRegistry.js";
 import { LlmRuntime } from "../src/llm/adapter/llmRuntime.js";
 import { ANTHROPIC_CAPABILITIES } from "../src/llm/adapter/providerCapabilities.js";
@@ -532,6 +534,47 @@ describe("in-process openAgentSession and resumeAgentSession under an activated 
       claimant: { pid: process.pid, hostId: hostname(), bootId: randomUUID(), startedAt: Date.now() } })).toThrow(/^PRINCIPAL_UNRESOLVED: /);
     expect(minted, "no lease was minted").not.toHaveBeenCalled();
     expect(ledgerState(), "no session row and no evidence row").toEqual(before);
+  });
+});
+
+describe("executed experiment trials run as the requester, not the process's OS user (secsweep 2026-10-31)", () => {
+  const trialInput = () => ({ view: { caseId: "c1", prompt: "Say done.", context: null, allowedActionClasses: ["READ_ONLY"] },
+    config: Buffer.from("Use only approved tools."), mode: "supervise" as const, signal: new AbortController().signal,
+    stamp: { agentId: "default", caseExecution: { v: 1 as const, casebookId: "book", caseId: "c1", caseSha256: "a".repeat(64),
+      trialId: "trial-1", configDigest: "b".repeat(64) } } });
+
+  it("runLease mints for the requester's principal key, and refuses the admin token's null principal", () => {
+    const ownerId = activatePlan(`not-${OS_USER}`);
+    expect(() => runLease({ workspace, agentId: "default", model: STUB_PROVIDER_MODEL, tools: "workspace", principalKey: null }))
+      .toThrow(/^PRINCIPAL_UNRESOLVED: /);
+    expect(minted).not.toHaveBeenCalled();
+    const lease = runLease({ workspace, agentId: "default", model: STUB_PROVIDER_MODEL, tools: "workspace", principalKey: `LOCAL_USER:${ownerId}` });
+    expect(lease.leaseToken).toBeTruthy();
+    expect((minted.mock.results[0]!.value as ReturnType<typeof issueLeaseToken>).payload.principal).toEqual({ userId: ownerId });
+  });
+
+  it("Studio refuses executeTrials from the admin token, which names no user, before any lease or run", async () => {
+    activatePlan(OS_USER); // even when the process's OS user is an active user
+    const token = "secsweep-admin-token";
+    const studio = await startStudioApiServer({ workspace, host: "127.0.0.1", port: 0, token });
+    try {
+      const response = await fetch(`${studio.url}/experiments/exp_any/run`, { method: "POST",
+        headers: { "content-type": "application/json", "x-amc-admin-token": token },
+        body: JSON.stringify({ mode: "supervise", executeTrials: { providerId: STUB_PROVIDER_ID } }) });
+      expect(response.status).toBe(409);
+      expect(await response.json()).toMatchObject({ code: "PRINCIPAL_UNRESOLVED" });
+      expect(minted).not.toHaveBeenCalled();
+    } finally { await studio.close(); }
+  });
+
+  it("a trial runner handed the requester's lease opens its session on it; without one it would mint for the OS user", async () => {
+    const ownerId = activatePlan(`not-${OS_USER}`);
+    // Without a lease the trial falls back to the OS user, who is not an active user here: refused.
+    await expect(providerTrialRunner(workspace, "default", { providerId: STUB_PROVIDER_ID }).runTrial(trialInput())).rejects.toThrow(/PRINCIPAL_UNRESOLVED/);
+    const { leaseToken } = runLease({ workspace, agentId: "default", model: STUB_PROVIDER_MODEL, tools: "workspace", principalKey: `LOCAL_USER:${ownerId}` });
+    minted.mockClear();
+    await providerTrialRunner(workspace, "default", { providerId: STUB_PROVIDER_ID, leaseToken }).runTrial(trialInput());
+    expect(minted, "the handed lease is used; no second lease is minted").not.toHaveBeenCalled();
   });
 });
 

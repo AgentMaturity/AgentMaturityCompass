@@ -245,6 +245,44 @@ describe("experiment public paths", () => {
   }, 120_000);
 });
 
+describe("Studio executed trials and history (secsweep 2026-10-31)", () => {
+  test("executeTrials is refused while Studio is read-only, before any run", async () => {
+    const { ws, experimentId, runsDir } = fixture();
+    const token = "experiment-readonly-token";
+    const studio = await startStudioApiServer({ workspace: ws, host: "127.0.0.1", port: await freePort(), token });
+    try {
+      writeFileSync(join(ws, ".amc", "trust.yaml.sig"), "tampered"); // after start: Studio refuses to start on it
+      const out = await call(`${studio.url}/experiments/${experimentId}/run`, { method: "POST", token,
+        body: JSON.stringify({ mode: "supervise", executeTrials: { providerId: "stub" } }) });
+      expect(out.status).toBe(403);
+      expect(String(out.json.error)).toMatch(/write operations blocked/);
+      expect(runFiles(runsDir)).toEqual([]);
+    } finally {
+      await studio.close();
+    }
+  }, 120_000);
+
+  test("history names a refused latest run with a fixed reason, never the error's server paths", async () => {
+    const { ws, experimentId } = fixture();
+    const token = "experiment-history-token";
+    // An experiment.yaml whose experimentId names no directory: loading its latest run throws with an absolute path.
+    const root = join(getAgentPaths(ws, "default").rootDir, "experiments");
+    mkdirSync(join(root, "exp_forged"), { recursive: true });
+    writeFileSync(join(root, "exp_forged", "experiment.yaml"),
+      readFileSync(join(root, experimentId, "experiment.yaml"), "utf8").replace(experimentId, "exp_ghost"));
+    const studio = await startStudioApiServer({ workspace: ws, host: "127.0.0.1", port: await freePort(), token });
+    try {
+      const history = await call(`${studio.url}/experiments/history?agentId=default`, { token });
+      expect(history.status).toBe(200);
+      const text = JSON.stringify(history.json);
+      expect(text).not.toContain(ws);
+      expect(text).not.toContain("experiment.yaml");
+    } finally {
+      await studio.close();
+    }
+  }, 120_000);
+});
+
 describe("experiment latest-run admission", () => {
   test("a tampered or re-candidated latest run is refused by analyze and gate; history reports why", () => {
     const { ws, experimentId, runsDir } = fixture();

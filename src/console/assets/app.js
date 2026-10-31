@@ -2563,7 +2563,7 @@ async function renderExperiments() {
       </div>
       <div class="scroll"><table><thead><tr><th>Run</th><th>Selected for probing (estimated metrics, not executed)</th><th>Structural status</th><th>Candidates</th><th>Top Reason</th><th>Actions</th></tr></thead><tbody id="optimizerRows"></tbody></table></div>
     `)}
-    ${card("Experiment Registry", `<pre class="scroll">${JSON.stringify(listed.experiments || listed, null, 2)}</pre>`)}
+    ${card("Experiment Registry", `<pre class="scroll">${htmlEscape(JSON.stringify(listed.experiments || listed, null, 2))}</pre>`)}
   `;
   const tbody = document.getElementById("expRows");
   const optimizerBody = document.getElementById("optimizerRows");
@@ -2586,9 +2586,9 @@ async function renderExperiments() {
         <td><strong title="${htmlEscape(row.latestRunProblem || "")}">${verdict}</strong></td>
         <td>
           <div class="row">
-            <button data-run="${row.experimentId}">Run</button>
-            <button class="secondary" data-analyze="${row.experimentId}">Analyze</button>
-            <button class="secondary" data-gate="${row.experimentId}">Gate</button>
+            <button data-run="${htmlEscape(row.experimentId)}">Run</button>
+            <button class="secondary" data-analyze="${htmlEscape(row.experimentId)}">Analyze</button>
+            <button class="secondary" data-gate="${htmlEscape(row.experimentId)}">Gate</button>
           </div>
         </td>
       </tr>`;
