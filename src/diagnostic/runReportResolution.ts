@@ -15,7 +15,11 @@ import { resolveRunAlias } from "./runAliases.js";
 import { sealedRunReportVerifies } from "./reportSeal.js";
 import type { DiagnosticReport } from "../types.js";
 
+/** A run id names a file (`<runsDir>/<runId>.json`), so nothing that could leave the runs directory is one. */
+const RUN_ID = /^[A-Za-z0-9_-]+$/;
+
 export function loadRunReport(workspace: string, runId: string, agentId?: string): DiagnosticReport {
+  if (!RUN_ID.test(runId)) throw Object.assign(new Error(`RUN_ID_INVALID: ${JSON.stringify(runId.slice(0, 80))} is not a run id`), { code: "RUN_ID_INVALID" });
   const agentPaths = getAgentPaths(workspace, agentId);
   const scopedFile = join(agentPaths.runsDir, `${runId}.json`);
   if (pathExists(scopedFile)) {
