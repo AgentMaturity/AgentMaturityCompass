@@ -10,13 +10,14 @@
  * in-process frame is src/a4/adaptContextPlugin.ts), and their re-checks at Review. Everything A4 writes here is self_reported,
  * except the probe's ref to the stub-provider turn A4 ran, which is synthetic_example.
  */
-import { existsSync, lstatSync, readFileSync, rmdirSync, rmSync } from "node:fs";
-import { dirname } from "node:path";
+import { cpSync, existsSync, lstatSync, mkdtempSync, readFileSync, rmdirSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { dirname, join } from "node:path";
 import { loadAdmittedCatalog } from "../../catalog/admission/gate.js";
 import { activeControlPlanHead } from "../../catalog/compiler/activate.js";
 import { renderPlanDiffMarkdown } from "../../catalog/compiler/diff.js";
 import { CONTROL_PLAN_REVIEW_TOOL, planReviewIntent } from "../../catalog/compiler/sign.js";
-import { latestEnforceResourceManifestPath, verifyEnforceResourceManifest, writeEnforceResourceManifest } from "../../enforce/resourceManifest.js";
+import { buildEnforceResourceManifest, latestEnforceResourceManifestPath, verifyEnforceResourceManifest, writeEnforceResourceManifest } from "../../enforce/resourceManifest.js";
 import { artifactSigPath } from "../../lifecycle/artifactSignature.js";
 import { CLOCK_REVIEW_STATUS } from "../../incidents/regulatoryClocks.js";
 import { openLedger } from "../../ledger/ledger.js";
@@ -338,6 +339,31 @@ function enforceSnapshot(workspace: string, agentId: string): { manifest: { mani
 }
 
 /**
+ * The snapshot the Enforce re-snapshot is about to write (its id is the resources' digest, so an earlier Build of the
+ * same bytes left it already), kept before the write: the file and its signature as keptBytes keeps them, the bundle
+ * directory copied aside. `restore` puts the earlier snapshot back, or removes one that was not there; `release` drops the copy.
+ */
+function keptSnapshot(workspace: string, agentId: string, manifestPath: string): { paths: string[]; restore: () => void; release: () => void } {
+  const manifestId = buildEnforceResourceManifest({ workspace, agentId }).manifestId;
+  const file = join(dirname(manifestPath), "snapshots", `${manifestId}.json`);
+  const bundle = join(dirname(manifestPath), "snapshots", manifestId);
+  const files = keptBytes([file, artifactSigPath(file)]);
+  const aside = existsSync(bundle) ? join(mkdtempSync(join(tmpdir(), "amc-a4-snapshot-")), "bundle") : null;
+  if (aside !== null) cpSync(bundle, aside, { recursive: true });
+  const release = (): void => { if (aside !== null) rmSync(dirname(aside), { recursive: true, force: true }); };
+  return { paths: [file, bundle, artifactSigPath(file)], release, restore: () => {
+    files();
+    try {
+      rmSync(bundle, { recursive: true, force: true });
+      if (aside !== null) cpSync(aside, bundle, { recursive: true });
+    } catch {
+      // Left as it is: Enforce reads it as drift.
+    }
+    release();
+  } };
+}
+
+/**
  * The bytes now at `paths` (each a regular file or absent; anything else refuses Build before it writes, 409
  * RESOURCE_UNREADABLE) and the parent directories that do not exist yet, and the function that puts them back: a file
  * that was absent is removed and a directory Build created is removed once empty. Restoring is best effort, as Enforce's
@@ -387,7 +413,8 @@ function keptBytes(paths: readonly string[]): () => void {
  * inside the governed transition once its role, readiness, step and stale-head checks passed; the Enforce manifest is
  * then re-written, signed, only when the writes moved nothing but the agent's memory directory. A write that fails, a
  * manifest that cannot be written or signed (refused before the writer publishes it), or a commit then refused (`rollback`)
- * puts back the bytes Build replaced and removes the snapshot it added: no write stays behind that no revision records.
+ * puts back the bytes Build replaced and the snapshot as it was before (removed when Build added it): no write stays
+ * behind that no revision records.
  */
 function build(ctx: A4ProducerContext): A4ProducerResult {
   const { spec, plan } = proposalOf(ctx);
@@ -421,13 +448,14 @@ function build(ctx: A4ProducerContext): A4ProducerResult {
       lane: "implementation", method: null, body: context.record }
   ];
   let restore: (() => void) | null = null;
-  let added: string[] = [];
+  let prior: ReturnType<typeof keptSnapshot> | null = null;
   const rollback = (): void => {
     restore?.();
-    for (const path of added) rmSync(path, { recursive: true, force: true });
+    prior?.restore();
   };
   return {
     rollback,
+    afterCommit: async () => { prior?.release(); return {}; },
     publish: () => {
       restore = keptBytes([memory.path, context.path, artifactSigPath(context.path), manifestPath, artifactSigPath(manifestPath)]);
       let snapshot: ReturnType<typeof enforceSnapshot>;
@@ -435,12 +463,14 @@ function build(ctx: A4ProducerContext): A4ProducerResult {
         writeMemoryPolicy(memory);
         writeContextPlugin(workspace, context);
         assertEnforceCurrent(workspace, project.agent_id, new Set(["memory"]));
+        prior = keptSnapshot(workspace, project.agent_id, manifestPath);
         snapshot = enforceSnapshot(workspace, project.agent_id);
+        // Only the snapshot kept above is put back; one written anywhere else is left as it is (never removed unkept) and Build refused.
+        if (snapshot.added.some((path) => !prior!.paths.includes(path))) throw fail(409, "ENFORCE_MANIFEST_REFUSED", "The Enforce snapshot was written where Build did not expect it; nothing Build wrote was kept.");
       } catch (error) {
         rollback();
         throw error;
       }
-      added = snapshot.added;
       const built = record(snapshot.manifest);
       return { outputs: outputsFor(built), spec: { ...spec, build: built } };
     },

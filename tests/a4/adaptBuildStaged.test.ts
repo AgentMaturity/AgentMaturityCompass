@@ -5,7 +5,7 @@
  * its revision binds.
  */
 import { createHash } from "node:crypto";
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { loadA4State, pendingExecutors } from "../../src/a4/a4Gates.js";
@@ -61,6 +61,30 @@ describe("Adapt Build publishes only what a recorded revision binds", () => {
       const produced = await produceAdapt("build", { workspace: j.t.workspace, state: loadA4State(store, j.p.projectId, now), principal: j.call(j.t.alice).principal, now });
       expect(changed(before, files(j.t.workspace))).toEqual([]);
       expect(typeof produced.publish).toBe("function");
+    } finally {
+      store.close();
+    }
+  });
+
+  test("a refused Build whose snapshot already existed keeps that signed snapshot byte for byte", async () => {
+    const j = await atAdaptBuild();
+    const store = openA4Store(j.t.workspace);
+    try {
+      const run = async () => {
+        const now = Date.now();
+        return produceAdapt("build", { workspace: j.t.workspace, state: loadA4State(store, j.p.projectId, now), principal: j.call(j.t.alice).principal, now });
+      };
+      // A first publish leaves the snapshot of exactly the bytes a second Build of the same answers produces.
+      const first = await run();
+      first.publish!();
+      const snapshots = join(j.t.workspace, ".amc", "agents", store.readHead(j.p.projectId)!.agent_id, "enforce", "resources", "snapshots");
+      const prior = [...files(snapshots)];
+      expect(prior.some(([name]) => name.endsWith(".json.sig"))).toBe(true);
+      const second = await run();
+      second.publish!();
+      second.rollback!();
+      expect(existsSync(snapshots)).toBe(true);
+      expect([...files(snapshots)]).toEqual(prior);
     } finally {
       store.close();
     }
