@@ -247,10 +247,11 @@ if any address is loopback, link-local (including 169.254.169.254), private,
 CGNAT, documentation, benchmarking, unique-local, multicast or reserved (IPv6
 forms that carry such an IPv4 address included; 6to4 and Teredo always) unless
 that exact IP literal is listed, and
-connects only to an address it checked. Denials answer HTTP 403. Every decision
+connects only to the addresses it checked, trying each in turn. Denials answer HTTP 403. Every decision
 writes a `NATIVE_SHELL_EGRESS` audit row (`callId`, `host`, `port`, `decision`,
 `reason`) before it takes effect; a row that cannot be written denies the
-connection.
+connection. A CONNECT tunnel writes one more row (`reason: "connected"`,
+`connectedAddress`) before it answers 200, and closes if that row cannot be written.
 
 curl and git over HTTPS read `http_proxy`/`HTTPS_PROXY`, npm and pip read
 `HTTPS_PROXY`. Node's built-in `fetch` reads them only with

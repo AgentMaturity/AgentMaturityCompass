@@ -70,10 +70,11 @@ async function requestError(handler: Handler, pathname: string, input: { body: s
   return { status: statuses[0], body };
 }
 
-// P1-55: a 500 body never carries the message; the route's message is kept in the error log line instead.
-function expectRouteMessage(status: number, message: string) {
-  if (status === 500) expect(lines.map((line) => line.detail?.message)).toEqual([message]);
-  return { ok: false, error: status === 500 ? "Internal server error" : message };
+// P1-55: a 500 body never carries the message. P0-55: nor does any other status; the body is the route's fallback
+// text and the internal detail is kept in the error log line instead.
+function expectRouteMessage(status: number, fallback: string, detail: string) {
+  expect(lines.map((line) => line.detail?.message)).toEqual([detail]);
+  return { ok: false, error: status === 500 ? "Internal server error" : fallback };
 }
 
 for (const [handler, pathname, fallbackStatus, fallback] of routes) {
@@ -92,14 +93,22 @@ for (const [handler, pathname, fallbackStatus, fallback] of routes) {
       });
     });
 
-    test("preserves the ordinary stream error's status and message (a 500 keeps it in the log only)", async () => {
+    test("keeps the ordinary stream error's status and its message in the log only", async () => {
       const out = await requestError(handler, pathname, { error: new Error("request stream failed") });
-      expect(out).toEqual({ status: fallbackStatus, body: expectRouteMessage(fallbackStatus, "request stream failed") });
+      expect(out).toEqual({ status: fallbackStatus, body: expectRouteMessage(fallbackStatus, fallback, "request stream failed") });
     });
 
-    test("preserves the route-specific non-Error fallback (a 500 keeps it in the log only)", async () => {
+    test("answers the route-specific fallback for a non-Error failure and logs the failure", async () => {
       const out = await requestError(handler, pathname, { error: "non-Error failure" });
-      expect(out).toEqual({ status: fallbackStatus, body: expectRouteMessage(fallbackStatus, fallback) });
+      expect(out).toEqual({ status: fallbackStatus, body: expectRouteMessage(fallbackStatus, fallback, "non-Error failure") });
     });
   });
 }
+
+// P0-55: a certificate with no proof tree is a malformed request (400), never a 500 from inside the verifier.
+test("formal/certificate refuses { proof: true } as an invalid request body", async () => {
+  const out = await requestError(handleEnforceRoute, "/api/v1/enforce/formal/certificate", { body: JSON.stringify({ certificate: { proof: true } }) });
+  expect(out.status).toBe(400);
+  expect(out.body).toMatchObject({ ok: false, error: expect.stringContaining("Invalid request body:") });
+  expect(JSON.stringify(out.body)).not.toContain("argument must be of type");
+});

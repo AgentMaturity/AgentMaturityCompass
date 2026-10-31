@@ -11,7 +11,7 @@
  * connection is pinned to them.
  */
 import type { IncomingHttpHeaders } from "node:http";
-import { isIP, type LookupFunction } from "node:net";
+import { isIP } from "node:net";
 import { canonicalAddress, canonicalHost, isNonPublicAddress, resolveAddresses, resolveAndCheck, type EgressCheck } from "../enforce/egressAllowlist.js";
 import type { GatewayConfig } from "./config.js";
 import { plainUtf8 } from "./redaction.js";
@@ -118,13 +118,7 @@ export async function checkUpstreamEgress(configured: Upstream, resolved: Upstre
     : { ...check, decision: { allowed: false, reason: `${check.decision.reason}; allowNonPublicAddresses is ignored because the gateway.yaml signature is not valid` } };
 }
 
-/** Answers only with the checked addresses, so a DNS change between the check and the connection cannot redirect it. */
-export function pinnedLookup(addresses: readonly string[]): LookupFunction | undefined {
-  const entries = addresses.map((address) => ({ address, family: isIP(address) }));
-  const first = entries[0];
-  if (first === undefined) return undefined;
-  return (_hostname, options, callback) => { if (options.all) callback(null, entries); else callback(null, first.address, first.family); };
-}
+export { pinnedLookup } from "../enforce/egressAllowlist.js";
 
 /** null means the request may be forwarded; an empty body carries no field. */
 export function requestFieldRefusal(body: Buffer, headers: IncomingHttpHeaders, fields: readonly string[]): FieldRefusal | null {

@@ -838,7 +838,7 @@ export function recordArchetypeAudit(params: {
   archetypeId: string;
   fileHashes: Record<string, string>;
 }): string {
-  const ledger = openLedger(params.workspace);
+  const ledger = openLedger(params.workspace, process.env.AMC_NO_SIGN === "1" ? { store: "unsigned" } : {});
   const sessionId = randomUUID();
   try {
     ledger.startSession({

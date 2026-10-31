@@ -815,7 +815,7 @@ export class ObservabilityBridge extends EventEmitter {
 
   private async recordToLedger(traces: NormalizedTrace[]): Promise<void> {
     try {
-      const ledger = openLedger(this.config.workspace);
+      const ledger = openLedger(this.config.workspace, process.env.AMC_NO_SIGN === "1" ? { store: "unsigned" } : {});
       const sessionId = `obs-bridge-${randomUUID()}`;
       ledger.startSession({
         sessionId,

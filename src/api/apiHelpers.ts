@@ -179,7 +179,7 @@ function writeError(res: ServerResponse, status: number, message: string, detail
   const error = oversized ? BODY_TOO_LARGE : code === 500 ? INTERNAL_SERVER_ERROR : message;
   res.writeHead(code, { 'Content-Type': 'application/json', 'X-Request-Id': requestId });
   res.end(JSON.stringify({ ok: false, error, requestId }));
-  logApiError(res, code, error, code === 500 ? detail : undefined);
+  logApiError(res, code, error, code === 500 || detail !== message ? detail : undefined);
 }
 
 export function apiError(res: ServerResponse, status: number, message: string): void {
@@ -196,7 +196,7 @@ export function apiInternalError(res: ServerResponse, error: unknown): void {
   writeError(res, 500, INTERNAL_SERVER_ERROR, error);
 }
 
-/** Preserve request-body status codes while retaining each route's existing fallback. */
+/** Preserve request-body status codes; any other failure answers the route's fallback and logs the detail (P0-55). */
 export function apiRequestError(
   res: ServerResponse,
   error: unknown,
@@ -207,7 +207,7 @@ export function apiRequestError(
     apiError(res, error.statusCode, error.message);
     return;
   }
-  apiError(res, fallbackStatus, error instanceof Error ? error.message : fallback);
+  writeError(res, fallbackStatus, fallback, error);
 }
 
 /* ── Method guard ────────────────────────────────────────────────── */

@@ -1,5 +1,5 @@
 import { lookup } from "node:dns/promises";
-import { BlockList, isIP } from "node:net";
+import { BlockList, isIP, type LookupFunction } from "node:net";
 
 /**
  * The one egress host decision (P1-05). The gateway forward proxy and the
@@ -133,4 +133,12 @@ export async function resolveAndCheck(host: string, policy: { readonly allowHost
   try { addresses = await resolve(name); } catch { /* refused below */ }
   return addresses.length === 0 ? { addresses, unresolved: true, decision: { allowed: false, reason: `${name} did not resolve (EGRESS_UNRESOLVED)` } }
     : { addresses, decision: decideEgress(name, addresses, policy) };
+}
+
+/** Answers only with the checked addresses, so a DNS change between the check and the connection cannot redirect it. */
+export function pinnedLookup(addresses: readonly string[]): LookupFunction | undefined {
+  const entries = addresses.map((address) => ({ address, family: isIP(address) }));
+  const first = entries[0];
+  if (first === undefined) return undefined;
+  return (_hostname, options, callback) => { if (options.all) callback(null, entries); else callback(null, first.address, first.family); };
 }

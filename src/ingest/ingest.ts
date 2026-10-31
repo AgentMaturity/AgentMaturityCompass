@@ -3,6 +3,7 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import { resolve } from "node:path";
 import { bundleDigest, eventMeta, verifyThirdPartyAttestation, workspaceOwnKeyIds, type BundleEntry } from "../claims/evidenceProvenance.js";
 import { openLedger, hashBinaryOrPath } from "../ledger/ledger.js";
+import { writerStore } from "../ledger/ledgerConnection.js";
 import { readEventPayload } from "../session/eventPayload.js";
 import type { TrustContext } from "../trust/trustContext.js";
 import type { EvidenceEvent } from "../types.js";
@@ -67,7 +68,7 @@ export function ingestEvidence(params: {
     throw new Error(`No files found to ingest: ${params.inputPath}`);
   }
 
-  const ledger = openLedger(workspace);
+  const ledger = openLedger(workspace, writerStore());
   const ingestSessionId = randomUUID();
   try {
     ledger.startSession({
@@ -132,7 +133,7 @@ function bundleOf(sourceEvents: EvidenceEvent[], agentId: string, sessionId: str
 
 /** The digest a third-party attester signs for `amc attest --attester-signature` (printed by `amc attest` as the bundle hash). */
 export function ingestBundleHash(workspace: string, ingestSessionId: string, agentId?: string): string {
-  const ledger = openLedger(workspace);
+  const ledger = openLedger(workspace, writerStore());
   try {
     return bundleDigest(bundleOf(ingestSessionEvents(ledger, ingestSessionId).sources, resolveAgentId(workspace, agentId), ingestSessionId));
   } finally {
@@ -268,7 +269,7 @@ function publishIngestAttestation(ledger: ReturnType<typeof openLedger>, params:
 }
 
 export function attestIngestSession(params: IngestAttestationInput): IngestAttestationResult {
-  const identity = attestationIdentity(params), ledger = openLedger(identity.workspace);
+  const identity = attestationIdentity(params), ledger = openLedger(identity.workspace, writerStore());
   try {
     const plan = prepareIngestAttestation(ledger, params, identity);
     return publishIngestAttestation(ledger, params, plan, ledger.signRunHash(plan.bundleHash));
@@ -292,7 +293,7 @@ export async function attestIngestSessionAsync(params: IngestAttestationInput, o
   const input: IngestAttestationInput = { ...params, attesterSignature: params.attesterSignature ? { ...params.attesterSignature } : undefined,
     trust: params.trust === undefined ? undefined : structuredClone(params.trust) }, beforePublish = options.beforePublish;
   beforePublish?.();
-  const fixed = captureRunHashAuthority(input.workspace, process.env.AMC_NO_SIGN === "1"), identity = attestationIdentity(input), ledger = openLedger(input.workspace);
+  const fixed = captureRunHashAuthority(input.workspace, process.env.AMC_NO_SIGN === "1"), identity = attestationIdentity(input), ledger = openLedger(input.workspace, writerStore());
   try {
     const plan = prepareIngestAttestation(ledger, input, identity, true);
     const source = attestationSourceState(plan), seal = await ledger.signRunHashAsync(plan.bundleHash, () => { beforePublish?.(); fixed(); });
