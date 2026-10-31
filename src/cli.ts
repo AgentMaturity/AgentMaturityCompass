@@ -334,7 +334,7 @@ import {
 import { issueExecTicketAsync, verifyExecTicket } from "./tickets/execTicketVerify.js";
 import { normalizeActionClass, parseTtlToMs } from "./tickets/execTicketCli.js";
 import { registerBudgetCommands } from "./cli-budget-commands.js";
-import { driftCheckCliAsync as driftCheckCli, driftReportCliAsync as driftReportCli, freezeLiftCliAsync as freezeLiftCli, freezeStatusCli } from "./drift/driftCli.js";
+import { driftCheckCliAsync as driftCheckCli, driftNotEvaluated, driftReportCliAsync as driftReportCli, freezeLiftCliAsync as freezeLiftCli, freezeStatusCli } from "./drift/driftCli.js";
 import { initAlertsConfigAsync as initAlertsConfig, sendTestAlert, verifyAlertsConfigSignature } from "./drift/alerts.js";
 import { startTrustDriftMonitor } from "./monitor/trustDriftMonitor.js";
 import { generateBom } from "./bom/bomGenerator.js";
@@ -16302,9 +16302,7 @@ drift
       against: opts.against ?? "previous"
     });
     console.log(JSON.stringify(result, null, 2));
-    if (result.triggered) {
-      process.exit(2);
-    }
+    if (result.triggered || driftNotEvaluated(result)) process.exit(result.triggered ? 2 : 3); // 3: drift could not be evaluated
   });
 
 drift

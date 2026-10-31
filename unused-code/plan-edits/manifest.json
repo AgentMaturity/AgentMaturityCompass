@@ -332,6 +332,13 @@
       "sha256": "b441577305fc5464ab38f634ce767a45369f013a8e1b379f8d218efcd9bc0ba2"
     },
     {
+      "path": "src/cli.ts",
+      "issue": "GAP-WP32",
+      "baseCommit": "58a328ea821450be9502522a5df52e5770bb08a9",
+      "archivePath": "unused-code/plan-edits/GAP-WP32/src/cli.ts.landed",
+      "sha256": "9683205535b68616dce8d3c4db8baade49e6015bec43a74336b083c9ed93b869"
+    },
+    {
       "path": "src/compliance/complianceEngine.ts",
       "issue": "P0-17",
       "baseCommit": "6b899a60c7ba3b605fed78e9257901e84b93c871",

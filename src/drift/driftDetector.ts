@@ -11,7 +11,7 @@ import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { createFreezeIncident, createFreezeIncidentForSnapshot, createFreezeIncidentForAuthority, listIncidents, type FreezeIncident } from "./freezeEngine.js";
-import { dispatchAlert, captureVerifiedAlertsConfig } from "./alerts.js";
+import { dispatchAlert, captureVerifiedAlertsConfig, type AlertPayload } from "./alerts.js";
 import { evaluateDriftRules } from "./driftRules.js";
 
 /** runId -> ledger-anchored report hash of each trusted run. */
@@ -39,6 +39,22 @@ export interface DriftCheckResult {
   previousRunId: string | null;
   currentRunId: string | null;
   incidentId: string | null;
+}
+
+/**
+ * Drift that could not be evaluated: the run history it compares is not whole (an unreadable ledger, a thinned, hidden or
+ * unverifiable run). Alerting callers treat it as alertable, never as a clean non-trigger (security review 2026-10-31).
+ */
+export function driftNotEvaluated(result: Pick<DriftCheckResult, "reasons">): boolean {
+  return result.reasons.some((reason) => reason.startsWith("INSUFFICIENT_EVIDENCE"));
+}
+
+/** The owner alert for a drift check that could not be evaluated. */
+export function driftNotEvaluatedAlert(result: DriftCheckResult): AlertPayload {
+  return { type: "AMC_ALERT", ruleId: "drift-not-evaluated", agentId: result.agentId, runId: result.currentRunId ?? "unknown",
+    summary: `Drift not evaluated: ${result.reasons.join(" | ")}`,
+    links: { dashboard: "http://127.0.0.1:4173", report: `.amc/agents/${result.agentId}/reports/${result.currentRunId ?? "latest"}.md` },
+    hashes: { reportSha256: sha256Hex(JSON.stringify(result)), bundleSha256: sha256Hex(`${result.agentId}:${result.currentRunId}`) } };
 }
 
 // A complete repeated baseline is required for inference; shorter histories retain the unconfirmed single-run guard.
