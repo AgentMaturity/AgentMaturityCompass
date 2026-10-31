@@ -59,6 +59,8 @@ export interface ShellEgressRow {
   readonly port: number;
   readonly decision: "allow" | "deny";
   readonly reason: string;
+  /** On the row a tunnel records once open: the checked address it reached. */
+  readonly connectedAddress?: string | null;
 }
 
 /**
