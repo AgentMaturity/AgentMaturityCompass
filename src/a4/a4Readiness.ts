@@ -211,7 +211,8 @@ export interface A4GateStatus {
 export function gateStatus(state: A4ReadinessState, row: A4GateRow, policy: ApprovalPolicy, now: number): A4GateStatus {
   const request = gateRequestOf(row);
   const requestedSeq = state.chain.find((link) => link.kind === "GATE_REQUESTED" && link.body.gateId === row.gate_id)?.seq ?? Number.MAX_SAFE_INTEGER;
-  const superseding = gateSupersededBy(state.chain, { gateId: row.gate_id, revisionNo: row.revision_no, requestedSeq });
+  const superseding = gateSupersededBy(state.chain, { gateId: row.gate_id, revisionNo: row.revision_no, requestedSeq,
+    boundItemIds: (parseJson(row.bound_items_json) as string[] | null) ?? [] });
   const counted = state.decisions.filter((decision) => decision.gate_id === row.gate_id && decision.request_digest === row.binding_digest
     && decisionRecordOf(decision)?.requestDigestSha256 === row.binding_digest);
   const quorum = evaluateApprovalQuorum({ request, decisions: counted.map((decision) => decisionRecordOf(decision)!), policy, now });

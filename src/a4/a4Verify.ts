@@ -36,7 +36,7 @@ import { canonicalize } from "../utils/json.js";
 import { derivedRefCount, revisionDerivedProblems } from "./a4Derived.js";
 import { a4AlgorithmAllowed, ledgerRowAgent, resolveRefs } from "./a4Evidence.js";
 import {
-  A4_BOUND_ITEMS, A4_ENVELOPE_KINDS, DEFAULT_A4_GATE_POLICY, a4EvidenceRefRowSchema, a4TransitionRowSchema, flatSlots, gatePolicyDigestOf, gateSupersededBy,
+  A4_ENVELOPE_KINDS, boundItemsFor, DEFAULT_A4_GATE_POLICY, a4EvidenceRefRowSchema, a4TransitionRowSchema, flatSlots, gatePolicyDigestOf, gateSupersededBy,
   ratchetedFromChain, type A4ChainLink, type A4EvidenceRefRow, type A4Stage
 } from "./a4Schema.js";
 import { authorsOf, buildersOf, evaluateSod, type SodDecision } from "./a4SoD.js";
@@ -156,10 +156,10 @@ function intentProblems(db: Ledger["db"], projectId: string, links: readonly A4C
   const problems = Object.keys(expected).filter((key) => canonicalize(expected[key]) !== canonicalize(intent[key] ?? null)).map((key) => `A4_INTENT_MISMATCH: gate ${gateId} ${key}`);
   if (gate.intent_json !== canonicalize(intent) || request?.boundHashes?.intentHash !== sha256Hex(String(gate.intent_json))
     || requested.body.readinessBindingDigest !== gate.readiness_sha256) problems.push(`A4_INTENT_MISMATCH: gate ${gateId} intentHash`);
-  // Exactly the stage's set: never a gate-derived item or an environment fact, never fewer than the mandatory items.
-  // ponytail: one v1 table; key A4_BOUND_ITEMS by intent version the day it changes, or older gates would fail here.
-  if (canonicalize(expected.boundItemIds) !== canonicalize(A4_BOUND_ITEMS[gate.stage as A4Stage] ?? null)) {
-    problems.push(`A4_BOUND_ITEMS: gate ${gateId} binds an item set other than A4_BOUND_ITEMS[${String(gate.stage)}]`);
+  // Exactly the stage's set under the intent version the request names: never a gate-derived item or an environment fact,
+  // never fewer than the mandatory items, and an older gate verifies under the set it bound.
+  if (canonicalize(expected.boundItemIds) !== canonicalize(boundItemsFor(gate.stage as A4Stage, requested.body.boundItemsVersion))) {
+    problems.push(`A4_BOUND_ITEMS: gate ${gateId} binds an item set other than its intent version's set for ${String(gate.stage)}`);
   }
   return problems;
 }
@@ -447,7 +447,7 @@ function satisfactionOf(snapshot: ReturnType<ReturnType<typeof readA4Store>["sna
     const revisionNo = Number(gate.revision_no);
     const requested = links.find((link) => link.kind === "GATE_REQUESTED" && link.body.gateId === gateId);
     if (requested === undefined) continue; // a side row the chain does not name fails completeness first
-    const supersededBy = gateSupersededBy(links, { gateId, revisionNo, requestedSeq: requested.seq });
+    const supersededBy = gateSupersededBy(links, { gateId, revisionNo, requestedSeq: requested.seq, boundItemIds: ([parsed(gate.bound_items_json)].flat() as unknown[]).map(String) });
     const counted = rows.a4_decisions.filter((row) => row.gate_id === gateId).flatMap((row) => {
       const decided = links.find((link) => link.kind === "GATE_DECIDED" && link.body.decisionId === row.decision_id);
       const record = approvalDecisionSchema.safeParse(object(row.decision_json));

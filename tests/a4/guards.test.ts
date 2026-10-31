@@ -4,7 +4,7 @@
  */
 import { describe, expect, test } from "vitest";
 import {
-  deriveSelfApprovalAllowed, gateSupersededBy, laneForClaimKind, ratchetedFromChain, type A4ChainLink
+  A4_BOUND_ITEMS, boundItemsFor, deriveSelfApprovalAllowed, gateSupersededBy, laneForClaimKind, ratchetedFromChain, type A4ChainLink
 } from "../../src/a4/a4Schema.js";
 import { acknowledgeable, PLAN_ACTIVATION_DEFERRED } from "../../src/a4/a4Readiness.js";
 import { evaluateSod, type SodDecision, type SodGate } from "../../src/a4/a4SoD.js";
@@ -175,10 +175,31 @@ describe("gateSupersededBy (a member or evidence ref added after the gate opened
     const { chain: links, gate: g } = opened(make);
     expect(gateSupersededBy(links, g)).toBeNull();
   });
+  test("an acknowledgement supersedes only a gate whose intent binds the item", () => {
+    const bound = ["members.present", "plan_unresolved"];
+    const { chain: links, rest, gate: g } = opened(() => [link("ACKNOWLEDGED", 3, { itemId: "plan_unresolved" })]);
+    expect(gateSupersededBy(links, { ...g, boundItemIds: bound })?.seq).toBe(rest[0]!.seq);
+    // A gate requested under intent version 1 does not bind plan_unresolved: the owner's acknowledgement leaves it open.
+    expect(gateSupersededBy(links, { ...g, boundItemIds: ["members.present"] })).toBeNull();
+  });
   test("a superseding link before the request does not count", () => {
     const early = link("MEMBER", 3, {});
     const { chain: links, gate: g } = opened(() => []);
     expect(gateSupersededBy([early, ...links], g)).toBeNull();
+  });
+});
+
+describe("bound items by intent version (a gate verifies under the set it bound)", () => {
+  test("version 1 is the governance set at Adapt; version 2 adds the owner acknowledgements; the current set is the newest", () => {
+    expect(boundItemsFor("adapt", 1)).not.toContain("plan_unresolved");
+    expect(boundItemsFor("adapt", 2)).toEqual([...boundItemsFor("adapt", 1)!, "plan_unresolved", "regulatory_sources_status"]);
+    expect(A4_BOUND_ITEMS.adapt).toEqual(boundItemsFor("adapt", 2));
+    expect(boundItemsFor("aspire", 2)).toEqual(boundItemsFor("aspire", 1));
+  });
+  test("a gate that names no version is version 1; an unknown version binds no set", () => {
+    expect(boundItemsFor("adapt", undefined)).toEqual(boundItemsFor("adapt", 1));
+    expect(boundItemsFor("adapt", 3)).toBeNull();
+    expect(boundItemsFor("adapt", "2")).toBeNull();
   });
 });
 

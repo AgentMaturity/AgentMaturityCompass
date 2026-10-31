@@ -67,7 +67,7 @@ const GOVERNANCE_BOUND_ITEMS = [
   // request (ACKNOWLEDGED supersedes an open gate), so the item is bound.
   "sod.self_provisioned"
 ] as const;
-export const A4_BOUND_ITEMS: Readonly<Record<A4Stage, readonly string[]>> = {
+const BOUND_ITEMS_V1: Readonly<Record<A4Stage, readonly string[]>> = {
   aspire: [...GOVERNANCE_BOUND_ITEMS],
   assemble: [...GOVERNANCE_BOUND_ITEMS],
   adapt: [...GOVERNANCE_BOUND_ITEMS],
@@ -78,6 +78,21 @@ export const A4_BOUND_ITEMS: Readonly<Record<A4Stage, readonly string[]>> = {
   activate: [...GOVERNANCE_BOUND_ITEMS, "lineage.independent_approvals", "deployment.same_host", "package.transparency", "deployment.receipt", "deployment.amc_check",
     "lease.scope", "monitoring.source", "regulatory_sources_status"]
 };
+/**
+ * The bound sets by intent version: a gate's GATE_REQUESTED body names the `boundItemsVersion` it was requested under
+ * (none is version 1), so a gate requested before a set changed still verifies under the set it bound. Version 2 binds
+ * Adapt's owner acknowledgements, `plan_unresolved` and D-21's `regulatory_sources_status`: one recorded after the
+ * request now supersedes the gate whose intent holds it, and none supersedes a gate whose intent does not.
+ */
+const BOUND_ITEMS_BY_VERSION: Readonly<Record<number, Readonly<Record<A4Stage, readonly string[]>>>> = {
+  1: BOUND_ITEMS_V1,
+  2: { ...BOUND_ITEMS_V1, adapt: [...BOUND_ITEMS_V1.adapt, "plan_unresolved", "regulatory_sources_status"] }
+};
+export const A4_BOUND_ITEMS_VERSION = 2;
+export const A4_BOUND_ITEMS = BOUND_ITEMS_BY_VERSION[A4_BOUND_ITEMS_VERSION]!;
+/** The set a gate of `stage` binds under `version` (a GATE_REQUESTED body's `boundItemsVersion`; absent is 1); null for an unknown version. */
+export const boundItemsFor = (stage: A4Stage, version: unknown): readonly string[] | null =>
+  (version === undefined ? BOUND_ITEMS_V1 : typeof version === "number" ? BOUND_ITEMS_BY_VERSION[version] : undefined)?.[stage] ?? null;
 
 /**
  * The session-id prefix of the turns A4 composes itself (Adapt's context probe on the stub provider,
@@ -125,15 +140,19 @@ export interface A4ChainLink {
 
 /**
  * The later transition that supersedes `gate`, or null (design §6.7). A HOLD cleared by a later RESUME does not
- * supersede; GATE_CONSUMED supersedes only its own gate; EVIDENCE_REF and ACKNOWLEDGED only on the bound revision.
+ * supersede; GATE_CONSUMED supersedes only its own gate; EVIDENCE_REF and ACKNOWLEDGED only on the bound revision, and
+ * ACKNOWLEDGED only for an item the gate's intent binds.
  */
-export function gateSupersededBy(chain: readonly A4ChainLink[], gate: { gateId: string; revisionNo: number; requestedSeq: number }): A4ChainLink | null {
+export function gateSupersededBy(chain: readonly A4ChainLink[], gate: { gateId: string; revisionNo: number; requestedSeq: number;
+  /** The gate's stored bound set: an ACKNOWLEDGED of an item outside it does not supersede (its intent never held it). */
+  boundItemIds?: readonly string[] }): A4ChainLink | null {
   const later = chain.filter((link) => link.seq > gate.requestedSeq).sort((a, b) => a.seq - b.seq);
   for (const link of later) {
     if (!(A4_SUPERSEDING_KINDS as readonly string[]).includes(link.kind)) continue;
     if (link.kind === "HOLD" && later.some((resume) => resume.kind === "RESUME" && resume.seq > link.seq)) continue;
     if (link.kind === "GATE_CONSUMED" && link.body.gateId !== gate.gateId) continue;
     if ((link.kind === "EVIDENCE_REF" || link.kind === "ACKNOWLEDGED") && link.revisionNo !== gate.revisionNo) continue;
+    if (link.kind === "ACKNOWLEDGED" && gate.boundItemIds !== undefined && !gate.boundItemIds.includes(String(link.body.itemId))) continue;
     return link;
   }
   return null;
