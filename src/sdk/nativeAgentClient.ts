@@ -2,7 +2,6 @@ import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
 import { realpathSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { resolve } from "node:path";
-import type { Writable } from "node:stream";
 import { TextDecoder } from "node:util";
 import type { AgentRunVerification } from "../agent/runReport.js";
 import type { NativeValidationResult } from "../agent/nativeValidation.js";
@@ -99,8 +98,7 @@ export type AMCNativeMcpStatus = NativeMcpStatus;
    * Nothing else (AMC_TOKEN, a parent lease, a provider key) is inherited unless `inheritEnv` is true.
    */
   readonly env?: NodeJS.ProcessEnv;
-  /** A lease minted for this runtime alone (Studio native tasks): handed to the child over an inherited pipe, never its environment. */
-  readonly leaseToken?: string;
+  /** A lease minted for this runtime alone (Studio native tasks): handed to the child over an inherited pipe, never its environment. */ readonly leaseToken?: string;
   /** Opt in to merging the whole parent environment under `env` (the pre-WP36 default). */
   readonly inheritEnv?: boolean;
   readonly timeoutMs?: number;
@@ -144,7 +142,6 @@ export type AMCNativeMcpStatus = NativeMcpStatus;
   /** The phases the verifier reported, `evidence-verification: succeeded` included (P2-13). */
   readonly execution: ExecutionStatus;
 }
-
 
 /** @public */ export class AMCNativeSession {
   readonly state = "accepted" as const;
@@ -280,10 +277,8 @@ export class AMCNativeClient {
     }
     // The cold verifier must use the very same pinned executable, even if the caller edits its options array.
     this.command = Object.freeze([...command]) as readonly [string, ...string[]];
-    const lease = options.leaseToken;
-    if (lease !== undefined && (typeof lease !== "string" || !/^[A-Za-z0-9_.-]{1,8192}$/.test(lease))) throw new AMCNativeInputError("leaseToken must be a lease token");
-    const { [NATIVE_TASK_LEASE_FD_ENV]: _leaseFd, ...env } = { ...(options.inheritEnv === true ? process.env : runtimeChildEnv(process.env)), ...options.env };
-    this.env = lease === undefined ? env : { ...env, [NATIVE_TASK_LEASE_FD_ENV]: String(NATIVE_TASK_LEASE_FD) };
+    const lease = options.leaseToken; if (lease !== undefined && (typeof lease !== "string" || !/^[A-Za-z0-9_.-]{1,8192}$/.test(lease))) throw new AMCNativeInputError("leaseToken must be a lease token");
+    this.env = { ...(options.inheritEnv === true ? process.env : runtimeChildEnv(process.env)), ...options.env, [NATIVE_TASK_LEASE_FD_ENV]: lease === undefined ? undefined : String(NATIVE_TASK_LEASE_FD) };
     this.agentId = options.agentId ?? "default";
     const args = [...this.command.slice(1), "acp", "--provider", options.provider];
     for (const [flag, value] of [["--model", options.model], ["--credential", options.credential],
@@ -306,10 +301,9 @@ export class AMCNativeClient {
         || options.validate.some(id => typeof id !== "string" || !/^[a-zA-Z0-9_-]{1,64}$/.test(id))) throw new AMCNativeInputError("Select one through eight distinct public validation check IDs.");
       for (const id of options.validate) args.push("--validate", id);
     }
-    if ((options.validate !== undefined || options.validationConfigSha256 !== undefined || options.validationRepair !== undefined) && !options.validationConfig)
-      throw new Error("Public validation requires an explicit operator config file.");
+    if ((options.validate !== undefined || options.validationConfigSha256 !== undefined || options.validationRepair !== undefined) && !options.validationConfig) throw new Error("Public validation requires an explicit operator config file.");
     this.child = spawn(this.command[0], args, { cwd: this.workspace, env: this.env, stdio: lease === undefined ? "pipe" : ["pipe", "pipe", "pipe", "pipe"], shell: false }) as ChildProcessWithoutNullStreams;
-    if (lease !== undefined) (this.child.stdio[NATIVE_TASK_LEASE_FD] as Writable).once("error", () => this.fail(new AMCNativeProtocolError("native agent lease pipe failed"))).end(lease);
+    if (lease !== undefined) (this.child.stdio[NATIVE_TASK_LEASE_FD] as NodeJS.WritableStream).once("error", () => this.fail(new AMCNativeProtocolError("native agent lease pipe failed"))).end(lease);
     this.childClosed = new Promise((resolve_) => {
       this.child.once("close", (code, signal) => { this.closed = true; resolve_();
         this.exitDetails = Object.freeze({ exitCode: code, signal });
