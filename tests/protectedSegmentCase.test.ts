@@ -113,7 +113,7 @@ describe("protected segments compare case-insensitively", () => {
       step += 1;
       const outcome = await toolset.seam.execute({
         callId: `c${step}`, toolName, rawArguments: JSON.stringify(args), sessionId: "segcase-session",
-        turn: 1, step, parentToken: null, signal: new AbortController().signal
+        turn: 1, step, parentToken: null, dispatch: "native", signal: new AbortController().signal
       });
       return String(outcome.content);
     };
