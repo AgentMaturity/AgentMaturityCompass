@@ -198,6 +198,8 @@ function createStore(workspace: string, ledger: Ledger, trust?: TrustContext, mi
     const problems: string[] = [];
     if (a4WitnessExists(db, projectId, head.head_seq + 1)) problems.push("chain truncated: a later A4 audit session exists");
     const links = walk(readRows(projectId), problems);
+    // The head row is unsigned; receipts and the foreign-agent check read its agent id, so it must be the signed CREATED body's (A4_SCOPE_AGENT).
+    if (links[0]?.body.agentId !== head.agent_id) problems.push("A4_SCOPE_AGENT: the head row and the CREATED transition name different agents");
     const last = links.at(-1);
     if (last === undefined || last.seq !== head.head_seq || last.row.body_digest !== head.head_digest
       || head.verified_seq !== head.head_seq || head.verified_digest !== head.head_digest) {
