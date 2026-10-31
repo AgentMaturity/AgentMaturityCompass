@@ -387,8 +387,7 @@ function prepareExperimentReport(params: ExperimentRunParams) {
     const dropped = row.status !== "unavailable" && candidate.status === "unavailable";
     return {
       caseId: row.caseId, title: row.title,
-      baselineSuccess: row.success,
-      candidateSuccess: dropped ? false : candidate.success,
+      baselineSuccess: row.success, candidateSuccess: dropped ? false : candidate.success,
       baselineValuePoints: row.valuePoints,
       candidateValuePoints: dropped ? 0 : candidate.valuePoints === null ? null : Number(candidate.valuePoints.toFixed(4)),
       baselineSuccessPoints: row.successPoints,
@@ -396,8 +395,7 @@ function prepareExperimentReport(params: ExperimentRunParams) {
       baselineCost: row.costTokens,
       candidateCost: candidate.costTokens === null ? null : Number(candidate.costTokens.toFixed(6)),
       reasons: row.reasons,
-      baselineStatus: row.status,
-      candidateStatus: candidate.status,
+      baselineStatus: row.status, candidateStatus: candidate.status,
       candidateReasons: candidate.reasons,
       paired: row.status !== "unavailable",
       baselineExecution: executionOf(row),

@@ -9,7 +9,7 @@
   ],
   "budgets": {
     "src/benchmarks/replayBenchmarkCorpus.ts": 29468,
-    "src/cli.ts": 24339,
+    "src/cli.ts": 24336,
     "src/score/metricValidity.ts": 16881,
     "src/watch/liveDriftAlerts.ts": 9792,
     "src/studio/studioServer.ts": 8707,
@@ -49,9 +49,9 @@
     "src/fleet/governance.ts": 964,
     "src/ops/operatorUx.ts": 953,
     "src/fleet/cascadeSimulator.ts": 943,
-    "src/assurance/microCanary.ts": 904,
-    "src/api/scoreRouter.ts": 901,
+    "src/assurance/microCanary.ts": 903,
     "src/claims/governanceLineage.ts": 900,
+    "src/api/scoreRouter.ts": 893,
     "src/observability/otelExporter.ts": 893,
     "src/bridge/hookIngress.ts": 884,
     "src/score/predictiveValidity.ts": 854
