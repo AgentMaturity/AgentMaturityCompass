@@ -55,17 +55,41 @@ jobs:
           npm i -g /tmp/amc.tgz
       
       - name: Initialize AMC workspace
+        # A committed .amc workspace is used as it is; its vault passphrase comes from AMC_VAULT_PASSPHRASE. A fresh one
+        # gets a vault whose generated passphrase lives only in this job's environment, masked in the log.
         run: |
-          amc init --non-interactive --agent ${{ inputs.agent-id }} || true
+          set -euo pipefail
+          if [ -d .amc ]; then
+            echo "Using the AMC workspace in $(pwd)/.amc."
+            exit 0
+          fi
+          if [ -z "${AMC_VAULT_PASSPHRASE:-}" ]; then
+            AMC_VAULT_PASSPHRASE="amc-ci-$(node -e 'process.stdout.write(require("crypto").randomBytes(24).toString("base64url"))')"
+            echo "::add-mask::$AMC_VAULT_PASSPHRASE"
+            echo "AMC_VAULT_PASSPHRASE=$AMC_VAULT_PASSPHRASE" >> "$GITHUB_ENV"
+            export AMC_VAULT_PASSPHRASE
+          fi
+          amc init --minimal --profile ci
       
       - name: Run AMC Score
         id: amc
         run: |
-          RESULT=$(amc --json --agent ${{ inputs.agent-id }})
-          SCORE=$(echo "$RESULT" | jq -r '.score // 0')
-          LEVEL=$(echo "$RESULT" | jq -r '.level // "L0"')
+          set -euo pipefail
+          RESULT=$(amc --json --agent "${{ inputs.agent-id }}")
+          # No evidence yet is a result, never a score: score and level stay empty.
+          if [ "$(echo "$RESULT" | jq -r '.evidenceStatus')" = "INSUFFICIENT_EVIDENCE" ]; then
+            echo "evidence=none" >> "$GITHUB_OUTPUT"
+            echo "## 🧭 AMC: no evidence yet" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "$RESULT" | jq -r '.nextEvidenceStep // "No measured maturity score was produced."' >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          SCORE=$(echo "$RESULT" | jq -r '.score')
+          LEVEL=$(echo "$RESULT" | jq -r '.level')
+          LEVEL_NUM=$(echo "$RESULT" | jq -r '.overallLevel | floor')
           echo "score=$SCORE" >> "$GITHUB_OUTPUT"
           echo "level=$LEVEL" >> "$GITHUB_OUTPUT"
+          echo "level_num=$LEVEL_NUM" >> "$GITHUB_OUTPUT"
           echo "## 🧭 AMC Score: $SCORE ($LEVEL)" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "$RESULT" | jq -r '.dimensions // {} | to_entries[] | "| \(.key) | \(.value.score) | \(.value.level) |"' >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true
@@ -73,8 +97,15 @@ jobs:
       - name: Check target level
         if: inputs.fail-below
         run: |
-          LEVEL_NUM=$(echo "${{ steps.amc.outputs.level }}" | sed 's/L//')
-          if [ "$LEVEL_NUM" -lt "${{ inputs.target-level }}" ]; then
+          if [ "${{ steps.amc.outputs.evidence }}" = "none" ]; then
+            if [ "${{ inputs.target-level }}" -gt 0 ]; then
+              echo "❌ No evidence yet: AMC has no measured level to compare with target L${{ inputs.target-level }}"
+              exit 1
+            fi
+            echo "✅ No target level is set, and there is no evidence yet"
+            exit 0
+          fi
+          if [ "${{ steps.amc.outputs.level_num }}" -lt "${{ inputs.target-level }}" ]; then
             echo "❌ AMC score ${{ steps.amc.outputs.level }} is below target L${{ inputs.target-level }}"
             exit 1
           fi

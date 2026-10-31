@@ -96,7 +96,21 @@ runs:
     - name: Initialize AMC workspace
       shell: bash
       working-directory: ${{ inputs.working-directory }}
-      run: amc init --non-interactive --agent "${{ inputs.agent-id }}" 2>/dev/null || true
+      run: |
+        set -euo pipefail
+        # A committed .amc workspace is used as it is; its vault passphrase comes from AMC_VAULT_PASSPHRASE. A fresh one
+        # gets a vault whose generated passphrase lives only in this job's environment, masked in the log.
+        if [ -d .amc ]; then
+          echo "Using the AMC workspace in $(pwd)/.amc."
+          exit 0
+        fi
+        if [ -z "${AMC_VAULT_PASSPHRASE:-}" ]; then
+          AMC_VAULT_PASSPHRASE="amc-ci-$(node -e 'process.stdout.write(require("crypto").randomBytes(24).toString("base64url"))')"
+          echo "::add-mask::$AMC_VAULT_PASSPHRASE"
+          echo "AMC_VAULT_PASSPHRASE=$AMC_VAULT_PASSPHRASE" >> "$GITHUB_ENV"
+          export AMC_VAULT_PASSPHRASE
+        fi
+        amc init --minimal --profile ci
 
     - name: Run AMC evaluation
       id: run-amc
@@ -111,23 +125,44 @@ runs:
         }
 
         ANSWERS_FILE="${{ inputs.answers-file }}"
+        STATUS=0
         if [ -n "$ANSWERS_FILE" ] && [ -f "$ANSWERS_FILE" ]; then
-          RAW_RESULT=$(amc quickscore --rapid --answers "$ANSWERS_FILE" --json --agent "${{ inputs.agent-id }}")
+          RAW_RESULT=$(amc quickscore --rapid --answers "$ANSWERS_FILE" --json --agent "${{ inputs.agent-id }}") || STATUS=$?
         else
-          RAW_RESULT=$(amc quickscore --auto --json --agent "${{ inputs.agent-id }}")
+          RAW_RESULT=$(amc quickscore --auto --json --agent "${{ inputs.agent-id }}") || STATUS=$?
         fi
         RESULT=$(printf '%s\n' "$RAW_RESULT" | extract_json)
         echo "$RESULT" > "$RESULT_PATH"
+        echo "result_path=$RESULT_PATH" >> "$GITHUB_OUTPUT"
 
-        SCORE=$(echo "$RESULT" | jq -r '.score // .percentage // 0')
-        LEVEL=$(echo "$RESULT" | jq -r '.level // .overallLevel // .preliminaryLevel // "L0"')
-        LEVEL_NUM=$(echo "$LEVEL" | sed 's/L//')
-        if ! [[ "$LEVEL_NUM" =~ ^[0-9]+$ ]]; then LEVEL_NUM=0; fi
+        # No evidence yet is a result, never a crash and never a score: quickscore exits 1 with AUTO_NO_EVIDENCE, or its
+        # report's result is not evaluated. score and level stay empty.
+        if [ "$(echo "$RESULT" | jq -r '.scoreStatus == "AUTO_NO_EVIDENCE" or .statusDimensions.result == "not_evaluated"')" = "true" ]; then
+          echo "evidence=none" >> "$GITHUB_OUTPUT"
+          echo "## 🧭 AMC: no evidence yet" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "No measured maturity score was produced for agent \`${{ inputs.agent-id }}\`." >> "$GITHUB_STEP_SUMMARY"
+          echo "$RESULT" | jq -r '.error // empty, .firstRunHint // empty' >> "$GITHUB_STEP_SUMMARY"
+          exit 0
+        fi
+        if [ "$STATUS" -ne 0 ]; then
+          echo "::error::amc quickscore exited $STATUS: $(echo "$RESULT" | jq -r '.error // "no error message"')"
+          exit "$STATUS"
+        fi
+
+        # Survey answers carry percentage and preliminaryLevel; an auto report carries layer levels, combined as the CLI's
+        # Overall line combines them. A result with neither is refused, never read as 0 or L0.
+        SCORE=$(echo "$RESULT" | jq -r '.score // .percentage // ([.layerScores[]?.avgFinalLevel] | if length > 0 then add / length * 100 | round / 100 else empty end)')
+        LEVEL=$(echo "$RESULT" | jq -r '.level // .overallLevel // .preliminaryLevel // ([.layerScores[]?.avgFinalLevel] | if length > 0 then "L\(add / length | floor | [., 5] | min)" else empty end)')
+        LEVEL_NUM=${LEVEL#L}
+        if [ -z "$SCORE" ] || ! [[ "$LEVEL_NUM" =~ ^[0-5]$ ]]; then
+          echo "::error::The AMC result names no score and L0-L5 level; see $RESULT_PATH."
+          exit 1
+        fi
 
         echo "score=$SCORE"         >> "$GITHUB_OUTPUT"
         echo "level=$LEVEL"         >> "$GITHUB_OUTPUT"
         echo "level_num=$LEVEL_NUM" >> "$GITHUB_OUTPUT"
-        echo "result_path=$RESULT_PATH" >> "$GITHUB_OUTPUT"
 
         # Step summary
         echo "## 🧭 AMC Score: ${SCORE} (${LEVEL})" >> "$GITHUB_STEP_SUMMARY"
@@ -146,6 +181,13 @@ runs:
         extract_json() {
           node -e 'let s="";process.stdin.setEncoding("utf8");process.stdin.on("data",c=>{s+=c;});process.stdin.on("end",()=>{const start=s.indexOf("{");if(start<0){console.error("AMC produced no JSON output");process.exit(2);}let depth=0,inString=false,escape=false,end=-1;for(let i=start;i<s.length;i++){const ch=s[i];if(escape){escape=false;continue;}if(ch==="\\"){escape=true;continue;}if(ch==="\""){inString=!inString;continue;}if(inString)continue;if(ch==="{")depth++;if(ch==="}"){depth--;if(depth===0){end=i+1;break;}}}if(end<0){console.error("AMC JSON output was truncated");process.exit(2);}const candidate=s.slice(start,end);try{JSON.parse(candidate);console.log(candidate);}catch{console.error("AMC output was not valid JSON");process.exit(2);}});'
         }
+
+        if [ "${{ steps.run-amc.outputs.evidence }}" = "none" ]; then
+          echo "dropped=false" >> "$GITHUB_OUTPUT"
+          echo "base_score=unavailable" >> "$GITHUB_OUTPUT"
+          echo "No evidence yet on this branch; skipping drop comparison." >> "$GITHUB_STEP_SUMMARY"
+          exit 0
+        fi
 
         # Checkout base branch, score it, compare
         git fetch origin "${{ github.base_ref }}" --depth=1 2>/dev/null || true
@@ -170,7 +212,9 @@ runs:
         HEAD_SCORE="${{ steps.run-amc.outputs.score }}"
         if [ -n "$RAW_BASE_RESULT" ]; then
           BASE_RESULT=$(printf '%s\n' "$RAW_BASE_RESULT" | extract_json)
-          BASE_SCORE=$(echo "$BASE_RESULT" | jq -r '.score // .percentage // 0')
+          BASE_SCORE=$(echo "$BASE_RESULT" | jq -r 'if .scoreStatus == "AUTO_NO_EVIDENCE" or .statusDimensions.result == "not_evaluated" then empty else .score // .percentage // ([.layerScores[]?.avgFinalLevel] | if length > 0 then add / length * 100 | round / 100 else empty end) end')
+        fi
+        if [ -n "${BASE_SCORE:-}" ]; then
           echo "base_score=$BASE_SCORE" >> "$GITHUB_OUTPUT"
           DROPPED=$(python3 -c "print('true' if float('$HEAD_SCORE') < float('$BASE_SCORE') else 'false')")
         else
@@ -190,15 +234,23 @@ runs:
       run: |
         set -euo pipefail
         TARGET=${{ inputs.target-level }}
-        LEVEL_NUM=${{ steps.run-amc.outputs.level_num }}
-        if ! [[ "$LEVEL_NUM" =~ ^[0-9]+$ ]]; then LEVEL_NUM=0; fi
+        EVIDENCE="${{ steps.run-amc.outputs.evidence }}"
+        LEVEL_NUM="${{ steps.run-amc.outputs.level_num }}"
         DROPPED="${{ steps.drop.outputs.dropped || 'false' }}"
         FAIL_ON_DROP="${{ inputs.fail-on-drop }}"
 
         PASSED=true
         REASON=""
 
-        if [ "$TARGET" -gt 0 ] && [ "$LEVEL_NUM" -lt "$TARGET" ]; then
+        if [ "$EVIDENCE" = "none" ]; then
+          if [ "$TARGET" -gt 0 ]; then
+            PASSED=false
+            REASON="no evidence yet: AMC has no measured level to compare with the required L${TARGET}"
+          fi
+        elif ! [[ "$LEVEL_NUM" =~ ^[0-5]$ ]]; then
+          PASSED=false
+          REASON="the AMC result has no level"
+        elif [ "$TARGET" -gt 0 ] && [ "$LEVEL_NUM" -lt "$TARGET" ]; then
           PASSED=false
           REASON="AMC level L${LEVEL_NUM} is below required L${TARGET}"
         fi
@@ -214,6 +266,8 @@ runs:
           echo "❌ Gate failed: $REASON" >> "$GITHUB_STEP_SUMMARY"
           echo "::error::AMC gate failed: $REASON"
           exit 1
+        elif [ "$EVIDENCE" = "none" ]; then
+          echo "✅ AMC gate passed: no target level is set, and there is no evidence yet" >> "$GITHUB_STEP_SUMMARY"
         else
           echo "✅ AMC gate passed — L${LEVEL_NUM} (${{ steps.run-amc.outputs.score }})" >> "$GITHUB_STEP_SUMMARY"
         fi
@@ -235,6 +289,9 @@ runs:
         else COLOR="red"; fi
 
         BADGE_URL="https://img.shields.io/badge/AMC-${LEVEL}%20(${SCORE})-${COLOR}?logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTEyIDJMMiA3bDEwIDUgMTAtNXptMCA5bC04LjUtNC4yNUwyIDEybDEwIDUgMTAtNXptMCA5bC04LjUtNC4yNUwyIDIxbDEwIDUgMTAtNXoiLz48L3N2Zz4="
+        if [ "${{ steps.run-amc.outputs.evidence }}" = "none" ]; then
+          BADGE_URL="https://img.shields.io/badge/AMC-no%20evidence%20yet-lightgrey"
+        fi
         echo "badge_url=$BADGE_URL" >> "$GITHUB_OUTPUT"
 
         # Save badge markdown to temp for artifact
@@ -247,13 +304,13 @@ runs:
         script: |
           const fs = require('fs');
           const resultPath = '${{ steps.run-amc.outputs.result_path }}';
-          let result = { score: 0, level: 'L0', dimensions: {} };
+          let result = {};
           try { result = JSON.parse(fs.readFileSync(resultPath, 'utf8')); } catch {}
 
-          const rawScore = result.score ?? result.percentage ?? 0;
-          const score = rawScore.toFixed ? rawScore.toFixed(2) : rawScore;
-          const level = result.level || result.overallLevel || result.preliminaryLevel || 'L0';
-          const levelNum = parseInt(level.replace('L', ''));
+          // The scoring step's outputs, not the raw result: no evidence yet and a failed evaluation are never a score.
+          const noEvidence = '${{ steps.run-amc.outputs.evidence }}' === 'none';
+          const score = '${{ steps.run-amc.outputs.score }}';
+          const level = '${{ steps.run-amc.outputs.level }}';
           const targetLevel = parseInt('${{ inputs.target-level }}') || 0;
           const passed = '${{ steps.gate.outputs.passed }}' !== 'false';
           const dropped = '${{ steps.drop.outputs.dropped }}' === 'true';
@@ -278,7 +335,24 @@ runs:
           if (dropped) statusLine += ` · ⚠️ Score dropped from ${baseScore}`;
 
           const badge = '${{ steps.badge.outputs.badge_url }}';
-          const body = `## ${statusEmoji} AMC Score: ${score} (${level})
+          const footer = `---
+          *[Agent Maturity Compass](https://github.com/AgentMaturity/AgentMaturityCompass) · amc-action v1*
+          <!-- amc-action -->`;
+          const body = noEvidence
+            ? `## ${passed ? '⚪' : '❌'} AMC: no evidence yet
+
+          No measured maturity score was produced. ${result.firstRunHint ?? 'Capture evidence with `amc wrap <runtime> -- <your-agent-command>`, or score survey answers with the `answers-file` input.'}
+
+          **Status:** ${passed ? 'No target level is set' : `No measured level to compare with the required L${targetLevel}`}
+
+          ${footer}`
+            : !level
+            ? `## ❌ AMC: no result
+
+          The AMC evaluation step did not produce a score; see the job log.
+
+          ${footer}`
+            : `## ${statusEmoji} AMC Score: ${score} (${level})
 
           ![AMC Badge](${badge})
 
@@ -286,8 +360,7 @@ runs:
 
           **Status:** ${statusLine}
 
-          ---
-          *[Agent Maturity Compass](https://github.com/AgentMaturity/AgentMaturityCompass) · amc-action v1*`;
+          ${footer}`;
 
           // Upsert: find existing AMC comment and update, or create new
           const { data: comments } = await github.rest.issues.listComments({
@@ -295,7 +368,7 @@ runs:
             repo: context.repo.repo,
             issue_number: context.issue.number,
           });
-          const existing = comments.find(c => c.body && c.body.includes('AMC Score:'));
+          const existing = comments.find(c => c.body && (c.body.includes('<!-- amc-action -->') || c.body.includes('AMC Score:')));
           if (existing) {
             await github.rest.issues.updateComment({
               owner: context.repo.owner,
