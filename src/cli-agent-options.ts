@@ -348,7 +348,9 @@ export function nativeRouteFor(
   const defaults = lookupProviderCatalog(providerId);
   const baseUrl = options.baseUrl ?? defaults?.defaultBaseUrl;
   if (baseUrl === undefined || baseUrl === null) throw new Error(`--base-url is required for provider ${providerId}`);
-  const credential = options.credential ?? defaults?.defaultCredentialRef;
+  // The default credential goes only to the provider's own origin, as model enumeration rules (modelEnumeration.ts).
+  const ownOrigin = defaults?.defaultBaseUrl != null && new URL(baseUrl).origin === new URL(defaults.defaultBaseUrl).origin;
+  const credential = options.credential ?? (ownOrigin ? defaults?.defaultCredentialRef : undefined);
   if (credential === undefined || credential === null) throw new Error(`--credential is required for provider ${providerId}`);
   return { providerId, adapter, baseUrl,
     credentialRef: credentialRef(credential),
