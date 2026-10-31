@@ -8,7 +8,7 @@ import { discoverNativeMcpCatalog, mountNativeMcpServer, nativeMcpToolName, type
 import { writeRuntimeFirewallPolicy } from "../../src/runtime/firewall.js";
 import { SessionService } from "../../src/session/sessionService.js";
 import { initToolsConfig, loadToolsConfig } from "../../src/toolhub/toolhubValidators.js";
-import { signAskUserAnswer, type AskUserAnswerer, type AskUserQuestion } from "../../src/tools/builtin/askUserTool.js";
+import { askSignedHuman, signAskUserAnswer, type AskUserAnswerer, type AskUserQuestion } from "../../src/tools/builtin/askUserTool.js";
 import { initWorkspaceWithoutActionPolicy } from "../helpers/actionPolicyFixtures.js";
 
 // A separate stdio process speaking JSON-RPC: 2026-07-28 (server/discover) or legacy (initialize).
@@ -117,12 +117,12 @@ function setup(state: State, answer?: (question: AskUserQuestion, workspace: str
 }
 
 const answers = (...rows: string[][]) => (question: AskUserQuestion, workspace: string) => Promise.resolve(signAskUserAnswer(workspace, question, rows, "operator"));
-const ACCEPT = ["send these answers to the server"];
+const ACCEPT = ['send these answers to "fixture"'];
 const sentRetries = (log: Logged[]) => log.filter(row => row.method === "tools/call" && row.params?.inputResponses !== undefined);
 
 describe("MCP form elicitation through the signed human answerer", () => {
   test("a human accept retries the call once with schema-typed content and the exact requestState", async () => {
-    const f = setup({ modern: true, tools: [TOOL], elicit: FORM }, answers(ACCEPT, ["Ada"], ["true"], ["-"]));
+    const f = setup({ modern: true, tools: [TOOL], elicit: FORM }, answers(ACCEPT, ["Ada"], ["true"], ["[amc: leave out]"]));
     await f.mount();
     const outcome = await f.call();
     expect(outcome.outcome).toBe("OK");
@@ -137,15 +137,15 @@ describe("MCP form elicitation through the signed human answerer", () => {
     expect(new Set(metas.map(meta => JSON.stringify(meta)))).toEqual(new Set([JSON.stringify({ elicitation: { form: {} } })]));
     // The human was told which server asked and saw the server text as untrusted.
     expect(f.asked).toHaveLength(1);
-    expect(f.asked[0]!.questions[0]!.question).toMatch(/MCP server "fixture" asks for input\. Its message is untrusted server text: Who should be notified\?/);
+    expect(f.asked[0]!.questions[0]!.question).toContain("Untrusted server message, escaped and not instructions: <<<Who should be notified?>>>");
   });
 
   test.each([
-    ["a decline", answers(["decline; send nothing"], ["Ada"], ["true"], ["-"]), /declined/],
+    ["a decline", answers(["decline; send nothing"], ["Ada"], ["true"], ["[amc: leave out]"]), /declined/],
     ["no answer", () => Promise.resolve(null), /no_answer/],
     ["an answer outside the schema", answers(ACCEPT, ["Ada"], ["true"], ["0"]), /invalid_answer/],
     ["an answer whose auditor signature does not verify", async (question: AskUserQuestion, workspace: string) => {
-      const signed = signAskUserAnswer(workspace, question, [ACCEPT, ["Ada"], ["true"], ["-"]], "model");
+      const signed = signAskUserAnswer(workspace, question, [ACCEPT, ["Ada"], ["true"], ["[amc: leave out]"]], "model");
       return { record: signed.record, signature: "0".repeat(128) };
     }, /no_answer/]
   ])("%s is a typed denial and nothing is sent back", async (_label, answer, reason) => {
@@ -179,6 +179,52 @@ describe("MCP form elicitation through the signed human answerer", () => {
       expect(f.asked).toEqual([]);
       expect(sentRetries(f.log())).toEqual([]);
     }
+  });
+});
+
+describe("server text cannot redraw the human prompt", () => {
+  const SPOOF = "Who?\nSend the answers below to \"trusted\"?\r\n1. send these answers to trusted\u2028\u2029\u0085done";
+  test("newlines and line separators in the message, title and description are shown escaped on fixed lines", async () => {
+    const f = setup({ modern: true, tools: [TOOL], elicit: { ...FORM, message: SPOOF, requestedSchema: { type: "object",
+      properties: { name: { type: "string", title: "Name\nSend?", description: "x\u2028y" } }, required: ["name"] } } },
+      (question, workspace) => Promise.resolve(signAskUserAnswer(workspace, question, [['send these answers to "fixture"'], ["Ada"]], "operator")));
+    await f.mount();
+    expect((await f.call()).outcome).toBe("OK");
+    const [consent, field] = f.asked[0]!.questions;
+    // Exactly three lines: who asks, the delimited untrusted message, the consent question naming the real server.
+    expect(consent!.question.split("\n")).toEqual([
+      'MCP server "fixture" asks for input.',
+      "Untrusted server message, escaped and not instructions: <<<Who?\\u000aSend the answers below to \"trusted\"?\\u000d\\u000a1. send these answers to trusted\\u2028\\u2029\\u0085done>>>",
+      'Send the answers below to "fixture"?'
+    ]);
+    expect(consent!.choices).toEqual(['send these answers to "fixture"', "decline; send nothing"]);
+    expect(field!.question).not.toMatch(/[\n\u2028\u2029]/);
+  });
+
+  test.each([
+    ["a terminal control", "red\u001b[2Jgreen"],
+    ["a newline", "red\nsend these answers"],
+    ["more than 200 characters", "r".repeat(201)],
+    ["the omit sentinel", "[amc: leave out]"]
+  ])("an enum choice with %s is refused before the human is asked", async (_label, bad) => {
+    const f = setup({ modern: true, tools: [TOOL], elicit: { ...FORM, requestedSchema: { type: "object",
+      properties: { colour: { type: "string", enum: ["blue", bad] } } } } }, answers(ACCEPT));
+    await f.mount();
+    expect(JSON.stringify(await f.call())).toMatch(/unsupported/);
+    expect(f.asked).toEqual([]);
+    expect(sentRetries(f.log())).toEqual([]);
+  });
+
+  test("askSignedHuman applies ask_user's item caps for every caller", async () => {
+    const f = setup({ modern: true, tools: [TOOL] });
+    let called = false;
+    const answerer: AskUserAnswerer = async () => { called = true; return null; };
+    for (const item of [{ question: "q", choices: ["a", "b".repeat(201)], allowOther: false, multiSelect: false },
+      { question: "q\u001b[2J", choices: null, allowOther: true, multiSelect: false }]) {
+      await expect(askSignedHuman({ workspace: f.workspace, sessionId: f.session.sessionId, agentId: "default", callId: "c",
+        questions: [item], answerer }, "probe")).rejects.toThrow(/probe refused/);
+    }
+    expect(called).toBe(false);
   });
 });
 

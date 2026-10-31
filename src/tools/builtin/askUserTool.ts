@@ -244,6 +244,12 @@ export async function askSignedHuman(input: {
   readonly questions: readonly AskUserItem[]; readonly answerer: AskUserAnswerer;
   readonly signal?: AbortSignal | undefined; readonly timeoutMs?: number | undefined;
 }, tool: string): Promise<SignedHumanAnswer> {
+  // The same per-item caps ask_user's arguments get, whoever builds the question.
+  for (const item of input.questions) {
+    const parsed = itemSchema.safeParse({ question: item.question, ...(item.choices === null ? {} : { choices: item.choices }),
+      allowOther: item.allowOther, multiSelect: item.multiSelect });
+    if (!parsed.success) throw new NativeToolRefusal(tool, "a question or choice is empty, oversized or contains terminal control characters");
+  }
   const dir = join(sessionRecordDir(input.workspace, input.sessionId), "ask-user");
   const record: AskUserQuestionRecord = {
     schemaVersion: "2026-10-29",

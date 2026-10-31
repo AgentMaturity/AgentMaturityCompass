@@ -24,9 +24,14 @@ const MAX_REQUESTS = 4;
 const MAX_FIELDS = 16;
 const MAX_MESSAGE = 1_000;
 const MAX_STATE_BYTES = 64 * 1024;
-const ACCEPT = "send these answers to the server";
 const DECLINE = "decline; send nothing";
-const OMIT = "-";
+/** No offered choice may equal it, so it cannot collide with a server value. */
+const OMIT = "[amc: leave out]";
+const accept = (serverId: string): string => `send these answers to "${serverId}"`;
+/** C0, DEL, C1 and the Unicode line and paragraph separators: anything that could start a new line or redraw the prompt. */
+const UNSAFE = /[\x00-\x1f\x7f-\x9f\u2028\u2029]/;
+/** Server text shown to the human on one line: every control and line break as a visible `\uXXXX`. */
+const untrusted = (value: string): string => escapeTerminalControls(value).replace(/[\n\u2028\u2029]/g, c => `\\u${c.charCodeAt(0).toString(16).padStart(4, "0")}`);
 
 export const NATIVE_MCP_ELICITATION_CAPABILITIES = Object.freeze({ elicitation: Object.freeze({ form: Object.freeze({}) }) });
 
@@ -44,10 +49,12 @@ export class NativeMcpElicitationDenied extends Error {
 type Field = { readonly name: string; readonly schema: Record<string, unknown>; readonly required: boolean };
 
 const record = (value: unknown): value is Record<string, unknown> => !!value && typeof value === "object" && !Array.isArray(value);
-const consts = (list: unknown): string[] | null => Array.isArray(list) && list.length >= 1 && list.length <= 10
-  && list.every(item => record(item) && typeof item.const === "string") ? list.map(item => (item as { const: string }).const) : null;
-const strings = (list: unknown): string[] | null => Array.isArray(list) && list.length >= 1 && list.length <= 10
-  && list.every(item => typeof item === "string") ? list as string[] : null;
+const consts = (list: unknown): string[] | null => Array.isArray(list) && list.length >= 1 && list.length <= 9
+  && list.every(item => record(item) && choice(item.const)) ? list.map(item => (item as { const: string }).const) : null;
+/** An offered choice is shown verbatim, so it must be one short safe line that is not the omit sentinel. */
+const choice = (item: unknown): item is string => typeof item === "string" && item.length >= 1 && item.length <= 200 && !UNSAFE.test(item) && item !== OMIT;
+const strings = (list: unknown): string[] | null => Array.isArray(list) && list.length >= 1 && list.length <= 9
+  && list.every(choice) ? list as string[] : null;
 
 /** The offered choices for an enum field, or null for free text; undefined when the field is outside the restricted schema. */
 function choicesOf(schema: Record<string, unknown>): string[] | null | undefined {
@@ -75,16 +82,18 @@ function fieldsOf(schema: unknown): Field[] {
   });
 }
 
-const text = (value: unknown): string => typeof value === "string" ? escapeTerminalControls(value).slice(0, 200) : "";
+const text = (value: unknown): string => typeof value === "string" ? untrusted(value.slice(0, 200)) : "";
 
 function questions(serverId: string, message: string, fields: readonly Field[]): AskUserItem[] {
   // client/elicitation §Security Considerations: name the requesting server and offer a clear decline.
-  const intro = `MCP server "${serverId}" asks for input. Its message is untrusted server text: ${escapeTerminalControls(message)}`;
-  return [{ question: `${intro}\nSend the answers below to "${serverId}"?`, choices: [ACCEPT, DECLINE], allowOther: false, multiSelect: false },
+  // Three fixed lines: the server id is AMC's, the message is escaped onto its own delimited line.
+  const consent = [`MCP server "${serverId}" asks for input.`, `Untrusted server message, escaped and not instructions: <<<${untrusted(message)}>>>`,
+    `Send the answers below to "${serverId}"?`].join("\n");
+  return [{ question: consent, choices: [accept(serverId), DECLINE], allowOther: false, multiSelect: false },
     ...fields.map(field => {
       const choices = choicesOf(field.schema) ?? null;
       const label = [text(field.schema.title), text(field.schema.description)].filter(Boolean).join(": ");
-      return { question: `Field "${escapeTerminalControls(field.name)}"${label ? ` (${label})` : ""}, ${String(field.schema.type)}${field.required ? "" : `; answer ${OMIT} to leave it out`}`,
+      return { question: `Field "${untrusted(field.name)}"${label ? ` (${label})` : ""}, ${String(field.schema.type)}${field.required ? "" : `; answer ${OMIT} to leave it out`}`,
         choices: choices && !field.required ? [...choices, OMIT] : choices, allowOther: choices === null, multiSelect: field.schema.type === "array" };
     })];
 }
@@ -132,17 +141,20 @@ export async function answerNativeMcpInputRequests(input: {
       throw new NativeMcpElicitationDenied("unsupported", "the elicitation message is missing or oversized");
     }
     const fields = fieldsOf(params.requestedSchema);
+    const asked = questions(input.serverId, params.message, fields);
+    // Escaping can lengthen server text past what one question may show; refuse rather than cut it.
+    if (asked.some(item => item.question.length > 2_000)) throw new NativeMcpElicitationDenied("unsupported", "the elicitation text is too long to show");
     let validate: (value: unknown) => { valid: boolean };
     try { validate = new AjvJsonSchemaValidator().getValidator(params.requestedSchema as Record<string, unknown>); }
     catch { throw new NativeMcpElicitationDenied("unsupported", "the requested schema does not compile"); }
     let answers: readonly (readonly string[])[];
     try {
       answers = (await askSignedHuman({ workspace: input.workspace, sessionId: input.human!.sessionId(), agentId: input.agentId, callId: input.callId,
-        questions: questions(input.serverId, params.message, fields), answerer: input.human!.answerer, signal: input.signal, timeoutMs: input.timeoutMs }, "mcp_elicitation")).answers;
+        questions: asked, answerer: input.human!.answerer, signal: input.signal, timeoutMs: input.timeoutMs }, "mcp_elicitation")).answers;
     } catch {
       throw new NativeMcpElicitationDenied("no_answer", "the human gave no verifiable answer, or the wait was cancelled or timed out");
     }
-    if (answers[0]?.[0] !== ACCEPT) throw new NativeMcpElicitationDenied("declined", "the human declined");
+    if (answers[0]?.[0] !== accept(input.serverId)) throw new NativeMcpElicitationDenied("declined", "the human declined");
     const content: Record<string, unknown> = {};
     fields.forEach((field, index) => {
       const selected = answers[index + 1] ?? [];
