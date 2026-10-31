@@ -309,8 +309,11 @@ export function readQueuedInputBytes(
   return spilled.bytes;
 }
 
-/** Original payload bytes plus admission semantics bind a caller id to exactly one request. */
-function requestFingerprint(target: InboxTarget, origin: InboxOrigin, wake: boolean, demotedFrom: InboxTarget | null,
+/**
+ * Committed payload bytes plus admission semantics bind a caller id to exactly one request. Under P2-02 redaction the
+ * redacting session recomputes it over the redacted bytes it commits, so no row keeps a digest of a protected value.
+ */
+export function requestFingerprint(target: InboxTarget, origin: InboxOrigin, wake: boolean, demotedFrom: InboxTarget | null,
   format: string | undefined, bytes: Buffer): string {
   return sha256Hex(canonicalize({ target: demotedFrom ?? target, origin, wake, payloadFormat: format ?? null, payloadSha256: sha256Hex(bytes) }));
 }
