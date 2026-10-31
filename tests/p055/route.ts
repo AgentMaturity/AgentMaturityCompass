@@ -9,7 +9,7 @@ export async function postRoute(handler: RouteHandler, pathname: string, body: u
   const req = Object.assign(Readable.from([Buffer.from(JSON.stringify(body))]), { method: "POST", url: pathname,
     headers: { "content-type": "application/json" } }) as unknown as IncomingMessage;
   let status = 0; let text = "";
-  const res = { headersSent: false, writeHead(code: number) { status = code; this.headersSent = true; return this; }, setHeader() {},
+  const res = { get headersSent() { return status !== 0; }, writeHead(code: number) { status = code; return res; }, setHeader() {},
     end(value?: unknown) { text = String(value ?? ""); } } as unknown as ServerResponse;
   const handled = await handler(pathname, "POST", req, res, workspace);
   return { handled, status, body: JSON.parse(text) };
