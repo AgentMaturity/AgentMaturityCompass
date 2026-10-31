@@ -9,6 +9,7 @@
  * citing the measurement that fired it. The replaced rows and spill objects are
  * never touched: compaction changes what the model sees, not what was recorded.
  */
+import { DataFlowRefused } from "../../dataflow/purposePolicy.js";
 import type { SettledStream } from "../../llm/adapter/streamRecorder.js";
 import { isLlmError } from "../../llm/llmFailure.js";
 import { RequestEncodingError } from "../../llm/request/requestSpec.js";
@@ -86,9 +87,12 @@ function summaryText(settled: SettledStream | null): string | null {
   return text.length > 0 ? text : null;
 }
 
-/** A provider, budget or wire-encoding refusal skips the summary. AMC_ codes are AMC's own contract or evidence failures. */
+/**
+ * A provider, budget, wire-encoding or protected-data (P2-02, recorded by the retry layer) refusal skips the summary.
+ * AMC_ codes are AMC's own contract or evidence failures.
+ */
 function isRefusal(error: unknown): boolean {
-  return (isLlmError(error) && !error.code.startsWith("AMC_")) || error instanceof RequestEncodingError;
+  return (isLlmError(error) && !error.code.startsWith("AMC_")) || error instanceof RequestEncodingError || error instanceof DataFlowRefused;
 }
 
 export class AutoCompactor {

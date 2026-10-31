@@ -288,7 +288,7 @@ export class LlmRuntime {
         } catch {
           throw new DataFlowRefused("audit_failed");
         }
-        if (!admission.allowed) throw new DataFlowRefused(admission.reason);
+        if (!admission.allowed) throw new DataFlowRefused(admission.reason, admission);
         // ponytail: admission runs at prepare only; requestRetry streams right after prepare. Add a dispatch recheck if a
         // caller ever waits between them.
       },

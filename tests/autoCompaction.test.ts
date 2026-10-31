@@ -16,6 +16,7 @@ import { AdapterRegistry } from "../src/llm/adapter/adapterRegistry.js";
 import { LlmRuntime } from "../src/llm/adapter/llmRuntime.js";
 import { credentialRef } from "../src/credentials/credentialRef.js";
 import { LlmStreamProtocolError } from "../src/llm/streamProtocol.js";
+import { DataFlowRefused } from "../src/dataflow/purposePolicy.js";
 import { compactionFromFlags, measurePromptPressure, resolveCompactionConfig } from "../src/agent/compaction/promptPressure.js";
 import { verifyAgentRun, type AgentRunVerification } from "../src/agent/runReport.js";
 import type { CompactionConfig, LoopNotification } from "../src/agent/loopTypes.js";
@@ -610,6 +611,35 @@ describe("automatic compaction: synthetic provider usage, real signed loop evide
       const path = join(observationRoot, "public-evidence.json"), bytes = Buffer.from(JSON.stringify(evidence, null, 2) + "\n");
       writeFileSync(path, bytes, { flag: "wx", mode: 0o600 });
       console.info(`[amc-p137-public-evidence] ${JSON.stringify({ path, bytes: bytes.length, sha256: digest(bytes) })}`);
+    });
+  });
+
+  it("P2-02: a protected-data refusal of the summary request skips the summary, is recorded, and the turn continues", async () => {
+    const longAnswer = "Synthetic prior work, long enough to be worth summarizing. ".repeat(150);
+    const outputs = { old: "a".repeat(5000), middle: "b".repeat(6000), "new-1": "c".repeat(8000), "new-2": "d".repeat(8000) };
+    await withFixture({ scripts: [toolStep("old", "fixture", "{}", { inputTokens: 7000 }), toolStep("middle", "fixture", "{}", { inputTokens: 7000 }),
+      textStep(longAnswer, { inputTokens: 7000 }), toolStep("new-1", "fixture", "{}", { inputTokens: 8500 }),
+      toolStep("new-2", "fixture", "{}", { inputTokens: 8500 }), textStep("Final answer after the refused summary.", { inputTokens: 3000 })],
+      tools: syntheticTools(outputs), config: { compaction: compaction({ summarize: true }) } }, async f => {
+      await turn(f, "First turn.");
+      // This turn's third prepare is the summary request: admission refuses it as llmRuntime would, before any header.
+      const prepare = f.h.llm.prepare.bind(f.h.llm);
+      let prepares = 0;
+      f.h.llm.prepare = spec => {
+        prepares += 1;
+        if (prepares === 3) throw new DataFlowRefused("baa_required", { processorId: "proc-general", purposeId: "support" });
+        return prepare(spec);
+      };
+      await turn(f, "Second turn.");
+      const rows = f.h.events();
+      expect(compactRows(rows).filter(row => compactionReceipt(row).mode === "summarize")).toEqual([]);
+      const refused = rowsOf(rows, "audit").filter(row => meta(row).auditType === "DATA_FLOW_REFUSED");
+      expect(refused.map(meta)).toEqual([expect.objectContaining({ reason: "baa_required", processorId: "proc-general", purposeId: "support" })]);
+      const summaryStep = rowsOf(rows, "step/start").find(row => meta(row).kind === "compaction-summary")!;
+      expect(extractEnvelope(refused[0]!.meta_json)?.step).toBe(extractEnvelope(summaryStep.meta_json)?.step);
+      expect(f.notifications.some(item => item.kind === "compaction"
+        && item.message === "summary step did not complete (Protected model request refused: baa_required); the turn continues uncompacted")).toBe(true);
+      expect(f.sent, "the refused summary request is never sent").toHaveLength(6);
     });
   });
 

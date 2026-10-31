@@ -25,15 +25,43 @@ const refusalReasons = ["admission_failed", "audit_failed", "detector_invalid", 
   "binding_ambiguous", "processor_unavailable", "purpose_unavailable", "purpose_not_permitted", "class_not_permitted",
   "contract_required", "baa_required"] as const;
 
-/** Static diagnostics only: no payload, route, path, or contract text enters this exception. */
+const registryTerm = (value: unknown): string | null =>
+  typeof value === "string" && /^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$/.test(value) ? value : null;
+
+/**
+ * Static diagnostics only: no payload, route, path, or contract text enters this exception. The processor and purpose
+ * are the signed registry's identifiers the refusal decided on (null when it named none, or one not shaped as a registry
+ * term), so a caller can say which operator declaration refused without quoting what was refused.
+ */
 export class DataFlowRefused extends Error {
   readonly code = "DATA_FLOW_REFUSED";
   readonly reason: string;
-  constructor(reason: string) {
+  readonly processorId: string | null;
+  readonly purposeId: string | null;
+  constructor(reason: string, names: { readonly processorId?: unknown; readonly purposeId?: unknown } = {}) {
     const safeReason = refusalReasons.find(value => value === reason) ?? "admission_failed";
     super(`Protected model request refused: ${safeReason}`);
     this.name = "DataFlowRefused";
     this.reason = safeReason;
+    this.processorId = registryTerm(names.processorId);
+    this.purposeId = registryTerm(names.purposeId);
+  }
+
+  /** The refusal as one audit row's meta (P2-02): code, reason and registry identifiers, never the refused content. */
+  evidence(): Record<string, unknown> {
+    return { auditType: "DATA_FLOW_REFUSED", code: this.code, reason: this.reason, processorId: this.processorId, purposeId: this.purposeId };
+  }
+
+  /** A refusal rebuilt from recorded facts (`reason`, `processorId`, `purposeId`), re-validated; null without a reason. */
+  static from(facts: { readonly reason?: unknown; readonly processorId?: unknown; readonly purposeId?: unknown }): DataFlowRefused | null {
+    return typeof facts.reason === "string" ? new DataFlowRefused(facts.reason, facts) : null;
+  }
+
+  /** The refusal read back from the meta of an audit row `evidence()` wrote; null for any other row. */
+  static fromEvidence(meta: unknown): DataFlowRefused | null {
+    if (meta === null || typeof meta !== "object") return null;
+    const row = meta as Record<string, unknown>;
+    return row.auditType === "DATA_FLOW_REFUSED" ? DataFlowRefused.from(row) : null;
   }
 }
 

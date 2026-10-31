@@ -10,6 +10,7 @@ import { LlmRuntime } from "../src/llm/adapter/llmRuntime.js";
 import { credentialRef } from "../src/credentials/credentialRef.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { initWorkspace } from "../src/workspace.js";
+import { initProcessorRegistry } from "../src/dataflow/processorRegistry.js";
 import type { EvidenceEvent } from "../src/types.js";
 import {
   SESSION_ENVELOPE_META_KEY,
@@ -227,6 +228,22 @@ describe("a prompt AMC's own budget refused (P0-59)", () => {
     const refused = await session.prompt("two");
     expect(refused).toMatchObject({ ok: false, failureCodes: ["AMC_NATIVE_BUDGET_REFUSED"] });
     expect(refused.ok ? "" : refused.reason).toMatch(/ended error/);
+  });
+});
+
+describe("a prompt protected-data admission refused (P2-02)", () => {
+  it("names the refusal's code, reason, processor and purpose on the failed result", async () => {
+    const dir = workspace();
+    // The signed run purpose allows PHI, so every request needs a BAA route; the bound processor holds only a DPA.
+    initProcessorRegistry(dir, { schemaVersion: "amc.dataflow-processors/v1", experimental: true, runPurpose: "support",
+      processors: [{ processorId: "proc-general", legalName: "Fixture General Processor",
+        contracts: [{ kind: "DPA", reference: "DPA-GENERAL-1", effective: "2026-01-01", expires: null, dataClasses: ["phi", "pii"] }] }],
+      purposes: [{ purposeId: "support", allowedDataClasses: ["phi", "pii"], allowedTools: ["model.request"], allowedProcessors: ["proc-general"] }],
+      bindings: [{ providerId: LOOP_PROVIDER, baseUrl: "https://api.anthropic.invalid", processorId: "proc-general", purposeId: "support" }] });
+    const session = sessionWith(dir, ["never sent"]);
+    const refused = await session.prompt("one");
+    expect(refused).toMatchObject({ ok: false, failureCodes: ["DATA_FLOW_REFUSED"],
+      dataFlow: { reason: "baa_required", processorId: "proc-general", purposeId: "support" } });
   });
 });
 
