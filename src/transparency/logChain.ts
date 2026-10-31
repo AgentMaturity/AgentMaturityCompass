@@ -301,11 +301,18 @@ export function readTransparencyEntries(workspace: string): TransparencyEntry[] 
   return readEntries(workspace);
 }
 
-export function verifyTransparencyLog(workspace: string): {
+export function verifyTransparencyLog(workspace: string): { ok: boolean; errors: string[]; entryCount: number; lastHash: string } {
+  const { entries: _entries, ...result } = verifiedTransparencyLog(workspace);
+  return result;
+}
+
+/** `verifyTransparencyLog` plus the entries it read and checked: search these, never a second read the log could be swapped under. */
+export function verifiedTransparencyLog(workspace: string): {
   ok: boolean;
   errors: string[];
   entryCount: number;
   lastHash: string;
+  entries: TransparencyEntry[];
 } {
   const errors: string[] = [];
   initTransparencyLog(workspace);
@@ -366,7 +373,8 @@ export function verifyTransparencyLog(workspace: string): {
     ok: errors.length === 0,
     errors,
     entryCount: entries.length,
-    lastHash: prev
+    lastHash: prev,
+    entries
   };
 }
 
