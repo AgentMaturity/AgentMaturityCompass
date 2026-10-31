@@ -326,7 +326,9 @@ function prepareExperimentReport(params: ExperimentRunParams) {
     throw new ExperimentInputError(`invalid experiment mode '${String(params.mode)}'; expected supervise or sandbox`);
   }
   const candidateConfig = experiment.experiment.candidateConfig;
-  if (!candidateConfig || !(candidateConfig.kind === "improvement-candidate" ? admitExperimentCandidate(params.workspace, candidateConfig, params.loopCandidate).valid : candidateConfig.signatureValid)) {
+  // The stored signatureValid flag is the experiment file's own claim: re-verify the candidate it names (WP37 review).
+  const admitted = candidateConfig ? admitExperimentCandidate(params.workspace, candidateConfig, params.loopCandidate) : null;
+  if (!candidateConfig || !admitted?.valid || admitted.digestSha256 !== candidateConfig.digestSha256) {
     throw new ExperimentInputError("candidate config is missing or unsigned");
   }
   if (!params.candidateWindow) {

@@ -1,7 +1,7 @@
 import { listContainedDir, readContainedOrNull, writeContained } from "../utils/containedFs.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
-import { anchorWorkspaceRecordHead, workspaceRecordHead, withWorkspaceRecordPublicationLock } from "../storage/workspaceRecordStore.js";
+import { anchorWorkspaceRecordHead, prepareWorkspaceRecordHeadFor, workspaceRecordHead, withWorkspaceRecordPublicationLock } from "../storage/workspaceRecordStore.js";
 import { assertPurposePublicationCurrent, capturePurposePublication } from "../keys/purposePublication.js";
 import { signWithPurposeKey } from "../keys/purposeProviders.js";
 import { KeyProviderError } from "../keys/provider.js";
@@ -10,7 +10,7 @@ import { assertOverridePublicationCurrent, BreakGlassSigningError, verifyOverrid
 import type { EmergencyOverride } from "./policyCanary.js";
 
 type PreparedOverride = Awaited<ReturnType<typeof import("./overrideSignature.js").prepareOverrideDigestSignature>>;
-const REL = ".amc/governor/emergency-overrides", AT = { area: ["governor"], kind: "emergency-overrides" };
+const REL = ".amc/governor/emergency-overrides", AT = { area: ["governor"], kind: "emergency-overrides", idField: "overrideId" };
 
 /** The existing canary activation hash, shared by its actual writer and reader. */
 export function canaryOverrideDigest(o: Pick<EmergencyOverride, "overrideId" | "agentId" | "reason" | "actionDescription" | "ttlMs" | "startedTs" | "expiresTs">): string {
@@ -51,6 +51,8 @@ export async function publishCanaryOverride(workspace: string, override: Emergen
   const hash = sha256Hex(canonicalize({ ...body, prev_record_hash: predecessor.head }));
   let signed: Awaited<ReturnType<typeof signWithPurposeKey>>;
   try { signed = await signWithPurposeKey(workspace, "artifact-seal", Buffer.from(hash, "hex")); } catch (error) { fileRefusal(error); }
+  let head: ReturnType<typeof prepareWorkspaceRecordHeadFor>;
+  try { head = prepareWorkspaceRecordHeadFor(workspace, AT, hash, signed); } catch (error) { fileRefusal(error); }
   return withCanaryOverridePublicationLock(workspace, () => {
     assertOverridePublicationCurrent(workspace, prepared.captured, prepared.signed);
     try { assertPurposePublicationCurrent(workspace, artifact, signed); } catch (error) { fileRefusal(error); }
@@ -60,8 +62,7 @@ export async function publishCanaryOverride(workspace: string, override: Emergen
     if (readContainedOrNull(workspace, rel, Number.MAX_SAFE_INTEGER) !== null) throw new Error("canary override destination changed while signing was prepared; retry");
     // Byte-for-byte legacy record construction, including the inner signature's existing field position.
     const record = { ...body, prev_record_hash: predecessor.head, record_hash: hash, signature: signed.signature.toString("base64"), storedTs: publishedAt };
-    writeContained(workspace, rel, JSON.stringify(record, null, 2), 0o644);
-    anchorWorkspaceRecordHead(workspace, AT, hash);
+    anchorWorkspaceRecordHead(workspace, AT, head, () => writeContained(workspace, rel, JSON.stringify(record, null, 2), 0o644));
     return own;
   });
 }

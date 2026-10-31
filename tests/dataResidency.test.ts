@@ -345,10 +345,11 @@ describe("residency compliance report", () => {
     expect(report.legalHolds.length).toBe(1);
   });
 
-  test("report for unknown tenant uses defaults", () => {
+  test("report for unknown tenant shows placeholder defaults and is unconfigured, never compliant", () => {
     const report = generateResidencyReport("unknown");
-    expect(report.region).toBe("us-east-1"); // default
-    expect(report.compliant).toBe(true);
+    expect(report.region).toBe("us-east-1"); // placeholder
+    expect(report.compliant).toBe(false);
+    expect(report.violations).toContain("[HIGH] Tenant unknown has no verified residency registration: its region and policy are unconfigured.");
   });
 });
 

@@ -29,7 +29,7 @@ import {
 } from "../storage/workspaceRecordStore.js";
 
 /** Where false-positive reports live under .amc/. */
-const FP_REPORTS_AT = { area: ["assurance"], kind: "false-positives" };
+const FP_REPORTS_AT = { area: ["assurance"], kind: "false-positives", idField: "reportId" };
 
 // ---------------------------------------------------------------------------
 // Types
@@ -454,7 +454,7 @@ export function generateFPTuningReport(opts?: {
 
 /** Developer-filed reports AMC did not observe: self-reported, and never a pass or fail of its own. */
 function fpTuningReportClaim(report: FPTuningReport): ReturnType<typeof envelopeForUnverifiedResult> {
-  return envelopeForUnverifiedResult({ producer: "assurance:false-positives", recordCount: report.totalFPReports, now: report.ts });
+  return envelopeForUnverifiedResult({ producer: "assurance:falsePositiveTracker", recordCount: report.totalFPReports, now: report.ts });
 }
 
 export function renderFPTuningReportMarkdown(report: FPTuningReport): string {

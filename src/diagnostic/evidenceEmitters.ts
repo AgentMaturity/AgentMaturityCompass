@@ -121,6 +121,7 @@ export const NON_MATURITY_AUDIT_MODULES: ReadonlyArray<{ module: string; why: st
   { module: "src/session/compactionRecovery.ts", why: "settles an interrupted context compaction on resume (PI-025); context bookkeeping, not agent behaviour" },
   { module: "src/shield/exploitConfirmation.ts", why: "operator-scoped exploit confirmation workflow" },
   { module: "src/skills/skillLoadTool.ts", why: "which skill file and digest the model loaded (DXC-29); workspace content provenance, never maturity evidence" },
+  { module: "src/storage/workspaceRecordStore.ts", why: "a workspace record store's head anchored for the first time (WP37): integrity bookkeeping, never maturity evidence" },
   { module: "src/studio/signatures.ts", why: "operator re-signed AMC configuration" },
   { module: "src/studio/studioServer.ts", why: "Studio operator actions on AMC itself" },
   { module: "src/studio/studioSupervisor.ts", why: "Studio runtime lifecycle and configuration signature failures" },

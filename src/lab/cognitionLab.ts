@@ -30,7 +30,7 @@ import {
 } from "../storage/workspaceRecordStore.js";
 
 /** Where lab experiments live under .amc/. */
-const EXPERIMENTS_AT = { area: ["lab"], kind: "experiments" };
+const EXPERIMENTS_AT = { area: ["lab"], kind: "experiments", idField: "experimentId" };
 const PROBE_RESULTS_AT = { area: ["lab"], kind: "probe-results" };
 
 // ---------------------------------------------------------------------------

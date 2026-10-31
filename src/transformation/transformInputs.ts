@@ -78,15 +78,6 @@ export class TransformInputCapture {
       return [...new Set([...picked.values()].map(row => row.path))].sort();
     });
   }
-  attestation(workspace: string, scope: Scope, taskId: string, valid: (value: unknown) => boolean): void {
-    this.select(() => {
-      const root = scope.type === "AGENT" ? join(workspace, ".amc", "agents", scope.agentId, "transform")
-        : join(workspace, ".amc", "org", "transform", scope.nodeId);
-      const row = jsonRows(join(root, "attestations"), false, false).filter(row => valid(row.body)).filter(row => row.body.taskId === taskId)
-        .sort((a, b) => Number(b.body.createdTs) - Number(a.body.createdTs))[0];
-      return row === undefined ? [] : [row.path];
-    });
-  }
   assertCurrent = (): void => { for (const assertion of this.assertions) assertion(); };
 }
 

@@ -12,7 +12,7 @@ import { captureTransformRelatedFiles } from "./transformInputs.js";
 import { prepareTransformPairs, publishTransformPairs, finishTransformPublication, type TransformPublicationChecks } from "./transformPublication.js";
 import type { TransformPlan } from "./transformTasks.js";
 
-export const transformAttestationSchema = z.object({
+const transformAttestationSchema = z.object({
   v: z.literal(1),
   attestationId: z.string().min(1),
   scope: z.object({
@@ -122,6 +122,7 @@ export function writeTransformAttestation(params: {
   };
 }
 
+/** The file is read once: its signature is checked over, and the attestation parsed from, the same bytes (WP37 review). */
 export function verifyTransformAttestation(workspace: string, path: string): {
   valid: boolean;
   signatureExists: boolean;
@@ -129,24 +130,29 @@ export function verifyTransformAttestation(workspace: string, path: string): {
   path: string;
   sigPath: string;
   attestation: TransformAttestation | null;
+  fileSha256: string;
 } {
-  const verified = verifySignedFileWithAuditor(workspace, path);
+  let bytes: Buffer | undefined;
+  try { bytes = readFileSync(path); } catch { /* verifySignedFileWithAuditor names the missing file */ }
+  const verified = verifySignedFileWithAuditor(workspace, path, bytes), fileSha256 = bytes ? sha256Hex(bytes) : "";
   let attestation: TransformAttestation | null = null;
-  if (verified.valid) {
+  if (verified.valid && bytes) {
     try {
-      attestation = transformAttestationSchema.parse(JSON.parse(readUtf8(path)) as unknown);
+      attestation = transformAttestationSchema.parse(JSON.parse(bytes.toString("utf8")) as unknown);
     } catch {
       return {
         ...verified,
         valid: false,
         reason: "attestation schema invalid",
-        attestation: null
+        attestation: null,
+        fileSha256
       };
     }
   }
   return {
     ...verified,
-    attestation
+    attestation,
+    fileSha256
   };
 }
 

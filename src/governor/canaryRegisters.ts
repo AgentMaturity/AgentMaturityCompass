@@ -23,8 +23,8 @@ import { signWithPurposeKey } from "../keys/purposeProviders.js";
 import type { RollbackPack, EmergencyOverride } from "./policyCanary.js";
 
 /** Where canary governance records live under .amc/. */
-const ROLLBACK_PACKS_AT = { area: ["governor"], kind: "rollback-packs" };
-const OVERRIDES_AT = { area: ["governor"], kind: "emergency-overrides" };
+const ROLLBACK_PACKS_AT = { area: ["governor"], kind: "rollback-packs", idField: "packId" };
+const OVERRIDES_AT = { area: ["governor"], kind: "emergency-overrides", idField: "overrideId" };
 
 /** Clears the in-process rollback-pack cache. Used by resetPolicyCanaryState(). */
 export function resetCanaryRegisters(): void {

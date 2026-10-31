@@ -285,6 +285,13 @@ describe("experiment promotion verifies its inputs and keeps the baseline eligib
     expect(warnings).toMatch(/baseline has zero successful cases/i);
   });
 
+  test("the synchronous run re-verifies the admitted candidate instead of trusting its stored flag (WP37 review)", () => {
+    const { ws, created, candidateFile } = setup(true);
+    writeFileSync(candidateFile, "candidate: tampered\n");
+    expect(() => runExperiment({ workspace: ws, agentId: "default", experimentId: created.experimentId, mode: "sandbox",
+      candidateWindow: "1d", baselineTrialId: "base-1", candidateTrialId: "cand-1" })).toThrow(/candidate config is missing or unsigned/);
+  });
+
   test("small samples carry an explicit comparability warning", () => {
     const { run } = setup(false, 1);
     expect(run.report.warnings?.join("\n")).toMatch(/1 paired case.*at least 3/i);

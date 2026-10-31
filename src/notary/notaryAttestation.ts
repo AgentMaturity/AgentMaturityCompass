@@ -145,14 +145,17 @@ export function verifyNotaryAttestationBundle(file: string, trust: TrustContext,
   ok: boolean;
   errors: string[];
   report: VerifierReportV1;
+  /** The attestation the verified signature covers; null unless `ok` (the verified-artifact registry reads it). */
+  attestation: z.infer<typeof notaryAttestPayloadSchema> | null;
 } {
   const rootTmp = mkdtempSync(join(tmpdir(), "amc-attest-verify-"));
   const errors: string[] = [];
   const signatures: IssuerAdmission[] = [];
+  let attestation: z.infer<typeof notaryAttestPayloadSchema> | null = null;
   const finish = () => {
     const report = buildVerifierReport({ artifact: { kind: "notary-attestation", path: resolve(file), sha256: fileSha256(resolve(file)) },
       context: trust, integrityErrors: errors, signatures, anchoring: { status: "not-applicable", detail: null } });
-    return { ok: report.trusted, errors, report };
+    return { ok: report.trusted, errors, report, attestation: report.trusted ? attestation : null };
   };
   try {
     runTarExtract(resolve(file), rootTmp);
@@ -172,6 +175,7 @@ export function verifyNotaryAttestationBundle(file: string, trust: TrustContext,
       const check = checkSignature({ signature: "attest.sig", purpose: "notary", context: trust, claimedSignedAt: payload.ts,
         candidates: [pubkeyPem, pub], verify: (pem) => verifyWithKey(Buffer.from(canonicalize(payload), "utf8"), pem, Buffer.from(sig, "base64")) });
       signatures.push(check.admission);
+      attestation = payload;
       if (!check.verified) {
         errors.push("attestation signature invalid");
       }

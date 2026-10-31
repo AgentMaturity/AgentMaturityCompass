@@ -4,14 +4,16 @@ import { TransformInputCapture } from "./transformInputs.js";
 import { prepareTransformOutputsAsync, transformLatestPath } from "./transformTasks.js";
 import { finishTransformPublication, type TransformPublicationChecks } from "./transformPublication.js";
 import { readdirSync } from "node:fs";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
+import { readVerified } from "../crypto/signing/verifiedArtifacts.js";
+import { workspaceSelfTrust } from "../trust/trustContext.js";
 import { verifySignedFileWithAuditor } from "../org/orgSigner.js";
 import { openLedger } from "../ledger/ledger.js";
 import { latestRunForAgent } from "../governor/actionPolicyEngine.js";
 import { latestAssuranceByPack } from "../assurance/assuranceRunner.js";
 import { loadLatestTransformPlan, transformPlanSchema, type TransformPlan, type TransformTask, writeSignedTransformPlan, writeSignedTransformSnapshot, summarizeBy4C } from "./transformTasks.js";
 import { percentDone, topBlockers, nextTasks } from "./transformScoring.js";
-import { findLatestAttestationForTask, transformAttestationSchema } from "./transformAttestations.js";
+import { attestationPathById, type TransformAttestation } from "./transformAttestations.js";
 import { resolveAgentId } from "../fleet/paths.js";
 import { readUtf8, pathExists } from "../utils/fs.js";
 import { computeOrgScorecard } from "../org/orgEngine.js";
@@ -189,6 +191,21 @@ function evaluateCheckpoint(params: {
   };
 }
 
+/**
+ * The newest attestation for a task that the verified-artifact registry admits (WP37 review): an unsigned, tampered or
+ * otherwise refused file never marks a task ATTESTED.
+ * ponytail: verifies every attestation file of the scope per task; index by task if plans grow large.
+ */
+function verifiedTaskAttestation(workspace: string, scope: Parameters<typeof attestationPathById>[1], taskId: string): { path: string; attestation: TransformAttestation } | null {
+  const dir = dirname(attestationPathById(workspace, scope, "_")), trust = workspaceSelfTrust(workspace);
+  let names: string[] = [];
+  try { names = readdirSync(dir).filter((name) => name.endsWith(".json")); } catch { return null; }
+  return names.flatMap((name) => {
+    const read = readVerified("transform-attestation", { file: join(dir, name), workspace, trust });
+    return read.status === "verified" && read.artifact.taskId === taskId ? [{ path: join(dir, name), attestation: read.artifact }] : [];
+  }).sort((a, b) => b.attestation.createdTs - a.attestation.createdTs)[0] ?? null;
+}
+
 function recalcPlanSummary(plan: TransformPlan): TransformPlan {
   const tasks = plan.tasks;
   const by4C = summarizeBy4C(tasks);
@@ -258,8 +275,8 @@ function computeTransformTracking(params: Parameters<typeof runTransformTracker>
       };
     }
 
-    reads?.attestation(params.workspace, scope, task.taskId, value => transformAttestationSchema.safeParse(value).success);
-    const attestation = findLatestAttestationForTask(params.workspace, scope, task.taskId);
+    reads?.select(() => { const found = verifiedTaskAttestation(params.workspace, scope, task.taskId); return found === null ? [] : [found.path, `${found.path}.sig`]; });
+    const attestation = verifiedTaskAttestation(params.workspace, scope, task.taskId)?.attestation ?? null;
     if (attestation) {
       return {
         ...task,
