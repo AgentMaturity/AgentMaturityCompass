@@ -302,6 +302,15 @@ export interface WorkspaceRecordFinding {
   detail: string;
 }
 
+/** One fixed sentence per finding, for outputs that must not echo a reader's error text (security sweep). */
+export const WORKSPACE_RECORD_FINDING_TEXT: Readonly<Record<WorkspaceRecordFinding["code"], string>> = {
+  UNREADABLE: "the file cannot be read as a record", HASH_MISMATCH: "record_hash does not match the record body and prev link",
+  UNSIGNED: "record carries no signature", SIGNATURE_INVALID: "signature does not verify under the workspace artifact-seal keys",
+  CHAIN_GAP: "the record names a predecessor that is not stored", HEAD_MISSING: "the newest record or its head anchor was removed",
+  HEAD_UNANCHORED: "no head anchor: a deleted newest record cannot be ruled out", HEAD_UNVERIFIED: "the head anchor does not verify",
+  KEYSET_UNVERIFIABLE: "the workspace key set does not verify"
+};
+
 /**
  * The artifact-seal keys records verify under. A key set that fails its own checks (a flipped byte in a pinned public
  * key or in revocations.signed.json) is unverifiable, never keyless: it still refuses unsigned records, and the reader
@@ -414,12 +423,12 @@ const RECORD_REFUSALS: ReadonlySet<WorkspaceRecordFinding["code"]> = new Set(["H
  * An unsigned record stays in only where the workspace has no artifact-seal verification key (a keyless workspace
  * writes nothing else); with a key, a stripped signature must not downgrade a record to "reported but kept".
  */
-export function readTrustedWorkspaceRecords<T>(workspace: string, at: RecordLocation): { records: T[]; unverified: string[] } {
+export function readTrustedWorkspaceRecords<T>(workspace: string, at: RecordLocation): { records: T[]; unverified: string[]; findings: WorkspaceRecordFinding[] } {
   // The rows returned are the rows verified: a file swapped after its check is never what a report reads (WP37 review).
   const { current, findings, keyed } = verifyStoredRecords(workspace, at);
   const refused = new Set(findings.filter((row) => RECORD_REFUSALS.has(row.code) || (keyed && row.code === "UNSIGNED")).map((row) => row.file));
   return { records: current.filter((row) => !refused.has(row.file)).map((row) => row.record as unknown as T),
-    unverified: findings.map((row) => `UNVERIFIED: ${at.kind} ${row.code} ${basename(row.file)}: ${row.detail}`) };
+    unverified: findings.map((row) => `UNVERIFIED: ${at.kind} ${row.code} ${basename(row.file)}: ${row.detail}`), findings };
 }
 
 function lastRecordHash(workspace: string, at: RecordLocation): string {

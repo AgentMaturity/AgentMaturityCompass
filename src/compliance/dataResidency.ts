@@ -14,7 +14,7 @@
  */
 
 import { randomUUID } from "node:crypto";
-import { resolve } from "node:path";
+import { basename, resolve } from "node:path";
 import { sha256Hex } from "../utils/hash.js";
 import { buildResidencyPolicy, buildTenantBoundary } from "./residencyRecordBodies.js";
 import { envelopeForUnverifiedResult } from "../claims/eligibility/adapters/results.js";
@@ -34,7 +34,8 @@ export { getBuiltInRedactionRules, applyRedaction, runRedactionTests };
 import {
   saveWorkspaceRecord,
   loadWorkspaceRecords,
-  verifyWorkspaceRecords,
+  readTrustedWorkspaceRecords,
+  WORKSPACE_RECORD_FINDING_TEXT,
   prepareWorkspaceRecordAsync,
   withWorkspaceRecordPublicationLock
 } from "../storage/workspaceRecordStore.js";
@@ -298,9 +299,10 @@ export function checkTenantIsolation(
   tenantIdA: string,
   tenantIdB: string,
   workspace?: string,
+  known?: { tenants: TenantBoundary[]; policies: ResidencyPolicy[] },
 ): TenantIsolationCheck {
-  const a = getTenant(tenantIdA, workspace);
-  const b = getTenant(tenantIdB, workspace);
+  const tenantOf = (id: string) => known ? known.tenants.find((t) => t.tenantId === id) ?? null : getTenant(id, workspace);
+  const a = tenantOf(tenantIdA), b = tenantOf(tenantIdB);
 
   const violations: TenantViolation[] = [];
 
@@ -342,8 +344,8 @@ export function checkTenantIsolation(
   // Check: region mismatch
   if (a.region !== b.region) {
     // Not a violation per se, but check for cross-region policy conflicts
-    const policyA = getPolicyForRegion(a.region);
-    const policyB = getPolicyForRegion(b.region);
+    const policyOf = (region: DataRegion) => known ? known.policies.find((p) => p.region === region) ?? null : getPolicyForRegion(region);
+    const policyA = policyOf(a.region), policyB = policyOf(b.region);
 
     if (policyA && policyB) {
       if (policyA.denyRegions.includes(b.region)) {
@@ -590,15 +592,15 @@ export function generateResidencyReport(
   opts?: { includeRedactionTests?: boolean },
   workspace?: string,
 ): ResidencyComplianceReport {
-  const tenant = getTenant(tenantId, workspace);
-  // The us-east-1 fallback previously fired for every tenant, because the
-  // lookup only ever saw tenants registered in this same process. It now means
-  // what it says: no registration for this tenant exists anywhere.
+  // Stored records shape the report only once verified (security sweep): a tampered, forged or, in a keyed workspace,
+  // unsigned record never sets the region, the policy or an isolation check; its finding is listed below.
+  const stored = workspace ? { policies: readTrustedWorkspaceRecords<ResidencyPolicy>(workspace, POLICIES_AT), tenants: readTrustedWorkspaceRecords<TenantBoundary>(workspace, TENANTS_AT) } : null;
+  const known = { policies: mergeById(policies, stored?.policies.records ?? [], (p) => p.policyId), tenants: mergeById(tenants, stored?.tenants.records ?? [], (t) => t.tenantId) };
+  const tenant = known.tenants.find((t) => t.tenantId === tenantId) ?? null;
+  // No verified registration: us-east-1 and the strict default are placeholders, and the tenant is unconfigured.
   const region = tenant?.region ?? "us-east-1";
-  const policy = getPolicyForRegion(region, workspace) ?? createDefaultPolicy(region);
-  const isolationChecks = getTenants(workspace)
-    .filter((t) => t.tenantId !== tenantId)
-    .map((t) => checkTenantIsolation(tenantId, t.tenantId, workspace));
+  const policy = known.policies.find((p) => p.region === region) ?? createDefaultPolicy(region);
+  const isolationChecks = known.tenants.filter((t) => t.tenantId !== tenantId).map((t) => checkTenantIsolation(tenantId, t.tenantId, workspace, known));
   const holds = getActiveLegalHolds(tenantId, workspace);
   const keyCustody = getKeyCustodyConfig(tenant?.keyCustodyMode ?? "local");
 
@@ -608,7 +610,7 @@ export function generateResidencyReport(
   }
 
   // Aggregate violations
-  const violations: string[] = [];
+  const violations: string[] = tenant ? [] : [`[HIGH] Tenant ${tenantId} has no verified residency registration: its region and policy are unconfigured.`];
   for (const check of isolationChecks) {
     for (const v of check.violations) {
       violations.push(`[${v.severity.toUpperCase()}] ${v.description}`);
@@ -624,13 +626,11 @@ export function generateResidencyReport(
   }
 
   // A tampered, unsigned or missing residency record must not vanish from the report (WP37).
-  if (workspace) {
-    for (const at of [POLICIES_AT, TENANTS_AT]) {
-      for (const finding of verifyWorkspaceRecords(workspace, at).findings) {
-        // Unanchored history (a register older than head anchors, not yet anchored by amc doctor) is no residency breach.
-        violations.push(finding.code === "HEAD_UNANCHORED" ? `[MEDIUM] Residency record history unanchored (${at.kind}): ${finding.code} ${finding.file}: ${finding.detail}`
-          : `[HIGH] Residency record integrity (${at.kind}): ${finding.code} ${finding.file}: ${finding.detail}`);
-      }
+  // Unanchored history (a register older than head anchors, not yet anchored by amc doctor) is no residency breach.
+  // Each finding prints a fixed sentence: a reader's error text can echo file contents.
+  for (const [kind, read] of stored ? [["policies", stored.policies], ["tenants", stored.tenants]] as const : []) {
+    for (const finding of read.findings) {
+      violations.push(`${finding.code === "HEAD_UNANCHORED" ? "[MEDIUM] Residency record history unanchored" : "[HIGH] Residency record integrity"} (${kind}): ${finding.code} ${basename(finding.file)}: ${WORKSPACE_RECORD_FINDING_TEXT[finding.code]}`);
     }
   }
 
