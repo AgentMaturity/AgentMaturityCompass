@@ -169,7 +169,7 @@ function headAnchorBasis(workspace: string, at: RecordLocation, recordHash: stri
  * The synchronous compatibility writer's anchor, signed with the vault's artifact-seal key like its record; on a
  * refused key both stay unsigned, which a keyed workspace reads as UNSIGNED and HEAD_UNVERIFIED.
  */
-export function prepareWorkspaceRecordHead(workspace: string, at: RecordLocation, recordHash: string): PreparedHeadAnchor {
+function prepareWorkspaceRecordHead(workspace: string, at: RecordLocation, recordHash: string): PreparedHeadAnchor {
   const basis = headAnchorBasis(workspace, at, recordHash);
   let signature = "unsigned";
   try { signature = signHexDigest(basis.digest, getSigningKey(workspace, "artifact-seal")); } catch { /* retained compatibility */ }

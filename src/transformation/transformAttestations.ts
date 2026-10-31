@@ -12,7 +12,7 @@ import { captureTransformRelatedFiles } from "./transformInputs.js";
 import { prepareTransformPairs, publishTransformPairs, finishTransformPublication, type TransformPublicationChecks } from "./transformPublication.js";
 import type { TransformPlan } from "./transformTasks.js";
 
-export const transformAttestationSchema = z.object({
+const transformAttestationSchema = z.object({
   v: z.literal(1),
   attestationId: z.string().min(1),
   scope: z.object({
