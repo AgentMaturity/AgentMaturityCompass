@@ -3,6 +3,7 @@ import { afterEach, describe, expect, test } from "vitest";
 import { renderNotification } from "../src/cli-agent-options.js";
 import { projectNativeRunDiagnostics, renderNativeRunDiagnostics } from "../src/agent/nativeFailureGuidance.js";
 import type { LoopNotification } from "../src/agent/loopTypes.js";
+import type { EvidenceEvent } from "../src/types.js";
 import { initProcessorRegistry } from "../src/dataflow/processorRegistry.js";
 import type { HttpTransport } from "../src/llm/adapter/transport.js";
 import { loopHarness, silentTransport, textStep, type LoopHarness } from "./helpers/agentLoopHarness.js";
@@ -62,7 +63,7 @@ describe("P2-02 — DataFlowRefused in the native loop", () => {
 
     // A later request in the same turn supersedes the refusal: the turn's error is then not diagnosed as one.
     const end = rows.findIndex((row) => row.event_type === "turn/end");
-    const laterHeader = { ...refusals[0]!, id: "later-request-header", event_type: "request/header" };
+    const laterHeader: EvidenceEvent = { ...refusals[0]!, id: "later-request-header", event_type: "request/header" };
     expect(projectNativeRunDiagnostics([...rows.slice(0, end), laterHeader, ...rows.slice(end)], h.sessionId)
       .map((item) => item.guidance.code)).toEqual(["UNKNOWN"]);
 
