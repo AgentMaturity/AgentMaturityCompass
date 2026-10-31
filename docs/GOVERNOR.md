@@ -15,7 +15,7 @@ Action policy file:
 - `.amc/action-policy.yaml`
 - `.amc/action-policy.yaml.sig`
 
-If signature verification fails, Governor denies `EXECUTE` and returns `SIMULATE` with `UNTRUSTED CONFIG` reasons. The same happens when the agent has no trusted diagnostic run, or its latest one is below integrity 0.6; the reasons then include an `UNTRUSTED RUN:` line that names the run and its integrity (see [Reaching EXECUTE](#reaching-execute)).
+If signature verification fails, Governor denies `EXECUTE` and returns `SIMULATE` with `UNTRUSTED CONFIG` reasons. The same happens when the agent's run history is untrusted: a planted, tampered, unanchored or rolled-back run file, or a latest trusted run that failed ledger verification or violated the trust boundary; no rule lifts that. A missing or low-integrity run is instead a rule condition: each class's rule carries `requireRunIntegrityAtLeast` (absent means 0.6, the HIGH TRUST line), the decision's `run-integrity` condition shows the threshold, an `UNTRUSTED RUN:` reason names the run and its integrity when it falls short, and a threshold below 0.6 adds `RUN INTEGRITY WAIVED:` to every decision made under it (see [Reaching EXECUTE](#reaching-execute)).
 
 ## Action Classes
 
@@ -33,6 +33,7 @@ Each class can require:
 
 - minimum effective question levels
 - minimum trust tier (`OBSERVED` / `OBSERVED_HARDENED`)
+- minimum integrity of the agent's latest sealed, ledger-anchored run (`requireRunIntegrityAtLeast`, 0..1, default 0.6; below 0.6 is an owner waiver that every decision, `amc doctor`, `amc policy controls` and profile activation name)
 - assurance pack thresholds
 - sandbox evidence for execute
 - owner execution ticket
@@ -58,7 +59,7 @@ amc governor report --agent <id> --window 14d --out .amc/agents/<id>/reports/gov
 
 `amc governor check --action <class> --mode execute` returns `EXECUTE` only when both of these hold:
 
-1. **A trusted run.** The agent's latest diagnostic run is sealed, anchored in the ledger, and HIGH TRUST (integrity index at least 0.6). Until then the governor treats the configuration as untrusted, whatever the signed policy says. No policy rule can lift this condition, because it is checked before any rule. The integrity index is the share of the question set's active questions that have accepted evidence, less penalties (see [SCORING_METHODOLOGY.md](SCORING_METHODOLOGY.md)).
+1. **A trusted run at the rule's threshold.** The agent's latest diagnostic run is sealed, anchored in the ledger, verifies, and reaches the rule's `requireRunIntegrityAtLeast` (0.6, the HIGH TRUST line, unless the owner signed another value; at or below 0.6 a HIGH TRUST label also meets it). A sealed, anchored run is required at every threshold, and a run with contradictions, unsupported claims, inflation attempts or invalid receipts (or one that does not record those counts) never satisfies a threshold below 0.6. The integrity index is the share of the question set's active questions that have accepted evidence, less penalties (see [SCORING_METHODOLOGY.md](SCORING_METHODOLOGY.md)).
 2. **The class's rule.** The rule's minimum effective question levels, trust tier, assurance packs, sandbox and execution ticket are all met.
 
 As of 2026-10-30, no command sequence gets a fresh workspace there on observed evidence:
@@ -67,12 +68,11 @@ As of 2026-10-30, no command sequence gets a fresh workspace there on observed e
 - The registered observed emitters (`src/diagnostic/evidenceEmitters.ts`) bind governed tool-call and delegation rows to only 10 of the 244 legacy questions. A run over observed evidence alone therefore stays near integrity 0.04.
 - The default policy's `READ_ONLY` rule also needs AMC-1.7 and AMC-3.3.1 at level 2, which no evidence map evaluates yet. It also needs the `injection` assurance pack, which needs a configured model.
 
-Importing self-reported evaluation results tagged to many questions can raise the integrity index. AMC does not document that as a path to EXECUTE: it is the agent's claim, not observed behaviour.
+Importing evaluation results can raise the integrity index and even the trust label: an export that names question ids tags any of the 244 questions (`src/eval/evalImporters.ts`), but those rows are self-reported, count at level 1 only, and lower the observed share the `OBSERVED` tier requires. AMC does not document that as a path to EXECUTE: it is the agent's claim, not observed behaviour.
 
-An owner has two honest choices today:
+An owner has two honest choices today: keep the signed policy and accept `SIMULATE` (the default after `amc init`); or sign a waiver for the classes to grant. For a waiver, run `amc` (or `amc run --score-only`) once so a sealed, anchored run exists, then edit `.amc/action-policy.yaml` for those classes: `requireRunIntegrityAtLeast: 0` (any higher value needs a run that reaches it), `requireTrustTierAtLeast: SELF_REPORTED` while the run has no observed rows, empty `minEffectiveQuestionLevels` and `requireAssurancePacks`, and `riskTierDefaults.<tier>.requireSandboxForExecute: false` for the tiers used. Then run `amc fix-signatures` (vault unlocked). It refuses an edit that does not parse, and it appends a sealed `CONFIG_RESIGNED` audit row that records the activation. Every decision then says `RUN INTEGRITY WAIVED: …`, `amc doctor` warns, `amc policy controls` shows the waiver and profile activation reports it as a widening. A planted, tampered, unanchored, rolled-back or verification-failed run, or a run with findings against the agent, still yields `SIMULATE` at threshold 0. Under a waiver an UNRELIABLE-labelled run can authorise EXECUTE; certificates, passports, READY and the trust label still require HIGH TRUST. A waiver has no expiry: `amc policy action init` re-signs the default and ends it.
 
-- Keep the signed policy and accept `SIMULATE`. This is the default after `amc init`.
-- Remove both `.amc/action-policy.yaml` and `.amc/action-policy.yaml.sig`. Native calls are then not checked against the Action Policy, and `amc agent run`, setup and `amc doctor` report `action policy: not configured`. Signed approvals (`--approve-tools`, `amc approvals`) bind the signed policy's hash, so they cannot be used in this state.
+Removing `.amc/action-policy.yaml` and its `.sig` is not a grant. Native calls then meet no Action Policy, signed approvals (`--approve-tools`, `amc approvals`) fail because they bind the signed policy's hash, `amc up` and Studio re-create the default policy, and `amc governor check` refuses.
 
 ## Decision Inputs
 
