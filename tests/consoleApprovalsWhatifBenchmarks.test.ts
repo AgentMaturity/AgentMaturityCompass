@@ -28,6 +28,7 @@ import { runDiagnostic } from "../src/diagnostic/runner.js";
 import { writeSignedGatePolicy, defaultGatePolicy } from "../src/ci/gate.js";
 import { generateBom } from "../src/bom/bomGenerator.js";
 import { signBomFile } from "../src/bom/bomVerifier.js";
+import { writeSealedReport } from "./helpers/sealedRun.js";
 import { issueCertificate } from "../src/assurance/certificate.js";
 import { readTransparencyEntries, verifyTransparencyLog, transparencyLogPath } from "../src/transparency/logChain.js";
 import { applyPolicyPack } from "../src/policyPacks/packApply.js";
@@ -182,9 +183,8 @@ function writeHighRun(workspace: string, runId = "run_high"): void {
   };
   writeFileSync(join(agentPaths.runsDir, `${runId}.json`), JSON.stringify(report, null, 2));
   mkdirSync(join(agentPaths.reportsDir, "assurance"), { recursive: true });
-  writeFileSync(
-    join(agentPaths.reportsDir, "assurance", `assurance_${now}.json`),
-    JSON.stringify(
+  // Sealed as the runner seals it: an unsealed report newer than every sealed one blocks the assurance readers.
+  writeSealedReport(workspace, join(agentPaths.reportsDir, "assurance"), `assurance_${now}`,
       {
         assuranceRunId: `assurance_${now}`,
         agentId: "default",
@@ -207,11 +207,7 @@ function writeHighRun(workspace: string, runId = "run_high"): void {
             scenarioResults: [{ auditEventTypes: [] }]
           }
         ]
-      },
-      null,
-      2
-    )
-  );
+      });
 }
 
 function readFileSafe(path: string): string | null {

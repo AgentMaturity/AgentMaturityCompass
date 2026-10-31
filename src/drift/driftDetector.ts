@@ -92,9 +92,9 @@ function prepareDriftDecision(input: DriftCheckParams): { result: DriftCheckResu
   catch (error) { return empty([`alerts config invalid: ${error instanceof Error ? error.message : "unknown"}`], previous.runId, current.runId); }
   const assurance = () => latestAssuranceByPack({ workspace: params.workspace, agentId, windowStartTs: current.windowStartTs, windowEndTs: current.windowEndTs });
   const baseline = selected.baseline.map(row => row.run);
-  const assuranceByPack = assurance();
-  let evaluated: ReturnType<typeof evaluateDriftRules>;
-  try { evaluated = evaluateDriftRules({ config: alerts.config, previousRun: previous, baselineRuns: baseline, currentRun: current, assuranceByPack }); }
+  let assuranceByPack: ReturnType<typeof assurance>, evaluated: ReturnType<typeof evaluateDriftRules>;
+  // A refused newer assurance report throws INSUFFICIENT_EVIDENCE as well (security sweep 2026-10-31).
+  try { assuranceByPack = assurance(); evaluated = evaluateDriftRules({ config: alerts.config, previousRun: previous, baselineRuns: baseline, currentRun: current, assuranceByPack }); }
   catch (error) {
     if (error instanceof Error && error.message.startsWith("INSUFFICIENT_EVIDENCE:")) return empty([error.message], previous.runId, current.runId);
     throw error;

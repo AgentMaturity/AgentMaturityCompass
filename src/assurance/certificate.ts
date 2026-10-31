@@ -607,6 +607,10 @@ export async function verifyCertificate(params: {
       const assurance = JSON.parse(readUtf8(assurancePath)) as AssuranceReport;
       if (!assurance.reportJsonSha256 || !assurance.runSealSig) {
         errors.push(`assurance report missing signature fields: ${assuranceFile}`);
+      } else if (sha256Hex(canonicalize({ ...assurance, reportJsonSha256: "", runSealSig: "" })) !== assurance.reportJsonSha256) {
+        errors.push(`assurance report hash mismatch: ${assuranceFile}`);
+      } else if (!sealedBy(`assurance/${assuranceFile} runSealSig`, assurance.reportJsonSha256, assurance.runSealSig, assurance.ts)) {
+        errors.push(`assurance report seal signature invalid: ${assuranceFile}`);
       }
     }
 

@@ -2,6 +2,8 @@ import { captureRunHashAuthority, runHashVerificationKeys, type RunHashPublicati
 import { publishAssuranceReport } from "./runReportPublication.js";
 import { verifyHexDigestAny } from "../crypto/keys.js";
 import { sealedRunReportVerifies } from "../diagnostic/reportSeal.js";
+import { refusedRunsBlocking, type RefusedRun } from "../diagnostic/runReportResolution.js";
+import type { GovernorAssuranceSummary } from "../governor/actionPolicyEngine.js";
 import { validateExecutedReportRow, isExecutedReportPack } from "./executed/reportValidation.js";
 import { loadAdmittedCatalog } from "../catalog/admission/gate.js";
 import { loadExecutedRunScope, ExecutedScopeIntegrityError } from "./executed/scope.js";
@@ -12,7 +14,7 @@ import { finalizeExecutedResults } from "./executed/finalize.js";
 import { randomUUID } from "node:crypto";
 import { executeAssurancePack } from "./assurancePackExecution.js";
 import { readdirSync } from "node:fs";
-import { join } from "node:path";
+import { basename, join } from "node:path";
 import type { AssurancePackResult, AssuranceReport, AssuranceScenarioResult, RiskTier, TrustLabel, TrustTier } from "../types.js";
 import { loadContextGraph } from "../context/contextGraph.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
@@ -518,13 +520,33 @@ export function scanVerifiedAssuranceByPack(params: {
   };
 }
 
+/**
+ * Each pack's result from the newest sealed report in the window. A refused report (unreadable, a failing seal, or an
+ * unsealed report newer than the newest sealed one) throws INSUFFICIENT_EVIDENCE rather than rolling back to an older
+ * sealed result (security sweep 2026-10-31).
+ */
 export function latestAssuranceByPack(params: {
   workspace: string;
   agentId?: string;
   windowStartTs: number;
   windowEndTs: number;
 }): Map<string, AssurancePackResult> {
-  return scanVerifiedAssuranceByPack(params).byPack;
+  const byPack = new Map<string, AssurancePackResult>();
+  for (const report of latestAssuranceReports(params)) for (const pack of report.packResults) if (!byPack.has(pack.packId)) byPack.set(pack.packId, pack);
+  return byPack;
+}
+
+/**
+ * The governor's assurance summary from sealed reports only, each pack's newest (`scanVerifiedAssuranceByPack`). Any
+ * unverified report in the window reads as missing evidence: every required pack is absent, so the gate fails closed.
+ * Replaces actionPolicyEngine's summarizeAssuranceForWindow, which keeps the best score across unsealed files.
+ */
+export function verifiedGovernorAssuranceSummary(workspace: string, agentId: string, windowStartTs: number, windowEndTs: number): GovernorAssuranceSummary {
+  const { byPack, unverifiedReports } = scanVerifiedAssuranceByPack({ workspace, agentId, windowStartTs, windowEndTs });
+  if (unverifiedReports.length > 0) return { packs: {} };
+  return { packs: Object.fromEntries([...byPack].map(([packId, pack]) => [packId, { score: pack.score0to100,
+    succeeded: pack.scenarioResults.flatMap((scenario) => scenario.auditEventTypes).filter((type) => type.endsWith("_SUCCEEDED")).length,
+    observed: pack.trustTier === "OBSERVED" || pack.trustTier === "OBSERVED_HARDENED" }])) };
 }
 
 export function generateAssurancePatchKit(params: {
@@ -672,6 +694,20 @@ export async function applyAssurancePatchKit(params: {
   };
 }
 
+/** A refused assurance report blocks the readers that would otherwise roll back to an older sealed one. */
+export class AssuranceEvidenceUnverifiableError extends Error {
+  readonly code = "ASSURANCE_EVIDENCE_UNVERIFIABLE";
+  constructor(readonly blocking: readonly RefusedRun[]) {
+    super(`INSUFFICIENT_EVIDENCE: assurance report(s) ${blocking.map((row) => basename(row.file)).join(", ")} cannot be verified`);
+    this.name = "AssuranceEvidenceUnverifiableError";
+  }
+}
+
+/**
+ * This agent's sealed assurance reports in the window, newest first (security sweep 2026-10-31: the readiness gate and
+ * certificate issuance read these). Throws when a refused file blocks them, as `refusedRunsBlocking` decides for runs:
+ * unreadable, a failing seal, or an unsealed report newer than the newest sealed one.
+ */
 export function latestAssuranceReports(params: {
   workspace: string;
   agentId?: string;
@@ -680,14 +716,26 @@ export function latestAssuranceReports(params: {
 }): AssuranceReport[] {
   const agentId = resolveAgentId(params.workspace, params.agentId);
   const reportsDir = assuranceReportsDir(params.workspace, agentId);
-  return readdirSync(reportsDir)
-    .filter((file) => file.endsWith(".json"))
-    .map((file) => JSON.parse(readUtf8(join(reportsDir, file))) as AssuranceReport)
-    .filter(
-      (report) =>
-        report.agentId === agentId &&
-        report.ts >= params.windowStartTs &&
-        report.ts <= params.windowEndTs
-    )
-    .sort((a, b) => b.ts - a.ts);
+  const reports: AssuranceReport[] = [], refused: RefusedRun[] = [];
+  for (const file of readdirSync(reportsDir).filter((name) => name.endsWith(".json")).map((name) => join(reportsDir, name))) {
+    let parsed: Record<string, unknown> | null;
+    try {
+      parsed = JSON.parse(readUtf8(file)) as Record<string, unknown> | null;
+    } catch {
+      refused.push({ file, ts: null, tampered: true });
+      continue;
+    }
+    const ts = typeof parsed?.ts === "number" && Number.isFinite(parsed.ts) ? parsed.ts : null;
+    if (parsed?.agentId !== agentId || (ts !== null && (ts < params.windowStartTs || ts > params.windowEndTs))) continue;
+    if (sealedRunReportVerifies(params.workspace, parsed)) {
+      reports.push(parsed as unknown as AssuranceReport);
+      continue;
+    }
+    const seal = parsed.runSealSig;
+    refused.push({ file, ts, tampered: typeof seal === "string" && seal.length > 0 && seal !== "unsigned" });
+  }
+  reports.sort((a, b) => b.ts - a.ts);
+  const blocking = refusedRunsBlocking(refused, reports[0]?.ts ?? null);
+  if (blocking.length > 0) throw new AssuranceEvidenceUnverifiableError(blocking);
+  return reports;
 }

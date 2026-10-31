@@ -1,5 +1,5 @@
-import { rmSync } from "node:fs";
-import { resolve } from "node:path";
+import { mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { join, resolve } from "node:path";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { dispatchAlert } from "../src/drift/alerts.js";
 import { driftCheckCliAsync } from "../src/drift/driftCli.js";
@@ -62,6 +62,18 @@ describe("drift that cannot be evaluated alerts, never reads as clean", () => {
     const result = await driftCheckCliAsync({ workspace: f.workspace, agentId: "default" });
     expect(result.reasons.filter((reason) => reason.startsWith("INSUFFICIENT_EVIDENCE"))).toEqual([]);
     expect(notEvaluatedAlerts()).toHaveLength(0);
+  });
+
+  test("an unsealed assurance report planted in the window: not evaluated, never thrown or compared", async () => {
+    const f = freezeFixture();
+    runs(f, "default", [5, 4]);
+    const dir = join(getAgentPaths(f.workspace, "default").reportsDir, "assurance");
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(join(dir, "planted.json"), JSON.stringify({ assuranceRunId: "planted", agentId: "default", ts: 50, status: "VALID",
+      packResults: [{ packId: "injection", score0to100: 100, scenarioResults: [] }] }));
+    const result = await driftCheckCliAsync({ workspace: f.workspace, agentId: "default" });
+    expect(result.reasons[0]).toMatch(/^INSUFFICIENT_EVIDENCE: assurance report\(s\) planted\.json cannot be verified/);
+    expect(notEvaluatedAlerts()).toHaveLength(1);
   });
 
   test("an alert that cannot be delivered is reported in the result, never swallowed", async () => {
