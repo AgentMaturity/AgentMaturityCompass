@@ -10,6 +10,7 @@ import { runDoctorCli } from "../src/doctor/doctorCli.js";
 // not qualify a real notary, platform ABI, gateway or signed policy.
 const seam = vi.hoisted(() => ({
   signature: { valid: true, signatureExists: true, reason: null as string | null },
+  actionPolicy: { actions: [] as Array<{ actionClass: string; requireRunIntegrityAtLeast?: number }> },
   studioRunning: true,
   notary: vi.fn(async () => ({ ok: true, reasons: [] })),
   sign: vi.fn(async () => undefined),
@@ -19,7 +20,7 @@ const seam = vi.hoisted(() => ({
 }));
 vi.mock("../src/studio/studioSupervisor.js", () => ({ studioStatus: () => ({ running: seam.studioRunning, state: { host: "127.0.0.1", apiPort: 3212, gatewayPort: 3210 } }) }));
 vi.mock("../src/vault/vaultCli.js", () => ({ vaultStatusNow: () => ({ unlocked: true }) }));
-vi.mock("../src/governor/actionPolicyEngine.js", () => ({ verifyActionPolicySignature: () => seam.signature }));
+vi.mock("../src/governor/actionPolicyEngine.js", () => ({ verifyActionPolicySignature: () => seam.signature, loadActionPolicy: () => seam.actionPolicy }));
 vi.mock("../src/toolhub/toolhubCli.js", () => ({ verifyToolhubConfig: () => seam.signature }));
 vi.mock("../src/budgets/budgets.js", () => ({ verifyBudgetsConfigSignature: () => seam.signature }));
 vi.mock("../src/approvals/approvalPolicyEngine.js", () => ({ verifyApprovalPolicySignature: () => seam.signature }));
@@ -40,6 +41,7 @@ describe("local doctor and explicit live-probe boundary", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     seam.signature = { valid: true, signatureExists: true, reason: null };
+    seam.actionPolicy = { actions: [] };
     seam.studioRunning = true;
     root = mkdtempSync(join(tmpdir(), "amc-doctor-local-boundary-"));
     mkdirSync(join(root, ".amc"));
@@ -86,6 +88,14 @@ describe("local doctor and explicit live-probe boundary", () => {
     expect(renderDoctorText(report)).not.toContain("MOSTLY READY");
     expect(seam.sign).not.toHaveBeenCalled();
     expect(seam.lease).not.toHaveBeenCalled();
+  });
+  it("names an owner run-integrity waiver as a warning, not a failure", async () => {
+    seam.actionPolicy = { actions: [{ actionClass: "WRITE_LOW", requireRunIntegrityAtLeast: 0.3 }, { actionClass: "DEPLOY" }] };
+    const report = await runDoctorRules(root);
+    const row = report.checks.find(check => check.id === "action-policy-run-integrity-waiver");
+    expect(row).toMatchObject({ status: "WARN", message: expect.stringContaining("below 0.6 on WRITE_LOW=0.3;") });
+    expect(row?.message).not.toContain("DEPLOY");
+    expect(renderDoctorText(report)).toContain("owner waiver");
   });
   it("does not silently promote a requested but unavailable live probe to PASS", async () => {
     seam.studioRunning = false;

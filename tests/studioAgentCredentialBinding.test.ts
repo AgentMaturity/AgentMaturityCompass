@@ -135,7 +135,9 @@ function syntheticGovernorControlInput(f: Fixture, agentId: string): void {
     fixtureKind: "SYNTHETIC_CREDENTIAL_AUTHORIZATION_CONTROL_INPUT_NOT_A_MEASUREMENT",
     agentId, runId: "synthetic-credential-binding-control", ts: now,
     windowStartTs: now - 1000, windowEndTs: now, integrityIndex: 1, trustLabel: "HIGH TRUST",
-    correlationRatio: 0, questionScores: [], evidenceTrustCoverage: { observed: 0, attested: 0, selfReported: 1 }
+    correlationRatio: 0, questionScores: [], evidenceTrustCoverage: { observed: 0, attested: 0, selfReported: 1 },
+    // The governor refuses a sealed run that does not record a passed ledger verification inside the trust boundary.
+    verificationPassed: true, trustBoundaryViolated: false, trustBoundaryMessage: null
   };
   const runsDir = getAgentPaths(f.workspace, agentId).runsDir;
   mkdirSync(runsDir, { recursive: true });

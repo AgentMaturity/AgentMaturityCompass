@@ -10,7 +10,7 @@ import {
   type TrustTier
 } from "../types.js";
 import { pathExists, readUtf8 } from "../utils/fs.js";
-import type { ActionPolicy, ActionPolicyRule, TrustTierAtLeast } from "./actionPolicySchema.js";
+import { DEFAULT_RUN_INTEGRITY_AT_LEAST, runIntegrityAtLeast, type ActionPolicy, type ActionPolicyRule, type TrustTierAtLeast } from "./actionPolicySchema.js";
 import { getAgentPaths } from "../fleet/paths.js";
 import { latestTrustedRun } from "./runTrust.js";
 import { defaultActionPolicy } from "./actionPolicyStore.js";
@@ -36,11 +36,17 @@ export interface GovernorAssuranceSummary {
 export interface GovernorTrustSummary {
   trustTier: TrustTier;
   sandboxEvidence: boolean;
+  /**
+   * A hard gate no rule waives: the run history is refused (`runRefusal`), or the latest trusted run failed ledger
+   * verification, is not VALID or violated the trust boundary (`runTrustGap`). Callers OR in their own signature failures
+   * (ToolHub: `!configTrusted`; the runner: `anyUntrustedConfig`). Never set for a merely missing or low-integrity run:
+   * that is the rule's `run-integrity` condition.
+   */
   untrustedConfig: boolean;
   correlationRatio: number;
-  /** Why the latest run file was not used (seal, agent or ledger anchor failed); absent when there was none to refuse. */
+  /** Why the latest run file was not used (seal, agent or ledger anchor failed); absent when nothing was refused. */
   runRefusal?: string;
-  /** Why the trusted run (or its absence) leaves the config untrusted; absent when the run vouches for it. */
+  /** With `untrustedConfig` from the run: why the latest trusted run cannot vouch at any threshold. */
   runTrustGap?: string;
 }
 
@@ -302,6 +308,8 @@ export function evaluateActionPermission(input: GovernorDecisionInput): Governor
   );
   const policySignatureValid = input.policySignatureValid ?? true;
   const trustedConfig = policySignatureValid && !input.trustSummary.untrustedConfig;
+  // A refused or unverifiable run history; a merely missing or low-integrity run is the rule's `run-integrity` condition.
+  const runCause = input.trustSummary.runRefusal ?? input.trustSummary.runTrustGap;
 
   addCondition(decision, {
     conditionId: "action-policy-rule",
@@ -319,9 +327,10 @@ export function evaluateActionPermission(input: GovernorDecisionInput): Governor
     passed: trustedConfig,
     actual: trustedConfig,
     expected: true,
-    reason: trustedConfig
-      ? "Action Policy and dependent configuration are trusted."
-      : "Action Policy or dependent configuration trust verification failed.",
+    reason: trustedConfig ? "Action Policy and dependent configuration are trusted."
+      : !policySignatureValid ? "Action Policy signature verification failed."
+        : runCause !== undefined ? `The agent's run history cannot vouch for its configuration: ${runCause}.`
+          : "Action Policy or dependent configuration trust verification failed.",
   });
 
   const simulateAllowed = !!rule || policy.defaultMode === "ALLOW";
@@ -357,13 +366,11 @@ export function evaluateActionPermission(input: GovernorDecisionInput): Governor
   if (!trustedConfig) {
     decision.allowed = true;
     decision.effectiveMode = "SIMULATE";
-    // Name the cause: a fresh agent's config is untrusted for want of a trusted run, not for a bad signature.
-    const runCause = input.trustSummary.runRefusal ?? input.trustSummary.runTrustGap;
     decision.reasons.push("UNTRUSTED CONFIG: the policy/config signatures or the agent's trusted run do not vouch for it. EXECUTE is denied.");
     if (!policySignatureValid) decision.reasons.push("UNTRUSTED CONFIG: Action Policy signature verification failed.");
     if (runCause) decision.reasons.push(`UNTRUSTED RUN: ${runCause}.`);
     if (!policySignatureValid || !runCause) decision.requiredEvidence.push("Re-sign policy/config files and rerun amc verify.");
-    if (runCause) decision.requiredEvidence.push(`A sealed amc run for this agent with integrity >= ${TRUSTED_RUN_MIN_INTEGRITY} (HIGH TRUST); see docs/GOVERNOR.md "Reaching EXECUTE".`);
+    if (runCause) decision.requiredEvidence.push("Restore the agent's run history: its newest sealed run must be ledger-anchored and verify; a planted, tampered, unanchored, rolled-back or verification-failed run never lifts SIMULATE.");
     return decision;
   }
 
@@ -429,6 +436,46 @@ export function evaluateActionPermission(input: GovernorDecisionInput): Governor
   if (!rule) {
     issues.push(`No explicit policy rule for ${input.actionClass}.`);
   } else {
+    // The rule's threshold (absent: 0.6). Below 0.6 is an owner waiver: it still needs a sealed, anchored run (G1), never
+    // covers findings against the agent (G2), and every decision made under it says so.
+    const threshold = runIntegrityAtLeast(rule);
+    const waived = threshold < DEFAULT_RUN_INTEGRITY_AT_LEAST;
+    const run = input.currentDiagnosticRun;
+    // The runner's matrix passes a scores-only stub when the agent has no trusted run: no finite index, no run.
+    const measured = run && Number.isFinite(run.integrityIndex) ? run : null;
+    const integrity = measured?.integrityIndex ?? 0;
+    const findings = measured !== null && waived ? runFindings(measured) : [];
+    const runState = measured === null ? `agent ${input.agentId} has no trusted diagnostic run`
+      : `latest trusted run ${measured.runId} has integrity ${integrity.toFixed(3)} (${measured.trustLabel})`;
+    // At or below the default a HIGH TRUST label also satisfies it, as the gate before this field did
+    // (`trustLabel !== "HIGH TRUST" && integrity < 0.6`); above the default the number alone decides.
+    const runSatisfied = measured !== null && findings.length === 0
+      && (integrity >= threshold || (measured.trustLabel === "HIGH TRUST" && threshold <= DEFAULT_RUN_INTEGRITY_AT_LEAST));
+    const findingList = findings.join(", ");
+    addCondition(decision, {
+      conditionId: "run-integrity",
+      label: "Trusted run integrity",
+      passed: runSatisfied,
+      actual: measured === null ? null : integrity,
+      expected: threshold,
+      reason: runSatisfied
+        ? waived ? `${runState}; satisfies the owner-signed threshold ${threshold}, below AMC's default ${DEFAULT_RUN_INTEGRITY_AT_LEAST} (rule ${input.actionClass} in .amc/action-policy.yaml).`
+          : `${runState}; satisfies ${threshold}.`
+        : measured === null ? `${runState}.`
+          : findings.length > 0 ? `${runState}; the owner-signed threshold ${threshold} does not cover findings against the agent (${findingList}).`
+            : `${runState}, below ${threshold}.`,
+    });
+    if (!runSatisfied) {
+      issues.push(measured === null ? `UNTRUSTED RUN: ${runState}.`
+        : findings.length > 0 ? `UNTRUSTED RUN: ${runState}; findings against the agent (${findingList}) are not covered by the ${input.actionClass} rule's threshold ${threshold}.`
+          : `UNTRUSTED RUN: ${runState}, below ${threshold}.`);
+      decision.requiredEvidence.push(findings.length > 0
+        ? `A sealed amc run for this agent without findings against it (${findingList}); a threshold below ${DEFAULT_RUN_INTEGRITY_AT_LEAST} covers missing evidence, not findings.`
+        : `A sealed amc run for this agent with integrity >= ${threshold}${threshold >= DEFAULT_RUN_INTEGRITY_AT_LEAST ? " (HIGH TRUST)" : ""}; see docs/GOVERNOR.md "Reaching EXECUTE".`);
+    } else if (waived) {
+      decision.reasons.push(`RUN INTEGRITY WAIVED: the signed ${input.actionClass} rule sets requireRunIntegrityAtLeast ${threshold} (AMC default ${DEFAULT_RUN_INTEGRITY_AT_LEAST}); ${runState}.`);
+    }
+
     const trustTierSatisfied = compareTrustTier(input.trustSummary.trustTier, rule.requireTrustTierAtLeast);
     addCondition(decision, {
       conditionId: "trust-tier",
@@ -616,18 +663,16 @@ export function summarizeAssuranceForWindow(workspace: string, agentId: string, 
   return summary;
 }
 
-/** The integrity a trusted run needs before the governor treats the agent's config as trusted (unless HIGH TRUST). */
-const TRUSTED_RUN_MIN_INTEGRITY = 0.6;
-
-export function deriveTrustSummaryFromRun(workspace: string, agentId: string, run: DiagnosticReport | null): GovernorTrustSummary {
+/**
+ * The trust summary a decision reads. `untrustedConfig` is the hard gate no rule waives: a refused run history (G5:
+ * `refusal`, resolved here when the caller passes none, so no caller can trust a refused history) or a latest trusted run
+ * that cannot vouch at any threshold. A missing or low-integrity run is the rule's `run-integrity` condition instead.
+ */
+export function deriveTrustSummaryFromRun(workspace: string, agentId: string, run: DiagnosticReport | null, refusal?: string | null): GovernorTrustSummary {
   if (!run) {
-    return {
-      trustTier: "SELF_REPORTED",
-      sandboxEvidence: false,
-      untrustedConfig: true,
-      correlationRatio: 0,
-      runTrustGap: `agent ${agentId} has no trusted diagnostic run`
-    };
+    const cause = refusal === undefined ? latestTrustedRun(workspace, agentId).refusal : refusal;
+    return { trustTier: "SELF_REPORTED", sandboxEvidence: false, untrustedConfig: cause !== null, correlationRatio: 0,
+      ...(cause === null ? {} : { runRefusal: cause }) };
   }
 
   let trustTier: TrustTier = "SELF_REPORTED";
@@ -665,16 +710,29 @@ export function deriveTrustSummaryFromRun(workspace: string, agentId: string, ru
     trustTier = "OBSERVED_HARDENED";
   }
 
-  const untrustedConfig = run.trustLabel !== "HIGH TRUST" && run.integrityIndex < TRUSTED_RUN_MIN_INTEGRITY;
-  return {
-    trustTier,
-    sandboxEvidence,
-    untrustedConfig,
-    correlationRatio: run.correlationRatio,
-    ...(untrustedConfig
-      ? { runTrustGap: `latest trusted run ${run.runId} has integrity ${run.integrityIndex.toFixed(3)} (${run.trustLabel}), below ${TRUSTED_RUN_MIN_INTEGRITY}` }
-      : {})
-  };
+  const hardGap = runHardGap(run);
+  return { trustTier, sandboxEvidence, untrustedConfig: hardGap !== null, correlationRatio: run.correlationRatio,
+    ...(hardGap === null ? {} : { runTrustGap: hardGap }) };
+}
+
+/** Why a sealed run cannot vouch at any threshold: it is not a measurement. Never set for a merely low index. */
+function runHardGap(run: DiagnosticReport): string | null {
+  if (!run.verificationPassed || run.status !== "VALID") return `latest trusted run ${run.runId} failed ledger verification (status ${run.status})`;
+  if (run.trustBoundaryViolated !== false) {
+    return `latest trusted run ${run.runId} ${run.trustBoundaryViolated === true ? "violated the trust boundary" : "records no trust-boundary result"}${run.trustBoundaryMessage ? `: ${run.trustBoundaryMessage}` : ""}`;
+  }
+  return null;
+}
+
+/**
+ * Evidence against the agent that an owner waiver never covers (G2): a waiver stands in for missing evidence, not for
+ * findings. A count the run does not carry is read as a finding, never as zero.
+ */
+function runFindings(run: DiagnosticReport): string[] {
+  const counts: ReadonlyArray<readonly [string, unknown]> = [["contradictions", run.contradictionCount], ["unsupported claims", run.unsupportedClaimCount],
+    ["inflation attempts", Array.isArray(run.inflationAttempts) ? run.inflationAttempts.length : undefined], ["invalid receipts", run.invalidReceiptsCount]];
+  return counts.flatMap(([name, count]) => typeof count !== "number" || !Number.isSafeInteger(count) || count < 0 ? [`${name} not recorded`]
+    : count > 0 ? [`${count} ${name}`] : []);
 }
 
 /** `latestTrustedRun` without the reason. */
@@ -688,7 +746,7 @@ export function summarizeGovernorInput(workspace: string, agentId: string): {
   assurance: GovernorAssuranceSummary;
 } {
   const { run, refusal } = latestTrustedRun(workspace, agentId);
-  const trust = { ...deriveTrustSummaryFromRun(workspace, agentId, run), ...(refusal ? { runRefusal: refusal } : {}) };
+  const trust = deriveTrustSummaryFromRun(workspace, agentId, run, refusal);
   const assurance = run
     ? summarizeAssuranceForWindow(workspace, agentId, run.windowStartTs, run.windowEndTs)
     : { packs: {} };

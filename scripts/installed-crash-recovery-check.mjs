@@ -67,7 +67,8 @@ const receipt = {
   limits: ["Explicit deterministic stub provider and operator-trusted local stdio MCP tool; no live model or OS sandbox claim.",
     "Monitor pin is captured locally before execution; it proves workspace-key consistency, not independent trust anchoring.",
     "Artifact/source build correspondence is supplied by the release receipt; this runner independently pins artifact, installed CLI, and committed orchestration bytes.",
-    "Private fixture credentials and raw workspace evidence remain under the mode-0700 output directory; publish only reviewed redacted receipts."]
+    "Private fixture credentials and raw workspace evidence remain under the mode-0700 output directory; publish only reviewed redacted receipts.",
+    "EXECUTE is reached under an owner-signed Action Policy waiver (READ_ONLY and WRITE_LOW: tier SELF_REPORTED, no evidence gates, run-integrity threshold 0 over the baseline run 02-initialize sealed, no sandbox for low/medium). It proves the governed EXECUTE, signed-approval and crash-recovery path, not the agent's maturity or trust; the waiver's activation is the CONFIG_RESIGNED audit row named in check owner-signed-run-integrity-waiver."]
 };
 const save = () => writeFileSync(join(root, "receipt.json"), scrub(JSON.stringify(receipt, null, 2)) + "\n");
 const check = (name, details = {}) => { receipt.checks.push({ name, ok: true, ...details }); save(); };
@@ -149,6 +150,33 @@ try {
   // Deferred MCP tools need native tool_search (READ_ONLY) signed beside the grant (d6441c858).
   toolsConfig.tools.allowedTools = [{ name: toolName, actionClass: "WRITE_LOW" }, { name: "tool_search", actionClass: "READ_ONLY" }];
   writeFileSync(toolsPath, JSON.stringify(toolsConfig, null, 2) + "\n"); await command("07-tools-sign", ["tools", "sign", "--json"]);
+  // AXR-02: the default signed Action Policy runs a fresh agent's EXECUTE as SIMULATE until its latest trusted run reaches
+  // integrity 0.6. The baseline run 02-initialize sealed measures nothing (integrity ~0), so the owner signs a waiver for
+  // READ_ONLY and WRITE_LOW only: no evidence gates, tier SELF_REPORTED, run-integrity threshold 0, no sandbox for
+  // low/medium. Every decision under it names the waiver. It proves the governed EXECUTE path, not maturity.
+  const policyPath = join(workspace, ".amc", "action-policy.yaml"), policy = YAML.parse(readFileSync(policyPath, "utf8"));
+  for (const rule of policy.actions) {
+    if (rule.actionClass !== "READ_ONLY" && rule.actionClass !== "WRITE_LOW") continue;
+    Object.assign(rule, { minEffectiveQuestionLevels: {}, requireAssurancePacks: {}, requireTrustTierAtLeast: "SELF_REPORTED",
+      requireRunIntegrityAtLeast: 0, allowExecute: true, requireExecTicket: false });
+  }
+  policy.riskTierDefaults.low.requireSandboxForExecute = false; policy.riskTierDefaults.medium.requireSandboxForExecute = false;
+  writeFileSync(policyPath, JSON.stringify(policy, null, 2) + "\n");
+  const resigned = await command("07b-policy-owner-waiver-sign", ["fix-signatures"]);
+  const resignAudit = /Audit event: (\S+)/.exec(String(resigned))?.[1] ?? null;
+  assert.ok(resignAudit, "fix-signatures must re-sign the edited policy and record CONFIG_RESIGNED"); // G4: the waiver's activation row
+  const waiverDecisions = {};
+  for (const action of ["READ_ONLY", "WRITE_LOW"]) {
+    const governed = await command(`07c-governor-check-${action}`, ["governor", "check", "--agent", "default", "--action", action, "--risk", "med", "--mode", "execute"]);
+    assert.equal(governed.effectiveMode, "EXECUTE", governed.reasons.join(" "));
+    const waived = governed.reasons.find(reason => reason.startsWith("RUN INTEGRITY WAIVED:")); assert.ok(waived, "the decision must name the owner waiver");
+    const condition = governed.conditionResults.find(row => row.conditionId === "run-integrity");
+    // G1: a waiver still needs the sealed, anchored baseline run 02-initialize published.
+    assert.equal(condition?.expected, 0); assert.equal(typeof condition?.actual, "number", "a sealed, anchored baseline run must exist (02-initialize)");
+    waiverDecisions[action] = { waived, runIntegrity: condition.actual };
+  }
+  check("owner-signed-run-integrity-waiver", { classes: ["READ_ONLY", "WRITE_LOW"], requireRunIntegrityAtLeast: 0, trustTier: "SELF_REPORTED",
+    sandboxForLowMedium: false, policySha256: sha(readFileSync(policyPath)), configResignedAuditEventId: resignAudit, decisions: waiverDecisions });
   monitor = sha(readFileSync(join(workspace, ".amc", "keys", "monitor_ed25519.pub")));
   writeFileSync(join(root, "private", "pre-execution-monitor.pub"), readFileSync(join(workspace, ".amc", "keys", "monitor_ed25519.pub")));
   env.AMC_EXPECTED_MONITOR_FINGERPRINT = monitor; process.env.AMC_EXPECTED_MONITOR_FINGERPRINT = monitor;
@@ -170,6 +198,8 @@ try {
     assert.equal(review.status, "PENDING");
     for (const field of ["requestIntegrity", "chainIntegrity", "contextIntegrity"]) assert.equal(review[field].valid, true);
     assert.equal(review.request.toolName, expectedTool); assert.equal(review.request.requiredApprovals, 1);
+    // G8: each approval is about an EXECUTE request, so the APPROVE_EXECUTE recorded below decides an EXECUTE call.
+    assert.equal(review.request.requestedMode, "EXECUTE"); assert.equal(review.request.effectiveMode, "EXECUTE");
     assert.equal(lines(effectsPath).length, 0);
     await command(`10-${step}-approve`, ["approvals", "approve", "--agent", "default", approvalId, "--mode", "execute", "--reason", "Explicit local crash-recovery acceptance",
       "--username", login.username, "--user-id", login.userId, "--roles", login.roles.join(","), "--session-token-file", tokenFile, "--expect-request-digest", review.requestDigestSha256]);
@@ -184,7 +214,7 @@ try {
     const outputs = done.updates.filter(({ update }) => update.sessionUpdate === "tool_call_update");
     assert.equal(outputs.length, 1, `${step}: one tool result`); assert.equal(outputs[0].update.status, "completed");
     const text = outputs[0].update.content[0].content.text;
-    // AXR-02: the signed Action Policy runs EXECUTE as SIMULATE until the agent has a trusted diagnostic run.
+    // AXR-02 under the owner-signed waiver: a SIMULATE result means the waiver did not take effect.
     assert.ok(!text.startsWith("SIMULATE "), `${step}: tool_search ran as SIMULATE under the signed Action Policy (AXR-02): ${text}`);
     return JSON.parse(text);
   };

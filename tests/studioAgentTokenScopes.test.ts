@@ -125,7 +125,9 @@ function syntheticGovernorControlInput(workspace: string): void {
   const report: Partial<DiagnosticReport> & { fixtureKind: string } = {
     fixtureKind: "SYNTHETIC_TOKEN_SCOPE_CONTROL_INPUT_NOT_A_MEASUREMENT", agentId: A, runId: "synthetic-token-scope-control",
     ts: now, windowStartTs: now - 1000, windowEndTs: now, status: "VALID", integrityIndex: 1, trustLabel: "HIGH TRUST", correlationRatio: 0,
-    questionScores: [], evidenceTrustCoverage: { observed: 0, attested: 0, selfReported: 1 }
+    questionScores: [], evidenceTrustCoverage: { observed: 0, attested: 0, selfReported: 1 },
+    // The governor refuses a sealed run that does not record a passed ledger verification inside the trust boundary.
+    verificationPassed: true, trustBoundaryViolated: false, trustBoundaryMessage: null
   };
   // The governor reads only sealed, ledger-anchored runs, so the control input is published as the runner would.
   writeAnchoredRun(workspace, getAgentPaths(workspace, A).runsDir, report as Parameters<typeof writeAnchoredRun>[2]);

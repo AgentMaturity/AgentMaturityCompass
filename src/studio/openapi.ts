@@ -1069,7 +1069,7 @@ function studioSchemas(): Record<string, unknown> {
         effectiveLogic: { oneOf: [{ $ref: "#/components/schemas/PolicyEvidenceLogic" }, { type: "null" }] },
         effectiveLogicSha256: { type: "string", pattern: "^[a-f0-9]{64}$" },
         hasAlternatives: { type: "boolean" },
-        mandatoryGates: { type: "array", minItems: 9, maxItems: 9, items: { type: "string" } },
+        mandatoryGates: { type: "array", minItems: 10, maxItems: 10, items: { type: "string" } },
         baseline: { $ref: "#/components/schemas/ActionEvidencePolicyHash" },
       },
       required: ["schemaVersion", "actionClass", "configured", "gateCount", "gates", "effectiveLogic", "effectiveLogicSha256", "hasAlternatives", "mandatoryGates", "baseline"],
@@ -1087,7 +1087,7 @@ function studioSchemas(): Record<string, unknown> {
         requiresAlternativeAcknowledgement: { type: "boolean" },
         gateCount: { type: "integer", minimum: 1, maximum: 60 },
         gates: { type: "array", minItems: 1, maxItems: 60, items: { $ref: "#/components/schemas/ActionEvidenceGate" } },
-        mandatoryGates: { type: "array", minItems: 9, maxItems: 9, items: { type: "string" } },
+        mandatoryGates: { type: "array", minItems: 10, maxItems: 10, items: { type: "string" } },
         baseline: { $ref: "#/components/schemas/ActionEvidencePolicyHash" },
         candidate: { $ref: "#/components/schemas/ActionEvidencePolicyHash" },
         logic: {
