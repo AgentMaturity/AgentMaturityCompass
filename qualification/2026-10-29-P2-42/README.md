@@ -13,3 +13,7 @@ Follow-up (all seven stations, resolved view):
 - `suite-run2.txt`: tests/a4, every test importing src/a4, the console-asset tests, the pinned suites and wormSideTables: 101 files, 1048 tests passed.
 - `mutations-v2.txt`: nine more mutations (kind-for-place, json parts, stateOf check, both revision routes), each killed.
 - `checks-v2.txt`: every check exits 0; `p242-final-v2.txt`: the P2-42 file (9 tests) after the mutation runs.
+
+## Receipt repaired 2026-10-31
+
+The folder had no `receipt.json`, which `npm run check:qualification` requires. It was written from this README, the files above and the git history. It names the follow-up commit `538f0a912`. Its commands are the follow-up's checks in `checks-v2.txt`, written as the npm scripts they name, and the runs in `suite-run2.txt` and `p242-final-v2.txt`, written as vitest commands because their command lines were not recorded. `tests` is the follow-up's suite run (1048 of 1048 passed), which includes the P2-42 file. The first commit's runs are described in the notes. Every evidence file is listed as a hashed artifact. The exact Node version, pnpm, the OS and most command durations were never recorded; they are written as `22` (the major this README gives), `not recorded` and `durationMs: 0`. `arch` is `arm64`, a same-host inference from that day's receipts that record it, because the schema allows only `arm64` or `x64`.

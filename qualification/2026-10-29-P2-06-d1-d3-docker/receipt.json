@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "key": "P2-06",
+  "date": "2026-10-29",
+  "commit": "ab6f2d4f62c0ed6785f3dbd9eb8a62e91656e54f",
+  "branch": "rtd/w7-docker",
+  "node": "not recorded on the host; the image is built on node:22-bookworm-slim (build.log)",
+  "pnpm": "not recorded",
+  "os": "colima profile amc-s7f, linux/arm64 (aarch64) VM, for the build and the container run; host OS not recorded",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "docker buildx build --load --progress=plain --target studio -t amc-studio:p2-06-d1-d3 .",
+      "exit": 0,
+      "durationMs": 0
+    }
+  ],
+  "tests": null,
+  "artifacts": [
+    {
+      "path": "build.log",
+      "sha256": "4593b50404e6a24cd95b2f05679729617843f857ce490813f5b452ae9ddee520"
+    },
+    {
+      "path": "image-id.txt",
+      "sha256": "2c759ecc943cd27005145ecc82ed103af65b38baed99a67f60b185b0a5a9d98d"
+    },
+    {
+      "path": "image-inspect.txt",
+      "sha256": "4e28635228ac206139bc3e496e287a417a6dd2ea32f3e83e7f42c8f94237c2c5"
+    },
+    {
+      "path": "readyz-after-value-init.json",
+      "sha256": "925cb47438dfbfb7e6cccb2de926fe942a72f1f9bd9cc52102dfa7d880384ade"
+    },
+    {
+      "path": "studio-state.json",
+      "sha256": "881237151a476428a6158fd5313f4c19eaaac227463c37686793124ab9350196"
+    },
+    {
+      "path": "studio.log",
+      "sha256": "6626f252aa4d9497d742c0ce2b636a53d1cc03c1a1dce6b2dbafdddf144ea2a7"
+    }
+  ],
+  "notes": "P2-06 defects D1 and D3 (source image build and Studio start), qualified locally on colima. The build ran at worktree tip 331f311d6 + uncommitted fix; colima amc-s7f aarch64 (build.log, first line); that fix was committed with this folder as ab6f2d4f6, whose parent is 331f311d6, so commit names ab6f2d4f6. branch is the one git history merged it from (91295062d, Merge branch 'rtd/w7-docker'). The only command whose line and exit the folder records is the image build. The container's bootstrap and Studio start (studio.log, studio-state.json: healthy, 0 restarts), the image inspection (image-inspect.txt), amc value init and the /readyz request (readyz-after-value-init.json: READY) are described in README.md with their outputs, but their command lines and exit codes were not recorded, so they are not listed as commands. Image id: image-id.txt (a local build, not a release image); nothing was pushed to a registry, and the container, its volumes and the generated test secrets were removed afterwards. Before amc value init, /readyz returned 503 with only VALUE_POLICY_UNTRUSTED: file missing, which is defect D2, fixed separately (P2-06-D2). tests is null: the folder records no test run; the commit's tests (tests/containerSourceBuild.test.ts) have no recorded run here. Not recorded: the host's Node, pnpm and OS versions and the build's duration (durationMs 0 means not recorded). arch is arm64 because the build and run were linux/arm64 (aarch64)."
+}

@@ -19,3 +19,12 @@ There is no Postgres server here and `pg` is not a dependency. Every test drives
 ## Pending (Sid)
 
 Run `docs/runbooks/POSTGRES_FAILOVER.md` once against the chosen HA setup and commit its `postgres-failover.json` here with a README naming the platform, version, replication mode and failover trigger. Not faked.
+
+## Receipt repaired 2026-10-31
+
+`receipt.json` did not follow `qualification/receipt.schema.json` (37 problems in `npm run check:qualification`). It lacked `pnpm`, `tests`, `artifacts` and `notes`, gave a short commit, listed commands without `durationMs`, and carried fields the schema does not allow (`slice`, `parent`, `postgresServer`, `redGreen`, `mutations`, `pending`, `securityReview` and per-command counts). The receipt now names the full commit `a3b6e2a92ae8b370e698dbd9ae114133e6557f3b` and lists every recorded command with its exit code, the two security-review rows included. `tests` is null because the runs are separate selections at two commits, and `artifacts` is empty because the folder holds no other files. Everything the extra fields recorded (slice, parent, server, counts, mutation checks, pending items and the security review) is kept in `notes`. `date` is now 2026-10-27, the folder's wave-3 date, which the checker requires it to equal; the receipt had recorded 2026-10-28, and its notes say so. pnpm and the command durations were never recorded; they are written as `not recorded` and `durationMs: 0`. The original receipt is in git at `58a328ea8:qualification/2026-10-27-P2-09d/receipt.json`.
+
+
+## Folder renamed 2026-10-31
+
+This folder was `qualification/2026-10-27-P2-09d/`. `npm run check:qualification` reads a folder name as `<YYYY-MM-DD>-<KEY>`, where a second receipt for the same key and day may add a lowercase variant (`qualification/README.md`). The receipt key is `P2-09`. The old suffix `d` follows the key without a hyphen, so it can never be a variant. The folder now carries the lowercase variant `-d`, the same slice letter. The evidence files are unchanged; git records the move as a rename.

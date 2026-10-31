@@ -121,7 +121,7 @@ No new product defect. The two remaining causes:
 Folder `kind-d5/`. The harness ran at `2866b1ec6` with `--only INS-1,INS-2,BR-1`, so the other 19 checks are recorded as not run and count as failed. There was no operator workaround, and the recovery targets were the same placeholder.
 
 - **Image:** N is `2866b1ec6`, built with the repository Dockerfile and no patch: `amc-studio@sha256:53d81cb1…`. It was passed as both `--image-a` and `--image-b`; no selected check uses N-1.
-- **What changed (details in `qualification/2026-10-29-P2-06-D5/`):**
+- **What changed (details in `qualification/2026-10-29-P2-06-d5-chart/`):**
   - The chart has `keyProvider.*` and `ledgerEncryption.*` values.
   - INS-1 installs with `keyProvider.provider=file` and `ledgerEncryption.enabled=true`. After the governed turn it checks the running workspace, not only the values.
 

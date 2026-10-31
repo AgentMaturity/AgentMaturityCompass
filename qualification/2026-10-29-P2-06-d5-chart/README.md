@@ -39,3 +39,8 @@ Image N was built at `2866b1ec6`. The two later commits change only a test asser
 - Image built inside the colima VM `amc-s7f` (Docker with buildx). The host Docker CLI has no buildx, and the Dockerfile needs BuildKit.
 - kind v0.33.0 with Kubernetes v1.37.0, cluster `amc-p206`. The kind API was reached through an ssh tunnel, because colima's port forward failed. The cluster and image N were deleted afterwards.
 - Secrets were random per run (`--ephemeral-secrets`). Recovery targets were an engineering-placeholder scratch file, as in the earlier runs.
+
+
+## Folder renamed 2026-10-31
+
+This folder was `qualification/2026-10-29-P2-06-D5/`. `npm run check:qualification` reads a folder name as `<YYYY-MM-DD>-<KEY>`, where a second receipt for the same key and day may add a lowercase variant (`qualification/README.md`). The receipt key is `P2-06`. The old uppercase suffix `-D5` reads as another key, so it can never match. The folder now carries the lowercase variant `-d5-chart`, from the lane branch `rtd/w7-d5-chart`. The branch name is added because a rename that changed only the letter case may leave the old directory name in place in existing macOS checkouts, whose file systems ignore case. The evidence files are unchanged; git records the move as a rename.

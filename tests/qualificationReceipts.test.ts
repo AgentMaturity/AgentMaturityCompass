@@ -77,6 +77,11 @@ describe("P0-01 qualification receipts", () => {
     expect(errorsFor()).toContain("folder name must be <YYYY-MM-DD>-<KEY>");
   });
 
+  test("the WP29 campaign plan folder is a definition, not a receipt", () => {
+    write("wp29-campaign/native-conformance.v1.json", "{}\n");
+    expect(validateQualificationDir(root)).toEqual({ ok: true, receipts: [], errors: [] });
+  });
+
   test("a missing README fails", () => {
     write(`${folder}/receipt.json`, JSON.stringify(receipt()));
     expect(errorsFor()).toContain("README.md");

@@ -1,0 +1,155 @@
+{
+  "schemaVersion": 1,
+  "key": "P2-09",
+  "date": "2026-10-29",
+  "commit": "64c1e2ec936957a1b9dc3d63eb83a54ad97e8ee6",
+  "branch": "rtd/w7-pg-migrate",
+  "node": "not recorded",
+  "pnpm": "not recorded",
+  "os": "not recorded",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run build",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run typecheck",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run typecheck:tests",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run lint",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:gates",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:dead-code",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:duplicates",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:counts",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:api-ref",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:freeze",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npx vitest run <4 test files; output in tests.log>",
+      "exit": 0,
+      "durationMs": 157600
+    },
+    {
+      "cmd": "npx vitest run <105 test files; output in tests-mirror-consumers.log>",
+      "exit": 0,
+      "durationMs": 779300
+    },
+    {
+      "cmd": "python3 mutate.py (9 mutations; output in mutation-checks.txt)",
+      "exit": 0,
+      "durationMs": 0
+    }
+  ],
+  "tests": null,
+  "artifacts": [
+    {
+      "path": "build.log",
+      "sha256": "03f016f8306c0633cb5d8a76f59569d64dcfe7f895ffbb94fbf401adc3f13bd8"
+    },
+    {
+      "path": "check-freeze.log",
+      "sha256": "b00336d0f5eccc413b71da3263540df8c2d4a9fd04ef1bd5e9a9d4aa6608a8c4"
+    },
+    {
+      "path": "check:api-ref.log",
+      "sha256": "b3f05c856b6880ccf5985f87f8939d6948fc30ce3dc70edd6c71e0e1dff3cb2d"
+    },
+    {
+      "path": "check:counts.log",
+      "sha256": "f22f32c8cce95da49779f77a8612a0ff3f01e55a3673dd741fc91b51cba93f8e"
+    },
+    {
+      "path": "check:dead-code.log",
+      "sha256": "860c90e4f9cbe1cd354b76f59c0ed99b00a74121629c115cbcb371c706a8b310"
+    },
+    {
+      "path": "check:docs-drift.log",
+      "sha256": "2e3dca3a044e9bc68bfdc3cc6fb49191e73288449e27d6093769f3a9ca665a2e"
+    },
+    {
+      "path": "check:duplicates.log",
+      "sha256": "b543e2fabc40e6524309ff9ce4939dea37d9f77733a1fb488074425e5407839f"
+    },
+    {
+      "path": "check:gates.log",
+      "sha256": "e59398d6b10bd12bbfdd3ab4f1094f5a49247370760dfafe11996cce02f585f1"
+    },
+    {
+      "path": "gen-api-ref.log",
+      "sha256": "31fb71b9c2fd1b4c4622b90d9ad85aa947e378d69965454722cd602b0822c152"
+    },
+    {
+      "path": "gen-counts.log",
+      "sha256": "228c5b550b1a134b952b855f5c44cb5cf65ba7aa328e53c37b4685dad222dc22"
+    },
+    {
+      "path": "lint.log",
+      "sha256": "b7096a28a4ef9fc9c2b3964e45ba643cee6913af3b85795f8e22294d36c7ec33"
+    },
+    {
+      "path": "mutate.py",
+      "sha256": "7fb1b70f1b3bff78fc7f7c19f4535a5dc225ccb483286df7a44c46c430f5ed5d"
+    },
+    {
+      "path": "mutation-checks.txt",
+      "sha256": "dfd3ad0a00e571e09878c291d8cdd14019bb580de41c81debd8e3ad4408ed3d6"
+    },
+    {
+      "path": "tests-mirror-consumers.log",
+      "sha256": "f1c83152a89e44feedad47f9da27518f81b640dde514de5ea37e51279d7dff4b"
+    },
+    {
+      "path": "tests.log",
+      "sha256": "0dfcc572e6899dd31cce61ac7bbeec13dec6527854c609c8b442ee2058342347"
+    },
+    {
+      "path": "typecheck.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "typecheck:tests.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "notes": "P2-09d-M1: amc evidence-stores migrate --to postgres is all or nothing. Base 331f311d6, branch rtd/w7-pg-migrate; commit 64c1e2ec9 holds the fix and this folder. Rows 1-10 are the checks README.md lists as passing, with their logs in this folder (<script>.log), written as the npm scripts they name; flags were not recorded. The generators' logs (gen-counts.log: No changes needed; gen-api-ref.log: Written docs/API_REFERENCE.md) are kept as artifacts; their exits were not recorded, so they are not commands. Row 11 exit 1: check-freeze.log fails only on freeze-exception keys from changesets already on the held line (P2-09d, P2-30, P3-14, …); this change adds no CLI command and no freeze exception. Rows 12 and 13 are the vitest runs in tests.log (4 files, 66 tests passed) and tests-mirror-consumers.log (105 files, 1260 tests passed); their command lines were not recorded, and their durationMs is the Duration vitest reported. Row 14 runs mutate.py, which breaks 9 guards in src/persistence/postgres/postgresMigration.ts one at a time and runs the migrate tests: all 9 were killed (mutation-checks.txt). An earlier run also killed the pinned determinism ids. Regression tests in tests/postgresSessionEventStore.test.ts and tests/a4PostgresMirror.test.ts are red on the base and green on the fix, as README.md describes case by case. Pending (Sid): the live Postgres drill in docs/runbooks/POSTGRES_FAILOVER.md. tests is null: the two runs may overlap and are not summed. Not recorded: node, pnpm, the OS and the other commands' durations (durationMs 0 means not recorded). arch is not recorded either; arm64 is a same-host inference from the same wave's 2026-10-29 receipt for D5 (darwin 25.6.0, macOS 26.6, arm64), because the schema allows only arm64 or x64."
+}

@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "key": "P2-06",
+  "date": "2026-10-29",
+  "commit": "b98565946c75ed60d2a4540269d1363651c5835c",
+  "branch": "rtd/w7-d4-restore",
+  "node": "not recorded",
+  "pnpm": "not recorded",
+  "os": "not recorded",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npx vitest run tests/backupRestoreRefusal.test.ts",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npx vitest run <51 test files: every test file importing keys/keyset or ops/backup, plus embeddedKeyForgery and referenceDeploymentHarness>",
+      "exit": 0,
+      "durationMs": 0
+    }
+  ],
+  "tests": null,
+  "artifacts": [
+    {
+      "path": "mutations.json",
+      "sha256": "9655c37763fe68a9ce6ed2901805d0bf012269ceb7605c9ad7b84c5bac5c3d20"
+    }
+  ],
+  "notes": "P2-06 defect D4 (BR-3, tenantChanged: true): amc backup restore decides every refusal before it writes. Base 331f311d6; branch is the one git history merged the fix from (a1206c3fe, Merge branch 'rtd/w7-d4-restore'); commit b98565946 holds the fix and this folder. Rows 1 and 2 write README.md's Evidence runs as vitest commands; their command lines were not recorded. Row 1: the 7 regression tests pass after the fix. Row 2, the module tests: 51 files, 718 tests passed. Red: on 331f311d6 the regression test failed for the cross-tenant case (FORK_DETECTED after write, tree bytes changed) and both failure-after-checks cases. Mutations (amc.p206-d4-mutations/1, test tests/backupRestoreRefusal.test.ts): M1 key comparison disabled (if (false)): killed: 2 tests failed (another workspace with marks; another workspace on a machine with no marks); M2 mark loop skipped (continue): killed: 1 test failed (a path where this machine accepted another key set); M3 call removed: killed: 3 tests failed; M4 extract, verify and seal directly in the target; no commit step: killed: 3 tests failed (replacedTo; no partial workspace after a failed seal; same workspace unchanged after a failed seal). The folder records no build, typecheck, lint or repository-check results, so none are listed. Pending: rerun BR-3 on the reference deployment (real cluster), pending for the P2-06 harness run. tests is null: the module run's skipped count was not recorded (row 2's selection includes row 1's file). Not recorded: node, pnpm, the OS and the command durations (durationMs 0 means not recorded). arch is not recorded either; arm64 is a same-host inference from the same wave's 2026-10-29 receipt for D5 (darwin 25.6.0, macOS 26.6, arm64), because the schema allows only arm64 or x64."
+}
