@@ -112,10 +112,11 @@ describe("AXE-27 unavailable memory ratios", () => {
     });
   });
 
-  test("zero predicted positives preserves measured zero recall", () => {
+  test("a detector that misses every labelled poisoned entry scores a measured 0, never an absent score", () => {
+    // Previously precision 0/0 was unavailable, the score null, and the miss dropped out of the maturity mean.
     expect(detectMemoryPoisoning([entry(true)])).toMatchObject({
-      precision: null, recall: 0, poisoningScore: null,
-      metricOutcomes: { precision: "not_evaluated", recall: "measured" },
+      precision: 0, recall: 0, poisoningScore: 0, outcome: "measured",
+      metricOutcomes: { precision: "measured", recall: "measured" },
     });
   });
 });
