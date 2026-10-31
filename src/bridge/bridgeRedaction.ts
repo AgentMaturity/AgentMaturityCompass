@@ -29,7 +29,8 @@ export function redactBridgeText(input: string): string {
   return redactSecrets(input, () => "<AMC_REDACTED>").redacted;
 }
 
-const MARKER = "<AMC_REDACTED>";
+/** The anonymous placeholder bridge evidence stores in place of a finding; a delegate's folded answer drops it. */
+export const BRIDGE_REDACTED_MARKER = "<AMC_REDACTED>";
 // What one call may scan with the detectors before its whole value is replaced: less than the gateway's per-body budget,
 // because the bridge's event loop also answers hook control decisions.
 const MAX_BRIDGE_SCAN_CHARS = MAX_REQUEST_SCAN_CHARS / 4;
@@ -44,15 +45,17 @@ const MAX_BRIDGE_SCAN_CHARS = MAX_REQUEST_SCAN_CHARS / 4;
  * a rounded JSON integer), and then the secret table, so JSON reaches the walk intact. Each `text` or `json` call may scan
  * MAX_BRIDGE_SCAN_CHARS; past that, or on any failure of the walk, the whole value stored is the marker. Text the bridge
  * hands back to an agent (control responses, deny reasons, `amc wrap`'s terminal output) keeps secrets-only
- * `redactBridgeText`, so an opted-in workspace's detectors never alter what an agent is told.
+ * `redactBridgeText`, so an opted-in workspace's detectors never alter what an agent is told. `replace` is what a walk
+ * finding is stored as (the marker unless a caller keeps a keyword, `processOutputRedactor`).
  */
-export function bridgeEvidenceRedactor(workspace: string):
+export function bridgeEvidenceRedactor(workspace: string,
+  replace: (finding: { readonly detector: string }) => string = () => BRIDGE_REDACTED_MARKER):
   { readonly text: (input: string, key?: string) => string; readonly json: (value: unknown) => unknown } {
   if (!protectedDataOptedIn(workspace)) {
     return Object.freeze({ text: (input: string) => redactBridgeText(input), json: (value: unknown) => redactJsonLeaves(value, redactBridgeText) });
   }
-  const walkFor = () => protectedWalk({ budget: MAX_BRIDGE_SCAN_CHARS, replace: () => MARKER, opaque: () => MARKER });
-  const guarded = <R>(redact: () => R): R | typeof MARKER => { try { return redact(); } catch { return MARKER; } };
+  const walkFor = () => protectedWalk({ budget: MAX_BRIDGE_SCAN_CHARS, replace, opaque: () => BRIDGE_REDACTED_MARKER });
+  const guarded = <R>(redact: () => R): R | typeof BRIDGE_REDACTED_MARKER => { try { return redact(); } catch { return BRIDGE_REDACTED_MARKER; } };
   return Object.freeze({
     text: (input: string, key?: string) => guarded(() => redactBridgeText(walkFor().text(input, key))),
     json: (value: unknown) => guarded(() => redactJsonLeaves(walkFor().value(value), redactBridgeText))
@@ -64,11 +67,13 @@ export function bridgeEvidenceRedactor(workspace: string):
  * opted in to protected-data redaction (P2-02), `bridgeEvidenceRedactor`'s text. Elsewhere the payload as it was before:
  * the diagnostic's transcript audits (POLICY_VIOLATION) and a delegated child's folded answer read these rows, and the
  * shared secret table would take out the keyword (`api_key=...`) or the plain value (a password-less connection string)
- * they need.
+ * they need. Opted in, a finding's value is replaced and its keyword kept: the walk replaces an `api_key` or `password`
+ * value only, and a PEM private key block whole, so its replacement keeps the label the audit reads.
  */
 export function processOutputRedactor(workspace: string): (payload: string | Buffer) => string | Buffer {
   if (!protectedDataOptedIn(workspace)) return (payload) => payload;
-  const evidence = bridgeEvidenceRedactor(workspace);
+  const evidence = bridgeEvidenceRedactor(workspace,
+    (finding) => finding.detector === "private_key" ? `PRIVATE KEY ${BRIDGE_REDACTED_MARKER}` : BRIDGE_REDACTED_MARKER);
   return (payload) => evidence.text(typeof payload === "string" ? payload : payload.toString("utf8"));
 }
 
