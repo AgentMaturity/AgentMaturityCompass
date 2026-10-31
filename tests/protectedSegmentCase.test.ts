@@ -11,6 +11,7 @@ import { insideWorkspace } from "../dist/tools/builtin/fsTools.js";
 import { walkWorkspace } from "../dist/tools/builtin/workspaceWalk.js";
 import { protectedPathReason } from "../dist/toolhub/protectedPaths.js";
 import { pathAllowedByPatterns } from "../dist/toolhub/toolhubValidators.js";
+import { admissibleConfigFile } from "../dist/experiments/configFile.js";
 
 /**
  * `.amc` and `.git` are protected by NAME, and on a case-insensitive volume
@@ -113,6 +114,19 @@ describe("protected segments compare case-insensitively", () => {
       }
     } finally {
       await toolset.close();
+    }
+  });
+
+  it("refuses an experiment config file named through .AMC, where the volume folds case", () => {
+    const dir = tempDir("amc-segcase-config-");
+    mkdirSync(join(dir, ".amc"), { recursive: true });
+    writeFileSync(join(dir, ".amc", "secret.yaml"), "k: v\n");
+    writeFileSync(join(dir, "candidate.yaml"), "k: v\n");
+    expect(admissibleConfigFile(dir, "candidate.yaml")).not.toBeNull();
+    expect(admissibleConfigFile(dir, ".amc/secret.yaml")).toBeNull();
+    if (!caseInsensitive(dir)) return;
+    for (const path of [".AMC/secret.yaml", ".Amc/secret.yaml"]) {
+      expect(admissibleConfigFile(dir, path), path).toBeNull();
     }
   });
 });
