@@ -393,7 +393,7 @@ export interface MountedNativeMcpServer {
 }
 
 /** stdio §Unexpected Termination: restarts of one mount's server, in total, with NATIVE_MCP_RECONNECT_LIMITS backoff. */
-export const NATIVE_MCP_STDIO_RESTARTS = 3;
+const NATIVE_MCP_STDIO_RESTARTS = 3;
 
 /** The SDK reports late traffic for a request it already cancelled through onerror; that is not a transport failure. */
 const ABANDONED_REQUEST_ECHO = /^Received a (response for an unknown message ID|progress notification for an unknown token)/;

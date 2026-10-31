@@ -12,7 +12,7 @@ import { ResultSchema, type ClientRequest } from "@modelcontextprotocol/sdk/type
  * remaining lifetime, because the server holds no subscription state across a
  * reconnection (basic/transports/stdio §Unexpected Termination).
  */
-export const NATIVE_MCP_SUBSCRIPTION_LIMITS = Object.freeze({ minTtlMs: 1_000, maxTtlMs: 3_600_000, uris: 32, active: 8 });
+const NATIVE_MCP_SUBSCRIPTION_LIMITS = Object.freeze({ minTtlMs: 1_000, maxTtlMs: 3_600_000, uris: 32, active: 8 });
 
 export interface NativeMcpSubscriptionOptions {
   /** Each must be a resource or template match of the pinned catalog. */
