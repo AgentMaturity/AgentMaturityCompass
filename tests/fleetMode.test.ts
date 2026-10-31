@@ -372,6 +372,10 @@ describe("fleet mode and trust tiers", () => {
     expect(audits.some((event) => (JSON.parse(event.payload_inline ?? "{}") as Record<string, unknown>).auditType === "SANDBOX_EXECUTION_ENABLED")).toBe(
       true
     );
+    // The container run is the confinement: the attestation names its backend and receipt digest, so readers count it.
+    const { isSandboxAttestation } = await import("../src/governor/sandboxEvidence.js");
+    expect(audits.filter((event) => isSandboxAttestation(JSON.parse(event.meta_json) as Record<string, unknown>))
+      .map((event) => (JSON.parse(event.meta_json) as Record<string, unknown>).sandboxBackend)).toEqual(["docker"]);
     expect(audits.some((event) => (JSON.parse(event.payload_inline ?? "{}") as Record<string, unknown>).auditType === "SANDBOX_NETWORK_CLEANUP_OK")).toBe(
       true
     );

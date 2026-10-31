@@ -5,6 +5,8 @@ import { hashBinaryOrPath, openLedger } from "../ledger/ledger.js";
 import { wrapAnyOutcome } from "../ledger/monitor.js";
 import { recordedArgv } from "../bridge/bridgeRedaction.js";
 import { resolveAgentId } from "../fleet/paths.js";
+import { sha256Hex } from "../utils/hash.js";
+import { canonicalize } from "../utils/json.js";
 
 export interface SandboxRunOptions {
   workspace: string;
@@ -136,9 +138,7 @@ function recordSandboxAttestation(params: {
       imageHash = "unknown";
     }
 
-    const audit = {
-      auditType: "SANDBOX_EXECUTION_ENABLED",
-      severity: "LOW",
+    const receipt = {
       agentId: params.agentId,
       image: params.image,
       imageHash,
@@ -151,6 +151,9 @@ function recordSandboxAttestation(params: {
       gatewayRoute: params.gatewayRoute ?? null,
       gatewayProxyUrl: params.gatewayProxyUrl ?? null
     };
+    // The container run is the confinement: the row names its backend and the digest of what it was started with.
+    const audit = { auditType: "SANDBOX_EXECUTION_ENABLED", severity: "LOW", ...receipt,
+      sandboxBackend: "docker", confinementReceiptSha256: sha256Hex(canonicalize(receipt)) };
     ledger.appendEvidence({
       sessionId,
       runtime: "sandbox",

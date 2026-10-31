@@ -185,6 +185,13 @@
       "sha256": "c7f4d42dd9d01f9d873a763684949b58926bd0b6d61feca351496ccfae2c4228"
     },
     {
+      "path": "src/assurance/assuranceRunner.ts",
+      "issue": "GAP-WP32",
+      "baseCommit": "58a328ea821450be9502522a5df52e5770bb08a9",
+      "archivePath": "unused-code/plan-edits/GAP-WP32/src/assurance/assuranceRunner.ts.landed",
+      "sha256": "87383204503e370a98df3090eec05bef3eed3183112218085a740b4c3f430e03"
+    },
+    {
       "path": "src/assurance/assuranceStore.ts",
       "issue": "P0-09",
       "baseCommit": "9b9058705e9c67af9d82d87aeacb1e2cb78b8ac1",

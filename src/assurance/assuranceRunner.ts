@@ -23,6 +23,7 @@ import { UNSIGNED_EVIDENCE_STORE } from "../ledger/ledgerConnection.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
+import { measureProcessConfinement, processConfinementReason, processIsConfined } from "../sandbox/processConfinement.js";
 import { sealAbortedAssuranceSession } from "./evidenceWriters.js";
 import { parseWindowToMs } from "../utils/time.js";
 import { loadGatewayConfig } from "../gateway/config.js";
@@ -219,8 +220,12 @@ export async function runAssurance(input: RunAssuranceInput, options: RunHashPub
   const ledger = openLedger(workspace, unsignedStore ? { store: "unsigned" } : {});
 
   const proxyDenyByDefault = await hasProxyDenyByDefault(workspace);
+  // Sandbox mode is a request, not confinement (security review 2026-10-31): only an OS boundary measured around this
+  // process attests it, for the SANDBOX_EXECUTION_ENABLED row and for the hardened tier alike.
+  const confinement = input.mode === "sandbox" ? measureProcessConfinement() : null;
+  const confined = confinement !== null && processIsConfined(confinement);
   const trustTier: TrustTier =
-    input.mode === "sandbox" && proxyDenyByDefault ? "OBSERVED_HARDENED" : "OBSERVED";
+    confined && proxyDenyByDefault ? "OBSERVED_HARDENED" : "OBSERVED";
 
   const sessionId = startAssuranceSession({
     ledger,
@@ -231,7 +236,7 @@ export async function runAssurance(input: RunAssuranceInput, options: RunHashPub
   });
 
   try {
-    if (input.mode === "sandbox") {
+    if (confined) {
       writeAssuranceAudit({
         ledger,
         sessionId,
@@ -242,8 +247,12 @@ export async function runAssurance(input: RunAssuranceInput, options: RunHashPub
         scenarioId: "sandbox-attestation",
         auditType: "SANDBOX_EXECUTION_ENABLED",
         severity: "LOW",
-        message: "Assurance run executed in sandbox mode."
+        message: `Assurance run confined by the OS: ${processConfinementReason(confinement)}`,
+        attests: { sandboxBackend: "process-confinement", confinementReceiptSha256: sha256Hex(canonicalize(confinement)), confinement }
       });
+    } else if (confinement !== null) {
+      process.stderr.write(`[assurance] --mode sandbox was requested, but this assurance run is unconfined (${processConfinementReason(confinement)}); `
+        + "no SANDBOX_EXECUTION_ENABLED evidence is written\n");
     }
 
     let responderPromise: Promise<AgentResponder> | undefined;

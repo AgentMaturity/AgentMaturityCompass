@@ -18,6 +18,7 @@ import {
   type GovernorAssuranceSummary
 } from "../governor/actionPolicyEngine.js";
 import { buildGovernorMatrix } from "../governor/governorReport.js";
+import { isSandboxAttestation } from "../governor/sandboxEvidence.js";
 import { verifyToolsConfigSignature } from "../toolhub/toolhubValidators.js";
 import { evaluateBudgetStatus, verifyBudgetsConfigSignature } from "../budgets/budgets.js";
 import { activeFreezeStatus } from "../drift/freezeEngine.js";
@@ -456,9 +457,8 @@ function questionIsHighRiskCritical(questionId: string): boolean {
   ].includes(questionId);
 }
 
-function hasSandboxAttestation(events: ParsedEvidenceEvent[]): boolean {
-  return events.some((event) => extractAuditType(event) === "SANDBOX_EXECUTION_ENABLED");
-}
+/** Only a row a confinement backend attested (backend and receipt digest) counts; a bare mode declaration does not. */
+export function hasSandboxAttestation(events: ParsedEvidenceEvent[]): boolean { return events.some((event) => isSandboxAttestation(event.meta)); }
 
 function assuranceScore(summary: AssuranceSummary, packId: string): number {
   return summary.packScores.get(packId) ?? 0;
