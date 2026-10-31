@@ -18,7 +18,6 @@ import { resolveAgentId } from "../fleet/paths.js";
 import {
   initOutcomeContract,
   initOutcomeContractAsync,
-  loadOutcomeContract,
   outcomeContractPath,
   signOutcomeContract,
   signOutcomeContractAsync,
@@ -149,7 +148,8 @@ export function outcomesAttestCli(params: {
   trustTier: "SELF_REPORTED";
 } {
   const agentId = resolveAgentId(params.workspace, params.agentId);
-  const contract = loadOutcomeContract(params.workspace, agentId);
+  // Like the async path: a manual attestation acts on a contract only once its signature verifies (WP37 review).
+  const contract = manualAttestationContract(params.workspace, agentId).contract;
   const metric = contract.outcomeContract.metrics.find((row) => row.metricId === params.metricId);
   if (!metric) {
     throw new Error(`metricId not found in contract: ${params.metricId}`);

@@ -4,7 +4,7 @@ import { loadContextGraph } from "../context/contextGraph.js";
 import { activeFreezeStatus } from "../drift/freezeEngine.js";
 import { loadAgentConfig, loadFleetConfig } from "../fleet/registry.js";
 import { resolveAgentId } from "../fleet/paths.js";
-import { loadOutcomeContract } from "../outcomes/outcomeContractEngine.js";
+import { outcomeContractPath, verifyOutcomeContractFile } from "../outcomes/outcomeContractEngine.js";
 import { listToolhubTools } from "../toolhub/toolhubCli.js";
 import { loadTargetProfile } from "../targets/targetProfile.js";
 import { loadLatestTransformPlan } from "../transformation/transformTasks.js";
@@ -39,13 +39,8 @@ function contextPackWithPolicy(params: { workspace: string; agentId?: string }, 
       return null;
     }
   })();
-  const outcome = (() => {
-    try {
-      return loadOutcomeContract(params.workspace, agentId);
-    } catch {
-      return null;
-    }
-  })();
+  // Output contract ids come only from a contract whose signature verifies (WP37 review).
+  const outcome = verifyOutcomeContractFile(params.workspace, outcomeContractPath(params.workspace, agentId)).contract;
   const freeze = activeFreezeStatus(params.workspace, agentId);
   const transform = loadLatestTransformPlan(params.workspace, {
     type: "AGENT",

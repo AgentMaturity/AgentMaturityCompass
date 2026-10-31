@@ -260,53 +260,40 @@ export function verifyOutcomeContractSignature(workspace: string, agentId?: stri
   sigPath: string;
 } {
   const path = outcomeContractPath(workspace, agentId);
-  const sigPath = outcomeContractSigPath(workspace, agentId);
-  if (!pathExists(path)) {
-    return {
-      valid: false,
-      signatureExists: false,
-      reason: "outcome contract missing",
-      path,
-      sigPath
-    };
-  }
-  if (!pathExists(sigPath)) {
-    return {
-      valid: false,
-      signatureExists: false,
-      reason: "outcome contract signature missing",
-      path,
-      sigPath
-    };
-  }
+  const { valid, signatureExists, reason } = verifyOutcomeContractFile(workspace, path);
+  return { valid, signatureExists, reason, path, sigPath: outcomeContractSigPath(workspace, agentId) };
+}
+
+/**
+ * The outcome contract at `path`, read once: its config-signature checked over those bytes and, when valid, the
+ * contract parsed from them (`contract` is null otherwise). What any reader that acts on a contract uses (WP37 review).
+ */
+export function verifyOutcomeContractFile(workspace: string, path: string): {
+  valid: boolean;
+  signatureExists: boolean;
+  reason: string | null;
+  fileSha256: string;
+  contract: OutcomeContract | null;
+} {
+  const sigPath = `${path}.sig`;
+  if (!pathExists(path)) return { valid: false, signatureExists: false, reason: "outcome contract missing", fileSha256: "", contract: null };
+  if (!pathExists(sigPath)) return { valid: false, signatureExists: false, reason: "outcome contract signature missing", fileSha256: "", contract: null };
   try {
     const sig = JSON.parse(readUtf8(sigPath)) as SignaturePayload;
-    const digest = sha256Hex(readFileSync(path));
-    if (digest !== sig.digestSha256) {
-      return {
-        valid: false,
-        signatureExists: true,
-        reason: "digest mismatch",
-        path,
-        sigPath
-      };
-    }
+    const bytes = readFileSync(path), digest = sha256Hex(bytes);
+    if (digest !== sig.digestSha256) return { valid: false, signatureExists: true, reason: "digest mismatch", fileSha256: digest, contract: null };
     assertKeysetComplete(workspace);
     const valid = verifyHexDigestAny(digest, sig.signature, getPurposeKeyHistory(workspace, "config-signature"));
-    return {
-      valid,
-      signatureExists: true,
-      reason: valid ? null : "signature verification failed",
-      path,
-      sigPath
-    };
+    let contract: OutcomeContract | null = null;
+    try { contract = valid ? outcomeContractSchema.parse(YAML.parse(bytes.toString("utf8")) as unknown) : null; } catch { /* signed but not a contract */ }
+    return { valid, signatureExists: true, reason: valid ? null : "signature verification failed", fileSha256: digest, contract };
   } catch (error) {
     return {
       valid: false,
       signatureExists: true,
       reason: String(error),
-      path,
-      sigPath
+      fileSha256: "",
+      contract: null
     };
   }
 }
