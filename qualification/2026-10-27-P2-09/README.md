@@ -66,3 +66,7 @@ amc evidence-stores worm-verify --index ./download/<indexKey> --objects ./downlo
 ```
 
 Record `worm-export-receipt.json`, the head-object output and the verify output here as `worm-real-bucket/`.
+
+## Receipt repaired 2026-10-31
+
+The folder held the three slice receipts (`receipt-a.json`, `receipt-b.json`, `receipt-c.json`) but no `receipt.json`, which `npm run check:qualification` requires. `receipt.json` now indexes them. It copies every slice command and exit code in order, names the slice-c commit `b14b656e1` (the last commit to touch this folder; it holds all three slices) and lists the slice receipts and `a-related-files.txt` as hashed artifacts. Its notes say which rows belong to which slice and explain each non-zero exit. `tests` is null because the runs overlap and are not additive. The slice receipts themselves are unchanged. pnpm and the command durations were never recorded; they are written as `not recorded` and `durationMs: 0`.
