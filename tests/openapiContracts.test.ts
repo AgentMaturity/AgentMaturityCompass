@@ -1,4 +1,5 @@
 import { describe, expect, test } from "vitest";
+import { spawnSync } from "node:child_process";
 import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -12,13 +13,20 @@ import {
 } from "../src/studio/openapi.js";
 
 describe("full OpenAPI contract", () => {
+  // Nothing else runs the publisher, so a broken marker pair left the document stale for days.
+  test("website/openapi.yaml is exactly what the native and A4 publisher writes from the build", () => {
+    const run = spawnSync(process.execPath, ["scripts/update-native-task-openapi.mjs", "--check"], { encoding: "utf8" });
+    expect(run.stderr).toBe("");
+    expect(run.status).toBe(0);
+  });
+
   test("publishes native routes with the public server prefix, declared auth and OpenAPI 3.0 schemas", () => {
     const spec = YAML.parse(readFileSync(new URL("../website/openapi.yaml", import.meta.url), "utf8"));
     expect(spec.openapi).toBe("3.0.3");
     const endpoints = Object.entries(spec.paths).filter(([path]) => path.includes("native-tasks"));
     expect(endpoints.map(([path]) => path).sort()).toEqual([
       "/v1/native-tasks", "/v1/native-tasks/options", "/v1/native-tasks/{taskId}",
-      ...["archive", "cancel", "release", "resume", "turn", "verify"].map(action => `/v1/native-tasks/{taskId}/${action}`)
+      ...["archive", "cancel", "fork", "release", "resume", "turn", "verify"].map(action => `/v1/native-tasks/{taskId}/${action}`)
     ].sort());
     expect(spec.paths["/v1/native-tasks"].get.parameters).toEqual(expect.arrayContaining([
       expect.objectContaining({ name: "includeArchived", in: "query", schema: { type: "boolean", default: false } })
