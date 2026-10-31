@@ -318,9 +318,12 @@ the agent's prompt pack.
   tools or a wider tools entry) it adds `TOOLS_CONFIG_CHANGED` and says to re-sign tools.yaml or rebuild the plan instead
   of changing the answers. Every refusal comes before Build writes, including the router's own size
   (256 KiB) and credential checks of the record Build makes (`413 INPUT_TOO_LARGE`; Propose already refuses a proposal
-  that leaves Build no room). When a write fails, or the step is not recorded after Build returned (the head moved, the
-  transition was refused, a replay answered), the memory policy, the context plugin and the Enforce manifest and its
-  signature are put back as they were, so no change stays behind that no revision records. **Review** is an owner's too
+  that leaves Build no room). Build stages the memory policy and the context plugin in memory, named by their sha256, and
+  publishes them, then re-writes the Enforce manifest, only inside the governed transition once its role, readiness,
+  step and stale-head checks passed; its outputs are sealed after that. When a write fails, or the commit is then
+  refused (the head moved twice, the ledger mirror could not commit, a replay answered), the memory policy, the context
+  plugin and the Enforce manifest and its signature are put back as they were, and the Enforce snapshot and the output
+  blobs it added are removed, so no change stays behind that no revision records. **Review** is an owner's too
   (owner mode): it signs the control results with the workspace auditor key. It refuses with `409 RESOURCE_DRIFTED` when
   the memory policy, the context plugin or the agent's Enforce resources moved since Build, then evaluates every
   requirement with `evaluateControl` (no loader binds runtime rows to catalog evidence contracts yet, so each reads
