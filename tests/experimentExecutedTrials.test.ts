@@ -219,8 +219,10 @@ describe("executed baseline and candidate trials (GAP-WP04)", () => {
       return await inner(input);
     };
     const executed = await executeCaseTrials({ workspace: ws, casebookId: "book", caseIds: ["case_1", "case_2", "case_3"], mode: "supervise", runTrial: flaky,
-      limits: { trialTimeoutMs: 200 },
+      // Unrecognised keys (a request body's) are dropped, never sealed into the report as limits that bound the run.
+      limits: { trialTimeoutMs: 200, maxCostUsd: 0.01, approvedBy: "auditor" } as unknown as { trialTimeoutMs: number },
       arms: [{ side: "baseline", configPath: config, configDigest: digest }, { side: "candidate", configPath: config, configDigest: digest }] });
+    expect(executed.limits).toEqual({ maxExecutions: 64, trialTimeoutMs: 200, concurrency: 1 });
     expect(executed.executions.map((row) => row.outcome)).toEqual(["unavailable", "unavailable", "completed", "completed", "completed", "completed"]);
     expect(executed.executions[0]!.reason).toMatch(/trial crashed: boom/);
     expect(executed.executions[1]!.reason).toMatch(/timed out/);

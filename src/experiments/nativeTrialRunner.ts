@@ -25,6 +25,8 @@ export interface NativeTrialRunnerOptions {
   /** Governed workspace tools through the native ToolPipeline, or none. An unconfined shell is never offered here. */
   readonly tools?: "none" | "workspace";
   readonly maxSteps?: number;
+  /** The requester's lease (Studio), so trial tool calls are authorized as them rather than the process's OS user. */
+  readonly leaseToken?: string;
 }
 
 /** The task the agent is given: the case prompt, then its declared context and allowed action classes. */
@@ -60,6 +62,7 @@ export function nativeTrialRunner(options: NativeTrialRunnerOptions): TrialRunne
       policyDigest: sha256Hex(canonicalize({ surface: "experiment-trial", tools })),
       tools,
       ...(options.maxSteps === undefined ? {} : { maxSteps: options.maxSteps }),
+      ...(options.leaseToken === undefined ? {} : { leaseToken: options.leaseToken }),
       rowStamp: stamp,
       // The case's allowed action classes bound the toolset: other tools are hidden, and a guessed call is denied.
       bindTools: ({ toolset }) => {
@@ -99,6 +102,7 @@ export interface TrialProviderSelection {
   readonly credential?: string;
   readonly maxTokens?: number;
   readonly maxSteps?: number;
+  readonly leaseToken?: string;
 }
 
 /** A native trial runner on one configured provider route, with the workspace's own credentials; and its executor identity. */
@@ -115,6 +119,7 @@ export function providerTrialRunner(workspace: string, agentId: string, selectio
     runTrial: nativeTrialRunner({ workspace, agentId, harnessVersion: amcVersion,
       makeLlm: (session) => new LlmRuntime({ session, credentials, registry, ...(transport === undefined ? {} : { transport }) }),
       route: { providerId: route.providerId, model, params: paramsFor(route.providerId, selection.maxTokens ?? 1024) },
-      ...(selection.maxSteps === undefined ? {} : { maxSteps: selection.maxSteps }) })
+      ...(selection.maxSteps === undefined ? {} : { maxSteps: selection.maxSteps }),
+      ...(selection.leaseToken === undefined ? {} : { leaseToken: selection.leaseToken }) })
   };
 }

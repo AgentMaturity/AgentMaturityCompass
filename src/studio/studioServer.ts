@@ -109,7 +109,7 @@ import type { ActionClass } from "../types.js";
 import { runGovernorCheck } from "../governor/governorCli.js";
 import { issueLeaseForCli } from "../leases/leaseCli.js";
 import { readRevokedLeaseIds, readVerifiedLeaseRevocations, revokeLease } from "../leases/leaseStore.js";
-import { verifyLeaseToken } from "../leases/leaseVerifier.js";
+import { verifyLeaseToken } from "../leases/leaseVerifier.js"; import { runLease } from "../leases/runLease.js"; import { LeasePrincipalRefused } from "../leases/leasePrincipal.js";
 import { extractLeaseCarrier } from "../leases/leaseCarriers.js";
 import { serveConsolePath } from "../console/consoleServer.js";
 import { handleStudioApiDelegation } from "./apiDelegation.js";
@@ -1128,8 +1128,8 @@ function listExperimentHistory(workspace: string, agentId: string): Array<{
     let latestRunProblem: string | null = null;
     try {
       latestRun = experimentLatestRunCli({ workspace, agentId, experimentId: row.experimentId }) as unknown as Record<string, unknown> | null;
-    } catch (error) {
-      latestRunProblem = error instanceof Error ? error.message : String(error);
+    } catch { // A fixed reason: the error text names server paths, and VIEWER roles read this list.
+      latestRunProblem = "the latest run is unreadable, unsealed or for another candidate; inspect it with amc experiment analyze";
     }
     return { experimentId: row.experimentId, name: row.name, casebookId: row.casebookId, latestRun, latestRunProblem };
   });
@@ -7777,23 +7777,23 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       const experimentRunMatch = pathname.match(/^\/experiments\/([^/]+)\/run$/);
       if (experimentRunMatch && req.method === "POST") {
         if (!requireRouteRoles(["OWNER", "OPERATOR"])) return;
-        const experimentId = decodeURIComponent(experimentRunMatch[1] ?? "");
-        const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
+        const experimentId = decodeURIComponent(experimentRunMatch[1] ?? ""), body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = (body ? JSON.parse(body) : {}) as { agentId?: unknown; mode?: unknown; candidateWindow?: unknown; candidateAgentId?: unknown; executeTrials?: { providerId?: unknown; model?: unknown; maxSteps?: unknown; limits?: unknown } } | null;
         if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) { json(res, 400, { error: "request body must be a JSON object" }); return; }
         if (parsed.agentId !== undefined && typeof parsed.agentId !== "string") { json(res, 400, { error: "agentId must be a string" }); return; }
         const trials = parsed.executeTrials; if (trials !== undefined && (typeof trials !== "object" || trials === null || typeof trials.providerId !== "string" || (trials.model !== undefined && typeof trials.model !== "string") || (trials.maxSteps !== undefined && typeof trials.maxSteps !== "number") || (trials.limits !== undefined && (typeof trials.limits !== "object" || trials.limits === null)))) { json(res, 400, { error: "executeTrials must name a providerId (GAP-WP04); the runner validates model, steps and limits" }); return; }
         if (trials === undefined && (typeof parsed.candidateWindow !== "string" || !parsed.candidateWindow.trim())) { json(res, 400, { error: "candidateWindow is required" }); return; }
         if (parsed.candidateAgentId !== undefined && (typeof parsed.candidateAgentId !== "string" || !parsed.candidateAgentId.trim())) { json(res, 400, { error: "candidateAgentId must be a non-empty string" }); return; } // The runner validates mode, window and candidate agent before any casebook work (ExperimentInputError).
-        const out = await experimentRunCliAsync({ workspace: options.workspace, agentId: resolveAgentId(options.workspace, parsed.agentId ?? "default"),
+        // Executed trials call providers and workspace tools: refused while Studio is read-only, and under a plan that requires a principal they run on the requester's lease (the admin token names no user), never the Studio process's OS user.
+        const runAgentId = resolveAgentId(options.workspace, parsed.agentId ?? "default"); let trialLease: { leaseToken?: string } = {}; if (trials !== undefined) { if (requiresReadOnlyMode(options.workspace)) { json(res, 403, { error: "users signature invalid; write operations blocked" }); return; } try { trialLease = runLease({ workspace: options.workspace, agentId: runAgentId, model: (trials.model ?? trials.providerId) as string, tools: "workspace", principalKey: auth.isAdmin ? null : `${auth.sessionAuthSource ?? "LOCAL_USER"}:${auth.userId}` }); } catch (error) { if (!(error instanceof LeasePrincipalRefused)) throw error; json(res, 409, { error: `${error.message}. Sign in as an active workspace user.`, code: error.code }); return; } }
+        const out = await experimentRunCliAsync({ workspace: options.workspace, agentId: runAgentId,
           experimentId, mode: (parsed.mode ?? "sandbox") as "supervise" | "sandbox", candidateWindow: parsed.candidateWindow as string | undefined, candidateAgentId: parsed.candidateAgentId,
-          ...(trials === undefined ? {} : { executeTrials: { providerId: trials.providerId as string, ...(trials.model === undefined ? {} : { model: trials.model as string }), ...(trials.maxSteps === undefined ? {} : { maxSteps: trials.maxSteps as number }), ...(trials.limits === undefined ? {} : { limits: trials.limits as Record<string, number> }) } }) }, { beforePublish: signingAuthority(["OWNER", "OPERATOR"]) }).catch(error => {
+          ...(trials === undefined ? {} : { executeTrials: { providerId: trials.providerId as string, ...trialLease, ...(trials.model === undefined ? {} : { model: trials.model as string }), ...(trials.maxSteps === undefined ? {} : { maxSteps: trials.maxSteps as number }), ...(trials.limits === undefined ? {} : { limits: trials.limits as Record<string, number> }) } }) }, { beforePublish: signingAuthority(["OWNER", "OPERATOR"]) }).catch(error => {
           if (res.headersSent) return null;
           if (error instanceof ExperimentInputError) { json(res, 400, { error: error.message, code: error.code }); return null; }
           if (respondReportSigningError(error, (status, result) => json(res, status, result))) return null; throw error;
         });
-        if (out) json(res, 200, out);
-        return;
+        if (out) json(res, 200, out); return;
       }
 
       const experimentAnalyzeMatch = pathname.match(/^\/experiments\/([^/]+)\/analyze$/);
