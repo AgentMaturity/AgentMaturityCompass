@@ -8,7 +8,7 @@
  */
 import { readFileSync } from "node:fs";
 import { isAbsolute, relative, resolve } from "node:path";
-import { effectiveTrustTier, workspaceOwnKeyIds, type ReaderTrust } from "../claims/evidenceProvenance.js";
+import { effectiveTrustTier, eventMeta, workspaceOwnKeyIds, type ReaderTrust } from "../claims/evidenceProvenance.js";
 import type { ClaimKind } from "../claims/eligibility/types.js";
 import { getPublicKeyHistory, verifyHexDigest } from "../crypto/keys.js";
 import { verifySignatureEnvelope } from "../crypto/signing/signatureEnvelope.js";
@@ -153,6 +153,31 @@ export function resolveLedgerEvent(ledger: Ledger, refId: string, sha256: string
   if (!intact) return { status: "unsigned", tier, found: true };
   return { status: event.payload_pruned === 1 ? "payload_pruned" : "resolved", tier, found: true };
 }
+
+const metaAgent = (event: Pick<EvidenceEvent, "meta_json">): string | null => {
+  const meta = eventMeta(event);
+  const agentId = meta.agentId ?? meta.agent_id;
+  return typeof agentId === "string" ? agentId : null;
+};
+/**
+ * The agent a ledger row is evidence about: the one its signed meta names, or, for a row whose meta names none (a native
+ * session's user/message frame), the one its session's signed `session/open` row names. `openRowOf` finds that row
+ * (the session's first row in a ledger, the session's only open row in an export) and `signed` checks it; null when
+ * neither names an agent. The router, the store and the record verifier all decide a ref's agent through this.
+ */
+export function ledgerRowAgent(event: Pick<EvidenceEvent, "meta_json" | "session_id">, openRowOf: (sessionId: string) => EvidenceEvent | undefined,
+  signed: (open: EvidenceEvent) => boolean): string | null {
+  const meta = eventMeta(event);
+  if (meta.agentId !== undefined || meta.agent_id !== undefined) return metaAgent(event);
+  const open = event.session_id ? openRowOf(event.session_id) : undefined;
+  return open !== undefined && open.event_type === "session/open" && open.session_id === event.session_id && signed(open) ? metaAgent(open) : null;
+}
+/** The first row of `sessionId` in this ledger (a native session's `session/open`). */
+export const firstSessionRow = (ledger: Ledger, sessionId: string): EvidenceEvent | undefined =>
+  ledger.db.prepare("SELECT * FROM evidence_events WHERE session_id = ? ORDER BY rowid LIMIT 1").get(sessionId) as EvidenceEvent | undefined;
+/** `ledgerRowAgent` on this ledger: the session's first row, signed and intact on its chain. */
+export const liveLedgerRowAgent = (ledger: Ledger, event: EvidenceEvent): string | null => ledgerRowAgent(event, (sessionId) => firstSessionRow(ledger, sessionId),
+  (open) => open.writer_sig !== "unsigned" && verifyEvidenceEventIntegrity({ ledger, eventId: open.id }).ok);
 
 /** A file that is missing or holds other bytes is dangling; one with the ref's bytes and no valid signature of the ref's kind is unsigned. */
 function resolveFileRef(workspace: string, ref: A4EvidenceRefRow, reasons: string[]): Status {

@@ -18,7 +18,7 @@ import { randomBytes } from "node:crypto";
 import { hostname } from "node:os";
 import type Database from "better-sqlite3";
 import { a4FloorFor, loadVerifiedApprovalPolicy } from "../approvals/approvalPolicyEngine.js";
-import { eventMeta, readerTrustFor } from "../claims/evidenceProvenance.js";
+import { readerTrustFor } from "../claims/evidenceProvenance.js";
 import type { ClaimKind } from "../claims/eligibility/types.js";
 import { getPrivateKeyPem } from "../crypto/keys.js";
 import { signDigestWithPolicy } from "../crypto/signing/signer.js";
@@ -40,7 +40,7 @@ export type { A4Actor, A4ChangeSpec, A4RequestKey, A4TransitionOptions, A4Transi
 import { captureA4RecordSigner, assertA4HotWriters, createA4CurrentLatch, A4TransitionPublicationError, type A4TransitionAttempt, type A4TransitionProgress } from "./a4TransitionSigning.js";
 import { A4BlobError, a4ProjectsRoot, createProjectKey, putPrivate } from "./a4Blobs.js";
 import { a4MirrorDivergence, LEDGER_BACKEND_INCOMPLETE_MESSAGE, ledgerBackendGap, writeA4Mirror } from "./a4LedgerBackend.js";
-import { ledgerRefClaim, resolveLedgerEvent } from "./a4Evidence.js";
+import { ledgerRefClaim, liveLedgerRowAgent, resolveLedgerEvent } from "./a4Evidence.js";
 import { type LedgerMirror, openLedgerMirror } from "../persistence/postgres/postgresLedgerMirror.js";
 import { assertMember, liveRolesFor, memberCandidates, populationFacts, principalPopulation } from "./a4Identity.js";
 import {
@@ -743,7 +743,7 @@ function createStore(workspace: string, ledger: Ledger, trust?: TrustContext, mi
      * An EVIDENCE_REF transition. The lane is derived, never chosen: the writer names only the self-reported column. A
      * ledger_event ref is resolved under the project lock, before anything is signed: a missing row is 409
      * EVIDENCE_REF_DANGLING, a row whose digests are not the ref's or whose signature or chain does not verify is 409
-     * EVIDENCE_REF_UNVERIFIED, a row whose signed meta names another agent (or none) is 409 EVIDENCE_REF_FOREIGN_AGENT,
+     * EVIDENCE_REF_UNVERIFIED, a row whose agent (`ledgerRowAgent`) is another or none is 409 EVIDENCE_REF_FOREIGN_AGENT,
      * and the tier is the row's `effectiveTrustTier`, never its declared tier.
      */
     addEvidenceRef(projectId: string, input: { actor: A4Actor; refKind: A4RefKind; refId: string; sha256: string; claimKind: ClaimKind;
@@ -757,9 +757,9 @@ function createStore(workspace: string, ledger: Ledger, trust?: TrustContext, mi
           const resolved = resolveLedgerEvent(ledger, input.refId, input.sha256, readerTrustFor(workspace), []);
           if (!resolved.found) throw new A4StoreError(409, "EVIDENCE_REF_DANGLING", `no ledger row ${input.refId}`);
           if (resolved.status !== "resolved" && resolved.status !== "payload_pruned") throw new A4StoreError(409, "EVIDENCE_REF_UNVERIFIED", `ledger row ${input.refId} does not match that sha256 or does not verify`);
-          // The row's signed meta must name this project's agent: another agent's OBSERVED rows never fill this project's lanes.
-          const meta = eventMeta(ledger.getEventById(input.refId)!);
-          if ((meta.agentId ?? meta.agent_id) !== head!.agent_id) {
+          // The row's signed meta (or its session's signed session/open row) must name this project's agent: another
+          // agent's OBSERVED rows never fill this project's lanes.
+          if (liveLedgerRowAgent(ledger, ledger.getEventById(input.refId)!) !== head!.agent_id) {
             throw new A4StoreError(409, "EVIDENCE_REF_FOREIGN_AGENT", `ledger row ${input.refId} is not a row of agent ${head!.agent_id}`);
           }
           claim = ledgerRefClaim(ledger.getEventById(input.refId)!, input.claimKind, input.method, resolved.tier);

@@ -19,7 +19,6 @@ import { apiSuccess } from "../api/apiHelpers.js";
 import type { NativeTaskApiContext } from "../api/nativeTasksRouter.js";
 import { envelopeForUnboundResult } from "../claims/eligibility/adapters.js";
 import type { ClaimEnvelope } from "../claims/eligibility/types.js";
-import { eventMeta } from "../claims/evidenceProvenance.js";
 import { signingRoute } from "../crypto/signing/signer.js";
 import { getAgentPaths } from "../fleet/paths.js";
 import { highSeveritySecretTypes } from "../release/releaseSecretScan.js";
@@ -31,6 +30,7 @@ import { auditA4 } from "./a4Audit.js";
 import { conformanceView } from "./a4Conformance.js";
 import { A4BlobError, getPrivate } from "./a4Blobs.js";
 import { eraseProjectPrivate } from "./a4Erasure.js";
+import { liveLedgerRowAgent } from "./a4Evidence.js";
 import { LEDGER_BACKEND_INCOMPLETE_MESSAGE, ledgerBackendGap } from "./a4LedgerBackend.js";
 import { A4_EVENT_WINDOW, a4Events } from "./a4Events.js";
 import {
@@ -414,9 +414,8 @@ async function projectMutation(route: A4Route, projectId: string, rest: string):
       return mutate(route, projectId, evidenceSchema, (body, request) => {
         const state = precheck(route, projectId, "build", body.expectedHeadSeq);
         const event = body.refKind === "ledger_event" ? store.ledger.getEventById(body.refId) : undefined;
-        const meta = event ? eventMeta(event) : null;
         // The store refuses it again under the project lock; refusing here first means nothing is planned on another agent's row.
-        if (meta !== null && (meta.agentId ?? meta.agent_id) !== state.project.agent_id) {
+        if (event && liveLedgerRowAgent(store.ledger, event) !== state.project.agent_id) {
           throw a4Fail(409, "EVIDENCE_REF_FOREIGN_AGENT", `ledger row ${body.refId} is not a row of agent ${state.project.agent_id}`);
         }
         // A ledger row earns the observed lane only through its recomputed tier (the runtime wrote it); the rest is self_reported.

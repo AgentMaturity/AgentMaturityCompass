@@ -34,7 +34,7 @@ import type { EvidenceEvent } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { derivedRefCount, revisionDerivedProblems } from "./a4Derived.js";
-import { a4AlgorithmAllowed, resolveRefs } from "./a4Evidence.js";
+import { a4AlgorithmAllowed, ledgerRowAgent, resolveRefs } from "./a4Evidence.js";
 import {
   A4_BOUND_ITEMS, A4_ENVELOPE_KINDS, DEFAULT_A4_GATE_POLICY, a4EvidenceRefRowSchema, a4TransitionRowSchema, flatSlots, gatePolicyDigestOf, gateSupersededBy,
   ratchetedFromChain, type A4ChainLink, type A4EvidenceRefRow, type A4Stage
@@ -387,11 +387,16 @@ function recordChecks(ledger: Ledger, record: A4RecordV1, bundleAgentId: string 
   const signed = seqZero === undefined ? null : seqZeroReceiptAgent(seqZero, record.projectId, keys);
   if (bundleAgentId !== undefined && (agent !== bundleAgentId || signed !== bundleAgentId)) scope.push(`A4_SCOPE_AGENT: record ${record.projectId} is not about the bundle's agent`);
   const completeness: string[] = [];
+  // A session's open row as the export carries it: the only session/open row of that session (none, or two, names no agent).
+  const openRowOf = (sessionId: string): EvidenceEvent | undefined => {
+    const opens = [...events.values()].filter((event) => event.session_id === sessionId && event.event_type === "session/open");
+    return opens.length === 1 ? opens[0] : undefined;
+  };
   for (const ref of record.tables.a4_evidence_refs.filter((row) => row.ref_kind === "ledger_event")) {
     const event = events.get(String(ref.ref_id));
     if (event === undefined) completeness.push(`REF_DANGLING: evidence ref ${String(ref.seq)} names ledger row ${String(ref.ref_id)}, absent from this export`);
     else if (ref.sha256 !== event.event_hash && ref.sha256 !== event.payload_sha256) completeness.push(`REF_DIGEST_MISMATCH: evidence ref ${String(ref.seq)}`);
-    else if ((eventMeta(event).agentId ?? eventMeta(event).agent_id) !== agent) scope.push(`A4_SCOPE_FOREIGN_AGENT: evidence ref ${String(ref.seq)} names a row of another agent`);
+    else if (ledgerRowAgent(event, openRowOf, (open) => rowProblem(open, keys) === null) !== agent) scope.push(`A4_SCOPE_FOREIGN_AGENT: evidence ref ${String(ref.seq)} names a row of another agent`);
   }
   return { errors, scope, completeness, agentId: agent };
 }

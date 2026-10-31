@@ -70,7 +70,12 @@ export const syntheticIn = (tables: Tables): boolean => tables.a4_evidence_refs.
 /** One project as stored, for a verifier without SQLite. Reads only; signs nothing. */
 export function readA4Record(db: Database.Database, projectId: string, keys: A4RecordKeys): A4RecordV1 {
   const tables = projectRows(db, projectId);
-  const ids = namedEventIds(tables);
+  const named = namedEventIds(tables);
+  // A ref row whose meta names no agent speaks for the agent of its session's first row (ledgerRowAgent): export that row too.
+  const opens = (named.length === 0 ? [] : db.prepare(`SELECT session_id, meta_json FROM evidence_events WHERE id IN (${marks(named.length)})`).all(...named) as Row[])
+    .filter((row) => { const meta = eventMeta({ meta_json: String(row.meta_json) }); return meta.agentId === undefined && meta.agent_id === undefined; })
+    .map((row) => (db.prepare("SELECT id FROM evidence_events WHERE session_id = ? ORDER BY rowid LIMIT 1").get(row.session_id) as { id: string }).id);
+  const ids = [...new Set([...named, ...opens])];
   const events = ids.length === 0 ? [] : db.prepare(`SELECT * FROM evidence_events WHERE id IN (${marks(ids.length)}) ORDER BY rowid`).all(...ids) as Row[];
   const sessionIds = [...new Set(events.map((row) => String(row.session_id)))];
   const sessions = sessionIds.length === 0 ? [] : db.prepare(`SELECT * FROM sessions WHERE session_id IN (${marks(sessionIds.length)}) ORDER BY started_ts, session_id`)
