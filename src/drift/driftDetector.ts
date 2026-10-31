@@ -11,7 +11,7 @@ import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { createFreezeIncident, createFreezeIncidentForSnapshot, createFreezeIncidentForAuthority, listIncidents, type FreezeIncident } from "./freezeEngine.js";
-import { dispatchAlert, captureVerifiedAlertsConfig } from "./alerts.js";
+import { dispatchAlert, captureVerifiedAlertsConfig, type AlertPayload } from "./alerts.js";
 import { evaluateDriftRules } from "./driftRules.js";
 
 /** runId -> ledger-anchored report hash of each trusted run. */
@@ -39,6 +39,22 @@ export interface DriftCheckResult {
   previousRunId: string | null;
   currentRunId: string | null;
   incidentId: string | null;
+}
+
+/**
+ * Drift that could not be evaluated: the run history it compares is not whole (an unreadable ledger, a thinned, hidden or
+ * unverifiable run). Alerting callers treat it as alertable, never as a clean non-trigger (security review 2026-10-31).
+ */
+export function driftNotEvaluated(result: Pick<DriftCheckResult, "reasons">): boolean {
+  return result.reasons.some((reason) => reason.startsWith("INSUFFICIENT_EVIDENCE"));
+}
+
+/** The owner alert for a drift check that could not be evaluated. */
+export function driftNotEvaluatedAlert(result: DriftCheckResult): AlertPayload {
+  return { type: "AMC_ALERT", ruleId: "drift-not-evaluated", agentId: result.agentId, runId: result.currentRunId ?? "unknown",
+    summary: `Drift not evaluated: ${result.reasons.join(" | ")}`,
+    links: { dashboard: "http://127.0.0.1:4173", report: `.amc/agents/${result.agentId}/reports/${result.currentRunId ?? "latest"}.md` },
+    hashes: { reportSha256: sha256Hex(JSON.stringify(result)), bundleSha256: sha256Hex(`${result.agentId}:${result.currentRunId}`) } };
 }
 
 // A complete repeated baseline is required for inference; shorter histories retain the unconfirmed single-run guard.
@@ -76,9 +92,9 @@ function prepareDriftDecision(input: DriftCheckParams): { result: DriftCheckResu
   catch (error) { return empty([`alerts config invalid: ${error instanceof Error ? error.message : "unknown"}`], previous.runId, current.runId); }
   const assurance = () => latestAssuranceByPack({ workspace: params.workspace, agentId, windowStartTs: current.windowStartTs, windowEndTs: current.windowEndTs });
   const baseline = selected.baseline.map(row => row.run);
-  const assuranceByPack = assurance();
-  let evaluated: ReturnType<typeof evaluateDriftRules>;
-  try { evaluated = evaluateDriftRules({ config: alerts.config, previousRun: previous, baselineRuns: baseline, currentRun: current, assuranceByPack }); }
+  let assuranceByPack: ReturnType<typeof assurance>, evaluated: ReturnType<typeof evaluateDriftRules>;
+  // A refused newer assurance report throws INSUFFICIENT_EVIDENCE as well (security sweep 2026-10-31).
+  try { assuranceByPack = assurance(); evaluated = evaluateDriftRules({ config: alerts.config, previousRun: previous, baselineRuns: baseline, currentRun: current, assuranceByPack }); }
   catch (error) {
     if (error instanceof Error && error.message.startsWith("INSUFFICIENT_EVIDENCE:")) return empty([error.message], previous.runId, current.runId);
     throw error;

@@ -6,7 +6,6 @@ import { fileURLToPath } from "node:url";
 import type { Writable } from "node:stream";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import YAML from "yaml";
-import { initWorkspace } from "../src/workspace.js";
 import { SessionService } from "../src/session/sessionService.js";
 import { openSessionEventStore } from "../src/persistence/openSessionEventStore.js";
 import { openLedger } from "../src/ledger/ledger.js";
@@ -25,7 +24,7 @@ import { toolEvidenceFor } from "../src/tools/toolEvidence.js";
 import { agentToolset } from "../src/agent/agentToolset.js";
 import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 import { liveNativeFailureGuidance, projectNativeRunDiagnostics } from "../src/agent/nativeFailureGuidance.js";
-import { removeActionPolicy } from "./helpers/actionPolicyFixtures.js";
+import { initWorkspaceWithoutActionPolicy } from "./helpers/actionPolicyFixtures.js";
 
 let workspace: string;
 const sessions: SessionService[] = [];
@@ -35,8 +34,7 @@ const credentials: CredentialsService = {
 };
 beforeEach(() => {
   workspace = mkdtempSync(join(tmpdir(), "amc-native-budgets-"));
-  initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
-  removeActionPolicy(workspace); // AXR-02: no Action Policy configured, as before; this file is not about it (amc init signs one).
+  initWorkspaceWithoutActionPolicy({ workspacePath: workspace, trustBoundaryMode: "isolated" }); // AXR-02 "not configured": never had an Action Policy; this file is not about it.
 });
 afterEach(() => {
   for (const session of sessions.splice(0)) { try { session.close({ reason: "completed" }); } catch { /* fixture teardown */ } }

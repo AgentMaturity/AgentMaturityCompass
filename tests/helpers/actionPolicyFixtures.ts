@@ -9,6 +9,7 @@ import { questionBank } from "../../src/diagnostic/questionBank.js";
 import { getAgentPaths } from "../../src/fleet/paths.js";
 import { actionPolicyPath, actionPolicySigPath, defaultActionPolicy, initActionPolicy } from "../../src/governor/actionPolicyEngine.js";
 import type { ActionClass, DiagnosticReport } from "../../src/types.js";
+import { initWorkspace, type InitWorkspaceOptions } from "../../src/workspace.js";
 import { writeAnchoredRun } from "./sealedRun.js";
 
 /** `report` sealed and ledger-anchored as the runner publishes it; the governor reads only such runs. */
@@ -91,7 +92,18 @@ export function baselineRunReport(agentId: string): DiagnosticReport {
   };
 }
 
-/** Remove the Action Policy and its signature: the "not configured" state. */
+/**
+ * `amc init` without its signed Action Policy: a workspace that never had one, the "not configured" state, in which
+ * native calls are not checked against a policy. It carries the signed absence declaration only such a workspace has.
+ */
+export function initWorkspaceWithoutActionPolicy(opts: InitWorkspaceOptions): ReturnType<typeof initWorkspace> {
+  return initWorkspace({ ...opts, actionPolicy: false });
+}
+
+/**
+ * Remove the Action Policy and its signature after `amc init` signed them: the "removed after signing" state, in which
+ * every governed class is denied (AXR-02); for "not configured" use `initWorkspaceWithoutActionPolicy`.
+ */
 export function removeActionPolicy(workspace: string): void {
   rmSync(actionPolicyPath(workspace), { force: true });
   rmSync(actionPolicySigPath(workspace), { force: true });

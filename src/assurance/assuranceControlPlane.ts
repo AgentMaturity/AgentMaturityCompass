@@ -26,7 +26,7 @@ import {
   assuranceSchedulerStatus
 } from "./assuranceScheduler.js";
 import { assuranceWaiverSchema } from "./assuranceSchema.js";
-import { loadAssuranceReport, latestAssuranceReports, listAssuranceHistory, runAssurance } from "./assuranceRunner.js";
+import { AssuranceEvidenceUnverifiableError, loadAssuranceReport, latestAssuranceReports, listAssuranceHistory, runAssurance } from "./assuranceRunner.js";
 import { listAssurancePacks } from "./packs/index.js";
 import { assuranceRunRecord, severityForScore } from "./assuranceArtifactPersistence.js";
 import { captureOrgPairs, captureOrgFiles, assertOrgPairsCurrent, captureOrgPairsAuthority, orgPairBytes, type OrgPairsOptions } from "../org/preparedOrgPairs.js";
@@ -338,11 +338,14 @@ export function assuranceReadinessGate(workspace: string): {
 type AssuranceReadiness = ReturnType<typeof assuranceReadinessGate>;
 
 function readinessProjection(workspace: string, policy: ReturnType<typeof loadAssurancePolicy>, reasons: string[] = [], warnings: string[] = []): AssuranceReadiness {
-  const latest = latestAssuranceReports({
-    workspace,
-    windowStartTs: 0,
-    windowEndTs: Date.now()
-  })[0] ?? null;
+  let latest: ReturnType<typeof latestAssuranceReports>[number] | null = null;
+  try {
+    latest = latestAssuranceReports({ workspace, windowStartTs: 0, windowEndTs: Date.now() })[0] ?? null;
+  } catch (error) {
+    // A refused newer report is never read as a baseline or as a pass (security sweep 2026-10-31).
+    if (!(error instanceof AssuranceEvidenceUnverifiableError)) throw error;
+    reasons.push("ASSURANCE_EVIDENCE_UNVERIFIABLE");
+  }
   const waiver = activeAssuranceWaiver(workspace);
   const latestStatus = latest
     ? runStatusFromReport(latest, policy.assurancePolicy.thresholds.minRiskAssuranceScore)

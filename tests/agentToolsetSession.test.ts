@@ -7,8 +7,7 @@ import { initBudgets } from "../src/budgets/budgets.js";
 import { openLedger, verifyLedgerIntegrity } from "../src/ledger/ledger.js";
 import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 import { SessionService } from "../src/session/sessionService.js";
-import { initWorkspace } from "../src/workspace.js";
-import { removeActionPolicy } from "./helpers/actionPolicyFixtures.js";
+import { initWorkspaceWithoutActionPolicy } from "./helpers/actionPolicyFixtures.js";
 
 /**
  * Tool evidence must name a session that exists.
@@ -30,8 +29,7 @@ function workspace(): string {
   process.env["AMC_VAULT_PASSPHRASE"] = "toolset-session-passphrase";
   const dir = realpathSync(mkdtempSync(join(tmpdir(), "amc-toolsess-")));
   dirs.push(dir);
-  initWorkspace({ workspacePath: dir, agentId: "default", trustBoundaryMode: "isolated" });
-  removeActionPolicy(dir); // AXR-02: no Action Policy configured, as before; this file is not about it (amc init signs one).
+  initWorkspaceWithoutActionPolicy({ workspacePath: dir, agentId: "default", trustBoundaryMode: "isolated" }); // AXR-02 "not configured": never had an Action Policy; this file is not about it.
   initBudgets(dir, "default");
   mkdirSync(join(dir, "workspace"), { recursive: true });
   writeFileSync(join(dir, "workspace", "n.txt"), "hello");

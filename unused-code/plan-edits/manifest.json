@@ -115,6 +115,13 @@
       "sha256": "c37dabc753cd0ede0a1a93af7498d139d4f654ea03a630848baa00a6cef6a34f"
     },
     {
+      "path": "src/agent/agentToolset.ts",
+      "issue": "GAP-WP32",
+      "baseCommit": "58a328ea821450be9502522a5df52e5770bb08a9",
+      "archivePath": "unused-code/plan-edits/GAP-WP32/src/agent/agentToolset.ts.landed",
+      "sha256": "78d76c44c12d98b8950e0cc31422fa96716565e49562bc0b16c1775bbd4dfb6c"
+    },
+    {
       "path": "src/agent/nativeToolCapabilities.ts",
       "issue": "P1-43",
       "baseCommit": "e263c5718df833f7e35d63012a9999faa949f607",
@@ -176,6 +183,13 @@
       "baseCommit": "c64a87641297be160f5901ed4d9c0634b341fef8",
       "archivePath": "unused-code/plan-edits/P0-15/src/assurance/assurancePolicyStore.ts.landed",
       "sha256": "c7f4d42dd9d01f9d873a763684949b58926bd0b6d61feca351496ccfae2c4228"
+    },
+    {
+      "path": "src/assurance/assuranceRunner.ts",
+      "issue": "GAP-WP32",
+      "baseCommit": "58a328ea821450be9502522a5df52e5770bb08a9",
+      "archivePath": "unused-code/plan-edits/GAP-WP32/src/assurance/assuranceRunner.ts.landed",
+      "sha256": "87383204503e370a98df3090eec05bef3eed3183112218085a740b4c3f430e03"
     },
     {
       "path": "src/assurance/assuranceStore.ts",
@@ -323,6 +337,13 @@
       "baseCommit": "9b9058705e9c67af9d82d87aeacb1e2cb78b8ac1",
       "archivePath": "unused-code/plan-edits/P0-09/src/ci/gate.ts.landed",
       "sha256": "b441577305fc5464ab38f634ce767a45369f013a8e1b379f8d218efcd9bc0ba2"
+    },
+    {
+      "path": "src/cli.ts",
+      "issue": "GAP-WP32",
+      "baseCommit": "58a328ea821450be9502522a5df52e5770bb08a9",
+      "archivePath": "unused-code/plan-edits/GAP-WP32/src/cli.ts.landed",
+      "sha256": "9683205535b68616dce8d3c4db8baade49e6015bec43a74336b083c9ed93b869"
     },
     {
       "path": "src/compliance/complianceEngine.ts",

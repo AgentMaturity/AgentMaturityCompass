@@ -30,6 +30,7 @@ import {
   verifyFleetConfigSignature
 } from "./fleet/registry.js";
 import { actionPolicyPath, initActionPolicy } from "./governor/actionPolicyEngine.js";
+import { declareActionPolicyAbsent } from "./governor/actionPolicyStore.js";
 import { initToolsConfig, toolsConfigPath } from "./toolhub/toolhubValidators.js";
 import { budgetsPath, initBudgets } from "./budgets/budgets.js";
 import { adaptersConfigPath, initAdaptersConfig } from "./adapters/adapterConfigStore.js";
@@ -216,6 +217,8 @@ export interface InitWorkspaceOptions {
   channels?: string[];
   tools?: string[];
   trustBoundaryMode?: "isolated" | "shared";
+  /** `false`: sign a declaration that this workspace has no Action Policy, the AXR-02 "not configured" state (fixtures). */
+  actionPolicy?: false;
 }
 
 export function defaultContextGraph(opts: InitWorkspaceOptions): Record<string, unknown> {
@@ -336,9 +339,9 @@ export function initWorkspace(opts: InitWorkspaceOptions = {}): { workspacePath:
   const ledger = openLedger(workspace);
   ledger.close();
 
-  if (!pathExists(actionPolicyPath(workspace))) {
-    initActionPolicy(workspace);
-  }
+  if (opts.actionPolicy === false) {
+    if (!pathExists(actionPolicyPath(workspace))) declareActionPolicyAbsent(workspace);
+  } else if (!pathExists(actionPolicyPath(workspace))) initActionPolicy(workspace);
 
   if (!pathExists(toolsConfigPath(workspace))) {
     initToolsConfig(workspace);

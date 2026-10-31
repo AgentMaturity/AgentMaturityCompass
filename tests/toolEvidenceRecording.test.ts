@@ -4,7 +4,6 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import Database from "better-sqlite3";
 import { afterEach, describe, expect, it } from "vitest";
-import { initWorkspace } from "../src/workspace.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { initBudgets } from "../src/budgets/budgets.js";
 import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
@@ -27,7 +26,7 @@ import type { ToolOutcome } from "../src/tools/toolTypes.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { canonicalize } from "../src/utils/json.js";
 import { lockVault } from "../src/vault/vault.js";
-import { removeActionPolicy } from "./helpers/actionPolicyFixtures.js";
+import { initWorkspaceWithoutActionPolicy } from "./helpers/actionPolicyFixtures.js";
 
 /**
  * Every governed tool call lands in the signed spine (P5.1 remainder).
@@ -67,8 +66,7 @@ function readyWorkspace(): string {
   process.env["AMC_VAULT_PASSPHRASE"] = prior ?? PASS;
   const dir = realpathSync(mkdtempSync(join(tmpdir(), "amc-toolev-")));
   dirs.push(dir);
-  initWorkspace({ workspacePath: dir, trustBoundaryMode: "isolated" });
-  removeActionPolicy(dir); // AXR-02: no Action Policy configured, as before; this file is not about it (amc init signs one).
+  initWorkspaceWithoutActionPolicy({ workspacePath: dir, trustBoundaryMode: "isolated" }); // AXR-02 "not configured": never had an Action Policy; this file is not about it.
   // P1-78: a toolset with no session writer records only into a session the ledger holds open.
   const ledger = openLedger(dir);
   ledger.startSession({ sessionId: "toolset-test-session", runtime: "amc", binaryPath: "test", binarySha256: "test" });
@@ -278,8 +276,7 @@ it("keeps a real journaled effect when recording fails, signs the gap and refuse
   let journal: ActionJournal | undefined;
   try {
     for (const [key, value] of Object.entries(environment)) process.env[key] = value;
-    initWorkspace({ workspacePath: workspace, agentId: "default", trustBoundaryMode: "isolated" });
-    removeActionPolicy(workspace); // AXR-02: no Action Policy configured, as before; this file is not about it (amc init signs one).
+    initWorkspaceWithoutActionPolicy({ workspacePath: workspace, agentId: "default", trustBoundaryMode: "isolated" }); // AXR-02 "not configured": never had an Action Policy; this file is not about it.
     // Pin before producing the policies, approvals and action receipts below.
     const monitorPem = getPublicKeyPem(workspace, "monitor");
     const auditorPem = getPublicKeyPem(workspace, "auditor");

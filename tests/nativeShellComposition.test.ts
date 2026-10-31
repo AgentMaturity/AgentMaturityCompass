@@ -7,7 +7,6 @@ import { join, resolve } from "node:path";
 import { Command } from "commander";
 import YAML from "yaml";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { initWorkspace } from "../src/workspace.js";
 import { initBudgets } from "../src/budgets/budgets.js";
 import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 import { agentToolset, type AgentToolset, type AgentToolsetOptions } from "../src/agent/agentToolset.js";
@@ -27,7 +26,7 @@ import { startAcpStdio } from "../src/acp/acpStdioMain.js";
 import { createNativeTaskService } from "../src/studio/nativeTaskService.js";
 import type { SandboxOutcome } from "../src/sandbox/sandboxTypes.js";
 import { FixedCredentials, LOOP_MODEL, LOOP_PROVIDER, scriptedAdapter, silentTransport, textStep } from "./helpers/agentLoopHarness.js";
-import { removeActionPolicy } from "./helpers/actionPolicyFixtures.js";
+import { initWorkspaceWithoutActionPolicy } from "./helpers/actionPolicyFixtures.js";
 
 /**
  * P0-06: the native shell is offered only when it is confined (Linux with a
@@ -82,8 +81,7 @@ function workspace(): string {
   process.env["AMC_VAULT_PASSPHRASE"] ??= "native-shell-composition-pass";
   const dir = realpathSync(mkdtempSync(join(tmpdir(), "amc-shell-gate-")));
   dirs.push(dir);
-  initWorkspace({ workspacePath: dir, agentId: "default", trustBoundaryMode: "isolated" });
-  removeActionPolicy(dir); // AXR-02: no Action Policy configured, as before; this file is not about it (amc init signs one).
+  initWorkspaceWithoutActionPolicy({ workspacePath: dir, agentId: "default", trustBoundaryMode: "isolated" }); // AXR-02 "not configured": never had an Action Policy; this file is not about it.
   initBudgets(dir, "default");
   writeRuntimeFirewallPolicy({ workspace: dir, mode: "observe" });
   return dir;

@@ -281,6 +281,9 @@ amc sandbox run --agent salesbot \
 - image name/hash (best effort)
 - command and args
 - `envKeys`: the names of the variables passed into the container (never their values) and, for `amc adapters run --mode SANDBOX`, the `leaseId` of the lease among them
+- `sandboxBackend` (`docker`) and `confinementReceiptSha256`, the sha256 of the canonical attestation fields above
+
+Readers (the governor's trust summary, `requireSandboxForExecute` and the high-risk level-5 cap) count only a `SANDBOX_EXECUTION_ENABLED` row that names its backend and receipt digest; a row without them reads as absent. `amc assurance run --mode sandbox` (the default mode) writes the row only when the assurance process is measured OS-confined (`sandboxBackend: process-confinement`, with the measurement and its digest); an unconfined run writes no row, prints that it ran unconfined, and is never labelled `OBSERVED_HARDENED`.
 
 The container receives only the variables named in `envKeys` plus the gateway route variables; values reach docker through its inherited environment, never its argv. `amc adapters run --mode SANDBOX` exits with the container's exit code.
 

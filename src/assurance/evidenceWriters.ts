@@ -250,6 +250,8 @@ export function writeAssuranceAudit(params: {
   auditType: string;
   severity?: "LOW" | "MED" | "HIGH" | "CRITICAL";
   message: string;
+  /** Fields the row attests beyond the message (a sandbox backend and its receipt digest), in its payload and meta. */
+  attests?: Readonly<Record<string, unknown>>;
 }): string {
   const severity = params.severity ?? "HIGH";
   const payload = JSON.stringify({
@@ -257,7 +259,8 @@ export function writeAssuranceAudit(params: {
     severity,
     message: params.message,
     packId: params.packId,
-    scenarioId: params.scenarioId
+    scenarioId: params.scenarioId,
+    ...params.attests
   });
   const event = params.ledger.appendEvidenceWithReceipt({
     sessionId: params.sessionId,
@@ -274,7 +277,8 @@ export function writeAssuranceAudit(params: {
       packId: params.packId,
       scenarioId: params.scenarioId,
       agentId: params.agentId,
-      trustTier: params.trustTier
+      trustTier: params.trustTier,
+      ...params.attests
     },
     receipt: {
       kind: params.auditType.startsWith("TOOL_") ? "tool_action" : "guard_check",

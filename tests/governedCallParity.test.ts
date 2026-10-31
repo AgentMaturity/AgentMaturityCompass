@@ -16,7 +16,7 @@ import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 import { ToolHubService } from "../src/toolhub/toolhubServer.js";
 import { initApprovalPolicy } from "../src/approvals/approvalPolicyEngine.js";
 import { initWorkspace } from "../src/workspace.js";
-import { permitAgentActions } from "./helpers/actionPolicyFixtures.js";
+import { permitAgentActions, removeActionPolicy } from "./helpers/actionPolicyFixtures.js";
 
 const agentId = "parity-agent";
 const SESSION = "parity-session";
@@ -55,7 +55,13 @@ async function native(dir: string, file: string): Promise<PlaneVerdict> {
 
 async function toolhub(dir: string, file: string): Promise<PlaneVerdict> {
   const service = new ToolHubService(dir);
-  const intent = service.createIntent({ initiator: "parity-test", agentId, toolName: "fs.read", args: { path: `./workspace/${file}` }, requestedMode: "EXECUTE" });
+  let intent: ReturnType<ToolHubService["createIntent"]>;
+  try {
+    intent = service.createIntent({ initiator: "parity-test", agentId, toolName: "fs.read", args: { path: `./workspace/${file}` }, requestedMode: "EXECUTE" });
+  } catch (error) {
+    // ToolHub refuses to create the intent at all, so nothing can execute: a denial on this plane.
+    return { denied: true, detail: error instanceof Error ? error.message : String(error) };
+  }
   const execution = await service.executeIntent({ intentId: intent.intentId });
   return { denied: !execution.allowed, detail: JSON.stringify(execution.result) };
 }
@@ -104,6 +110,14 @@ describe("the same call, the same answer on the native, ToolHub and hook planes"
   test("an Action Policy that does not verify: denied on all three", async () => {
     const dir = workspace();
     writeFileSync(actionPolicyPath(dir), `${readFileSync(actionPolicyPath(dir), "utf8")}\n# tamper\n`);
+    const verdicts = await planes(dir, "public.txt");
+    for (const [plane, verdict] of Object.entries(verdicts)) expect(verdict.denied, `${plane}: ${verdict.detail}`).toBe(true);
+    expect(verdicts.native.detail).toContain("action-policy");
+  });
+
+  test("an Action Policy removed after signing (policy and signature): denied on all three", async () => {
+    const dir = workspace();
+    removeActionPolicy(dir);
     const verdicts = await planes(dir, "public.txt");
     for (const [plane, verdict] of Object.entries(verdicts)) expect(verdict.denied, `${plane}: ${verdict.detail}`).toBe(true);
     expect(verdicts.native.detail).toContain("action-policy");

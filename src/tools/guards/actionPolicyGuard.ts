@@ -1,5 +1,6 @@
 import { existsSync } from "node:fs";
 import { actionPolicyPath, actionPolicySigPath, verifyActionPolicySignature } from "../../governor/actionPolicyEngine.js";
+import { actionPolicyDeclaredAbsent } from "../../governor/actionPolicyStore.js";
 import { runGovernorCheck } from "../../governor/governorCli.js";
 import type { ActionClass } from "../../types.js";
 import { RUN_CODE_TOOL } from "../toolPipeline.js";
@@ -8,17 +9,19 @@ import type { ToolGuard, ToolMode } from "../toolTypes.js";
 /**
  * The governor's signed Action Policy on native tool calls (AXR-02), as ToolHub decides it.
  *
- * - No `.amc/action-policy.yaml`: not configured. Native calls are not checked against it (today's behaviour), and
- *   readiness and doctor say so.
- * - Present but unsigned or tampered (or its signature left behind with the policy removed): every governed class is
- *   denied until it is restored or re-signed.
+ * - No `.amc/action-policy.yaml` in a workspace created without one (its signed absence declaration verifies): not
+ *   configured. Native calls are not checked against it (today's behaviour), and readiness and doctor say so.
+ * - Removed after signing (no verifying absence declaration: `amc init` always signs a policy), or present but unsigned
+ *   or tampered (or its signature left behind): every governed class is denied until it is restored or re-signed.
  * - Present and signed: the decision ToolHub makes for a call without a work order (risk tier `med`, no exec ticket).
  *   A denial denies; a downgrade to SIMULATE narrows the call's mode before it enters (see `actionPolicyMode`).
  */
 export type ActionPolicyState = "not configured" | "signed" | "untrusted";
 
 export function actionPolicyState(workspace: string): ActionPolicyState {
-  if (!existsSync(actionPolicyPath(workspace))) return existsSync(actionPolicySigPath(workspace)) ? "untrusted" : "not configured";
+  if (!existsSync(actionPolicyPath(workspace))) {
+    return existsSync(actionPolicySigPath(workspace)) || !actionPolicyDeclaredAbsent(workspace) ? "untrusted" : "not configured";
+  }
   return verifyActionPolicySignature(workspace).valid ? "signed" : "untrusted";
 }
 
@@ -38,7 +41,9 @@ function actionPolicyVerdict(workspace: string, call: ActionPolicyCall): { reado
   const state = actionPolicyState(workspace);
   if (state === "not configured") return null;
   if (state === "untrusted") {
-    return { denial: "Action Policy is present but does not verify; every governed class is denied until .amc/action-policy.yaml is restored or re-signed (amc policy action init)", mode: "SIMULATE" };
+    return { denial: existsSync(actionPolicyPath(workspace))
+      ? "Action Policy is present but does not verify; every governed class is denied until .amc/action-policy.yaml is restored or re-signed (amc policy action init)"
+      : "Action Policy was removed after signing; every governed class is denied until .amc/action-policy.yaml is restored from backup or re-created (amc policy action init)", mode: "SIMULATE" };
   }
   try {
     const decision = runGovernorCheck({ workspace, agentId: call.agentId, actionClass: call.actionClass, riskTier: "med", mode: call.requestedMode });

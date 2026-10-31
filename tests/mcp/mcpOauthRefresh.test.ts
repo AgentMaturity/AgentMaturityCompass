@@ -14,8 +14,7 @@ import { initBudgets } from "../../src/budgets/budgets.js";
 import { writeRuntimeFirewallPolicy } from "../../src/runtime/firewall.js";
 import { SessionService } from "../../src/session/sessionService.js";
 import { initToolsConfig, loadToolsConfig } from "../../src/toolhub/toolhubValidators.js";
-import { initWorkspace } from "../../src/workspace.js";
-import { removeActionPolicy } from "../helpers/actionPolicyFixtures.js";
+import { initWorkspaceWithoutActionPolicy } from "../helpers/actionPolicyFixtures.js";
 
 /**
  * WP41 (PXA-18, PXA-19, PXB-09): a loopback authorization server that rotates
@@ -154,8 +153,7 @@ describe("WP41 MCP OAuth refresh coordination", () => {
     vi.stubEnv("AMC_VAULT_PASSPHRASE", "wp41-oauth-fixture-vault");
     const a = await authority();
     const workspace = a.root;
-    initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
-    removeActionPolicy(workspace); // AXR-02: no Action Policy configured, as before; this file is not about it (amc init signs one). initBudgets(workspace);
+    initWorkspaceWithoutActionPolicy({ workspacePath: workspace, trustBoundaryMode: "isolated" }); initBudgets(workspace); // AXR-02 "not configured": never had an Action Policy; this file is not about it.
     writeRuntimeFirewallPolicy({ workspace, mode: "observe" });
     const name = nativeMcpToolName("oauth_fixture", "lookup"), configured = loadToolsConfig(workspace);
     initToolsConfig(workspace, { ...configured, tools: { ...configured.tools, allowedTools: [...configured.tools.allowedTools, { name, actionClass: "READ_ONLY" }] } });

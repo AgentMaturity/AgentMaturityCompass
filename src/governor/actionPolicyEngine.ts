@@ -1,5 +1,3 @@
-import { readdirSync } from "node:fs";
-import { join } from "node:path";
 import { openLedger } from "../ledger/ledger.js";
 import {
   type ActionClass,
@@ -9,10 +7,10 @@ import {
   type TargetProfile,
   type TrustTier
 } from "../types.js";
-import { pathExists, readUtf8 } from "../utils/fs.js";
 import { DEFAULT_RUN_INTEGRITY_AT_LEAST, runIntegrityAtLeast, type ActionPolicy, type ActionPolicyRule, type TrustTierAtLeast } from "./actionPolicySchema.js";
-import { getAgentPaths } from "../fleet/paths.js";
 import { latestTrustedRun } from "./runTrust.js";
+import { isSandboxAttestation } from "./sandboxEvidence.js";
+import { verifiedGovernorAssuranceSummary } from "../assurance/assuranceRunner.js";
 import { defaultActionPolicy } from "./actionPolicyStore.js";
 export { latestTrustedRun } from "./runTrust.js";
 export { ACTION_POLICY_WRITER_LOCK, actionPolicyWriterPendingPath, assertActionPolicyWriterReady,
@@ -576,93 +574,6 @@ export function evaluateActionPermission(input: GovernorDecisionInput): Governor
   return decision;
 }
 
-function parseAssuranceReportFile(file: string): {
-  ts: number;
-  windowStartTs: number;
-  windowEndTs: number;
-  trustTier: TrustTier;
-  packResults: Array<{
-    packId: string;
-    score0to100: number;
-    scenarioResults: Array<{ auditEventTypes: string[] }>;
-  }>;
-} | null {
-  try {
-    const parsed = JSON.parse(readUtf8(file)) as {
-      ts?: number;
-      windowStartTs?: number;
-      windowEndTs?: number;
-      trustTier?: TrustTier;
-      packResults?: Array<{
-        packId?: string;
-        score0to100?: number;
-        scenarioResults?: Array<{ auditEventTypes?: string[] }>;
-      }>;
-    };
-    const packResults = (parsed.packResults ?? [])
-      .filter((pack): pack is { packId: string; score0to100: number; scenarioResults: Array<{ auditEventTypes: string[] }> } =>
-        typeof pack.packId === "string"
-      )
-      .map((pack) => ({
-        packId: pack.packId,
-        score0to100: typeof pack.score0to100 === "number" ? pack.score0to100 : 0,
-        scenarioResults: (pack.scenarioResults ?? []).map((scenario) => ({
-          auditEventTypes: Array.isArray(scenario.auditEventTypes) ? scenario.auditEventTypes.filter((item): item is string => typeof item === "string") : []
-        }))
-      }));
-    return {
-      ts: parsed.ts ?? 0,
-      windowStartTs: parsed.windowStartTs ?? parsed.ts ?? 0,
-      windowEndTs: parsed.windowEndTs ?? parsed.ts ?? 0,
-      trustTier: parsed.trustTier ?? "SELF_REPORTED",
-      packResults
-    };
-  } catch {
-    return null;
-  }
-}
-
-export function summarizeAssuranceForWindow(workspace: string, agentId: string, windowStartTs: number, windowEndTs: number): GovernorAssuranceSummary {
-  const agentPaths = getAgentPaths(workspace, agentId);
-  const dir = join(agentPaths.reportsDir, "assurance");
-  if (!pathExists(dir)) {
-    return { packs: {} };
-  }
-  const summary: GovernorAssuranceSummary = { packs: {} };
-  for (const file of readdirSync(dir)) {
-    if (!file.endsWith(".json")) {
-      continue;
-    }
-    const parsed = parseAssuranceReportFile(join(dir, file));
-    if (!parsed) {
-      continue;
-    }
-    if (parsed.windowEndTs < windowStartTs || parsed.windowStartTs > windowEndTs) {
-      continue;
-    }
-
-    for (const pack of parsed.packResults) {
-      let succeeded = 0;
-      for (const scenario of pack.scenarioResults) {
-        for (const auditType of scenario.auditEventTypes) {
-          if (auditType.endsWith("_SUCCEEDED")) {
-            succeeded += 1;
-          }
-        }
-      }
-      const existing = summary.packs[pack.packId];
-      if (!existing || pack.score0to100 > existing.score) {
-        summary.packs[pack.packId] = {
-          score: pack.score0to100,
-          succeeded,
-          observed: parsed.trustTier === "OBSERVED" || parsed.trustTier === "OBSERVED_HARDENED"
-        };
-      }
-    }
-  }
-  return summary;
-}
-
 /**
  * The trust summary a decision reads. `untrustedConfig` is the hard gate no rule waives: a refused run history (G5:
  * `refusal`, resolved here when the caller passes none, so no caller can trust a refused history) or a latest trusted run
@@ -694,7 +605,7 @@ export function deriveTrustSummaryFromRun(workspace: string, agentId: string, ru
         if (meta.agentId && meta.agentId !== agentId) {
           continue;
         }
-        if (meta.auditType === "SANDBOX_EXECUTION_ENABLED") {
+        if (isSandboxAttestation(meta)) {
           sandboxEvidence = true;
           break;
         }
@@ -748,7 +659,7 @@ export function summarizeGovernorInput(workspace: string, agentId: string): {
   const { run, refusal } = latestTrustedRun(workspace, agentId);
   const trust = deriveTrustSummaryFromRun(workspace, agentId, run, refusal);
   const assurance = run
-    ? summarizeAssuranceForWindow(workspace, agentId, run.windowStartTs, run.windowEndTs)
+    ? verifiedGovernorAssuranceSummary(workspace, agentId, run.windowStartTs, run.windowEndTs)
     : { packs: {} };
   return {
     run,

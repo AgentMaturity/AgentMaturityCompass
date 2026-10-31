@@ -6,9 +6,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { runComposedTurn, type ComposedTurnHandle } from "../src/kernel/agentLoopRunner.js";
 import { STUB_PROVIDER_ID, STUB_PROVIDER_MODEL, stubProviderRoute, stubProviderTransport } from "../src/agent/stubProvider.js";
 import type { AgentToolSeam } from "../src/agent/toolSeam.js";
-import { initWorkspace } from "../src/workspace.js";
 import { openLedger } from "../src/ledger/ledger.js";
-import { removeActionPolicy } from "./helpers/actionPolicyFixtures.js";
+import { initWorkspaceWithoutActionPolicy } from "./helpers/actionPolicyFixtures.js";
 
 const dirs: string[] = [];
 beforeEach(() => {
@@ -34,8 +33,7 @@ describe("WP16 bounded native kernel shutdown", () => {
   it("stops waiting for a tool that ignores SIGTERM cancellation and never seals unconfirmed cleanup as success", async () => {
     const dir = realpathSync(mkdtempSync(join(tmpdir(), "amc-wp16-kernel-")));
     dirs.push(dir);
-    initWorkspace({ workspacePath: dir, agentId: "default", trustBoundaryMode: "isolated" });
-    removeActionPolicy(dir); // Not about the Action Policy: run in its "not configured" state (WP35b).
+    initWorkspaceWithoutActionPolicy({ workspacePath: dir, agentId: "default", trustBoundaryMode: "isolated" }); // AXR-02 "not configured": never had an Action Policy; this file is not about it.
     const sessionId = `noncooperative-${randomUUID()}`;
     const entered = deferred<void>();
     const shutdown = deferred<Promise<boolean>>();

@@ -4,7 +4,6 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { Socket } from "node:net";
 import { afterEach, describe, expect, test, vi } from "vitest";
-import { initWorkspace } from "../src/workspace.js";
 import { initBudgets } from "../src/budgets/budgets.js";
 import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 import { initToolsConfig, loadToolsConfig } from "../src/toolhub/toolhubValidators.js";
@@ -12,7 +11,7 @@ import { agentToolset } from "../src/agent/agentToolset.js";
 import { SessionService } from "../src/session/sessionService.js";
 import { discoverNativeMcpCatalog, mountNativeMcpServer, nativeMcpToolName, type MountedNativeMcpServer } from "../src/mcp/nativeMcpClient.js";
 import type { NativeMcpHttpServer } from "../src/mcp/nativeMcpHttpTransport.js";
-import { removeActionPolicy } from "./helpers/actionPolicyFixtures.js";
+import { initWorkspaceWithoutActionPolicy } from "./helpers/actionPolicyFixtures.js";
 
 // Loopback-only executable regression fixtures. Authoring these tests does not
 // execute them, initialize a workspace, resolve credentials or start a server.
@@ -36,8 +35,7 @@ interface Held { kind: "notification" | "tool"; response: ServerResponse; releas
 async function fixture() {
   vi.stubEnv("AMC_VAULT_PASSPHRASE", "p03-synthetic-test-vault-passphrase");
   const workspace = mkdtempSync(join(tmpdir(), "amc-p03-mcp-recovery-"));
-  initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
-  removeActionPolicy(workspace); // AXR-02: no Action Policy configured, as before; this file is not about it (amc init signs one).
+  initWorkspaceWithoutActionPolicy({ workspacePath: workspace, trustBoundaryMode: "isolated" }); // AXR-02 "not configured": never had an Action Policy; this file is not about it.
   initBudgets(workspace); writeRuntimeFirewallPolicy({ workspace, mode: "observe" });
   const name = nativeMcpToolName("p03", "mutate"), config = loadToolsConfig(workspace);
   initToolsConfig(workspace, { ...config, tools: { ...config.tools,

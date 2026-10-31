@@ -67,6 +67,8 @@ Assurance policy is signed at:
 Fail-closed behavior:
 - invalid policy signature => assurance endpoints fail and workspace readiness includes `ASSURANCE_POLICY_UNTRUSTED`
 - threshold breach with fail-closed enabled => readiness includes `ASSURANCE_THRESHOLD_BREACH`
+- readiness, certificates, drift, the what-if simulator and every per-pack reader count sealed assurance reports only; an unreadable report, one whose seal fails, or an unsealed report newer than the newest sealed one blocks them (readiness includes `ASSURANCE_EVIDENCE_UNVERIFIABLE`, drift reports `INSUFFICIENT_EVIDENCE`) rather than falling back to an older report
+- `amc cert verify` recomputes each carried assurance report's `reportJsonSha256` and verifies its `runSealSig`
 
 ## Commands
 

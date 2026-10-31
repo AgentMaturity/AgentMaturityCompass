@@ -10,7 +10,7 @@ import { randomBytes, randomUUID } from "node:crypto";
 import { join } from "node:path";
 import type { DiagnosticReport, TrustTier } from "../types.js";
 import { runDiagnostic } from "../diagnostic/runner.js";
-import { runDriftCheckAsync as runDriftCheck, type DriftCheckResult } from "../drift/driftDetector.js";
+import { driftNotEvaluated, driftNotEvaluatedAlert, runDriftCheckAsync as runDriftCheck, type DriftCheckResult } from "../drift/driftDetector.js";
 import { dispatchAlert, loadAlertsConfig, type AlertPayload } from "../drift/alerts.js";
 import { detectEvidenceStreamAnomalies, type ObservabilityAnomaly } from "../observability/anomalyDetector.js";
 import { openLedger } from "../ledger/ledger.js";
@@ -44,6 +44,8 @@ export interface MonitoringMetrics {
   lastScoredAt: number | null;
   lastDriftCheckAt: number | null;
   activeIncidents: number;
+  /** Drift checks that could not be evaluated (INSUFFICIENT_EVIDENCE); each one alerted the owner. */
+  driftNotEvaluated: number;
   anomaliesDetected: number;
   totalScores: number;
   uptime: number;
@@ -114,6 +116,7 @@ export class ContinuousMonitor extends EventEmitter {
       lastScoredAt: null,
       lastDriftCheckAt: null,
       activeIncidents: 0,
+      driftNotEvaluated: 0,
       anomaliesDetected: 0,
       totalScores: 0,
       uptime: 0
@@ -344,6 +347,16 @@ export class ContinuousMonitor extends EventEmitter {
       if (result.triggered) {
         this.metrics.activeIncidents += 1;
         await this.handleDriftDetected(result);
+      } else if (driftNotEvaluated(result)) {
+        // A history that is not whole is never a clean non-trigger (security review 2026-10-31): count it and alert.
+        this.metrics.driftNotEvaluated += 1;
+        if (this.config.enableWebhooks) {
+          try {
+            await dispatchAlert(this.config.workspace, driftNotEvaluatedAlert(result));
+          } catch (error) {
+            this.emitError("drift_alert_failed", error);
+          }
+        }
       }
 
       this.emit("drift", {

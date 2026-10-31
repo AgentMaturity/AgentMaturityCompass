@@ -146,7 +146,7 @@ describe("WP37 sealed assurance reads", () => {
   }
   const reportsDir = (ws: string) => join(getAgentPaths(ws, "agent-x").reportsDir, "assurance");
 
-  test("latestAssuranceByPack skips a report whose pack results were edited after sealing", () => {
+  test("latestAssuranceByPack refuses a newest report whose pack results were edited after sealing", () => {
     const ws = workspace();
     writeSealedReport(ws, reportsDir(ws), "a1", assuranceReport("a1", 1000, 40));
     const edited = writeSealedReport(ws, reportsDir(ws), "a2", assuranceReport("a2", 2000, 45));
@@ -155,7 +155,8 @@ describe("WP37 sealed assurance reads", () => {
     });
 
     const window = { workspace: ws, agentId: "agent-x", windowStartTs: 0, windowEndTs: 5000 };
-    expect(latestAssuranceByPack(window).get("injection")?.score0to100).toBe(40);
+    // It used to fall back to a1's 40; a refused newest report now blocks instead (security sweep 2026-10-31).
+    expect(() => latestAssuranceByPack(window)).toThrow(/INSUFFICIENT_EVIDENCE: assurance report\(s\) a2\.json/);
     expect(scanVerifiedAssuranceByPack(window).unverifiedReports).toEqual([edited]);
   });
 

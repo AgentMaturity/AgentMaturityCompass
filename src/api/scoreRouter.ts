@@ -78,9 +78,7 @@ const createClaimBodySchema = z.object({
   publicKeyHash: nonEmptyStringSchema,
   issuingWorkspace: nonEmptyStringSchema,
   audience: nonEmptyStringSchema, // P1-08: a claim is bound to the agent or workspace it is for
-  sharedSecret: optionalNonEmptyStringSchema,
-  amcScore: z.number().optional(),
-  amcLevel: optionalNonEmptyStringSchema,
+  sharedSecret: optionalNonEmptyStringSchema, // the claim's amcScore and amcLevel come from the agent's trusted run, never the body
   amcPassportId: optionalNonEmptyStringSchema,
   ttlHours: z.number().positive().optional(),
 });
@@ -770,27 +768,21 @@ export async function handleScoreRoute(
     return true;
   }
 
-  // POST /api/v1/score/trust/create-claim — create a new agent identity claim
+  // POST /api/v1/score/trust/create-claim — an agent identity claim stating the agent's latest trusted score. A request
+  // never chooses that score, and never signs with the server's AMC_TRUST_SECRET (security review 2026-10-31).
   if (pathname === '/api/v1/score/trust/create-claim' && method === 'POST') {
     try {
       const body = await bodyJsonSchema(req, createClaimBodySchema);
-      const { createAgentClaim } = await import('../score/crossAgentTrust.js');
-      const secret = body.sharedSecret ?? process.env['AMC_TRUST_SECRET']; // P0-55: no well-known default secret
-      if (!secret) { apiError(res, 400, 'sharedSecret is required when the server sets no AMC_TRUST_SECRET'); return true; }
-      const result = createAgentClaim(
-        body.agentId,
-        body.publicKeyHash,
-        body.issuingWorkspace,
-        secret,
-        {
-          audience: body.audience,
-          amcScore: body.amcScore,
-          amcLevel: body.amcLevel,
-          amcPassportId: body.amcPassportId,
-          ttlHours: body.ttlHours,
-        },
-      );
-      apiSuccess(res, result, 201);
+      if (!body.sharedSecret) { apiError(res, 400, 'sharedSecret is required: a request never signs with the server AMC_TRUST_SECRET'); return true; }
+      const [{ createAgentClaim }, { latestTrustedRun }, { assertNotExample }, { overallScore }, { scoreToLevel, toDisplayScore }] = await Promise.all([
+        import('../score/crossAgentTrust.js'), import('../governor/runTrust.js'), import('../claims/eligibility/exampleMode.js'),
+        import('../diagnostic/levelSemantics.js'), import('../score/scoringScale.js')]);
+      const { run, refusal } = latestTrustedRun(workspace, body.agentId);
+      if (!run) { apiError(res, 409, `NO_TRUSTED_RUN: agent ${body.agentId} has no trusted diagnostic run to state a score from${refusal ? ` (${refusal})` : ''}`); return true; }
+      assertNotExample(run, 'signed into an agent claim');
+      const internal = overallScore(run.layerScores) / 5; // levels 0-5 to the claim's 0-1 internal scale
+      apiSuccess(res, createAgentClaim(body.agentId, body.publicKeyHash, body.issuingWorkspace, body.sharedSecret, { audience: body.audience,
+        amcScore: toDisplayScore(internal), amcLevel: scoreToLevel(internal), amcPassportId: body.amcPassportId, ttlHours: body.ttlHours }), 201);
     } catch (err) {
       scoreRouteError(res, err, 'create-claim failed');
     }
