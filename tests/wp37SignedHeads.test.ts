@@ -3,9 +3,12 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import {
-  prepareWorkspaceRecordAsync, readTrustedWorkspaceRecords, saveWorkspaceRecord, updateWorkspaceRecord, verifyWorkspaceRecords, withWorkspaceRecordPublicationLock
+  adoptWorkspaceRecordHead, prepareWorkspaceRecordAsync, readTrustedWorkspaceRecords, saveWorkspaceRecord, updateWorkspaceRecord, verifyWorkspaceRecords, withWorkspaceRecordPublicationLock
 } from "../src/storage/workspaceRecordStore.js";
 import * as keyFacade from "../src/crypto/keys.js";
+import { generateResidencyReport, registerTenant, resetDataResidencyState } from "../src/compliance/dataResidency.js";
+import { runDoctorRules } from "../src/doctor/doctorRules.js";
+import { openLedger } from "../src/ledger/ledger.js";
 import * as files from "../src/utils/fs.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { canonicalize } from "../src/utils/json.js";
@@ -131,5 +134,93 @@ describe("the head anchor is signed like a record (WP37 review)", () => {
     await expect(prepareWorkspaceRecordAsync(ws, AT, "a", { tenantId: "a" }, 1)).rejects.toThrow("owned anchor signing refusal");
     expect(existsSync(recordFile(ws, "a"))).toBe(false);
     expect(existsSync(headFile(ws))).toBe(false);
+  });
+});
+
+/** Records as the store wrote them before head anchors existed: chained and signed, with no anchor and no ledger row. */
+function legacyStore(ws: string): Array<{ record_hash: string }> {
+  const out: Array<{ record_hash: string }> = [];
+  let prev = "GENESIS_TENANTS";
+  for (const [id, storedTs] of [["a", 1], ["b", 2]] as const) {
+    const body = { tenantId: id }, hash = sha256Hex(canonicalize({ ...body, prev_record_hash: prev }));
+    const record = { ...body, prev_record_hash: prev, record_hash: hash, signature: keyFacade.signHexDigest(hash, keyFacade.getSigningKey(ws, "artifact-seal")), storedTs };
+    files.ensureDir(join(ws, ".amc", "compliance", "residency", "tenants"));
+    writeFileSync(recordFile(ws, id), JSON.stringify(record, null, 2));
+    out.push(record);
+    prev = hash;
+  }
+  return out;
+}
+
+/** The ledger rows that record a store's head being anchored. */
+function headAudits(ws: string): Array<Record<string, unknown>> {
+  const ledger = openLedger(ws, { readonly: true });
+  try {
+    return (ledger.db.prepare("SELECT payload_inline FROM evidence_events WHERE session_id LIKE 'ops-workspace_record_head_anchored-%' ORDER BY rowid")
+      .all() as Array<{ payload_inline: string }>).map((row) => JSON.parse(row.payload_inline) as Record<string, unknown>);
+  } finally { ledger.close(); }
+}
+
+describe("stores written before head anchors are anchored once (WP37 review)", () => {
+  const headCheck = async (ws: string) => (await runDoctorRules(ws)).checks.find((row) => row.id === "workspace-record-heads");
+
+  test("doctor anchors the store once with an audit row, it reads clean, and a deleted newest record is then caught", async () => {
+    const ws = keyed("amc-wp37s-adopt-");
+    const [, newest] = legacyStore(ws);
+    expect(await headCheck(ws)).toMatchObject({ status: "INFO", message: expect.stringContaining(`compliance/residency/tenants at ${newest!.record_hash.slice(0, 16)}`) });
+    expect(headAudits(ws)).toEqual([expect.objectContaining({ auditType: "WORKSPACE_RECORD_HEAD_ANCHORED", kind: "tenants", recordHash: newest!.record_hash, adopted: true })]);
+    expect(codes(ws)).toEqual([]);
+    expect(await headCheck(ws)).toMatchObject({ status: "PASS" });
+    expect(headAudits(ws)).toHaveLength(1);
+    unlinkSync(recordFile(ws, "b"));
+    expect(headCodes(ws)).toEqual(["HEAD_MISSING"]);
+  }, 60_000);
+
+  test("the first verifying read of a keyed workspace anchors the store, and a later anchor deletion is not re-anchored", () => {
+    const ws = keyed("amc-wp37s-adopt-");
+    legacyStore(ws);
+    expect(codes(ws)).toEqual([]);
+    expect(headAudits(ws)).toHaveLength(1);
+    unlinkSync(recordFile(ws, "b"));
+    unlinkSync(headFile(ws));
+    expect(headCodes(ws)).toEqual(["HEAD_MISSING"]);
+    expect(existsSync(headFile(ws))).toBe(false);
+    expect(headAudits(ws)).toHaveLength(1);
+  });
+
+  test("a store anchored by its first write is never re-anchored after its anchor is deleted; doctor fails it", async () => {
+    const ws = keyed("amc-wp37s-adopt-");
+    const first = saveWorkspaceRecord(ws, AT, "a", { tenantId: "a" }, 1);
+    saveWorkspaceRecord(ws, AT, "b", { tenantId: "b" }, 2);
+    expect(headAudits(ws)).toEqual([expect.objectContaining({ kind: "tenants", recordHash: first.record_hash, adopted: false })]);
+    unlinkSync(recordFile(ws, "b"));
+    unlinkSync(headFile(ws));
+    expect(headCodes(ws)).toEqual(["HEAD_MISSING"]);
+    expect(await headCheck(ws)).toMatchObject({ status: "FAIL", message: expect.stringContaining("compliance/residency/tenants") });
+    expect(existsSync(headFile(ws))).toBe(false);
+  }, 60_000);
+
+  test("a record written while the adopted anchor was being signed refuses the adoption", () => {
+    const ws = keyed("amc-wp37s-adopt-");
+    legacyStore(ws);
+    const actual = keyFacade.getSigningKey;
+    vi.spyOn(keyFacade, "getSigningKey").mockImplementationOnce((workspace, purpose) => {
+      const late = JSON.parse(readFileSync(recordFile(ws, "b"), "utf8")) as Record<string, unknown>;
+      writeFileSync(recordFile(ws, "late"), JSON.stringify({ ...late, tenantId: "late", record_hash: "f".repeat(64), storedTs: 3 }, null, 2));
+      return actual(workspace, purpose);
+    });
+    expect(adoptWorkspaceRecordHead(ws, AT)).toEqual({ status: "refused", reason: "workspace records changed while their head anchor was prepared; retry" });
+    expect(existsSync(headFile(ws))).toBe(false);
+  });
+
+  test("residency reports unanchored history at its own severity, not as a HIGH breach", () => {
+    const ws = scratch("amc-wp37s-residency-");
+    resetDataResidencyState();
+    registerTenant({ tenantId: "t1", workspaceId: "w1", region: "eu-west-1" }, ws);
+    registerTenant({ tenantId: "t2", workspaceId: "w2", region: "eu-west-1" }, ws);
+    unlinkSync(headFile(ws));
+    resetDataResidencyState();
+    const unanchored = generateResidencyReport("t1", {}, ws).violations.filter((line) => line.includes("HEAD_UNANCHORED"));
+    expect(unanchored).toEqual([expect.stringMatching(/^\[MEDIUM\] Residency record history unanchored \(tenants\): HEAD_UNANCHORED /)]);
   });
 });

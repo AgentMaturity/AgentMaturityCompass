@@ -627,7 +627,9 @@ export function generateResidencyReport(
   if (workspace) {
     for (const at of [POLICIES_AT, TENANTS_AT]) {
       for (const finding of verifyWorkspaceRecords(workspace, at).findings) {
-        violations.push(`[HIGH] Residency record integrity (${at.kind}): ${finding.code} ${finding.file}: ${finding.detail}`);
+        // Unanchored history (a register older than head anchors, not yet anchored by amc doctor) is no residency breach.
+        violations.push(finding.code === "HEAD_UNANCHORED" ? `[MEDIUM] Residency record history unanchored (${at.kind}): ${finding.code} ${finding.file}: ${finding.detail}`
+          : `[HIGH] Residency record integrity (${at.kind}): ${finding.code} ${finding.file}: ${finding.detail}`);
       }
     }
   }
