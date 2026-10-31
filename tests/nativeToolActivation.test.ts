@@ -19,8 +19,7 @@ import { initToolsConfig, loadVerifiedToolsConfigSnapshot, toolsConfigPath, tool
 import type { ToolDefinition } from "../src/tools/toolTypes.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { canonicalize } from "../src/utils/json.js";
-import { initWorkspace } from "../src/workspace.js";
-import { removeActionPolicy } from "./helpers/actionPolicyFixtures.js";
+import { initWorkspaceWithoutActionPolicy } from "./helpers/actionPolicyFixtures.js";
 
 const cleanups: Array<() => void | Promise<void>> = [];
 afterEach(async () => {
@@ -40,8 +39,7 @@ function fixture(definitions = [deferred()], options: { mode?: "code"; grants?: 
   cleanups.push(() => rmSync(root, { recursive: true, force: true }));
   vi.stubEnv("AMC_VAULT_PASSPHRASE", "synthetic-native-activation-fixture");
   vi.stubEnv("AMC_CONTROL_CHECKPOINT_DIR", join(root, "external-control-checkpoints"));
-  initWorkspace({ workspacePath: workspace, agentId: "default", trustBoundaryMode: "isolated" });
-  removeActionPolicy(workspace); // Not about the Action Policy: run in its "not configured" state (WP35b).
+  initWorkspaceWithoutActionPolicy({ workspacePath: workspace, agentId: "default", trustBoundaryMode: "isolated" }); // AXR-02 "not configured": never had an Action Policy; this file is not about it.
   initBudgets(workspace, "default"); writeRuntimeFirewallPolicy({ workspace, mode: "observe" });
   const grants: Grant[] = options.grants ?? definitions.map(({ name, actionClass }) => ({ name, actionClass }));
   const config = defaultToolsConfig();

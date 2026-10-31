@@ -39,6 +39,7 @@ import { ToolPipeline } from "../tools/toolPipeline.js";
 import type { ActionClass } from "../types.js";
 import { ControlCheckpointRootInWorkspaceError, loadActiveCompiledPolicy } from "../catalog/compiler/activate.js";
 import { ACTION_CLASSES } from "../governor/actionCatalog.js";
+import { actionPolicyPath } from "../governor/actionPolicyStore.js";
 import { writeEffectivePolicyReceipt } from "../policy/effectivePolicyReceipt.js";
 import { ToolRegistry, ToolLoadoutError } from "../tools/toolRegistry.js";
 import { openLedger } from "../ledger/ledger.js";
@@ -244,7 +245,9 @@ export function checkToolsetReadiness(workspace: string, options: {
 
   const actionPolicy = actionPolicyState(workspace);
   if (actionPolicy === "untrusted") {
-    blockers.push("the Action Policy does not verify, so every governed call is denied — restore .amc/action-policy.yaml or re-sign it: amc policy action init");
+    blockers.push(existsSync(actionPolicyPath(workspace))
+      ? "the Action Policy does not verify, so every governed call is denied — restore .amc/action-policy.yaml or re-sign it: amc policy action init"
+      : "the Action Policy was removed after signing, so every governed call is denied — restore it from backup or run: amc policy action init");
   }
 
   const writeScope = [...new Set(selected.filter(tool => tool.name === "fs.write" || tool.name === "fs.edit")

@@ -2,7 +2,6 @@ import { mkdtempSync, realpathSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { initWorkspace } from "../src/workspace.js";
 import { initBudgets } from "../src/budgets/budgets.js";
 import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 import { openLedger } from "../src/ledger/ledger.js";
@@ -15,7 +14,7 @@ import { spawnSubagent, type SubagentRunContext } from "../src/agent/subagentSpa
 import { rootIdentity } from "../src/agent/delegationIdentity.js";
 import type { LoopEventRecord } from "../src/session/loopEventMeta.js";
 import { FixedCredentials, LOOP_MODEL, LOOP_PROVIDER, scriptedAdapter, silentTransport, textStep } from "./helpers/agentLoopHarness.js";
-import { removeActionPolicy } from "./helpers/actionPolicyFixtures.js";
+import { initWorkspaceWithoutActionPolicy } from "./helpers/actionPolicyFixtures.js";
 
 const resourceState = vi.hoisted(() => ({ unknown: false, toolsets: [] as import("../src/agent/agentToolset.js").AgentToolset[] }));
 vi.mock("../src/agent/agentToolset.js", async importOriginal => {
@@ -46,8 +45,7 @@ afterEach(async () => {
 function workspace(): string {
   const dir = realpathSync(mkdtempSync(join(tmpdir(), "amc-wp16-child-")));
   dirs.push(dir);
-  initWorkspace({ workspacePath: dir, agentId: "default", trustBoundaryMode: "isolated" });
-  removeActionPolicy(dir); // Not about the Action Policy: run in its "not configured" state (WP35b).
+  initWorkspaceWithoutActionPolicy({ workspacePath: dir, agentId: "default", trustBoundaryMode: "isolated" }); // AXR-02 "not configured": never had an Action Policy; this file is not about it.
   initBudgets(dir, "default");
   writeRuntimeFirewallPolicy({ workspace: dir, mode: "observe" });
   return dir;

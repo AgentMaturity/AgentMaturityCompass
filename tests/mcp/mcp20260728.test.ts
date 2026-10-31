@@ -19,8 +19,7 @@ import { writeRuntimeFirewallPolicy } from "../../src/runtime/firewall.js";
 import { SessionService } from "../../src/session/sessionService.js";
 import { initToolsConfig, loadToolsConfig } from "../../src/toolhub/toolhubValidators.js";
 import { canonicalize } from "../../src/utils/json.js";
-import { initWorkspace } from "../../src/workspace.js";
-import { removeActionPolicy } from "../helpers/actionPolicyFixtures.js";
+import { initWorkspaceWithoutActionPolicy } from "../helpers/actionPolicyFixtures.js";
 
 const CHECKOUT = realpathSync(fileURLToPath(new URL("../../", import.meta.url)));
 const MODERN = "2026-07-28";
@@ -235,8 +234,7 @@ async function owned(label: string, loseFirstToolResponse: boolean, body: (f: Fi
   });
   try {
     process.env.AMC_VAULT_PASSPHRASE = "stateless-fixture-vault-only";
-    initWorkspace({ workspacePath: root, trustBoundaryMode: "isolated" });
-    removeActionPolicy(root); // AXR-02: no Action Policy configured, as before; this file is not about it (amc init signs one). initBudgets(root);
+    initWorkspaceWithoutActionPolicy({ workspacePath: root, trustBoundaryMode: "isolated" }); initBudgets(root); // AXR-02 "not configured": never had an Action Policy; this file is not about it.
     writeRuntimeFirewallPolicy({ workspace: root, mode: "observe" });
     const configured = loadToolsConfig(root);
     initToolsConfig(root, { ...configured, tools: { ...configured.tools,

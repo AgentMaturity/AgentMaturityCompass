@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, rmSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import YAML from "yaml";
 import { getSigningKey, signHexDigest } from "../crypto/keys.js";
@@ -48,6 +48,40 @@ export function actionPolicySigPath(workspace: string): string {
 
 function signActionPolicyDigest(workspace: string, digest: string): string {
   return signHexDigest(digest, getSigningKey(workspace, "config-signature"));
+}
+
+/**
+ * AXR-02: `amc init` signs an Action Policy, so a missing pair reads as removed after signing (every governed class
+ * denied). Only a workspace created without one carries this signed declaration, and only it reads "not configured".
+ * Without the config-signature key nobody can forge it; deleting or editing it reads as removed. Every signing deletes
+ * it before its pair is published.
+ */
+export function actionPolicyAbsentPath(workspace: string): string {
+  return join(workspace, ".amc", "action-policy.absent.sig");
+}
+
+const ABSENT_DIGEST = sha256Hex(canonicalize({ kind: "amc.action-policy-absent/v1" }));
+
+/** Sign this workspace's "never had an Action Policy" declaration (initWorkspace with `actionPolicy: false`). */
+export function declareActionPolicyAbsent(workspace: string): string {
+  const path = actionPolicyAbsentPath(workspace);
+  writeFileAtomic(path, JSON.stringify({ digestSha256: ABSENT_DIGEST, signature: signActionPolicyDigest(workspace, ABSENT_DIGEST), signedTs: Date.now() }, null, 2), 0o644);
+  return path;
+}
+
+/** Whether a declaration this workspace's config-signature key signed says it never had an Action Policy. */
+export function actionPolicyDeclaredAbsent(workspace: string): boolean {
+  try {
+    const sig = JSON.parse(readUtf8(actionPolicyAbsentPath(workspace))) as { digestSha256?: unknown; signature?: unknown };
+    return sig.digestSha256 === ABSENT_DIGEST && typeof sig.signature === "string" && (assertKeysetComplete(workspace),
+      verifyCurrentPurposeCredentialSignature(workspace, "config-signature", Buffer.from(ABSENT_DIGEST, "hex"), Buffer.from(sig.signature, "base64")));
+  } catch {
+    return false;
+  }
+}
+
+function retireAbsentDeclaration(workspace: string): void {
+  rmSync(actionPolicyAbsentPath(workspace), { force: true });
 }
 
 export function defaultActionPolicy(): ActionPolicy {
@@ -228,6 +262,7 @@ export function signActionPolicyWithLockHeld(workspace: string, explicitPath?: s
     signer: "auditor"
   };
   const sigPath = `${file}.sig`;
+  retireAbsentDeclaration(workspace);
   writeFileAtomic(sigPath, JSON.stringify(payload, null, 2), 0o644);
   return sigPath;
 }
@@ -346,6 +381,7 @@ function completeActionPolicyPlan(plan: ReturnType<typeof captureActionPolicyPla
     const signatureBytes = Buffer.from(JSON.stringify({ digestSha256: digest, signature, signedTs: Date.now(), signer: "auditor" } satisfies ActionPolicySignature, null, 2));
     const guard = () => { plan.beforePublish?.(); plan.assertInputsCurrent?.(); assertActionPolicyWriterReady(workspace); assertSignatureCurrent(); assertOrgPairsCurrent(expected); };
     const committed: string[] = []; let attemptedPath = plan.replacement ? file : signaturePath;
+    retireAbsentDeclaration(workspace); // before any member is written; each write still runs guard() first
     try {
       for (const member of plan.replacement ? [{ path: file, bytes }, { path: signaturePath, bytes: signatureBytes }] : [{ path: signaturePath, bytes: signatureBytes }]) {
         guard(); attemptedPath = member.path;
@@ -365,6 +401,7 @@ function completeActionPolicyPlan(plan: ReturnType<typeof captureActionPolicyPla
     if (recorded !== undefined) return withActionPolicyLock(file, () => publishObserved(recorded));
     return withActionPolicyLock(file, () => {
       plan.beforePublish?.(); plan.assertInputsCurrent?.(); assertActionPolicyWriterReady(workspace); assertSignatureCurrent();
+      retireAbsentDeclaration(workspace);
       const sidecar: ActionPolicySignature = { digestSha256: digest, signature, signedTs: Date.now(), signer: "auditor" };
       const signatureBytes = Buffer.from(JSON.stringify(sidecar, null, 2));
       assertOrgPairsCurrent(plan.before); // The exact destination check is last, after every caller/authority check.

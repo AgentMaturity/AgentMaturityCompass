@@ -10,8 +10,7 @@ import { SessionService } from "../src/session/sessionService.js";
 import { loadNativeMcpConfiguration, requireReviewedNativeMcpGrants } from "../src/setup/nativeMcpConfig.js";
 import { initToolsConfig, loadToolsConfig } from "../src/toolhub/toolhubValidators.js";
 import { sha256Hex } from "../src/utils/hash.js";
-import { initWorkspace } from "../src/workspace.js";
-import { removeActionPolicy } from "./helpers/actionPolicyFixtures.js";
+import { initWorkspaceWithoutActionPolicy } from "./helpers/actionPolicyFixtures.js";
 
 // A separate stdio process, deliberately independent of the SDK and dist/.
 const SERVER = String.raw`
@@ -82,8 +81,7 @@ function setup(state: FixtureState = { resources: [RESOURCE], resourceTemplates:
   cleanups.push(async () => { rmSync(workspace, { recursive: true, force: true }); });
   const statePath = join(workspace, "fixture-state.json"), logPath = join(workspace, "fixture-calls.jsonl");
   writeFileSync(statePath, JSON.stringify(state));
-  initWorkspace({ workspacePath: workspace, agentId: "default", trustBoundaryMode: "isolated" });
-  removeActionPolicy(workspace); // Not about the Action Policy: run in its "not configured" state (WP35b).
+  initWorkspaceWithoutActionPolicy({ workspacePath: workspace, agentId: "default", trustBoundaryMode: "isolated" }); // AXR-02 "not configured": never had an Action Policy; this file is not about it.
   initBudgets(workspace, "default");
   writeRuntimeFirewallPolicy({ workspace, mode: "observe" });
   const capabilities = [...permitted.map(name => ({ name: nativeMcpToolName("fixture", name), actionClass: "READ_ONLY" as const })),

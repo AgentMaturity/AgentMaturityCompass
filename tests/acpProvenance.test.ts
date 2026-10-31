@@ -5,11 +5,10 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { UNSIGNED } from "../src/agent/runReport.js";
 import { createAcpAgent, type AcpAgent } from "../src/acp/acpAgentServer.js";
 import { projectSessionUpdates } from "../src/acp/acpProjection.js";
-import { initWorkspace } from "../src/workspace.js";
 import { SessionService } from "../src/session/sessionService.js";
 import type { AgentPromptResult, AgentSession } from "../src/agent/agentSession.js";
 import type { EvidenceEvent } from "../src/types.js";
-import { removeActionPolicy } from "./helpers/actionPolicyFixtures.js";
+import { initWorkspaceWithoutActionPolicy } from "./helpers/actionPolicyFixtures.js";
 
 /**
  * Three defects found by scoping the Python client against the running server.
@@ -26,8 +25,7 @@ function workspace(): string {
   vi.stubEnv("AMC_VAULT_PASSPHRASE", "acp-provenance-passphrase");
   const dir = realpathSync(mkdtempSync(join(tmpdir(), "amc-acpprov-")));
   dirs.push(dir);
-  initWorkspace({ workspacePath: dir, agentId: "default", trustBoundaryMode: "isolated" });
-  removeActionPolicy(dir); // AXR-02: no Action Policy configured, as before; this file is not about it (amc init signs one).
+  initWorkspaceWithoutActionPolicy({ workspacePath: dir, agentId: "default", trustBoundaryMode: "isolated" }); // AXR-02 "not configured": never had an Action Policy; this file is not about it.
   return dir;
 }
 

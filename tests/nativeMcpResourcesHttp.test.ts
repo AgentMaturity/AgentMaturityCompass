@@ -11,8 +11,7 @@ import type { NativeMcpHttpServer } from "../src/mcp/nativeMcpHttpTransport.js";
 import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 import { SessionService } from "../src/session/sessionService.js";
 import { initToolsConfig, loadToolsConfig } from "../src/toolhub/toolhubValidators.js";
-import { initWorkspace } from "../src/workspace.js";
-import { removeActionPolicy } from "./helpers/actionPolicyFixtures.js";
+import { initWorkspaceWithoutActionPolicy } from "./helpers/actionPolicyFixtures.js";
 
 const SECRET = "synthetic-resource-http-credential-2718";
 const URI = "resource://fixture/docs/pinned";
@@ -44,8 +43,7 @@ async function foreignResourceTrap() {
 async function fixture(mode: Mode, state: State = {}, timeoutMs = 1500) {
   vi.stubEnv("AMC_VAULT_PASSPHRASE", "resource-http-fixture-vault-passphrase");
   const workspace = realpathSync(mkdtempSync(join(tmpdir(), "amc-resource-http-")));
-  initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" }); initBudgets(workspace);
-  removeActionPolicy(workspace); // Not about the Action Policy: run in its "not configured" state (WP35b).
+  initWorkspaceWithoutActionPolicy({ workspacePath: workspace, trustBoundaryMode: "isolated" }); initBudgets(workspace); // AXR-02 "not configured": never had an Action Policy; this file is not about it.
   writeRuntimeFirewallPolicy({ workspace, mode: "observe" });
   const capabilities = ["resources/list", "resources/read"].map(name => ({ name: nativeMcpToolName("fixture", name), actionClass: "READ_ONLY" as const }));
   const configured = loadToolsConfig(workspace);

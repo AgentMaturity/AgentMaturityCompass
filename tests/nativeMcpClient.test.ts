@@ -4,7 +4,6 @@ import { join } from "node:path";
 import { Command } from "commander";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { registerAgentCommands } from "../src/cli-agent-commands.js";
-import { initWorkspace } from "../src/workspace.js";
 import { initBudgets } from "../src/budgets/budgets.js";
 import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 import { agentToolset, checkToolsetReadiness } from "../src/agent/agentToolset.js";
@@ -17,7 +16,7 @@ import { openActionJournal } from "../src/actions/actionJournal.js";
 import { prepareFileSignatureWithAuditor } from "../src/org/orgSigner.js";
 import { gateToolCallsOnApproval } from "../src/agent/approvalGate.js";
 import { initProcessorRegistry } from "../src/dataflow/processorRegistry.js";
-import { removeActionPolicy } from "./helpers/actionPolicyFixtures.js";
+import { initWorkspaceWithoutActionPolicy } from "./helpers/actionPolicyFixtures.js";
 
 // A genuine separate stdio process speaking JSON-RPC. No shared dist, SDK
 // server implementation, network connection or provider credentials are used.
@@ -87,8 +86,7 @@ function setup(state: FixtureState, permitted = state.tools.map(remote => remote
   cleanups.push(async () => { rmSync(workspace, { recursive: true, force: true }); });
   const statePath = join(workspace, "fixture-state.json"), logPath = join(workspace, "fixture-calls.jsonl"), pidPath = join(workspace, "fixture-pid");
   writeFileSync(statePath, JSON.stringify(state));
-  initWorkspace({ workspacePath: workspace, agentId: "default", trustBoundaryMode: "isolated" });
-  removeActionPolicy(workspace); // AXR-02: no Action Policy configured, as before; this file is not about it (amc init signs one).
+  initWorkspaceWithoutActionPolicy({ workspacePath: workspace, agentId: "default", trustBoundaryMode: "isolated" }); // AXR-02 "not configured": never had an Action Policy; this file is not about it.
   initBudgets(workspace, "default"); writeRuntimeFirewallPolicy({ workspace, mode: "observe" });
   const config = loadToolsConfig(workspace);
   initToolsConfig(workspace, { ...config, tools: { ...config.tools, allowedTools: [...config.tools.allowedTools,

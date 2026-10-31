@@ -5,6 +5,7 @@ import { versions } from "node:process";
 import { studioStatus } from "../studio/studioSupervisor.js";
 import { vaultStatusNow } from "../vault/vaultCli.js";
 import { verifyActionPolicySignature } from "../governor/actionPolicyEngine.js";
+import { actionPolicyDeclaredAbsent } from "../governor/actionPolicyStore.js";
 import { verifyToolhubConfig } from "../toolhub/toolhubCli.js";
 import { verifyBudgetsConfigSignature } from "../budgets/budgets.js";
 import { verifyApprovalPolicySignature } from "../approvals/approvalPolicyEngine.js";
@@ -221,11 +222,15 @@ export async function runDoctorRules(workspace: string, options: DoctorOptions =
 
   pushRuntimeFirewallCheck(checks, workspace, strict);
 
-  // AXR-02: absent, native agent calls meet no Action Policy; said as such rather than as a missing signature.
+  // AXR-02: never configured, native agent calls meet no Action Policy; said as such rather than as a missing signature.
+  // Removed after signing (no signed absence declaration), every governed call is denied until it is restored.
   const actionPolicySig = verifyActionPolicySignature(workspace);
   if (actionPolicySig.reason === "action policy missing" && !existsSync(actionPolicySig.sigPath)) {
-    checks.push({ id: "sig-action-policy", status: "WARN", message: "action policy: not configured (native agent calls are not checked against an Action Policy)",
-      fixHint: "Create and sign one with: amc policy action init" });
+    checks.push(!actionPolicyDeclaredAbsent(workspace)
+      ? { id: "sig-action-policy", status: "FAIL", message: "action policy removed after signing: restore it from backup or run amc policy action init",
+        fixHint: "Restore .amc/action-policy.yaml and its .sig from backup, or create and sign a new one with: amc policy action init" }
+      : { id: "sig-action-policy", status: "WARN", message: "action policy: not configured (native agent calls are not checked against an Action Policy)",
+        fixHint: "Create and sign one with: amc policy action init" });
   } else pushSignatureCheck(checks, "sig-action-policy", "action-policy.yaml", actionPolicySig);
   pushSignatureCheck(checks, "sig-tools", "tools.yaml", verifyToolhubConfig(workspace));
   pushSignatureCheck(checks, "sig-budgets", "budgets.yaml", verifyBudgetsConfigSignature(workspace));

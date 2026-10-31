@@ -9,14 +9,13 @@ import { mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, test, vi } from "vitest";
-import { initWorkspace } from "../src/workspace.js";
 import { initBudgets } from "../src/budgets/budgets.js";
 import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 import { agentToolset } from "../src/agent/agentToolset.js";
 import { SessionService } from "../src/session/sessionService.js";
 import { initToolsConfig, loadToolsConfig } from "../src/toolhub/toolhubValidators.js";
 import { discoverNativeMcpCatalog, mountNativeMcpServer, nativeMcpToolName } from "../src/mcp/nativeMcpClient.js";
-import { removeActionPolicy } from "./helpers/actionPolicyFixtures.js";
+import { initWorkspaceWithoutActionPolicy } from "./helpers/actionPolicyFixtures.js";
 
 // On tools/call the server can announce a catalog change BEFORE its result line.
 const SERVER = String.raw`
@@ -50,8 +49,7 @@ async function mounted(notifyOnCall: boolean) {
   cleanups.push(async () => { rmSync(workspace, { recursive: true, force: true }); });
   const statePath = join(workspace, "state.json"), logPath = join(workspace, "calls.log");
   writeFileSync(statePath, JSON.stringify({ tools: [tool], notifyOnCall })); writeFileSync(logPath, "");
-  initWorkspace({ workspacePath: workspace, agentId: "default", trustBoundaryMode: "isolated" });
-  removeActionPolicy(workspace); // AXR-02: no Action Policy configured, as before; this file is not about it (amc init signs one).
+  initWorkspaceWithoutActionPolicy({ workspacePath: workspace, agentId: "default", trustBoundaryMode: "isolated" }); // AXR-02 "not configured": never had an Action Policy; this file is not about it.
   initBudgets(workspace, "default"); writeRuntimeFirewallPolicy({ workspace, mode: "observe" });
   const name = nativeMcpToolName("fixture", "lookup"), config = loadToolsConfig(workspace);
   initToolsConfig(workspace, { ...config, tools: { ...config.tools, allowedTools: [...config.tools.allowedTools, { name, actionClass: "READ_ONLY" as const }] } });

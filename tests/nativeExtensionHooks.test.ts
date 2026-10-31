@@ -13,7 +13,7 @@ import { initBudgets } from "../src/budgets/budgets.js";
 import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 import { readTurnEndMeta } from "../src/session/turnLifecycleMeta.js";
 import { SessionService } from "../src/session/sessionService.js";
-import { removeActionPolicy } from "./helpers/actionPolicyFixtures.js";
+import { initWorkspaceWithoutActionPolicy } from "./helpers/actionPolicyFixtures.js";
 import { ToolPipeline } from "../src/tools/toolPipeline.js";
 import { loopHarness, textStep, toolStep, StubToolSeam, ok } from "./helpers/agentLoopHarness.js";
 
@@ -38,13 +38,14 @@ afterEach(() => {
   else process.env.AMC_VAULT_PASSPHRASE = passphrase;
   for (const directory of directories.splice(0)) rmSync(directory, { recursive: true, force: true });
 });
-function fixture(signed = true) {
+/** `actionPolicy: false` builds a workspace that never had an Action Policy (AXR-02 "not configured"). */
+function fixture(signed = true, actionPolicy = true) {
   const workspace = realpathSync(mkdtempSync(join(tmpdir(), "amc-extension-hooks-")));
   directories.push(workspace);
   const checkpoints = realpathSync(mkdtempSync(join(tmpdir(), "amc-hook-checkpoints-")));
   directories.push(checkpoints); vi.stubEnv("AMC_CONTROL_CHECKPOINT_DIR", checkpoints);
   process.env.AMC_VAULT_PASSPHRASE = "native-hooks-fixture";
-  initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+  (actionPolicy ? initWorkspace : initWorkspaceWithoutActionPolicy)({ workspacePath: workspace, trustBoundaryMode: "isolated" });
   const root = join(workspace, "hooks"); mkdirSync(root);
   const path = join(root, "extension.json");
   const hooks = Object.fromEntries(["turn-start", "turn-end", "step-start", "step-end", "tool-start", "tool-end", "pre-tool"].map(kind => [kind, { export: "hook" }]));
@@ -109,7 +110,7 @@ describe("governed native extension hooks", () => {
     expect(Object.isFrozen(view)).toBe(true);
   });
   it("registers the native guard for top-level and Code Mode sub-calls with recorded evidence", async () => {
-    const f = fixture(); f.manager.load(f.path); removeActionPolicy(f.workspace);
+    const f = fixture(true, false); f.manager.load(f.path);
     initBudgets(f.workspace, "default"); writeRuntimeFirewallPolicy({ workspace: f.workspace, mode: "observe" });
     mkdirSync(join(f.workspace, "workspace")); writeFileSync(join(f.workspace, "workspace", "file.txt"), "private contents");
     const session = new SessionService(f.workspace);
@@ -134,7 +135,7 @@ describe("governed native extension hooks", () => {
     } finally { toolset.close(); session.close({ reason: "completed" }); }
   });
   it("prepares the same deny-only guard on journaled calls", async () => {
-    const f = fixture(); f.manager.load(f.path); removeActionPolicy(f.workspace);
+    const f = fixture(true, false); f.manager.load(f.path);
     runtime.invoke.mockResolvedValue('{"decision":"deny","reason":"journal review required"}');
     const registry = new ToolRegistry(); const body = vi.fn(() => ({ ok: true, output: "must not run" }));
     registry.define(defineTool({ name: "fs.read", description: "read", actionClass: "READ_ONLY", body }));
