@@ -1,4 +1,5 @@
 import { createPublicKey, sign, X509Certificate } from "node:crypto";
+import { isoTimeSchema } from "../contracts/v1/common.js";
 import { canonicalSigningKey, SIGNING_ALGORITHMS, signingKeyId, verifyWithKey } from "../keys/algorithmPolicy.js";
 import { checkedDescription, KeyProviderError, signChecked, type KeyDescription, type KeyProvider } from "../keys/provider.js";
 import { z } from "zod";
@@ -21,7 +22,7 @@ export class TrustListError extends Error {
 export const TRUST_LIST_MAX_BYTES = 1024 * 1024;
 const DOMAIN_TAG = "AMC_TRUST_LIST_V1";
 const keyIdSchema = z.string().regex(/^[0-9a-f]{64}$/, "must be 64 lowercase hex");
-const utcTimeSchema = z.iso.datetime();
+const utcTimeSchema = isoTimeSchema;
 
 /**
  * The canonical SPKI PEM (Node's export, LF line endings) of an Ed25519 public key. Null for anything else,

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { nonEmpty, sha256HexSchema } from "./common.js";
+import { isoTimeSchema, nonEmpty, sha256HexSchema } from "./common.js";
 
 /**
  * `amc.a4-deployment-receipt/v1`: the operator's statement (`recordedStatus`, self_reported) and AMC's own check
@@ -17,7 +17,7 @@ export const a4DeploymentReceiptV1Schema = z.strictObject({
   receipt: z.strictObject({
     imageDigest: z.string().nullable(),
     overlayDigest: sha256HexSchema.nullable(),
-    restartedAt: z.iso.datetime().nullable(),
+    restartedAt: isoTimeSchema.nullable(),
     helmRevision: z.number().int().min(1).nullable(),
     destinationRef: z.string().nullable(),
     note: z.string().nullable()

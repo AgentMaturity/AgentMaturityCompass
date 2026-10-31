@@ -4,6 +4,7 @@
  */
 import { z } from "zod";
 import { authorizationRecordV1Schema } from "../contracts/v1/authorizationRecord.js";
+import { isoTimeSchema } from "../contracts/v1/common.js";
 import { ACTION_CLASSES } from "../governor/actionCatalog.js";
 import type { ActionClass } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -95,7 +96,7 @@ export const actionReceiptV1Schema = z.strictObject({
   /** `completed` only. */
   outcomeDigest: sha256.nullable(),
   externalRef: z.string().nullable(),
-  at: z.iso.datetime(),
+  at: isoTimeSchema,
   prevReceiptDigest: sha256.nullable()
 });
 export type ActionReceiptV1 = Readonly<z.infer<typeof actionReceiptV1Schema>>;
