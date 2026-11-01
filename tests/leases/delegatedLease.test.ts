@@ -114,6 +114,16 @@ describe("child leases", () => {
     expect(verify(child).ok).toBe(true);
   });
 
+  it("ends no later than its parent even when issuing it takes longer than a second", () => {
+    const parent = root();
+    let clock = Date.now();
+    const slow = vi.spyOn(Date, "now").mockImplementation(() => (clock += 2_000));
+    try {
+      const child = issueChildLease(workspace, parent.token, { runAs: "default/sub-slow" });
+      expect(payloadOf(child).expiresTs).toBeLessThanOrEqual(parent.payload.expiresTs);
+    } finally { slow.mockRestore(); }
+  });
+
   it("dies with the parent lease", () => {
     const parent = root();
     const child = issueChildLease(workspace, parent.token, { runAs: "default/sub-1" });
