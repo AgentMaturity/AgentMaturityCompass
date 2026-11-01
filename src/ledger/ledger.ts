@@ -18,7 +18,7 @@ import type {
 import { getSigningKey, getPublicKeyHistory, signHexDigest, signHexDigestWith, verifyHexDigestAny } from "../crypto/keys.js";
 import { cachedSigningKey } from "../keys/cachedSigningKey.js";
 import { prepareRunHashSignature } from "./runHashSignature.js";
-import { prepareReceiptWriter, withLedgerReceipt, type PreparedReceiptWriter } from "../keys/receiptWriter.js";
+import { assertReceiptSigning, prepareReceiptWriter, withLedgerReceipt, type PreparedReceiptWriter } from "../keys/receiptWriter.js";
 import { operationalSqlMetadata } from "../keys/operationalLedgerWriter.js";
 import { verifyGatewayConfigSignature } from "../gateway/config.js";
 import { verifyActionPolicySignature } from "../governor/actionPolicyEngine.js";
@@ -214,10 +214,6 @@ export class Ledger {
     else this.db.close();
   }
 
-  private monitorPrivateKey(): string {
-    return getSigningKey(this.workspace, "ledger-row");
-  }
-
   private auditorPrivateKey(): string {
     return getSigningKey(this.workspace, "artifact-seal");
   }
@@ -332,7 +328,7 @@ export class Ledger {
       created_ts: params.createdTs,
       created_by: "AUTO"
     });
-    const signature = signHexDigest(sha256Hex(canonical), this.monitorPrivateKey());
+    const signature = this.signMonitorDigest(sha256Hex(canonical));
 
     this.db
       .prepare(
@@ -375,7 +371,7 @@ export class Ledger {
       added_ts: params.createdTs,
       added_by: "AUTO"
     });
-    const edgeSig = signHexDigest(sha256Hex(edgePayload), this.monitorPrivateKey());
+    const edgeSig = this.signMonitorDigest(sha256Hex(edgePayload));
     this.db
       .prepare(
         `INSERT INTO causal_edges
@@ -673,6 +669,7 @@ export class Ledger {
     receiptSha256: string;
   } {
     this.assertTrustedWriter();
+    assertReceiptSigning(); // before any blob is stored
     assertSessionNamespace(this.db, input.sessionId);
     const id = input.id ?? randomUUID();
     const ts = input.ts ?? Date.now();
@@ -756,7 +753,7 @@ export class Ledger {
           metaJson
         });
         const recalculated = sha256Hex(`${prevHash}${canonicalMetadata}${payloadSha256}`);
-        const writerSig = signHexDigest(recalculated, this.monitorPrivateKey());
+        const writerSig = this.signMonitorDigest(recalculated);
 
         const row = {
           id,
@@ -854,7 +851,7 @@ export class Ledger {
             payload_sha256: payloadSha256
           })}`
         );
-        const signature = signHexDigest(eventHash, this.monitorPrivateKey());
+        const signature = this.signMonitorDigest(eventHash);
         const minted = mint({
           kind: "guard_check",
           ts,
