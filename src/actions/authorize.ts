@@ -26,6 +26,7 @@ import type { EffectDeclaration } from "../toolhub/toolsSchema.js";
 import { revokedLeaseIdSet } from "../leases/leaseStore.js";
 import { verifyLeaseToken } from "../leases/leaseVerifier.js";
 import { findToolDefinition, loadVerifiedToolsConfigSnapshot } from "../toolhub/toolhubValidators.js";
+import { bashDescription } from "../tools/builtin/bashTool.js";
 import type { ToolExecution } from "../tools/toolTypes.js";
 import type { ActionClass } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -152,14 +153,15 @@ function actionFacts(call: Call, compiled?: CompiledPolicyFacts): { readonly ok:
   }
 }
 
-/** Amount and recipient first: they are what an approver is deciding. */
-function questionFor(intent: AuthorizationIntent): string {
+/** Amount and recipient first: they are what an approver is deciding. A shell description is the agent's own words, quoted. */
+function questionFor(intent: AuthorizationIntent, description: string | null): string {
   const { amount, recipient, destination, resourceId, resourceVersion } = intent.bindings;
   const facts = [amount && `${amount.value} ${amount.currency}`, recipient && `to ${recipient}`,
     destination && `destination ${destination}`, resourceId && `resource ${resourceId}${resourceVersion ? `@${resourceVersion}` : ""}`]
     .filter((fact): fact is string => typeof fact === "string" && fact.length > 0);
   return `${facts.length > 0 ? `${facts.join(", ")}: ` : ""}the agent wants to call "${intent.toolName}" ` +
-    `(${intent.actionClass}, arguments ${intent.argumentsDigest.slice(0, 12)})`;
+    `(${intent.actionClass}, arguments ${intent.argumentsDigest.slice(0, 12)})` +
+    (description === null ? "" : `; the agent describes it as ${JSON.stringify(description)} (unverified)`);
 }
 
 /** The intent an approval for this call must bind, and the question to ask about it. */
@@ -167,7 +169,7 @@ export function authorizationIntentFor(call: Call, ctx: Pick<AuthorizationContex
   const facts = actionFacts(call, ctx.compiledPolicy);
   if (!facts.ok) return facts;
   const payload = intentPayloadFor(facts.facts);
-  return { ok: true, payload, question: questionFor(payload) };
+  return { ok: true, payload, question: questionFor(payload, call.name === "bash" ? bashDescription(call.arguments) : null) };
 }
 
 function approvalBinding(execution: ToolExecution, approvalRequestId: string): AuthorizationRecordV1["authority"]["approvals"][number] | Failed {

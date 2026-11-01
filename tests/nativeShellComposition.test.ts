@@ -96,7 +96,7 @@ function compose(dir: string, extra: Partial<AgentToolsetOptions> = {}) {
   return { toolset, audits: (type: string) => rows.filter(row => row.meta["auditType"] === type).map(row => row.meta) };
 }
 const names = (toolset: AgentToolset): string[] => (toolset.seam.schemas() ?? []).map(schema => schema.name);
-const bashCall = (command: string) => ({ callId: `c-${command}`, toolName: "bash", rawArguments: JSON.stringify({ command }),
+const bashCall = (command: string, description?: string) => ({ callId: `c-${command}`, toolName: "bash", rawArguments: JSON.stringify({ command, description }),
   sessionId: "shell-gate-session", turn: 1, step: 1, parentToken: null, dispatch: "native" as const, signal: new AbortController().signal });
 
 function setAllowUnconfined(dir: string, value: boolean): void {
@@ -133,6 +133,8 @@ describe("macOS", () => {
       expect(receipt).toMatchObject({ platform: "darwin", backend: "none", confined: false, enforcementLevel: "none", optInSource: "cli-flag" });
     }
     expect(audits("NATIVE_SHELL_UNCONFINED_ENABLED")).toEqual([expect.objectContaining({ platform: "darwin", optInSource: "cli-flag", sessionId: "shell-gate-session" })]);
+    await toolset.seam.execute(bashCall("echo described", "print a greeting"));
+    expect(audits("NATIVE_SHELL_CONFINEMENT").at(-1)).toMatchObject({ confined: false, agentSuppliedDescription: "print a greeting" });
     expect(toolset.readiness.shell).toMatchObject({ offered: true, decision: "unconfined-opt-in", enforcement: "none", boundary: null, reason: CLI_FLAG_WARNING });
     expect(stderr.mock.calls.filter(([chunk]) => String(chunk).includes(CLI_FLAG_WARNING))).toHaveLength(1);
   });
@@ -166,6 +168,18 @@ describe("Windows and Linux", () => {
     expect(audits("NATIVE_SHELL_CONFINEMENT")).toEqual([expect.objectContaining({ platform: "linux", backend: "bwrap", confined: true,
       enforcementLevel: "enforced", boundary: "linux-bwrap" })]);
     expect(audits("NATIVE_SHELL_UNCONFINED_ENABLED")).toEqual([]);
+  });
+
+  it("records the call's own description on the receipt as agent-supplied, and drops one that carries control characters", async () => {
+    pin("linux");
+    backend.run.mockImplementation(async () => ({ confined: true, backend: "bwrap", failure: null, exitCode: 0, timedOut: false,
+      stdout: "ok", stderr: "", writableRoots: [], treeExitProven: true }));
+    const { toolset, audits } = compose(workspace());
+    await toolset.seam.execute(bashCall("echo described", "list the build output"));
+    await toolset.seam.execute(bashCall("echo bidi", "safe\u202e txt.exe"));
+    await toolset.seam.execute(bashCall("echo none"));
+    expect(audits("NATIVE_SHELL_CONFINEMENT").map(receipt => receipt["agentSuppliedDescription"]))
+      .toEqual(["list the build output", null, null]);
   });
 });
 
