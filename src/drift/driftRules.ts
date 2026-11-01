@@ -16,7 +16,8 @@ function assertComparable(baseline: DiagnosticReport[], current: DiagnosticRepor
   let expectedLayers: string | undefined;
   for (const run of [...baseline, current]) {
     if (!Array.isArray(run.layerScores) || run.layerScores.length === 0
-      || ![run.integrityIndex, run.correlationRatio, run.ts, run.windowStartTs, run.windowEndTs].every(Number.isFinite)
+      || ![run.integrityIndex, run.ts, run.windowStartTs, run.windowEndTs].every(Number.isFinite)
+      || (run.correlationRatio !== null && !Number.isFinite(run.correlationRatio))
       || run.layerScores.some(row => !row || typeof row.layerName !== "string" || !row.layerName || !Number.isFinite(row.avgFinalLevel)))
       throw new Error("INSUFFICIENT_EVIDENCE: drift run has missing or nonfinite comparison metrics; comparison unconfirmed");
     const names = run.layerScores.map(row => row.layerName);
@@ -66,7 +67,11 @@ export function evaluateDriftRules(params: {
   const overallValues = baseline.map(overall), integrityValues = baseline.map(run => run.integrityIndex);
   const overallDrop = Number((median(overallValues) - overall(params.currentRun)).toFixed(4));
   const integrityDrop = Number((median(integrityValues) - params.currentRun.integrityIndex).toFixed(4));
-  const correlationDrop = Number((median(baseline.map(run => run.correlationRatio)) - params.currentRun.correlationRatio).toFixed(4));
+  // A run with no receipted trace measured no correlation (null): it is left out of the baseline, never read as 0.
+  const correlationBaseline = baseline.flatMap(run => run.correlationRatio === null ? [] : [run.correlationRatio]);
+  const currentCorrelation = params.currentRun.correlationRatio;
+  const correlationDrop = currentCorrelation === null || correlationBaseline.length === 0 ? 0
+    : Number((median(correlationBaseline) - currentCorrelation).toFixed(4));
   const overallConfirmed = significantDrop(overallValues, overall(params.currentRun), "overall");
   const integrityConfirmed = significantDrop(integrityValues, params.currentRun.integrityIndex, "integrity");
   const previousLayers = layerMap(baseline[0]!), currentLayers = layerMap(params.currentRun);
@@ -88,8 +93,10 @@ export function evaluateDriftRules(params: {
     if (integrityDrop >= rule.when.integrityDropGte && integrityConfirmed) {
       reasons.push(`integrity drop ${integrityDrop} >= ${rule.when.integrityDropGte}`);
     }
-    if (params.currentRun.correlationRatio < rule.when.correlationDropBelow) {
-      reasons.push(`correlation ${params.currentRun.correlationRatio} < ${rule.when.correlationDropBelow}`);
+    if (currentCorrelation === null) {
+      if (rule.when.correlationDropBelow > 0) reasons.push("correlation not measured (INSUFFICIENT_EVIDENCE)");
+    } else if (currentCorrelation < rule.when.correlationDropBelow) {
+      reasons.push(`correlation ${currentCorrelation} < ${rule.when.correlationDropBelow}`);
     }
     for (const [packId, minScore] of Object.entries(rule.when.assuranceDropBelow)) {
       const pack = params.assuranceByPack.get(packId);

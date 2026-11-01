@@ -78,6 +78,7 @@ export interface RunOptions {
   contextWindow?: string;
   compactThreshold?: string;
   autoSummary?: boolean;
+  autoCompact?: boolean;
   tools?: string;
   toolMode?: string;
   unsafeUnconfinedShell?: boolean;
@@ -258,7 +259,7 @@ export function activeChildLimitOption(io: AgentLoopCliIo, raw: string | undefin
 }
 
 /** Explicit compaction settings; undefined leaves reviewed route defaults to the driver, null reports an error. */
-export function compactionOption(io: AgentLoopCliIo, options: Pick<RunOptions, "contextWindow" | "compactThreshold" | "autoSummary">,
+export function compactionOption(io: AgentLoopCliIo, options: Pick<RunOptions, "contextWindow" | "compactThreshold" | "autoSummary" | "autoCompact">,
   preset?: Partial<CompactionConfig>, route?: { readonly providerId: string; readonly model: string }): Partial<CompactionConfig> | undefined | null {
   try { return compactionFromFlags(options, preset, route); }
   catch (error) {

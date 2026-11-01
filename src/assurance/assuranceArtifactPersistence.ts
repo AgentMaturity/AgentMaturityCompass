@@ -127,7 +127,7 @@ function v1Documents(params: V1ArtifactInput) {
     selectedPacks: report.packResults.map((p) => p.packId),
     evidenceGates: {
       integrityIndex: report.integrityIndex,
-      correlationRatio: 0,
+      correlationRatio: null, // an assurance pack run measures no trace correlation
       observedShare: 0
     },
     packRuns,

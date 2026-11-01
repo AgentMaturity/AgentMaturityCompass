@@ -135,7 +135,7 @@ function renderHtml(report: DiagnosticReport, claim: ClaimEnvelope): string {
       <dt>Verification</dt><dd>${report.verificationPassed ? "✅ PASSED" : "❌ FAILED"}</dd>
       <dt>Trust Boundary</dt><dd>${report.trustBoundaryViolated ? "⚠️ VIOLATED" : "✅ OK"}</dd>
       <dt>Evidence Coverage</dt><dd>${(report.evidenceCoverage * 100).toFixed(1)}%</dd>
-      <dt>Correlation Ratio</dt><dd>${(typeof report.correlationRatio === "number" ? report.correlationRatio : 0).toFixed(3)}</dd>
+      <dt>Correlation Ratio</dt><dd>${typeof report.correlationRatio === "number" ? report.correlationRatio.toFixed(3) : "not measured"}</dd>
     </dl>
   </div>
   <div class="card">

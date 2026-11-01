@@ -163,6 +163,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--context-window <tokens>", "override the reviewed model context window for automatic compaction")
     .option("--compact-threshold <fraction>", "use ratio trigger instead of the catalog token reserve (0.5-0.95; requires --context-window)")
     .option("--no-auto-summary", "prune old tool output only; never run a model-written summary step")
+    .option("--no-auto-compact", "turn automatic compaction off (on by default for a reviewed model context window)")
     .option("--session <id>", "resume this unsealed session; each turn verifies before acquiring its writer")
     .option("--fork-from <id>", "create a child of this verified parent on the first task")
     .action(async (opts: import("./setup/nativeInteractiveSession.js").NativeChatOptions, command: Command) => {
@@ -198,6 +199,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--context-window <tokens>", "override the reviewed model context window for automatic compaction")
     .option("--compact-threshold <fraction>", "use ratio trigger instead of the catalog token reserve (0.5-0.95; requires --context-window)")
     .option("--no-auto-summary", "prune old tool output only; never run a model-written summary step")
+    .option("--no-auto-compact", "turn automatic compaction off (on by default for a reviewed model context window)")
     .option("--tools <mode>", 'tool seam: "workspace" (the governed built-ins), "echo", or "none"')
     .option("--tool-mode <mode>", '"native" (one call per step) or "code" (dispatch from a program)')
     .option("--unsafe-unconfined-shell", "macOS without Seatbelt only: offer the native shell UNCONFINED, with your full user rights; ignored where Seatbelt or Bubblewrap confines it, refused on Windows")

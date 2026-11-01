@@ -72,8 +72,15 @@ export function resolveRouteCompaction(input: Partial<CompactionConfig> | undefi
 
 /** Explicit CLI fields take precedence over exact signed preset fields. The driver supplies catalog defaults later. */
 export function compactionFromFlags(flags: { readonly contextWindow?: string | undefined; readonly compactThreshold?: string | undefined;
-  readonly autoSummary?: boolean | undefined }, preset?: Partial<CompactionConfig>, route?: Selection): Partial<CompactionConfig> | undefined {
+  readonly autoSummary?: boolean | undefined; readonly autoCompact?: boolean | undefined }, preset?: Partial<CompactionConfig>,
+  route?: Selection): Partial<CompactionConfig> | undefined {
   if (preset !== undefined) resolveCompactionConfig(preset);
+  if (flags.autoCompact === false) {
+    if (flags.contextWindow !== undefined || flags.compactThreshold !== undefined || flags.autoSummary === false) {
+      throw new Error("--no-auto-compact turns automatic compaction off; --context-window, --compact-threshold and --no-auto-summary cannot be combined with it.");
+    }
+    return { contextWindowTokens: null }; // the explicit opt-out wins over reviewed route defaults and signed preset fields
+  }
   if (flags.contextWindow === undefined && preset === undefined) {
     if (flags.compactThreshold !== undefined || flags.autoSummary === false) {
       throw new Error("--compact-threshold and --no-auto-summary require --context-window; unused options are not ignored.");

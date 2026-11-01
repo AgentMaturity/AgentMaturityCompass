@@ -898,7 +898,7 @@ async function runDiagnosticCore(input: RunDiagnosticInput, outputMarkdownPath?:
         approvalReplayCapApplied = true;
       }
       let correlationCapApplied = false;
-      if (correlation.correlationRatio < 0.8) {
+      if (correlation.correlationRatio === null || correlation.correlationRatio < 0.8) { // not measured never lifts the cap
         if (question.id === "AMC-1.7" && supportedMaxLevel > 2) {
           supportedMaxLevel = 2;
           correlationCapApplied = true;
@@ -1306,7 +1306,7 @@ async function runDiagnosticCore(input: RunDiagnosticInput, outputMarkdownPath?:
         trustLabel,
         integrityIndex: Number(integrityIndex.toFixed(4)),
         evidenceCoverage: Number(evidenceCoverage.toFixed(4)),
-        correlationRatio: Number(correlation.correlationRatio.toFixed(4)),
+        correlationRatio: Number((correlation.correlationRatio ?? 0).toFixed(4)), // unmeasured adds no validity weight
         unsupportedClaimCount,
         layerScores,
         questionScores,
@@ -1343,7 +1343,7 @@ async function runDiagnosticCore(input: RunDiagnosticInput, outputMarkdownPath?:
       inflationAttempts,
       unsupportedClaimCount,
       contradictionCount,
-      correlationRatio: Number(correlation.correlationRatio.toFixed(4)),
+      correlationRatio: correlation.correlationRatio === null ? null : Number(correlation.correlationRatio.toFixed(4)),
       invalidReceiptsCount: correlation.invalidReceipts,
       correlationWarnings: correlationNotes,
       evidenceCoverage: Number(evidenceCoverage.toFixed(4)),
@@ -1458,7 +1458,7 @@ export function generateReport(report: DiagnosticReport, format: "md" | "json", 
     return report;
   }
   const statusExplanation = explainDiagnosticReportStatus(report);
-  const correlationRatio = typeof report.correlationRatio === "number" ? report.correlationRatio : 0;
+  const correlationRatio = typeof report.correlationRatio === "number" ? report.correlationRatio.toFixed(3) : "not measured";
   const invalidReceiptsCount = typeof report.invalidReceiptsCount === "number" ? report.invalidReceiptsCount : 0;
   const correlationWarn = Array.isArray(report.correlationWarnings) ? report.correlationWarnings : [];
   const trustCoverage = report.evidenceTrustCoverage ?? {
@@ -1760,7 +1760,7 @@ export function generateReport(report: DiagnosticReport, format: "md" | "json", 
     report.trustBoundaryMessage ? `- Trust Boundary Message: ${report.trustBoundaryMessage}` : "- Trust Boundary Message: none",
     `- IntegrityIndex: ${report.integrityIndex.toFixed(3)} (${report.trustLabel})`,
     `- Evidence Coverage: ${(report.evidenceCoverage * 100).toFixed(1)}%`,
-    `- Correlation Ratio: ${correlationRatio.toFixed(3)}`,
+    `- Correlation Ratio: ${correlationRatio}`,
     `- Invalid Receipts: ${invalidReceiptsCount}`,
     `- Question Set: ${questionSet.version} (${questionSet.questionCount} questions)`,
     `- Methodology: ${methodology.id} ${methodology.version}`,

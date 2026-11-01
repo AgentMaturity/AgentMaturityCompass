@@ -38,6 +38,11 @@ function report(overrides: Partial<DiagnosticReport> = {}): DiagnosticReport {
 }
 
 describe("diagnostic report status explanation", () => {
+  test("renders an unmeasured correlation as not measured, never as 0.000, and keeps an old sealed number", () => {
+    expect(generateReport(report({ correlationRatio: null }), "md") as string).toContain("- Correlation Ratio: not measured");
+    expect(generateReport(report({ correlationRatio: 0.5 }), "md") as string).toContain("- Correlation Ratio: 0.500");
+  });
+
   test.each(["1.1.1", undefined])("keeps version %s legacy in the rendered report", (version) => {
     const stored = report(version ? { methodology: { ...getPublicMethodologyManifest(), amcVersion: version } } : {});
     const markdown = generateReport(stored, "md") as string;

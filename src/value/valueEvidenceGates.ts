@@ -2,7 +2,8 @@ import type { ValuePolicy } from "./valuePolicySchema.js";
 
 export interface ValueGateInputs {
   integrityIndex: number;
-  correlationRatio: number;
+  /** Null when not measured; it fails a strong-claim minimum above 0. */
+  correlationRatio: number | null;
   observedShare: number;
   selfReportedShare: number;
   notaryRequired: boolean;
@@ -21,7 +22,9 @@ export function evaluateValueEvidenceGates(policy: ValuePolicy, inputs: ValueGat
       `integrityIndex ${inputs.integrityIndex.toFixed(3)} < ${policy.valuePolicy.evidenceGates.minIntegrityIndexForStrongClaims.toFixed(3)}`
     );
   }
-  if (inputs.correlationRatio < policy.valuePolicy.evidenceGates.minCorrelationRatioForStrongClaims) {
+  if (inputs.correlationRatio === null) { // a minimum of 0 sets no requirement
+    if (policy.valuePolicy.evidenceGates.minCorrelationRatioForStrongClaims > 0) reasons.push("correlationRatio not measured");
+  } else if (inputs.correlationRatio < policy.valuePolicy.evidenceGates.minCorrelationRatioForStrongClaims) {
     reasons.push(
       `correlationRatio ${inputs.correlationRatio.toFixed(3)} < ${policy.valuePolicy.evidenceGates.minCorrelationRatioForStrongClaims.toFixed(3)}`
     );

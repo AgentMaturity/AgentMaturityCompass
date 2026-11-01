@@ -47,6 +47,7 @@ export interface NativeChatOptions extends NativeChatProfileOptions {
   readonly contextWindow?: string;
   readonly compactThreshold?: string;
   readonly autoSummary?: boolean;
+  readonly autoCompact?: boolean;
   readonly session?: string;
   readonly forkFrom?: string;
 }
@@ -283,7 +284,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       // Each turn's child run validates these; they are forwarded verbatim, never defaulted here.
       ...(options.contextWindow === undefined ? [] : ["--context-window", options.contextWindow]),
       ...(options.compactThreshold === undefined ? [] : ["--compact-threshold", options.compactThreshold]),
-      ...(options.autoSummary === false ? ["--no-auto-summary"] : []),
+      ...(options.autoSummary === false ? ["--no-auto-summary"] : []), ...(options.autoCompact === false ? ["--no-auto-compact"] : []),
       ...(approvalClass === undefined ? [] : ["--approve-tools", approvalClass, "--approve-risk", approvalRisk]), ...mcpArgs,
       ...(validation === undefined ? [] : ["--validation-config", resolve(options.validationConfig!), "--validation-config-sha256", validation.configSha256,
         ...validation.checks.flatMap(check => ["--validate", check.id]),

@@ -26,7 +26,7 @@ export const valueSnapshotSchema = z.object({
   reasons: z.array(z.string()).default([]),
   gates: z.object({
     integrityIndex: z.number().min(0).max(1),
-    correlationRatio: z.number().min(0).max(1),
+    correlationRatio: z.number().min(0).max(1).nullable(),
     observedShare: z.number().min(0).max(1),
     selfReportedShare: z.number().min(0).max(1)
   }),

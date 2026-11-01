@@ -93,7 +93,7 @@ The default operation summarizes a range. `--replace` preserves one entry's role
 
 ### Automatic compaction
 
-Declare the model's context window with `--context-window <tokens>` on `amc agent-loop run`, `amc agent-loop chat` or `amc acp`; SDK and ACP callers pass `compaction` in `AgentSessionInit`. AMC never infers a window from a model name, and without a declared window nothing changes.
+Automatic compaction is on by default when the selected route's reviewed model metadata states its context window. AMC never infers a window from a model name: unknown, mismatched or tampered metadata leaves the window unknown, and then nothing changes unless you declare one with `--context-window <tokens>` on `amc agent-loop run`, `amc agent-loop chat` or `amc acp`. SDK and ACP callers pass `compaction` in `AgentSessionInit`. A window above 16,384 tokens keeps a 16,384-token reserve: compaction starts once the reported prompt leaves less than that. `--no-auto-compact` turns compaction off for the session, overriding the route default and any signed preset field; SDK callers pass `compaction: { contextWindowTokens: null }`.
 
 After each completed step, AMC reads the prompt size the provider reported for that step's request: `inputTokens + cacheRead + cacheWrite`, the disjoint counts every native adapter records. When that reaches `--compact-threshold` of the declared window (default 0.8, accepted 0.5 to 0.95), AMC compacts at that step boundary:
 

@@ -237,7 +237,7 @@ export const forecastArtifactSchema = z.object({
     selfReportedShare: z.number().min(0).max(1),
     observedRuns: z.number().int().min(0),
     latestIntegrityIndex: z.number().min(0).max(1),
-    latestCorrelationRatio: z.number().min(0).max(1)
+    latestCorrelationRatio: z.number().min(0).max(1).nullable()
   }),
   series: forecastSeriesBlockSchema,
   drift: z.array(forecastDriftSchema).default([]),

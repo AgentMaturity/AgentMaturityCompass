@@ -8,7 +8,7 @@ import { SandboxRunner } from "../sandbox/sandboxRunner.js";
 import { createNativeSandboxBash } from "../sandbox/nativeSandboxBinding.js";
 import { childShellReadiness, nativeShellReadiness, type ExplicitShellOptIn, type NativeShellReadiness } from "../sandbox/nativeShellGate.js";
 import { measureProcessConfinement, processConfinementReason, processIsConfined, type ConfinementMeasurement } from "../sandbox/processConfinement.js";
-import { bashTool } from "../tools/builtin/bashTool.js";
+import { bashDescription, bashTool } from "../tools/builtin/bashTool.js";
 import { fsTools } from "../tools/builtin/fsTools.js";
 import { ReadBeforeEditLedger } from "../tools/builtin/readBeforeEdit.js";
 import { searchTools } from "../tools/builtin/searchTools.js";
@@ -462,7 +462,7 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
       writableRoots: outcome.confined ? outcome.writableRoots : [], enforcement: outcome.enforcement ?? null,
       exitCode: outcome.exitCode, timedOut: outcome.timedOut, cancelled: outcome.cancelled ?? false,
       treeExitProven: outcome.treeExitProven ?? false, droppedBytes: outcome.droppedBytes ?? 0,
-      callId: execution.callId, rootCallId: execution.rootCallId, token: execution.token
+      agentSuppliedDescription: bashDescription(execution.arguments), callId: execution.callId, rootCallId: execution.rootCallId, token: execution.token
       });
     },
     // Written before the proxy acts on the decision; a failed write denies the connection.
@@ -480,7 +480,7 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
         recordUnconfinedEnabled();
         recordAudit({ schemaVersion: "2026-09-08", auditType: "NATIVE_SHELL_CONFINEMENT", platform: process.platform,
           backend: "none", confined: false, enforcementLevel: "none", optInSource: shell.optInSource,
-          callId: execution.callId, rootCallId: execution.rootCallId, token: execution.token });
+          agentSuppliedDescription: bashDescription(execution.arguments), callId: execution.callId, rootCallId: execution.rootCallId, token: execution.token });
       }
       return unconfined.body(execution);
     } });

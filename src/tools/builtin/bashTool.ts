@@ -38,6 +38,13 @@ const bashArgs = z.object({
   timeoutMs: z.number().int().positive().max(600_000).default(120_000)
 });
 
+/** The call's own `description` when it is a valid one: agent-supplied and unverified, for receipts and approval questions. */
+export function bashDescription(args: Readonly<Record<string, unknown>>): string | null {
+  const parsed = bashArgs.shape.description.safeParse(args.description);
+  // Control and format characters (newlines, bidi overrides) could redraw what an approver reads: dropped, not shown.
+  return parsed.success && parsed.data !== undefined && !/[\p{Cc}\p{Cf}]/u.test(parsed.data) ? parsed.data : null;
+}
+
 /** Per stream. Output past this is counted and reported, never silently lost. */
 const MAX_OUTPUT_BYTES = 64_000;
 

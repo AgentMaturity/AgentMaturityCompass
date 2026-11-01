@@ -145,7 +145,7 @@ export const assuranceRunSchema = z.object({
   selectedPacks: z.array(assurancePackIdSchema).default([]),
   evidenceGates: z.object({
     integrityIndex: z.number().min(0).max(1),
-    correlationRatio: z.number().min(0).max(1),
+    correlationRatio: z.number().min(0).max(1).nullable(),
     observedShare: z.number().min(0).max(1)
   }),
   packRuns: z.array(assurancePackRunSchema).default([]),
@@ -228,7 +228,7 @@ export const assuranceCertSchema = z.object({
   }),
   gates: z.object({
     integrityIndex: z.number().min(0).max(1),
-    correlationRatio: z.number().min(0).max(1),
+    correlationRatio: z.number().min(0).max(1).nullable(),
     observedShare: z.number().min(0).max(1)
   }),
   bindings: z.object({

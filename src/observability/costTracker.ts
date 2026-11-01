@@ -59,7 +59,8 @@ export interface CostReport {
   totalTokens: number;
   totalCalls: number;
   errorCount: number;
-  errorRate: number;
+  /** Null over a window with no calls: no error rate was measured. */
+  errorRate: number | null;
   avgCostPerCall: number;
   avgTokensPerCall: number;
   avgCostPerDay: number;
@@ -229,7 +230,7 @@ export class CostTracker {
       totalTokens,
       totalCalls: filtered.length,
       errorCount,
-      errorRate: filtered.length > 0 ? errorCount / filtered.length : 0,
+      errorRate: filtered.length > 0 ? errorCount / filtered.length : null,
       avgCostPerCall: filtered.length > 0 ? totalCost / filtered.length : 0,
       avgTokensPerCall: filtered.length > 0 ? totalTokens / filtered.length : 0,
       avgCostPerDay,
@@ -440,7 +441,7 @@ function bucketByDay(records: CostRecord[]): CostBucket[] {
 function emptyReport(agentId: string, start: number, end: number): CostReport {
   return {
     agentId, periodStart: start, periodEnd: end,
-    totalCostUsd: 0, totalTokens: 0, totalCalls: 0, errorCount: 0, errorRate: 0,
+    totalCostUsd: 0, totalTokens: 0, totalCalls: 0, errorCount: 0, errorRate: null,
     avgCostPerCall: 0, avgTokensPerCall: 0, avgCostPerDay: 0, projectedMonthlyCostUsd: 0,
     costByModel: {}, costByProvider: {}, costByDay: [], anomalies: [],
     topExpensiveTraces: [], recommendations: ["No cost data available. Connect an observability provider with `amc watch connect`."],

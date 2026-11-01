@@ -41,7 +41,8 @@ export interface GovernorTrustSummary {
    * that is the rule's `run-integrity` condition.
    */
   untrustedConfig: boolean;
-  correlationRatio: number;
+  /** The latest trusted run's ratio; null when there is no run or it measured no correlation. */
+  correlationRatio: number | null;
   /** Why the latest run file was not used (seal, agent or ledger anchor failed); absent when nothing was refused. */
   runRefusal?: string;
   /** With `untrustedConfig` from the run: why the latest trusted run cannot vouch at any threshold. */
@@ -582,7 +583,7 @@ export function evaluateActionPermission(input: GovernorDecisionInput): Governor
 export function deriveTrustSummaryFromRun(workspace: string, agentId: string, run: DiagnosticReport | null, refusal?: string | null): GovernorTrustSummary {
   if (!run) {
     const cause = refusal === undefined ? latestTrustedRun(workspace, agentId).refusal : refusal;
-    return { trustTier: "SELF_REPORTED", sandboxEvidence: false, untrustedConfig: cause !== null, correlationRatio: 0,
+    return { trustTier: "SELF_REPORTED", sandboxEvidence: false, untrustedConfig: cause !== null, correlationRatio: null,
       ...(cause === null ? {} : { runRefusal: cause }) };
   }
 
