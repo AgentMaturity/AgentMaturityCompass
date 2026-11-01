@@ -346,6 +346,13 @@
       "sha256": "b441577305fc5464ab38f634ce767a45369f013a8e1b379f8d218efcd9bc0ba2"
     },
     {
+      "path": "src/cli-late-stage-commands.ts",
+      "issue": "GAP-WP32",
+      "baseCommit": "20b87b5e647bf67a58a909781fb252dedd0ebb51",
+      "archivePath": "unused-code/plan-edits/GAP-WP32/src/cli-late-stage-commands.ts.landed",
+      "sha256": "1b7e55c604a0bc7aa703ef26474fd251cd403a4b204dc09d64987c606006f228"
+    },
+    {
       "path": "src/cli.ts",
       "issue": "GAP-WP32",
       "baseCommit": "58a328ea821450be9502522a5df52e5770bb08a9",

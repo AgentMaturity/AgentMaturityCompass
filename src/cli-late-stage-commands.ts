@@ -270,8 +270,8 @@ export function registerLateStageCliCommands({
     .action(async (opts: { gateway?: string; vault?: boolean; demo?: boolean; json?: boolean }) => {
       const { DEMO_AGENT_ID, runDemo, runDemoWithoutUserVault, shouldRunNoVaultDemo, startDemoUpstream } = await import("./demo/demoRun.js");
       const { EXAMPLE_BANNER, exampleEnvelope } = await import("./claims/eligibility/exampleMode.js");
-      const { issueLeaseForCli } = await import("./leases/leaseCli.js");
-      const { ensureLeaseRevocationStore } = await import("./leases/leaseCli.js");
+      const { issueLeaseForCli, ensureLeaseRevocationStore } = await import("./leases/leaseCli.js");
+      const { withWorkspaceScope } = await import("./enforce/evidenceEmitter.js");
 
       if (shouldRunNoVaultDemo(opts)) {
         if (opts.gateway) {
@@ -345,7 +345,7 @@ export function registerLateStageCliCommands({
         console.log(chalk.gray(`  Gateway: ${gatewayUrl}`));
         console.log(chalk.gray("  Simulating a multi-turn AI agent through the AMC gateway...\n"));
 
-        const result = await runDemo(gatewayUrl, lease.token, DEMO_AGENT_ID);
+        const result = await withWorkspaceScope(workspace, () => runDemo(gatewayUrl, lease.token, DEMO_AGENT_ID));
 
         console.log(chalk.green(`\n✓ Demo complete in ${(result.durationMs / 1000).toFixed(1)}s`));
         console.log(chalk.gray(`  ${result.requestsSent} requests sent through gateway`));

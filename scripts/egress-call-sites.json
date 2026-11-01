@@ -8,7 +8,7 @@
     "Gated describes a source integration seam, not observed residency or legal approval. Scope/caller limitations remain in each reason.",
     "Deferred is deliberately distinct from exempt. Complete architecture acceptance must reject unresolved deferred sites before full coverage can be claimed.",
     "Line locations are navigation hints and must be refreshed when source moves; patterns and aliases are not a complete static-analysis proof.",
-    "The gated demo transport covers the released scoped internal caller. Its frozen CLI caller at src/cli-late-stage-commands.ts:348 remains deferred for explicit workspace wiring; this caller limitation does not add a second native transport row."
+    "The gated demo transport covers the released scoped internal caller and the CLI caller in src/cli-late-stage-commands.ts, which runs it inside its workspace scope; neither adds a second native transport row."
   ],
   "sites": [
     {
@@ -201,7 +201,7 @@
       "line": 378,
       "call": "fetch(",
       "status": "gated",
-      "reason": "Released no-vault internal runDemo caller installs prepared workspace scope; private helper captures it, prepares same-endpoint manual-redirect gateway POST, and gates bridge immediately before fetch with null facts/caller-declared demo actor. Typed denial propagates without a complete run result. Source-only: frozen CLI caller cli-late-stage-commands.ts:348 remains deferred for explicit workspace wiring, and external library callers own their scope. Earlier temp setup/lease/servers/requests can have effects; synthetic output, cleanup and transport/region limits remain unqualified."
+      "reason": "Released no-vault internal runDemo caller installs prepared workspace scope; private helper captures it, prepares same-endpoint manual-redirect gateway POST, and gates bridge immediately before fetch with null facts/caller-declared demo actor. Typed denial propagates without a complete run result. The CLI caller in cli-late-stage-commands.ts runs it inside its workspace scope; external library callers own their scope. Earlier temp setup/lease/servers/requests can have effects; synthetic output, cleanup and transport/region limits remain unqualified."
     },
     {
       "siteId": "src/doctor/doctorLiveProbe.ts:34:1",
