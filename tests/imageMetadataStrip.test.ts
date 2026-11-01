@@ -151,7 +151,7 @@ function requestImages(root: string, systemPromptEventId: string, events: readon
   const result = resolveRequestSources({ workspace: root, events, model: "fixture-model", params: { max_tokens: 64 }, systemPromptEventId,
     toolSchemaEventId: null, toolSchemaSha256: null, projectionCutoffEventId: events[events.length - 1]!.id });
   expect(result.failure).toBeNull();
-  return result.request!.messages.flatMap(message => message.parts).flatMap(part => part.kind === "image" ? [part] : []);
+  return result.request!.messages.flatMap(message => message.parts).flatMap(part => part.kind === "image" ? [{ ...part, bytes: part.bytes ?? Buffer.alloc(0) }] : []); // missing bytes fail the equality checks
 }
 const withMeta = (events: readonly EvidenceEvent[], id: string, edit: (meta: Record<string, unknown>) => void) => events.map(row => {
   if (row.id !== id) return row;
