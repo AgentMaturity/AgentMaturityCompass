@@ -1613,6 +1613,7 @@ Serve the Agent Client Protocol on stdio (for editors; prints nothing but frames
 | `--context-window <tokens>` | - |
 | `--compact-threshold <fraction>` | - |
 | `--no-auto-summary` | - |
+| `--no-auto-compact` | - |
 | `--agent-id <id>` | - |
 | `--system-prompt <text>` | - |
 
@@ -1801,6 +1802,7 @@ Interactive native tasks over the existing governed run/resume path for the sele
 | `--context-window <tokens>` | - |
 | `--compact-threshold <fraction>` | - |
 | `--no-auto-summary` | - |
+| `--no-auto-compact` | - |
 | `--session <id>` | - |
 | `--fork-from <id>` | - |
 | `--lease-file <path>` | - |
@@ -1876,6 +1878,7 @@ Run one agent turn and report what the signed log recorded
 | `--context-window <tokens>` | - |
 | `--compact-threshold <fraction>` | - |
 | `--no-auto-summary` | - |
+| `--no-auto-compact` | - |
 | `--tools <mode>` | - |
 | `--tool-mode <mode>` | - |
 | `--unsafe-unconfined-shell` | - |
@@ -12581,7 +12584,7 @@ export const assuranceRunSchema = z.object({
   selectedPacks: z.array(assurancePackIdSchema).default([]),
   evidenceGates: z.object({
     integrityIndex: z.number().min(0).max(1),
-    correlationRatio: z.number().min(0).max(1),
+    correlationRatio: z.number().min(0).max(1).nullable(),
     observedShare: z.number().min(0).max(1)
   }),
   packRuns: z.array(assurancePackRunSchema).default([]),
@@ -12664,7 +12667,7 @@ export const assuranceCertSchema = z.object({
   }),
   gates: z.object({
     integrityIndex: z.number().min(0).max(1),
-    correlationRatio: z.number().min(0).max(1),
+    correlationRatio: z.number().min(0).max(1).nullable(),
     observedShare: z.number().min(0).max(1)
   }),
   bindings: z.object({
