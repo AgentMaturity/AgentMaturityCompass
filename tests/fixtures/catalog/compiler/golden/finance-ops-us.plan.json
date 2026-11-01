@@ -112,7 +112,7 @@
     "register": {
       "path": "src/compliance/regulatory/register.json",
       "schemaVersion": 1,
-      "digest": "sha256:4d1c6e5f44d069765f280f37c7b9d3d33ad6d3f55ddb3abfff288aa5d6597155"
+      "digest": "sha256:1bf5374186c3d108544e29a87510844ec594315ec5ca0a1ceb634be550cc40a4"
     },
     "producers": {
       "digest": "sha256:466909cd3b69596c461ef973080917aed7c76a1abc1c620e243d70687b56d33c"
@@ -1032,5 +1032,5 @@
       }
     ]
   },
-  "digest": "sha256:3aa5cc96b3c302ccf253c12731ff3b3b3dd2146daf664539a2982f55131630ae"
+  "digest": "sha256:10647b6d69a99e5a1062f7e04b63a1b7862e572e2a6003da74ea1e11b5ebb15a"
 }
