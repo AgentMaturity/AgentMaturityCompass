@@ -345,7 +345,9 @@ const membersSchema = z.strictObject({
 });
 const commentSchema = z.strictObject({
   body: z.string().trim().min(1).max(16_384), cardId: z.string().regex(/^[A-Za-z0-9_.:-]{1,128}$/),
-  inReplyTo: z.string().regex(/^a4c_[0-9a-f]{32}$/).nullable().optional(), clientRequestId: clientRequestIdSchema
+  inReplyTo: z.string().regex(/^a4c_[0-9a-f]{32}$/).nullable().optional(), clientRequestId: clientRequestIdSchema,
+  // The surface the comment came through, as its sender states it (self-reported): the console sends none, amc_a4_comment "mcp".
+  via: z.enum(["studio", "mcp"]).default("studio")
 });
 const evidenceSchema = z.strictObject({
   refKind: z.enum(A4_REF_KINDS), refId: z.string().min(1).max(512), sha256: z.string().regex(/^[0-9a-f]{64}$/),
@@ -400,7 +402,7 @@ async function projectMutation(route: A4Route, projectId: string, rest: string):
       // Read roles plus membership: an APPROVER-only or AUDITOR member can discuss without being granted OPERATOR.
       return mutate(route, projectId, commentSchema, (body, request) => {
         assertVisible(route, store.membersOf(projectId));
-        return store.addComment(projectId, { actor: principal, body: body.body, cardId: body.cardId, inReplyTo: body.inReplyTo ?? null, request });
+        return store.addComment(projectId, { actor: principal, body: body.body, cardId: body.cardId, inReplyTo: body.inReplyTo ?? null, via: body.via, request });
       }, 201);
     case "/members":
       return mutate(route, projectId, membersSchema, (body, request) => {
@@ -595,7 +597,10 @@ function projectRead(route: A4Route, projectId: string, rest: string): boolean {
   if (rest === "/comments") {
     assertQuery(params, params.has("card") ? ["card"] : []);
     const card = params.get("card");
-    const rows = store.snapshot(projectId).rows.a4_comments.filter((row) => card === null || row.card_id === card);
+    const snapshot = store.snapshot(projectId);
+    const rows = snapshot.rows.a4_comments.filter((row) => card === null || row.card_id === card);
+    // `via` lives in the signed COMMENT body; a comment recorded before it existed answers null (not recorded).
+    const via = new Map(snapshot.links.filter((link) => link.kind === "COMMENT").map((link) => [link.body.commentId, link.body.via ?? null]));
     apiSuccess(route.res, { comments: rows.map((row) => {
       let body: string | null = null;
       let reasonCode: string | null = null;
@@ -605,7 +610,7 @@ function projectRead(route: A4Route, projectId: string, rest: string): boolean {
         reasonCode = error instanceof A4BlobError ? error.code : "BLOB_UNREADABLE";
       }
       return { commentId: row.comment_id, cardId: row.card_id, revisionNo: row.revision_no, stage: row.stage, authorKey: row.author_key,
-        inReplyTo: row.in_reply_to, body, reasonCode, ts: row.ts };
+        inReplyTo: row.in_reply_to, via: via.get(row.comment_id) ?? null, body, reasonCode, ts: row.ts };
     }) });
     return true;
   }

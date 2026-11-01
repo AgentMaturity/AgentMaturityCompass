@@ -98,7 +98,7 @@ describe("A4 MCP tools keep the signing key out of the agent host", () => {
     expect(request!.headers[NATIVE_CSRF_HEADER]).toBe(nativeCsrfTokenForSession(payload));
     expect(request!.headers[NATIVE_INTENT_HEADER]).toBeTruthy();
     expect(request!.headers.origin).toBe(studio.origin);
-    expect(request!.body).toEqual({ body: comment.body, cardId: comment.cardId, inReplyTo: null, clientRequestId: comment.clientRequestId });
+    expect(request!.body).toEqual({ body: comment.body, cardId: comment.cardId, inReplyTo: null, clientRequestId: comment.clientRequestId, via: "mcp" });
   });
 
   it("passes Studio's refusal through with its status and code", async () => {

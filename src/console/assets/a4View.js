@@ -258,11 +258,12 @@ export function renderReviewCard(ctx) {
 /**
  * One thread per stage-qualified card id (`aspire:specification`), the key a4.js posts and presence uses. Studio names a
  * comment's author by principal key only; a current member's key is shown as their username.
+ * A comment whose signed body says it came through MCP (`via: "mcp"`) carries a VIA MCP pill.
  */
 function renderComments(cardId, comments, members = []) {
   const names = new Map(members.map((member) => [member.principalKey, member.username]));
   const rows = comments.filter((comment) => comment.cardId === cardId).map((comment) => `<li>
-    <span class="pill">SELF_REPORTED</span> <strong>${esc(names.get(comment.authorKey) ?? comment.authorKey)}</strong>
+    <span class="pill">SELF_REPORTED</span>${comment.via === "mcp" ? ' <span class="pill">VIA MCP</span>' : ""} <strong>${esc(names.get(comment.authorKey) ?? comment.authorKey)}</strong>
     <span class="muted">${time(comment.ts)}</span><div>${typeof comment.body === "string" ? esc(comment.body)
       : `<span class="muted">Text not returned by Studio</span> ${codes(comment.reasonCode ? [comment.reasonCode] : [])}`}</div></li>`);
   return `<details class="a4-comments" data-a4-open="discussion"${rows.length ? " open data-a4-default-open" : ""}><summary>Discussion (${rows.length})</summary>${list(rows, "No comments yet.")}

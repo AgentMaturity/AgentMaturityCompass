@@ -283,7 +283,7 @@ export function registerA4Tools(server: McpServer, host: Host): void {
       // Studio's route checks membership, dedupes the clientRequestId, writes the encrypted blob and signs the transition.
       const baseUrl = localStudioUrl(ctx.store.workspace);
       const { status, body } = await createA4Client({ baseUrl, session: ctx.session, timeoutMs: STUDIO_TIMEOUT_MS }).comment(args.projectId,
-        { body: args.body, cardId: args.cardId, inReplyTo: args.inReplyTo ?? null, clientRequestId: args.clientRequestId }).catch((error: unknown) => {
+        { body: args.body, cardId: args.cardId, inReplyTo: args.inReplyTo ?? null, clientRequestId: args.clientRequestId, via: "mcp" }).catch((error: unknown) => {
         throw studioFailure(error, baseUrl);
       });
       // Missing data never reads as recorded: a success names this project and a seq, and a refusal carries its error.
