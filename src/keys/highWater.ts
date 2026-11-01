@@ -39,6 +39,7 @@ export type HighWaterEntry = z.infer<typeof entrySchema>;
 const MAX_BYTES = 8 * 1024 * 1024;
 const READ_ONLY_CODES = new Set(["EROFS", "EACCES", "EPERM"]);
 const warnedReadOnly = new Set<string>();
+let lastParsed: { bytes: Buffer; entries: Record<string, HighWaterEntry> } | null = null;
 
 export interface HighWaterOptions {
   amcHome?: string;
@@ -93,12 +94,18 @@ function readEntries(opts: HighWaterOptions): Record<string, HighWaterEntry> {
     throw new Error(`anti-rollback state ${path} is unreadable (${error instanceof Error ? error.message : String(error)}); `
       + "refusing to decide on rollback until it is restored or removed by the machine owner");
   }
+  // The file is read and contained on every call; only the parse is reused, and only for byte-identical contents.
+  // A large file costs tens of milliseconds to parse and a signature check reads it many times, which blocked Studio's
+  // event loop (and its SIGTERM handler) for longer than a deploy's 10 s grace period.
+  if (lastParsed?.bytes.equals(bytes)) return lastParsed.entries;
   // Written canonically, so a duplicated or re-spelled key never reads as a different mark than the one written.
   let value: unknown = null;
   try { value = parseCanonicalJson(bytes); } catch { /* reported as invalid below */ }
   const parsed = fileSchema.safeParse(value);
   if (!parsed.success) throw new Error(`anti-rollback state ${path} is not a valid amc.high-water file; refusing to decide on rollback`);
-  return parsed.data.entries;
+  for (const entry of Object.values(parsed.data.entries)) Object.freeze(entry);
+  lastParsed = { bytes, entries: Object.freeze(parsed.data.entries) };
+  return lastParsed.entries;
 }
 
 /** The ids of every mark of one kind on this machine. */

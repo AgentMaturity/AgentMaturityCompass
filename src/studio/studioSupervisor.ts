@@ -588,15 +588,18 @@ export async function runStudioForeground(params: {
   return {
     state,
     stop: async () => {
-      await api.close();
-      await dashboard.close();
-      await gateway.close();
-      await metrics.close();
+      // The API refuses new work synchronously, then the stop is recorded before the bounded drain (up to 10 s of
+      // sockets and in-flight requests): a deploy's SIGTERM grace period is 10 s, so recording it last lost it.
+      const apiClosed = api.close();
       try {
         writeStudioLifecycleAudit(workspace, agentId, "STUDIO_RUNTIME_STOPPED");
       } catch {
         // Lifecycle audit is best-effort and must not block shutdown.
       }
+      await apiClosed;
+      await dashboard.close();
+      await gateway.close();
+      await metrics.close();
       clearStudioState(workspace);
     }
   };
