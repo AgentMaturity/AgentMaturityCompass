@@ -185,12 +185,12 @@ const MEMBER_KEY = String.raw`(?<k>(?:[A-Za-z0-9_.-]|\\+u[0-9A-Fa-f]{4}){1,64})`
  * Name and value pairs in exact text: a quoted member (JSON, a Python or JS literal, a string or a number, its quotes
  * escaped once too: JSON in a JSON string), a form, query or command-line field, a multipart form part, and an env or YAML
  * line. A name may spell characters as `\uXXXX`, escaped again at each level of nesting. Each value is checked with its
- * name, decoded (`memberFinding`); only the value is replaced. A decoded view runs only the
- * rules that do not depend on where quotes fall (`exactOnly: false`): decoding an escaped backslash before a closing quote
- * leaves an escaped quote, so a quoted member's value would run on to the next quote.
+ * name, decoded (`memberFinding`); only the value is replaced. A quoted string value ends at its closing quote or, unclosed
+ * (truncated output), at the end of its line. A decoded view runs only the rules that do not depend on where quotes fall
+ * (`exactOnly: false`): decoding an escaped backslash before a closing quote leaves an escaped quote, so a value runs on.
  */
 const PAIR_RULES: readonly { readonly type: "secret_json" | "secret_field"; readonly re: RegExp; readonly exactOnly: boolean }[] = Object.freeze([
-  { type: "secret_json", exactOnly: true, re: new RegExp(String.raw`(?<q>\\?["'])${MEMBER_KEY}\k<q>\s*:\s*(?<r>\\?["'])(?<v>(?:(?!\k<r>)(?:[^\\]|\\[\s\S]))*)\k<r>`) },
+  { type: "secret_json", exactOnly: true, re: new RegExp(String.raw`(?<q>\\?["'])${MEMBER_KEY}\k<q>\s*:\s*(?<r>\\?["'])(?<v>(?:(?!\k<r>)(?:[^\\\r\n]|\\[^\r\n]))*)(?:\k<r>|(?=[\r\n]|$))`) },
   { type: "secret_json", exactOnly: true, re: new RegExp(String.raw`(?<q>\\?["'])${MEMBER_KEY}\k<q>\s*:\s*(?<v>-?\d[\d.eE+-]*)`) },
   { type: "secret_field", exactOnly: false, re: new RegExp(String.raw`(?:^|[?&;\s])${MEMBER_KEY}=(?<v>[^&;\s#]*)`) },
   { type: "secret_field", exactOnly: true, re: new RegExp(String.raw`name="${MEMBER_KEY}"[^\r\n]{0,256}\r?\n(?:[^\r\n]{1,256}\r?\n){0,8}\r?\n(?<v>[^\r\n]*)`) },

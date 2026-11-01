@@ -1,0 +1,1750 @@
+{
+  "schema": "amc.test.protected-walk-corpus/v1",
+  "note": "P2-02 parse-first walker regression corpus. Rows are reconstructed from the finding descriptions in plan/p2-02-walker-design.md section 4 (the original probe scripts did not survive); `{{NAME}}` placeholders are filled by tests/dataflowWalkerCorpus.test.ts.",
+  "cases": [
+    {
+      "id": "r1-01-adapter-stdout",
+      "round": "r1",
+      "finding": "r1-01",
+      "surface": "process-output",
+      "input": {
+        "text": "charged card {{CARD}} for order 77"
+      },
+      "expect": {
+        "absent": [
+          "{{CARD}}"
+        ],
+        "present": [
+          "<AMC_REDACTED>"
+        ]
+      }
+    },
+    {
+      "id": "r1-02-sse-split-email",
+      "round": "r1",
+      "finding": "r1-02",
+      "surface": "gateway-body",
+      "input": {
+        "contentType": "text/event-stream",
+        "text": "data: {\"choices\":[{\"delta\":{\"content\":\"odalys.fenwick@exa\"}}]}\n\ndata: {\"choices\":[{\"delta\":{\"content\":\"mple.com\"}}]}\n\ndata: [DONE]\n\n"
+      },
+      "expect": {
+        "opaque": "unscanned",
+        "absent": [
+          "odalys.fenwick"
+        ]
+      }
+    },
+    {
+      "id": "r1-03-toolhub-declared",
+      "round": "r1",
+      "finding": "r1-03",
+      "surface": "toolhub",
+      "input": {
+        "value": {
+          "result": {
+            "patient": {
+              "name": "Jane Roe",
+              "ward": 4
+            }
+          }
+        },
+        "declared": {
+          "patient.name": "phi"
+        }
+      },
+      "expect": {
+        "classes": [
+          "phi"
+        ],
+        "absent": [
+          "Jane Roe"
+        ],
+        "present": [
+          "\"ward\":4"
+        ]
+      }
+    },
+    {
+      "id": "r1-04-declared-any-depth",
+      "round": "r1",
+      "finding": "r1-04",
+      "surface": "walk",
+      "declared": {
+        "patient.name": "phi"
+      },
+      "input": {
+        "text": "{\"result\":\"{\\\"patient\\\":{\\\"name\\\":\\\"Jane Roe\\\"}}\"}"
+      },
+      "expect": {
+        "classes": [
+          "phi"
+        ],
+        "absent": [
+          "Jane Roe"
+        ]
+      }
+    },
+    {
+      "id": "r1-05-percent-email",
+      "round": "r1",
+      "finding": "r1-05",
+      "surface": "walk",
+      "input": {
+        "text": "to=odalys.fenwick%40example.com&x=1"
+      },
+      "expect": {
+        "classes": [
+          "pii"
+        ],
+        "absent": [
+          "odalys.fenwick"
+        ]
+      }
+    },
+    {
+      "id": "r1-05-html-email",
+      "round": "r1",
+      "finding": "r1-05",
+      "surface": "walk",
+      "input": {
+        "text": "mail odalys.fenwick&#64;example.com now"
+      },
+      "expect": {
+        "classes": [
+          "pii"
+        ],
+        "absent": [
+          "odalys.fenwick"
+        ]
+      }
+    },
+    {
+      "id": "r1-06-header-denylist",
+      "round": "r1",
+      "finding": "r1-06",
+      "surface": "gateway-header",
+      "optedIn": false,
+      "input": {
+        "key": "authorization",
+        "text": "Bearer {{OPENAI}}"
+      },
+      "expect": {
+        "absent": [
+          "{{OPENAI}}"
+        ],
+        "present": [
+          "[REDACTED]"
+        ]
+      }
+    },
+    {
+      "id": "r1-07-outcome-unknown-notice",
+      "round": "r1",
+      "finding": "r1-07",
+      "surface": "out-of-walker",
+      "coveredBy": "src/dataflow/redactingSession.ts",
+      "reason": "The notice split happens in the session wrapper before the walk; the walk never sees the notice.",
+      "input": {},
+      "expect": {}
+    },
+    {
+      "id": "r1-08-toolhub-declared-number",
+      "round": "r1",
+      "finding": "r1-08",
+      "surface": "toolhub",
+      "input": {
+        "value": {
+          "result": {
+            "patient": {
+              "mrn": 20261101
+            }
+          }
+        },
+        "declared": {
+          "patient.mrn": "phi"
+        }
+      },
+      "expect": {
+        "classes": [
+          "phi"
+        ],
+        "absent": [
+          "20261101"
+        ]
+      }
+    },
+    {
+      "id": "r1-09-toolhub-raw-arguments",
+      "round": "r1",
+      "finding": "r1-09",
+      "surface": "toolhub",
+      "input": {
+        "value": {
+          "arguments": {
+            "to": "{{EMAIL}}",
+            "body": "hello"
+          }
+        }
+      },
+      "expect": {
+        "classes": [
+          "pii"
+        ],
+        "absent": [
+          "{{EMAIL}}"
+        ],
+        "present": [
+          "hello"
+        ]
+      }
+    },
+    {
+      "id": "r1-10-github-token",
+      "round": "r1",
+      "finding": "r1-10",
+      "surface": "walk",
+      "input": {
+        "text": "token {{GITHUB}} in the log"
+      },
+      "expect": {
+        "classes": [
+          "credential"
+        ],
+        "absent": [
+          "{{GITHUB}}"
+        ]
+      }
+    },
+    {
+      "id": "r1-10-client-secret",
+      "round": "r1",
+      "finding": "r1-10",
+      "surface": "walk",
+      "input": {
+        "text": "{\"client_secret\":\"abc\"}"
+      },
+      "expect": {
+        "classes": [
+          "credential"
+        ],
+        "absent": [
+          "\"abc\""
+        ]
+      }
+    },
+    {
+      "id": "r2-01-sandbox-env",
+      "round": "r2",
+      "finding": "r2-01",
+      "surface": "out-of-walker",
+      "coveredBy": "src/adapters/adapterRunner.ts",
+      "reason": "SANDBOX mode passes the environment by name (docker run -e NAME); it runs in every workspace, before any walk.",
+      "input": {},
+      "expect": {}
+    },
+    {
+      "id": "r2-02-env-name-json",
+      "round": "r2",
+      "finding": "r2-02",
+      "surface": "walk",
+      "input": {
+        "text": "{\"DB_PASSWORD\":\"supersecretvalue1\"}"
+      },
+      "expect": {
+        "classes": [
+          "credential"
+        ],
+        "absent": [
+          "supersecretvalue1"
+        ]
+      }
+    },
+    {
+      "id": "r2-02-env-name-line",
+      "round": "r2",
+      "finding": "r2-02",
+      "surface": "walk",
+      "input": {
+        "text": "DB_PASSWORD=supersecretvalue1"
+      },
+      "expect": {
+        "classes": [
+          "credential"
+        ],
+        "absent": [
+          "supersecretvalue1"
+        ]
+      }
+    },
+    {
+      "id": "r2-03-curl-user",
+      "round": "r2",
+      "finding": "r2-03",
+      "surface": "argv",
+      "input": {
+        "command": "curl",
+        "args": [
+          "-u",
+          "alice:{{PASSWORD}}",
+          "https://api.example.com"
+        ]
+      },
+      "expect": {
+        "absent": [
+          "{{PASSWORD}}"
+        ],
+        "present": [
+          "https://api.example.com"
+        ]
+      }
+    },
+    {
+      "id": "r2-04-header-email",
+      "round": "r2",
+      "finding": "r2-04",
+      "surface": "gateway-header",
+      "input": {
+        "key": "x-end-user",
+        "text": "{{EMAIL}}"
+      },
+      "expect": {
+        "classes": [
+          "pii"
+        ],
+        "absent": [
+          "{{EMAIL}}"
+        ]
+      }
+    },
+    {
+      "id": "r2-05-double-percent",
+      "round": "r2",
+      "finding": "r2-05",
+      "surface": "walk",
+      "input": {
+        "text": "q=odalys.fenwick%2540example.com"
+      },
+      "expect": {
+        "classes": [
+          "pii"
+        ],
+        "absent": [
+          "odalys.fenwick"
+        ]
+      }
+    },
+    {
+      "id": "r2-06-form-password",
+      "round": "r2",
+      "finding": "r2-06",
+      "surface": "walk",
+      "input": {
+        "text": "user=bob&password={{PASSWORD}}&remember=1"
+      },
+      "expect": {
+        "classes": [
+          "credential"
+        ],
+        "absent": [
+          "{{PASSWORD}}"
+        ],
+        "present": [
+          "user=bob",
+          "remember=1"
+        ]
+      }
+    },
+    {
+      "id": "r2-06-multipart-password",
+      "round": "r2",
+      "finding": "r2-06",
+      "surface": "walk",
+      "input": {
+        "text": "--b\r\nContent-Disposition: form-data; name=\"password\"\r\n\r\n{{PASSWORD}}\r\n--b--"
+      },
+      "expect": {
+        "classes": [
+          "credential"
+        ],
+        "absent": [
+          "{{PASSWORD}}"
+        ]
+      }
+    },
+    {
+      "id": "r2-06-query-password",
+      "round": "r2",
+      "finding": "r2-06",
+      "surface": "gateway-target",
+      "input": {
+        "text": "/login?user=bob&password={{PASSWORD}}"
+      },
+      "expect": {
+        "absent": [
+          "{{PASSWORD}}"
+        ],
+        "present": [
+          "user=bob"
+        ]
+      }
+    },
+    {
+      "id": "r2-07-ndjson-reasoning",
+      "round": "r2",
+      "finding": "r2-07",
+      "surface": "gateway-body",
+      "input": {
+        "contentType": "application/x-ndjson",
+        "text": "{\"message\":{\"content\":\"odalys.fenwick@exa\"}}\n{\"message\":{\"content\":\"mple.com\"}}\n"
+      },
+      "expect": {
+        "opaque": "unscanned",
+        "absent": [
+          "odalys.fenwick"
+        ]
+      }
+    },
+    {
+      "id": "r2-08-toolhub-repeats",
+      "round": "r2",
+      "finding": "r2-08",
+      "surface": "toolhub",
+      "input": {
+        "value": {
+          "result": {
+            "patient": {
+              "name": "Jane Roe"
+            },
+            "echo": "Jane Roe",
+            "log": "{\"who\":\"Jane Roe\", trunc"
+          }
+        },
+        "declared": {
+          "patient.name": "phi"
+        }
+      },
+      "expect": {
+        "classes": [
+          "phi"
+        ],
+        "absent": [
+          "Jane Roe"
+        ]
+      }
+    },
+    {
+      "id": "r2-09-utf16-body",
+      "round": "r2",
+      "finding": "r2-09",
+      "surface": "gateway-body",
+      "input": {
+        "contentType": "text/plain; charset=utf-16",
+        "text": "mail {{EMAIL}}"
+      },
+      "expect": {
+        "opaque": "unscanned",
+        "absent": [
+          "{{EMAIL}}"
+        ]
+      }
+    },
+    {
+      "id": "r2-10-bridge-over-limit",
+      "round": "r2",
+      "finding": "r2-10",
+      "surface": "bridge-text",
+      "input": {
+        "generate": [
+          [
+            "a ",
+            600000
+          ],
+          [
+            " {{EMAIL}}",
+            1
+          ]
+        ]
+      },
+      "expect": {
+        "absent": [
+          "{{EMAIL}}"
+        ],
+        "present": [
+          "<AMC_REDACTED>"
+        ]
+      }
+    },
+    {
+      "id": "r2-11-keyed-json-member",
+      "round": "r2",
+      "finding": "r2-11",
+      "surface": "walk",
+      "input": {
+        "text": "{\"medicalRecordNumber\":\"{{MRN}}\"}"
+      },
+      "expect": {
+        "classes": [
+          "phi"
+        ],
+        "absent": [
+          "{{MRN}}"
+        ]
+      }
+    },
+    {
+      "id": "r2-12-argv-flag-password",
+      "round": "r2",
+      "finding": "r2-12",
+      "surface": "walk",
+      "key": "password",
+      "input": {
+        "text": "{{PASSWORD}}"
+      },
+      "expect": {
+        "classes": [
+          "credential"
+        ],
+        "absent": [
+          "{{PASSWORD}}"
+        ]
+      }
+    },
+    {
+      "id": "r2-12-recorded-argv",
+      "round": "r2",
+      "finding": "r2-12",
+      "surface": "argv",
+      "input": {
+        "command": "deploy",
+        "args": [
+          "--password",
+          "{{PASSWORD}}",
+          "--region",
+          "eu-west-1"
+        ]
+      },
+      "expect": {
+        "absent": [
+          "{{PASSWORD}}"
+        ],
+        "present": [
+          "eu-west-1"
+        ]
+      }
+    },
+    {
+      "id": "r2-13-declared-linear",
+      "round": "r2",
+      "finding": "r2-13",
+      "surface": "walk",
+      "input": {
+        "generateValue": {
+          "declaredRows": 20000
+        },
+        "declared": {
+          "rows.name": "pii"
+        }
+      },
+      "expect": {
+        "classes": [
+          "pii"
+        ],
+        "withinMs": 20000
+      }
+    },
+    {
+      "id": "r2-14-header-secret-name",
+      "round": "r2",
+      "finding": "r2-14",
+      "surface": "gateway-header",
+      "input": {
+        "key": "x-patient-mrn",
+        "text": "{{MRN}}"
+      },
+      "expect": {
+        "classes": [
+          "phi"
+        ],
+        "absent": [
+          "{{MRN}}"
+        ]
+      }
+    },
+    {
+      "id": "r2-15-base64",
+      "round": "r2",
+      "finding": "r2-15",
+      "surface": "walk",
+      "input": {
+        "text": "blob {{base64:card {{CARD}} end of the note}}"
+      },
+      "expect": {
+        "classes": [
+          "card_number"
+        ],
+        "absent": [
+          "{{base64:card {{CARD}} end of the note}}"
+        ]
+      }
+    },
+    {
+      "id": "r3-01-sk-after-tab",
+      "round": "r3",
+      "finding": "r3-01",
+      "surface": "gateway-header",
+      "optedIn": false,
+      "input": {
+        "key": "x-note",
+        "text": "key\t{{OPENAI}}"
+      },
+      "expect": {
+        "absent": [
+          "{{OPENAI}}"
+        ]
+      }
+    },
+    {
+      "id": "r3-06-sk-after-newline",
+      "round": "r3",
+      "finding": "r3-06",
+      "surface": "bridge-text",
+      "optedIn": false,
+      "input": {
+        "text": "key\n{{OPENAI}}"
+      },
+      "expect": {
+        "absent": [
+          "{{OPENAI}}"
+        ]
+      }
+    },
+    {
+      "id": "r3-02-monitor-row-not-opted",
+      "round": "r3",
+      "finding": "r3-02",
+      "surface": "process-output",
+      "optedIn": false,
+      "input": {
+        "text": "export api_key=abcdefghijklmnop1234"
+      },
+      "expect": {
+        "unchanged": true
+      }
+    },
+    {
+      "id": "r3-03-delegate-answer-not-opted",
+      "round": "r3",
+      "finding": "r3-03",
+      "surface": "process-output",
+      "optedIn": false,
+      "input": {
+        "text": "The answer is postgres://app@db.internal/app"
+      },
+      "expect": {
+        "unchanged": true
+      }
+    },
+    {
+      "id": "r3-04-wrap-sigint",
+      "round": "r3",
+      "finding": "r3-04",
+      "surface": "out-of-walker",
+      "coveredBy": "src/cli.ts",
+      "reason": "amc wrap settles pending telemetry on SIGINT/SIGTERM in the CLI process; no walk input.",
+      "input": {},
+      "expect": {}
+    },
+    {
+      "id": "r3-05-quoted-mrn",
+      "round": "r3",
+      "finding": "r3-05",
+      "surface": "walk",
+      "input": {
+        "text": "note \"MRN\": \"{{MRN}}\" end"
+      },
+      "expect": {
+        "classes": [
+          "phi"
+        ],
+        "absent": [
+          "{{MRN}}"
+        ]
+      }
+    },
+    {
+      "id": "r3-05-quoted-passport",
+      "round": "r3",
+      "finding": "r3-05",
+      "surface": "walk",
+      "input": {
+        "text": "note \"passport_number\": \"X1234567\" end"
+      },
+      "expect": {
+        "classes": [
+          "pii"
+        ],
+        "absent": [
+          "X1234567"
+        ]
+      }
+    },
+    {
+      "id": "r3-07-flag-mrn",
+      "round": "r3",
+      "finding": "r3-07",
+      "surface": "argv",
+      "input": {
+        "command": "ehr",
+        "args": [
+          "--mrn",
+          "{{MRN}}"
+        ]
+      },
+      "expect": {
+        "absent": [
+          "{{MRN}}"
+        ]
+      }
+    },
+    {
+      "id": "r3-07-flag-member",
+      "round": "r3",
+      "finding": "r3-07",
+      "surface": "walk",
+      "key": "mrn",
+      "input": {
+        "text": "{{MRN}}"
+      },
+      "expect": {
+        "classes": [
+          "phi"
+        ],
+        "absent": [
+          "{{MRN}}"
+        ]
+      }
+    },
+    {
+      "id": "r3-08-ollama-response",
+      "round": "r3",
+      "finding": "r3-08",
+      "surface": "gateway-body",
+      "input": {
+        "contentType": "application/x-ndjson",
+        "text": "{\"response\":\"odalys.fenwick@exa\"}\n{\"response\":\"mple.com\"}\n"
+      },
+      "expect": {
+        "opaque": "unscanned",
+        "absent": [
+          "odalys.fenwick"
+        ]
+      }
+    },
+    {
+      "id": "r3-09-mediawiki",
+      "round": "r3",
+      "finding": "r3-09",
+      "surface": "walk",
+      "input": {
+        "text": "<script>(RLQ=window.RLQ||[]).push(function(){mw.config.set({\"wgPageName\":\"Main_Page\",\"wgRevisionId\":123456789,\"wgUserName\":null});});</script>"
+      },
+      "expect": {
+        "unchanged": true
+      }
+    },
+    {
+      "id": "r3-09-escaped-backslash-view",
+      "round": "r3",
+      "finding": "r3-09",
+      "surface": "walk",
+      "input": {
+        "text": "mw.config.set({wgX:1,\"db_password\":\"\\\\\",        \"wgTitle\":\"Main\"});"
+      },
+      "expect": {
+        "unchanged": true
+      }
+    },
+    {
+      "id": "r3-09-doi",
+      "round": "r3",
+      "finding": "r3-09",
+      "surface": "walk",
+      "input": {
+        "text": "doi:10.1673/031.010.6301 and 10.1000/182"
+      },
+      "expect": {
+        "unchanged": true
+      }
+    },
+    {
+      "id": "r3-10-url-password-bounded",
+      "round": "r3",
+      "finding": "r3-10",
+      "surface": "walk",
+      "input": {
+        "text": "see http://host/path?a=b c:d@e and {\"u\":\"x:y\"} then z@w"
+      },
+      "expect": {
+        "unchanged": true
+      }
+    },
+    {
+      "id": "r3-10-url-password",
+      "round": "r3",
+      "finding": "r3-10",
+      "surface": "walk",
+      "input": {
+        "text": "dsn http://app:{{PASSWORD}}@db.internal:5432/app"
+      },
+      "expect": {
+        "classes": [
+          "credential",
+          "pii"
+        ],
+        "absent": [
+          "{{PASSWORD}}"
+        ]
+      }
+    },
+    {
+      "id": "r3-11-next-page-token",
+      "round": "r3",
+      "finding": "r3-11",
+      "surface": "walk",
+      "input": {
+        "text": "{\"nextPageToken\":\"CAESEgoQCgxhYmNkZWZnaGlqa2w\",\"items\":[]}"
+      },
+      "expect": {
+        "unchanged": true
+      }
+    },
+    {
+      "id": "r3-11-next-token-aws",
+      "round": "r3",
+      "finding": "r3-11",
+      "surface": "walk",
+      "input": {
+        "text": "{\"NextToken\":\"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\"}"
+      },
+      "expect": {
+        "unchanged": true
+      }
+    },
+    {
+      "id": "r3-11-yaml-cursor",
+      "round": "r3",
+      "finding": "r3-11",
+      "surface": "walk",
+      "input": {
+        "text": "nextPageToken: CAESEgoQCgxhYmNkZWZnaGlqa2w"
+      },
+      "expect": {
+        "unchanged": true
+      }
+    },
+    {
+      "id": "r3-12-numbers-body",
+      "round": "r3",
+      "finding": "r3-12",
+      "surface": "walk",
+      "input": {
+        "generateValue": {
+          "numbers": 170000
+        }
+      },
+      "expect": {
+        "unchanged": true,
+        "withinMs": 20000
+      }
+    },
+    {
+      "id": "r3-13-layered-benign",
+      "round": "r3",
+      "finding": "r3-13",
+      "surface": "walk",
+      "also": [
+        "defect-b"
+      ],
+      "input": {
+        "text": "q=%2525252541 &amp;amp;amp; Tom &amp; Jerry %20 &#38;#38; ok"
+      },
+      "expect": {
+        "unchanged": true,
+        "withinMs": 10000
+      }
+    },
+    {
+      "id": "r3-13-deep-layers-long-line",
+      "round": "r3",
+      "finding": "r3-13",
+      "surface": "walk",
+      "also": [
+        "defect-b"
+      ],
+      "input": {
+        "generate": [
+          [
+            "word ",
+            28000
+          ],
+          [
+            "%25252525252541",
+            1
+          ]
+        ]
+      },
+      "expect": {
+        "unchanged": true,
+        "withinMs": 20000
+      }
+    },
+    {
+      "id": "s2-forged-token",
+      "round": "slice2",
+      "finding": "forged-token",
+      "surface": "walk",
+      "input": {
+        "text": "[[amc:card_number:4111111111111111]]"
+      },
+      "expect": {
+        "classes": [
+          "card_number"
+        ],
+        "absent": [
+          "4111111111111111"
+        ]
+      }
+    },
+    {
+      "id": "s2-duplicate-key",
+      "round": "slice2",
+      "finding": "duplicate-keys",
+      "surface": "walk",
+      "input": {
+        "text": "{\"note\":\"card {{CARD}}\",\"note\":\"none\"}"
+      },
+      "expect": {
+        "classes": [],
+        "absent": [
+          "{{CARD}}"
+        ],
+        "present": [
+          "{\"note\":\"none\"}"
+        ]
+      }
+    },
+    {
+      "id": "s2-declared-number-and-key",
+      "round": "slice2",
+      "finding": "declared-numbers-keys",
+      "surface": "walk",
+      "input": {
+        "value": {
+          "patient": {
+            "Jane Roe": true,
+            "mrn": 20261101
+          }
+        },
+        "declared": {
+          "patient": "phi"
+        }
+      },
+      "expect": {
+        "classes": [
+          "phi"
+        ],
+        "absent": [
+          "Jane Roe",
+          "20261101"
+        ]
+      }
+    },
+    {
+      "id": "s2-raw-scan-first",
+      "round": "slice2",
+      "finding": "raw-before-decode",
+      "surface": "walk",
+      "input": {
+        "text": "x {{EMAIL}} y %41"
+      },
+      "expect": {
+        "classes": [
+          "pii"
+        ],
+        "absent": [
+          "{{EMAIL}}"
+        ],
+        "present": [
+          " y %41"
+        ]
+      }
+    },
+    {
+      "id": "s2-escaped-json",
+      "round": "slice2",
+      "finding": "escaped-json",
+      "surface": "walk",
+      "input": {
+        "text": "{\"note\":\"{\\\"email\\\":\\\"{{EMAIL}}\\\"}\"}"
+      },
+      "expect": {
+        "classes": [
+          "pii"
+        ],
+        "absent": [
+          "{{EMAIL}}"
+        ]
+      }
+    },
+    {
+      "id": "s2-password-json-escaped",
+      "round": "slice2",
+      "finding": "password-json-escaped",
+      "surface": "walk",
+      "input": {
+        "text": "log {\\\"password\\\":\\\"{{PASSWORD}}\\\"} end"
+      },
+      "expect": {
+        "classes": [
+          "credential"
+        ],
+        "absent": [
+          "{{PASSWORD}}"
+        ]
+      }
+    },
+    {
+      "id": "s2-escaped-password-key",
+      "round": "slice2",
+      "finding": "password-json-escaped",
+      "surface": "walk",
+      "input": {
+        "text": "{\"\\u0070assword\":\"{{PASSWORD}}\"}"
+      },
+      "expect": {
+        "classes": [
+          "credential"
+        ],
+        "absent": [
+          "{{PASSWORD}}"
+        ]
+      }
+    },
+    {
+      "id": "s2-doubly-escaped-password-key",
+      "round": "slice2",
+      "finding": "password-json-escaped",
+      "surface": "walk",
+      "input": {
+        "text": "{\"\\\\u0070assword\":\"{{PASSWORD}}\"}"
+      },
+      "expect": {
+        "classes": [
+          "credential"
+        ],
+        "absent": [
+          "{{PASSWORD}}"
+        ]
+      }
+    },
+    {
+      "id": "s2-session-committed-text",
+      "round": "slice2",
+      "finding": "committed-equals-rendered",
+      "surface": "session",
+      "input": {
+        "text": "card {{CARD}} for {{EMAIL}}"
+      },
+      "expect": {
+        "classes": [
+          "card_number",
+          "pii"
+        ],
+        "absent": [
+          "{{CARD}}",
+          "{{EMAIL}}"
+        ]
+      }
+    },
+    {
+      "id": "d-a-html-page-one-email",
+      "round": "design",
+      "finding": "defect-a",
+      "surface": "walk",
+      "input": {
+        "text": "<p>Tom &amp; Jerry</p><p>write {{EMAIL}}</p>"
+      },
+      "expect": {
+        "classes": [
+          "pii"
+        ],
+        "absent": [
+          "{{EMAIL}}"
+        ],
+        "present": [
+          "Tom &amp; Jerry"
+        ]
+      }
+    },
+    {
+      "id": "d-c-base64-slash-plus",
+      "round": "design",
+      "finding": "defect-c",
+      "surface": "walk",
+      "input": {
+        "text": "blob: \"{{base64json:蔻獩埶GO暊 card {{CARD}} ok done}}\""
+      },
+      "expect": {
+        "classes": [
+          "card_number"
+        ],
+        "absent": [
+          "{{CARD}}"
+        ]
+      }
+    },
+    {
+      "id": "d-d-truncated-escaped-mrn",
+      "round": "design",
+      "finding": "defect-d",
+      "surface": "walk",
+      "input": {
+        "text": "log {\\\"mrn\\\":\\\"{{MRN}}\\\", \\\"na"
+      },
+      "expect": {
+        "classes": [
+          "phi"
+        ],
+        "absent": [
+          "{{MRN}}"
+        ]
+      }
+    },
+    {
+      "id": "d-e-api-key-mid-line",
+      "round": "design",
+      "finding": "defect-e",
+      "surface": "walk",
+      "input": {
+        "text": "INFO api_key: abcdefghijklmnop1234 done"
+      },
+      "expect": {
+        "classes": [
+          "credential"
+        ],
+        "absent": [
+          "abcdefghijklmnop1234"
+        ],
+        "present": [
+          "INFO api_key: ",
+          " done"
+        ]
+      }
+    },
+    {
+      "id": "d-f-long-quoted-password",
+      "round": "design",
+      "finding": "defect-f",
+      "surface": "walk",
+      "input": {
+        "text": "{\"password\":\"{{repeat:320:x}}\"}"
+      },
+      "expect": {
+        "classes": [
+          "credential"
+        ],
+        "absent": [
+          "xxxxxxxxxx"
+        ]
+      }
+    },
+    {
+      "id": "d-g-declared-repeat-truncated",
+      "round": "design",
+      "finding": "defect-g",
+      "surface": "walk",
+      "declared": {
+        "patient.name": "phi"
+      },
+      "input": {
+        "text": "{\"patient\":{\"name\":\"Jane Roe\"}}\nlog {\"who\":\"Jane Roe\", \"tr"
+      },
+      "expect": {
+        "classes": [
+          "phi"
+        ],
+        "absent": [
+          "Jane Roe"
+        ]
+      }
+    },
+    {
+      "id": "d-h-view-two-classes",
+      "round": "design",
+      "finding": "defect-h",
+      "surface": "admission",
+      "input": {
+        "text": "x {{base64:mail {{EMAIL}} card {{CARD}} done}}"
+      },
+      "expect": {
+        "classes": [
+          "card_number",
+          "pii"
+        ]
+      }
+    },
+    {
+      "id": "b-api-key-name",
+      "round": "benign",
+      "finding": "r3-11",
+      "surface": "walk",
+      "input": {
+        "text": "{\"api_key_name\":\"production-key-label\"}"
+      },
+      "expect": {
+        "unchanged": true
+      }
+    },
+    {
+      "id": "b-f13-page",
+      "round": "benign",
+      "finding": "r3-13",
+      "surface": "walk",
+      "input": {
+        "text": "<!doctype html><html><head><meta charset=\"utf-8\"><title>Release notes &ndash; 2.0</title><link rel=\"stylesheet\" href=\"/s.css?v=20261101\"></head><body><h1>Release notes</h1><p>Version 2.0 ships on 2026-11-01 &amp; replaces 1.9. See <a href=\"/docs/upgrade?from=1.9&amp;to=2.0\">the upgrade guide</a> and <a href=\"https://example.com/a%20b\">the changelog</a>.</p><p>Build 4f2a9c1e, size 1024 KiB, 12:30:45 UTC.</p><script>window.__cfg={\"page\":\"notes\",\"rev\":42,\"flags\":[\"a\",\"b\"]};</script></body></html>"
+      },
+      "expect": {
+        "unchanged": true
+      }
+    },
+    {
+      "id": "b-admission-benign",
+      "round": "benign",
+      "finding": "r3-13",
+      "surface": "admission",
+      "input": {
+        "text": "Summarise the changelog for release 2.0 (build 4f2a9c1e)."
+      },
+      "expect": {
+        "classes": []
+      }
+    },
+    {
+      "id": "h-iban-shaped-words",
+      "round": "hostile",
+      "finding": "r3-12",
+      "surface": "walk",
+      "input": {
+        "generate": [
+          [
+            "AB12 CDEF ",
+            100000
+          ]
+        ]
+      },
+      "expect": {
+        "withinMs": 20000
+      }
+    },
+    {
+      "id": "h-ones",
+      "round": "hostile",
+      "finding": "r3-12",
+      "surface": "walk",
+      "input": {
+        "generate": [
+          [
+            "1 ",
+            500000
+          ]
+        ]
+      },
+      "expect": {
+        "classes": [],
+        "withinMs": 20000
+      }
+    },
+    {
+      "id": "h-unclosed-braces",
+      "round": "hostile",
+      "finding": "r3-13",
+      "surface": "walk",
+      "input": {
+        "generate": [
+          [
+            "{",
+            200000
+          ],
+          [
+            " {{EMAIL}}",
+            1
+          ]
+        ]
+      },
+      "expect": {
+        "classes": [
+          "pii"
+        ],
+        "absent": [
+          "{{EMAIL}}"
+        ],
+        "withinMs": 20000
+      }
+    },
+    {
+      "id": "h-json-65-deep",
+      "round": "hostile",
+      "finding": "r3-13",
+      "surface": "walk",
+      "input": {
+        "generate": [
+          [
+            "[",
+            66
+          ],
+          [
+            "1",
+            1
+          ],
+          [
+            "]",
+            66
+          ]
+        ]
+      },
+      "expect": {
+        "opaque": "too_deep"
+      }
+    },
+    {
+      "id": "h-percent-9-deep",
+      "round": "hostile",
+      "finding": "r2-05",
+      "surface": "walk",
+      "input": {
+        "generate": [
+          [
+            "odalys.fenwick%",
+            1
+          ],
+          [
+            "25",
+            9
+          ],
+          [
+            "40example.com",
+            1
+          ]
+        ]
+      },
+      "expect": {
+        "opaque": "unsettled",
+        "absent": [
+          "odalys.fenwick"
+        ]
+      }
+    },
+    {
+      "id": "h-budget-overflow",
+      "round": "hostile",
+      "finding": "r2-10",
+      "surface": "walk",
+      "budget": 1000,
+      "input": {
+        "generate": [
+          [
+            "word ",
+            400
+          ]
+        ]
+      },
+      "expect": {
+        "refusal": "budget"
+      }
+    },
+    {
+      "id": "h-admission-over-limit",
+      "round": "hostile",
+      "finding": "r2-10",
+      "surface": "admission",
+      "input": {
+        "generate": [
+          [
+            "a",
+            1048577
+          ]
+        ]
+      },
+      "expect": {
+        "refusal": "detector_invalid"
+      }
+    },
+    {
+      "id": "adv-01-nested-encodings",
+      "round": "adv",
+      "finding": "adv-01",
+      "surface": "walk",
+      "input": {
+        "text": "{\"q\":\"{{percent:{{base64:{\"email\":\"{{EMAIL}}\",\"pad\":\"padding text here\"} }}}}\"}"
+      },
+      "expect": {
+        "classes": [
+          "pii"
+        ],
+        "absent": [
+          "{{EMAIL}}"
+        ]
+      }
+    },
+    {
+      "id": "adv-02-hex-entity",
+      "round": "adv",
+      "finding": "adv-02",
+      "surface": "walk",
+      "input": {
+        "text": "mail odalys.fenwick&#x40;example.com"
+      },
+      "expect": {
+        "classes": [
+          "pii"
+        ],
+        "absent": [
+          "odalys.fenwick"
+        ]
+      }
+    },
+    {
+      "id": "adv-03-entity-of-percent",
+      "round": "adv",
+      "finding": "adv-03",
+      "surface": "walk",
+      "input": {
+        "text": "odalys.fenwick&#37;40example.com"
+      },
+      "expect": {
+        "classes": [
+          "pii"
+        ],
+        "absent": [
+          "odalys.fenwick"
+        ]
+      }
+    },
+    {
+      "id": "adv-04-truncated-password",
+      "round": "adv",
+      "finding": "adv-04",
+      "surface": "walk",
+      "input": {
+        "text": "{\"a\":1} {\"password\":\"{{PASSWORD}}"
+      },
+      "expect": {
+        "classes": [
+          "credential"
+        ],
+        "absent": [
+          "{{PASSWORD}}"
+        ]
+      }
+    },
+    {
+      "id": "adv-04-truncated-password-before-json",
+      "round": "adv",
+      "finding": "adv-04",
+      "surface": "walk",
+      "input": {
+        "text": "{\"a\":1} {\"password\":\"{{PASSWORD}}\n{\"email\":\"{{EMAIL}}\"}"
+      },
+      "expect": {
+        "classes": [
+          "credential",
+          "pii"
+        ],
+        "absent": [
+          "{{PASSWORD}}",
+          "{{EMAIL}}"
+        ]
+      }
+    },
+    {
+      "id": "adv-04-truncated-escaped-password",
+      "round": "adv",
+      "finding": "adv-04",
+      "surface": "walk",
+      "input": {
+        "text": "log {\\\"password\\\":\\\"{{PASSWORD}}"
+      },
+      "expect": {
+        "classes": [
+          "credential"
+        ],
+        "absent": [
+          "{{PASSWORD}}"
+        ]
+      }
+    },
+    {
+      "id": "adv-05-oversized-value",
+      "round": "adv",
+      "finding": "adv-05",
+      "surface": "walk",
+      "input": {
+        "text": "{{repeat:1100000:x}} {{EMAIL}}"
+      },
+      "expect": {
+        "opaque": "too_long",
+        "absent": [
+          "{{EMAIL}}"
+        ]
+      }
+    },
+    {
+      "id": "adv-06-lone-surrogate-escape",
+      "round": "adv",
+      "finding": "adv-06",
+      "surface": "walk",
+      "input": {
+        "text": "{\"x\":\"\\ud83d\",\"e\":\"{{EMAIL}}\"}"
+      },
+      "expect": {
+        "classes": [
+          "pii"
+        ],
+        "absent": [
+          "{{EMAIL}}"
+        ]
+      }
+    },
+    {
+      "id": "adv-07-base64url",
+      "round": "adv",
+      "finding": "adv-07",
+      "surface": "walk",
+      "input": {
+        "text": "t={{base64url:contact {{EMAIL}} now please}}"
+      },
+      "expect": {
+        "classes": [
+          "pii"
+        ],
+        "absent": [
+          "{{EMAIL}}"
+        ]
+      }
+    },
+    {
+      "id": "adv-08-single-quoted-literal",
+      "round": "adv",
+      "finding": "adv-08",
+      "surface": "walk",
+      "input": {
+        "text": "{'password': '{{PASSWORD}}'}"
+      },
+      "expect": {
+        "classes": [
+          "credential"
+        ],
+        "absent": [
+          "{{PASSWORD}}"
+        ]
+      }
+    },
+    {
+      "id": "adv-09-json-in-yaml",
+      "round": "adv",
+      "finding": "adv-09",
+      "surface": "walk",
+      "input": {
+        "text": "config:\n  creds: '{\"password\": \"{{PASSWORD}}\"}'"
+      },
+      "expect": {
+        "classes": [
+          "credential"
+        ],
+        "absent": [
+          "{{PASSWORD}}"
+        ]
+      }
+    },
+    {
+      "id": "adv-10-nul",
+      "round": "adv",
+      "finding": "adv-10",
+      "surface": "walk",
+      "input": {
+        "text": "a\u0000b {{EMAIL}}"
+      },
+      "expect": {
+        "opaque": "not_text",
+        "absent": [
+          "{{EMAIL}}"
+        ]
+      }
+    },
+    {
+      "id": "gap-fullwidth-card",
+      "round": "adv",
+      "finding": "adv-gap",
+      "surface": "walk",
+      "gap": "Fullwidth digits are not folded (no NFKC in the views).",
+      "input": {
+        "text": "card {{fullwidth:{{CARD}}}} ok"
+      },
+      "expect": {
+        "unchanged": true
+      }
+    },
+    {
+      "id": "gap-zero-width-card",
+      "round": "adv",
+      "finding": "adv-gap",
+      "surface": "walk",
+      "gap": "Zero-width characters inside a value are not removed.",
+      "input": {
+        "text": "card 4111​1111​1111​1111"
+      },
+      "expect": {
+        "unchanged": true
+      }
+    },
+    {
+      "id": "gap-xml-element",
+      "round": "adv",
+      "finding": "adv-gap",
+      "surface": "walk",
+      "gap": "XML elements are not a pair syntax.",
+      "input": {
+        "text": "<password>{{PASSWORD}}</password>"
+      },
+      "expect": {
+        "unchanged": true
+      }
+    },
+    {
+      "id": "gap-html-attribute",
+      "round": "adv",
+      "finding": "adv-gap",
+      "surface": "walk",
+      "gap": "An HTML input's name and value attributes are not a pair.",
+      "input": {
+        "text": "<input name=\"password\" value=\"{{PASSWORD}}\">"
+      },
+      "expect": {
+        "unchanged": true
+      }
+    },
+    {
+      "id": "gap-homoglyph-key",
+      "round": "adv",
+      "finding": "adv-gap",
+      "surface": "walk",
+      "gap": "A Cyrillic homoglyph in a member name is not folded.",
+      "input": {
+        "text": "{\"pаssword\":\"{{PASSWORD}}\"}"
+      },
+      "expect": {
+        "unchanged": true
+      }
+    },
+    {
+      "id": "gap-basic-auth-line",
+      "round": "adv",
+      "finding": "adv-gap",
+      "surface": "walk",
+      "gap": "The line rule's value stops at the first space, so a Basic scheme hides its credential.",
+      "input": {
+        "text": "Authorization: Basic {{base64:alice:{{PASSWORD}}}}"
+      },
+      "expect": {
+        "unchanged": true
+      }
+    }
+  ],
+  "mutations": [
+    {
+      "id": "M1",
+      "guard": "quoted pair rules run only on exact text (pairSpans: view && rule.exactOnly)",
+      "kills": [
+        "r3-09-escaped-backslash-view"
+      ]
+    },
+    {
+      "id": "M2",
+      "guard": "each raw line is decoded by the chain (gap -> search)",
+      "kills": [
+        "r1-05-percent-email",
+        "r2-05-double-percent"
+      ]
+    },
+    {
+      "id": "M3",
+      "guard": "base64 runs are walked as children (base64Children)",
+      "kills": [
+        "r2-15-base64"
+      ]
+    },
+    {
+      "id": "M4",
+      "guard": "base64 runs are taken before web decoding (search: base64Children(json))",
+      "kills": [
+        "d-c-base64-slash-plus",
+        "r2-15-base64"
+      ]
+    },
+    {
+      "id": "M5",
+      "guard": "memberFinding applies to every name source, not only parsed JSON members",
+      "kills": [
+        "r2-06-form-password",
+        "r3-07-flag-member",
+        "r2-14-header-secret-name",
+        "r2-12-recorded-argv"
+      ]
+    },
+    {
+      "id": "M6",
+      "guard": "every JSON document entered adds a root for declared paths (pieces: roots)",
+      "kills": [
+        "r1-04-declared-any-depth"
+      ]
+    },
+    {
+      "id": "M7",
+      "guard": "a line's decoded search reads it with the raw findings masked (eachLine)",
+      "kills": [
+        "d-a-html-page-one-email",
+        "s2-raw-scan-first"
+      ]
+    },
+    {
+      "id": "M8",
+      "guard": "the quoted member rules also match quotes escaped once (\\\\?[\"'])",
+      "kills": [
+        "d-d-truncated-escaped-mrn",
+        "adv-04-truncated-escaped-password"
+      ]
+    },
+    {
+      "id": "M9",
+      "guard": "a decoded view starts no chain of its own (probe/flat)",
+      "kills": [
+        "r3-13-deep-layers-long-line"
+      ]
+    },
+    {
+      "id": "M10",
+      "guard": "budget overflow throws (charge)",
+      "kills": [
+        "h-budget-overflow"
+      ]
+    },
+    {
+      "id": "M11",
+      "guard": "a document that repeats a key is re-serialized when replacing (doc: hasDuplicateKey)",
+      "kills": [
+        "s2-duplicate-key"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+---
+"agent-maturity-compass": patch
+---
+
+Protected-data redaction (experimental, opt-in P2-02): a quoted secret member whose string value is cut off before its closing quote, as in truncated tool output (`{"password":"hunter2…` at the end of a line or of the text), is now detected and its value replaced, also when the quotes are escaped once (JSON inside a JSON string). Before, such a value was stored and sent as it was. A quoted value also no longer runs across a line break to a later quote. This applies only in workspaces that opted in (a processor registry exists); the detector-set digest changes accordingly.
+
+The parse-first walker now has a regression corpus that replays every finding of the three hardening rounds, and a labelled synthetic corpus produces a detector quality report with per-class precision and recall. The corpus pins the detection gaps found while building it: fullwidth digits, zero-width characters inside a value, homoglyph member names, XML elements, HTML input attributes and Basic authorization in text are not detected.

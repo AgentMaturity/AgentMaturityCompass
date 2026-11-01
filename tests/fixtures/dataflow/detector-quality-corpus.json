@@ -1,0 +1,508 @@
+{
+  "schema": "amc.test.detector-quality-corpus/v1",
+  "note": "Synthetic labelled corpus for the P2-02 detector quality report: published test card numbers, example.com addresses, invented identifiers. `planted` lists every protected value in a sample; a sample with none is a negative.",
+  "requiredRecall": {
+    "card": 1,
+    "ssn": 1,
+    "mrn": 1
+  },
+  "samples": [
+    {
+      "id": "card-plain-0",
+      "text": "Please charge 4111111111111111 for invoice 2026-100.",
+      "planted": [
+        {
+          "value": "4111111111111111",
+          "dataClass": "card_number",
+          "kind": "card"
+        }
+      ]
+    },
+    {
+      "id": "card-plain-1",
+      "text": "Please charge 4012888888881881 for invoice 2026-101.",
+      "planted": [
+        {
+          "value": "4012888888881881",
+          "dataClass": "card_number",
+          "kind": "card"
+        }
+      ]
+    },
+    {
+      "id": "card-plain-2",
+      "text": "Please charge 5555555555554444 for invoice 2026-102.",
+      "planted": [
+        {
+          "value": "5555555555554444",
+          "dataClass": "card_number",
+          "kind": "card"
+        }
+      ]
+    },
+    {
+      "id": "card-plain-3",
+      "text": "Please charge 5105105105105100 for invoice 2026-103.",
+      "planted": [
+        {
+          "value": "5105105105105100",
+          "dataClass": "card_number",
+          "kind": "card"
+        }
+      ]
+    },
+    {
+      "id": "card-plain-4",
+      "text": "Please charge 378282246310005 for invoice 2026-104.",
+      "planted": [
+        {
+          "value": "378282246310005",
+          "dataClass": "card_number",
+          "kind": "card"
+        }
+      ]
+    },
+    {
+      "id": "card-plain-5",
+      "text": "Please charge 6011111111111117 for invoice 2026-105.",
+      "planted": [
+        {
+          "value": "6011111111111117",
+          "dataClass": "card_number",
+          "kind": "card"
+        }
+      ]
+    },
+    {
+      "id": "card-plain-6",
+      "text": "Please charge 3530111333300000 for invoice 2026-106.",
+      "planted": [
+        {
+          "value": "3530111333300000",
+          "dataClass": "card_number",
+          "kind": "card"
+        }
+      ]
+    },
+    {
+      "id": "card-spaced",
+      "text": "Card: 4111 1111 1111 1111, exp 12/29",
+      "planted": [
+        {
+          "value": "4111 1111 1111 1111",
+          "dataClass": "card_number",
+          "kind": "card"
+        }
+      ]
+    },
+    {
+      "id": "card-dashed",
+      "text": "card=5555-5555-5555-4444&cvv=***",
+      "planted": [
+        {
+          "value": "5555-5555-5555-4444",
+          "dataClass": "card_number",
+          "kind": "card"
+        }
+      ]
+    },
+    {
+      "id": "card-json-string",
+      "text": "{\"payment\":{\"pan\":\"378282246310005\",\"brand\":\"amex\"}}",
+      "planted": [
+        {
+          "value": "378282246310005",
+          "dataClass": "card_number",
+          "kind": "card"
+        }
+      ]
+    },
+    {
+      "id": "card-json-number",
+      "text": "{\"payment\":{\"pan\":6011111111111117}}",
+      "planted": [
+        {
+          "value": "6011111111111117",
+          "dataClass": "card_number",
+          "kind": "card"
+        }
+      ]
+    },
+    {
+      "id": "card-percent",
+      "text": "q=pan%3D4012888888881881%26x%3D1",
+      "planted": [
+        {
+          "value": "4012888888881881",
+          "dataClass": "card_number",
+          "kind": "card"
+        }
+      ]
+    },
+    {
+      "id": "card-base64",
+      "text": "attachment Q3VzdG9tZXIgY2FyZCA0MTExMTExMTExMTExMTExIG9uIGZpbGUu",
+      "planted": [
+        {
+          "value": "Q3VzdG9tZXIgY2FyZCA0MTExMTExMTExMTExMTExIG9uIGZpbGUu",
+          "dataClass": "card_number",
+          "kind": "card"
+        }
+      ]
+    },
+    {
+      "id": "ssn-0",
+      "text": "Applicant SSN 219-09-9999, filed 2026-10-01.",
+      "planted": [
+        {
+          "value": "219-09-9999",
+          "dataClass": "pii",
+          "kind": "ssn"
+        }
+      ]
+    },
+    {
+      "id": "ssn-1",
+      "text": "Applicant SSN 078-05-1120, filed 2026-10-02.",
+      "planted": [
+        {
+          "value": "078-05-1120",
+          "dataClass": "pii",
+          "kind": "ssn"
+        }
+      ]
+    },
+    {
+      "id": "ssn-2",
+      "text": "Applicant SSN 123-45-6789, filed 2026-10-03.",
+      "planted": [
+        {
+          "value": "123-45-6789",
+          "dataClass": "pii",
+          "kind": "ssn"
+        }
+      ]
+    },
+    {
+      "id": "ssn-3",
+      "text": "Applicant SSN 457-55-5462, filed 2026-10-04.",
+      "planted": [
+        {
+          "value": "457-55-5462",
+          "dataClass": "pii",
+          "kind": "ssn"
+        }
+      ]
+    },
+    {
+      "id": "ssn-json",
+      "text": "{\"applicant\":{\"ssn\":\"219-09-9999\"}}",
+      "planted": [
+        {
+          "value": "219-09-9999",
+          "dataClass": "pii",
+          "kind": "ssn"
+        }
+      ]
+    },
+    {
+      "id": "ssn-html",
+      "text": "<td>SSN</td><td>078&#45;05&#45;1120</td>",
+      "planted": [
+        {
+          "value": "078&#45;05&#45;1120",
+          "dataClass": "pii",
+          "kind": "ssn"
+        }
+      ]
+    },
+    {
+      "id": "mrn-0",
+      "text": "Discharge note. MRN: A7781234. Follow up in 2 weeks.",
+      "planted": [
+        {
+          "value": "A7781234",
+          "dataClass": "phi",
+          "kind": "mrn"
+        }
+      ]
+    },
+    {
+      "id": "mrn-1",
+      "text": "Discharge note. MRN A1234567. Follow up in 2 weeks.",
+      "planted": [
+        {
+          "value": "A1234567",
+          "dataClass": "phi",
+          "kind": "mrn"
+        }
+      ]
+    },
+    {
+      "id": "mrn-2",
+      "text": "Discharge note. medical record number 77881234. Follow up in 2 weeks.",
+      "planted": [
+        {
+          "value": "77881234",
+          "dataClass": "phi",
+          "kind": "mrn"
+        }
+      ]
+    },
+    {
+      "id": "mrn-3",
+      "text": "Discharge note. Medical Record ID: RX551234. Follow up in 2 weeks.",
+      "planted": [
+        {
+          "value": "RX551234",
+          "dataClass": "phi",
+          "kind": "mrn"
+        }
+      ]
+    },
+    {
+      "id": "mrn-4",
+      "text": "Discharge note. health record number HR-0042117. Follow up in 2 weeks.",
+      "planted": [
+        {
+          "value": "HR-0042117",
+          "dataClass": "phi",
+          "kind": "mrn"
+        }
+      ]
+    },
+    {
+      "id": "mrn-5",
+      "text": "Discharge note. NHS number 943 476 5919. Follow up in 2 weeks.",
+      "planted": [
+        {
+          "value": "943 476 5919",
+          "dataClass": "phi",
+          "kind": "mrn"
+        }
+      ]
+    },
+    {
+      "id": "mrn-json-member",
+      "text": "{\"patient\":{\"medicalRecordNumber\":\"A7781234\",\"ward\":4}}",
+      "planted": [
+        {
+          "value": "A7781234",
+          "dataClass": "phi",
+          "kind": "mrn"
+        }
+      ]
+    },
+    {
+      "id": "mrn-escaped",
+      "text": "log {\\\"mrn\\\":\\\"A1234567\\\", \\\"ward\\\": 4}",
+      "planted": [
+        {
+          "value": "A1234567",
+          "dataClass": "phi",
+          "kind": "mrn"
+        }
+      ]
+    },
+    {
+      "id": "email-0",
+      "text": "Contact odalys.fenwick@example.com today.",
+      "planted": [
+        {
+          "value": "odalys.fenwick@example.com",
+          "dataClass": "pii",
+          "kind": "email"
+        }
+      ]
+    },
+    {
+      "id": "email-1",
+      "text": "cc: quill.marrow+billing@example.org",
+      "planted": [
+        {
+          "value": "quill.marrow+billing@example.org",
+          "dataClass": "pii",
+          "kind": "email"
+        }
+      ]
+    },
+    {
+      "id": "phone-0",
+      "text": "Call +14155552671 after 5pm.",
+      "planted": [
+        {
+          "value": "+14155552671",
+          "dataClass": "pii",
+          "kind": "phone"
+        }
+      ]
+    },
+    {
+      "id": "phone-1",
+      "text": "Phone: (415) 555-2671",
+      "planted": [
+        {
+          "value": "(415) 555-2671",
+          "dataClass": "pii",
+          "kind": "phone"
+        }
+      ]
+    },
+    {
+      "id": "iban-0",
+      "text": "Pay to GB82 WEST 1234 5698 7654 32 by Friday.",
+      "planted": [
+        {
+          "value": "GB82 WEST 1234 5698 7654 32",
+          "dataClass": "bank_account",
+          "kind": "iban"
+        }
+      ]
+    },
+    {
+      "id": "iban-1",
+      "text": "IBAN DE89370400440532013000",
+      "planted": [
+        {
+          "value": "DE89370400440532013000",
+          "dataClass": "bank_account",
+          "kind": "iban"
+        }
+      ]
+    },
+    {
+      "id": "password-json",
+      "text": "{\"user\":\"bob\",\"password\":\"hunter2-fixture\"}",
+      "planted": [
+        {
+          "value": "hunter2-fixture",
+          "dataClass": "credential",
+          "kind": "password"
+        }
+      ]
+    },
+    {
+      "id": "password-form",
+      "text": "user=bob&password=hunter2-fixture&remember=1",
+      "planted": [
+        {
+          "value": "hunter2-fixture",
+          "dataClass": "credential",
+          "kind": "password"
+        }
+      ]
+    },
+    {
+      "id": "password-env",
+      "text": "DB_PASSWORD=correct-horse-fixture",
+      "planted": [
+        {
+          "value": "correct-horse-fixture",
+          "dataClass": "credential",
+          "kind": "password"
+        }
+      ]
+    },
+    {
+      "id": "miss-name",
+      "text": "Jane Roe was admitted on Tuesday.",
+      "planted": [
+        {
+          "value": "Jane Roe",
+          "dataClass": "pii",
+          "kind": "name"
+        }
+      ]
+    },
+    {
+      "id": "miss-fullwidth-card",
+      "text": "card ４１１１１１１１１１１１１１１１ on file",
+      "planted": [
+        {
+          "value": "４１１１１１１１１１１１１１１１",
+          "dataClass": "card_number",
+          "kind": "card_obfuscated"
+        }
+      ]
+    },
+    {
+      "id": "miss-xml-password",
+      "text": "<password>hunter2-fixture</password>",
+      "planted": [
+        {
+          "value": "hunter2-fixture",
+          "dataClass": "credential",
+          "kind": "password_xml"
+        }
+      ]
+    },
+    {
+      "id": "neg-timestamps",
+      "text": "Started 1730419200, finished 1730419260123 (epoch ms), took 60s at 12:30:45.",
+      "planted": []
+    },
+    {
+      "id": "neg-versions",
+      "text": "Upgraded node 22.11.0 -> 22.23.3; schema 2026.10.31; build 4f2a9c1e.",
+      "planted": []
+    },
+    {
+      "id": "neg-doi",
+      "text": "See doi:10.1673/031.010.6301 and 10.1000/182 for details.",
+      "planted": []
+    },
+    {
+      "id": "neg-uuid-sha",
+      "text": "run 0b3f6f0e-6c7a-4f50-9d4e-6f1d2c9a7b11 at commit 63dfa3e15a9c0d1e2f3a4b5c6d7e8f90a1b2c3d4",
+      "planted": []
+    },
+    {
+      "id": "neg-prices",
+      "text": "Total $1,234.56 for 12 items; order 100045, SKU 4111-AB.",
+      "planted": []
+    },
+    {
+      "id": "neg-cursor",
+      "text": "{\"nextPageToken\":\"CAESEgoQCgxhYmNkZWZnaGlqa2w\",\"items\":[]}",
+      "planted": []
+    },
+    {
+      "id": "neg-api-key-name",
+      "text": "{\"api_key_name\":\"production-key-label\",\"token_count\":1234}",
+      "planted": []
+    },
+    {
+      "id": "neg-mediawiki",
+      "text": "<script>(RLQ=window.RLQ||[]).push(function(){mw.config.set({\"wgPageName\":\"Main_Page\",\"wgRevisionId\":123456789});});</script>",
+      "planted": []
+    },
+    {
+      "id": "neg-dates",
+      "text": "Admitted 2026-10-31, discharged 31/10/2026, review on 11-07-2026.",
+      "planted": []
+    },
+    {
+      "id": "neg-counters",
+      "text": "processed 2147483647 rows, 4294967295 bytes, 9007199254740991 ops",
+      "planted": []
+    },
+    {
+      "id": "neg-luhn-invalid",
+      "text": "Reference 4111111111111112 is not a card.",
+      "planted": []
+    },
+    {
+      "id": "neg-prose",
+      "text": "The patient record was reviewed by the medical team and no record number was given.",
+      "planted": []
+    }
+  ],
+  "notCovered": [
+    "Names, addresses and other free-text identifiers outside declared fields.",
+    "Values split across JSON fields, lines or stream chunks that are not joined.",
+    "Fullwidth or other non-ASCII digits, zero-width characters inside a value, and homoglyph member names.",
+    "XML elements, HTML input attributes and Basic authorization schemes as name and value pairs.",
+    "Base64 that decodes to binary (images, audio, PDFs).",
+    "Clinical meaning: a keyword-bound MRN pattern is not a clinical record check."
+  ]
+}
