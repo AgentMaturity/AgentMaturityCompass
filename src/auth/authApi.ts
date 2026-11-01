@@ -6,6 +6,7 @@ import YAML from "yaml";
 import { getSigningKey, signHexDigest } from "../crypto/keys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
+import { isA4CommentScopeRoute } from "../studio/nativeAdmission.js";
 import { parseCookieHeader, issueSessionToken, issueSessionTokenAsync, verifySessionToken, type SessionPayload } from "./sessionTokens.js";
 import { hashPassword, verifyPassword } from "./passwordHash.js";
 import { createUserRecord, usersFileSchema, type UserRecord, type UsersFile } from "./userSchema.js";
@@ -468,6 +469,7 @@ export function createTrackedSession(params: {
   roles: UserRole[];
   ttlMs?: number;
   authSource: "LOCAL_USER" | "WORKSPACE_ROUTER";
+  scope?: SessionPayload["scope"];
 }): { token: string; payload: SessionPayload } {
   return storeTrackedSession(params, issueSessionToken(params));
 }
@@ -521,9 +523,9 @@ export function createSession(params: {
 }
 
 /** Runtime local-login counterpart of the synchronous compatibility API. */
-export async function createSessionAsync(params: Parameters<typeof createSession>[0]): Promise<ReturnType<typeof createSession>> {
+export async function createSessionAsync(params: Parameters<typeof createSession>[0] & { scope?: SessionPayload["scope"] }): Promise<ReturnType<typeof createSession>> {
   return createTrackedSessionAsync({ workspace: params.workspace, userId: params.user.userId, username: params.user.username,
-    roles: params.user.roles, ttlMs: params.ttlMs, authSource: "LOCAL_USER" });
+    roles: params.user.roles, ttlMs: params.ttlMs, authSource: "LOCAL_USER", scope: params.scope });
 }
 
 export function revokeSessionByToken(params: {
@@ -576,6 +578,8 @@ export function revokeSessionByToken(params: {
 export function verifyTrackedSessionToken(params: {
   workspace: string;
   token: string;
+  /** The one narrowed scope this caller admits; a scoped token is refused everywhere else (fail closed). */
+  acceptScope?: SessionPayload["scope"];
 }): {
   ok: boolean;
   payload: SessionPayload | null;
@@ -589,6 +593,9 @@ export function verifyTrackedSessionToken(params: {
   });
   if (!verified.ok || !verified.payload) {
     return verified;
+  }
+  if (verified.payload.scope !== undefined && verified.payload.scope !== params.acceptScope) {
+    return { ok: false, payload: null, error: "session scope not accepted here" };
   }
 
   const dir = sessionsDir(params.workspace);
@@ -673,7 +680,10 @@ export function sessionFromRequest(params: {
       error: "missing session cookie"
     };
   }
-  return verifyTrackedSessionToken({ workspace: params.workspace, token });
+  // An a4_comment credential reaches only the A4 reads and the comment route (P1-64 follow-up).
+  const { pathname } = new URL(params.req.url ?? "/", "http://studio.invalid");
+  return verifyTrackedSessionToken({ workspace: params.workspace, token,
+    acceptScope: isA4CommentScopeRoute(pathname, params.req.method ?? "GET") ? "a4_comment" : undefined });
 }
 
 export function clearSessionCookie(res: ServerResponse, path = "/", secure = false): void {

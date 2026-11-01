@@ -727,13 +727,13 @@ function createStore(workspace: string, ledger: Ledger, trust?: TrustContext, mi
      * is written inside the build, so a missing project, a vault that cannot sign or a request replay writes none.
      * ponytail: a blob whose transition then fails stays as an unreferenced file.
      */
-    addComment(projectId: string, input: { actor: A4Actor; body: string; cardId: string; inReplyTo?: string | null; request?: A4RequestKey }): A4TransitionResult {
+    addComment(projectId: string, input: { actor: A4Actor; body: string; cardId: string; inReplyTo?: string | null; via?: "studio" | "mcp"; request?: A4RequestKey }): A4TransitionResult {
       if (input.body.trim().length === 0 || input.cardId.trim().length === 0) throw new A4StoreError(400, "INPUT_INVALID", "A comment needs text and a card.");
       const commentId = randomId("a4c");
       let blob: { bodySha256: string; blobRef: string } | undefined;
       return commit(projectId, input.actor, ({ head, ts }) => {
         blob ??= putPrivate(workspace, projectId, Buffer.from(input.body, "utf8"), createdKeySha256(projectId));
-        return { kind: "COMMENT", payload: { commentId, cardId: input.cardId, bodySha256: blob.bodySha256, blobRef: blob.blobRef },
+        return { kind: "COMMENT", payload: { commentId, cardId: input.cardId, bodySha256: blob.bodySha256, blobRef: blob.blobRef, via: input.via ?? "studio" },
           sideRows: [{ table: "a4_comments", values: { comment_id: commentId, project_id: projectId, revision_no: head!.revision_no, stage: head!.stage,
             card_id: input.cardId, author_key: input.actor.key, body_sha256: blob.bodySha256, blob_ref: blob.blobRef, in_reply_to: input.inReplyTo ?? null, ts } }] };
       }, { request: input.request }, null);

@@ -4,7 +4,9 @@
  * read live records; nothing about identity is mocked. The preview gate is on unless a case turns it off.
  */
 import { spawn } from "node:child_process";
+import { mkdirSync, writeFileSync } from "node:fs";
 import type { IncomingMessage, ServerResponse } from "node:http";
+import { join } from "node:path";
 import { Readable } from "node:stream";
 import { fileURLToPath } from "node:url";
 import { vi } from "vitest";
@@ -16,7 +18,8 @@ import { createNativeTaskService } from "../../src/studio/nativeTaskService.js";
 import type { NativeTaskService } from "../../src/studio/nativeTaskTypes.js";
 import { governanceFixture } from "../governor/governanceFixture.js";
 
-export type Who = { userId: string } | "admin" | "demo" | "none";
+/** A user; `authSource: "WORKSPACE_ROUTER"` is a hosted-router session (its record from `routerSession`), LOCAL_USER otherwise. */
+export type Who = { userId: string; authSource?: "WORKSPACE_ROUTER" } | "admin" | "demo" | "none";
 export interface Reply { status: number; body: { ok?: boolean; data?: Record<string, unknown>; code?: string; error?: string; detail?: unknown } }
 
 export interface A4Workspace { workspace: string; sessionId: string; owner: { userId: string }; alice: { userId: string }; bob: { userId: string } }
@@ -44,7 +47,7 @@ function serviceFor(workspace: string): NativeTaskService {
 
 function context(workspace: string, who: Who, executionAllowed: boolean): NativeTaskApiContext | undefined {
   if (who === "none") return undefined;
-  const principalId = who === "admin" ? "bootstrap-admin" : who === "demo" ? "demo" : `session:LOCAL_USER:${who.userId}`;
+  const principalId = who === "admin" ? "bootstrap-admin" : who === "demo" ? "demo" : `session:${who.authSource ?? "LOCAL_USER"}:${who.userId}`;
   const csrf = "p235-native-csrf";
   return { service: serviceFor(workspace), principalId, demo: who === "demo", nativeCsrfToken: csrf,
     admissionActor: { isAdmin: who === "admin", userId: typeof who === "object" ? who.userId : null, nativeCsrfToken: csrf }, executionAllowed: () => executionAllowed };
@@ -64,6 +67,16 @@ export async function a4(workspace: string, who: Who, method: string, path: stri
     { workspace, nativeTasks: context(workspace, who, options.executionAllowed ?? true), revalidateAuthority: () => true });
   if (!handled) throw new Error(`${method} ${path} is not an A4 route`);
   return { status, body: out === "" ? {} : JSON.parse(out) as Reply["body"] };
+}
+
+/** A live WORKSPACE_ROUTER session record, as the hosted router writes it (unsigned; A4 reads its roles live). */
+export function routerSession(workspace: string, userId: string, username: string, roles: string[]): Who {
+  const dir = join(workspace, ".amc", "studio", "sessions");
+  mkdirSync(dir, { recursive: true });
+  const now = Date.now();
+  writeFileSync(join(dir, `sess_router_${userId}.json`), JSON.stringify({ sessionId: `sess_router_${userId}`, userId, username, roles, issuedTs: now,
+    expiresTs: now + 3_600_000, revoked: false, tokenSha256: "0".repeat(64), authSource: "WORKSPACE_ROUTER" }), { mode: 0o600 });
+  return { userId, authSource: "WORKSPACE_ROUTER" };
 }
 
 let counter = 0;

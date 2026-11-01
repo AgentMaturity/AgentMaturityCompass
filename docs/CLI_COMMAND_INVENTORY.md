@@ -87,7 +87,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc approvals approve` | - | `--agent <agentId>`<br>`--mode <simulate|execute>`<br>`--reason <text>`<br>`--username <username>`<br>`--roles <roles>`<br>`--user-id <userId>`<br>`--session-token-file <path>`<br>`--expect-request-digest <sha256>` | - |
 | `amc approvals deny` | - | `--agent <agentId>`<br>`--reason <text>`<br>`--username <username>`<br>`--roles <roles>`<br>`--user-id <userId>`<br>`--session-token-file <path>`<br>`--expect-request-digest <sha256>` | - |
 | `amc approvals list` | - | `--agent <agentId>`<br>`--status <status>`<br>`--query <requestId>`<br>`--action-class <class>`<br>`--risk-tier <tier>`<br>`--effective-mode <mode>`<br>`--created-after <timestamp>`<br>`--created-before <timestamp>`<br>`--order <order>`<br>`--limit <count>`<br>`--json` | - |
-| `amc approvals login` | Authenticate an existing local user and write a new private tracked session-token file for native approvals | `--username <name>`<br>`--token-file <newpath>`<br>`--ttl-minutes <n>`<br>`--password-stdin`<br>`--json` | - |
+| `amc approvals login` | Authenticate an existing local user and write a new private tracked session-token file for native approvals | `--username <name>`<br>`--token-file <newpath>`<br>`--ttl-minutes <n>`<br>`--password-stdin`<br>`--a4-comment-only`<br>`--json` | - |
 | `amc approvals show` | - | `--agent <agentId>` | - |
 | `amc archetype` | Archetype packs | - | - |
 | `amc archetype apply` | Apply archetype context/targets/guardrails/evals to an agent | `--agent <agentId>` | - |

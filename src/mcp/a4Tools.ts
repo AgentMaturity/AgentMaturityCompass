@@ -4,10 +4,11 @@
  * goes through withClaim with the server's own envelope (the readiness evaluator's `claim`, or the router's unbound
  * claim where no producer exists yet), never one composed here.
  *
- * Identity: the MCP server is a local process with no per-user session. An `amc approvals login` token file named by
- * AMC_A4_SESSION_TOKEN_FILE in the server's MCP config is the principal (admission native_login_token, in memory only),
- * re-resolved against the signed users.yaml on every call. That file is the user's whole Studio session and the agent
- * host can read it, so only a VIEWER-only user's session is accepted. The comment tool refuses without one; reads without
+ * Identity: the MCP server is a local process with no per-user session. An `amc approvals login --a4-comment-only` token
+ * file named by AMC_A4_SESSION_TOKEN_FILE in the server's MCP config is the principal (admission native_login_token, in
+ * memory only), re-resolved against the signed users.yaml on every call. The agent host can read that file, so only an
+ * `a4_comment`-scoped credential (signed into the session token; Studio admits it for A4 reads and comments only) of a
+ * VIEWER-only user is accepted. The comment tool refuses without one; reads without
  * one answer as the router's admin token does (every project, reads only). Never a tool argument. Every tool refuses
  * while the workspace is read-only.
  *
@@ -146,13 +147,19 @@ function sessionPrincipal(workspace: string, pathname: string, method: "GET" | "
   if (!tokenFile) return null;
   let read: ReturnType<typeof readNativeApprovalSession>;
   try {
-    read = readNativeApprovalSession(workspace, tokenFile);
+    read = readNativeApprovalSession(workspace, tokenFile, "a4_comment");
   } catch (error) {
     // An open error names the file; only the token checks' own messages pass through.
     const reason = error instanceof Error && (error as NodeJS.ErrnoException).code === undefined ? error.message : "The session token file could not be opened";
     throw new A4StoreError(401, "A4_SESSION_REQUIRED", `${reason}. Run \`amc approvals login\` for a new token file.`);
   }
   const actor = read.payload;
+  // Only a comment-scoped credential: Studio admits it for A4 reads and comments and nothing else, so the agent host
+  // holding this file cannot decide an approval or reach another route with it (P1-64 follow-up).
+  if (actor.scope !== "a4_comment") {
+    throw new A4StoreError(403, "A4_SESSION_NOT_COMMENT_SCOPED", `The ${A4_SESSION_TOKEN_ENV} session is a full Studio session. `
+      + "Log in with `amc approvals login --a4-comment-only` for a credential Studio admits only for A4 reads and comments.");
+  }
   let verified: ReturnType<typeof listVerifiedUsers>;
   try {
     verified = listVerifiedUsers(workspace);
@@ -283,7 +290,7 @@ export function registerA4Tools(server: McpServer, host: Host): void {
       // Studio's route checks membership, dedupes the clientRequestId, writes the encrypted blob and signs the transition.
       const baseUrl = localStudioUrl(ctx.store.workspace);
       const { status, body } = await createA4Client({ baseUrl, session: ctx.session, timeoutMs: STUDIO_TIMEOUT_MS }).comment(args.projectId,
-        { body: args.body, cardId: args.cardId, inReplyTo: args.inReplyTo ?? null, clientRequestId: args.clientRequestId }).catch((error: unknown) => {
+        { body: args.body, cardId: args.cardId, inReplyTo: args.inReplyTo ?? null, clientRequestId: args.clientRequestId, via: "mcp" }).catch((error: unknown) => {
         throw studioFailure(error, baseUrl);
       });
       // Missing data never reads as recorded: a success names this project and a seq, and a refusal carries its error.

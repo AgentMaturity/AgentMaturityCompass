@@ -416,7 +416,10 @@ the agent's prompt pack.
   tools.yaml binding adds `TOOLS_CONFIG_CHANGED` to `PLAN_WEAKENS_ACTIVE_PLAN`. Whenever
   activation is due or opened, `plan_activated` is BLOCKED from Review on for a plan `activateControlPlan` would refuse
   (`PLAN_BLOCKED`, `PLAN_WEAKENS_ACTIVE_PLAN`, `ACTIVE_PLAN_UNREADABLE`); before Review the same codes show on a WAITING
-  item that is not mandatory, so it never holds the direction gate. A workspace has one active plan for every agent:
+  item that is not mandatory, so it never holds the direction gate. An active plan activated before a catalog change
+  fails its lock check when the policy loads (`ACTIVE_PLAN_LOCK_MISMATCH`, recorded as Understand's and Review's active
+  plan); a restore cannot fix that, so Adapt shows a WAITING `active_plan_lock` item, not mandatory, that says to
+  recompile and re-approve: build the plan on the shipped catalog and activate it. A workspace has one active plan for every agent:
   activating replaces it, and `activateControlPlan` refuses a plan weaker than the active one. Each project's plan
   carries its own agent's budgets, so another agent's active plan makes this one weaker (`PLAN_WEAKENS_ACTIVE_PLAN`) and
   opening the review is refused before any gate is consumed. Understand and Review record the active plan's profile:
@@ -749,7 +752,10 @@ A value claim keeps four lanes side by side:
   the KPI and its window (P2-24, P3-21).
 
 `GET …/value` resolves every claim's refs again on each read. It also lists the members' other objectives
-(self-reported, not evaluated), the ROI worksheet (not evaluated; numeric self-answers) and the PMF hypotheses, each
+(self-reported, not evaluated), the ROI worksheet (P3-20's `V = (h_before − h_after) × r + n_prevented × c_finding − (p + i + m)`, each input a
+low-to-high range with its source and V a range, self-reported; Activate answers only `m`, as the cost cap
+`budgetCostUsdPerDay` × 365, so it reads `not_evaluated` and names each missing input as `ROI_INPUT_MISSING:<term>` until
+the partner inputs are collected) and the PMF hypotheses, each
 shown predicted, observed (the row's value, lane observed only while its ref resolves there) and verdict
 (self-reported). A hypothesis leaves `proposed` only through `POST …/hypotheses/:id/observe`. `GET …/monitor` returns the
 newest monitor record of the current release while its signed file resolves.

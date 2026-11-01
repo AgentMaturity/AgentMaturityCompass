@@ -99,8 +99,8 @@ function typedGraphDigest(workspace: string, agentId: string): string | null {
 
 /**
  * What Enforce binds for the agent: the sha256 of its live resource set (its config and the config's `.sig`, its context
- * graph, the fleet's typed-graphs/latest.json, …) once it has a latest manifest, null before. A later write Enforce would
- * read as DRIFTED (another agent's Build replacing latest.json, a removed or replaced `.sig`) is then RESOURCE_DRIFTED at
+ * graph, its typed-graphs/<agentId>/latest.json, …) once it has a latest manifest, null before. A later write Enforce would
+ * read as DRIFTED (a graph naming this agent replacing that file, a removed or replaced `.sig`) is then RESOURCE_DRIFTED at
  * decide, complete and the effect preamble. Assemble (P1-60) binds this same slot and reuses this recomputer.
  * ponytail: hashes every Enforce candidate on each read; cache by mtime if large imported runs make readiness slow.
  */
@@ -616,7 +616,7 @@ function propose(ctx: A4ProducerContext): A4ProducerResult {
  * Build (after the direction gate is consumed): the context graph through validateContextGraph and initWorkspace's writer,
  * scaffoldAgent for an agent with none of its files, else the signed config re-saved (a placeholder one when it has none)
  * and its own target profile re-signed with the new contextGraphHash and its verified mapping; the outcome contract when
- * there is none; the typed multi-agent graph (writeTypedMultiAgentGraph, which also replaces the fleet's latest.json);
+ * there is none; the typed multi-agent graph (writeTypedMultiAgentGraph, which also replaces this agent's and the fleet's latest.json);
  * then the Enforce manifest so the agent is ACTIVE. It signs what `agent add`, `target set` and `snapshot`
  * sign, so it takes their owner-mode gates, and the router admits only owners (src/api/accessPolicy.ts A4_OWNER). Every
  * check that can refuse runs before the first write. Each write is an implementation ref with its file's sha256; the

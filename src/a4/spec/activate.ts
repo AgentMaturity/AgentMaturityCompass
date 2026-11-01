@@ -121,7 +121,7 @@ const positiveInt = (value: unknown): number | null => {
   const text = textValue(value);
   return text !== null && /^[1-9][0-9]{0,8}$/.test(text) ? Number(text) : null;
 };
-const positiveNumber = (value: unknown): number | null => {
+export const positiveNumber = (value: unknown): number | null => {
   const text = textValue(value);
   return text !== null && /^[0-9]{1,9}(\.[0-9]{1,4})?$/.test(text) && Number(text) > 0 ? Number(text) : null;
 };

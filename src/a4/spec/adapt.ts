@@ -414,6 +414,12 @@ function signingItems(state: A4ReadinessState, query: A4ReadinessQuery, spec: Re
               nextAction: { label: "Build signs the plan; this project then completes with it signed, not activated, unless an owner opens the activation" } })
               : item("plan_activated", "READY", { reasonCodes: ["PLAN_SIGNED_NOT_ACTIVATED", ...replaces], nextAction: { label: signedNotActivated } })
   ];
+  // A plan activated before a catalog change fails its lock check (loadActiveCompiledPolicy), which no restore fixes.
+  if ((active as { error?: unknown } | null | undefined)?.error === "ACTIVE_PLAN_LOCK_MISMATCH") {
+    items.push(waiting("active_plan_lock", ["ACTIVE_PLAN_LOCK_MISMATCH"], { kind: "source_unavailable", section: "governance", mandatory: false,
+      nextAction: { label: "The workspace's active plan was compiled against an older catalog and fails its lock check, so sessions under it are refused: "
+        + `recompile and re-approve (Build this plan again on the shipped catalog, then activate it with ${ACTIVATE_PLAN_EFFECT_ID} at completion)` } }));
+  }
   // AMC's own CONTROL_RESULT signature check, as Review recorded it and as the file reads now (live): integrity of bytes
   // under this workspace's keys, never a lane, never a claim. Only a notary-route signature or an unpinned issuer is a
   // local limit (not evaluated); any other failure, at Review or since (edited, deleted, re-signed), blocks.

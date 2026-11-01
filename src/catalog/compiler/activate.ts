@@ -134,7 +134,8 @@ export function loadActiveCompiledPolicy(workspace: string): ActiveCompiledPolic
   const lock = verifyCatalogLock(plan.lock, catalog);
   if (!lock.ok) {
     const first = lock.mismatches[0];
-    throw new Error(`the shipped catalog differs from the active plan's lockfile (${first?.path}: expected ${first?.expected}, found ${first?.actual}); recompile and reactivate`);
+    throw Object.assign(new Error(`the shipped catalog differs from the active plan's lockfile (${first?.path}: expected ${first?.expected}, found ${first?.actual}); recompile and reactivate`),
+      { code: "ACTIVE_PLAN_LOCK_MISMATCH" });
   }
   const controls = plan.requirements.filter((r) => r.applicability !== "not_applicable").map((r): ActiveControl => {
     const record = catalog.controls.get(r.controlId);

@@ -5,6 +5,7 @@
  * - verifyAndConsumeEffect: the engine quorum is re-counted under A4's own SoD before consume.
  * - Drift: a bound resource edited between GATE_CONSUMED (EFFECT_STARTED) and the executor's preamble fails the effect
  *   naming the slot, and nothing is applied.
+ * - Kill switch: one raised between EFFECT_STARTED and the preamble fails the effect FREEZE_ACTIVE and holds the project.
  * - Crash: an attempt whose owner process died (a real second process that exits after commit) is swept to
  *   process_lost by liveness; a live executor of this process is never swept, however old its heartbeat; a retry while
  *   it runs is refused; after the sweep a retry runs it to completion.
@@ -13,6 +14,7 @@ import { afterEach, describe, expect, test, vi } from "vitest";
 import { pendingExecutors } from "../../src/a4/a4Gates.js";
 import { completeStage, retryEffect, runA4Effect, sweepA4Effects } from "../../src/a4/a4Effects.js";
 import { A4StoreError, openA4Store, type A4Store } from "../../src/a4/a4Store.js";
+import { activateKillSwitch } from "../../src/runtime/killSwitch.js";
 import { initToolsConfig } from "../../src/toolhub/toolhubValidators.js";
 import { cleanupGovernanceFixtures, REFUND } from "../governor/governanceFixture.js";
 import { a4Child, refusal } from "./a4Harness.js";
@@ -88,6 +90,21 @@ describe("scenario: effect drift and crash", () => {
     expect(String(failed[0]![1])).toMatch(/RESOURCE_DRIFTED.*signedConfigs\.tools/);
     expect(await j.item("effects.failed", "adapt")).toMatchObject({ status: "BLOCKED" });
     expect((await j.p.get(j.t.alice)).body.data).toMatchObject({ stage: "adapt" });
+  });
+
+  test("a kill switch raised after the attempt started fails the effect with FREEZE_ACTIVE and holds the project", async () => {
+    const { j, gate } = await atAssembleCompletion();
+    await j.openEffect("assemble", "completion", gate);
+    await j.p.sync();
+    const s = store(j);
+    const started = completeStage(s, j.p.projectId, { ...j.call(j.t.alice), stage: "assemble", gateId: gate.gateId, expectedHeadSeq: j.p.head });
+    // Between EFFECT_STARTED and the executor's preamble: an operator stops new effects workspace-wide.
+    await activateKillSwitch({ workspace: j.t.workspace, issuedBy: "a4-owner", scope: { kind: "workspace", id: "workspace" }, mode: "stop_new_effects",
+      reason: "P2-35 mid-effect kill", incidentId: "inc-a4-kill" });
+    await runA4Effect(s, j.p.projectId, started.attemptId!);
+    const settled = (await effectLinks(j)).filter(([kind]) => kind !== "EFFECT_STARTED");
+    expect(settled).toEqual([["EFFECT_FAILED", "FREEZE_ACTIVE"]]);
+    expect((await j.p.get(j.t.alice)).body.data).toMatchObject({ hold: true });
   });
 
   test("a dead owner is swept to process_lost by liveness; a live executor is not; a retry waits for the sweep, then runs", async () => {

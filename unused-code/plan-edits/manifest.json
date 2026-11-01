@@ -472,6 +472,13 @@
       "sha256": "7f8cd201e6850e2d14c9b176f1a258dd5c4fb0c4c2f4992f1a68287faca004b7"
     },
     {
+      "path": "src/fleet/typedGraph.ts",
+      "issue": "GAP-WP32",
+      "baseCommit": "20b87b5e647bf67a58a909781fb252dedd0ebb51",
+      "archivePath": "unused-code/plan-edits/GAP-WP32/src/fleet/typedGraph.ts.landed",
+      "sha256": "0005e6d6c12f2bcbe9cdc911fc7a465f3cfd9e3d3d13af4a4dfe322f6a834c01"
+    },
+    {
       "path": "src/forecast/forecastStore.ts",
       "issue": "P2-08",
       "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",

@@ -211,8 +211,10 @@ describe("typed multi-agent graph", () => {
   test("attaches graph digest to resource manifests and fleet lifecycle evidence", () => {
     const ws = workspace();
     const written = writeTypedMultiAgentGraph({ workspace: ws, graph: validGraph() });
-    const manifest = buildEnforceResourceManifest({ workspace: ws, agentId: "default" });
-    const graphResource = manifest.resources.find((resource) => resource.id === "graph:.amc/fleet/typed-graphs/latest.json");
+    // The graph is a resource of the agents it names (orchestrator, specialist), not of every agent (A4 typed-graph scoping).
+    const manifest = buildEnforceResourceManifest({ workspace: ws, agentId: "orchestrator" });
+    const graphResource = manifest.resources.find((resource) => resource.id === "graph:.amc/fleet/typed-graphs/orchestrator/latest.json");
+    expect(buildEnforceResourceManifest({ workspace: ws, agentId: "default" }).resources.some((resource) => resource.kind === "graph")).toBe(false);
     const lifecycle = buildFleetLifecycleRunArtifact({ workspace: ws, result: fleetResult() });
 
     expect(graphResource?.digest).toBe(written.ref.digestSha256);

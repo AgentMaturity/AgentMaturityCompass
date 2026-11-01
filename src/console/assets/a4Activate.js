@@ -315,8 +315,8 @@ function renderValue(ctx) {
     ${table(["KPI", "Recommended", "Implemented", "Observed", "Independently reviewed"], rows, "No value claim recorded for this release.")}
     <h4>Other objectives (self-reported, not evaluated)</h4>
     ${table(["Kind", "Statement"], list(value.objectives).map((row) => [`<code>${esc(row.kind)}</code>`, esc(row.statement)]), "None stated.")}
-    <p class="muted">ROI worksheet (${esc(value.roiWorksheet?.formula)}): <code>${esc(value.roiWorksheet?.status)}</code> · <code>${esc(value.roiWorksheet?.claim?.claimKind)}</code>
-      ${codes(value.roiWorksheet?.claim?.reasons)}</p>
+    <p class="muted">ROI worksheet (${esc(value.roiWorksheet?.formula)}): <code>${esc(value.roiWorksheet?.status)}</code> · <code>${esc(value.roiWorksheet?.claimKind)}</code>
+      ${value.roiWorksheet?.value ? `V ${esc(value.roiWorksheet.value.low)} to ${esc(value.roiWorksheet.value.high)} USD per year ` : ""}${codes(value.roiWorksheet?.reasonCodes)} ${codes(value.roiWorksheet?.claim?.reasons)}</p>
     ${hypothesesHtml(ctx, list(value.hypotheses))}${loadButton(ctx)}`;
 }
 
