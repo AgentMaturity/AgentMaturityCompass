@@ -875,6 +875,31 @@
       }
     },
     {
+      "id": "r3-13-deep-layers-long-line",
+      "round": "r3",
+      "finding": "r3-13",
+      "surface": "walk",
+      "also": [
+        "defect-b"
+      ],
+      "input": {
+        "generate": [
+          [
+            "word ",
+            28000
+          ],
+          [
+            "%25252525252541",
+            1
+          ]
+        ]
+      },
+      "expect": {
+        "unchanged": true,
+        "withinMs": 20000
+      }
+    },
+    {
       "id": "s2-forged-token",
       "round": "slice2",
       "finding": "forged-token",
@@ -1068,7 +1093,7 @@
       "finding": "defect-c",
       "surface": "walk",
       "input": {
-        "text": "blob: \"{{base64json:card {{CARD}} ok?>>>~~~ sure, done today}}\""
+        "text": "blob: \"{{base64json:蔻獩埶GO暊 card {{CARD}} ok done}}\""
       },
       "expect": {
         "classes": [
@@ -1663,7 +1688,8 @@
       "id": "M4",
       "guard": "base64 runs are taken before web decoding (search: base64Children(json))",
       "kills": [
-        "d-c-base64-slash-plus"
+        "d-c-base64-slash-plus",
+        "r2-15-base64"
       ]
     },
     {
@@ -1672,7 +1698,8 @@
       "kills": [
         "r2-06-form-password",
         "r3-07-flag-member",
-        "r2-14-header-secret-name"
+        "r2-14-header-secret-name",
+        "r2-12-recorded-argv"
       ]
     },
     {
@@ -1686,7 +1713,8 @@
       "id": "M7",
       "guard": "a line's decoded search reads it with the raw findings masked (eachLine)",
       "kills": [
-        "d-a-html-page-one-email"
+        "d-a-html-page-one-email",
+        "s2-raw-scan-first"
       ]
     },
     {
@@ -1694,14 +1722,14 @@
       "guard": "the quoted member rules also match quotes escaped once (\\\\?[\"'])",
       "kills": [
         "d-d-truncated-escaped-mrn",
-        "s2-password-json-escaped"
+        "adv-04-truncated-escaped-password"
       ]
     },
     {
       "id": "M9",
       "guard": "a decoded view starts no chain of its own (probe/flat)",
       "kills": [
-        "r3-13-layered-benign"
+        "r3-13-deep-layers-long-line"
       ]
     },
     {
