@@ -1,3 +1,5 @@
+import type { LessonTransferRequest } from "../learning/lessonProvenance.js";
+import { assertPromptLessonRun } from "./promptLessonTransfer.js";
 import YAML from "yaml";
 import { readFileSync } from "node:fs";
 import { resolveAgentId } from "../fleet/paths.js";
@@ -152,8 +154,9 @@ export async function preparePromptForBridgeRequest(params: {
   provider: PromptPackProvider;
   requestKind: string;
   body: unknown;
+  lessonRun?: LessonTransferRequest;
 }) {
-  const input = {workspace:params.workspace,agentId:params.agentId,provider:params.provider,requestKind:params.requestKind,body:structuredClone(params.body)};
+  const input = {workspace:params.workspace,agentId:params.agentId,provider:params.provider,requestKind:params.requestKind,body:structuredClone(params.body),lessonRun:params.lessonRun === undefined ? undefined : structuredClone(params.lessonRun)};
   params = input;
   const path = promptPolicyPath(input.workspace), before = captureOrgPairs([path]), bytes = orgPairBytes(before,path), sidecar = orgPairBytes(before,`${path}.sig`);
   const policySig = bytes === null ? {valid:false,reason:"prompt policy missing"} : sidecar === null ? {valid:false,reason:"signature missing"} : verifyAuditorSignatureBytes(input.workspace,"BUNDLE",bytes,sidecar);
@@ -212,7 +215,9 @@ export async function preparePromptForBridgeRequest(params: {
     };
   }
   const verify = verifyWorkspacePromptPack(params.workspace, latestPath);
-  if (policy.promptPolicy.enforcement.mode === "ENFORCE" && policy.promptPolicy.enforcement.requirePackSignatureValid && !verify.ok) {
+  const inspect = inspectPromptPackArtifact(latestPath);
+  // Authenticate metadata before using it to decide whether lesson admission guards apply.
+  if ((policy.promptPolicy.enforcement.mode === "ENFORCE" || inspect.pack.checkpoints.lessonTransfer?.status === "SELECTED") && !verify.ok) {
     return {
       ok: false as const,
       status: 503,
@@ -220,7 +225,8 @@ export async function preparePromptForBridgeRequest(params: {
       reasons: verify.errors
     };
   }
-  const inspect = inspectPromptPackArtifact(latestPath);
+  try { assertPromptLessonRun(input.workspace, agentId, inspect.pack.checkpoints.lessonTransfer, input.lessonRun, inspect.pack.agent); }
+  catch { return { ok: false as const, status: 503, code: "PROMPT_PACK_INVALID", reasons: ["lesson pack requires its exact run context and currently eligible lessons"] }; }
   const lint = inspect.lint;
   if (
     policy.promptPolicy.enforcement.mode === "ENFORCE" &&

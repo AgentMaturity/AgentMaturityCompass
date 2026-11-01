@@ -570,14 +570,14 @@ describe("buildLessonAdvisories", () => {
     db.close();
   });
 
-  test("tracks injection count on lessons", () => {
+  test("preview does not count lesson injection", () => {
     const { db } = freshDb();
     makeSignedLesson(db, { lessonId: "lsn_track1" });
 
     buildLessonAdvisories(db, "agent-1", undefined, lessonWorkspace());
     const lesson = getLessonById(db, "lsn_track1");
-    expect(lesson!.injectionCount).toBe(1);
-    expect(lesson!.lastInjectedTs).not.toBeNull();
+    expect(lesson!.injectionCount).toBe(0);
+    expect(lesson!.lastInjectedTs).toBeNull();
     db.close();
   });
 
@@ -616,7 +616,7 @@ describe("buildLessonAdvisories", () => {
   test("injecting, drift-tracking or re-activating a lesson does not invalidate its hash", () => {
     const { db } = freshDb();
     makeSignedLesson(db, { lessonId: "lsn_life" });
-    buildLessonAdvisories(db, "agent-1", undefined, lessonWorkspace());
+    updateLessonInjection(db, "lsn_life", Date.now());
     updateLessonPostInjectionRun(db, "lsn_life", "run-9", 0.2, false);
     updateLessonStatus(db, "lsn_life", "STALE", lessonWorkspace());
     updateLessonStatus(db, "lsn_life", "ACTIVE", lessonWorkspace());

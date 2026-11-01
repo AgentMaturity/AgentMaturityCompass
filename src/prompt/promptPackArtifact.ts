@@ -1,3 +1,6 @@
+import { resolveAgentId } from "../fleet/paths.js";
+import type { LessonTransferRequest } from "../learning/lessonProvenance.js";
+import { assertPromptLessonOutputs, assertPromptLessonsCurrent } from "./promptLessonTransfer.js";
 import { mkdtempSync, readFileSync, readdirSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
@@ -76,7 +79,7 @@ function parseProviderFiles(root: string): PromptProviderFiles {
     gemini: promptProviderGeminiSchema.parse(JSON.parse(readUtf8(join(root, "provider", "gemini.json"))) as unknown),
     xai: promptProviderOpenAiSchema.parse(JSON.parse(readUtf8(join(root, "provider", "xai.json"))) as unknown),
     openrouter: promptProviderOpenAiSchema.parse(JSON.parse(readUtf8(join(root, "provider", "openrouter.json"))) as unknown),
-    generic: promptProviderGenericSchema.parse({
+    generic: promptProviderGenericSchema.parse(pathExists(join(root, "provider", "generic.json")) ? JSON.parse(readUtf8(join(root, "provider", "generic.json"))) : {
       v: 1,
       systemMessage: readUtf8(join(root, "provider", "openai.json")).length > 0
         ? (JSON.parse(readUtf8(join(root, "provider", "openai.json"))) as { systemMessage: string }).systemMessage
@@ -98,16 +101,24 @@ export function buildPromptPackArtifact(params: {
   workspace: string;
   agentId?: string;
   outFile: string;
+  lessons?: LessonTransferRequest;
 }): PromptPackBuildResult {
-  const outFile = resolve(params.outFile), before = capturePromptFiles([outFile]);
-  const compiled = compilePromptPack({ workspace: params.workspace, agentId: params.agentId });
+  const outFile = resolve(params.outFile);
+  assertPromptLessonOutputs(params.workspace, [outFile], params.lessons !== undefined);
+  const before = capturePromptFiles([outFile]);
+  const agentId = resolveAgentId(params.workspace, params.agentId ?? "default");
+  const compiled = compilePromptPack({ workspace: params.workspace, agentId, lessons: params.lessons });
   const signature = promptPackSignatureSchema.parse(signPromptPack(params.workspace, compiled.pack));
   const signerPub = signature.envelope ? Buffer.from(signature.envelope.pubkeyB64, "base64").toString("utf8") : (getPublicKeyHistory(params.workspace, "auditor")[0] ?? "");
   if (!signerPub) throw new Error("missing signer pubkey for prompt pack");
   const lint = `${canonicalize(promptLintSchema.parse(compiled.lint))}\n`;
   const lintSignature = JSON.stringify(signSerializedPayloadWithAuditor(params.workspace, lint), null, 2);
   const bytes = promptArchiveBytes(compiled, signature, signerPub, lintSignature);
-  publishPromptFiles(params.workspace, before, [{ path: outFile, bytes }]);
+  const assertLessons = () => {
+    assertPromptLessonOutputs(params.workspace, [outFile], params.lessons !== undefined);
+    assertPromptLessonsCurrent(params.workspace, agentId, compiled.pack.checkpoints.lessonTransfer);
+  };
+  publishPromptFiles(params.workspace, before, [{ path: outFile, bytes }], assertLessons);
   return { outFile, sha256: sha256Hex(bytes), pack: compiled.pack, signature, lint: compiled.lint, providerFiles: compiled.providerFiles };
 }
 

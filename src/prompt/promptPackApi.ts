@@ -1,3 +1,5 @@
+import { commitPromptLessons } from "./promptLessonTransfer.js";
+import type { LessonTransferRequest } from "../learning/lessonProvenance.js";
 import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
@@ -272,13 +274,15 @@ export function buildPromptPackForApi(params: {
   workspace: string;
   agentId?: string;
   outFile?: string;
+  lessons?: LessonTransferRequest;
 }) {
   const agentId = resolveAgentId(params.workspace, params.agentId ?? "default");
   const tempOut = params.outFile ? resolve(params.workspace, params.outFile) : tempArtifactPath(params.workspace, agentId);
   const built = buildPromptPackArtifact({
     workspace: params.workspace,
     agentId,
-    outFile: tempOut
+    outFile: tempOut,
+    lessons: params.lessons
   });
   const persisted = savePromptPackArtifact({
     workspace: params.workspace,
@@ -291,6 +295,7 @@ export function buildPromptPackForApi(params: {
     agentId,
     lint: built.lint
   });
+  commitPromptLessons(params.workspace, agentId, built.pack.packId, built.pack.checkpoints.lessonTransfer);
   appendTransparencyEntry({
     workspace: params.workspace,
     type: "PROMPT_PACK_CREATED",

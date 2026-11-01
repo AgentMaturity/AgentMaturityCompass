@@ -7104,6 +7104,7 @@ Extract lessons from verified effective corrections
 |--------|-------------|
 | `--agent <agentId>` | - |
 | `--min-effectiveness <n>` | - |
+| `--provenance <file>` | - |
 
 #### `amc memory-report`
 
@@ -8380,6 +8381,7 @@ Build and sign .amcprompt for an agent
 |--------|-------------|
 | `--agent <agentId>` | - |
 | `--out <file>` | - |
+| `--lessons <file>` | - |
 
 #### `amc prompt pack diff`
 

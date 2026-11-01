@@ -1,3 +1,4 @@
+import type { LessonTransferRequest } from "../learning/lessonProvenance.js";
 import { assertOwnerMode } from "../mode/mode.js";
 
 /** Reuse the fixed registered tuning owner gate; the prompt command label supplies error context only. */
@@ -70,6 +71,7 @@ export function promptPackBuildCli(params: {
   workspace: string;
   agentId?: string;
   outFile?: string;
+  lessons?: LessonTransferRequest;
 }) {
   return buildPromptPackForApi(params);
 }

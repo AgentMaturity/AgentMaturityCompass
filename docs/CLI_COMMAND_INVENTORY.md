@@ -747,7 +747,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc memory writeback` | Write governed reasoning memory from an EpisodeRecord | `--agent <agentId>`<br>`--consumer <csv>`<br>`--ttl-days <n>`<br>`--review-days <n>`<br>`--summary <text>`<br>`--json` | - |
 | `amc memory-advisories` | Show advisories from correction memory for prompt injection | `--agent <agentId>` | - |
 | `amc memory-expire` | Expire stale lessons past their TTL | `--agent <agentId>` | - |
-| `amc memory-extract` | Extract lessons from verified effective corrections | `--agent <agentId>`<br>`--min-effectiveness <n>` | - |
+| `amc memory-extract` | Extract lessons from verified effective corrections | `--agent <agentId>`<br>`--min-effectiveness <n>`<br>`--provenance <file>` | - |
 | `amc memory-report` | Generate correction memory report | `--agent <agentId>`<br>`--window <window>` | - |
 | `amc meta-confidence` | Report confidence in the maturity score itself | `--agent <id>`<br>`--run <runId>` | - |
 | `amc methodology` | Print the public AMC scoring methodology manifest and hash | `--json`<br>`--reproducibility`<br>`--sample-dataset`<br>`--format <format>`<br>`--out <path>` | - |
@@ -931,7 +931,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc prompt` | Northstar prompt policy + pack operations | - | - |
 | `amc prompt init` | Create and sign .amc/prompt/policy.yaml | - | - |
 | `amc prompt pack` | Prompt pack artifact operations | - | - |
-| `amc prompt pack build` | Build and sign .amcprompt for an agent | `--agent <agentId>`<br>`--out <file>` | - |
+| `amc prompt pack build` | Build and sign .amcprompt for an agent | `--agent <agentId>`<br>`--out <file>`<br>`--lessons <file>` | - |
 | `amc prompt pack diff` | Diff latest prompt pack against previous snapshot | `--agent <agentId>` | - |
 | `amc prompt pack show` | Show provider-specific enforced system prompt | `--agent <agentId>`<br>`--provider <provider>`<br>`--format <format>` | - |
 | `amc prompt pack verify` | Verify .amcprompt signature and lint signature | `--pubkey <path>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | - |

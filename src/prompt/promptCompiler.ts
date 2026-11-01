@@ -1,3 +1,6 @@
+import { redactSecrets } from "../shield/redaction/redactSecrets.js";
+import { capturePromptLessons } from "./promptLessonTransfer.js";
+import type { LessonTransferRequest } from "../learning/lessonProvenance.js";
 import { readFileSync } from "node:fs";
 import { randomUUID } from "node:crypto";
 import { join } from "node:path";
@@ -127,20 +130,21 @@ export interface CompiledPromptPack {
 export function compilePromptPack(params: {
   workspace: string;
   agentId?: string;
+  lessons?: LessonTransferRequest;
 }): CompiledPromptPack {
   const workspace = params.workspace;
   const agentId = resolveAgentId(workspace, params.agentId ?? "default");
   const policy = loadPromptPolicy(workspace);
   const cgxPack = resolveCgxPack(workspace, agentId);
-  return compilePromptPackWithInputs(workspace, agentId, policy, cgxPack, capturePromptCompilerFacts(workspace, agentId), fileSha(promptPolicyPath(workspace)));
+  return compilePromptPackWithInputs(workspace, agentId, policy, cgxPack, capturePromptCompilerFacts(workspace, agentId, params.lessons), fileSha(promptPolicyPath(workspace)));
 }
 
 /** Internal fact capture shared with the actual async compiler; no signing or initialization is performed here. */
-export function capturePromptCompilerFacts(workspace: string, agentId: string) {
+export function capturePromptCompilerFacts(workspace: string, agentId: string, lessons?: LessonTransferRequest) {
   const advisories = listAdvisories(workspace).filter(row => row.scope.type === "WORKSPACE" || (row.scope.type === "AGENT" && row.scope.id === agentId))
     .sort((x, y) => advisorySortWeight(x.severity) - advisorySortWeight(y.severity) || x.advisoryId.localeCompare(y.advisoryId)).slice(0, 5);
   return structuredClone({ bridge: loadBridgeConfig(workspace), trust: loadTrustConfig(workspace), agent: loadAgentConfig(workspace, agentId),
-    tools: listToolhubTools(workspace), advisories, canonSha: fileSha(canonPath(workspace)), bankSha: fileSha(diagnosticBankPath(workspace)),
+    tools: listToolhubTools(workspace), advisories, lessonTransfer: capturePromptLessons(workspace, agentId, lessons), canonSha: fileSha(canonPath(workspace)), bankSha: fileSha(diagnosticBankPath(workspace)),
     mechanicSha: pathExists(mechanicTargetsPath(workspace)) ? fileSha(mechanicTargetsPath(workspace)) : null });
 }
 /** Pure template construction; callers retain their own authenticated input/publication boundaries. */
@@ -241,7 +245,8 @@ export function compilePromptPackWithInputs(workspace: string, agentId: string, 
     },
     checkpoints: {
       topTransformTasks: transformTasks,
-      currentAdvisories: advisories
+      currentAdvisories: advisories,
+      ...(facts.lessonTransfer ? { lessonTransfer: facts.lessonTransfer } : {})
     }
   });
 
@@ -291,11 +296,17 @@ export function compilePromptPackWithInputs(workspace: string, agentId: string, 
     )
   };
 
+  if (facts.lessonTransfer) pack.bindings.providerFilesSha256 = sha256Hex(canonicalize(providerFiles));
+
   const lint = runPromptLint({
     pack,
     providerFiles,
     policy
   });
+
+  if (facts.lessonTransfer && (lint.status === "FAIL" || redactSecrets(canonicalize({ pack, providerFiles }), () => "[REDACTED]").findings.length > 0)) {
+    throw new Error("lesson prompt failed admission: sensitive or disallowed prompt content");
+  }
 
   return {
     pack,
