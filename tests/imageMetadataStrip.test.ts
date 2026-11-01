@@ -115,13 +115,14 @@ describe("image metadata stripping", () => {
     // JPEG: no frame header before the scan; a segment length past the end; a scan-only marker before SOS.
     expect(malformed(Buffer.concat([SOI, APP0, DQT, SCAN]), "image/jpeg")).toBe("malformed-container");
     expect(malformed(Buffer.concat([SOI, Buffer.from([0xff, 0xe1, 0xff, 0xff]), APP0, SOF0, SCAN]), "image/jpeg")).toBe("malformed-container");
-    expect(malformed(Buffer.concat([SOI, Buffer.from([0xff, 0xd0]), SOF0, SCAN]), "image/jpeg")).toBe("malformed-container");
+    expect(malformed(Buffer.concat([SOI, Buffer.from([0xff, 0xd0, 0, 2]), SOF0, SCAN]), "image/jpeg")).toBe("malformed-container");
     // PNG: a kept chunk with a bad CRC; bytes after IEND; IHDR not first.
     const badCrc = Buffer.from(IHDR); badCrc[badCrc.length - 1] ^= 1;
     expect(malformed(Buffer.concat([PNG_SIG, badCrc, IDAT, IEND]), "image/png")).toBe("malformed-container");
     expect(malformed(Buffer.concat([CLEAN_PNG, TEXT]), "image/png")).toBe("malformed-container");
     expect(malformed(Buffer.concat([PNG_SIG, IHDR, IHDR, IDAT, IEND]), "image/png")).toBe("malformed-container");
-    // WebP: a chunk size past the RIFF end; VP8X not first.
+    // WebP: a chunk outside the declared RIFF size; a chunk size past the RIFF end; VP8X not first.
+    expect(malformed(Buffer.concat([CLEAN_WEBP, riffChunk("JUNK", Buffer.alloc(0))]), "image/webp")).toBe("malformed-container");
     const longChunk = Buffer.from(CLEAN_WEBP); longChunk.writeUInt32LE(0xff, 16);
     expect(malformed(longChunk, "image/webp")).toBe("malformed-container");
     expect(malformed(riff(VP8L, vp8x(0)), "image/webp")).toBe("malformed-container");
@@ -207,6 +208,18 @@ describe("the attachment row a provider request reads", () => {
     const reason = (edit: (meta: Record<string, unknown>) => void) => (refusal(() => validateAcpOrderedHistory(root, withMeta(events, image.id, edit))) as AcpFailure).acpData;
     expect(reason(meta => { delete meta.sourceSha256; })).toEqual({ reason: "ordered-image-rewritten" });
     expect(reason(meta => { meta.sourceSha256 = sha256Hex(CLEAN_JPEG); })).toEqual({ reason: "ordered-image-rewritten" });
+  });
+
+  test("a row recorded before stripping (no source digest) still verifies when it equals its source byte for byte", () => {
+    const { root, writer } = opened();
+    const inbox = new LoopInbox(writer, () => {});
+    inbox.insert("next-turn", "", "followup", { wake: false, demotedFrom: null, parts: [
+      { type: "text", text: "Already clean." }, { type: "image", image: { filename: "clean.jpg", mediaType: "image/jpeg", bytes: CLEAN_JPEG } }] });
+    writer.startTurn({ trigger: "user" }); writer.startStep();
+    const [claimed] = inbox.claim("next-turn");
+    recordNativeOrderedMessage(writer, claimed!);
+    const events = writer.readEvents(), image = events.find(row => row.event_type === "user/attachment")!;
+    expect(() => validateAcpOrderedHistory(root, withMeta(events, image.id, meta => { delete meta.sourceSha256; delete meta.sentSha256; }))).not.toThrow();
   });
 
   test("an audio bundle's image rows verify against the original image the same way", () => {

@@ -31,11 +31,10 @@ function stripJpeg(b: Buffer): Buffer {
   const kept: Buffer[] = [b.subarray(0, 2)];
   let i = 2, frame = false;
   for (;;) {
-    if (i + 4 > b.length || b[i] !== 0xff) malformed("JPEG segment is truncated or misaligned");
+    if (i + 4 > b.length || b[i] !== 0xff) malformed("JPEG segment is truncated, misaligned or runs past the image");
     const marker = b[i + 1]!;
     if (marker === 0xff || marker === 0x00 || marker === 0x01 || (marker >= 0xd0 && marker <= 0xd9)) malformed("JPEG has an unexpected marker before SOS");
     const end = i + 2 + b.readUInt16BE(i + 2);
-    if (end < i + 4 || end > b.length) malformed("JPEG segment length runs past the image");
     // ponytail: stops at the first SOS, so a segment between progressive scans is kept; walk scans if one ever carries metadata.
     if (marker === 0xda) {
       if (!frame) malformed("JPEG reaches SOS without a frame header");
@@ -107,7 +106,6 @@ function stripGif(b: Buffer): Buffer {
   let i = 13 + table(b[10]!);
   const kept: Buffer[] = [];
   for (;;) {
-    if (i >= b.length) malformed("GIF has no trailer");
     const start = i, introducer = b[i]!;
     if (introducer === 0x3b) {
       if (i + 1 !== b.length) malformed("GIF has bytes after its trailer");
