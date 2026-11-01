@@ -18,8 +18,11 @@ export function prepareReceiptWriter(workspace: string) {
   const key = getReceiptChildKey(workspace); current(workspace, state.current.sha256);
   return Object.freeze({ sha256: state.current.sha256, key });
 }
+const REFUSED = "receipt child signing requires an unlocked signing vault";
+/** AMC_NO_SIGN=1 authorizes no receipt on either branch: a real receipt on an unsigned capture would pass as signed evidence. */
+export function assertReceiptSigning(): void { if (process.env.AMC_NO_SIGN === "1") throw new Error(REFUSED); }
 function current(workspace: string, expected: string) {
-  if (process.env.AMC_NO_SIGN === "1" || !vaultStatus(workspace).unlocked) throw new Error("receipt child signing requires an unlocked signing vault");
+  assertReceiptSigning(); if (!vaultStatus(workspace).unlocked) throw new Error(REFUSED);
   const state = readReceiptAuthorityState(workspace);
   if (state === null || state.current.sha256 !== expected) throw new Error("receipt authority changed; reopen the ledger");
   const named = configuredRef(loadKeysConfig(workspace), "receipt"), binding = state.binding.binding;
@@ -35,6 +38,7 @@ export type PreparedReceiptWriter = ReturnType<typeof prepareReceiptWriter>;
 /** SQL already owns its immediate transaction/savepoint. All child work here is local. */
 export function withLedgerReceipt<T>(ledger: ReceiptSqlReader, prepared: PreparedReceiptWriter, stream: ReceiptStream, metadata: Record<string, unknown>, ts: number,
   append: (meta: Record<string, unknown>, mint: (input: Omit<MintReceiptInput, "privateKeyPem">) => ReturnType<typeof mintReceipt>) => T): T {
+  assertReceiptSigning();
   if (RECEIPT_AUTHORITY_META in metadata) throw new Error("receipt authority metadata is reserved");
   if (!ledger.db.inTransaction) throw new Error("receipt minting requires the existing SQL transaction");
   // BEGIN IMMEDIATE already excludes owner cutover: the default path needs no new file lock or filesystem effect.

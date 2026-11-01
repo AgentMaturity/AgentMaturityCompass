@@ -262,12 +262,12 @@ export function writeAssuranceAudit(params: {
     scenarioId: params.scenarioId,
     ...params.attests
   });
-  const event = params.ledger.appendEvidenceWithReceipt({
+  const evidence = {
     sessionId: params.sessionId,
     runtime: params.runtime,
-    eventType: "audit",
+    eventType: "audit" as const,
     payload,
-    payloadExt: "json",
+    payloadExt: "json" as const,
     inline: true,
     meta: {
       source: "assurance",
@@ -279,7 +279,12 @@ export function writeAssuranceAudit(params: {
       agentId: params.agentId,
       trustTier: params.trustTier,
       ...params.attests
-    },
+    }
+  };
+  // `assurance run --no-sign` mints no receipt (AMC_NO_SIGN=1 authorizes none): the audit is a plain unsigned row.
+  if (process.env.AMC_NO_SIGN === "1") return params.ledger.appendEvidence(evidence);
+  const event = params.ledger.appendEvidenceWithReceipt({
+    ...evidence,
     receipt: {
       kind: params.auditType.startsWith("TOOL_") ? "tool_action" : "guard_check",
       agentId: params.agentId,
