@@ -10,6 +10,7 @@ import { orderedParts } from "./fixtures/nativeOrderedImageHarness.js";
 import { SessionService } from "../src/session/sessionService.js";
 import { readNativeSessionEvents } from "../src/session/readNativeSessionEvents.js";
 import { initWorkspace } from "../src/workspace.js";
+import { paddedPng } from "./helpers/paddedPng.js";
 
 type Frame = { id?: number; result?: Record<string, unknown>; error?: { code: number; message: string; data?: unknown } };
 let workspace: string;
@@ -41,8 +42,7 @@ function recordedImage(sessionId: string, size: number): void {
     const writer = new SessionService(workspace);
     writer.open({ sessionId: sessionId, agentId: "default", harnessVersion: "fixture", compositionDigest: "fixture", policyDigest: "fixture" });
     writer.recordSystemPrompt("Image fixture."); writer.startTurn({ trigger: "user" }); writer.startStep();
-    const image = Buffer.alloc(size, 0x61);
-    Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jZ1sAAAAASUVORK5CYII=", "base64").copy(image);
+    const image = paddedPng(Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jZ1sAAAAASUVORK5CYII=", "base64"), size, () => 0x61);
     writer.recordUserAttachment({ filename: "large.png", content: image, kind: "image", mimeType: "image/png" });
     writer.endStep({ stopReason: "end_turn", usage: null }); writer.endTurn({ reason: "complete" }); writer.sealTurn(); writer.close({ reason: "completed" });
 }
