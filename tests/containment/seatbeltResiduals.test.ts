@@ -116,7 +116,10 @@ print("found=%s"%(service!=0)); print("open=%s"%hex(iokit.IOServiceOpen(service,
       expect(call.receipt.confined).toBe(true);
       expect(call.data).toMatchObject({ status: 200, body: "owned-p105-origin" });
       expect(origin.requests.slice(before)).toEqual([{ method: "GET", url: "/fetched" }]);
-      expect(f.egress.map(row => row.row)).toEqual([{ host: "127.0.0.1", port: origin.port, decision: "allow", reason: "127.0.0.1 is listed as an IP literal" }]);
+      expect(f.egress.map(row => row.row)).toEqual([
+        { host: "127.0.0.1", port: origin.port, decision: "allow", reason: "127.0.0.1 is listed as an IP literal" },
+        { host: "127.0.0.1", port: origin.port, decision: "allow", reason: "connected", connectedAddress: "127.0.0.1" },
+      ]);
       passed = true;
     } finally { await f.finish(passed); }
   });
