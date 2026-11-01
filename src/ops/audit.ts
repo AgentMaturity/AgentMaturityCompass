@@ -23,19 +23,23 @@ export function appendOpsAuditEvent(params: {
       binaryPath: "amc",
       binarySha256: sha256Hex(Buffer.from("amc", "utf8"))
     });
-    const event = ledger.appendEvidenceWithReceipt({
+    const entry = {
       sessionId,
-      runtime: "unknown",
-      eventType: "audit",
+      runtime: "unknown" as const,
+      eventType: "audit" as const,
       payload: json,
-      payloadExt: "json",
+      payloadExt: "json" as const,
       inline: true,
       meta: {
         auditType: params.auditType,
         severity: params.severity ?? "LOW",
         trustTier: "OBSERVED",
         source: "ops"
-      },
+      }
+    };
+    // AMC_NO_SIGN=1 mints no receipt: the audit is still recorded, as a plain unsigned row that ledger verification rejects.
+    const event = process.env.AMC_NO_SIGN === "1" ? ledger.appendEvidenceDetailed(entry) : ledger.appendEvidenceWithReceipt({
+      ...entry,
       receipt: {
         kind: "guard_check",
         agentId: "system",
