@@ -7,6 +7,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import { writeAssuranceAudit } from "../../src/assurance/evidenceWriters.js";
+import { appendOpsAuditEvent } from "../../src/ops/audit.js";
 import { computeIncidentHash, createIncidentStore } from "../../src/incidents/incidentStore.js";
 import { withLedgerReceipt } from "../../src/keys/receiptWriter.js";
 import { readReceiptAuthorityState } from "../../src/keys/receiptAuthorityState.js";
@@ -70,6 +71,17 @@ test("assurance run --no-sign audits are plain unsigned rows without a receipt",
   expect(meta.auditType).toBe("ASSURANCE_TARGET_RESOLVED");
   expect(meta).not.toHaveProperty("receipt");
   expect(meta).not.toHaveProperty("receipt_id");
+});
+
+test("ops audits (the deletion gate's record) are plain unsigned rows without a receipt", () => {
+  const audit = appendOpsAuditEvent({ workspace, auditType: "DELETION_ALLOWED", payload: { executor: "test" } });
+  expect(audit.eventHash).toMatch(/^[a-f0-9]{64}$/);
+  const reader = openLedger(workspace);
+  try {
+    const row = reader.db.prepare("SELECT writer_sig, meta_json FROM evidence_events WHERE id = ?").get(audit.eventId) as { writer_sig: string; meta_json: string };
+    expect(row.writer_sig).toBe("unsigned");
+    expect(JSON.parse(row.meta_json)).not.toHaveProperty("receipt");
+  } finally { reader.close(); }
 });
 
 test("auto-linking to an open incident writes unsigned link and edge rows", () => {

@@ -4064,6 +4064,12 @@ components:
           type: string
           pattern: ^[A-Za-z0-9_-]{8,128}$
           description: Owner-scoped idempotency key; a retry with the same key and body answers the recorded result.
+        via:
+          type: string
+          enum:
+            - studio
+            - mcp
+          description: The surface the sender states (self-reported); default studio.
     A4Presence:
       type: object
       additionalProperties: false

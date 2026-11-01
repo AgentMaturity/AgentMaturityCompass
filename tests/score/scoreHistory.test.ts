@@ -324,4 +324,18 @@ describe("ScoreHistoryStore", () => {
     expect(history[0].dimensionScores.governance).toBe(0.9);
     expect(history[1].dimensionScores.governance).toBe(0.8);
   });
+
+  it("under AMC_NO_SIGN=1 writes an unsigned snapshot that integrity verification rejects", () => {
+    const previous = process.env.AMC_NO_SIGN;
+    process.env.AMC_NO_SIGN = "1";
+    try {
+      const snapshot = store.recordSnapshot({ agentId: "agent-1", dimensionScores: { governance: 0.5 }, overallScore: 0.5, level: 2 });
+      expect(snapshot.signature).toBe("unsigned");
+    } finally {
+      if (previous === undefined) delete process.env.AMC_NO_SIGN; else process.env.AMC_NO_SIGN = previous;
+    }
+    const result = store.verifyIntegrity("agent-1");
+    expect(result.ok).toBe(false);
+    expect(result.errors.join("\n")).toMatch(/signature invalid/);
+  });
 });

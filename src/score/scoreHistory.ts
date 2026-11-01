@@ -184,7 +184,8 @@ export class ScoreHistoryStore {
     });
 
     const snapshotHash = sha256Hex(canonical);
-    const signature = signHexDigest(snapshotHash, this.monitorPrivateKey());
+    // Under AMC_NO_SIGN=1 no row carries a real signature, matching the ledger; verifyIntegrity rejects "unsigned".
+    const signature = process.env.AMC_NO_SIGN === "1" ? "unsigned" : signHexDigest(snapshotHash, this.monitorPrivateKey());
 
     this.db.prepare(`
       INSERT INTO score_history
