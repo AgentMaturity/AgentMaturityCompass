@@ -54,15 +54,14 @@ function buildEvidenceExamples(question: DiagnosticQuestion): string[] {
   const level3Option = question.options.find((option) => option.level === 3);
   const level3Gate = question.gates.find((gate) => gate.level === 3);
   const examples: string[] = [];
+  // P1-07: a level AMC cannot evaluate gets its reason, never that gate's requirements, L3 evidence or bank hints.
+  const notEvaluated = notEvaluatedLevel(question, 0, 3);
+  if (notEvaluated) return [notEvaluated.notice];
 
   if (level3Option) {
     examples.push(...level3Option.typicalEvidence.slice(0, 2).map((row) => compactSentence(row)));
   }
-  // P1-07: a level AMC cannot evaluate gets its reason, never that gate's earlier requirements.
-  const notEvaluated = notEvaluatedLevel(question, 0, 3);
-  if (notEvaluated) {
-    examples.push(notEvaluated.notice);
-  } else if (level3Gate?.requiredEvidenceTypes.length) {
+  if (level3Gate?.requiredEvidenceTypes.length) {
     examples.push(`Required evidence types for L3 include: ${level3Gate.requiredEvidenceTypes.join(", ")}.`);
   }
   if (question.evidenceGateHints.trim().length > 0) {

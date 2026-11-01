@@ -3851,7 +3851,7 @@
       ],
       "lastReviewed": "2026-10-03",
       "verified": false,
-      "openQuestions": ["Statute text and effective date: primary text unreachable 2026-10-03 (ilga.gov ECONNREFUSED; retried 2026-10-04T05:06Z). Obligation summary from the health digest (IDFPR release), not from the Act."],
+      "openQuestions": ["Statute text and effective date: primary text unreachable 2026-10-03 (ilga.gov ECONNREFUSED; retried 2026-10-04T05:06Z; connection to 12.43.67.2:443 and :80 timed out 2026-11-01T01:13Z-01:16Z). Obligation summary from the health digest (IDFPR release), not from the Act."],
       "taskStatus": "in force",
       "affectedPacks": ["wellness-management", "professional-practice"],
       "provenance": ["research/health/digest.json:1155"]
@@ -4953,11 +4953,11 @@
         { "id": "2026-01-01-effective-date-as-stated", "date": "2026-01-01", "event": "Effective date (as stated in the program task brief; not read from statute)", "verified": false, "url": "https://www.ilga.gov/legislation/publicacts/fulltext.asp?Name=103-0804", "retrievedAt": "2026-10-04T05:12:00Z" }
       ],
       "sources": [
-        { "title": "Public Act 103-0804 full text (attempted)", "url": "https://www.ilga.gov/legislation/publicacts/fulltext.asp?Name=103-0804", "publisher": "Illinois General Assembly", "retrievedAt": "2026-10-04T05:12:00Z", "fetched": false, "note": "ECONNREFUSED 12.43.67.2:443 on 2026-10-04T05:06Z; also unreachable 2026-10-03" }
+        { "title": "Public Act 103-0804 full text (attempted)", "url": "https://www.ilga.gov/legislation/publicacts/fulltext.asp?Name=103-0804", "publisher": "Illinois General Assembly", "retrievedAt": "2026-10-04T05:12:00Z", "fetched": false, "note": "ECONNREFUSED 12.43.67.2:443 on 2026-10-04T05:06Z; also unreachable 2026-10-03; anonymous retry 2026-11-01T01:13Z-01:16Z timed out on :443 and :80, nothing retrieved, so no sha256" }
       ],
       "lastReviewed": "2026-10-03",
       "verified": false,
-      "openQuestions": ["primary text unreachable 2026-10-03 (ilga.gov ECONNREFUSED 2026-10-03 and 2026-10-04T05:06Z). Status 'in-force' is unconfirmed."],
+      "openQuestions": ["primary text unreachable 2026-10-03 (ilga.gov ECONNREFUSED 2026-10-03 and 2026-10-04T05:06Z; timed out 2026-11-01T01:13Z-01:16Z). Status 'in-force' is unconfirmed."],
       "taskStatus": "in force",
       "affectedPacks": ["compliance:globalRegulatory", "future-of-work"],
       "provenance": ["research/cross-framework/digest.json:1295"]

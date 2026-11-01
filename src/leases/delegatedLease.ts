@@ -83,7 +83,7 @@ export function issueChildLease(workspace: string, parentToken: string, child: {
   saveDelegationChain(workspace, extended);
   const classes = lease.executeActionClasses === undefined ? child.allowedActionClasses
     : lease.executeActionClasses.filter((actionClass) => child.allowedActionClasses === undefined || child.allowedActionClasses.includes(actionClass));
-  return issueLeaseToken({ workspace, workspaceId: lease.workspaceId, agentId: lease.agentId, ttlMs: remaining - 1_000, scopes: lease.scopes,
+  return issueLeaseToken({ workspace, workspaceId: lease.workspaceId, agentId: lease.agentId, ttlMs: remaining - 1_000, notAfterTs: lease.expiresTs, scopes: lease.scopes,
     ...(classes === undefined ? {} : { executeActionClasses: [...classes] }), routeAllowlist: lease.routeAllowlist, modelAllowlist: lease.modelAllowlist,
     maxTokensPerMinute: lease.maxTokensPerMinute, maxRequestsPerMinute: lease.maxRequestsPerMinute, maxCostUsdPerDay: lease.maxCostUsdPerDay,
     workOrderId: lease.workOrderId ?? null, ...(lease.principal === undefined ? {} : { principal: lease.principal }),

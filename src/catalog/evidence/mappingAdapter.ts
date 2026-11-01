@@ -41,7 +41,8 @@ export function ledgerChainError(events: readonly EvidenceEvent[], monitorKeys: 
     const delegated = operationalEvidenceProblems(options.workspace, events, options);
     if (delegated.length) return delegated.slice(0, 3).join("; ");
   }
-  // ponytail: rehashes the whole chain on every report; checkpoint a verified prefix if ledgers grow large.
+  // ponytail: rehashes the whole chain on every report. A cache keyed by a verified head hash would trust a prefix row
+  // whose bytes changed under an unchanged event_hash; checkpoint only behind a signed, row-byte-binding anchor (P1-26).
   let previous = "GENESIS";
   for (const event of events) {
     if (event.prev_event_hash !== previous) return `ledger chain broken at event ${event.id}`;

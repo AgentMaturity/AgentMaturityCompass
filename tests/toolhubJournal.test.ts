@@ -169,6 +169,11 @@ describe("ToolHub journal selection on algorithm fixtures", () => {
   it.each(journalCases)("%s %s journals=%s", (mode, actionClass, expected) => {
     expect(isJournaledToolhubExecution(mode, actionClass)).toBe(expected);
   });
+
+  it.each(["READ_ONLY", "WRITE_LOW", "WRITE_HIGH"] as const)("an approved EXECUTE %s journals; an approved SIMULATE does not", (actionClass) => {
+    expect(isJournaledToolhubExecution("EXECUTE", actionClass, true)).toBe(true);
+    expect(isJournaledToolhubExecution("SIMULATE", actionClass, true)).toBe(false);
+  });
 });
 
 describe("ToolHub execution ID binding", () => {

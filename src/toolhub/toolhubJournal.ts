@@ -16,8 +16,12 @@ import type { ToolBlastRadiusConsent } from "./blastRadiusConsent.js";
 import { appendToolEvidenceWithReceipt, redactedEvidenceValue } from "./toolhubReceipts.js";
 import type { ToolDefinition } from "./toolsSchema.js";
 
-export const isJournaledToolhubExecution = (mode: ExecutionMode, actionClass: ActionClass): boolean =>
-  mode === "EXECUTE" && actionClass !== "READ_ONLY" && actionClass !== "WRITE_LOW";
+/**
+ * Journaled: executions above WRITE_LOW, and any execution an approval authorizes (`approved`), whose approval the
+ * journal's recheck spends, so a failed effect leaves an execution to reconcile instead of a spent approval (P1-02).
+ */
+export const isJournaledToolhubExecution = (mode: ExecutionMode, actionClass: ActionClass, approved = false): boolean =>
+  mode === "EXECUTE" && (approved || (actionClass !== "READ_ONLY" && actionClass !== "WRITE_LOW"));
 
 export function toolhubExecutionId(workspaceId: string, intentId: string): string {
   return `exec_${sha256Hex(`toolhub:${workspaceId}:${intentId}`).slice(0, 32)}`;

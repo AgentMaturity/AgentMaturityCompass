@@ -6,7 +6,7 @@
 import { z } from "zod";
 import type { SignedDigest } from "../../crypto/signing/signerTypes.js";
 import { validateStationScope } from "../../domains/stations.js";
-import { LEGACY_OPERATING_PROFILE_SCHEMA_VERSION, OPERATING_PROFILE_SCHEMA_VERSION } from "../../domains/operatingProfiles/operatingProfileTypes.js";
+import { LEGACY_OPERATING_PROFILE_SCHEMA_VERSION, OPERATING_PROFILE_SCHEMA_VERSION, type OperatingProfile } from "../../domains/operatingProfiles/operatingProfileTypes.js";
 import type { ToolsConfig } from "../../toolhub/toolsSchema.js";
 import type { ActionClass } from "../../types.js";
 import type { TrustContext } from "../../trust/trustContext.js";
@@ -104,6 +104,12 @@ export interface CompileInput {
    * bytes (P1-10F). The compiler reads no file. Absent, the visible tools are the built-in default list.
    */
   signedTools?: SignedToolsInput;
+  /**
+   * The proposed signed-config fragments of the F1 operating profile the deployment profile references, read and
+   * hash-checked by the caller (compileInputs). The plan's fragments start from them instead of F1's defaults; one that
+   * would leave the plan weaker than it compiles without them is refused (OPERATING_PROFILE_WEAKENS).
+   */
+  fromOperatingProfile?: OperatingProfile["proposedSignedConfigs"];
   /**
    * P1-34: promotions effectiveSupport decided, keyed by control id, bound into the plan digest. Only these let reviewed or
    * qualified support stand; without them it compiles experimental. Deciding them reads the clock and trust state, so it

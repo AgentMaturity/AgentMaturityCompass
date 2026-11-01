@@ -44,7 +44,7 @@ import {
   computeLayerScores,
   evaluateLevels,
   eventQuestionIds,
-  notEvaluatedLevel,
+  hintTowardLevel, notEvaluatedLevel,
   overallScore,
   trustLabelFromIntegrity,
   UNTRUSTED_CONFIG_INTEGRITY_CAP
@@ -339,11 +339,11 @@ function prioritizeUpgradeActions(
   return { actions, recommendationControls, targetDiff };
 }
 
-function collectEvidenceChecklist(scores: QuestionScore[]): string[] {
+export function collectEvidenceChecklist(scores: QuestionScore[], questions: readonly DiagnosticQuestion[]): string[] {
   const out = new Set<string>();
   for (const score of scores) {
     if (score.finalLevel < 3) {
-      out.add(`${score.questionId}: capture multi-session evidence with audit + metric events.`);
+      out.add(`${score.questionId}: ${hintTowardLevel(questions.find((q) => q.id === score.questionId), score.finalLevel, 3, "capture multi-session evidence with audit + metric events.")}`);
     }
     if (score.flags.includes("FLAG_UNSUPPORTED_CLAIM")) {
       out.add(`${score.questionId}: avoid unsupported high claims; attach [ev:<eventId>] references.`);
@@ -1288,7 +1288,7 @@ async function runDiagnosticCore(input: RunDiagnosticInput, outputMarkdownPath?:
 
     const prioritized = prioritizeUpgradeActions(questionScores, targetProfile, activeQuestions);
     const confidenceSummary = summarizeConfidenceControls(questionScores, prioritized.recommendationControls);
-    const evidenceToCollectNext = collectEvidenceChecklist(questionScores);
+    const evidenceToCollectNext = collectEvidenceChecklist(questionScores, activeQuestions);
     const questionExplainability = buildQuestionExplainabilityReport({
       agentId,
       runId,

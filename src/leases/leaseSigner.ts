@@ -41,6 +41,8 @@ export interface IssueLeaseInput {
    * not end at this agent.
    */
   delegation?: { readonly chainDigest: string; readonly spiffeId: string | null; readonly ancestorLeaseIds?: readonly string[] };
+  /** The latest expiry the lease may carry (a child's parent's expiresTs); the ttl is clamped to it. */
+  notAfterTs?: number;
 }
 
 function createLeasePayload(input: IssueLeaseInput): LeasePayload {
@@ -51,7 +53,7 @@ function createLeasePayload(input: IssueLeaseInput): LeasePayload {
     v: input.delegation === undefined ? 1 : 2,
     leaseId: `lease_${randomUUID().replace(/-/g, "")}`,
     issuedTs: now,
-    expiresTs: now + Math.max(60_000, input.ttlMs),
+    expiresTs: Math.min(now + Math.max(60_000, input.ttlMs), input.notAfterTs ?? Number.MAX_SAFE_INTEGER),
     workspaceId: input.workspaceId ?? "default",
     agentId: input.agentId,
     ...(input.claimKind === undefined ? {} : { claimKind: input.claimKind }),

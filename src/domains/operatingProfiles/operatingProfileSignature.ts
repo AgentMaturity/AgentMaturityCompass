@@ -32,7 +32,7 @@ export function operatingProfileSigPath(profilePath: string): string {
 }
 
 /** Parses profile bytes and refuses a profile whose recomputed consistency check fails. */
-function parseConsistentProfile(bytes: Buffer): OperatingProfile {
+export function parseConsistentProfile(bytes: Buffer): OperatingProfile {
   let profile: OperatingProfile;
   let violations: string[];
   try {

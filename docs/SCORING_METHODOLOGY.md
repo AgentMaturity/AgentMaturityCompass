@@ -16,8 +16,6 @@ AMC publishes a machine-readable scoring methodology manifest so reports, badges
 
 Current methodology delta: diagnostic levels are cumulative and are earned only from rows that registered emitters write, bound to a question through its evidence map above L1; L3 is not evaluated for any question yet, and L4 and L5 are not evaluated (see How a Level Is Earned). Scores drop wherever seeded, untagged or unregistered evidence counted. Level bands, layer and overall arithmetic, and trust-label thresholds are unchanged.
 
-Previous methodology delta (r223): AMC now derives the public badge methodology assurance hash and the diagnostic methodology-versioning receipt from one canonical source-review boundary and gate selection. This includes the existing OpenAI Simple Evals boundary on both surfaces. Scoring ranges, thresholds, weighting, maturity labels, evidence gates, question-level answer anchors, and historical methodology hashes are unchanged.
-
 Reference verification recognizes hashes emitted by AMC's supported built-in question sets: `amc-legacy-240-v1` and `amc-lifecycle-2026-v1`. Custom question-set hashes fail closed because they are not part of the immutable built-in hash registry; verify those artifacts from their full signed manifest rather than treating them as a published built-in methodology reference.
 
 | Level | Canonical name | Diagnostic range |
@@ -28,10 +26,6 @@ Reference verification recognizes hashes emitted by AMC's supported built-in que
 | L3 | Defined | 3-3.99 |
 | L4 | Managed | 4-4.74 |
 | L5 | Optimizing | 4.75-5 |
-
-Prior methodology delta: AMC separated artifact validity from evidence readiness across Score, lifecycle artifacts, Studio, report sharing, and executive briefs. A `VALID` seal proves that a report is internally intact and verifies under its declared trust boundary. It does not prove evidence sufficiency. Only `READY` reports are claim-eligible; `LIMITED`, `INSUFFICIENT_EVIDENCE`, and `UNVERIFIED` fail closed with a concrete next evidence step.
-
-Earlier methodology delta: Cua-style computer-use benchmark public-methodology source-review assurance binds the existing methodology-versioning receipt and badge assurance hash. trycua/cua repository, README, Cua-Bench docs, desktop sandbox, OSWorld, ScreenSpot, Windows Arena, task, trajectory, and benchmark-run metadata remains source-review scope only; Score, Shield, and Watch claims require AMC-owned eval-pack, task dataset, environment image, setup/test/oracle proof, validation table, threshold policy, methodology version/changelog/deprecation/migration proof, metric owner, sample size, confidence interval, signed evidence, no-copy proof, badge assurance, and row hashes. No Cua adapter, SDK/importer, benchmark runner, desktop sandbox integration, trajectory importer, dataset mirror, parity layer, or copied upstream code/prose/config/tasks/trajectories is introduced.
 
 Prior no-bloat boundaries remain active: No Lunary adapter, SDK/importer, trace importer, prompt manager, dashboard clone, parity layer, or copied website prose/config/data/examples is introduced. No LangSmith adapter, SDK/importer, trace importer, evaluator importer, parity layer, or copied website prose/config/data/examples is introduced. No PocketFlow subsystem, SDK/importer, adapter, parity layer, framework-compatibility claim, registry mirror, or copied upstream code/prose/config/examples is introduced. No OpenAI Simple Evals subsystem, SDK/importer, adapter, parity layer, or copied upstream code/prose/config/task/result content is introduced. No lm-evaluation-harness subsystem, SDK/importer, adapter, parity layer, or copied upstream code/prose/config/task/result content is introduced. No chemistry/domain subsystem, connector, importer, parity layer, or copied paper prose/data is introduced.
 
