@@ -35,7 +35,7 @@ import type { A4ReadinessState } from "./a4Readiness.js";
 import { a4ValueClaimV1Schema, laneForClaimKind, type A4ChainLink, type A4ValueClaimV1 } from "./a4Schema.js";
 import { A4StoreError, openA4Store, type A4ChangeSpec, type A4Store } from "./a4Store.js";
 import { errorCodeOf } from "./aspireUnderstand.js";
-import { activateSpecOf, currentRelease, cycleLinks } from "./spec/activate.js";
+import { activateSpecOf, currentRelease, cycleLinks, positiveNumber } from "./spec/activate.js";
 import { answerValues, aspireSpecOf, hypothesisDigestOf, listValue, previousHypotheses, textValue } from "./spec/aspire.js";
 
 /** ponytail: a claim lists at most this many ledger refs; a KPI resting on more is untraced past it (value null). Page them if that bites. */
@@ -243,6 +243,34 @@ function claimRow(store: A4Store, state: A4ReadinessState, link: A4ChainLink, re
     integrity: { status: envelopeValid ? "verified_locally" : "integrity_failed", envelopeValid, ref: { refId: link.body.refId, sha256: link.body.sha256 } } } };
 }
 
+/** P3-20's ROI worksheet, per workflow and per year: reviewer hours saved at the loaded rate, plus prevented findings at their remediation cost, minus costs. */
+export const ROI_FORMULA = "V = (h_before − h_after) × r + n_prevented × c_finding − (p + i + m)";
+const ROI_TERMS = ["h_before", "h_after", "r", "n_prevented", "c_finding", "p", "i", "m"] as const;
+export type RoiInput = { readonly low: number; readonly high: number; readonly source: string };
+type Range = readonly [number, number];
+const times = (a: Range, b: Range): Range => {
+  const corners = [a[0] * b[0], a[0] * b[1], a[1] * b[0], a[1] * b[1]];
+  return [Math.min(...corners), Math.max(...corners)];
+};
+/**
+ * The worksheet over the inputs named, each a low-to-high range with its source; V is a range. A missing or invalid
+ * input is never zero: V is then null and the worksheet `not_evaluated`, naming each one. Every input is the members' or
+ * partner's statement, so the result is self_reported whatever it says.
+ */
+export function roiWorksheet(given: Partial<Record<(typeof ROI_TERMS)[number], RoiInput>>) {
+  const inputs = Object.fromEntries(ROI_TERMS.map((term) => [term, given[term] ?? null])) as Record<(typeof ROI_TERMS)[number], RoiInput | null>;
+  const missing = ROI_TERMS.filter((term) => inputs[term] === null);
+  const invalid = ROI_TERMS.filter((term) => { const v = inputs[term]; return v !== null && !(Number.isFinite(v.low) && Number.isFinite(v.high) && v.low >= 0 && v.low <= v.high); });
+  const reasonCodes = [...missing.map((term) => `ROI_INPUT_MISSING:${term}`), ...invalid.map((term) => `ROI_INPUT_INVALID:${term}`)];
+  if (reasonCodes.length > 0) return { status: "not_evaluated" as const, formula: ROI_FORMULA, claimKind: "self_reported" as const, inputs, value: null, reasonCodes };
+  const r = (term: (typeof ROI_TERMS)[number]): Range => [inputs[term]!.low, inputs[term]!.high];
+  const hours = times([r("h_before")[0] - r("h_after")[1], r("h_before")[1] - r("h_after")[0]], r("r"));
+  const findings = times(r("n_prevented"), r("c_finding"));
+  const costs = [r("p"), r("i"), r("m")].reduce<Range>((sum, cost) => [sum[0] + cost[0], sum[1] + cost[1]], [0, 0]);
+  return { status: "evaluated" as const, formula: ROI_FORMULA, claimKind: "self_reported" as const, inputs,
+    value: { low: hours[0] + findings[0] - costs[1], high: hours[1] + findings[1] - costs[0], unit: "usd_per_year" }, reasonCodes: [] };
+}
+
 /**
  * GET …/value: the four-lane view of the current release's value claims (the newest review's), the members' other objectives (self_reported,
  * not evaluated), the ROI worksheet (a recommendation, numeric self-answers) and the hypotheses. It reads; it never runs
@@ -263,10 +291,13 @@ export function valueView(store: A4Store, state: A4ReadinessState, regulated: bo
       reason: "an objective in the members' words names no evidence source; the value claims are the contract's KPIs" } })));
   const producer = `a4:${projectId}:value`;
   const claims = rows.flatMap((entry) => entry.claims);
+  const budgetCap = positiveNumber(values.get("budgetCostUsdPerDay"));
   return { projectId, view: "value", releaseId, status: rows.length > 0 ? "recorded" : "not_evaluated",
     reasonCodes: releaseId === null ? ["NO_RELEASE"] : rows.length > 0 ? [] : ["NO_VALUE_CLAIM_RECORDED"],
     claims: rows.map((entry) => entry.row), objectives,
-    roiWorksheet: { status: "not_evaluated", formula: "P3-20", inputs: { budgetCostUsdPerDay: textValue(values.get("budgetCostUsdPerDay")) },
+    // Only m is answered in Activate (the cost cap, which overstates spend); the other P3-20 inputs come from a partner's P1-29 baseline and are not collected yet.
+    roiWorksheet: { ...roiWorksheet(budgetCap === null ? {} : { m: { low: budgetCap * 365, high: budgetCap * 365,
+      source: "Activate answer budgetCostUsdPerDay × 365: the agent's cost cap, an upper bound on its spend" } }),
       claim: envelopeForUnboundResult({ producer: `${producer}:roi`, method: "numeric_self_answer", regulated, now }) },
     hypotheses: hypothesesView(state, now), boundary: BOUNDARY,
     claim: claims.length > 0 ? envelopeForAggregate(producer, claims, now) : envelopeForUnboundResult({ producer, method: "human_review", regulated, now }) };
