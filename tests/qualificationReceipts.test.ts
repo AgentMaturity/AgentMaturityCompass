@@ -107,6 +107,12 @@ describe("P0-01 qualification receipts", () => {
     expect(validateQualificationDir(root).errors).toEqual([expect.stringMatching(/^2026-10-30-WP3: receipt.json\/key must match pattern/)]);
   });
 
+  test("an upgrade from a published release (UPGRADE-1.1.1) is a receipt key; a partial version is not", () => {
+    writeReceipt(receipt({ key: "UPGRADE-1.1.1", date: "2026-11-01" }), "2026-11-01-UPGRADE-1.1.1");
+    writeReceipt(receipt({ key: "UPGRADE-1.1", date: "2026-11-01" }), "2026-11-01-UPGRADE-1.1");
+    expect(validateQualificationDir(root).errors).toEqual([expect.stringMatching(/^2026-11-01-UPGRADE-1\.1: receipt.json\/key must match pattern/)]);
+  });
+
   test("a folder date that differs from the receipt date fails", () => {
     writeReceipt(receipt({ date: "2026-10-06" }));
     expect(errorsFor()).toMatch(/date/);
