@@ -190,7 +190,8 @@ const MEMBER_KEY = String.raw`(?<k>(?:[A-Za-z0-9_.-]|\\+u[0-9A-Fa-f]{4}){1,64})`
  * leaves an escaped quote, so a quoted member's value would run on to the next quote.
  */
 const PAIR_RULES: readonly { readonly type: "secret_json" | "secret_field"; readonly re: RegExp; readonly exactOnly: boolean }[] = Object.freeze([
-  { type: "secret_json", exactOnly: true, re: new RegExp(String.raw`(?<q>\\?["'])${MEMBER_KEY}\k<q>\s*:\s*(?<r>\\?["'])(?<v>(?:(?!\k<r>)(?:[^\\]|\\[\s\S]))*)\k<r>`) },
+  // A string value ends at its closing quote, or unclosed (truncated output) at the end of its line.
+  { type: "secret_json", exactOnly: true, re: new RegExp(String.raw`(?<q>\\?["'])${MEMBER_KEY}\k<q>\s*:\s*(?<r>\\?["'])(?<v>(?:(?!\k<r>)(?:[^\\\r\n]|\\[^\r\n]))*)(?:\k<r>|(?=[\r\n]|$))`) },
   { type: "secret_json", exactOnly: true, re: new RegExp(String.raw`(?<q>\\?["'])${MEMBER_KEY}\k<q>\s*:\s*(?<v>-?\d[\d.eE+-]*)`) },
   { type: "secret_field", exactOnly: false, re: new RegExp(String.raw`(?:^|[?&;\s])${MEMBER_KEY}=(?<v>[^&;\s#]*)`) },
   { type: "secret_field", exactOnly: true, re: new RegExp(String.raw`name="${MEMBER_KEY}"[^\r\n]{0,256}\r?\n(?:[^\r\n]{1,256}\r?\n){0,8}\r?\n(?<v>[^\r\n]*)`) },
