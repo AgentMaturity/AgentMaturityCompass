@@ -19,7 +19,7 @@ A strict JSON object (`deploymentProfileSchema` in `src/catalog/compiler/types.t
 | `deployment` | `tenantId`, `workspaceId`, `deploymentId` and at least one `agentIds` entry. |
 | `primaryStation`, `stations`, `domains`, `jurisdictions`, `roles`, `entityTypes`, `riskClass`, `useCases`, `dataClasses` | Facts. Stations are the seven station ids; `stations` must include `primaryStation` when both are known. |
 | `euRoleRecord`, `art63Record` | `{ ref, sha256 }` or null: artifacts, not flags. The compiler carries them; it does not check them. |
-| `operatingProfile` | `{ path, sha256, schemaVersion }` of an F1 operating profile (path relative to the working directory), or null. The CLI refuses a file whose bytes do not hash to `sha256`. |
+| `operatingProfile` | `{ path, sha256, schemaVersion }` of an F1 operating profile (path relative to the working directory, inside it), or null. `compileInputs` refuses a file it cannot read there, whose bytes do not hash to `sha256`, whose `schemaVersion` differs or that fails F1's consistency check; the plan's signed-config fragments then start from that profile's (`fromOperatingProfile`, see Outputs). |
 | `exceptions` | Reviewer exceptions, below. |
 
 A fact is `{ value, provenance, source, reviewedBy }`. `value: null` means unknown: the compiler never guesses.
@@ -135,6 +135,15 @@ signature and schema from one read); the compiler reads no file. Without it the 
 P1-10F. Both callers that compile against a workspace, `amc catalog compile` and A4 Adapt's Understand, get it from
 `compileInputs` (`src/catalog/compileInputs.ts`): `{}` when there is no tools.yaml, and `TOOLS_CONFIG_UNVERIFIED`
 when one is present but does not verify, never the wider default list.
+
+`fromOperatingProfile` is the referenced F1 profile's `proposedSignedConfigs`, which `compileInputs` reads when the
+deployment profile names one. The plan's approval policy, budgets (per agent id the profile carries), tools, action
+policy and ops policy start from those fragments instead of F1's defaults, and the plan's controls narrow them as they
+narrow the defaults; with a signed tools.yaml the visible tools are also limited to the profile's tool names. The
+firewall fragment stays `block`, the strictest mode. A profile fragment that would leave the plan weaker than the same
+compile without it is refused (`OPERATING_PROFILE_WEAKENS`), except retention days, which have two legitimate strict
+directions (record-keeping and minimization), so the profile's stand. A4 builds its deployment profile with
+`operatingProfile: null`, so it never seeds.
 
 - `profile`: id, the SHA-256 of the canonical normalized profile, fact provenance, and the profile's
   `{ tenantId, deploymentId }`, which authorization records under the active plan bind (P1-78; absent from plans
@@ -335,8 +344,9 @@ amc catalog compile --profile tests/fixtures/catalog/compiler/finance-ops-us.pro
 ## Error codes
 
 `PROFILE_INVALID`, `CATALOG_INVALID`, `UNKNOWN_PARAMETER`, `PARAMETER_TYPE`, `PARAMETER_POINT`, `STRICTNESS_MISMATCH`,
-`EXCEPTION_ON_LAYER0`, `EXCEPTION_UNKNOWN_CONTROL`, `EXCEPTION_UNKNOWN_PARAMETER`, and `TOOLS_CONFIG_UNVERIFIED` from
-`compileInputs` before compilePlan runs.
+`EXCEPTION_ON_LAYER0`, `EXCEPTION_UNKNOWN_CONTROL`, `EXCEPTION_UNKNOWN_PARAMETER`, `OPERATING_PROFILE_WEAKENS`, and
+`TOOLS_CONFIG_UNVERIFIED`, `OPERATING_PROFILE_UNREADABLE` and `OPERATING_PROFILE_INVALID` from `compileInputs` before
+compilePlan runs.
 
 ## Not in this step
 

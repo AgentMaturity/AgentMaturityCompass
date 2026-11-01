@@ -7,6 +7,7 @@ import { buildRuntimePolicy } from "../src/catalog/compiler/runtimePolicy.js";
 import type { CompiledPlan } from "../src/catalog/compiler/types.js";
 import { loadCatalog } from "../src/catalog/loader.js";
 import { listDomainIds } from "../src/domains/domainRegistry.js";
+import { buildOperatingProfile } from "../src/domains/operatingProfiles/operatingProfileBuilder.js";
 import { ACTION_CLASSES } from "../src/governor/actionCatalog.js";
 
 /**
@@ -140,6 +141,29 @@ describe("P1-46: F2 refusal rules, by rule id, as the compiler holds them", () =
     const withF1 = compilePlan({ profile: pinned as never, catalog, asOf: AS_OF });
     expect(withF1.profile.sha256).not.toBe(plain.profile.sha256);
     expect(withF1.runtimePolicy.policyDigest).toBe(plain.runtimePolicy.policyDigest);
+  });
+
+  test.each(listDomainIds().sort())("fromOperatingProfile: %s's fragments start from the referenced F1 profile, not F1's defaults", (station) => {
+    const f1 = buildOperatingProfile({ station: station as never, agentId: "finance-ops-agent", generatedAt: AS_OF }).proposedSignedConfigs;
+    const plain = compilePlan({ profile: stationProfile(station) as never, catalog, asOf: AS_OF });
+    const seeded = compilePlan({ profile: stationProfile(station) as never, catalog, asOf: AS_OF, fromOperatingProfile: f1 });
+    const signed = seeded.runtimePolicy.proposedSignedConfigs as unknown as Signed & { opsPolicy: unknown };
+    expect(signed.budgets.budgets.perAgent["finance-ops-agent"]).toEqual((f1.budgets as unknown as Signed["budgets"]).budgets.perAgent["finance-ops-agent"]);
+    expect(signed.actionPolicy).toEqual(f1.actionPolicy);
+    expect(seeded.runtimePolicy.proposedSignedConfigs.firewall).toEqual({ mode: "block", failClosedOnMissingPolicy: true });
+    expect(seeded.runtimePolicy.policyDigest).not.toBe(plain.runtimePolicy.policyDigest);
+  });
+
+  test("fromOperatingProfile: a profile fragment looser than the plan without it is refused (OPERATING_PROFILE_WEAKENS)", () => {
+    const f1 = buildOperatingProfile({ station: "health", agentId: "finance-ops-agent", generatedAt: AS_OF }).proposedSignedConfigs;
+    const loose = structuredClone(f1) as typeof f1 & { approvalPolicy: Signed["approvalPolicy"] };
+    loose.approvalPolicy.approvalPolicy.actionClasses.WRITE_HIGH = { ...loose.approvalPolicy.approvalPolicy.actionClasses.WRITE_HIGH!, requiredApprovals: 0 };
+    expect(() => compilePlan({ profile: stationProfile("health") as never, catalog, asOf: AS_OF, fromOperatingProfile: loose }))
+      .toThrow(/^OPERATING_PROFILE_WEAKENS: .*approvalPolicy/);
+    const lavish = structuredClone(f1) as typeof f1 & { budgets: Signed["budgets"] };
+    lavish.budgets.budgets.perAgent["finance-ops-agent"]!.daily.maxToolExecutes.SECURITY = 50;
+    expect(() => compilePlan({ profile: stationProfile("health") as never, catalog, asOf: AS_OF, fromOperatingProfile: lavish }))
+      .toThrow(/^OPERATING_PROFILE_WEAKENS: .*budgets/);
   });
 });
 

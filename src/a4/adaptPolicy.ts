@@ -158,7 +158,7 @@ export function understandAdapt(input: { workspace: string; projectId: string; w
   try {
     profile = parseDeploymentProfile(raw);
     catalog = loadAdmittedCatalog();
-    plan = compilePlan({ profile, catalog, asOf: new Date(input.now).toISOString(), ...compileInputs(input.workspace) });
+    plan = compilePlan({ profile, catalog, asOf: new Date(input.now).toISOString(), ...compileInputs(input.workspace, profile) });
   } catch (error) {
     compileError = { code: errorCodeOf(error, "COMPILE_FAILED"), message: (error instanceof Error ? error.message : String(error)).slice(0, 500) };
   }

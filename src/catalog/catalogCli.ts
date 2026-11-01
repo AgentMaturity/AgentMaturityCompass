@@ -12,7 +12,6 @@ import chalk from "chalk";
 import type { Command } from "commander";
 import { assertCompilerOutputOutsideSignedConfigTree } from "./compiler/outputPath.js";
 import { writeFileAtomic } from "../utils/fs.js";
-import { sha256Hex } from "../utils/hash.js";
 import { loadTrustContext } from "../trust/trustContext.js";
 import { activateControlPlan } from "./compiler/activate.js";
 import { compilePlan, parseDeploymentProfile } from "./compiler/compile.js";
@@ -39,10 +38,6 @@ function readSignedPlan(planPath: string): SignedPlan {
 export function compileCatalogPlan(workspace: string, opts: CompileFlags) {
   if (opts.activate && opts.requestReview) throw new Error("--activate needs a review that was already approved; it cannot be combined with --request-review");
   const profile = parseDeploymentProfile(readJson(resolve(workspace, opts.profile)));
-  const ref = profile.operatingProfile;
-  if (ref && sha256Hex(readFileSync(resolve(workspace, ref.path))) !== ref.sha256) {
-    throw new Error(`operating profile ${ref.path} does not match the sha256 the deployment profile records`);
-  }
   // P1-33: a pack's declared reviewed support stands only where its recomputed admission admits it.
   const catalog = loadAdmittedCatalog();
   if (opts.lock) {
@@ -54,8 +49,8 @@ export function compileCatalogPlan(workspace: string, opts: CompileFlags) {
   const previous = opts.previous ? readSignedPlan(resolve(workspace, opts.previous)) : null;
   const now = new Date();
   // P1-10F: the same workspace inputs A4 Adapt compiles with: the verified .amc/tools.yaml, or with none the built-in
-  // default list; one that does not verify refuses.
-  const inputs = compileInputs(workspace);
+  // default list; one that does not verify refuses. And the referenced operating profile, hash-checked, as fragment seed.
+  const inputs = compileInputs(workspace, profile);
   const visibleToolsSource = inputs.signedTools ? { source: "signed-tools-yaml" as const, sha256: inputs.signedTools.sha256 } : { source: "defaults" as const };
   const plan = compilePlan({ profile, catalog, asOf: now.toISOString(), ...inputs,
     ...(profile.mergeExceptions?.length ? { mergeExceptionTrust: loadTrustContext({ now }) } : {}) });
