@@ -1,3 +1,4 @@
+import { imageRowMatchesSource } from "../attachments/imageMetadataStrip.js";
 import { decodeNativeAudioInput, materializeNativeAudioParts, NATIVE_AUDIO_INPUT_FORMAT, type NativeAudioPart } from "../attachments/nativeAudioInput.js";
 import type { EvidenceEvent } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -97,7 +98,7 @@ export function validateNativeAudioProvenance(workspace: string, events: readonl
       } else {
         const media = part.type === "audio" ? part.audio : part.image;
         if (row.event_type !== "user/attachment" || info.filename !== media.filename || info.mimeType !== media.mediaType
-            || info.bytes !== media.bytes.length || !bytes.equals(media.bytes)
+            || !(part.type === "image" ? imageRowMatchesSource(info, part.image, bytes) : info.bytes === media.bytes.length && bytes.equals(media.bytes))
             || info.sourceInputIndex !== (part.type === "audio" ? audioIndex++ : imageIndex++)) return inconsistent("original binary/MIME/filename/length/media-index changed");
       }
     }

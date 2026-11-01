@@ -1,6 +1,7 @@
 import { detonateAttachment } from "../shield/attachmentDetonation.js";
 import { sha256Hex } from "../utils/hash.js";
 import type { SessionService } from "../session/sessionService.js";
+import { stripNativeImageMetadata } from "./imageMetadataStrip.js";
 import { imageTypeForFilename, nativeImageMediaType, snapshotNativeImages } from "./nativeImageInput.js";
 
 /**
@@ -56,7 +57,7 @@ export function ingestAttachment(params: {
   const imageType = imageTypeForFilename(params.filename);
   if (imageType !== null || nativeImageMediaType(bytes) !== null) {
     if (imageType === null) return { ok: false, reason: "Image bytes require an explicit matching supported image filename; they are not text." };
-    try { snapshotNativeImages([{ filename: params.filename, mediaType: imageType, bytes }]); }
+    try { snapshotNativeImages([{ filename: params.filename, mediaType: imageType, bytes: stripNativeImageMetadata(bytes, imageType) }]); }
     catch (error) { return { ok: false, reason: error instanceof Error ? error.message : "Image attachment refused." }; }
   }
   const mimeType = imageType ?? verdict.mimeType;

@@ -20,6 +20,7 @@ import { buildApprovalRow } from "./approvalEventMeta.js";
 import { buildLoopEventRow } from "./loopEventMeta.js";
 import { buildSessionOpenMeta } from "./sessionOpenMeta.js";
 import { assertNativeImageBytes, snapshotNativeImages } from "../attachments/nativeImageInput.js";
+import { stripNativeImageMetadata } from "../attachments/imageMetadataStrip.js";
 import { assertNativeAudioBytes, snapshotNativeAudio, NATIVE_AUDIO_INPUT_FORMAT } from "../attachments/nativeAudioInput.js";
 import { snapshotRecordedGeminiPart } from "./geminiPartMeta.js";
 import type { LoopEventRecord } from "./loopEventMeta.js";
@@ -474,9 +475,11 @@ export class SessionService extends SessionEventWriter {
   }): SessionEventRef {
     const turn = this.currentTurn;
     const step = this.currentStep;
-    const bytes = typeof params.content === "string"
+    const source = typeof params.content === "string"
       ? Buffer.from(params.content, "utf8")
       : Buffer.from(params.content);
+    // An image row holds what a request sends: the source bytes without EXIF/IPTC/XMP/comment metadata (PXB-42).
+    const bytes = params.kind === "image" ? stripNativeImageMetadata(source, params.mimeType) : source;
     if ((params.sourceInputEventId !== undefined || params.sourceInputIndex !== undefined)
         && ((params.kind !== "image" && params.kind !== "audio") || typeof params.sourceInputEventId !== "string" || !params.sourceInputEventId
           || !Number.isSafeInteger(params.sourceInputIndex) || params.sourceInputIndex! < 0)) {
@@ -506,7 +509,7 @@ export class SessionService extends SessionEventWriter {
     return this.recordContent({
       eventType: "user/attachment",
       content: retained === null ? bytes : retained.descriptor,
-      // Names BOTH: the digest of the ORIGINAL bytes makes the slot content-addressed, the filename
+      // Names BOTH: the digest of the recorded bytes (never the spill descriptor) makes the slot content-addressed, the filename
       // keeps it legible to a person reading the log.
       slot: `attachment:${params.filename}:${sha256Hex(bytes).slice(0, 12)}`,
       role: "user",
@@ -517,6 +520,7 @@ export class SessionService extends SessionEventWriter {
         filename: params.filename,
         mimeType: params.mimeType,
         bytes: bytes.byteLength,
+        ...(params.kind === "image" ? { sourceSha256: sha256Hex(source), sentSha256: sha256Hex(bytes) } : {}),
         ...(params.sourceInputEventId === undefined ? {} : { sourceInputEventId: params.sourceInputEventId, sourceInputIndex: params.sourceInputIndex }),
         ...(params.sourceInputFormat === undefined ? {} : { sourceInputFormat: params.sourceInputFormat, sourceContentIndex: params.sourceContentIndex }),
         ...(retained === null ? {} : { [SPILL_META_KEY]: retained.ref })
