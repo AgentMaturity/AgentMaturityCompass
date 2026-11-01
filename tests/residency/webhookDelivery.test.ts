@@ -51,6 +51,13 @@ describe("webhook delivery", () => {
     expect(failing.requests).toHaveLength(1);
   });
 
+  test("a supplied client is never called for a denied attempt: the retry loop checks before every post", async () => {
+    const client = { post: vi.fn(async () => ({ status: 202, body: "" })) };
+    await expect(withWorkspaceScope(blocked, () => deliverWebhookWithRetry({ request: request(`${hook.url}/w`), policy: POLICY, dependencies: { client } })))
+      .rejects.toBeInstanceOf(EgressBlocked);
+    expect(client.post).not.toHaveBeenCalled();
+  });
+
   test("concurrent deliveries keep separate scopes: the blocked one sends nothing, the open one delivers", async () => {
     const [denied, delivered] = await Promise.allSettled([
       withWorkspaceScope(blocked, () => deliverWebhookWithRetry({ request: request(`${hook.url}/w`), policy: POLICY })),
