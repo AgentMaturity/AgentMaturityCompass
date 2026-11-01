@@ -38,6 +38,7 @@ import { wavBytes } from "./fixtures/nativeSignedAudio.js";
 import { initProcessorRegistry } from "../src/dataflow/processorRegistry.js";
 import { redactingSessionFor } from "../src/dataflow/redactingSession.js";
 import { RedactionRefused } from "../src/dataflow/tokenizer.js";
+import { paddedPng } from "./helpers/paddedPng.js";
 
 const PNG = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jZ1sAAAAASUVORK5CYII=", "base64");
 const PASSPHRASE = "disposable-attachment-spill-fixture-passphrase";
@@ -50,13 +51,8 @@ afterEach(async () => {
   vi.unstubAllEnvs();
 });
 
-/** A PNG header followed by a deterministic non-repeating body: passes the media sniff, sized exactly as asked. */
-function png(bytes: number): Buffer {
-  const out = Buffer.alloc(bytes);
-  for (let i = 0; i < bytes; i++) out[i] = (i * 7919 + (i >> 8)) & 0xff;
-  PNG.copy(out);
-  return out;
-}
+/** A well-formed PNG padded inside its container with a deterministic non-repeating body, sized exactly as asked. */
+function png(bytes: number): Buffer { return paddedPng(PNG, bytes, i => i * 7919 + (i >> 8)); }
 type Admission = (input: SessionStoreAppendInput, commit: () => SessionStoreAppendResult) => SessionStoreAppendResult;
 function opened(options: { provision?: boolean; admission?: Admission } = {}) {
   vi.stubEnv("AMC_VAULT_PASSPHRASE", PASSPHRASE);

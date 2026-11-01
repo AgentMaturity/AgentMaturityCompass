@@ -14,6 +14,7 @@ import { sha256Hex } from "../src/utils/hash.js";
 import { imageInput, IMAGE_PNG_BASE64 } from "./fixtures/nativeAcpImageRuntime.js";
 import { orderedCleanup, orderedWorkspace, orderedHarness, openedOrdered, orderedBlocks,
   orderedRequest, expectedImageWire, firstUserWire, orderedCold, PROVIDERS } from "./fixtures/nativeOrderedImageHarness.js";
+import { paddedPng } from "./helpers/paddedPng.js";
 
 afterEach(orderedCleanup);
 describe("ordered image input through public ACP (unexecuted)", () => {
@@ -152,7 +153,7 @@ describe("ordered image input through public ACP (unexecuted)", () => {
     expect(next.frames.filter(frame => frame.method === "session/update")).toEqual([]); expect(next.sent).toEqual([]);
   }, 60_000);
   test("a legitimate local ordered session that outgrows the ACP aggregate replay bound refuses load before any partial replay", async () => {
-    const { h, root, sessionId } = await openedOrdered(); const bytes = Buffer.alloc(OUTGROW_BYTES); imageInput().bytes.copy(bytes);
+    const { h, root, sessionId } = await openedOrdered(); const bytes = paddedPng(imageInput().bytes, OUTGROW_BYTES);
     expect((await h.sessions.get(sessionId)!.promptParts!([{ type: "image", image: { filename: "first.png", mediaType: "image/png", bytes } },
       { type: "text", text: "after the first image" }])).ok).toBe(true);
     await h.call("_amc/session/release", { sessionId }); await h.close();

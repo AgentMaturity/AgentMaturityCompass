@@ -25,6 +25,7 @@ import type { EvidenceEvent } from "../src/types.js";
 import { initWorkspace } from "../src/workspace.js";
 import { SessionService } from "../src/session/sessionService.js";
 import { createNativeAcpImageFixture, IMAGE_PNG_BASE64 } from "./fixtures/nativeAcpImageRuntime.js";
+import { paddedPng } from "./helpers/paddedPng.js";
 
 type Frame = { id?: number; result?: Record<string, unknown>; error?: { code: number; message: string; data?: unknown };
   method?: string; params?: { sessionId: string; update: { sessionUpdate: string; content?: { type: string; text?: string; data?: string; mimeType?: string } } } };
@@ -294,7 +295,7 @@ describe("ACP signed images: public wire and lifecycle (not executed)", () => {
     // Every row stays within the signed per-event cap; a legitimate local session
     // can still outgrow the ACP aggregate replay bound, and loading it must refuse
     // the whole replay rather than truncate it.
-    const bytes = Buffer.alloc(OUTGROW_BYTES); Buffer.from(IMAGE_PNG_BASE64, "base64").copy(bytes);
+    const bytes = paddedPng(Buffer.from(IMAGE_PNG_BASE64, "base64"), OUTGROW_BYTES);
     const result = await h.sessions.get(sessionId)!.prompt("Local image within the signed event cap", [{ filename: "first.png", mediaType: "image/png", bytes }]);
     expect(result.ok).toBe(true);
     await h.call("_amc/session/release", { sessionId }); await h.close();
@@ -316,7 +317,7 @@ describe("ACP signed images: public wire and lifecycle (not executed)", () => {
       expect(projectSessionUpdates(root, writer.readEvents(), 0, { includeUser: true }).updates).toEqual([
         { sessionUpdate: "user_message_chunk", content: { type: "text", text: "Original text attachment" } }
       ]);
-      const bytes = Buffer.alloc(OUTGROW_BYTES); Buffer.from(IMAGE_PNG_BASE64, "base64").copy(bytes);
+      const bytes = paddedPng(Buffer.from(IMAGE_PNG_BASE64, "base64"), OUTGROW_BYTES);
       for (let i = 0; i < OUTGROW_ROWS; i++) writer.recordUserAttachment({ filename: `history-${i}.png`, content: bytes, mimeType: "image/png", kind: "image" });
       writer.endStep({ stopReason: "complete", usage: null }); writer.endTurn({ reason: "complete" }); writer.sealTurn();
       const rows = writer.readEvents();

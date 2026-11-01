@@ -121,6 +121,7 @@ Each projected row carries its signed source inbox event ID, format and
 zero-based `sourceContentIndex`. Images also retain their historical image-only
 `sourceInputIndex`, original MIME, byte length and SHA-256. Original binary bytes
 are never replaced by a UTF-8 representation in queued or signed image payloads.
+Each projected image row holds the original stripped of EXIF (GPS included), IPTC, XMP, comment and PNG text/time metadata, and refuses an image whose container cannot be parsed; the row records `sourceSha256` (the original) and `sentSha256` (the bytes the provider receives).
 The existing attachment scanner still inspects its own text view of those bytes;
 that view is not the image payload. Text uses exact UTF-8, including empty text.
 The ordinary surface projection and request-source resolver preserve signed row
