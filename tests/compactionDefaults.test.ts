@@ -63,6 +63,19 @@ describe("catalog defaults and exact signed compaction overrides", () => {
       .toMatchObject({ contextWindowTokens: 8000, reserveTokens: null, threshold: 0.8 });
   });
 
+  it("--no-auto-compact turns compaction off over the reviewed route default and a signed preset, and refuses unused options", () => {
+    const preset = { contextWindowTokens: 100000, modelOverrides: [{ ...route, contextWindowTokens: 150000 }] };
+    for (const selected of [compactionFromFlags({ autoCompact: false }), compactionFromFlags({ autoCompact: false }, preset, route),
+      compactionFromFlags({ autoCompact: false }, preset)]) {
+      expect(selected).toEqual({ contextWindowTokens: null });
+      expect(resolveRouteCompaction(selected, route, snapshot())).toMatchObject({ contextWindowTokens: null, reserveTokens: null });
+    }
+    expect(compactionFromFlags({ autoCompact: true })).toBeUndefined();
+    for (const flags of [{ contextWindow: "300000" }, { compactThreshold: "0.9" }, { autoSummary: false }]) {
+      expect(() => compactionFromFlags({ ...flags, autoCompact: false })).toThrow(/--no-auto-compact/);
+    }
+  });
+
   it("keeps explicit CLI fields above exact preset fields", () => {
     const config = compactionFromFlags({ contextWindow: "300000", compactThreshold: "0.9" }, {
       keepRecentSteps: 7, modelOverrides: [{ ...route, contextWindowTokens: 100000, reserveTokens: 1000, summarize: false }]

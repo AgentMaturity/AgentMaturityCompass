@@ -67,6 +67,7 @@ export function registerAcpCommands(program: Command): void {
     .option("--context-window <tokens>", "Override the reviewed model context window for automatic compaction")
     .option("--compact-threshold <fraction>", "Use ratio trigger instead of the catalog token reserve (0.5-0.95; requires --context-window)")
     .option("--no-auto-summary", "Prune old tool output only; never run a model-written summary step")
+    .option("--no-auto-compact", "Turn automatic compaction off (on by default for a reviewed model context window)")
     .option("--agent-id <id>", "Agent identity recorded in the ledger", "default")
     .option("--system-prompt <text>", "System prompt for each session", "You are a careful assistant.")
     .action((opts: {
@@ -97,6 +98,7 @@ export function registerAcpCommands(program: Command): void {
       contextWindow?: string;
       compactThreshold?: string;
       autoSummary?: boolean;
+      autoCompact?: boolean;
       agentId: string;
       systemPrompt: string;
     }) => {
