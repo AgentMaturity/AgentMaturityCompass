@@ -8680,8 +8680,7 @@ promptPack
     const out = await promptPackBuildCli({
       workspace: process.cwd(),
       agentId: opts.agent,
-      outFile: opts.out,
-      lessons
+      outFile: opts.out, lessons
     }, { beforePublish: () => assertPromptCliOwnerMode(process.cwd(), "prompt pack build") });
     console.log(chalk.green("Prompt pack created"));
     console.log(`agent=${out.agentId}`);
