@@ -1,15 +1,20 @@
 /**
  * P2-35 · design §17 "Unauthorized progression". Reason codes: SOD_VIOLATION (requester_not_approver, author_not_approver),
  * A4_NOT_A_MEMBER, ADMIN_TOKEN_REFUSED, DEMO_REFUSED, A4_NOT_READY (complete before quorum), A4_DUPLICATE_DECISION,
- * PRINCIPAL_ROLE_INSUFFICIENT. The router-entry refusals on every route are in routerAdmission.test.ts.
+ * PRINCIPAL_ROLE_INSUFFICIENT, CROSS_PLANE (a hosted-router member voting after a local one). The router-entry refusals on every route are in routerAdmission.test.ts.
  */
 import { afterEach, describe, expect, test, vi } from "vitest";
+import { pendingExecutors } from "../../src/a4/a4Gates.js";
 import { addUser } from "../../src/auth/authApi.js";
 import { cleanupGovernanceFixtures } from "../governor/governanceFixture.js";
-import { A4Project, a4Workspace, refusal } from "./a4Harness.js";
+import { A4Project, a4Workspace, refusal, routerSession } from "./a4Harness.js";
+import { ASSEMBLE_ANSWERS, Journey } from "./a4Journey.js";
 
-vi.setConfig({ testTimeout: 60_000 });
-afterEach(() => cleanupGovernanceFixtures());
+vi.setConfig({ testTimeout: 300_000 });
+afterEach(() => {
+  pendingExecutors.clear();
+  cleanupGovernanceFixtures();
+});
 
 describe("scenario: unauthorized progression", () => {
   test("only a distinct member approver progresses the gate; every other caller is refused and nothing is recorded", async () => {
@@ -60,5 +65,23 @@ describe("scenario: unauthorized progression", () => {
     const { revokeUser } = await import("../../src/auth/authApi.js");
     revokeUser({ workspace, username: "bob" });
     expect(refusal(await p.decide(bob, gate))).toEqual([403, "A4_USER_DISABLED"]);
+  });
+
+  test("a WORKSPACE_ROUTER member's vote after a LOCAL_USER member's is refused as CROSS_PLANE, over HTTP", async () => {
+    const j = await Journey.start();
+    await j.throughAspire();
+    await j.propose("assemble", ASSEMBLE_ANSWERS);
+    expect((await j.complete("assemble", await j.approve("assemble", "direction"))).status).toBe(200);
+    await j.build("assemble");
+    const rita = routerSession(j.t.workspace, "router-rita", "rita", ["APPROVER", "OPERATOR"]);
+    expect((await j.p.post(j.t.alice, "/members", { principalKey: "WORKSPACE_ROUTER:router-rita", projectRoles: ["approver"] })).status).toBe(200);
+    // Assemble's completion gate takes two approvers, so a second vote is still open after bob's.
+    const gate = await j.p.openGate(j.t.alice, "assemble", "completion");
+    expect((await j.p.decide(j.t.bob, gate)).status).toBe(201);
+    expect((await j.p.gate(j.t.alice, gate.gateId)).status).toBe("PENDING");
+    const cross = await j.p.decide(rita, gate);
+    expect(refusal(cross)).toEqual([400, "SOD_VIOLATION"]);
+    expect(cross.body.error).toMatch(/CROSS_PLANE/);
+    expect((cross.body.detail as { violations: string[] }).violations).toContain("one_plane");
   });
 });

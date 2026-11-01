@@ -28,13 +28,13 @@ marked **pending** has no test yet; the reason is given. Nothing here is skipped
 | 1 | Misunderstood intent | covered | `scenario01MisunderstoodIntent.test.ts` | UNDERSTANDING_NOT_CONFIRMED, A4_STEP_ORDER |
 | 2 | Requested revisions | covered | `scenario02RequestedRevisions.test.ts` | CHANGES_REQUESTED, A4_GATE_STALE, A4_GATE_SEQ_MISMATCH |
 | 3 | Stale approvals | covered (RESOURCE_DRIFTED on an open gate: scenario 16 covers it at the executor) | `scenario03StaleApprovals.test.ts` | A4_GATE_STALE (request, memberSet, consumed), A4_GATE_SEQ_MISMATCH, GATE_EXPIRING, GATE_EXPIRED |
-| 4 | Unauthorized progression | covered (cross-plane HTTP session pending) | `scenario04UnauthorizedProgression.test.ts`, `routerAdmission.test.ts`, `scenario16…`, `scenario09…` | SOD_VIOLATION, A4_NOT_A_MEMBER, ADMIN_TOKEN_REFUSED, DEMO_REFUSED, A4_NOT_READY, A4_DUPLICATE_DECISION, PRINCIPAL_ROLE_INSUFFICIENT, A4_USER_DISABLED, EFFECT_QUORUM_INSUFFICIENT |
+| 4 | Unauthorized progression | covered (cross-plane over HTTP with a WORKSPACE_ROUTER session record: scenario04) | `scenario04UnauthorizedProgression.test.ts`, `routerAdmission.test.ts`, `scenario16…`, `scenario09…` | SOD_VIOLATION, A4_NOT_A_MEMBER, ADMIN_TOKEN_REFUSED, DEMO_REFUSED, A4_NOT_READY, A4_DUPLICATE_DECISION, PRINCIPAL_ROLE_INSUFFICIENT, A4_USER_DISABLED, EFFECT_QUORUM_INSUFFICIENT |
 | 5 | Collaborative conflicts | covered | `scenario05CollaborativeConflicts.test.ts`, `storeDedupe.test.ts`, `twoProcessRace.test.ts` | A4_STALE_HEAD, REQUEST_CONFLICT, SECRET_IN_REQUEST_ROW, replay across processes |
 | 6 | Changed operating markets | covered | `scenario06ChangedMarkets.test.ts` | PLAN_STALE, PLAN_MISSING_FACTS, UNRESOLVED:L2-FIX-US-01, A4_GATE_STALE, NO_RELEASE |
 | 7 | Unsupported integrations | covered | `scenario07UnsupportedIntegrations.test.ts` | UNSUPPORTED_INTEGRATION, PATH:other, STATUS:preview, OWNER_ACKNOWLEDGED, A4_NOT_ACKNOWLEDGEABLE |
 | 8 | Failed deployment | covered | `scenario08FailedDeployment.test.ts` | DEPLOYMENT_UNCHECKED, RECEIPT_NOT_SUCCEEDED, READYZ_FAILED, REDIRECT_REFUSED, DESTINATION_MISMATCH, PACKAGE_DIGEST_MISMATCH, DEPLOYMENT_IDENTITY_NOT_EVALUATED |
 | 9 | Rollback | covered (freeze-first for high/critical pending) | `scenario09Rollback.test.ts` | EFFECT_QUORUM_INSUFFICIENT, SOD_VIOLATION, RELEASE_ROLLED_BACK, PACKAGE_DIGEST_MISMATCH |
-| 10 | Hold / freeze / kill switch | covered (freeze and kill switch pending) | `scenario10HoldFreeze.test.ts` | A4_ON_HOLD (ON_HOLD), NOT_ON_HOLD |
+| 10 | Hold / freeze / kill switch | covered (a kill switch raised mid-effect: scenario16; a signed incident freeze is read by the same `activeFreezeStatus` and has no case of its own) | `scenario10HoldFreeze.test.ts`, `scenario16EffectDriftCrash.test.ts` | A4_ON_HOLD (ON_HOLD), NOT_ON_HOLD, EFFECT_FAILED FREEZE_ACTIVE (automatic hold) |
 | 11 | Single-user workspace | covered (hosted rows pending) | `scenario11SingleUser.test.ts`, `scenario15AcknowledgedBlocker.test.ts`, `guards.test.ts` | SOD_DEGRADED_SINGLE_USER (selfApproved), SOD_VIOLATION after the ratchet, SOD_DEGRADED_SELF_PROVISIONED |
 | 12 | Vault locked / no-sign | covered | `scenario12VaultLocked.test.ts` | A4_VAULT_LOCKED (423), VAULT_LOCKED, UNSIGNED_STORE |
 | 13 | Tampered record | covered | `scenario13TamperedRecord.test.ts`, `recordFixtures.test.ts` | A4_SIDE_ROW_MISMATCH, A4_CHAIN_INVALID, A4_INTEGRITY_FAILED (readiness BLOCKED) |
@@ -42,9 +42,10 @@ marked **pending** has no test yet; the reason is given. Nothing here is skipped
 | 15 | Acknowledged blocker | covered | `scenario15AcknowledgedBlocker.test.ts`, `scenario07…`, `guards.test.ts` | SOD_DEGRADED_SELF_PROVISIONED, OWNER_ACKNOWLEDGED (bound, never READY, expires after 90 days), A4_GATE_STALE |
 | 16 | Effect drift and crash | covered | `scenario16EffectDriftCrash.test.ts` | EFFECT_QUORUM_INSUFFICIENT, SOD_VIOLATION, EFFECT_FAILED (RESOURCE_DRIFTED signedConfigs.tools, process_lost), EFFECT_RUNNING / EFFECT_NOT_RETRYABLE |
 
-Still open inside covered scenarios: a freeze or kill switch raised mid-effect (scenario 10/16), freeze-first rollback
-for a high or critical risk tier (scenario 9), a WORKSPACE_ROUTER session (cross-plane, hosted single-user; needs a
-router session record), and Assemble's native path (a stub-provider build session through the native task service).
+Still open inside covered scenarios: freeze-first rollback for a high or critical risk tier (scenario 9; a high tier
+makes the journey's quorum self-provisioned, so every gate needs an owner acknowledgement the journey does not drive
+yet), a hosted single-user WORKSPACE_ROUTER workspace (scenario 11; `routerSession` in the harness writes the record),
+and Assemble's native path (a stub-provider build session through the native task service).
 The D-23 end-to-end qualification (one project Aspire → Activate on a non-stub provider, macOS and Linux ARM64, receipts
 under `qualification/<date>-P1-62/`) is Sid's and stays pending.
 
@@ -63,7 +64,7 @@ under test, so a new route or table is covered without a fixture edit. `tests/fi
 | stale (old request digest; superseded; expired; expired before complete) | covered | `scenario03StaleApprovals.test.ts` |
 | replayed (same clientRequestId, concurrent, two processes) | covered | `scenario05…`, `storeDedupe.test.ts`, `twoProcessRace.test.ts` |
 | cross-workspace / cross-project request id | covered (cross-project) | `storeDedupe.test.ts` |
-| cross-plane vote | covered (pure) | `guards.test.ts`; an HTTP router session is **pending** (no WORKSPACE_ROUTER session record fixture) |
+| cross-plane vote | covered | `guards.test.ts` (pure), `scenario04UnauthorizedProgression.test.ts` (HTTP, a WORKSPACE_ROUTER session record from `routerSession`) |
 | forged key, rotated-out key (expired, revoked, key-compromise), expired or inactive attestation, own workspace key, wrong purpose, other bytes | covered | `verifiedLane.test.ts` |
 | missing evidence, deleted side row | covered | `scenario13TamperedRecord.test.ts`, `recordFixtures.test.ts` |
 | digest-less decision | covered | `recordFixtures.test.ts` (stale-approval: DECISION_NOT_BOUND) |
@@ -142,6 +143,8 @@ processes of `twoProcessRace.test.ts` run `dist/`, so the store dedupe they exer
 | LS1 | `revokeStagingAfterDeny` | revoke nothing | killed | leases › a DENY of the deployment approval revokes the staging lease |
 | RB1 | rollback lease revocation | revoke nothing | killed | scenario09 › a production rollback … |
 | OU1 | `no_open_outcome_unknown` | READY while an execution is open | killed | scenario14 › an open outcome_unknown blocks Assemble … |
+| KS1 | executor preamble freeze | read only an unreadable freeze | killed | scenario16 › a kill switch raised after the attempt started … |
+| CP1 | `evaluateSod` one plane, over HTTP | drop the `one_plane` rule | killed | scenario04 › a WORKSPACE_ROUTER member's vote after a LOCAL_USER member's … |
 
 Notes: at the router, `priorReplay` answers a recorded request before the store runs, so the store's dedupe (D1 to D3)
 is reachable directly (`storeDedupe.test.ts`) and by two processes that both pass the router check.
@@ -240,6 +243,8 @@ copied verbatim. Many name cases from Assemble, Adapt and Activate that the pend
 ### P1-64 (amc-a4-5, branch rtd/p1-64-a4-mcp-sdk, 8579878a9..135ef91a6 on 06961457, not merged) — closing note 2026-10-11
 
 - Untested in the repo suite (P2-35 debt): MCP comment replay and `REQUEST_CONFLICT`; `A4_NOT_A_MEMBER` for non-members; the token path never being printed; the `A4_SESSION_TOO_PRIVILEGED` refusal; the read-only refusal (`NATIVE_READ_ONLY`); the tool count of 11 without `AMC_A4_PREVIEW` and 16 with it (`amc mcp list-tools` too); the SDK passing `400 SOD_VIOLATION` through unchanged; the SDK refusing redirects (`redirect: "error"`). From the dropped `tests/a4McpTools.test.ts`: the vault-variable refusal reaching no Studio; the cookie, CSRF proof, `Origin` and body sent to Studio; a Studio refusal passed through with its status and code; 503 `A4_STUDIO_NOT_RUNNING` without Studio; `A4_SESSION_TOO_PRIVILEGED`. From the third round: the `AMC_VAULT_PASSPHRASE_FILE` refusal; a dead pid, pid 0, a bad port and an unreadable state.json each giving 503 with nothing sent; a non-local host giving 403 `A4_STUDIO_NOT_LOCAL` with nothing sent; a wildcard bind sent with its Host unchanged; 502 `A4_STUDIO_BAD_ANSWER` for `{ok:true,data:{}}`, another project's answer, a non-JSON answer, and `ok:false` with a 2xx status; 504 `A4_STUDIO_TIMEOUT`; the signing note in the readiness and project text; a tampered row giving 409 `A4_INTEGRITY_FAILED`; the SDK's `timeoutMs`.
+
+Paid since (lane a4b, 2026-11-01), in `tests/a4/a4McpTools.test.ts`: the vault-variable refusals (`AMC_VAULT_PASSPHRASE`, `AMC_VAULT_PASSPHRASE_FILE`) reaching no Studio; the cookie, CSRF proof, `Origin` and body sent to Studio; a Studio refusal passed through with its status and code; 503 `A4_STUDIO_NOT_RUNNING`; 403 `A4_STUDIO_NOT_LOCAL` with nothing sent; `A4_SESSION_TOO_PRIVILEGED`; 502 `A4_STUDIO_BAD_ANSWER` for `{ok:true,data:{}}`, another project's answer, a non-JSON answer and `ok:false` with a 2xx status; 504 `A4_STUDIO_TIMEOUT`; the tool count with and without `AMC_A4_PREVIEW`; the SDK passing `400 SOD_VIOLATION` through unchanged, refusing redirects and `timeoutMs`; the `a4_comment` credential and `A4_SESSION_NOT_COMMENT_SCOPED`. Still unpaid: MCP comment replay and `REQUEST_CONFLICT`, `A4_NOT_A_MEMBER` for non-members through MCP, the token path never being printed, `NATIVE_READ_ONLY`, a dead pid, pid 0, a bad port or an unreadable state.json, a wildcard bind's Host, the signing note, and a tampered row's 409 `A4_INTEGRITY_FAILED`.
 
 ### P1-63 (amc-a4-4, branch rtd/p1-63-a4-rules, 5c30f2ab9..e8eef32b9 on 06961457, not merged) — closing note 2026-10-11
 

@@ -2061,6 +2061,7 @@ Authenticate an existing local user and write a new private tracked session-toke
 | `--token-file <newpath>` | - |
 | `--ttl-minutes <n>` | - |
 | `--password-stdin` | - |
+| `--a4-comment-only` | - |
 | `--json` | - |
 
 #### `amc approvals show`
