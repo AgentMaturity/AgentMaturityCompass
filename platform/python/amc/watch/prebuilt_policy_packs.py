@@ -284,7 +284,7 @@ def mitre_atlas_policy_pack() -> PolicyPack:
     """MITRE ATLAS adversarial threat landscape policy pack."""
     return PolicyPack(
         name="MITRE ATLAS",
-        version="1.1",
+        version="1.2",
         description="MITRE ATLAS (Adversarial Threat Landscape for AI Systems) policy pack covering ML supply chain, prompt injection, model evasion, data exfiltration, and cost harvesting threats.",
         modules=[
             "e1_policy",
@@ -312,11 +312,11 @@ def mitre_atlas_policy_pack() -> PolicyPack:
                 "remediation": "Block LLM jailbreak attempts per AML.T0054 (LLM Jailbreak)",
             },
             {
-                "id": "ATLAS_T0025_EXFILTRATION",
+                "id": "ATLAS_T0024_EXFILTRATION",
                 "action": "deny",
                 "target": "data_exfiltration",
                 "condition": "secret_exfiltration_succeeded",
-                "remediation": "Prevent data exfiltration via inference API per AML.T0025",
+                "remediation": "Prevent data exfiltration via inference API per AML.T0024 (Exfiltration via AI Inference API)",
             },
             {
                 "id": "ATLAS_T0010_SUPPLY_CHAIN",
