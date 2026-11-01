@@ -483,7 +483,7 @@ export class ToolHubService {
       approvalRequired,
       blastRadiusConsent
     };
-    const boundIntent = isJournaledToolhubExecution(decision.effectiveMode, record.actionClass)
+    const boundIntent = isJournaledToolhubExecution(decision.effectiveMode, record.actionClass, approvalRequired)
       ? toolhubApprovalIntent({ workspace: this.workspace, intentId, agentId: input.agentId, toolName: input.toolName,
           actionClass: record.actionClass, args: input.args, requestedMode: record.request.requestedMode, effectiveMode: decision.effectiveMode }) : null;
     const approvalInput: ApprovalRequestInput | null = approvalRequired ? {
@@ -792,7 +792,7 @@ export class ToolHubService {
       });
     }
 
-    const journaled = isJournaledToolhubExecution(effectiveMode, intent.actionClass), held = journaled ? null : toolhubLifecycleHold(this.workspace, intent.request.agentId, intent.actionClass); if (held !== null) return this.auditDenied(intent, "AGENT_NOT_ACTIVE", held, { executeAttempted: requestedMode === "EXECUTE", executeWithoutTicketAttempted: false }); // P2-23: held agents, unjournaled calls
+    const journaled = isJournaledToolhubExecution(effectiveMode, intent.actionClass, approvalUsedId !== null), held = journaled ? null : toolhubLifecycleHold(this.workspace, intent.request.agentId, intent.actionClass); if (held !== null) return this.auditDenied(intent, "AGENT_NOT_ACTIVE", held, { executeAttempted: requestedMode === "EXECUTE", executeWithoutTicketAttempted: false }); // P2-23: held agents, unjournaled calls
     const executionId = journaled ? toolhubExecutionId(workspaceIdFromDirectory(this.workspace), intent.intentId) : `exec_${randomUUID().replace(/-/g, "")}`;
     const blastRadiusReviewerDecision: ToolBlastRadiusReviewerDecision =
       approvalUsedId !== null
@@ -871,7 +871,7 @@ export class ToolHubService {
         blastRadiusReceipt: evidence?.actionReceipt, blastRadiusConsent };
     }
     if (approvalUsedId) {
-      // Non-journaled compatibility path: consume before its effect as before P1-54.
+      // Non-journaled compatibility path, reached with an approval only when the call was downgraded to SIMULATE.
       let consume: ReturnType<typeof consumeApprovedExecution> | null = null;
       try { consume = consumeApprovedExecution({ workspace: this.workspace, approvalId: approvalUsedId, expectedAgentId: intent.request.agentId, executionId }); } catch { /* unreadable: denied below */ }
       if (!consume?.consumed) return this.auditDenied(intent, consume ? "APPROVAL_REPLAY_ATTEMPTED" : "APPROVAL_QUORUM_FAILED", consume?.reason ?? "approval consumption could not be recorded", { executeAttempted: true, executeWithoutTicketAttempted: true });
