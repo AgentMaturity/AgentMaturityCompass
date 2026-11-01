@@ -20,7 +20,9 @@ export function prepareReceiptWriter(workspace: string) {
 }
 const REFUSED = "receipt child signing requires an unlocked signing vault";
 /** AMC_NO_SIGN=1 authorizes no receipt on either branch: a real receipt on an unsigned capture would pass as signed evidence. */
-export function assertReceiptSigning(): void { if (process.env.AMC_NO_SIGN === "1") throw new Error(REFUSED); }
+export function assertReceiptSigning(): void {
+  if (process.env.AMC_NO_SIGN === "1") throw new Error(`${REFUSED}; AMC_NO_SIGN=1 mints no receipt, so run this signed (unset AMC_NO_SIGN, drop --no-sign)`);
+}
 function current(workspace: string, expected: string) {
   assertReceiptSigning(); if (!vaultStatus(workspace).unlocked) throw new Error(REFUSED);
   const state = readReceiptAuthorityState(workspace);
