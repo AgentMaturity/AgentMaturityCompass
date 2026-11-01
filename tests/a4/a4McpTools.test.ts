@@ -6,7 +6,9 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { loginNativeApprovals } from "../../src/approvals/nativeApprovalLogin.js";
-import { addUser, initUsersConfig, verifyTrackedSessionToken } from "../../src/auth/authApi.js";
+import { addUser, initUsersConfig, sessionFromRequest, verifyTrackedSessionToken } from "../../src/auth/authApi.js";
+import { readNativeApprovalSession } from "../../src/setup/nativeApprovalIdentity.js";
+import { authenticate } from "../../src/studio/toolhubIntentAuthority.js";
 import { createAmcMcpServer, resetRateLimiter } from "../../src/mcp/amcMcpServer.js";
 import { createA4Client } from "../../src/sdk/a4Client.js";
 import { AMCSDKError } from "../../src/sdk/errors.js";
@@ -26,14 +28,14 @@ afterEach(() => {
   for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true });
 });
 
-async function fixture(role: "VIEWER" | "APPROVER" = "VIEWER") {
+async function fixture(role: "VIEWER" | "APPROVER" = "VIEWER", a4CommentOnly = true) {
   vi.stubEnv("AMC_VAULT_PASSPHRASE", "a4-mcp-fixture-passphrase");
   const workspace = realpathSync(mkdtempSync(join(tmpdir(), "amc-a4-mcp-"))); roots.push(workspace);
   initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
   initUsersConfig({ workspace, username: "administrator", password: "admin-fixture-password" });
   addUser({ workspace, username: "a4-agent", roles: [role], password });
   const tokenFile = join(workspace, "a4-agent.session");
-  await loginNativeApprovals({ workspace, username: "a4-agent", tokenFile }, async () => password);
+  await loginNativeApprovals({ workspace, username: "a4-agent", tokenFile, a4CommentOnly }, async () => password);
   vi.stubEnv("AMC_VAULT_PASSPHRASE", "");
   vi.stubEnv("AMC_A4_PREVIEW", "1");
   vi.stubEnv("AMC_A4_SESSION_TOKEN_FILE", tokenFile);
@@ -90,7 +92,7 @@ describe("A4 MCP tools keep the signing key out of the agent host", () => {
     expect(result.content[0]!.text).toContain("at seq 7");
     expect(result.structuredContent).toMatchObject({ projectId, seq: 7, replay: false });
     const token = readFileSync(f.tokenFile, "utf8").trim();
-    const payload = verifyTrackedSessionToken({ workspace: f.workspace, token }).payload!;
+    const payload = verifyTrackedSessionToken({ workspace: f.workspace, token, acceptScope: "a4_comment" }).payload!;
     expect(studio.seen).toHaveLength(1);
     const [request] = studio.seen;
     expect(request!.url).toBe(`/api/v1/a4/projects/${projectId}/comments`);
@@ -221,3 +223,32 @@ describe("createA4Client", () => {
     expect(answer).toEqual({ status: 400, body: refused });
   });
 });
+
+describe("the a4_comment credential (P1-64 follow-up)", () => {
+  it("is refused by the MCP tools when the file holds a full Studio session", async () => {
+    const f = await fixture("VIEWER", false);
+    const result = await f.call("amc_a4_list_projects");
+    expect(result.structuredContent).toEqual({ status: 403, code: "A4_SESSION_NOT_COMMENT_SCOPED" });
+  });
+
+  it("is admitted by Studio only for A4 reads and the comment route, never an approval or another route", async () => {
+    const f = await fixture();
+    const token = readFileSync(f.tokenFile, "utf8").trim();
+    const cookie = `amc_session=${encodeURIComponent(token)}`;
+    const at = (method: string, url: string) => ({ headers: { cookie }, rawHeaders: ["cookie", cookie], method, url }) as unknown as Parameters<typeof sessionFromRequest>[0]["req"];
+    const admitted = (method: string, url: string) => sessionFromRequest({ workspace: f.workspace, req: at(method, url) }).ok;
+    expect(admitted("GET", "/api/v1/a4/projects")).toBe(true);
+    expect(admitted("GET", `/api/v1/a4/projects/${projectId}/readiness?stage=aspire`)).toBe(true);
+    expect(admitted("POST", `/api/v1/a4/projects/${projectId}/comments`)).toBe(true);
+    for (const [method, url] of [["POST", `/api/v1/a4/projects/${projectId}/gates/a4g_1/approve`], ["POST", `/api/v1/a4/projects/${projectId}/stages/aspire/answers`],
+      ["POST", "/approvals/apr_1/approve"], ["POST", "/approvals/requests/apr_1/decide"], ["GET", "/api/v1/agents"], ["GET", "/auth/me"],
+      ["POST", `/api/v1/a4/projects/${projectId}/comments/../gates/a4g_1/approve`], ["POST", "/api/v1/native-tasks"]]) {
+      expect(admitted(method!, url!), `${method} ${url}`).toBe(false);
+      expect(authenticate(at(method!, url!), f.workspace, "admin-token-not-sent"), `${method} ${url}`).toBeNull();
+    }
+    // `amc approvals … --session-token-file` reads the file without accepting the scope, so it cannot decide with it.
+    expect(() => readNativeApprovalSession(f.workspace, f.tokenFile)).toThrow(/active tracked workspace login is required/);
+    expect(verifyTrackedSessionToken({ workspace: f.workspace, token })).toMatchObject({ ok: false, error: "session scope not accepted here" });
+  });
+});
+

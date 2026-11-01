@@ -21,9 +21,9 @@ export function readPrivateTokenFile(path: string, label: string): string {
 }
 
 /** Read an existing authenticated session; never mint an identity or infer a role. The token is a live credential: keep it in memory only. */
-export function readNativeApprovalSession(workspace: string, tokenFile: string) {
+export function readNativeApprovalSession(workspace: string, tokenFile: string, acceptScope?: "a4_comment") {
   const token = readPrivateTokenFile(tokenFile, "Approval session token");
-  const verified = verifyTrackedSessionToken({ workspace, token });
+  const verified = verifyTrackedSessionToken({ workspace, token, acceptScope });
   if (!verified.ok || verified.payload === null) throw new Error("An active tracked workspace login is required; the approval session is missing, expired, revoked or untrusted");
   return { token, payload: verified.payload };
 }
