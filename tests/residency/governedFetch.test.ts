@@ -17,8 +17,9 @@ beforeEach(async () => {
 });
 afterEach(async () => { vi.restoreAllMocks(); await closeFixtures(); });
 
+type Mutable<T> = { -readonly [K in keyof T]: T[K] };
 /** A GET of `origin` (signed origins: that origin; egress hosts: its name and the loopback literal it resolves to). */
-function input(origin: string, extra: Partial<GovernedGetInput> = {}): GovernedGetInput & { workspace?: string } {
+function input(origin: string, extra: Partial<GovernedGetInput> = {}): Mutable<GovernedGetInput> {
   const host = new URL(origin).hostname;
   return { tool: "web_fetch", url: `${origin}/doc`, maxBytes: 10_000, recordEgress: (_decision: WebEgressDecision) => undefined,
     policy: { origins: new Set([origin]), hosts: [...new Set([host, "127.0.0.1"])], maxBytes: 10_000, policyDigestSha256: "0".repeat(64) },
