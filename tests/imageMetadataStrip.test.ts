@@ -133,6 +133,46 @@ describe("image metadata stripping", () => {
   });
 });
 
+describe("PXB-42 review: every scan is walked and unknown chunks are dropped", () => {
+  const SCAN2 = Buffer.concat([segment(0xda, Buffer.from([1, 1, 0, 0, 63, 0])), Buffer.from([0x12, 0xff, 0xd0, 0x34])]);
+  const progressive = (between: Buffer) => Buffer.concat([SOI, APP0, DQT, SOF0, DHT, SCAN2, between, DHT, SCAN]);
+
+  test("JPEG: APPn and COM segments between progressive scans are dropped", () => {
+    const stripped = stripNativeImageMetadata(progressive(Buffer.concat([COM, APP1])), "image/jpeg");
+    expect(stripped.equals(progressive(Buffer.alloc(0)))).toBe(true);
+    for (const secret of ["comment-secret", "Exif"]) expect(stripped.includes(secret)).toBe(false);
+  });
+
+  test("JPEG: bytes after EOI (an appended MPF image with Exif GPS) are not sent", () => {
+    const appended = Buffer.concat([SOI, APP1, DQT, SOF0, DHT, SCAN]);
+    const stripped = stripNativeImageMetadata(Buffer.concat([CLEAN_JPEG, appended]), "image/jpeg");
+    expect(stripped.equals(CLEAN_JPEG)).toBe(true);
+    expect(stripped.includes(GPS_TIFF)).toBe(false);
+  });
+
+  test("JPEG: a scan with no EOI is refused", () => {
+    const error = refusal(() => stripNativeImageMetadata(Buffer.concat([SOI, APP0, DQT, SOF0, DHT, SCAN2]), "image/jpeg"));
+    expect((error as ImageMetadataStripError).reason).toBe("malformed-container");
+  });
+
+  test("PNG: an unknown ancillary chunk is dropped and an unknown critical chunk is refused", () => {
+    const withPrivate = Buffer.concat([PNG_SIG, IHDR, pngChunk("prVt", Buffer.from("owner-secret")), pngChunk("pHYs", Buffer.alloc(9)), IDAT, IEND]);
+    expect(stripNativeImageMetadata(withPrivate, "image/png").equals(Buffer.concat([PNG_SIG, IHDR, pngChunk("pHYs", Buffer.alloc(9)), IDAT, IEND]))).toBe(true);
+    const critical = Buffer.concat([PNG_SIG, IHDR, pngChunk("ZZZZ", Buffer.alloc(1)), IDAT, IEND]);
+    expect((refusal(() => stripNativeImageMetadata(critical, "image/png")) as ImageMetadataStripError).reason).toBe("malformed-container");
+  });
+
+  test("WebP: an unknown chunk is dropped", () => {
+    const stripped = stripNativeImageMetadata(riff(vp8x(0), VP8L, riffChunk("META", Buffer.from("owner-secret"))), "image/webp");
+    expect(stripped.equals(CLEAN_WEBP)).toBe(true);
+  });
+
+  test("GIF: a plain-text extension is dropped", () => {
+    const plainText = Buffer.concat([Buffer.from([0x21, 0x01, 12]), Buffer.alloc(12), Buffer.from([12]), Buffer.from("owner-secret"), Buffer.from([0])]);
+    expect(stripNativeImageMetadata(gif(NETSCAPE, plainText, GCE), "image/gif").equals(CLEAN_GIF)).toBe(true);
+  });
+});
+
 const roots: string[] = [], writers = new Set<SessionService>();
 afterEach(() => {
   for (const writer of writers) writer.disposeWithoutClosing();
