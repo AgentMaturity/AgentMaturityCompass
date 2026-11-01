@@ -15,6 +15,12 @@ vi.mock("../../src/studio/studioSupervisor.js", async (importOriginal) => ({
   studioStatus: () => ({ running: true, vaultUnlocked: true, state: { host: "127.0.0.1", apiPort: 1, gatewayPort: studio.gatewayPort } })
 }));
 
+const leases = vi.hoisted(() => ({ issued: 0 }));
+vi.mock("../../src/leases/leaseCli.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../../src/leases/leaseCli.js")>();
+  return { ...actual, issueLeaseForCli: (...args: Parameters<typeof actual.issueLeaseForCli>) => { leases.issued += 1; return actual.issueLeaseForCli(...args); } };
+});
+
 vi.setConfig({ testTimeout: 60_000 });
 let blocked: string, open: string, gateway: Listener;
 beforeEach(async () => {
@@ -24,6 +30,7 @@ beforeEach(async () => {
   blockResidency(blocked);
   gateway = await listen((_req, res) => { res.writeHead(200).end("{}"); });
   studio.gatewayPort = Number(new URL(gateway.url).port);
+  leases.issued = 0;
 });
 afterEach(async () => { vi.restoreAllMocks(); await closeFixtures(); });
 
@@ -31,12 +38,13 @@ const probe = (url: string, workspace?: string) => requestDoctorStatus(`${url}/o
 const carrierRows = (checks: Array<{ id: string; status: string }>) => checks.filter(row => row.id.startsWith("lease-carrier")).map(row => [row.id, row.status]);
 
 describe("doctor live probes", () => {
-  test("a denied probe rejects typed before any socket; doctor reports a residency FAIL and sends nothing", async () => {
+  test("a denied probe rejects typed before any socket; doctor reports a residency FAIL, issues no lease and sends nothing", async () => {
     await expect(probe(gateway.url, blocked)).rejects.toBeInstanceOf(EgressBlocked);
     await expect(withWorkspaceScope(blocked, () => probe(gateway.url))).rejects.toBeInstanceOf(EgressBlocked);
     const report = await runDoctorRules(blocked, { liveProbes: true });
     expect(carrierRows(report.checks)).toEqual([["lease-carriers-live", "FAIL"]]);
     expect(report.checks.find(row => row.id === "lease-carriers-live")?.message).toMatch(/blocked by residency/);
+    expect(leases.issued).toBe(0);
     expect(gateway.connections).toBe(0);
   });
 
