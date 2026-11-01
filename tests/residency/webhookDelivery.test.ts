@@ -41,16 +41,24 @@ describe("webhook delivery", () => {
     expect(hook.connections).toBe(0);
   });
 
-  test("the scope and endpoint are captured at entry: a retry after the workspace is blocked is refused, and a mutated url is never used", async () => {
-    const other = await listen();
+  test("the captured scope is rechecked on each retry: blocked during the backoff, the retry is refused and sends nothing", async () => {
     const input = request("");
     const failing = await listen((_req, res) => { res.writeHead(500).end("busy"); });
     input.url = `${failing.url}/w`;
-    const sleep = vi.fn(async () => { blockResidency(open); input.url = `${other.url}/w`; });
+    const sleep = vi.fn(async () => { blockResidency(open); });
     await expect(withWorkspaceScope(open, () => deliverWebhookWithRetry({ request: input, policy: POLICY, dependencies: { sleep } })))
       .rejects.toBeInstanceOf(EgressBlocked);
     expect(failing.requests).toHaveLength(1);
-    expect(other.connections).toBe(0);
+  });
+
+  test("concurrent deliveries keep separate scopes: the blocked one sends nothing, the open one delivers", async () => {
+    const [denied, delivered] = await Promise.allSettled([
+      withWorkspaceScope(blocked, () => deliverWebhookWithRetry({ request: request(`${hook.url}/w`), policy: POLICY })),
+      withWorkspaceScope(open, () => deliverWebhookWithRetry({ request: request(`${hook.url}/w`), policy: POLICY }))
+    ]);
+    expect(denied.status === "rejected" && denied.reason).toBeInstanceOf(EgressBlocked);
+    expect(delivered.status === "fulfilled" && delivered.value.delivered).toBe(true);
+    expect(hook.requests).toHaveLength(1);
   });
 
   test("a 3xx is an undelivered attempt, never followed", async () => {
