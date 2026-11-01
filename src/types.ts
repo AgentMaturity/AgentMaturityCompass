@@ -3279,7 +3279,8 @@ export interface DiagnosticReport {
   inflationAttempts: { questionId: string; claimed: number; supported: number }[];
   unsupportedClaimCount: number;
   contradictionCount: number;
-  correlationRatio: number;
+  /** Null when no trace in the window carried a receipt (not measured); sealed reports written before this hold a number. */
+  correlationRatio: number | null;
   invalidReceiptsCount: number;
   correlationWarnings: string[];
   evidenceCoverage: number;

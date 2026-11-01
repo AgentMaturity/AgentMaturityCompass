@@ -224,7 +224,7 @@ async function createValueSnapshotRun(params: {
     reasons: gates.ok ? [] : gates.reasons,
     gates: {
       integrityIndex: Number(forecastSignals.evidence.latestIntegrityIndex.toFixed(6)),
-      correlationRatio: Number(forecastSignals.evidence.latestCorrelationRatio.toFixed(6)),
+      correlationRatio: forecastSignals.evidence.latestCorrelationRatio === null ? null : Number(forecastSignals.evidence.latestCorrelationRatio.toFixed(6)),
       observedShare: trustSummary.observed,
       selfReportedShare: trustSummary.selfReported
     },

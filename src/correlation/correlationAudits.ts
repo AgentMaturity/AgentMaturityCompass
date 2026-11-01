@@ -30,7 +30,7 @@ export function persistCorrelationAudits(params: {
       relatedEventIds: issue.relatedEventIds,
       runId: params.runId,
       agentId: params.agentId,
-      correlationRatio: Number(params.metrics.correlationRatio.toFixed(4)),
+      correlationRatio: params.metrics.correlationRatio === null ? null : Number(params.metrics.correlationRatio.toFixed(4)),
       invalidReceipts: params.metrics.invalidReceipts,
       totalTracesWithReceipt: params.metrics.totalTracesWithReceipt,
       totalTraces: params.metrics.totalTraces

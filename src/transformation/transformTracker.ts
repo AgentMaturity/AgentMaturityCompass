@@ -43,7 +43,7 @@ function inferTrustTierFromRun(run: ReturnType<typeof latestRunForAgent>): "SELF
   }
   const observed = run.evidenceTrustCoverage?.observed ?? 0;
   const attested = run.evidenceTrustCoverage?.attested ?? 0;
-  if (observed >= 0.85 && run.correlationRatio >= 0.95 && (run.invalidReceiptsCount ?? 0) === 0) {
+  if (observed >= 0.85 && run.correlationRatio !== null && run.correlationRatio >= 0.95 && (run.invalidReceiptsCount ?? 0) === 0) {
     return "OBSERVED_HARDENED";
   }
   if (observed >= 0.5) {

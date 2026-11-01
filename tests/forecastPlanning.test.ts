@@ -61,7 +61,7 @@ function writeRunFixture(params: {
   observed: number;
   attested: number;
   selfReported: number;
-  correlation: number;
+  correlation: number | null;
 }): void {
   const paths = getAgentPaths(params.workspace, "default");
   const run: DiagnosticReport = {
@@ -497,6 +497,26 @@ describe("forecast planning", () => {
     expect(latest.transformPlanInput?.outcome).toBe("not_evaluated");
     expect(latest.reasons.some((reason) => reason.includes("INTEGRITY_BELOW_MIN"))).toBe(true);
     expect(latest.series.maturityOverall.forecast.short).toBeNull();
+  });
+
+  test("a window with no receipted trace is not measured: no correlation point, gated as not measured", () => {
+    const workspace = newWorkspace();
+    forecastInitCli(workspace);
+    const baseTs = Date.now() - 10 * 86_400_000;
+    for (let i = 0; i < 4; i += 1) {
+      writeRunFixture({ workspace, runId: `unmeasured_${i}`, ts: baseTs + i * 86_400_000, overall: 3, integrity: 0.95,
+        observed: 0.9, attested: 0.05, selfReported: 0.05, correlation: null });
+    }
+    const out = forecastRefreshCli({ workspace, scope: "agent", targetId: "default" });
+    expect(out.status).toBe("INSUFFICIENT_EVIDENCE");
+    const latest = JSON.parse(
+      readFileSync(forecastScopeLatestPath(workspace, { type: "AGENT", id: "default" }), "utf8")
+    ) as ForecastArtifact;
+    expect(latest.reasons).toContain("CORRELATION_NOT_MEASURED");
+    expect(latest.reasons.some((reason) => reason.startsWith("CORRELATION_BELOW_MIN"))).toBe(false);
+    expect(latest.series.maturityOverall.points).toHaveLength(4);
+    expect(latest.series.correlationRatio.points).toEqual([]);
+    expect(renderForecastMarkdown(latest)).toContain("- Correlation (now): not measured");
   });
 
   test("drift advisories are produced for critical drops", () => {

@@ -1249,7 +1249,7 @@ export function registerLateStageCliCommands({
         console.log(`Total Calls:      ${report.totalCalls}`);
         console.log(`Avg Cost/Call:    $${report.avgCostPerCall.toFixed(6)}`);
         console.log(`Projected/Month:  $${report.projectedMonthlyCostUsd.toFixed(2)}`);
-        console.log(`Error Rate:       ${(report.errorRate * 100).toFixed(1)}%`);
+        console.log(`Error Rate:       ${report.errorRate === null ? "not measured" : `${(report.errorRate * 100).toFixed(1)}%`}`);
         if (Object.keys(report.costByModel).length > 0) {
           console.log(chalk.cyan("\nBy Model:"));
           for (const [model, data] of Object.entries(report.costByModel)) {

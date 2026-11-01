@@ -706,7 +706,7 @@ export function collectAuditBinderLocalData(params: AuditBinderCollectionInput, 
       maturityByDim = byDimensionFromRun(run);
       unknownQuestionsCount = run.questionScores.filter((row) => row.finalLevel <= 1).length;
       integrityIndex = Number(run.integrityIndex.toFixed(6));
-      correlationRatio = Number(run.correlationRatio.toFixed(6));
+      correlationRatio = Number((run.correlationRatio ?? 0).toFixed(6)); // binder schema is 0..1: not measured stays below every gate
       observedShare = Number((run.evidenceTrustCoverage?.observed ?? 0).toFixed(6));
       attestedShare = Number((run.evidenceTrustCoverage?.attested ?? 0).toFixed(6));
       selfReportedShare = Number((run.evidenceTrustCoverage?.selfReported ?? 1).toFixed(6));

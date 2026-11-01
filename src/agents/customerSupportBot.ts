@@ -11,6 +11,7 @@
 
 import { randomUUID } from 'node:crypto';
 import { AMCAgentBase } from './agentBase.js';
+import { ratioOrNull } from '../utils/ratio.js';
 
 /* ── Types ──────────────────────────────────────────────────────── */
 
@@ -65,8 +66,9 @@ export interface BotStats {
   bySentiment: Record<Sentiment, number>;
   byPriority: Record<Priority, number>;
   avgResponseConfidence: number;
-  escalationRate: number;
-  slaBreachRate: number;
+  /** Null with no tickets: a rate over zero tickets was not measured. */
+  escalationRate: number | null;
+  slaBreachRate: number | null;
   piiDetectionCount: number;
 }
 
@@ -398,8 +400,8 @@ export class CustomerSupportBot extends AMCAgentBase {
       bySentiment,
       byPriority,
       avgResponseConfidence: tickets.length > 0 ? totalConfidence / tickets.length : 0,
-      escalationRate: tickets.length > 0 ? escalated / tickets.length : 0,
-      slaBreachRate: tickets.length > 0 ? breached / tickets.length : 0,
+      escalationRate: ratioOrNull(escalated, tickets.length),
+      slaBreachRate: ratioOrNull(breached, tickets.length),
       piiDetectionCount: piiCount,
     };
   }

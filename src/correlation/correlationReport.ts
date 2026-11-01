@@ -17,7 +17,7 @@ export function correlationWarnings(metrics: CorrelationMetrics): string[] {
   if (metrics.mismatchedAgentId > 0) {
     warnings.push(`${metrics.mismatchedAgentId} trace receipt(s) had agent attribution mismatches.`);
   }
-  if (metrics.correlationRatio < 0.9 && metrics.totalTracesWithReceipt > 0) {
+  if (metrics.correlationRatio !== null && metrics.correlationRatio < 0.9) {
     warnings.push(`Trace correlation ratio ${metrics.correlationRatio.toFixed(3)} is below recommended 0.90.`);
   }
   return warnings;

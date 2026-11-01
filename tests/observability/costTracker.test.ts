@@ -40,6 +40,7 @@ describe("CostTracker", () => {
     expect(report.totalCalls).toBeGreaterThanOrEqual(5);
     expect(report.totalCostUsd).toBeGreaterThan(0);
     expect(report.costByModel["gpt-4o"]).toBeDefined();
+    expect(report.errorRate).toBe(0);
     expect(report.costByModel["gpt-4o"]!.pctOfTotal).toBeCloseTo(100, 0);
   });
 
@@ -72,6 +73,7 @@ describe("CostTracker", () => {
     const report = tracker.generateReport(30);
     expect(report.totalCalls).toBe(0);
     expect(report.totalCostUsd).toBe(0);
+    expect(report.errorRate).toBeNull(); // no calls: not measured, not a clean 0
     expect(report.recommendations.length).toBeGreaterThan(0);
   });
 });

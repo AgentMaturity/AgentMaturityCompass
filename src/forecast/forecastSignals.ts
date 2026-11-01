@@ -42,7 +42,8 @@ export interface ForecastSignalBundle {
     selfReportedShare: number;
     observedRuns: number;
     latestIntegrityIndex: number;
-    latestCorrelationRatio: number;
+    /** Null when the latest run measured no correlation (no receipted trace); never read as 0 or as passing. */
+    latestCorrelationRatio: number | null;
   };
   runRefs: string[];
   transformPlanInput: ForecastTransformPlanInput;
@@ -76,7 +77,7 @@ function listJsonFiles(dir: string): string[] {
 function runTrustTier(run: DiagnosticReport): "SELF_REPORTED" | "ATTESTED" | "OBSERVED" | "OBSERVED_HARDENED" {
   const observed = run.evidenceTrustCoverage?.observed ?? 0;
   const attested = run.evidenceTrustCoverage?.attested ?? 0;
-  if (observed >= 0.85 && run.correlationRatio >= 0.95 && (run.invalidReceiptsCount ?? 0) === 0) {
+  if (observed >= 0.85 && run.correlationRatio !== null && run.correlationRatio >= 0.95 && (run.invalidReceiptsCount ?? 0) === 0) {
     return "OBSERVED_HARDENED";
   }
   if (observed >= 0.5) {
@@ -377,7 +378,7 @@ function collectForecastSignalsAt(params: {
   let runCount = 0;
   let observedRuns = 0;
   let latestIntegrityIndex = 0;
-  let latestCorrelationRatio = 0;
+  let latestCorrelationRatio: number | null = null;
   let orgQuestionCount = 67;
   const ignoredInputs: string[] = [];
   let targetProgress = {
@@ -414,7 +415,8 @@ function collectForecastSignalsAt(params: {
 
       points.maturityOverall.push({ ts: run.ts, value: Number(overall.toFixed(6)), runId: run.runId, trustTier });
       points.integrityIndex.push({ ts: run.ts, value: Number(run.integrityIndex.toFixed(6)), runId: run.runId, trustTier });
-      points.correlationRatio.push({ ts: run.ts, value: Number(run.correlationRatio.toFixed(6)), runId: run.runId, trustTier });
+      // A run with no receipted trace did not measure correlation; it adds no point rather than a 0.
+      if (run.correlationRatio !== null) points.correlationRatio.push({ ts: run.ts, value: Number(run.correlationRatio.toFixed(6)), runId: run.runId, trustTier });
       points.fourC.Concept.push({ ts: run.ts, value: fourC.Concept, runId: run.runId, trustTier });
       points.fourC.Culture.push({ ts: run.ts, value: fourC.Culture, runId: run.runId, trustTier });
       points.fourC.Capabilities.push({ ts: run.ts, value: fourC.Capabilities, runId: run.runId, trustTier });
@@ -594,7 +596,7 @@ function collectForecastSignalsAt(params: {
       selfReportedShare: safeDiv(selfAccumulator, runCount),
       observedRuns,
       latestIntegrityIndex: Number((latestIntegrityIndex ?? 0).toFixed(6)),
-      latestCorrelationRatio: Number((latestCorrelationRatio ?? 0).toFixed(6))
+      latestCorrelationRatio: latestCorrelationRatio === null ? null : Number(latestCorrelationRatio.toFixed(6))
     },
     runRefs: [...new Set(runRefs)],
     transformPlanInput,

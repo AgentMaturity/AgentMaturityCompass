@@ -102,7 +102,7 @@ function inferTrustTier(report: DiagnosticReport): TrustTier | "OBSERVED_HARDENE
     attested: 0,
     selfReported: 0
   };
-  if (coverage.observed >= 0.85 && report.correlationRatio >= 0.95 && report.invalidReceiptsCount === 0) {
+  if (coverage.observed >= 0.85 && report.correlationRatio !== null && report.correlationRatio >= 0.95 && report.invalidReceiptsCount === 0) {
     return "OBSERVED_HARDENED";
   }
   if (coverage.observed >= 0.5) {
@@ -338,10 +338,10 @@ function buildNodeScorecard(params: {
     }))
   );
   const correlationMedian = weightedMedian(
-    params.snapshots.map((snap) => ({
+    params.snapshots.flatMap((snap) => snap.run.correlationRatio === null ? [] : [{ // unmeasured runs add no point
       value: snap.run.correlationRatio,
       weight: snap.finalWeight
-    }))
+    }])
   );
 
   const cheatSuspicionCount = params.snapshots.reduce(

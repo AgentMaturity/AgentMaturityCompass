@@ -30,7 +30,8 @@ function emptyCategoryScores(): Record<AssuranceFindingCategory, number> {
 
 export interface AssuranceEvidenceGates {
   integrityIndex: number;
-  correlationRatio: number;
+  /** Null when not measured; it blocks certificate issuance like a ratio below a minimum above 0. */
+  correlationRatio: number | null;
   observedShare: number;
 }
 
@@ -47,7 +48,9 @@ export function evaluateAssuranceEvidenceGates(params: {
       `integrityIndex ${params.gates.integrityIndex.toFixed(4)} < min ${params.policy.assurancePolicy.gates.minIntegrityIndex.toFixed(4)}`
     );
   }
-  if (params.gates.correlationRatio < params.policy.assurancePolicy.gates.minCorrelationRatio) {
+  if (params.gates.correlationRatio === null) { // a minimum of 0 sets no requirement
+    if (params.policy.assurancePolicy.gates.minCorrelationRatio > 0) reasons.push("correlationRatio not measured");
+  } else if (params.gates.correlationRatio < params.policy.assurancePolicy.gates.minCorrelationRatio) {
     reasons.push(
       `correlationRatio ${params.gates.correlationRatio.toFixed(4)} < min ${params.policy.assurancePolicy.gates.minCorrelationRatio.toFixed(4)}`
     );

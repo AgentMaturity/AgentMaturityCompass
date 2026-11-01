@@ -176,8 +176,8 @@ describe("WP37 sealed assurance reads", () => {
 
     const detail = assuranceRunDetailForApi({ workspace: ws, runId: "a1" });
     expect(detail.run).not.toBeNull();
-    // The runner persists 0/0 for gates it never measured; the projection used to claim 1/1.
-    expect(detail.run?.evidenceGates.correlationRatio).toBe(0);
+    // The runner persists null correlation and 0 observed share for gates it never measured; the projection used to claim 1/1.
+    expect(detail.run?.evidenceGates.correlationRatio).toBeNull(); // not measured, never a measured 0
     expect(detail.run?.evidenceGates.observedShare).toBe(0);
     expect(detail.run?.score.status).toBe("INSUFFICIENT_EVIDENCE");
     expect(detail.run?.score.pass).toBe(false);

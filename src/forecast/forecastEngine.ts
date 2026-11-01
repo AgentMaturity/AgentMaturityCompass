@@ -111,7 +111,9 @@ function evidenceGateFailures(policy: ForecastPolicy, signals: ForecastSignalBun
       `INTEGRITY_BELOW_MIN:${signals.evidence.latestIntegrityIndex.toFixed(3)}<${gates.minIntegrityIndex.toFixed(3)}`
     );
   }
-  if (signals.evidence.latestCorrelationRatio < gates.minCorrelationRatio) {
+  if (signals.evidence.latestCorrelationRatio === null) { // a minimum of 0 sets no requirement
+    if (gates.minCorrelationRatio > 0) reasons.push("CORRELATION_NOT_MEASURED");
+  } else if (signals.evidence.latestCorrelationRatio < gates.minCorrelationRatio) {
     reasons.push(
       `CORRELATION_BELOW_MIN:${signals.evidence.latestCorrelationRatio.toFixed(3)}<${gates.minCorrelationRatio.toFixed(3)}`
     );
