@@ -133,10 +133,25 @@ function enterLockQueue(input: { root: string; name: string; timeoutMs?: number 
   return { lockPath, ownContenderPath, token, name: input.name, contendersDir, deadline: Date.now() + (input.timeoutMs ?? 5_000) };
 }
 
+/** What linkSync gives on a filesystem without hard links (FAT, some FUSE and SMB mounts). */
+const NO_HARD_LINKS: ReadonlySet<string> = new Set(["EPERM", "ENOTSUP", "EOPNOTSUPP", "ENOSYS"]);
+
+/** The lock: a hard link to the contender file, or where hard links are unsupported an exclusive (`wx`) copy of it. */
+function placeLock(attempt: HeldLockAttempt): void {
+  try {
+    linkSync(attempt.ownContenderPath, attempt.lockPath);
+  } catch (error) {
+    if (!NO_HARD_LINKS.has(String((error as NodeJS.ErrnoException).code))) throw error;
+    // ponytail: the reaper matches a lock to its contender by inode, so a dead holder's `wx` lock is never reaped; it
+    // stays busy until removed by hand. Add a token-checked reap when such filesystems are in real use.
+    writeFileSync(attempt.lockPath, readFileSync(attempt.ownContenderPath), { flag: "wx", mode: 0o600 });
+  }
+}
+
 /** One acquisition attempt: true when held, false to wait and retry; throws on timeout or an unexpected error. */
 function tryAcquire(attempt: HeldLockAttempt): boolean {
   try {
-    linkSync(attempt.ownContenderPath, attempt.lockPath);
+    placeLock(attempt);
     return true;
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code !== "EEXIST") {
