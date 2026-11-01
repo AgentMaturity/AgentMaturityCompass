@@ -2778,7 +2778,6 @@
     {"id":"b230ead9e6fe1c590d8d78dc04c88a427f2f5bed5b6734a4eccdaa9bf53e40aa","file":"src/benchmarks/benchStore.ts","kind":"exports"},
     {"id":"b250597c7e5c294f61af7a8fb47190e8985d4682ae123311a54f4435a20d903d","file":"src/domainProof/sourceRuleManifestSchema.ts","kind":"exports"},
     {"id":"b257fee442b2d85f3a7571efcc39677c69eaff77f6c895d7b3d09e1277c5f3f8","file":"src/domains/conformance/index.ts","kind":"types"},
-    {"id":"b25abae01277388f34d4ccabf8e237ca19237e05ba6ed69bc9c3eccb15da0d42","file":"src/tools/builtin/nativeToolBreadth/governedFetch.ts","kind":"types"},
     {"id":"b25d08ad0bd2ef52e23ac2e08b2582104f4aa72f8d97b887db5bef3a40243d8f","file":"src/scanner/index.ts","kind":"types"},
     {"id":"b2622e6e4af4ad1722ff82f32cdeb937007ace775618e45b7e6db4df889f294b","file":"src/benchmarks/replayBenchmarkCorpus.ts","kind":"types"},
     {"id":"b2629f9080413751b66dcec576d1dda6b4ca3e54b8153e23812cb119240b3b81","file":"src/plugins/pluginApiVersion.ts","kind":"types"},
