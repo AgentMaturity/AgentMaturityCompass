@@ -5,6 +5,11 @@
  * writer and as a signed artifact (`effective-policy-receipt`) under `.amc/effective-policy/`. Small on purpose:
  * control ids and digests, never the policy body. A receipt shows what AMC enforced and where; it is not a compliance
  * claim, and a receipt for one policy digest is no evidence for a session that ran another.
+ *
+ * Writer: native sessions (`agentToolset`). Not the kernel tool service
+ * (src/kernel/services/toolServices.ts): it enforces the active compiled policy through the same `compiled-policy`
+ * guard, but has no session id or session writer to record the row through, and no host composes it yet. A host that
+ * composes it with a session writer writes this receipt the way `agentToolset` does.
  */
 import { randomUUID } from "node:crypto";
 import { join } from "node:path";
