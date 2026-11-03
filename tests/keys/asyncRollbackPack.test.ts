@@ -206,11 +206,11 @@ describe("actual async rollback-pack producer", () => {
   test("checked async refuses unlocked and locked no-sign while retained sync unsigned/ephemeral behavior is unchanged", async () => {
     // Signed run-hash authority refuses no-sign mode even with an unlocked vault; nothing is stored or cached.
     const f = fixture(); await positive(f); vi.stubEnv("AMC_NO_SIGN", "1"); const unlocked = storedFiles(f), cached = [...canary.getRollbackPacks("default")];
-    await expect(canary.createRollbackPackAsync("default", f.policy, "unlocked no-sign", f.workspace)).rejects.toThrow("no-sign mode does not authorize policy signing");
+    await expect(canary.createRollbackPackAsync("default", f.policy, "unlocked no-sign", f.workspace)).rejects.toThrow("no-sign mode does not authorize artifact-seal signing");
     expect(storedFiles(f)).toEqual(unlocked); expect(canary.getRollbackPacks("default")).toEqual(cached);
     vi.stubEnv("AMC_VAULT_PASSPHRASE", undefined); lockVault(f.workspace); const before = storedFiles(f), live = [...canary.getRollbackPacks("default")];
     try {
-      await expect(canary.createRollbackPackAsync("default", f.policy, "locked no-sign", f.workspace)).rejects.toMatchObject({ code: "KEY_PROVIDER_KEY_REFUSED" });
+      await expect(canary.createRollbackPackAsync("default", f.policy, "locked no-sign", f.workspace)).rejects.toThrow("no-sign mode does not authorize artifact-seal signing");
       expect(storedFiles(f)).toEqual(before); expect(canary.getRollbackPacks("default")).toEqual(live);
       const legacy = canary.createRollbackPack("legacy", f.policy, "retained ephemeral", f.workspace);
       const digest = sha256Hex(canonicalize({ packId: legacy.packId, agentId: legacy.agentId, policyFileSha256: legacy.policyFileSha256, reason: legacy.reason, createdTs: legacy.createdTs }));

@@ -4,12 +4,12 @@
  * `.amc/evidence.sqlite`, where an unsigned row makes every later signed reader fail.
  */
 import Database from "better-sqlite3";
-import { existsSync, mkdtempSync, readdirSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Readable } from "node:stream";
-import { afterEach, beforeEach, expect, test, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { agentToolset } from "../../src/agent/agentToolset.js";
 import { handleWatchRoute } from "../../src/api/watchRouter.js";
 import { signArtifactProvenance } from "../../src/artifact/artifactProvenance.js";
@@ -18,12 +18,15 @@ import { reserveNativeToolBudget } from "../../src/budgets/nativeBudgetAdmission
 import { createFreezeIncident } from "../../src/drift/freezeEngine.js";
 import { evalImportCoverageStatus, importEvalResults } from "../../src/eval/evalImporters.js";
 import { executeCaseTrials } from "../../src/experiments/trialExecutor.js";
+import { signWithPurposeKey } from "../../src/keys/purposeProviders.js";
 import { openLedger } from "../../src/ledger/ledger.js";
 import { UNSIGNED_EVIDENCE_STORE } from "../../src/ledger/ledgerConnection.js";
 import { exportReviewTimingCsv, recordReviewTiming } from "../../src/operator/reviewTiming.js";
 import { writeEffectivePolicyReceipt } from "../../src/policy/effectivePolicyReceipt.js";
 import { checkChangeEnvelopeAtOpen } from "../../src/runtime/changeEnvelope.js";
-import { activateKillSwitch } from "../../src/runtime/killSwitch.js";
+import { activateKillSwitch, killSwitchDenial, killSwitchStatus, releaseKillSwitch } from "../../src/runtime/killSwitch.js";
+import { runKillSwitchDrill } from "../../src/runtime/killSwitchDrill.js";
+import { runProviderExitDrill } from "../../src/runtime/providerExit.js";
 import { recordFenceRefusal } from "../../src/session/writerFence.js";
 import { checkpointLedger, checkpointsDir, completePendingCheckpoints } from "../../src/time/checkpoint.js";
 import { initWorkspace, loadAMCConfig, saveAMCConfig, signAmcConfig } from "../../src/workspace.js";
@@ -96,12 +99,61 @@ test("the retained sync freeze incident refuses and publishes no incident", () =
   expect(files(dir)).toEqual(before);
 });
 
-test("the kill switch refuses and writes no kill record", async () => {
-  const dir = join(workspace, ".amc", "runtime", "kill-switch"), before = files(dir), rows = signedStore().size;
-  await expect(activateKillSwitch({ workspace, issuedBy: "owner-1", scope: { kind: "workspace", id: "workspace" }, mode: "stop_all",
-    reason: "probe", incidentId: null })).rejects.toThrow("no-sign mode does not authorize kill switch signing");
-  expect(files(dir)).toEqual(before);
-  expect(signedStore().size).toBe(rows);
+describe("the kill switch under no-sign", () => {
+  const killDir = () => join(workspace, ".amc", "runtime", "kill-switch");
+  const write = (row: object) => writeFileSync(join(killDir(), `planted-${Math.random().toString(16).slice(2)}.json`), JSON.stringify(row));
+  const tool = (agentId: string, actionClass: "READ_ONLY" | "WRITE_LOW") => ({ kind: "tool" as const, agentId, actionClass });
+
+  test("an unsigned kill stops the scope it names, is recorded unsigned, and cannot be released under no-sign", async () => {
+    const rows = signedStore().size;
+    const kill = await activateKillSwitch({ workspace, issuedBy: "owner-1", scope: { kind: "agent", id: "agent-a" }, mode: "stop_new_effects",
+      reason: "emergency", incidentId: "inc-1" });
+    expect(kill.signature).toBe("unsigned");
+    expect(killSwitchDenial(workspace, tool("agent-a", "WRITE_LOW"))).toContain(`kill_switch_active: ${kill.killId}`);
+    expect(killSwitchDenial(workspace, tool("agent-a", "READ_ONLY"))).toBeNull();
+    expect(killSwitchDenial(workspace, tool("agent-b", "WRITE_LOW"))).toBeNull();
+    expect(signedStore().size).toBe(rows);
+    expect([...unsignedStore().values()]).toEqual(["unsigned"]);
+    const before = files(killDir());
+    await expect(releaseKillSwitch({ workspace, releasedBy: "owner-1", killId: kill.killId, incidentId: "inc-1" }))
+      .rejects.toThrow("no-sign mode cannot release a kill");
+    expect(files(killDir())).toEqual(before);
+    // A signing session's signed OWNER release lifts it.
+    vi.stubEnv("AMC_NO_SIGN", "0");
+    await releaseKillSwitch({ workspace, releasedBy: "owner-1", killId: kill.killId, incidentId: "inc-1" });
+    expect(killSwitchDenial(workspace, tool("agent-a", "WRITE_LOW"))).toBeNull();
+  });
+
+  test("no unsigned record releases or narrows a signed kill", async () => {
+    vi.stubEnv("AMC_NO_SIGN", "0");
+    const signed = await activateKillSwitch({ workspace, issuedBy: "owner-1", scope: { kind: "workspace", id: "workspace" }, mode: "stop_all",
+      reason: "signed", incidentId: "inc-1" });
+    vi.stubEnv("AMC_NO_SIGN", "1");
+    write({ ...signed, scope: { kind: "agent", id: "nobody" }, mode: "stop_new_effects", signature: "unsigned" });
+    expect(killSwitchDenial(workspace, tool("default", "READ_ONLY"))).toContain(`kill_switch_active: ${signed.killId} (workspace:workspace, stop_all)`);
+    write({ v: 1, release: true, killId: signed.killId, incidentId: "inc-1", releasedBy: "owner-1", releasedTs: Date.now(), signature: "unsigned" });
+    expect(killSwitchStatus(workspace).unverifiable).toHaveLength(1);
+    expect(killSwitchDenial(workspace, tool("default", "READ_ONLY"))).toContain("unverifiable kill-switch record treated as an active stop_all");
+  });
+
+  test("an unsigned kill whose scope is not a plain id stops everything", () => {
+    mkdirSync(killDir(), { recursive: true });
+    write({ v: 1, killId: "kill_x", scope: { kind: "agent", id: "" }, mode: "stop_new_effects", reason: "r", incidentId: null,
+      issuedBy: "o", issuedTs: Date.now(), signature: "unsigned" });
+    expect(killSwitchDenial(workspace, tool("default", "READ_ONLY"))).toContain("treated as an active stop_all");
+  });
+
+  test("the drills refuse before activating a kill they could not release", async () => {
+    await expect(runKillSwitchDrill({ workspace, actions: 1 })).rejects.toThrow("no-sign mode does not authorize drills");
+    await expect(runProviderExitDrill({ workspace, agentId: "default", provider: "openai" })).rejects.toThrow("no-sign mode does not authorize drills");
+    expect(files(killDir())).toEqual([]);
+  });
+});
+
+test("the shared purpose signer refuses every purpose but the session credential", async () => {
+  await expect(signWithPurposeKey(workspace, "artifact-seal", Buffer.from("probe"))).rejects.toThrow("no-sign mode does not authorize artifact-seal signing");
+  await expect(signWithPurposeKey(workspace, "receipt", Buffer.from("probe"))).rejects.toThrow("no-sign mode does not authorize receipt signing");
+  expect((await signWithPurposeKey(workspace, "session", Buffer.from("probe"))).signature.length).toBeGreaterThan(0);
 });
 
 // Change envelope test results refuse too; that case needs an authenticated tester and an active envelope (tests/runtime/changeEnvelope.test.ts).

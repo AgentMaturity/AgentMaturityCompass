@@ -25,9 +25,18 @@ export interface SignedDrillReceipt<T extends object> {
 
 /** Signs a drill receipt with the workspace's artifact-seal key; verifyDrillReceipt checks it against that key history. */
 export async function signDrillReceipt<T extends object>(workspace: string, body: T & { schema: "amc.drill/1"; drillId: string }): Promise<SignedDrillReceipt<T>> {
+  assertDrillSigning();
   const digestSha256 = sha256Hex(canonicalize(body));
   const signed = await signWithPurposeKey(workspace, "artifact-seal", Buffer.from(digestSha256, "hex"));
   return { body, digestSha256, signature: signed.signature.toString("base64"), signerPublicKeyPem: signed.publicKeyPem };
+}
+
+/**
+ * A drill's output is a signed receipt and it ends with a signed release, so under AMC_NO_SIGN=1 it refuses before
+ * activating anything: a no-sign kill could not be released, and the drill must never leave a kill active.
+ */
+export function assertDrillSigning(): void {
+  if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize drills: a drill writes a signed receipt and ends with a signed release");
 }
 
 export function verifyDrillReceipt<T extends object>(workspace: string, receipt: SignedDrillReceipt<T>): boolean {
@@ -54,6 +63,7 @@ export interface KillSwitchDrillBody {
  * `actions` calls under a workspace stop_new_effects kill, then a signed release. Never leaves the kill active.
  */
 export async function runKillSwitchDrill(p: { workspace: string; actions?: number; owner?: string }): Promise<SignedDrillReceipt<KillSwitchDrillBody>> {
+  assertDrillSigning();
   const drillId = `drill_${randomUUID().replace(/-/g, "")}`;
   const dir = join(p.workspace, ".amc", "drills", drillId);
   mkdirSync(dir, { recursive: true });

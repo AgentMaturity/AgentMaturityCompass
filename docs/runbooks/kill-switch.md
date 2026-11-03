@@ -33,6 +33,14 @@ A file in either kill-switch directory that cannot be read or verified
 counts as an active workspace `stop_all` and raises a
 `KILL_SWITCH_UNVERIFIABLE` alert. Remove only files you can account for.
 
+Under `AMC_NO_SIGN=1` the kill still activates, because refusing an emergency
+stop is the unsafe direction. The record carries the signature `unsigned`, the
+ledger row goes to the unsigned evidence store, and no receipt is written.
+Every enforcement point treats it as an active kill for the scope and mode it
+names (one whose scope is not a plain id counts as a workspace `stop_all`). An
+unsigned record never lifts or narrows a kill: an unsigned release counts as
+an unverifiable file, and a kill is released only by the signed release below.
+
 ## 2. Release (OWNER)
 
 ```bash
@@ -41,7 +49,8 @@ curl -s -X POST "$AMC_URL/api/v1/runtime/kill-switch/release" \
   -d '{"killId":"<killId>","incidentId":"<the kill'"'"'s incident>"}'
 ```
 
-The release is signed and must name the kill's incident. Break-glass never
+The release is signed and must name the kill's incident, so under
+`AMC_NO_SIGN=1` it is refused; release from a signing session. Break-glass never
 overrides an active kill switch. An agent-scoped `stop_all` kill also suspended the agent
 (lifecycle reason `incident`); the release does not resume it. An OWNER
 resumes it with `amc lifecycle transition --to active` once the incident is
@@ -83,4 +92,6 @@ Without `--workspace` the drill uses a fresh temporary workspace. It passes
 only when the fixture system of record shows zero effects after activation.
 Its signed `amc.drill/1` receipt records the manual-fallback rehearsal as
 `pending` until a person rehearses step 3 on a kind cluster and fills it in.
-The drill cadence is agreed with the design partner (Sid, P2-03).
+The drill cadence is agreed with the design partner (Sid, P2-03). Under
+`AMC_NO_SIGN=1` the drill refuses before activating anything, since it could
+neither release its kill nor sign its receipt.
