@@ -1583,81 +1583,398 @@
       }
     },
     {
-      "id": "gap-fullwidth-card",
+      "id": "adv-fullwidth-card",
       "round": "adv",
-      "finding": "adv-gap",
+      "finding": "adv-closed-gap",
       "surface": "walk",
-      "gap": "Fullwidth digits are not folded (no NFKC in the views).",
       "input": {
         "text": "card {{fullwidth:{{CARD}}}} ok"
       },
       "expect": {
-        "unchanged": true
+        "classes": [
+          "card_number"
+        ],
+        "absent": [
+          "{{fullwidth:{{CARD}}}}"
+        ]
       }
     },
     {
-      "id": "gap-zero-width-card",
+      "id": "adv-zero-width-card",
       "round": "adv",
-      "finding": "adv-gap",
+      "finding": "adv-closed-gap",
       "surface": "walk",
-      "gap": "Zero-width characters inside a value are not removed.",
       "input": {
         "text": "card 4111​1111​1111​1111"
       },
       "expect": {
-        "unchanged": true
+        "classes": [
+          "card_number"
+        ],
+        "absent": [
+          "4111​1111​1111​1111"
+        ]
       }
     },
     {
-      "id": "gap-xml-element",
+      "id": "adv-xml-element",
       "round": "adv",
-      "finding": "adv-gap",
+      "finding": "adv-closed-gap",
       "surface": "walk",
-      "gap": "XML elements are not a pair syntax.",
       "input": {
         "text": "<password>{{PASSWORD}}</password>"
       },
       "expect": {
-        "unchanged": true
+        "classes": [
+          "credential"
+        ],
+        "absent": [
+          "{{PASSWORD}}"
+        ],
+        "present": [
+          "<password>",
+          "</password>"
+        ]
       }
     },
     {
-      "id": "gap-html-attribute",
+      "id": "adv-html-attribute",
       "round": "adv",
-      "finding": "adv-gap",
+      "finding": "adv-closed-gap",
       "surface": "walk",
-      "gap": "An HTML input's name and value attributes are not a pair.",
       "input": {
         "text": "<input name=\"password\" value=\"{{PASSWORD}}\">"
       },
       "expect": {
-        "unchanged": true
+        "classes": [
+          "credential"
+        ],
+        "absent": [
+          "{{PASSWORD}}"
+        ],
+        "present": [
+          "<input name=\"password\" value=\""
+        ]
       }
     },
     {
-      "id": "gap-homoglyph-key",
+      "id": "adv-homoglyph-key",
       "round": "adv",
-      "finding": "adv-gap",
+      "finding": "adv-closed-gap",
       "surface": "walk",
-      "gap": "A Cyrillic homoglyph in a member name is not folded.",
       "input": {
         "text": "{\"pаssword\":\"{{PASSWORD}}\"}"
       },
       "expect": {
-        "unchanged": true
+        "classes": [
+          "credential"
+        ],
+        "absent": [
+          "{{PASSWORD}}"
+        ],
+        "present": [
+          "\"pаssword\":"
+        ]
       }
     },
     {
-      "id": "gap-basic-auth-line",
+      "id": "adv-basic-auth-line",
       "round": "adv",
-      "finding": "adv-gap",
+      "finding": "adv-closed-gap",
       "surface": "walk",
-      "gap": "The line rule's value stops at the first space, so a Basic scheme hides its credential.",
       "input": {
         "text": "Authorization: Basic {{base64:alice:{{PASSWORD}}}}"
       },
       "expect": {
+        "classes": [
+          "credential"
+        ],
+        "absent": [
+          "{{base64:alice:{{PASSWORD}}}}"
+        ],
+        "present": [
+          "Authorization: Basic "
+        ]
+      }
+    },
+    {
+      "id": "adv-html-attribute-value-first",
+      "round": "adv",
+      "finding": "adv-closed-gap",
+      "surface": "walk",
+      "input": {
+        "text": "<input value='{{PASSWORD}}' type=\"password\" name='db_password'/>"
+      },
+      "expect": {
+        "classes": [
+          "credential"
+        ],
+        "absent": [
+          "{{PASSWORD}}"
+        ]
+      }
+    },
+    {
+      "id": "adv-xml-element-attributes",
+      "round": "adv",
+      "finding": "adv-closed-gap",
+      "surface": "walk",
+      "input": {
+        "text": "<config>\n  <apiKey env=\"prod\">{{OPENAI}}</apiKey>\n</config>"
+      },
+      "expect": {
+        "classes": [
+          "credential"
+        ],
+        "absent": [
+          "{{OPENAI}}"
+        ],
+        "present": [
+          "<config>",
+          "</apiKey>"
+        ]
+      }
+    },
+    {
+      "id": "adv-basic-auth-free-text",
+      "round": "adv",
+      "finding": "adv-closed-gap",
+      "surface": "walk",
+      "input": {
+        "text": "retry with basic {{base64:svc-user:{{PASSWORD}}}} please"
+      },
+      "expect": {
+        "classes": [
+          "credential"
+        ],
+        "absent": [
+          "{{base64:svc-user:{{PASSWORD}}}}"
+        ],
+        "present": [
+          "retry with basic "
+        ]
+      }
+    },
+    {
+      "id": "adv-zero-width-key",
+      "round": "adv",
+      "finding": "adv-closed-gap",
+      "surface": "walk",
+      "input": {
+        "text": "{\"pass​word\":\"{{PASSWORD}}\"}"
+      },
+      "expect": {
+        "classes": [
+          "credential"
+        ],
+        "absent": [
+          "{{PASSWORD}}"
+        ]
+      }
+    },
+    {
+      "id": "adv-homoglyph-env-line",
+      "round": "adv",
+      "finding": "adv-closed-gap",
+      "surface": "walk",
+      "input": {
+        "text": "DB_PАSSWORD={{PASSWORD}}"
+      },
+      "expect": {
+        "classes": [
+          "credential"
+        ],
+        "absent": [
+          "{{PASSWORD}}"
+        ]
+      }
+    },
+    {
+      "id": "adv-fullwidth-card-session",
+      "round": "adv",
+      "finding": "adv-closed-gap",
+      "surface": "session",
+      "input": {
+        "text": "card {{fullwidth:{{CARD}}}} ok"
+      },
+      "expect": {
+        "classes": [
+          "card_number"
+        ],
+        "absent": [
+          "{{fullwidth:{{CARD}}}}"
+        ]
+      }
+    },
+    {
+      "id": "adv-xml-element-session",
+      "round": "adv",
+      "finding": "adv-closed-gap",
+      "surface": "session",
+      "input": {
+        "text": "<user><password>{{PASSWORD}}</password></user>"
+      },
+      "expect": {
+        "classes": [
+          "credential"
+        ],
+        "absent": [
+          "{{PASSWORD}}"
+        ]
+      }
+    },
+    {
+      "id": "adv-basic-auth-session",
+      "round": "adv",
+      "finding": "adv-closed-gap",
+      "surface": "session",
+      "input": {
+        "text": "Authorization: Basic {{base64:alice:{{PASSWORD}}}}"
+      },
+      "expect": {
+        "classes": [
+          "credential"
+        ],
+        "absent": [
+          "{{base64:alice:{{PASSWORD}}}}"
+        ]
+      }
+    },
+    {
+      "id": "adv-benign-xml",
+      "round": "adv",
+      "finding": "adv-closed-gap",
+      "surface": "walk",
+      "input": {
+        "text": "<report><title>Quarterly review</title><note lang=\"en\">see section 2</note><token/></report>"
+      },
+      "expect": {
         "unchanged": true
+      }
+    },
+    {
+      "id": "adv-benign-html-form",
+      "round": "adv",
+      "finding": "adv-closed-gap",
+      "surface": "walk",
+      "input": {
+        "text": "<form><input type=\"text\" name=\"q\" value=\"search terms\"><input type=\"password\" name=\"password\" value=\"\"><input name=\"email_opt_in\" value=\"yes\"></form>"
+      },
+      "expect": {
+        "unchanged": true
+      }
+    },
+    {
+      "id": "adv-benign-basic-words",
+      "round": "adv",
+      "finding": "adv-closed-gap",
+      "surface": "walk",
+      "input": {
+        "text": "Basic Authentication is covered in Basic Settings; basic understanding helps. Basic plan: Basic12345678."
+      },
+      "expect": {
+        "unchanged": true
+      }
+    },
+    {
+      "id": "adv-benign-non-ascii-text",
+      "round": "adv",
+      "finding": "adv-closed-gap",
+      "surface": "walk",
+      "input": {
+        "text": "ｈｅｌｌｏ ｗｏｒｌｄ, Привет мир, zero​width ﬁle 2026"
+      },
+      "expect": {
+        "unchanged": true
+      }
+    },
+    {
+      "id": "h-input-attribute-runs",
+      "round": "hostile",
+      "finding": "adv-closed-gap",
+      "surface": "walk",
+      "input": {
+        "generate": [
+          [
+            "<input name=\"password\" ",
+            40000
+          ]
+        ]
+      },
+      "expect": {
+        "withinMs": 20000
+      }
+    },
+    {
+      "id": "h-input-unclosed-values",
+      "round": "hostile",
+      "finding": "adv-closed-gap",
+      "surface": "walk",
+      "input": {
+        "generate": [
+          [
+            "<input value=\"",
+            70000
+          ]
+        ]
+      },
+      "expect": {
+        "withinMs": 20000
+      }
+    },
+    {
+      "id": "h-xml-unclosed-elements",
+      "round": "hostile",
+      "finding": "adv-closed-gap",
+      "surface": "walk",
+      "input": {
+        "generate": [
+          [
+            "<password>",
+            90000
+          ]
+        ]
+      },
+      "expect": {
+        "withinMs": 20000
+      }
+    },
+    {
+      "id": "h-basic-long-run",
+      "round": "hostile",
+      "finding": "adv-closed-gap",
+      "surface": "walk",
+      "input": {
+        "generate": [
+          [
+            "Basic ",
+            1
+          ],
+          [
+            "A",
+            900000
+          ]
+        ]
+      },
+      "expect": {
+        "withinMs": 20000
+      }
+    },
+    {
+      "id": "h-fullwidth-zero-width-runs",
+      "round": "hostile",
+      "finding": "adv-closed-gap",
+      "surface": "walk",
+      "input": {
+        "generate": [
+          [
+            "１​",
+            300000
+          ]
+        ]
+      },
+      "expect": {
+        "withinMs": 20000
       }
     }
   ],

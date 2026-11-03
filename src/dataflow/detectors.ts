@@ -6,6 +6,7 @@ import { SECRET_PATTERNS } from "../shield/redaction/secretPatterns.js";
 import { assertNoDuplicateJsonKeys, canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 import { RedactionRefused, TOKEN_PATTERN_SOURCE } from "./tokenizer.js";
+import { decodeWebEscapes, foldName, foldText, NAME_FOLD_CHARS, NAMED_REFERENCES, WEB_ESCAPE } from "./textViews.js";
 
 export interface ProtectedDataDetection {
   readonly classes: readonly ProtectedDataClass[];
@@ -32,7 +33,7 @@ const CLASS_BY_TYPE: Readonly<Record<string, ProtectedDataClass>> = Object.freez
   api_key_openai: "credential", api_key_github: "credential", api_key_stripe: "credential", api_key_aws: "credential",
   password_json: "credential", anthropic_key: "credential", slack_token: "credential", google_api_key: "credential",
   bearer_token: "credential", jwt: "credential", private_key: "credential", password_in_url: "credential",
-  generic_api_key: "credential", secret_json: "credential", secret_field: "credential"
+  generic_api_key: "credential", secret_json: "credential", secret_field: "credential", basic_auth: "credential"
 });
 // ponytail: a bare 10-digit run not preceded by "+" is dropped as noise, so a phone number written that way is not
 // detected; E.164 (+14155552671) and 11-digit (14155552671) runs still are. Add a context-keyed phone rule (e.g. "tel:",
@@ -66,24 +67,6 @@ const JSON_ESCAPES: Readonly<Record<string, string>> = Object.freeze({ n: "\n", 
 const decodeJsonEscapes = (text: string) => !text.includes("\\") ? text : text.replace(/\\(?:u([0-9a-fA-F]{4})|([\s\S]))/g,
   (_match, hex: string | undefined, char: string) => hex !== undefined ? String.fromCharCode(Number.parseInt(hex, 16))
     : Object.hasOwn(JSON_ESCAPES, char) ? JSON_ESCAPES[char]! : char);
-const NAMED_REFERENCES: Readonly<Record<string, string>> = Object.freeze({ amp: "&", commat: "@", period: ".", plus: "+",
-  num: "#", colon: ":", lt: "<", gt: ">", quot: "\"", apos: "'", nbsp: " " });
-const WEB_ESCAPE = /(?:%[0-9A-Fa-f]{2})+|(?<=[A-Za-z0-9])\+(?=[A-Za-z0-9])|&(?:#(\d{1,7})|#[xX]([0-9A-Fa-f]{1,6})|([A-Za-z]{2,6}));/g;
-/**
- * Percent-encoding (a form's `+` between letters or digits as a space) and HTML character references, decoded in one
- * linear pass, as a server or browser reads a URL, a form post or a page: `alice%40example.com`, `4111+1111+1111+1111`,
- * `alice&#64;example.com`. A %-run that is not UTF-8 decodes byte by byte; an unknown reference stays as it is.
- */
-const decodeWebEscapes = (text: string) => text.replace(WEB_ESCAPE,
-  (match: string, decimal: string | undefined, hex: string | undefined, name: string | undefined) => {
-    if (match === "+") return " ";
-    if (match.startsWith("%")) {
-      try { return decodeURIComponent(match); } catch { return match.replace(/%([0-9A-Fa-f]{2})/g, (_byte, code: string) => String.fromCharCode(Number.parseInt(code, 16))); }
-    }
-    if (name !== undefined) return Object.hasOwn(NAMED_REFERENCES, name.toLowerCase()) ? NAMED_REFERENCES[name.toLowerCase()]! : match;
-    const code = decimal !== undefined ? Number.parseInt(decimal, 10) : Number.parseInt(hex!, 16);
-    return code <= 0x10ffff ? String.fromCodePoint(code) : match;
-  });
 const BASE64_RUN = /[A-Za-z0-9+/_-]{24,}={0,2}/g;
 const CONTROL_CHARS = /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\u009f]/g;
 const STRICT_UTF8 = new TextDecoder("utf-8", { fatal: true });
@@ -162,25 +145,28 @@ const decodedName = (key: string, round = 1): string => { const next = decodeWeb
 function memberFinding(key: string | undefined, value: string, issued: IssuedToken, charge: (length: number) => void,
   secretDetector: string): Finding | undefined {
   if (key === undefined || value === "") return undefined;
-  const name = decodedName(key), words = memberWords(name);
+  const name = foldName(decodedName(key)), words = memberWords(name);
   const rest = value.includes("[[amc:") ? withoutTokens(value, issued) : value;
   if (secretMember(name, words, rest)) return { dataClass: "credential", detector: secretDetector };
   return keyedSpan(words, value, issued, charge);
 }
 /**
  * Credential shapes beside dlp's provider keys: the shared secret table's (src/shield/redaction/secretPatterns.ts), a PEM
- * private key block whole, a URL's password and an `api_key`/`apikey`/`api_secret` assignment anywhere in a line. Where a
+ * private key block whole, a URL's password, an `api_key`/`apikey`/`api_secret` assignment anywhere in a line and a Basic
+ * scheme's base64 `user:password` (`accept`: only a run that decodes to that, so "Basic Settings" is prose). Where a
  * rule has a group, only the value it captures is replaced. None backtracks quadratically.
  */
-const CREDENTIAL_RULES: readonly { readonly type: string; readonly re: RegExp }[] = Object.freeze([
+const CREDENTIAL_RULES: readonly { readonly type: string; readonly re: RegExp; readonly accept?: (value: string) => boolean }[] = Object.freeze([
   ...["anthropic_key", "slack_token", "google_api_key", "bearer_token", "jwt"].map(type => ({ type, re: sharedSecret(type) })),
   { type: "private_key", re: /-----BEGIN [A-Z ]{0,20}PRIVATE KEY-----[^-]*(?:-----END [A-Z ]{0,20}PRIVATE KEY-----)?/ },
   { type: "password_in_url", re: /\/\/[^:\s/@"]{1,256}:([^@\s/"]{1,256})@/ },
-  { type: "generic_api_key", re: /(?:api[_-]?key|apikey|api_secret)["\s:=]+["']?([A-Za-z0-9_-]{16,})/i }
+  { type: "generic_api_key", re: /(?:api[_-]?key|apikey|api_secret)["\s:=]+["']?([A-Za-z0-9_-]{16,})/i },
+  { type: "basic_auth", re: /\bBasic\s+([A-Za-z0-9+/]{8,}={0,2})/i, accept: value => /^[^\u0000-\u001f:]*:[^\u0000-\u001f]*$/.test(decodeBase64Run(value) ?? "") }
 ]);
 // Each rule compiled for scanning once (per unit, compiling them again cost more than the scan); `re` stays non-global.
 const CREDENTIAL_SCANS: readonly RegExp[] = CREDENTIAL_RULES.map(rule => new RegExp(rule.re.source, `${rule.re.flags}gd`));
-const MEMBER_KEY = String.raw`(?<k>(?:[A-Za-z0-9_.-]|\\+u[0-9A-Fa-f]{4}){1,64})`;
+const NAME_CHARS = `[A-Za-z0-9_.${NAME_FOLD_CHARS}-]`;
+const MEMBER_KEY = String.raw`(?<k>(?:${NAME_CHARS}|\\+u[0-9A-Fa-f]{4}){1,64})`;
 /**
  * Name and value pairs in exact text: a quoted member (JSON, a Python or JS literal, a string or a number, its quotes
  * escaped once too: JSON in a JSON string), a form, query or command-line field, a multipart form part, and an env or YAML
@@ -188,13 +174,17 @@ const MEMBER_KEY = String.raw`(?<k>(?:[A-Za-z0-9_.-]|\\+u[0-9A-Fa-f]{4}){1,64})`
  * name, decoded (`memberFinding`); only the value is replaced. A quoted string value ends at its closing quote or, unclosed
  * (truncated output), at the end of its line. A decoded view runs only the rules that do not depend on where quotes fall
  * (`exactOnly: false`): decoding an escaped backslash before a closing quote leaves an escaped quote, so a value runs on.
+ * An XML element's text and an HTML input's quoted `value` under its `name` (either order) are pairs too.
  */
 const PAIR_RULES: readonly { readonly type: "secret_json" | "secret_field"; readonly re: RegExp; readonly exactOnly: boolean }[] = Object.freeze([
   { type: "secret_json", exactOnly: true, re: new RegExp(String.raw`(?<q>\\?["'])${MEMBER_KEY}\k<q>\s*:\s*(?<r>\\?["'])(?<v>(?:(?!\k<r>)(?:[^\\\r\n]|\\[^\r\n]))*)(?:\k<r>|(?=[\r\n]|$))`) },
   { type: "secret_json", exactOnly: true, re: new RegExp(String.raw`(?<q>\\?["'])${MEMBER_KEY}\k<q>\s*:\s*(?<v>-?\d[\d.eE+-]*)`) },
   { type: "secret_field", exactOnly: false, re: new RegExp(String.raw`(?:^|[?&;\s])${MEMBER_KEY}=(?<v>[^&;\s#]*)`) },
   { type: "secret_field", exactOnly: true, re: new RegExp(String.raw`name="${MEMBER_KEY}"[^\r\n]{0,256}\r?\n(?:[^\r\n]{1,256}\r?\n){0,8}\r?\n(?<v>[^\r\n]*)`) },
-  { type: "secret_field", exactOnly: false, re: /^[ \t]*(?<k>[A-Za-z0-9_.-]{1,64})[ \t]*[:=][ \t]*(?<v>\S+)/m }
+  { type: "secret_field", exactOnly: false, re: new RegExp(String.raw`^[ \t]*(?<k>${NAME_CHARS}{1,64})[ \t]*[:=][ \t]*(?<v>\S+)`, "m") },
+  { type: "secret_field", exactOnly: false, re: new RegExp(String.raw`<(?<k>${NAME_CHARS}{1,64})(?:\s[^<>]{0,256})?>(?<v>[^<]*)</\k<k>\s*>`) },
+  { type: "secret_field", exactOnly: false, re: new RegExp(String.raw`<input\b[^<>]{0,256}?\sname=(?<q>["'])(?<k>${NAME_CHARS}{1,64})\k<q>[^<>]{0,256}?\svalue=(?<r>["'])(?<v>(?:(?!\k<r>)[^<>])*)\k<r>`, "i") },
+  { type: "secret_field", exactOnly: false, re: new RegExp(String.raw`<input\b[^<>]{0,256}?\svalue=(?<r>["'])(?<v>(?:(?!\k<r>)[^<>])*)\k<r>[^<>]{0,256}?\sname=(?<q>["'])(?<k>${NAME_CHARS}{1,64})\k<q>`, "i") }
 ]);
 const PAIR_SCANS: readonly RegExp[] = PAIR_RULES.map(rule => new RegExp(rule.re.source, `${rule.re.flags}gd`));
 /** Binds the patterns, mappings, filters, walk, token format and limits below; receipts and admission rows carry it. */
@@ -208,7 +198,7 @@ export const DETECTOR_SET_DIGEST = sha256Hex(canonicalize({
   secretMembers: SECRET_MEMBER.source, secretMemberNames: SECRET_MEMBER_NAME.source, pageTokenNames: PAGE_TOKEN_NAME.source,
   keyedNames: KEYWORD_BOUND.source, webEscapes: { source: WEB_ESCAPE.source, named: NAMED_REFERENCES },
   base64Runs: { source: BASE64_RUN.source, controls: CONTROL_CHARS.source }, tokenFormat: TOKEN_PATTERN_SOURCE,
-  walk: { revision: "protected-walk-v2", order: "json>base64>web", maxDecodePasses: MAX_DECODE_PASSES, viewRules: "dlp+shape+assign+line" },
+  walk: { revision: "protected-walk-v3", order: "json>base64>web>nfkc", nameFold: NAME_FOLD_CHARS, maxDecodePasses: MAX_DECODE_PASSES, viewRules: "dlp+shape+assign+line" },
   limits: { maxDepth: MAX_DEPTH, maxLeafChars: MAX_PROTECTED_TEXT_CHARS, maxRequestScanChars: MAX_REQUEST_SCAN_CHARS,
     unitCharge: UNIT_CHARGE, keyedContextChars: KEYED_CONTEXT_CHARS }
 }));
@@ -247,14 +237,14 @@ function credentialSpans(text: string, tokens: readonly (readonly [number, numbe
   const spans: PiiSpan[] = [];
   // Every rule but the URL password needs a letter, so a number is not scanned 8 more times.
   if (!/[A-Za-z]/.test(text) && !text.includes("//")) return spans;
-  for (const [index, { type, re }] of CREDENTIAL_RULES.entries()) {
+  for (const [index, { type, re, accept }] of CREDENTIAL_RULES.entries()) {
     const scan = CREDENTIAL_SCANS[index]!;
     scan.lastIndex = 0;
     for (let match = scan.exec(text); match !== null; match = scan.exec(text)) {
       const whole: PiiSpan = { type, start: match.index, end: match.index + match[0].length };
       if (isNoise(text, whole) || shieldedByToken(text, tokens, whole, issued, slice => re.test(slice))) continue;
       const [start, end] = match.indices![1] ?? match.indices![0]!;
-      spans.push({ type, start, end });
+      if (accept === undefined || accept(text.slice(start, end))) spans.push({ type, start, end });
     }
   }
   return spans;
@@ -387,7 +377,7 @@ function replaceRegions<R extends { readonly start: number; readonly end: number
 // (JSON in a JSON string) are found too.
 function pairSpans(text: string, view: boolean, issued: IssuedToken, charge: (length: number) => void): ProtectedDataSpan[] {
   const spans: ProtectedDataSpan[] = [];
-  if (!/[:=]/.test(text)) return spans;
+  if (!/[:=<]/.test(text)) return spans;
   for (const [index, rule] of PAIR_RULES.entries()) {
     if (view && rule.exactOnly) continue;
     const scan = PAIR_SCANS[index]!;
@@ -710,10 +700,11 @@ export function protectedWalk(options: WalkOptions): ProtectedWalk {
       for (let view = masked, round = 0; round < MAX_DECODE_PASSES; round += 1) {
         const json = decodeJsonEscapes(view);
         if (json !== view) { base64Children(json, child); probe(json, child); }
-        const web = decodeWebEscapes(json);
+        const web = decodeWebEscapes(json), folded = foldText(web);
         if (web !== json) { base64Children(web, child); probe(web, child); }
-        if (web === view) return distinctFindings(found);
-        view = web;
+        if (folded !== web) { base64Children(folded, child); probe(folded, child); }
+        if (folded === view) return distinctFindings(found);
+        view = folded;
       }
     } finally { probes.pop(); }
     throw new WalkRefused("unsettled");
