@@ -3,6 +3,7 @@ import YAML from "yaml";
 import { ensureDir, pathExists, readUtf8 } from "../utils/fs.js";
 import { captureOrgPairs, assertOrgPairsCurrent, orgPairBytes, publishOrgPairs, publishOrgPairsAsync, prepareOrgPairsAsync, type OrgPairsOptions, type OrgPairsSnapshot } from "../org/preparedOrgPairs.js";
 import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
+import { PROMPT_SCHEDULER_CONFIGURED, witnessConfiguration } from "../transparency/configWitness.js";
 import { readFileSync } from "node:fs";
 import {
   defaultPromptPolicy,
@@ -117,8 +118,10 @@ export function savePromptSchedulerState(workspace: string, state: PromptSchedul
   sigPath: string;
 } {
   ensurePromptDirs(workspace);
-  const path = promptSchedulerPath(workspace);
-  return publishOrgPairs(workspace, [{ path, bytes: Buffer.from(JSON.stringify(promptSchedulerStateSchema.parse(state), null, 2)) }])[0]!;
+  const path = promptSchedulerPath(workspace), bytes = Buffer.from(JSON.stringify(promptSchedulerStateSchema.parse(state), null, 2));
+  const saved = publishOrgPairs(workspace, [{ path, bytes }])[0]!;
+  witnessConfiguration(workspace, PROMPT_SCHEDULER_CONFIGURED, path, bytes);
+  return saved;
 }
 
 export function loadPromptSchedulerState(workspace: string): PromptSchedulerState {

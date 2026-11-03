@@ -7,6 +7,7 @@ import { captureOrgPairs, assertOrgPairsCurrent, orgPairBytes, captureOrgPairsAu
 import { defaultPromptSchedulerState, promptSchedulerStateSchema, promptPolicySchema } from "./promptPolicySchema.js";
 import { promptPolicyPath, promptSchedulerPath } from "./promptPolicyStore.js";
 import { buildPromptPackForApiAsync } from "./promptPackAsync.js";
+import { PROMPT_SCHEDULER_CONFIGURED, witnessConfiguration } from "../transparency/configWitness.js";
 function agents(workspace: string): string[] {
   try { return [...new Set(["default", ...listAgents(workspace).map(row => row.id)])].sort((a, b) => a.localeCompare(b)); }
   catch { return ["default"]; }
@@ -38,8 +39,9 @@ export async function promptSchedulerRunNowForApiAsync(params: {workspace:string
       built.push({agentId:row.agentId,packId:row.pack.packId,sha256:row.sha256,lint:row.lint.status}); }
     assertCurrent(); const now = Date.now(), updated = promptSchedulerStateSchema.parse({...state,lastRefreshTs:now,
       nextRefreshTs:now + Math.max(1, policy.promptPolicy.recurrence.refreshCadenceHours) * 60 * 60 * 1000,lastOutcome:{status:"OK",reason:""}});
-    const plan = await prepareOrgPairsAsync(workspace, [{path:statePath,bytes:Buffer.from(JSON.stringify(updated,null,2))}], {beforePublish:assertStable,assertInputsCurrent:assertCurrent}, before);
-    plan.publish(); return {built,scheduler:updated};
+    const stateBytes = Buffer.from(JSON.stringify(updated,null,2));
+    const plan = await prepareOrgPairsAsync(workspace, [{path:statePath,bytes:stateBytes}], {beforePublish:assertStable,assertInputsCurrent:assertCurrent}, before);
+    plan.publish(); witnessConfiguration(workspace, PROMPT_SCHEDULER_CONFIGURED, statePath, stateBytes); return {built,scheduler:updated};
   } catch(cause) { throw new PromptSchedulerPublicationError(Object.freeze([...built]), cause); }
 }
 export async function promptSchedulerTickAsync(params: {workspace:string;workspaceReady:boolean}, options: OrgPairsOptions = {}) {

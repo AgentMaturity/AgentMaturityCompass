@@ -2,14 +2,18 @@
  * `amc verify all` on optional features: a feature the workspace never configured reads NOT_CONFIGURED and does not
  * withhold the headline, while a configured feature that fails verification still fails it.
  */
-import { appendFileSync, mkdtempSync, rmSync } from "node:fs";
+import { appendFileSync, existsSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { verifyAll } from "../src/verify/verifyAll.js";
 import { verifyAllExit } from "../src/cli-trust-flags.js";
 import { passportPolicyPath, savePassportPolicy } from "../src/passport/passportStore.js";
+import { passportPolicyApplyForApiAsync } from "../src/passport/passportApi.js";
+import { transparencyLogPath } from "../src/transparency/logChain.js";
+import { buildPromptPackForApi } from "../src/prompt/promptPackApi.js";
+import { promptLatestPackPath } from "../src/prompt/promptPolicyStore.js";
 import { promptSchedulerPath, savePromptSchedulerState } from "../src/prompt/promptPolicyStore.js";
 import { defaultPromptSchedulerState } from "../src/prompt/promptPolicySchema.js";
 import { openLedger } from "../src/ledger/ledger.js";
@@ -119,5 +123,52 @@ describe("verify all: not configured is not INCOMPLETE", () => {
     savePromptSchedulerState(ws, defaultPromptSchedulerState());
     rmSync(promptSchedulerPath(ws));
     expect(status(await run(ws), "prompt-scheduler-signature")).toBe("FAIL");
+  });
+
+  test.each([
+    ["synchronously", (ws: string) => { savePassportPolicy(ws, defaultPassportPolicy()); }],
+    ["through the async policy apply", async (ws: string) => { await passportPolicyApplyForApiAsync({ workspace: ws, policy: defaultPassportPolicy() }); }]
+  ])("a passport policy saved %s and then deleted with its signature fails: the transparency log witnesses it", async (_how, save) => {
+    const ws = fresh();
+    await save(ws);
+    rmSync(passportPolicyPath(ws));
+    rmSync(`${passportPolicyPath(ws)}.sig`);
+    const report = await run(ws);
+    expect(status(report, "passport-policy-signature")).toBe("FAIL");
+    expect(report.criticalFail).toBe(true);
+    expect(report.status).toBe("FAIL");
+    expect(report.notConfigured).not.toContain("passport-policy-signature");
+  });
+
+  test("a prompt scheduler state deleted with its signature fails: the transparency log witnesses it", async () => {
+    const ws = fresh();
+    savePromptSchedulerState(ws, defaultPromptSchedulerState());
+    rmSync(promptSchedulerPath(ws));
+    rmSync(`${promptSchedulerPath(ws)}.sig`);
+    const report = await run(ws);
+    expect(status(report, "prompt-scheduler-signature")).toBe("FAIL");
+    expect(report.status).toBe("FAIL");
+  });
+
+  test("a prompt pack the transparency log records as built fails when its directory is deleted", async () => {
+    const ws = fresh();
+    buildPromptPackForApi({ workspace: ws, agentId: "default" });
+    expect(status(await run(ws), "prompt-packs")).toBe("PASS");
+    rmSync(dirname(promptLatestPackPath(ws, "default")), { recursive: true, force: true });
+    const report = await run(ws);
+    expect(status(report, "prompt-packs")).toBe("FAIL");
+    expect(report.status).toBe("FAIL");
+  });
+
+  test("without a readable witness log, removed passport files read INCOMPLETE, never PASS, and the log is not recreated", async () => {
+    const ws = fresh();
+    savePassportPolicy(ws, defaultPassportPolicy());
+    for (const file of [passportPolicyPath(ws), `${passportPolicyPath(ws)}.sig`, transparencyLogPath(ws)]) rmSync(file);
+    const report = await run(ws);
+    expect(report.status).toBe("INCOMPLETE");
+    expect(report.skippedCritical).toEqual(["passport-policy-signature", "transparency-log", "transparency-merkle"]);
+    expect(report.notConfigured).not.toContain("passport-policy-signature");
+    expect(existsSync(transparencyLogPath(ws))).toBe(false);
+    expect((await run(ws)).status).toBe("INCOMPLETE");
   });
 });

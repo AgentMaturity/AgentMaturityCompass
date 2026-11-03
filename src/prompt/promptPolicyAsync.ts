@@ -9,6 +9,7 @@ import { vaultStatus } from "../vault/vault.js";
 import { captureOrgPairs, orgPairBytes, prepareOrgPairsAsync, publishOrgPairsAsync, captureOrgPairsAuthority, type OrgPairsOptions, type OrgPairWrite } from "../org/preparedOrgPairs.js";
 import { appendTransparencyEntryAsync } from "../transparency/asyncWorkspaceAppend.js";
 import { sha256Hex } from "../utils/hash.js";
+import { PROMPT_SCHEDULER_CONFIGURED, witnessConfiguration } from "../transparency/configWitness.js";
 import { defaultPromptPolicy, defaultPromptSchedulerState, promptPolicySchema, promptSchedulerStateSchema, type PromptPolicy } from "./promptPolicySchema.js";
 import { ensurePromptDirs, promptPolicyPath, promptSchedulerPath, loadPromptPolicyAsync } from "./promptPolicyStore.js";
 
@@ -23,6 +24,7 @@ export async function promptInitForApiAsync(workspace: string, options: OrgPairs
   if (policyBytes === null) writes.push({ path, bytes: Buffer.from(YAML.stringify(policy)) });
   if (schedulerBytes === null) writes.push({ path: scheduler, bytes: Buffer.from(JSON.stringify(defaultPromptSchedulerState(), null, 2)) });
   if (writes.length > 0) await publishOrgPairsAsync(workspace, writes, options, previous);
+  for (const row of writes) if (row.path === scheduler) witnessConfiguration(workspace, PROMPT_SCHEDULER_CONFIGURED, row.path, row.bytes);
   ensurePromptDirs(workspace);
   return { path, sigPath: `${path}.sig`, policy };
 }
@@ -57,7 +59,9 @@ export async function promptSchedulerSetEnabledForApiAsync(params: { workspace: 
   const workspace = params.workspace, enabled = params.enabled, path = promptSchedulerPath(workspace), previous = captureOrgPairs([path]);
   const bytes = orgPairBytes(previous, path), current = bytes === null ? defaultPromptSchedulerState() : promptSchedulerStateSchema.parse(JSON.parse(bytes.toString("utf8")) as unknown);
   const state = promptSchedulerStateSchema.parse({ ...current, enabled });
-  const saved = (await publishOrgPairsAsync(workspace, [{ path, bytes: Buffer.from(JSON.stringify(state, null, 2)) }], options, previous))[0]!;
+  const stateBytes = Buffer.from(JSON.stringify(state, null, 2));
+  const saved = (await publishOrgPairsAsync(workspace, [{ path, bytes: stateBytes }], options, previous))[0]!;
+  witnessConfiguration(workspace, PROMPT_SCHEDULER_CONFIGURED, path, stateBytes);
   return { state, ...saved };
 }
 

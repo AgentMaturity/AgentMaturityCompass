@@ -3,7 +3,8 @@ import { readdirSync, statSync } from "node:fs";
 import { verifyTrustConfigSignature, checkNotaryTrust } from "../trust/trustConfig.js";
 import { verifyOpsPolicySignature } from "../ops/policy.js";
 import { verifyPluginWorkspace } from "../plugins/pluginApi.js";
-import { verifyTransparencyLog } from "../transparency/logChain.js";
+import { transparencyLogPath, verifiedTransparencyLog } from "../transparency/logChain.js";
+import { PASSPORT_POLICY_WITNESSES, PROMPT_SCHEDULER_CONFIGURED } from "../transparency/configWitness.js";
 import { verifyTransparencyMerkle } from "../transparency/merkleIndexStore.js";
 import { verifyLedgerIntegrity } from "../ledger/ledger.js";
 import { LEDGER_UNANCHORED_MESSAGE } from "../ledger/ledgerVerification.js";
@@ -110,6 +111,21 @@ function notConfigured(id: string, critical: boolean, details: string[]): Verify
   return { id, status: "NOT_CONFIGURED", critical, details };
 }
 
+/** The verified transparency log's entry types and agents, or null when it is missing or does not verify. */
+type Witness = { types: Set<string>; agentsOf: (type: string) => Set<string> } | null;
+
+/**
+ * A witnessed part with nothing on disk: NOT_CONFIGURED only when the verified log holds no witness of its configuration,
+ * FAIL when it does (the files were removed), and SKIP when the log cannot be read to tell.
+ */
+function absentPart(id: string, critical: boolean, witness: Witness, types: readonly string[], what: string): VerifyAllCheck {
+  if (witness === null) return skip(id, critical, [`${what} absent, and no verified transparency log shows it was never configured`]);
+  const seen = types.find((type) => witness.types.has(type));
+  return seen !== undefined
+    ? fail(id, critical, [`${what} missing: the transparency log records it was configured (${seen})`])
+    : notConfigured(id, critical, [`${what} never configured (no ${types.join(" or ")} in the verified transparency log)`]);
+}
+
 export async function verifyAll(params: {
   workspace: string;
   /** The operator's trust context (P0-09): it anchors the ledger and admits release keys; --allow-unanchored lives here. */
@@ -117,6 +133,19 @@ export async function verifyAll(params: {
 }): Promise<VerifyAllReport> {
   const workspace = resolve(params.workspace);
   const checks: VerifyAllCheck[] = [];
+  // Read before any check: verifying a missing log would recreate it empty and sign a fresh seal, erasing the witnesses.
+  const tlogPresent = statExists(transparencyLogPath(workspace));
+  let tlog: ReturnType<typeof verifiedTransparencyLog> | null = null, tlogError: string | null = null;
+  try {
+    tlog = tlogPresent ? verifiedTransparencyLog(workspace) : null;
+  } catch (error) {
+    tlogError = String(error);
+  }
+  const entries = tlog?.ok === true ? tlog.entries : null;
+  const witness: Witness = entries === null ? null : {
+    types: new Set(entries.map((entry) => entry.type)),
+    agentsOf: (type) => new Set(entries.filter((entry) => entry.type === type).map((entry) => entry.agentId))
+  };
 
   const trustSig = verifyTrustConfigSignature(workspace);
   checks.push(
@@ -210,7 +239,7 @@ export async function verifyAll(params: {
     // A state file without its signature, or a signature without its state file, is unverifiable and fails; only the
     // absence of both is not configured.
     !statExists(promptSchedulerSig.path) && !statExists(promptSchedulerSig.sigPath)
-      ? notConfigured("prompt-scheduler-signature", false, ["scheduler not initialized"])
+      ? absentPart("prompt-scheduler-signature", false, witness, [PROMPT_SCHEDULER_CONFIGURED], "prompt scheduler state")
       : promptSchedulerSig.valid && statExists(promptSchedulerSig.path)
       ? pass("prompt-scheduler-signature", false, [promptSchedulerSig.path])
       : fail("prompt-scheduler-signature", false, [promptSchedulerSig.reason ?? "state file missing beside its signature"])
@@ -218,6 +247,10 @@ export async function verifyAll(params: {
 
   const promptErrors: string[] = [];
   const promptAgents = listPromptAgentsWithPacks(workspace);
+  // Packs are enforced on agents, so a pack the log records as built (PROMPT_PACK_CREATED) must still be on disk.
+  for (const agentId of witness?.agentsOf("PROMPT_PACK_CREATED") ?? []) {
+    if (!promptAgents.includes(agentId)) promptErrors.push(`pack(${agentId}): missing; the transparency log records a pack built for this agent`);
+  }
   for (const agentId of promptAgents) {
     const packPath = promptLatestPackPath(workspace, agentId);
     const verify = verifyWorkspacePromptPack(workspace, packPath);
@@ -230,8 +263,10 @@ export async function verifyAll(params: {
     }
   }
   checks.push(
-    promptAgents.length === 0
-      ? notConfigured("prompt-packs", false, ["no prompt packs built"])
+    promptAgents.length === 0 && promptErrors.length === 0
+      ? witness === null
+        ? skip("prompt-packs", false, ["no prompt packs, and no verified transparency log shows none were built"])
+        : notConfigured("prompt-packs", false, ["no prompt packs built (none in the verified transparency log)"])
       : promptErrors.length === 0
       ? pass("prompt-packs", false, ["all prompt packs + lint signatures verified"])
       : fail("prompt-packs", false, promptErrors)
@@ -305,14 +340,14 @@ export async function verifyAll(params: {
     !statExists(passportPolicySigPath(workspace)) &&
     listPassportExportFiles(workspace).length === 0 &&
     passportCacheEntries.length === 0;
-  if (passportUninitialized) {
-    checks.push(notConfigured("passport-policy-signature", true, ["passport not initialized yet"]));
-    checks.push(notConfigured("passport-workspace-integrity", false, ["passport not initialized yet"]));
+  const passportAbsent = passportUninitialized ? absentPart("passport-policy-signature", true, witness, PASSPORT_POLICY_WITNESSES, "passport policy") : null;
+  if (passportAbsent !== null && passportAbsent.status !== "FAIL") {
+    checks.push(passportAbsent, { ...passportAbsent, id: "passport-workspace-integrity", critical: false });
   } else {
     checks.push(
       passportPolicy.valid
         ? pass("passport-policy-signature", true, [passportPolicy.path])
-        : fail("passport-policy-signature", true, [passportPolicy.reason ?? "invalid"])
+        : fail("passport-policy-signature", true, [passportPolicy.reason ?? "invalid", ...(passportAbsent?.details ?? [])])
     );
     const passportWorkspace = verifyPassportWorkspace({
       workspace
@@ -335,21 +370,19 @@ export async function verifyAll(params: {
     );
   }
 
-  try {
-    const tlog = verifyTransparencyLog(workspace);
-    checks.push(
-      tlog.ok
-        ? pass("transparency-log", true, [`entries=${tlog.entryCount}`, `lastHash=${tlog.lastHash}`])
-        : fail("transparency-log", true, tlog.errors)
-    );
-  } catch (error) {
-    checks.push(fail("transparency-log", true, [String(error)]));
-  }
+  const tlogMissing = "transparency log missing: not verified, and verify all does not recreate it";
+  checks.push(
+    !tlogPresent ? skip("transparency-log", true, [tlogMissing])
+      : tlog === null ? fail("transparency-log", true, [tlogError ?? "transparency log unreadable"])
+      : tlog.ok ? pass("transparency-log", true, [`entries=${tlog.entryCount}`, `lastHash=${tlog.lastHash}`])
+      : fail("transparency-log", true, tlog.errors)
+  );
 
   try {
-    const merkle = verifyTransparencyMerkle(workspace);
+    const merkle = tlogPresent ? verifyTransparencyMerkle(workspace) : null;
     checks.push(
-      merkle.ok
+      merkle === null ? skip("transparency-merkle", true, [tlogMissing])
+      : merkle.ok
         ? pass("transparency-merkle", true, [`leafCount=${merkle.leafCount}`, `root=${merkle.root ?? ""}`])
         : fail("transparency-merkle", true, merkle.errors)
     );
@@ -378,8 +411,12 @@ export async function verifyAll(params: {
 
   // P1-57: each A4 project's chain, side rows and envelopes (integrity of bytes; never a claim about the agent).
   try {
+    // A4 projects are witnessed by their hash-chained ledger audit rows, so "no project" holds only on a ledger that verified.
+    const ledgerVerified = checks.some((check) => check.id === "ledger-hash-chain" && check.status === "PASS");
     for (const row of verifyA4Projects(workspace, params.trust)) {
-      checks.push({ id: "a4-projects", status: row.status, critical: true, details: row.details });
+      checks.push(row.status === "NOT_CONFIGURED" && !ledgerVerified
+        ? skip("a4-projects", true, [...row.details, "the ledger hash chain did not verify, so no A4 project cannot be shown"])
+        : { id: "a4-projects", status: row.status, critical: true, details: row.details });
     }
   } catch (error) {
     checks.push(fail("a4-projects", true, [String(error)]));

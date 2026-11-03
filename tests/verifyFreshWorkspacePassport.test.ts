@@ -29,7 +29,7 @@ describe("verify all on a fresh workspace (first-run passport boundary)", () => 
     const policy = report.checks.find((check) => check.id === "passport-policy-signature");
     const integrity = report.checks.find((check) => check.id === "passport-workspace-integrity");
     expect(policy?.status).toBe("NOT_CONFIGURED");
-    expect(policy?.details).toEqual(["passport not initialized yet"]);
+    expect(policy?.details).toEqual([expect.stringContaining("never configured")]);
     expect(integrity?.status).toBe("NOT_CONFIGURED");
     const passportFailures = report.checks.filter(
       (check) => check.id.startsWith("passport-") && check.status === "FAIL"
