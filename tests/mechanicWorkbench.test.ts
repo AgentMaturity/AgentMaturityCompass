@@ -180,6 +180,7 @@ describe("mechanic workbench", () => {
     expect(entries.some((row) => row.type === "MECHANIC_PROFILE_APPLIED")).toBe(true);
   });
 
+  // Signed plan creation and an approval quorum: 5.5 s and 11.4 s locally, past 30 s under CI coverage.
   test("planner is deterministic for fixed fixtures and emits only supported action kinds", async () => {
     const workspace = newWorkspace();
     vi.useFakeTimers();
@@ -213,7 +214,7 @@ describe("mechanic workbench", () => {
     ]);
     const actualKinds = parsed.phases.flatMap((phase) => phase.actions.map((action) => action.kind));
     expect(actualKinds.every((kind) => allowedKinds.has(kind))).toBe(true);
-  });
+  }, 90_000);
 
   test("simulator honesty gates numeric output on insufficient evidence", () => {
     const workspace = newWorkspace();
@@ -354,7 +355,7 @@ describe("mechanic workbench", () => {
       });
       expect(decisions.length).toBeGreaterThanOrEqual(2);
     }
-  });
+  }, 90_000);
 
   test("mechanic console pages serve and contain no external refs", async () => {
     const workspace = newWorkspace();
