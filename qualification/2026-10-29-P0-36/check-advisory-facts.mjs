@@ -1,16 +1,22 @@
 #!/usr/bin/env node
 /**
- * P0-36: re-checks every repository fact the 1.1.1 advisory draft (docs/security/advisories/1.1.1.md) cites,
- * against the git history of the checkout it runs in. Read-only: it runs `git show`, `git ls-tree`, `git log` and
- * `git merge-base` only. Exit 0 when every fact holds, 1 otherwise.
+ * P0-36: mechanically checks part of what the 1.1.1 advisory draft (docs/security/advisories/1.1.1.md) cites, against
+ * the git history of the checkout that holds this script (git runs at its root, whatever the working directory): that
+ * one or more cited lines of each `in v1.1.1` citation contain an expected text (not every line of a cited range),
+ * that each cited commit is in HEAD's history, that each cited file is tracked at HEAD, and the vault's tracking
+ * history. It does not check test names, dates, counts or anything outside LINES, COMMITS and FILES. Read-only: it
+ * runs `git show`, `git ls-tree`, `git log` and `git merge-base` only. Exit 0 when every check holds, 1 otherwise.
  *
  *   node qualification/2026-10-29-P0-36/check-advisory-facts.mjs            # facts
  *   node qualification/2026-10-29-P0-36/check-advisory-facts.mjs --keys     # also list historical public key ids
  *   node qualification/2026-10-29-P0-36/check-advisory-facts.mjs --published <package dir>
  *
- * --published also checks each fact against an extracted npm 1.1.1 tarball (the directory holding package.json and
- * dist/). The registry's 1.1.1 was built from a source later than the v1.1.1 tag, so a fact that holds at the tag
- * does not by itself hold for what npm users installed.
+ * --published checks an extracted npm package (the directory holding package.json and dist/): that package.json says
+ * 1.1.1, that each named dist file contains a PUBLISHED text anywhere in the file (one compiled counterpart per
+ * `v1.1.1` entry of LINES; not its position, nor the rest of a cited range), that dist/cli.js and dist/ledger/ledger.js
+ * do not contain EXPECTED_MONITOR, and that exactly PUBLISHED_RAW_TAR_SITES dist .js files contain RAW_TAR. It does
+ * not check the tarball's shasum. The registry's 1.1.1 was built from a source later than the v1.1.1 tag, so a fact
+ * that holds at the tag does not by itself hold for what npm users installed.
  *
  * --keys lists the AMC key id (sha256 of the canonical SPKI PEM, src/keys/algorithmPolicy.ts signingKeyIdentity)
  * of every public key ever tracked under .amc/keys/ or --/.amc/keys/. They are candidate inputs for P0-37's distrust
@@ -20,8 +26,11 @@ import { execFileSync } from "node:child_process";
 import { createHash, createPublicKey } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 
-const git = (...args) => execFileSync("git", args, { encoding: "utf8", maxBuffer: 64 * 1024 * 1024, stdio: ["ignore", "pipe", "ignore"] });
+/** git runs at the repository root, so pathspecs resolve the same from any working directory. */
+const ROOT = fileURLToPath(new URL("../../", import.meta.url));
+const git = (...args) => execFileSync("git", args, { cwd: ROOT, encoding: "utf8", maxBuffer: 64 * 1024 * 1024, stdio: ["ignore", "pipe", "ignore"] });
 const tryGit = (...args) => { try { return git(...args); } catch { return null; } };
 const lineAt = (rev, path, line) => (tryGit("show", `${rev}:${path}`) ?? "").split("\n")[line - 1] ?? "";
 
