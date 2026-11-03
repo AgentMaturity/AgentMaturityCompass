@@ -601,9 +601,10 @@ export function unsignedIncidents(workspace: string, agentId: string, now = Date
   } catch { return { incidents: [], rejected: 0, unreadable: true }; }
 }
 
-/** An incident list's `limit`: a positive integer in plain digits, or undefined for anything else. */
+/** An incident list's `limit`: a positive integer in plain digits of any size (clamped to the largest safe integer), or undefined. */
 export function incidentListLimit(raw: string | null | undefined): number | undefined {
-  return raw && /^[1-9]\d{0,5}$/.test(raw.trim()) ? Number(raw.trim()) : undefined;
+  const value = raw && /^\d+$/.test(raw.trim()) ? Number(raw.trim()) : 0;
+  return value > 0 ? Math.min(value, Number.MAX_SAFE_INTEGER) : undefined;
 }
 
 /**

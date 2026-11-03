@@ -20,7 +20,7 @@ import { reserveNativeToolBudget } from "../../src/budgets/nativeBudgetAdmission
 import { createFreezeIncident } from "../../src/drift/freezeEngine.js";
 import { evalImportCoverageStatus, importEvalResults } from "../../src/eval/evalImporters.js";
 import { executeCaseTrials } from "../../src/experiments/trialExecutor.js";
-import { createIncidentStore, unsignedIncidents } from "../../src/incidents/incidentStore.js";
+import { createIncidentStore, incidentListLimit, unsignedIncidents } from "../../src/incidents/incidentStore.js";
 import { revokeKeyAsync } from "../../src/keys/purposeKeys.js";
 import { signPurposeRevocationList, signWithPurposeKey } from "../../src/keys/purposeProviders.js";
 import { openLedger } from "../../src/ledger/ledger.js";
@@ -204,6 +204,12 @@ describe("the kill switch under no-sign", () => {
     expect(section(limited)).toMatchObject({ count: 2, pinnedPastLimit: 1 });
     // A limit that is not a positive integer falls back to 50.
     for (const bad of ["-1", "0", "abc", "2x", "1.5"]) expect(titles(await getJson(`/api/v1/incidents?agent=agent-a&limit=${bad}`)), bad).toHaveLength(3);
+    // Any positive integer limit is honoured, however large (pending-main took them all); a huge one is clamped, not refused.
+    for (const big of ["10000", "1000000", "99999999999999999999"]) expect(titles(await getJson(`/api/v1/incidents?agent=agent-a&limit=${big}`)), big).toHaveLength(3);
+    expect(["1", "007", "999999", "1000000", " 10000 ", "99999999999999999999"].map(incidentListLimit))
+      .toEqual([1, 7, 999_999, 1_000_000, 10_000, Number.MAX_SAFE_INTEGER]);
+    expect(["", "0", "000", "-1", "+5", "1.5", "1e3", "2x", "0x10", null, undefined].map(incidentListLimit)).toEqual(Array(11).fill(undefined));
+    expect(listCli("--limit", "1000000").stdout).toMatch(/signed-new[\s\S]*signed-mid[\s\S]*signed-critical/);
     const cli = listCli("--limit", "1");
     expect(cli.stdout, cli.stderr).toMatch(/signed-new[\s\S]*signed-critical\n1 OPEN CRITICAL incident\(s\) shown past --limit\.\nUnsigned incidents[^\n]*\n.*skew-2.*\(unsigned\)\n.*\[CRITICAL\/OPEN\]  Kill switch activated.*\(unsigned\)\n1 unsigned OPEN CRITICAL incident\(s\) shown past --limit\./);
     expect(cli.stdout).not.toMatch(/future|ancient|signed-mid/);
