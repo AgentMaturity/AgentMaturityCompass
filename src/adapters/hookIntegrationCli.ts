@@ -5,6 +5,7 @@ import { promptPassphrase, unlockVaultInteractive, vaultStatusNow } from "../vau
 import { recoverHookAuditLatch } from "../bridge/hookAuditLatch.js";
 import { unlockVault } from "../vault/vault.js";
 import {
+  authorizeForwardInvocation,
   getHookIntegrationStatus,
   installHookIntegration,
   removeHookIntegration,
@@ -17,6 +18,8 @@ import { isHookProvider } from "../bridge/hookProviders.js";
 import { findPiPackage } from "./pi/piInstall.js";
 import { findDshPackage } from "./dsh/dshInstall.js";
 import { findClaudeCode } from "./hookProviders/claudeCode.js";
+import { claudeHookSchemasFor } from "./hookProviders/claudeCodePayloads.js";
+import { normalizeBridgeBase } from "./hookProviders/installFiles.js";
 import { verifyClaudeControl, type ClaudeControlVerification } from "./claudeHookProbe.js";
 import { readStdinAll, runHookForward, type HookForwardOptions } from "./hookForwarder.js";
 // The hidden `connect hooks forward` and tests still reach the forwarder through here.
@@ -34,6 +37,19 @@ function printControlVerification(control: ClaudeControlVerification): void {
 function printGovernance(governance: NonNullable<HookIntegrationStatus["governance"]>): void {
   console.log(`Governance: ${governance.claim} (${governance.registeredSessions} registered session(s), ${governance.qualifiedSessions} on a qualified version)`);
   console.log(chalk.gray(governance.note));
+}
+
+/** Why a Claude Code control installation will deny every action, read the way its forwarder reads it; empty when none. */
+function claudeControlWarnings(workspace: string, agentId: string, bridgeUrl: string): string[] {
+  let version: string | null;
+  try {
+    version = authorizeForwardInvocation({ workspace, provider: "claude-code", mode: "control", agentId, bridgeBase: normalizeBridgeBase(bridgeUrl),
+      tokenFile: ".amc/hooks/claude-code.lease" }).claudeCodeVersion;
+  } catch (error) {
+    return [`the installation does not verify (${error instanceof Error ? error.message : String(error)}); the hook denies every action`];
+  }
+  if (claudeHookSchemasFor(version)) return [];
+  return [`${version ? `Claude Code ${version} is not a release AMC qualified` : "no Claude Code was on PATH"}, so the installation binds no qualified release and the hook denies every action; reinstall with a qualified Claude Code on PATH`];
 }
 
 function printFileChanges(files: HookFileChange[]): void {
@@ -75,11 +91,12 @@ export function registerHookIntegrationCommands(
       if (!opts.dryRun && !vaultStatusNow(process.cwd()).unlocked) {
         await unlockVaultInteractive(process.cwd());
       }
+      const agentId = opts.agent ?? activeAgent() ?? "default";
       const result = installHookIntegration({
         workspace: process.cwd(),
         provider: opts.provider,
         mode: opts.mode,
-        agentId: opts.agent ?? activeAgent() ?? "default",
+        agentId,
         bridgeBase: opts.bridgeUrl,
         ttl: opts.ttl,
         rpm: Number(opts.rpm),
@@ -89,11 +106,13 @@ export function registerHookIntegrationCommands(
         dshPackageDir: opts.provider === "dsh" ? findDshPackage() ?? undefined : undefined,
         claudeCodeBinary: opts.provider === "claude-code" && opts.mode === "control" && !opts.dryRun ? findClaudeCode() ?? undefined : undefined
       });
+      const warnings = opts.provider === "claude-code" && opts.mode === "control" && !opts.dryRun ? claudeControlWarnings(process.cwd(), agentId, opts.bridgeUrl) : [];
       if (opts.json) {
-        console.log(JSON.stringify(result, null, 2));
+        console.log(JSON.stringify({ ...result, warnings }, null, 2));
         return;
       }
       console.log(chalk.hex("#4AEF79")(opts.dryRun ? "AMC hook install plan" : result.changed ? "AMC hook installed" : "AMC hook already installed"));
+      for (const warning of warnings) console.log(chalk.yellow(`Warning: ${warning}`));
       console.log(`Provider: ${result.provider}`);
       console.log(`Mode: ${result.mode}`);
       console.log(`Hook lease: ${result.lease.scopes.join(", ")} on ${result.lease.route}`);

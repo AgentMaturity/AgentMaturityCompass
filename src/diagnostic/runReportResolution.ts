@@ -7,12 +7,14 @@
  * `sealedRunReportVerifies` instead. Keeping them in their own module keeps
  * that boundary visible.
  */
-import { readdirSync } from "node:fs";
+import { readdirSync, readFileSync, statSync } from "node:fs";
 import { basename, join } from "node:path";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { pathExists, readUtf8 } from "../utils/fs.js";
 import { resolveRunAlias } from "./runAliases.js";
 import { sealedRunReportVerifies } from "./reportSeal.js";
+import { runHashVerificationKeys } from "../ledger/runHashSignature.js";
+import { sha256Hex } from "../utils/hash.js";
 import type { DiagnosticReport } from "../types.js";
 
 /** A run id names a file (`<runsDir>/<runId>.json`), so nothing that could leave the runs directory is one. */
@@ -171,6 +173,140 @@ export interface RefusedRun {
   tampered: boolean;
 }
 
+/** What one run file's exact bytes (by digest) say under one set of verification keys; it holds no report bytes. */
+interface RunFileVerdict {
+  /** The file's stat identity, or "" while it changed too recently for its stat to vouch for its bytes. */
+  stat: string;
+  digest: string;
+  keys: string;
+  /** The scan that last used it: a scan never evicts verdicts it already used (see `remember`). */
+  scan: number;
+  verified: boolean;
+  head: { ts: number; runId: string };
+  refused: RefusedRun;
+}
+
+/** One file's verdict in one scan, with its bytes when this scan read them. */
+interface ScannedFile { file: string; verdict: RunFileVerdict; bytes: Buffer | null }
+
+// Gates re-read every run file at each currentness check (a passport publication does so hundreds of times). A verdict
+// is reused without reading the file while its stat identity is unchanged, and without re-verifying while its digest is.
+// ponytail: LRU over verdict count, ~300 bytes each; past MAX_CACHED_VERDICTS files in one scan the extra files miss.
+const verdicts = new Map<string, RunFileVerdict>();
+export const MAX_CACHED_VERDICTS = 4096;
+/** A file changed within this window may change again inside one timestamp tick, so its stat does not vouch for it. */
+const RACY_MS = 2_000;
+let scans = 0;
+
+function statIdentity(file: string): { key: string; changedMs: number } | null {
+  try {
+    const st = statSync(file, { bigint: true });
+    return { key: `${st.dev}:${st.ino}:${st.size}:${st.mtimeNs}:${st.ctimeNs}`, changedMs: Number(st.ctimeMs > st.mtimeMs ? st.ctimeMs : st.mtimeMs) };
+  } catch {
+    return null;
+  }
+}
+
+/** Most recently used last. A full cache evicts its least recently used verdict, unless this scan already used it. */
+function remember(file: string, verdict: RunFileVerdict): void {
+  verdicts.delete(file);
+  if (verdicts.size >= MAX_CACHED_VERDICTS) {
+    const [oldest, row] = verdicts.entries().next().value as [string, RunFileVerdict];
+    if (row.scan === verdict.scan) return;
+    verdicts.delete(oldest);
+  }
+  verdicts.set(file, verdict);
+}
+
+function runFileVerdict(workspace: string, file: string, keys: readonly string[] | null, scan: number, trustStat: boolean): ScannedFile | null {
+  const keyText = keys === null ? null : JSON.stringify(keys), known = keyText === null ? undefined : verdicts.get(file);
+  const stat = statIdentity(file);
+  const usable = known !== undefined && known.keys === keyText;
+  if (trustStat && usable && stat !== null && known.stat === stat.key && known.stat !== "") {
+    const verdict = { ...known, scan };
+    remember(file, verdict);
+    return { file, verdict, bytes: null };
+  }
+  let bytes: Buffer;
+  try {
+    bytes = readFileSync(file);
+  } catch {
+    return null;
+  }
+  const digest = sha256Hex(bytes);
+  const statKey = stat !== null && stat.changedMs < Date.now() - RACY_MS ? stat.key : "";
+  if (usable && known.digest === digest) {
+    const verdict = { ...known, stat: statKey, scan };
+    remember(file, verdict);
+    return { file, verdict, bytes };
+  }
+  let parsed: Record<string, unknown> | null, unparseable = false;
+  try {
+    parsed = JSON.parse(bytes.toString("utf8")) as Record<string, unknown> | null;
+  } catch {
+    parsed = null; unparseable = true;
+  }
+  const verified = parsed !== null && typeof parsed === "object" && keys !== null && sealedRunReportVerifies(workspace, parsed, keys);
+  const seal = parsed?.runSealSig;
+  const verdict: RunFileVerdict = { stat: statKey, digest, keys: keyText ?? "", scan, verified, head: { ts: parsed?.ts as number, runId: parsed?.runId as string },
+    refused: unparseable ? { file, ts: null, tampered: true }
+      : { file, ts: typeof parsed?.ts === "number" && Number.isFinite(parsed.ts) ? parsed.ts : null,
+        tampered: typeof seal === "string" && seal.length > 0 && seal !== "unsigned" } };
+  if (keyText !== null) remember(file, verdict);
+  return { file, verdict, bytes };
+}
+
+/** Every run file's verdict, the sealed ones newest first (the order `scanVerifiedRuns` returns runs in). */
+function runFileVerdicts(workspace: string, agentId: string, trustStat: boolean): { sealed: ScannedFile[]; refused: RefusedRun[] } {
+  let keys: readonly string[] | null;
+  try {
+    keys = runHashVerificationKeys(workspace);
+  } catch {
+    keys = null;
+  }
+  const scan = ++scans, sealed: ScannedFile[] = [], refused: RefusedRun[] = [];
+  for (const file of agentRunFiles(workspace, agentId)) {
+    const scanned = runFileVerdict(workspace, file, keys, scan, trustStat);
+    if (scanned === null) refused.push({ file, ts: null, tampered: true });
+    else if (scanned.verdict.verified) sealed.push(scanned);
+    else refused.push({ ...scanned.verdict.refused });
+  }
+  sealed.sort((a, b) => b.verdict.head.ts - a.verdict.head.ts || b.verdict.head.runId.localeCompare(a.verdict.head.runId));
+  return { sealed, refused };
+}
+
+/**
+ * A fresh report for each caller, parsed from bytes whose digest is the verified one; null when the file changed after
+ * its stat vouched for it, and the caller then scans again reading every file.
+ */
+function sealedRun(scanned: ScannedFile): DiagnosticReport | null {
+  let bytes = scanned.bytes;
+  if (bytes === null) {
+    try {
+      bytes = readFileSync(scanned.file);
+    } catch {
+      return null;
+    }
+    if (sha256Hex(bytes) !== scanned.verdict.digest) return null;
+  }
+  return JSON.parse(bytes.toString("utf8")) as DiagnosticReport;
+}
+
+/** `pick` over a scan that trusts unchanged stats, or over one that reads every file when a picked file changed since. */
+function withSealedRuns<T>(workspace: string, agentId: string,
+  pick: (sealed: ScannedFile[], refused: RefusedRun[], read: (row: ScannedFile) => DiagnosticReport) => T): T {
+  class Changed extends Error {}
+  const read = (row: ScannedFile) => sealedRun(row) ?? (() => { throw new Changed(); })();
+  try {
+    const { sealed, refused } = runFileVerdicts(workspace, agentId, true);
+    return pick(sealed, refused, read);
+  } catch (error) {
+    if (!(error instanceof Changed)) throw error;
+    const { sealed, refused } = runFileVerdicts(workspace, agentId, false);
+    return pick(sealed, refused, (row) => sealedRun(row)!);
+  }
+}
+
 /**
  * The seal-only run reader (WP37): the agent's runs whose seal verifies (`sealedRunReportVerifies`), newest first,
  * and every file it refused. The seal is the only check here: nothing binds a run to this agent or to the ledger.
@@ -178,25 +314,7 @@ export interface RefusedRun {
  * binding, the ledger anchor and the rollback guard on top; display reads `agentRunFiles`/`loadRunReport`.
  */
 export function scanVerifiedRuns(workspace: string, agentId: string): { runs: DiagnosticReport[]; refused: RefusedRun[] } {
-  const runs: DiagnosticReport[] = [], refused: RefusedRun[] = [];
-  for (const file of agentRunFiles(workspace, agentId)) {
-    let parsed: Record<string, unknown>;
-    try {
-      parsed = JSON.parse(readUtf8(file)) as Record<string, unknown>;
-    } catch {
-      refused.push({ file, ts: null, tampered: true });
-      continue;
-    }
-    if (parsed !== null && typeof parsed === "object" && sealedRunReportVerifies(workspace, parsed)) {
-      runs.push(parsed as unknown as DiagnosticReport);
-      continue;
-    }
-    const seal = parsed?.runSealSig;
-    refused.push({ file, ts: typeof parsed?.ts === "number" && Number.isFinite(parsed.ts) ? parsed.ts : null,
-      tampered: typeof seal === "string" && seal.length > 0 && seal !== "unsigned" });
-  }
-  runs.sort((a, b) => b.ts - a.ts || b.runId.localeCompare(a.runId));
-  return { runs, refused };
+  return withSealedRuns(workspace, agentId, (sealed, refused, read) => ({ runs: sealed.map(read), refused }));
 }
 
 /** The sealed runs only, newest first; see `scanVerifiedRuns` for the refused files. */
@@ -218,9 +336,11 @@ export function refusedRunsBlocking(refused: readonly RefusedRun[], selectedTs: 
  * silently roll the consumer back to an older sealed run. Seal-only: a gate or signer uses `latestTrustedRun`.
  */
 export function latestVerifiedRun(workspace: string, agentId: string): { run: DiagnosticReport | null; blocking: RefusedRun[] } {
-  const { runs, refused } = scanVerifiedRuns(workspace, agentId);
-  const blocking = refusedRunsBlocking(refused, runs[0]?.ts ?? null);
-  return { run: blocking.length > 0 ? null : runs[0] ?? null, blocking };
+  // Only the newest sealed run is parsed for the caller: the rest are read just to order them and find blockers.
+  return withSealedRuns(workspace, agentId, (sealed, refused, read) => {
+    const blocking = refusedRunsBlocking(refused, sealed[0]?.verdict.head.ts ?? null);
+    return { run: blocking.length > 0 || !sealed[0] ? null : read(sealed[0]), blocking };
+  });
 }
 
 /**

@@ -260,7 +260,8 @@ describe("recorded Claude Code 2.1.296 payloads", () => {
   });
 
   test("the forwarder answers each session hook as its event needs when AMC is unreachable: deny, block, never force a stop", async () => {
-    const workspace = claudeWorkspace();
+    // Installed for the unreachable Bridge it then forwards to: AMC is down, the installation itself is sound.
+    const workspace = claudeWorkspace({ bridgeBase: "http://127.0.0.1:9" });
     const opts = { provider: "claude-code" as const, mode: "control" as const, agent: agentId, tokenFile: ".amc/hooks/claude-code.lease", bridgeUrl: "http://127.0.0.1:9" };
     const run = (name: string) => runHookForward({ ...opts, event: String(recorded(name, workspace).hook_event_name) }, async () => JSON.stringify(recorded(name, workspace)),
       workspace, 3_000);
