@@ -19,15 +19,69 @@ export const decodeWebEscapes = (text: string) => text.replace(WEB_ESCAPE,
     return code <= 0x10ffff ? String.fromCodePoint(code) : match;
   });
 
+const JSON_ESCAPES: Readonly<Record<string, string>> = Object.freeze({ n: "\n", t: "\t", r: "\r", b: "\b", f: "\f" });
+// JSON string escapes (\n, \uXXXX, \" ...) decoded in one linear pass, so escaped text in malformed arguments still matches.
+export const decodeJsonEscapes = (text: string) => !text.includes("\\") ? text : text.replace(/\\(?:u([0-9a-fA-F]{4})|([\s\S]))/g,
+  (_match, hex: string | undefined, char: string) => hex !== undefined ? String.fromCharCode(Number.parseInt(hex, 16))
+    : Object.hasOwn(JSON_ESCAPES, char) ? JSON_ESCAPES[char]! : char);
+export const BASE64_RUN = /[A-Za-z0-9+/_-]{24,}={0,2}/g;
+export const CONTROL_CHARS = /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\u009f]/g;
+const STRICT_UTF8 = new TextDecoder("utf-8", { fatal: true });
+/**
+ * What a run of 24 or more base64 or base64url characters decodes to, where that is UTF-8 text with at most one control
+ * character in ten (an encoded mail body, a text resource blob, a Secret's `data`); undefined for other runs (hashes,
+ * random tokens, binary). The text is always shorter than the run.
+ */
+export const decodeBase64Run = (run: string): string | undefined => {
+  const body = run.replace(/=+$/, "");
+  if (body.length % 4 === 1) return undefined;
+  let decoded: string;
+  try { decoded = STRICT_UTF8.decode(Buffer.from(body, "base64")); } catch { return undefined; }
+  return decoded.length > 0 && (decoded.match(CONTROL_CHARS)?.length ?? 0) * 10 <= decoded.length ? decoded : undefined;
+};
+/** Whether bytes are UTF-8 text without control characters (a Basic token of letters only must be). */
+export const readableText = (bytes: Buffer) => { try { return !/[\u0000-\u001f\u007f-\u009f]/.test(STRICT_UTF8.decode(bytes)); } catch { return false; } };
 /** Characters that render as nothing or only steer layout: every default-ignorable code point and format (Cf) character. */
 const IGNORABLE = /[\p{Default_Ignorable_Code_Point}\p{Cf}]/gu;
+/**
+ * The longest a fold may be, from the length of its text: four times it plus 1 MiB (60,000 copies of U+FDFA, a squared
+ * unit such as U+337F on every character, a ligature line), and never over 16 MiB. A fold past it is not built.
+ */
+export const FOLD_GROWTH = 4, FOLD_SLACK = 1_048_576, FOLD_MAX_CHARS = 16_777_216;
+export const foldLimit = (length: number) => Math.min(FOLD_GROWTH * length + FOLD_SLACK, FOLD_MAX_CHARS);
+/** A fold that would pass its limit: callers fail closed (refuse the request, replace the line or the whole text). */
+export class FoldOverflow extends Error {
+  constructor() { super("Folded text would pass its length limit"); this.name = "FoldOverflow"; }
+}
+const NFKD_LENGTHS = new Map<string, number>();
+/**
+ * Whether NFKC of `text` is at most `limit` characters, before building it: each code point's NFKD length summed (the NFKC
+ * of a whole text is never longer than the NFKD of its characters), stopping once past the limit.
+ */
+function foldFits(text: string, limit: number): boolean {
+  let total = 0;
+  for (let index = 0; index < text.length && total <= limit;) {
+    const width = text.codePointAt(index)! > 0xffff ? 2 : 1;
+    if (text.charCodeAt(index) < 0x80) { total += 1; index += 1; continue; }
+    const char = text.slice(index, index + width);
+    let length = NFKD_LENGTHS.get(char);
+    if (length === undefined) { length = char.normalize("NFKD").length; if (NFKD_LENGTHS.size < 65_536) NFKD_LENGTHS.set(char, length); }
+    total += length;
+    index += width;
+  }
+  return total <= limit;
+}
 /**
  * Text as it reads: NFKC (fullwidth `４１１１` is `4111`, `ﬁ` is `fi`, `㎩` is `Pa`) with ignorable and format characters
  * removed (zero-width space, U+200E, U+2062, a variation selector), so a card number split by them or typed in fullwidth
  * digits is seen. ASCII text is returned as it is. NFKC can lengthen text (U+FDFA is 18 characters); the whole text is
- * always folded, never part of it, and the walk charges a folded view's length to its request budget.
+ * always folded, never part of it, and a fold that could pass `limit` (`foldLimit`) throws `FoldOverflow` before it is built.
  */
-export const foldText = (text: string) => /[^\u0000-\u007f]/.test(text) ? text.normalize("NFKC").replace(IGNORABLE, "") : text;
+export const foldText = (text: string, limit = foldLimit(text.length)) => {
+  if (!/[^\u0000-\u007f]/.test(text)) return text;
+  if (!foldFits(text, limit)) throw new FoldOverflow();
+  return text.normalize("NFKC").replace(IGNORABLE, "");
+};
 
 /** Cyrillic and Greek letters drawn like a Latin one, folded in member names only: prose in those scripts is left as it is. */
 const CONFUSABLES: Readonly<Record<string, string>> = Object.freeze({
@@ -49,21 +103,34 @@ export const NAME_CHAR = "[^\\u0000-\\u002c\\u002f\\u003a-\\u0040\\u005b-\\u005e
 /** A member name as it reads (`foldText`), its look-alike letters folded to Latin: `pаssword` and `ｐａｓｓｗｏｒｄ` are `password`. */
 export const foldName = (name: string) => foldText(name).replace(CONFUSABLE, letter => CONFUSABLES[letter]!);
 const FOLDED_CHARS = new Map<string, string>();
+const foldChar = (char: string) => {
+  let folded = char.charCodeAt(0) < 0x80 ? char : FOLDED_CHARS.get(char);
+  if (folded === undefined) { folded = foldName(char); if (FOLDED_CHARS.size < 65_536) FOLDED_CHARS.set(char, folded); }
+  return folded;
+};
 /**
  * `text` with each code point folded as `foldName` folds it, and where each view character came from: view character `i`
- * was read from original characters `from[i]` to `to[i]`, so a match in the view maps back to the text. Undefined for
- * ASCII text, which folds to itself.
+ * was read from the code point at original offset `from[i]`, so a match in the view maps back to the text. Undefined for
+ * ASCII text, which folds to itself. The view's length is measured first; past `foldLimit` it throws `FoldOverflow`, so
+ * neither the view nor its offsets are built.
  */
-export function foldedView(text: string): { readonly view: string; readonly from: readonly number[]; readonly to: readonly number[] } | undefined {
+export function foldedView(text: string): { readonly view: string; readonly from: Int32Array } | undefined {
   if (!/[^\u0000-\u007f]/.test(text)) return undefined;
-  const from: number[] = [], to: number[] = [], parts: string[] = [];
+  const limit = foldLimit(text.length);
+  let length = 0;
   for (let index = 0; index < text.length;) {
-    const width = text.codePointAt(index)! > 0xffff ? 2 : 1, char = text.slice(index, index + width);
-    let folded = char.charCodeAt(0) < 0x80 ? char : FOLDED_CHARS.get(char);
-    if (folded === undefined) { folded = foldName(char); if (FOLDED_CHARS.size < 65_536) FOLDED_CHARS.set(char, folded); }
-    for (let offset = 0; offset < folded.length; offset += 1) { from.push(index); to.push(index + width); }
+    const width = text.codePointAt(index)! > 0xffff ? 2 : 1;
+    length += foldChar(text.slice(index, index + width)).length;
+    if (length > limit) throw new FoldOverflow();
+    index += width;
+  }
+  const from = new Int32Array(length), parts: string[] = [];
+  for (let index = 0, at = 0; index < text.length;) {
+    const width = text.codePointAt(index)! > 0xffff ? 2 : 1, folded = foldChar(text.slice(index, index + width));
+    from.fill(index, at, at + folded.length);
+    at += folded.length;
     parts.push(folded);
     index += width;
   }
-  return { view: parts.join(""), from, to };
+  return { view: parts.join(""), from };
 }

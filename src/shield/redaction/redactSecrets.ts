@@ -1,6 +1,6 @@
 import { SECRET_PATTERNS, type SecretPattern } from "./secretPatterns.js";
-import { markupSecretSpans } from "../../dataflow/detectors.js";
-import { foldedView } from "../../dataflow/textViews.js";
+import { basicTokenSpans, markupSecretSpans } from "../../dataflow/detectors.js";
+import { FoldOverflow, foldedView } from "../../dataflow/textViews.js";
 
 /**
  * The one redaction pass over text (P5.3).
@@ -37,18 +37,26 @@ interface Region { readonly type: string; readonly start: number; readonly end: 
 
 /**
  * What the table alone does not read, as regions of the original text: the value of a secret-named XML element or HTML
- * input (the protected-data walk's markup rules, src/dataflow/detectors.ts), and a table match in the text read as the
+ * input and a free-text Basic token that decodes to a user:password pair (the protected-data walk's rules,
+ * src/dataflow/detectors.ts), and a table match in the text read as the
  * walk reads a member name (`foldedView`: NFKC, look-alike letters, ignorable characters removed) where that reading
- * changed it, so `аpi_key=` with a Cyrillic а or a fullwidth `ａｐｉ＿ｋｅｙ` is redacted too.
+ * changed it, so `аpi_key=` with a Cyrillic а or a fullwidth `ａｐｉ＿ｋｅｙ` is redacted too. Text whose folded reading
+ * would pass its length limit (`foldLimit`: megabytes of U+FDFA) cannot be read that way and is replaced whole.
  */
 function foldedRegions(text: string): Region[] {
-  const regions: Region[] = markupSecretSpans(text).map(span => ({ type: "secret_field", start: span.start, end: span.end }));
-  const folded = foldedView(text);
+  const regions: Region[] = [...markupSecretSpans(text).map(span => ({ type: "secret_field", start: span.start, end: span.end })),
+    ...basicTokenSpans(text).map(span => ({ type: "basic_auth", ...span }))];
+  let folded: ReturnType<typeof foldedView>;
+  try { folded = foldedView(text); } catch (error) {
+    if (error instanceof FoldOverflow) return [{ type: "fold_overflow", start: 0, end: text.length }];
+    throw error;
+  }
   if (folded === undefined) return regions;
   for (const entry of SECRET_PATTERNS) {
     for (const match of folded.view.matchAll(globalise(entry.pattern))) {
       if (match[0].length === 0) continue;
-      const start = folded.from[match.index]!, end = folded.to[match.index + match[0].length - 1]!;
+      const start = folded.from[match.index]!, last = folded.from[match.index + match[0].length - 1]!;
+      const end = last + (text.codePointAt(last)! > 0xffff ? 2 : 1);
       if (text.slice(start, end) !== match[0]) regions.push({ type: entry.type, start, end });
     }
   }

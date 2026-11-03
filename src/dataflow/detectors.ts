@@ -6,7 +6,8 @@ import { SECRET_PATTERNS } from "../shield/redaction/secretPatterns.js";
 import { assertNoDuplicateJsonKeys, canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 import { RedactionRefused, TOKEN_PATTERN_SOURCE } from "./tokenizer.js";
-import { decodeWebEscapes, foldName, foldText, NAME_CHAR, NAMED_REFERENCES, WEB_ESCAPE } from "./textViews.js";
+import { BASE64_RUN, CONTROL_CHARS, decodeBase64Run, decodeJsonEscapes, decodeWebEscapes, FOLD_GROWTH, FOLD_MAX_CHARS, FOLD_SLACK,
+  FoldOverflow, foldLimit, foldName, foldText, NAME_CHAR, NAMED_REFERENCES, readableText, WEB_ESCAPE } from "./textViews.js";
 
 export interface ProtectedDataDetection {
   readonly classes: readonly ProtectedDataClass[];
@@ -62,26 +63,6 @@ export const MAX_PROTECTED_TEXT_CHARS = 1_048_576;
 export const MAX_REQUEST_SCAN_CHARS = 16_777_216;
 /** What each unit (a string, key or number the walk reads) costs beside its length, so leaf count is bounded too. */
 const UNIT_CHARGE = 16;
-const JSON_ESCAPES: Readonly<Record<string, string>> = Object.freeze({ n: "\n", t: "\t", r: "\r", b: "\b", f: "\f" });
-// JSON string escapes (\n, \uXXXX, \" ...) decoded in one linear pass, so escaped text in malformed arguments still matches.
-const decodeJsonEscapes = (text: string) => !text.includes("\\") ? text : text.replace(/\\(?:u([0-9a-fA-F]{4})|([\s\S]))/g,
-  (_match, hex: string | undefined, char: string) => hex !== undefined ? String.fromCharCode(Number.parseInt(hex, 16))
-    : Object.hasOwn(JSON_ESCAPES, char) ? JSON_ESCAPES[char]! : char);
-const BASE64_RUN = /[A-Za-z0-9+/_-]{24,}={0,2}/g;
-const CONTROL_CHARS = /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\u009f]/g;
-const STRICT_UTF8 = new TextDecoder("utf-8", { fatal: true });
-/**
- * What a run of 24 or more base64 or base64url characters decodes to, where that is UTF-8 text with at most one control
- * character in ten (an encoded mail body, a text resource blob, a Secret's `data`); undefined for other runs (hashes,
- * random tokens, binary). The text is always shorter than the run.
- */
-const decodeBase64Run = (run: string): string | undefined => {
-  const body = run.replace(/=+$/, "");
-  if (body.length % 4 === 1) return undefined;
-  let decoded: string;
-  try { decoded = STRICT_UTF8.decode(Buffer.from(body, "base64")); } catch { return undefined; }
-  return decoded.length > 0 && (decoded.match(CONTROL_CHARS)?.length ?? 0) * 10 <= decoded.length ? decoded : undefined;
-};
 // ponytail: JSON inside a JSON string escapes again at each level, and web or base64 encoding can wrap either, so each raw
 // line is decoded by one chain, a JSON-escape pass then a web pass per round, up to this many rounds; a line still changing
 // after them is unreadable (`unsettled`). Raise it if deeper encodings are real.
@@ -153,7 +134,7 @@ function memberFinding(key: string | undefined, value: string, issued: IssuedTok
 /**
  * Credential shapes beside dlp's provider keys: the shared secret table's (src/shield/redaction/secretPatterns.ts, with
  * any Basic token in an Authorization header), a PEM private key block whole, a URL's password, an `api_key` assignment,
- * and a free Basic run whose bytes hold a `:` after their first, printable if it is all letters ("Basic Overview" is prose).
+ * and a free Basic run whose bytes hold a `:`, UTF-8 text without controls if it is all letters ("Basic Overview" is prose).
  * Where a rule has a group, only the value it captures is replaced. None backtracks quadratically.
  */
 const CREDENTIAL_RULES: readonly { readonly type: string; readonly re: RegExp; readonly accept?: (value: string) => boolean }[] = Object.freeze([
@@ -163,7 +144,8 @@ const CREDENTIAL_RULES: readonly { readonly type: string; readonly re: RegExp; r
   { type: "generic_api_key", re: /(?:api[_-]?key|apikey|api_secret)["\s:=]+["']?([A-Za-z0-9_-]{16,})/i },
   { type: "basic_auth", re: /\bBasic\s+([A-Za-z0-9+/_-]{8,}={0,2})/i, accept: value => basicPair(Buffer.from(value, "base64"), /[^A-Za-z]/.test(value)) }
 ]);
-const basicPair = (bytes: Buffer, notWord: boolean) => bytes.indexOf(0x3a) >= 1 && (notWord || bytes.every(byte => byte >= 0x20 && byte < 0x7f));
+// An empty user name (":secret") and a UTF-8 password count; a run of letters only must decode to text without controls.
+const basicPair = (bytes: Buffer, notWord: boolean) => bytes.includes(0x3a) && (notWord || readableText(bytes));
 // Each rule compiled for scanning once (per unit, compiling them again cost more than the scan); `re` stays non-global.
 const CREDENTIAL_SCANS: readonly RegExp[] = CREDENTIAL_RULES.map(rule => new RegExp(rule.re.source, `${rule.re.flags}gd`));
 const MEMBER_KEY = String.raw`(?<k>(?:${NAME_CHAR}|\\+u[0-9A-Fa-f]{4}){1,64})`;
@@ -201,7 +183,7 @@ export const DETECTOR_SET_DIGEST = sha256Hex(canonicalize({
   secretMembers: SECRET_MEMBER.source, secretMemberNames: SECRET_MEMBER_NAME.source, pageTokenNames: PAGE_TOKEN_NAME.source,
   keyedNames: KEYWORD_BOUND.source, webEscapes: { source: WEB_ESCAPE.source, named: NAMED_REFERENCES },
   base64Runs: { source: BASE64_RUN.source, controls: CONTROL_CHARS.source }, tokenFormat: TOKEN_PATTERN_SOURCE,
-  walk: { revision: "protected-walk-v5", order: "json>base64>web>nfkc", nfkcView: "whole-budget-charged", nameChar: NAME_CHAR, maxDecodePasses: MAX_DECODE_PASSES, viewRules: "dlp+shape+assign+line" },
+  walk: { revision: "protected-walk-v6", order: "json>base64>web>nfkc", nfkcView: { mode: "whole-budget-charged", bound: "nfkd-per-code-point", growth: FOLD_GROWTH, slack: FOLD_SLACK, max: FOLD_MAX_CHARS }, nameChar: NAME_CHAR, maxDecodePasses: MAX_DECODE_PASSES, viewRules: "dlp+shape+assign+line" },
   limits: { maxDepth: MAX_DEPTH, maxLeafChars: MAX_PROTECTED_TEXT_CHARS, maxRequestScanChars: MAX_REQUEST_SCAN_CHARS,
     unitCharge: UNIT_CHARGE, keyedContextChars: KEYED_CONTEXT_CHARS }
 }));
@@ -401,6 +383,12 @@ function pairSpans(text: string, view: boolean, issued: IssuedToken, charge: (le
 export const markupSecretSpans = (text: string): readonly ProtectedDataSpan[] =>
   pairSpans(text, true, NONE_ISSUED, () => undefined, true).filter(span => span.dataClass === "credential");
 
+/** Free-text Basic tokens (the last credential rule, its decode check included), for the shared redaction pass. */
+export function basicTokenSpans(text: string): readonly { readonly start: number; readonly end: number }[] {
+  const { re, accept } = CREDENTIAL_RULES.at(-1)!;
+  return Array.from(text.matchAll(new RegExp(re.source, `${re.flags}gd`)), match => match.indices![1]!)
+    .filter(([start, end]) => accept!(text.slice(start, end))).map(([start, end]) => ({ start, end }));
+}
 interface Segment { readonly start: number; readonly end: number; readonly parsed: unknown }
 interface BracketPair { readonly start: number; readonly end: number; readonly children: readonly BracketPair[] }
 // The bracket pairs of `text` as a forest in text order. Quotes count only inside a bracket; a raw line break inside a
@@ -556,6 +544,9 @@ export function protectedWalk(options: WalkOptions): ProtectedWalk {
   let repeats: ((text: string) => ProtectedDataClass | undefined) | undefined;
   let declaring = false, scanned = 0;
   const charge = (length: number) => { scanned += length; if (scanned > budget) walkRefused("budget"); };
+  /** `text` folded (NFKC), refused before it is built where it could pass the budget left ("budget") or `foldLimit`. */
+  const fold = (text: string) => { const room = budget - scanned, limit = foldLimit(text.length);
+    try { return foldText(text, Math.min(room, limit)); } catch (error) { throw error instanceof FoldOverflow ? new WalkRefused(room < limit ? "budget" : "too_long") : error; } };
   const record = (finding: Finding) => { (probes.at(-1) ?? findings).push(finding); };
   const swap = (finding: Finding, value: string) => replace !== undefined && probes.length === 0 ? replace(finding, value) : value;
   const hit = (finding: Finding, value: string) => { record(finding); return swap(finding, value); };
@@ -710,7 +701,7 @@ export function protectedWalk(options: WalkOptions): ProtectedWalk {
       for (let view = masked, round = 0; round < MAX_DECODE_PASSES; round += 1) {
         const json = decodeJsonEscapes(view);
         if (json !== view) { base64Children(json, child); probe(json, child); }
-        const web = decodeWebEscapes(json), folded = foldText(web);
+        const web = decodeWebEscapes(json), folded = fold(web);
         if (web !== json) { base64Children(web, child); probe(web, child); }
         if (folded !== web) { base64Children(folded, child); probe(folded, child); }
         if (folded === view) return distinctFindings(found);
