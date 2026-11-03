@@ -29,7 +29,7 @@
     "src/adapters/hookIntegration.ts": 1400,
     "src/bridge/bridgeServer.ts": 1375,
     "src/eval/judgeCalibration.ts": 1291,
-    "src/ledger/ledger.ts": 1291,
+    "src/ledger/ledger.ts": 1288,
     "src/guide/guideGenerator.ts": 1268,
     "src/workspaces/hostDb.ts": 1248,
     "src/score/operationalIndependence.ts": 1202,

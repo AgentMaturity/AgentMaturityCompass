@@ -2419,6 +2419,193 @@
       "expect": {
         "withinMs": 20000
       }
+    },
+    {
+      "id": "adv-benign-nfkc-escaped-json",
+      "round": "adv",
+      "finding": "adv-closed-gap",
+      "surface": "walk",
+      "input": {
+        "generate": [
+          [
+            "log {\\\"a\\\":\\\"",
+            1
+          ],
+          [
+            "ﷺ",
+            60000
+          ],
+          [
+            "\\\"}",
+            1
+          ]
+        ]
+      },
+      "expect": {
+        "unchanged": true
+      }
+    },
+    {
+      "id": "adv-benign-nfkc-escaped-json-squared",
+      "round": "adv",
+      "finding": "adv-closed-gap",
+      "surface": "walk",
+      "input": {
+        "generate": [
+          [
+            "log {\\\"a\\\":\\\"",
+            1
+          ],
+          [
+            "㍿",
+            300000
+          ],
+          [
+            "\\\"}",
+            1
+          ]
+        ]
+      },
+      "expect": {
+        "unchanged": true
+      }
+    },
+    {
+      "id": "adv-benign-nfkc-fullwidth-json",
+      "round": "adv",
+      "finding": "adv-closed-gap",
+      "surface": "walk",
+      "input": {
+        "generate": [
+          [
+            "｛＂a＂:＂",
+            1
+          ],
+          [
+            "ﷺ",
+            60000
+          ],
+          [
+            "＂｝",
+            1
+          ]
+        ]
+      },
+      "expect": {
+        "unchanged": true
+      }
+    },
+    {
+      "id": "adv-xml-long-attribute-list",
+      "round": "adv",
+      "finding": "adv-closed-gap",
+      "surface": "walk",
+      "input": {
+        "generate": [
+          [
+            "<password ",
+            1
+          ],
+          [
+            "data-attribute-name=\"v\" ",
+            12
+          ],
+          [
+            ">{{PASSWORD}}</password>",
+            1
+          ]
+        ]
+      },
+      "expect": {
+        "classes": [
+          "credential"
+        ],
+        "absent": [
+          "{{PASSWORD}}"
+        ],
+        "present": [
+          "</password>"
+        ]
+      }
+    },
+    {
+      "id": "adv-input-long-attribute-list",
+      "round": "adv",
+      "finding": "adv-closed-gap",
+      "surface": "walk",
+      "input": {
+        "generate": [
+          [
+            "<input ",
+            1
+          ],
+          [
+            "data-attribute-name=\"v\" ",
+            12
+          ],
+          [
+            "name=\"password\" value=\"{{PASSWORD}}\">",
+            1
+          ]
+        ]
+      },
+      "expect": {
+        "classes": [
+          "credential"
+        ],
+        "absent": [
+          "{{PASSWORD}}"
+        ]
+      }
+    },
+    {
+      "id": "adv-xml-comment-in-element",
+      "round": "adv",
+      "finding": "adv-closed-gap",
+      "surface": "walk",
+      "input": {
+        "text": "<password><!-- x -->{{PASSWORD}}</password>"
+      },
+      "expect": {
+        "classes": [
+          "credential"
+        ],
+        "absent": [
+          "{{PASSWORD}}"
+        ],
+        "present": [
+          "</password>"
+        ]
+      }
+    },
+    {
+      "id": "adv-basic-base64url-token",
+      "round": "adv",
+      "finding": "adv-closed-gap",
+      "surface": "walk",
+      "input": {
+        "text": "Basic dXNlcjpo_W50ZXIy-xyzabc"
+      },
+      "expect": {
+        "classes": [
+          "credential"
+        ],
+        "absent": [
+          "_W50ZXIy-xyzabc"
+        ]
+      }
+    },
+    {
+      "id": "adv-benign-basic-headings",
+      "round": "adv",
+      "finding": "adv-closed-gap",
+      "surface": "walk",
+      "input": {
+        "text": "## Basic Overview\nChapter 2: Basic Operations\nBasic Information and Basic Principles"
+      },
+      "expect": {
+        "unchanged": true
+      }
     }
   ],
   "mutations": [

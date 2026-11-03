@@ -501,7 +501,8 @@
     "Names, addresses and other free-text identifiers outside declared fields.",
     "Values split across JSON fields, lines or stream chunks that are not joined.",
     "Non-ASCII digits that NFKC does not fold (Arabic-Indic, Devanagari), and look-alike letters in member names outside the Cyrillic and Greek fold table.",
-    "Namespaced XML element names, CDATA sections over 1,024 characters, quoted markup attribute values over 256 characters, unquoted HTML attribute values, and HTML attributes other than an input's name and value.",
+    "Namespaced XML element names, CDATA sections and comments inside an element over 1,024 characters each, markup attribute values over 256 characters, attribute names over 64 characters, more than 64 attributes before the value, an unquoted HTML input value, and HTML attributes other than an input's name and value.",
+    "A free-text Basic token (outside an Authorization header) that decodes to no colon after its first byte, or that is letters only and does not decode to printable ASCII.",
     "Text redacted only by the shared secret table (redactSecrets: fetched web pages, file tools, SDK evidence and the other direct callers), which reads no JSON member, form, query, multipart or env-line name and value pairs and no Basic token outside an Authorization header.",
     "Base64 that decodes to binary (images, audio, PDFs).",
     "Clinical meaning: a keyword-bound MRN pattern is not a clinical record check."
