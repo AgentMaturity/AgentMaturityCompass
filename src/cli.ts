@@ -17010,8 +17010,8 @@ audit
     if (!["splunk", "datadog", "cloudtrail", "azure"].includes(format)) {
       throw new Error("format must be splunk|datadog|cloudtrail|azure");
     }
-    const limit = incidentListLimit(opts.limit);
-    if (limit === undefined) throw new Error("limit must be a positive integer");
+    const limit = Number.parseInt(opts.limit, 10);
+    if (!Number.isFinite(limit) || limit <= 0) throw new Error("limit must be a positive integer");
     const out = auditEnterpriseExportCli({
       workspace: process.cwd(),
       format: format as "splunk" | "datadog" | "cloudtrail" | "azure",

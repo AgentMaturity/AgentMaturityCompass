@@ -50,8 +50,10 @@ limit: it is kept past it and counted (`pinnedPastLimit`). Unsigned rows dated
 more than five minutes in the future, or before the workspace was created, are
 not shown but counted (`unsigned.rejected`) with a warning. If the unsigned
 store cannot be read, or is not a regular file inside the workspace (a FIFO or
-a symlink, say), it is never opened: the list still shows the signed incidents
-and says so (`unsigned.unreadable`).
+a symlink, say), it is never opened; if its `incidents` or
+`incident_transitions` is a view, a virtual table or has a generated column,
+it is never queried. Either way the list still shows the signed incidents and
+says so (`unsigned.unreadable`).
 
 ## 2. Release (OWNER)
 

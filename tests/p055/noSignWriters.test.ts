@@ -271,6 +271,36 @@ describe("the kill switch under no-sign", () => {
     }
   });
 
+  test("an unsigned store whose incidents are a view, a virtual table or a generated column is never queried", () => {
+    vi.stubEnv("AMC_NO_SIGN", "0");
+    openLedger(workspace).close();
+    seedIncidents(".amc/evidence.sqlite", [{ id: "signed", createdTs: 1_000 }]);
+    const path = join(workspace, UNSIGNED_EVIDENCE_STORE);
+    // Every column the reader checks, so only the kind of table can refuse it.
+    const columns = "'x' AS incident_id, 'agent-a' AS agent_id, 'WARN' AS severity, 'OPEN' AS state, 'x' AS title, 'x' AS description, "
+      + "'MANUAL' AS trigger_type, 'x' AS trigger_id, '[]' AS root_cause_claim_ids_json, '[]' AS affected_question_ids_json, "
+      + "'[]' AS causal_edges_json, '[]' AS timeline_event_ids_json, n AS created_ts, n AS updated_ts, NULL AS resolved_ts, "
+      + "NULL AS postmortem_ref, '0' AS prev_incident_hash, 'x' AS incident_hash, 'x' AS signature";
+    const plants: Array<[string, string]> = [
+      // Sorting a recursive CTE without end never returns: a reader that queried it would hang the list.
+      ["a recursive view", `CREATE VIEW incidents AS WITH RECURSIVE r(n) AS (SELECT 1 UNION ALL SELECT n + 1 FROM r) SELECT ${columns} FROM r`],
+      ["a virtual table", `CREATE VIRTUAL TABLE incidents USING fts5(${columns.replace(/'[^']*' AS |n AS |NULL AS /g, "")})`],
+      ["a generated column", "ALTER TABLE incidents ADD COLUMN slow BLOB AS (zeroblob(1000))"]
+    ];
+    for (const [name, sql] of plants) {
+      rmSync(path, { force: true });
+      seedIncidents(UNSIGNED_EVIDENCE_STORE, [{ id: "u", createdTs: Date.now() }]);
+      const db = new Database(path);
+      if (name !== "a generated column") db.exec("DROP TABLE incidents");
+      db.exec(sql); db.close();
+      const cli = spawnSync(process.execPath, [resolve("dist/cli.js"), "incident", "list", "--agent", "agent-a"],
+        { cwd: workspace, encoding: "utf8", env: cliEnv(), timeout: 10_000 });
+      expect(cli.status, `${name}: ${cli.signal} ${cli.stderr}`).toBe(0);
+      expect(cli.stdout, name).toContain("signed");
+      expect(cli.stderr, name).toContain("Warning: the unsigned evidence store could not be read");
+    }
+  }, 60_000);
+
   test("the unsigned store is read newest first and at most 500 incidents deep", () => {
     seedIncidents(UNSIGNED_EVIDENCE_STORE, Array.from({ length: 600 }, (_, index) => ({ id: `u-${index}`, createdTs: Date.now() - 100_000 + index })));
     const listed = unsignedIncidents(workspace, "agent-a");
@@ -338,6 +368,13 @@ test("native budget admission and executed trials refuse before writing a row", 
     arms: [{ side: "baseline" }, { side: "candidate" }] as never })).rejects.toThrow("no-sign mode does not authorize executed trials");
   expect(signedStore().size).toBe(rows);
   expect(unsignedStore().size).toBe(0);
+});
+
+test("audit export keeps its own limit parsing: the incident list's six-digit cap does not apply", () => {
+  const exportCli = (limit: string) => spawnSync(process.execPath, [resolve("dist/cli.js"), "audit", "export", "--format", "splunk",
+    "--output", join(root, "audit.json"), "--limit", limit], { cwd: workspace, encoding: "utf8", env: { ...process.env, AMC_NO_SIGN: "1" }, timeout: 30_000 });
+  for (const limit of ["1000000", "25000000"]) expect(exportCli(limit).status, limit).toBe(0);
+  for (const bad of ["0", "-1", "abc"]) expect(exportCli(bad).stderr, bad).toContain("limit must be a positive integer");
 });
 
 test("record-only writers put unsigned rows in the unsigned store only", () => {

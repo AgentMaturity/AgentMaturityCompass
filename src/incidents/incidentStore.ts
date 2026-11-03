@@ -559,8 +559,8 @@ function unsignedStoreFile(workspace: string, path: string): "absent" | "file" |
  * signing sessions too, so the incident must stay visible there. Never verified, and never merged into the signed store.
  * Rows dated in the future past a small clock skew, or before the workspace was created, are not read but counted in
  * `rejected`: a planted row cannot sit above every real one or use up the read cap. Anything wrong with that store (not
- * a regular file, outside the workspace, not a database, a table or column missing, a malformed row) reads as no
- * incidents with `unreadable` set, so it can never fail or block the signed incident list it is shown beside.
+ * a regular file, outside the workspace, not a database, a view, virtual table or generated column, a table or column
+ * missing, a malformed row) reads as no incidents with `unreadable` set, so it can never fail or block the signed list.
  */
 export function unsignedIncidents(workspace: string, agentId: string, now = Date.now()):
   { incidents: UnsignedIncident[]; rejected: number; unreadable: boolean } {
@@ -573,11 +573,17 @@ export function unsignedIncidents(workspace: string, agentId: string, now = Date
     const window = [Math.max(0, statSync(join(workspace, ".amc")).birthtimeMs - UNSIGNED_CLOCK_SKEW_MS), now + UNSIGNED_CLOCK_SKEW_MS] as const;
     const db = new Database(path, { readonly: true, fileMustExist: true });
     try {
-      const tables = Object.keys(UNSIGNED_INCIDENT_COLUMNS).map((table) =>
-        new Set((db.pragma(`table_info(${table})`) as Array<{ name: string }>).map((column) => column.name)));
+      // Both names must be real tables: a view (a recursive CTE never ends), a virtual table or a generated column runs
+      // code on every read. ponytail: better-sqlite3 has no progress handler or interrupt to stop a query on time, so the
+      // bound is this check plus the read cap: what remains is a scan of a regular file's own rows.
+      const kinds = db.prepare(`SELECT type FROM pragma_table_list WHERE schema = 'main'
+        AND name COLLATE NOCASE IN ('incidents', 'incident_transitions')`).all() as Array<{ type: string }>;
       // Detectors create both tables on their first incident; a store with neither has never held one.
-      if (tables.every((columns) => columns.size === 0)) return { incidents: [], rejected: 0, unreadable: false };
-      if (Object.values(UNSIGNED_INCIDENT_COLUMNS).some((names, index) => names.some((name) => !tables[index]!.has(name)))) {
+      if (kinds.length === 0) return { incidents: [], rejected: 0, unreadable: false };
+      if (kinds.length !== 2 || kinds.some((kind) => kind.type !== "table")) return { incidents: [], rejected: 0, unreadable: true };
+      const tables = Object.keys(UNSIGNED_INCIDENT_COLUMNS).map((table) => db.pragma(`table_xinfo(${table})`) as Array<{ name: string; hidden: number }>);
+      if (tables.some((columns) => columns.some((column) => column.hidden !== 0))
+        || Object.values(UNSIGNED_INCIDENT_COLUMNS).some((names, index) => names.some((name) => !tables[index]!.some((column) => column.name === name)))) {
         return { incidents: [], rejected: 0, unreadable: true };
       }
       const incidents = getIncidentsByAgent(db, agentId, undefined, UNSIGNED_INCIDENT_READ_CAP, window);
