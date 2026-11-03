@@ -2086,6 +2086,339 @@
       "expect": {
         "withinMs": 20000
       }
+    },
+    {
+      "id": "adv-cf-invisible-times-card",
+      "round": "adv",
+      "finding": "adv-closed-gap",
+      "surface": "walk",
+      "input": {
+        "text": "card 4111⁢1111⁢1111⁢1111 ok"
+      },
+      "expect": {
+        "classes": [
+          "card_number"
+        ],
+        "absent": [
+          "4111⁢1111"
+        ]
+      }
+    },
+    {
+      "id": "adv-lrm-member-name",
+      "round": "adv",
+      "finding": "adv-closed-gap",
+      "surface": "walk",
+      "input": {
+        "text": "{\"pass‎word\":\"{{PASSWORD}}\"}"
+      },
+      "expect": {
+        "classes": [
+          "credential"
+        ],
+        "absent": [
+          "{{PASSWORD}}"
+        ]
+      }
+    },
+    {
+      "id": "adv-invisible-times-env-line",
+      "round": "adv",
+      "finding": "adv-closed-gap",
+      "surface": "walk",
+      "input": {
+        "text": "DB_PASS⁢WORD={{PASSWORD}}"
+      },
+      "expect": {
+        "classes": [
+          "credential"
+        ],
+        "absent": [
+          "{{PASSWORD}}"
+        ]
+      }
+    },
+    {
+      "id": "adv-xml-quoted-attribute-gt",
+      "round": "adv",
+      "finding": "adv-closed-gap",
+      "surface": "walk",
+      "input": {
+        "text": "<password hint=\"a>b\">{{PASSWORD}}</password>"
+      },
+      "expect": {
+        "classes": [
+          "credential"
+        ],
+        "absent": [
+          "{{PASSWORD}}"
+        ],
+        "present": [
+          "<password hint=\"a>b\">",
+          "</password>"
+        ]
+      }
+    },
+    {
+      "id": "adv-html-quoted-attribute-gt",
+      "round": "adv",
+      "finding": "adv-closed-gap",
+      "surface": "walk",
+      "input": {
+        "text": "<input title=\"a>b\" name=\"password\" value=\"{{PASSWORD}}\">"
+      },
+      "expect": {
+        "classes": [
+          "credential"
+        ],
+        "absent": [
+          "{{PASSWORD}}"
+        ]
+      }
+    },
+    {
+      "id": "adv-basic-header-no-colon",
+      "round": "adv",
+      "finding": "adv-closed-gap",
+      "surface": "walk",
+      "input": {
+        "text": "Authorization: Basic {{base64:{{PASSWORD}}}}"
+      },
+      "expect": {
+        "classes": [
+          "credential"
+        ],
+        "absent": [
+          "{{base64:{{PASSWORD}}}}"
+        ],
+        "present": [
+          "Authorization: Basic "
+        ]
+      }
+    },
+    {
+      "id": "adv-basic-proxy-header-short",
+      "round": "adv",
+      "finding": "adv-closed-gap",
+      "surface": "walk",
+      "input": {
+        "text": "Proxy-Authorization: Basic c2VjcmV0"
+      },
+      "expect": {
+        "classes": [
+          "credential"
+        ],
+        "absent": [
+          "c2VjcmV0"
+        ]
+      }
+    },
+    {
+      "id": "adv-basic-latin1-free-text",
+      "round": "adv",
+      "finding": "adv-closed-gap",
+      "surface": "walk",
+      "input": {
+        "text": "retry with basic //5zdmM6aHVudGVyMi1maXh0dXJl please"
+      },
+      "expect": {
+        "classes": [
+          "credential"
+        ],
+        "absent": [
+          "//5zdmM6aHVudGVyMi1maXh0dXJl"
+        ]
+      }
+    },
+    {
+      "id": "adv-fullwidth-quoted-key",
+      "round": "adv",
+      "finding": "adv-closed-gap",
+      "surface": "walk",
+      "input": {
+        "text": "{'ｐａｓｓｗｏｒｄ': '{{PASSWORD}}'"
+      },
+      "expect": {
+        "classes": [
+          "credential"
+        ],
+        "absent": [
+          "{{PASSWORD}}"
+        ]
+      }
+    },
+    {
+      "id": "adv-math-bold-quoted-key",
+      "round": "adv",
+      "finding": "adv-closed-gap",
+      "surface": "walk",
+      "input": {
+        "text": "{\"𝐩𝐚𝐬𝐬𝐰𝐨𝐫𝐝\": \"{{PASSWORD}}"
+      },
+      "expect": {
+        "classes": [
+          "credential"
+        ],
+        "absent": [
+          "{{PASSWORD}}"
+        ]
+      }
+    },
+    {
+      "id": "adv-ligature-key-past-nfkc-cap",
+      "round": "adv",
+      "finding": "adv-closed-gap",
+      "surface": "walk",
+      "input": {
+        "generate": [
+          [
+            "ﷺ",
+            60000
+          ],
+          [
+            " key sk-Fx7Kq2Lm9Pz4ﬀRt6Vw8Yb1Nc3 ok",
+            1
+          ]
+        ]
+      },
+      "expect": {
+        "classes": [
+          "credential"
+        ],
+        "absent": [
+          "sk-Fx7Kq2Lm9Pz4ﬀ"
+        ]
+      }
+    },
+    {
+      "id": "adv-benign-cf-text",
+      "round": "adv",
+      "finding": "adv-closed-gap",
+      "surface": "walk",
+      "input": {
+        "text": "‎شكرا‏, x⁢y, ‍👍‍, ok"
+      },
+      "expect": {
+        "unchanged": true
+      }
+    },
+    {
+      "id": "h-xml-quoted-gt-run",
+      "round": "hostile",
+      "finding": "adv-closed-gap",
+      "surface": "walk",
+      "input": {
+        "generate": [
+          [
+            "<password a=\"",
+            1
+          ],
+          [
+            ">",
+            1000000
+          ]
+        ]
+      },
+      "expect": {
+        "withinMs": 20000
+      }
+    },
+    {
+      "id": "h-xml-quoted-attribute-runs",
+      "round": "hostile",
+      "finding": "adv-closed-gap",
+      "surface": "walk",
+      "input": {
+        "generate": [
+          [
+            "<password",
+            1
+          ],
+          [
+            " a=\">\"",
+            160000
+          ]
+        ]
+      },
+      "expect": {
+        "withinMs": 20000
+      }
+    },
+    {
+      "id": "h-input-quoted-attribute-runs",
+      "round": "hostile",
+      "finding": "adv-closed-gap",
+      "surface": "walk",
+      "input": {
+        "generate": [
+          [
+            "<input",
+            1
+          ],
+          [
+            " t='>'",
+            160000
+          ]
+        ]
+      },
+      "expect": {
+        "withinMs": 20000
+      }
+    },
+    {
+      "id": "h-basic-header-long-run",
+      "round": "hostile",
+      "finding": "adv-closed-gap",
+      "surface": "walk",
+      "input": {
+        "generate": [
+          [
+            "Authorization: Basic ",
+            1
+          ],
+          [
+            "A",
+            1000000
+          ]
+        ]
+      },
+      "expect": {
+        "withinMs": 20000
+      }
+    },
+    {
+      "id": "h-ignorable-runs",
+      "round": "hostile",
+      "finding": "adv-closed-gap",
+      "surface": "walk",
+      "input": {
+        "generate": [
+          [
+            "p⁢",
+            500000
+          ]
+        ]
+      },
+      "expect": {
+        "withinMs": 20000
+      }
+    },
+    {
+      "id": "h-fullwidth-name-runs",
+      "round": "hostile",
+      "finding": "adv-closed-gap",
+      "surface": "walk",
+      "input": {
+        "generate": [
+          [
+            " ｐ=",
+            333000
+          ]
+        ]
+      },
+      "expect": {
+        "withinMs": 20000
+      }
     }
   ],
   "mutations": [

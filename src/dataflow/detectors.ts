@@ -6,7 +6,7 @@ import { SECRET_PATTERNS } from "../shield/redaction/secretPatterns.js";
 import { assertNoDuplicateJsonKeys, canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 import { RedactionRefused, TOKEN_PATTERN_SOURCE } from "./tokenizer.js";
-import { decodeWebEscapes, foldName, foldText, NAME_FOLD_CHARS, NAMED_REFERENCES, WEB_ESCAPE } from "./textViews.js";
+import { decodeWebEscapes, foldName, foldText, NAME_CHAR, NAMED_REFERENCES, WEB_ESCAPE } from "./textViews.js";
 
 export interface ProtectedDataDetection {
   readonly classes: readonly ProtectedDataClass[];
@@ -152,21 +152,22 @@ function memberFinding(key: string | undefined, value: string, issued: IssuedTok
 }
 /**
  * Credential shapes beside dlp's provider keys: the shared secret table's (src/shield/redaction/secretPatterns.ts), a PEM
- * private key block whole, a URL's password, an `api_key`/`apikey`/`api_secret` assignment anywhere in a line and a Basic
- * scheme's base64 `user:password` (`accept`: only a run that decodes to that, so "Basic Settings" is prose). Where a
- * rule has a group, only the value it captures is replaced. None backtracks quadratically.
+ * private key block whole, a URL's password, an `api_key`/`apikey`/`api_secret` assignment anywhere in a line, any Basic
+ * token in an `Authorization` or `Proxy-Authorization` header, and elsewhere a Basic run whose bytes hold a `:` (`accept`,
+ * so "Basic Settings" is prose). Where a rule has a group, only the value it captures is replaced. None backtracks quadratically.
  */
 const CREDENTIAL_RULES: readonly { readonly type: string; readonly re: RegExp; readonly accept?: (value: string) => boolean }[] = Object.freeze([
-  ...["anthropic_key", "slack_token", "google_api_key", "bearer_token", "jwt"].map(type => ({ type, re: sharedSecret(type) })),
+  ...["anthropic_key", "slack_token", "google_api_key", "bearer_token", "jwt", "basic_auth"].map(type => ({ type, re: sharedSecret(type) })),
   { type: "private_key", re: /-----BEGIN [A-Z ]{0,20}PRIVATE KEY-----[^-]*(?:-----END [A-Z ]{0,20}PRIVATE KEY-----)?/ },
   { type: "password_in_url", re: /\/\/[^:\s/@"]{1,256}:([^@\s/"]{1,256})@/ },
   { type: "generic_api_key", re: /(?:api[_-]?key|apikey|api_secret)["\s:=]+["']?([A-Za-z0-9_-]{16,})/i },
-  { type: "basic_auth", re: /\bBasic\s+([A-Za-z0-9+/]{8,}={0,2})/i, accept: value => /^[^\u0000-\u001f:]*:[^\u0000-\u001f]*$/.test(decodeBase64Run(value) ?? "") }
+  { type: "basic_auth", re: /\bBasic\s+([A-Za-z0-9+/]{8,}={0,2})/i, accept: value => Buffer.from(value, "base64").includes(0x3a) }
 ]);
 // Each rule compiled for scanning once (per unit, compiling them again cost more than the scan); `re` stays non-global.
 const CREDENTIAL_SCANS: readonly RegExp[] = CREDENTIAL_RULES.map(rule => new RegExp(rule.re.source, `${rule.re.flags}gd`));
-const NAME_CHARS = `[A-Za-z0-9_.${NAME_FOLD_CHARS}-]`;
-const MEMBER_KEY = String.raw`(?<k>(?:${NAME_CHARS}|\\+u[0-9A-Fa-f]{4}){1,64})`;
+const MEMBER_KEY = String.raw`(?<k>(?:${NAME_CHAR}|\\+u[0-9A-Fa-f]{4}){1,64})`;
+// One markup attribute; a quoted value may hold ">" (up to 256 characters), never "<".
+const ATTR = String.raw`(?:[^<>"']|"[^"<]{0,256}"|'[^'<]{0,256}')`;
 /**
  * Name and value pairs in exact text: a quoted member (JSON, a Python or JS literal, a string or a number, its quotes
  * escaped once too: JSON in a JSON string), a form, query or command-line field, a multipart form part, and an env or YAML
@@ -175,17 +176,17 @@ const MEMBER_KEY = String.raw`(?<k>(?:${NAME_CHARS}|\\+u[0-9A-Fa-f]{4}){1,64})`;
  * (truncated output), at the end of its line. A decoded view runs only the rules that do not depend on where quotes fall
  * (`exactOnly: false`): decoding an escaped backslash before a closing quote leaves an escaped quote, so a value runs on.
  * An XML element's text (CDATA sections in it up to 1,024 characters each) and an HTML input's quoted `value` under its
- * `name` (either order) are pairs too.
+ * `name` (either order) are pairs too (`markup`), their attributes' quoted values holding ">" or not.
  */
-const PAIR_RULES: readonly { readonly type: "secret_json" | "secret_field"; readonly re: RegExp; readonly exactOnly: boolean }[] = Object.freeze([
+const PAIR_RULES: readonly { readonly type: "secret_json" | "secret_field"; readonly re: RegExp; readonly exactOnly: boolean; readonly markup?: true }[] = Object.freeze([
   { type: "secret_json", exactOnly: true, re: new RegExp(String.raw`(?<q>\\?["'])${MEMBER_KEY}\k<q>\s*:\s*(?<r>\\?["'])(?<v>(?:(?!\k<r>)(?:[^\\\r\n]|\\[^\r\n]))*)(?:\k<r>|(?=[\r\n]|$))`) },
   { type: "secret_json", exactOnly: true, re: new RegExp(String.raw`(?<q>\\?["'])${MEMBER_KEY}\k<q>\s*:\s*(?<v>-?\d[\d.eE+-]*)`) },
   { type: "secret_field", exactOnly: false, re: new RegExp(String.raw`(?:^|[?&;\s])${MEMBER_KEY}=(?<v>[^&;\s#]*)`) },
   { type: "secret_field", exactOnly: true, re: new RegExp(String.raw`name="${MEMBER_KEY}"[^\r\n]{0,256}\r?\n(?:[^\r\n]{1,256}\r?\n){0,8}\r?\n(?<v>[^\r\n]*)`) },
-  { type: "secret_field", exactOnly: false, re: new RegExp(String.raw`^[ \t]*(?<k>${NAME_CHARS}{1,64})[ \t]*[:=][ \t]*(?<v>\S+)`, "m") },
-  { type: "secret_field", exactOnly: false, re: new RegExp(String.raw`<(?<k>${NAME_CHARS}{1,64})(?:\s[^<>]{0,256})?>(?<v>(?:<!\[CDATA\[(?:[^\]]|\](?!\]>)){0,1024}\]\]>|[^<])*)</\k<k>\s*>`) },
-  { type: "secret_field", exactOnly: false, re: new RegExp(String.raw`<input\b[^<>]{0,256}?\sname=(?<q>["'])(?<k>${NAME_CHARS}{1,64})\k<q>[^<>]{0,256}?\svalue=(?<r>["'])(?<v>(?:(?!\k<r>)[^<>])*)\k<r>`, "i") },
-  { type: "secret_field", exactOnly: false, re: new RegExp(String.raw`<input\b[^<>]{0,256}?\svalue=(?<r>["'])(?<v>(?:(?!\k<r>)[^<>])*)\k<r>[^<>]{0,256}?\sname=(?<q>["'])(?<k>${NAME_CHARS}{1,64})\k<q>`, "i") }
+  { type: "secret_field", exactOnly: false, re: new RegExp(String.raw`^[ \t]*(?<k>${NAME_CHAR}{1,64})[ \t]*[:=][ \t]*(?<v>\S+)`, "m") },
+  { type: "secret_field", exactOnly: false, markup: true, re: new RegExp(String.raw`<(?<k>${NAME_CHAR}{1,64})(?:\s${ATTR}{0,256})?>(?<v>(?:<!\[CDATA\[(?:[^\]]|\](?!\]>)){0,1024}\]\]>|[^<])*)</\k<k>\s*>`) },
+  { type: "secret_field", exactOnly: false, markup: true, re: new RegExp(String.raw`<input\b${ATTR}{0,256}?\sname=(?<q>["'])(?<k>${NAME_CHAR}{1,64})\k<q>${ATTR}{0,256}?\svalue=(?<r>["'])(?<v>(?:(?!\k<r>)[^<])*)\k<r>`, "i") },
+  { type: "secret_field", exactOnly: false, markup: true, re: new RegExp(String.raw`<input\b${ATTR}{0,256}?\svalue=(?<r>["'])(?<v>(?:(?!\k<r>)[^<])*)\k<r>${ATTR}{0,256}?\sname=(?<q>["'])(?<k>${NAME_CHAR}{1,64})\k<q>`, "i") }
 ]);
 const PAIR_SCANS: readonly RegExp[] = PAIR_RULES.map(rule => new RegExp(rule.re.source, `${rule.re.flags}gd`));
 /** Binds the patterns, mappings, filters, walk, token format and limits below; receipts and admission rows carry it. */
@@ -199,7 +200,7 @@ export const DETECTOR_SET_DIGEST = sha256Hex(canonicalize({
   secretMembers: SECRET_MEMBER.source, secretMemberNames: SECRET_MEMBER_NAME.source, pageTokenNames: PAGE_TOKEN_NAME.source,
   keyedNames: KEYWORD_BOUND.source, webEscapes: { source: WEB_ESCAPE.source, named: NAMED_REFERENCES },
   base64Runs: { source: BASE64_RUN.source, controls: CONTROL_CHARS.source }, tokenFormat: TOKEN_PATTERN_SOURCE,
-  walk: { revision: "protected-walk-v3", order: "json>base64>web>nfkc", nfkcOverCap: "per-char-non-lengthening", nameFold: NAME_FOLD_CHARS, maxDecodePasses: MAX_DECODE_PASSES, viewRules: "dlp+shape+assign+line" },
+  walk: { revision: "protected-walk-v4", order: "json>base64>web>nfkc", nfkcView: "whole-budget-charged", nameChar: NAME_CHAR, maxDecodePasses: MAX_DECODE_PASSES, viewRules: "dlp+shape+assign+line" },
   limits: { maxDepth: MAX_DEPTH, maxLeafChars: MAX_PROTECTED_TEXT_CHARS, maxRequestScanChars: MAX_REQUEST_SCAN_CHARS,
     unitCharge: UNIT_CHARGE, keyedContextChars: KEYED_CONTEXT_CHARS }
 }));
@@ -260,7 +261,10 @@ const valueOnly = (text: string, span: PiiSpan): PiiSpan => span.type !== "passw
 
 /** dlp's patterns and the credential shapes over `text`. Offsets refer to the original text. No matched values are returned or logged. */
 export function detectProtectedText(text: string, issued: IssuedToken = NONE_ISSUED): readonly ProtectedDataSpan[] {
-  if (typeof text !== "string" || text.length > MAX_PROTECTED_TEXT_CHARS) return refused();
+  return typeof text !== "string" || text.length > MAX_PROTECTED_TEXT_CHARS ? refused() : scanText(text, issued);
+}
+/** `detectProtectedText` without its length limit, for a line's NFKC view, whose length the walk has charged. */
+function scanText(text: string, issued: IssuedToken): readonly ProtectedDataSpan[] {
   // Noise and token hex are rejected inside the scan, so a dropped span cannot hide an overlapping match
   // ("12:34:56.78.90.12").
   const tokens = tokenRanges(text, issued);
@@ -376,11 +380,11 @@ function replaceRegions<R extends { readonly start: number; readonly end: number
 // PAIR_RULES spans in `text` (in a decoded `view`, only the rules that do not depend on quotes) whose value `memberFinding`
 // flags under its name, narrowed to the value. Each search resumes at the value's start, so members nested inside a value
 // (JSON in a JSON string) are found too.
-function pairSpans(text: string, view: boolean, issued: IssuedToken, charge: (length: number) => void): ProtectedDataSpan[] {
+function pairSpans(text: string, view: boolean, issued: IssuedToken, charge: (length: number) => void, markupOnly = false): ProtectedDataSpan[] {
   const spans: ProtectedDataSpan[] = [];
   if (!/[:=<]/.test(text)) return spans;
   for (const [index, rule] of PAIR_RULES.entries()) {
-    if (view && rule.exactOnly) continue;
+    if ((view && rule.exactOnly) || (markupOnly && rule.markup !== true)) continue;
     const scan = PAIR_SCANS[index]!;
     scan.lastIndex = 0;
     for (let match = scan.exec(text); match !== null; match = scan.exec(text)) {
@@ -392,6 +396,9 @@ function pairSpans(text: string, view: boolean, issued: IssuedToken, charge: (le
   }
   return spans;
 }
+/** Credential values in secret-named XML elements and HTML inputs, for the shared redaction pass (redactSecrets). */
+export const markupSecretSpans = (text: string): readonly ProtectedDataSpan[] =>
+  pairSpans(text, true, NONE_ISSUED, () => undefined, true).filter(span => span.dataClass === "credential");
 
 interface Segment { readonly start: number; readonly end: number; readonly parsed: unknown }
 interface BracketPair { readonly start: number; readonly end: number; readonly children: readonly BracketPair[] }
@@ -701,7 +708,7 @@ export function protectedWalk(options: WalkOptions): ProtectedWalk {
       for (let view = masked, round = 0; round < MAX_DECODE_PASSES; round += 1) {
         const json = decodeJsonEscapes(view);
         if (json !== view) { base64Children(json, child); probe(json, child); }
-        const web = decodeWebEscapes(json), folded = foldText(web, MAX_PROTECTED_TEXT_CHARS);
+        const web = decodeWebEscapes(json), folded = foldText(web);
         if (web !== json) { base64Children(web, child); probe(web, child); }
         if (folded !== web) { base64Children(folded, child); probe(folded, child); }
         if (folded === view) return distinctFindings(found);
@@ -718,8 +725,8 @@ export function protectedWalk(options: WalkOptions): ProtectedWalk {
     }
   }
   /** One decoded view: its JSON walked exactly, the rest scanned flat (`flat`), with no decoding chain of its own. */
+  // Decoding only shortens a line; its NFKC view may be longer than any unit may be, and is read whole, its length charged.
   function probe(view: string, ctx: WalkContext): void {
-    if (view.length > MAX_PROTECTED_TEXT_CHARS) throw new WalkRefused("too_long");
     charge(view.length);
     const inner: WalkContext = { ...ctx, roots: [...ctx.roots, ctx.path.length] };
     let cursor = 0;
@@ -736,7 +743,7 @@ export function protectedWalk(options: WalkOptions): ProtectedWalk {
   /** A view's text outside its JSON: dlp, the credential shapes, the quote-free pairs and declared repeats. */
   function flat(text: string, ctx: WalkContext): void {
     if (text === "") return;
-    for (const span of detectProtectedText(text, issued)) record(span);
+    for (const span of scanText(text, issued)) record(span);
     for (const span of pairSpans(text, true, issued, charge)) record(span);
     const repeat = repeats !== undefined && underAt(ctx.path) ? repeats(text) : undefined;
     if (repeat !== undefined) record({ dataClass: repeat, detector: "declared_field" });

@@ -1,4 +1,6 @@
 import { SECRET_PATTERNS, type SecretPattern } from "./secretPatterns.js";
+import { markupSecretSpans } from "../../dataflow/detectors.js";
+import { foldedView } from "../../dataflow/textViews.js";
 
 /**
  * The one redaction pass over text (P5.3).
@@ -31,6 +33,28 @@ export interface SecretRedactionResult {
  */
 const globalise = (pattern: RegExp): RegExp => new RegExp(pattern.source, `${pattern.flags}g`);
 
+interface Region { readonly type: string; readonly start: number; readonly end: number }
+
+/**
+ * What the table alone does not read, as regions of the original text: the value of a secret-named XML element or HTML
+ * input (the protected-data walk's markup rules, src/dataflow/detectors.ts), and a table match in the text read as the
+ * walk reads a member name (`foldedView`: NFKC, look-alike letters, ignorable characters removed) where that reading
+ * changed it, so `аpi_key=` with a Cyrillic а or a fullwidth `ａｐｉ＿ｋｅｙ` is redacted too.
+ */
+function foldedRegions(text: string): Region[] {
+  const regions: Region[] = markupSecretSpans(text).map(span => ({ type: "secret_field", start: span.start, end: span.end }));
+  const folded = foldedView(text);
+  if (folded === undefined) return regions;
+  for (const entry of SECRET_PATTERNS) {
+    for (const match of folded.view.matchAll(globalise(entry.pattern))) {
+      if (match[0].length === 0) continue;
+      const start = folded.from[match.index]!, end = folded.to[match.index + match[0].length - 1]!;
+      if (text.slice(start, end) !== match[0]) regions.push({ type: entry.type, start, end });
+    }
+  }
+  return regions;
+}
+
 /**
  * Replace every secret in `text`.
  *
@@ -45,7 +69,14 @@ export function redactSecrets(
   extraPatterns: readonly RegExp[] = []
 ): SecretRedactionResult {
   const findings: SecretFinding[] = [];
-  let redacted = text;
+  let redacted = "", cursor = 0;
+  for (const region of foldedRegions(text).sort((a, b) => a.start - b.start || b.end - a.end)) {
+    findings.push({ type: region.type, index: region.start });
+    if (region.end <= cursor) continue;
+    redacted += text.slice(cursor, Math.max(cursor, region.start)) + (region.start >= cursor ? placeholderFor(region.type) : "");
+    cursor = region.end;
+  }
+  redacted += text.slice(cursor);
 
   const apply = (type: string, pattern: RegExp): void => {
     const scanner = globalise(pattern);

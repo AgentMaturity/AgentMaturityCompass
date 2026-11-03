@@ -891,7 +891,8 @@ vi.mock("../src/shield/dynamicAttackGenerator.js", () => ({
   }
 }));
 
-vi.mock("../src/vault/dlp.js", () => ({ scanForPII: m.scanForPII }));
+// Partial: the shared secret redaction pass reads dlp's spans through the protected-data detectors.
+vi.mock("../src/vault/dlp.js", async (importOriginal) => ({ ...(await importOriginal<typeof import("../src/vault/dlp.js")>()), scanForPII: m.scanForPII }));
 vi.mock("../src/vault/zkPrivacy.js", () => ({
   createZKRangeProof: m.createZKRangeProof,
   verifyZKRangeProof: m.verifyZKRangeProof,

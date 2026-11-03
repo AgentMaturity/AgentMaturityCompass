@@ -200,3 +200,73 @@ describe("the other copies of the private-key hole", () => {
     }
   });
 });
+
+describe("parity with the protected-data walk", () => {
+  // Synthetic values, spelled in parts so no scanner reads a secret here.
+  const PASSWORD = ["hunter2", "fixture"].join("-");
+  const KEY = ["abcdefghij", "klmnop123"].join("");
+  const redact = (text: string) => redactSecrets(text, (type) => `[${type}]`);
+
+  it("redacts the values the walk reads in markup, a Basic header and folded member names", () => {
+    for (const [label, text, secret] of [
+      ["xml element", `<config><password>${PASSWORD}</password></config>`, PASSWORD],
+      ["xml element with a quoted >", `<db_password hint="a>b">${PASSWORD}</db_password>`, PASSWORD],
+      ["xml cdata", `<secret><![CDATA[${PASSWORD}]]></secret>`, PASSWORD],
+      ["html input", `<input type="password" name="password" value="${PASSWORD}">`, PASSWORD],
+      ["html input value first", `<input value='${PASSWORD}' name='api_key'>`, PASSWORD],
+      ["basic header", `Authorization: Basic ${Buffer.from(`alice:${PASSWORD}`).toString("base64")}`, Buffer.from(`alice:${PASSWORD}`).toString("base64")],
+      ["basic header, any token", "Proxy-Authorization: Basic c2VjcmV0", "c2VjcmV0"],
+      ["basic header in json", `{"Authorization": "Basic ${Buffer.from(PASSWORD).toString("base64")}"}`, Buffer.from(PASSWORD).toString("base64")],
+      ["cyrillic key name", `аpi_key=${KEY}`, KEY],
+      ["fullwidth key name", `ａｐｉ＿ｋｅｙ: ${KEY}`, KEY],
+      ["ignorable inside key name", `api⁢_key=${KEY}`, KEY],
+      ["homoglyph xml element", `<pаssword>${PASSWORD}</pаssword>`, PASSWORD]
+    ] as const) {
+      const { redacted, findings } = redact(text);
+      expect(redacted, label).not.toContain(secret);
+      expect(findings.length, label).toBeGreaterThan(0);
+      expect(blindSecrets(text).blinded, label).not.toContain(secret);
+    }
+  });
+
+  it("keeps markup around the value and maps folded matches back to the original text", () => {
+    expect(redact(`<password>${PASSWORD}</password>`).redacted).toBe("<password>[secret_field]</password>");
+    const text = `x аpi_key=${KEY} y`;
+    const { redacted, findings } = redact(text);
+    expect(redacted).toBe("x [generic_api_key] y");
+    expect(findings).toEqual([{ type: "generic_api_key", index: 2 }]);
+  });
+
+  it("leaves ordinary text, markup and non-ASCII prose alone", () => {
+    for (const benign of [
+      "Basic Authentication is covered in Basic Settings; Basic plan: Basic12345678.",
+      "<report><title>Secret Garden</title><note lang=\"en\">see section 2</note><token/></report>",
+      "<form><input type=\"text\" name=\"q\" value=\"search terms\"><input type=\"password\" name=\"password\" value=\"\"></form>",
+      "Authorization header: use the Basic scheme",
+      "ｈｅｌｌｏ ｗｏｒｌｄ, Привет мир, пароль, zero​width ﬁle 2026 ㎩",
+      "password reset instructions were sent",
+      "const password = readPassword();"
+    ]) {
+      expect(redact(benign).redacted, benign).toBe(benign);
+      expect(redactBridgeText(benign), benign).toBe(benign);
+    }
+  });
+
+  it("reads hostile megabyte inputs in bounded time", () => {
+    for (const [label, text] of [
+      ["unclosed quoted attribute", `<password a="${">".repeat(1_000_000)}`],
+      ["many quoted attributes", `<password${" a=\">\"".repeat(160_000)}`],
+      ["input attributes", `<input${" t='>'".repeat(160_000)}`],
+      ["basic header run", `Authorization: Basic ${"A".repeat(1_000_000)}`],
+      ["fullwidth names", " ａｐｉ＿ｋｅｙ=".repeat(100_000)],
+      ["ignorable runs", "p⁢".repeat(500_000)],
+      ["mixed non-ASCII", Array.from({ length: 1_000_000 }, (_, i) => String.fromCharCode(0x80 + (i % 60_000))).join("")]
+    ] as const) {
+      const started = performance.now();
+      redact(text);
+      const elapsed = performance.now() - started;
+      console.info(`redactSecrets ${label}: ${Math.round(elapsed)} ms`);
+      expect(elapsed, label).toBeLessThan(20_000);
+    }
+  });
+});

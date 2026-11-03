@@ -19,22 +19,15 @@ export const decodeWebEscapes = (text: string) => text.replace(WEB_ESCAPE,
     return code <= 0x10ffff ? String.fromCodePoint(code) : match;
   });
 
-/** Characters that render as nothing: zero-width space, joiners, word joiner, soft hyphen, Mongolian vowel separator, BOM. */
-const ZERO_WIDTH_SOURCE = "\\u00ad\\u180e\\u200b-\\u200d\\u2060\\ufeff";
-const ZERO_WIDTH = new RegExp(`[${ZERO_WIDTH_SOURCE}]`, "g");
-/** One character's NFKC form where it is no longer than the character (`４` is `4`), else the character as it is. */
-const foldChar = (char: string) => { const folded = char.normalize("NFKC"); return folded.length <= char.length ? folded : char; };
+/** Characters that render as nothing or only steer layout: every default-ignorable code point and format (Cf) character. */
+const IGNORABLE = /[\p{Default_Ignorable_Code_Point}\p{Cf}]/gu;
 /**
- * Text as it reads: NFKC (fullwidth `４１１１` is `4111`, `ﬁ` is `fi`) with zero-width characters removed, so a card number
- * split by them or typed in fullwidth digits is seen. ASCII text is returned as it is. NFKC can lengthen text (U+FDFA is
- * 18 characters): where it would pass `maxChars`, each character is folded only where that does not lengthen it, so the
- * fold never makes a text the walk accepted too long to read.
+ * Text as it reads: NFKC (fullwidth `４１１１` is `4111`, `ﬁ` is `fi`, `㎩` is `Pa`) with ignorable and format characters
+ * removed (zero-width space, U+200E, U+2062, a variation selector), so a card number split by them or typed in fullwidth
+ * digits is seen. ASCII text is returned as it is. NFKC can lengthen text (U+FDFA is 18 characters); the whole text is
+ * always folded, never part of it, and the walk charges a folded view's length to its request budget.
  */
-export const foldText = (text: string, maxChars = Number.POSITIVE_INFINITY) => {
-  if (!/[^\u0000-\u007f]/.test(text)) return text;
-  const nfkc = text.normalize("NFKC");
-  return (nfkc.length <= Math.max(maxChars, text.length) ? nfkc : text.replace(/[^\u0000-\u007f]/gu, foldChar)).replace(ZERO_WIDTH, "");
-};
+export const foldText = (text: string) => /[^\u0000-\u007f]/.test(text) ? text.normalize("NFKC").replace(IGNORABLE, "") : text;
 
 /** Cyrillic and Greek letters drawn like a Latin one, folded in member names only: prose in those scripts is left as it is. */
 const CONFUSABLES: Readonly<Record<string, string>> = Object.freeze({
@@ -47,7 +40,30 @@ const CONFUSABLES: Readonly<Record<string, string>> = Object.freeze({
   "Υ": "Y", "Χ": "X"
 });
 const CONFUSABLE = new RegExp(`[${Object.keys(CONFUSABLES).join("")}]`, "g");
-/** What a member-name pattern accepts beside ASCII name characters, so `pаssword=` (Cyrillic а) reaches `foldName`. */
-export const NAME_FOLD_CHARS = Object.keys(CONFUSABLES).join("") + ZERO_WIDTH_SOURCE;
+/**
+ * One member-name character in a pattern: an ASCII name character or any non-ASCII character but a space, so a name with
+ * look-alike, fullwidth, mathematical or ignorable characters (`pаssword`, `ｐａｓｓｗｏｒｄ`, `pass\u200eword`) reaches
+ * `foldName`, which decides what it reads as. An astral character counts as two.
+ */
+export const NAME_CHAR = "[^\\u0000-\\u002c\\u002f\\u003a-\\u0040\\u005b-\\u005e\\u0060\\u007b-\\u007f\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000]";
 /** A member name as it reads (`foldText`), its look-alike letters folded to Latin: `pаssword` and `ｐａｓｓｗｏｒｄ` are `password`. */
 export const foldName = (name: string) => foldText(name).replace(CONFUSABLE, letter => CONFUSABLES[letter]!);
+const FOLDED_CHARS = new Map<string, string>();
+/**
+ * `text` with each code point folded as `foldName` folds it, and where each view character came from: view character `i`
+ * was read from original characters `from[i]` to `to[i]`, so a match in the view maps back to the text. Undefined for
+ * ASCII text, which folds to itself.
+ */
+export function foldedView(text: string): { readonly view: string; readonly from: readonly number[]; readonly to: readonly number[] } | undefined {
+  if (!/[^\u0000-\u007f]/.test(text)) return undefined;
+  const from: number[] = [], to: number[] = [], parts: string[] = [];
+  for (let index = 0; index < text.length;) {
+    const width = text.codePointAt(index)! > 0xffff ? 2 : 1, char = text.slice(index, index + width);
+    let folded = char.charCodeAt(0) < 0x80 ? char : FOLDED_CHARS.get(char);
+    if (folded === undefined) { folded = foldName(char); if (FOLDED_CHARS.size < 65_536) FOLDED_CHARS.set(char, folded); }
+    for (let offset = 0; offset < folded.length; offset += 1) { from.push(index); to.push(index + width); }
+    parts.push(folded);
+    index += width;
+  }
+  return { view: parts.join(""), from, to };
+}
