@@ -138,6 +138,11 @@ describe("WP37 verified run readers", () => {
     expect(text).toContain("Unverifiable agent diagnostic runs block the latest result");
     expect(text).not.toContain("0.99");
     expect(text).not.toContain("\"integrityIndex\":0.5");
+    // Nothing trusted measured the trust signals: they read not measured (null), never 0.
+    expect(binder.trust.integrityIndex).toBeNull();
+    expect(binder.trust.correlationRatio).toBeNull();
+    expect(binder.trust.evidenceCoverage).toBeNull();
+    expect(binder.sections.maturity.status).toBe("INSUFFICIENT_EVIDENCE");
   });
 });
 

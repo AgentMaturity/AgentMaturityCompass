@@ -754,39 +754,60 @@
     "trust": {
       "properties": {
         "correlationRatio": {
-          "maximum": 1,
-          "minimum": 0,
-          "type": "number"
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "evidenceCoverage": {
-          "properties": {
-            "attestedShare": {
-              "maximum": 1,
-              "minimum": 0,
-              "type": "number"
+          "anyOf": [
+            {
+              "properties": {
+                "attestedShare": {
+                  "maximum": 1,
+                  "minimum": 0,
+                  "type": "number"
+                },
+                "observedShare": {
+                  "maximum": 1,
+                  "minimum": 0,
+                  "type": "number"
+                },
+                "selfReportedShare": {
+                  "maximum": 1,
+                  "minimum": 0,
+                  "type": "number"
+                }
+              },
+              "required": [
+                "observedShare",
+                "attestedShare",
+                "selfReportedShare"
+              ],
+              "type": "object"
             },
-            "observedShare": {
-              "maximum": 1,
-              "minimum": 0,
-              "type": "number"
-            },
-            "selfReportedShare": {
-              "maximum": 1,
-              "minimum": 0,
-              "type": "number"
+            {
+              "type": "null"
             }
-          },
-          "required": [
-            "observedShare",
-            "attestedShare",
-            "selfReportedShare"
-          ],
-          "type": "object"
+          ]
         },
         "integrityIndex": {
-          "maximum": 1,
-          "minimum": 0,
-          "type": "number"
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "notary": {
           "properties": {

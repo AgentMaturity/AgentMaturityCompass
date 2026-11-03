@@ -10,15 +10,16 @@ export const binderScopeSchema = z.object({
 
 export const binderSectionStatusSchema = z.enum(["OK", "INSUFFICIENT_EVIDENCE"]);
 
+/** A trust signal AMC did not measure (no trusted run or scorecard, no receipted trace) is null, never 0. */
 export const binderTrustSchema = z.object({
-  integrityIndex: z.number().min(0).max(1),
-  correlationRatio: z.number().min(0).max(1),
+  integrityIndex: z.number().min(0).max(1).nullable(),
+  correlationRatio: z.number().min(0).max(1).nullable(),
   trustLabel: z.enum(["LOW", "MEDIUM", "HIGH"]),
   evidenceCoverage: z.object({
     observedShare: z.number().min(0).max(1),
     attestedShare: z.number().min(0).max(1),
     selfReportedShare: z.number().min(0).max(1)
-  }),
+  }).nullable(),
   notary: z.object({
     enabled: z.boolean(),
     fingerprint: z.string().nullable().optional(),

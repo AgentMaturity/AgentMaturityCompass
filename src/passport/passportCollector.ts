@@ -178,8 +178,10 @@ function collectPassportLocalData(params: {
   const report = latestTrustedRun(params.workspace, scope.agentIdForDiagnostic).run;
   assertNotExample(report, "signed into a passport");
   const trustLabel = mapTrustLabel(report?.trustLabel);
-  const integrityIndex = Number((report?.integrityIndex ?? 0).toFixed(4));
-  const correlationRatio = Number((report?.correlationRatio ?? 0).toFixed(4));
+  // Not measured reads null, never 0: no trusted run measured no integrity, and a run whose window carried no receipted
+  // trace measured no correlation.
+  const integrityIndex = report ? Number(report.integrityIndex.toFixed(4)) : null;
+  const correlationRatio = typeof report?.correlationRatio === "number" ? Number(report.correlationRatio.toFixed(4)) : null;
 
   const reportCoverage = report?.evidenceTrustCoverage
     ? {
@@ -193,11 +195,8 @@ function collectPassportLocalData(params: {
     type: scope.type,
     id: scope.id
   });
-  const evidenceCoverage = reportCoverage ?? forecastRisk.evidenceCoverage ?? {
-    observedShare: 0,
-    attestedShare: 0,
-    selfReportedShare: 1
-  };
+  // Neither a trusted run nor a signed forecast measured the evidence mix: null (not evaluated).
+  const evidenceCoverage = reportCoverage ?? forecastRisk.evidenceCoverage;
 
   const layers = {
     strategicOps: readLayerValue(report?.layerScores, "strategicOps"),
@@ -300,8 +299,11 @@ function collectPassportLocalData(params: {
   const reasons = new Set<string>();
   const gates = params.policy.passportPolicy.integrityGates;
   const trustGateMet = trustRank(trustLabel) >= trustRank(gates.requireTrustLabelForVerified);
-  if (integrityIndex < gates.minIntegrityIndexForVerified) reasons.add("GATE_FAIL_LOW_INTEGRITY");
-  if (correlationRatio < gates.minCorrelationRatioForVerified) reasons.add("GATE_FAIL_LOW_CORRELATION");
+  // Not measured never meets a minimum above 0, and says so; a minimum of 0 sets no requirement.
+  if (integrityIndex === null) { if (gates.minIntegrityIndexForVerified > 0) reasons.add("GATE_FAIL_INTEGRITY_NOT_MEASURED"); }
+  else if (integrityIndex < gates.minIntegrityIndexForVerified) reasons.add("GATE_FAIL_LOW_INTEGRITY");
+  if (correlationRatio === null) { if (gates.minCorrelationRatioForVerified > 0) reasons.add("GATE_FAIL_CORRELATION_NOT_MEASURED"); }
+  else if (correlationRatio < gates.minCorrelationRatioForVerified) reasons.add("GATE_FAIL_LOW_CORRELATION");
   if (!trustGateMet) reasons.add("GATE_FAIL_LOW_TRUST_LABEL");
   if (gates.requireAssuranceCertPassForVerified && assurance?.cert.status !== "PASS") reasons.add("MISSING_ASSURANCE_CERT_PASS");
   if (gates.requireNotaryWhenEnabled && notaryEnabled && !trustConfig.trust.notary.pinnedPubkeyFingerprint) reasons.add("NOTARY_FINGERPRINT_MISSING");

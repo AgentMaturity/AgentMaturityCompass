@@ -72,39 +72,30 @@ function riskToScore(risk: number): number {
   return 100 - Math.max(0, Math.min(100, risk));
 }
 
+/** Weighted sum of 0..1 parts; null (not evaluated) when any part was not measured. */
+function weightedComposite(parts: Array<[number | null, number]>): number | null {
+  if (parts.some(([value]) => value === null)) return null;
+  return Number(parts.reduce((sum, [value, weight]) => sum + (value as number) * weight * 100, 0).toFixed(6));
+}
+
 function compositeScores(params: {
   local: BenchArtifact;
   policyWeights: ReturnType<typeof loadBenchPolicy>["benchPolicy"]["weights"];
 }): {
-  ecosystemAlignmentScore: number;
-  riskAssuranceScore: number;
-  digitalDualityReadiness: number;
+  ecosystemAlignmentScore: number | null;
+  riskAssuranceScore: number | null;
+  digitalDualityReadiness: number | null;
 } {
   const w = params.policyWeights;
-  const ecosystemAlignmentScore = Number(
-    (
-      (riskToScore(params.local.metrics.strategyFailureRisks.ecosystemFocusRisk) / 100) * w.ecosystemAlignment.ecosystemFocusRisk * 100 +
-      (params.local.metrics.valueDimensions.emotionalValue / 100) * w.ecosystemAlignment.emotionalValue * 100 +
-      (params.local.metrics.valueDimensions.brandValue / 100) * w.ecosystemAlignment.brandValue * 100
-    ).toFixed(6)
-  );
-  const riskAssuranceScore = Number(
-    (
-      (riskToScore(params.local.metrics.strategyFailureRisks.riskAssuranceRisk) / 100) * w.riskAssurance.riskAssuranceRisk * 100 +
-      params.local.evidence.integrityIndex * w.riskAssurance.integrityIndex * 100 +
-      params.local.evidence.correlationRatio * w.riskAssurance.correlationRatio * 100
-    ).toFixed(6)
-  );
-  const digitalDualityReadiness = Number(
-    (
-      (riskToScore(params.local.metrics.strategyFailureRisks.digitalDualityRisk) / 100) * w.digitalDuality.digitalDualityRisk * 100 +
-      (params.local.metrics.maturity.fiveLayers.strategicOps / 5) * w.digitalDuality.toolGovernanceMaturity * 100
-    ).toFixed(6)
-  );
+  const { valueDimensions: values, strategyFailureRisks: risks, maturity } = params.local.metrics;
+  const ratio = (value: number | null, scale: number) => (value === null ? null : value / scale);
   return {
-    ecosystemAlignmentScore,
-    riskAssuranceScore,
-    digitalDualityReadiness
+    ecosystemAlignmentScore: weightedComposite([[riskToScore(risks.ecosystemFocusRisk) / 100, w.ecosystemAlignment.ecosystemFocusRisk],
+      [ratio(values.emotionalValue, 100), w.ecosystemAlignment.emotionalValue], [ratio(values.brandValue, 100), w.ecosystemAlignment.brandValue]]),
+    riskAssuranceScore: weightedComposite([[riskToScore(risks.riskAssuranceRisk) / 100, w.riskAssurance.riskAssuranceRisk],
+      [params.local.evidence.integrityIndex, w.riskAssurance.integrityIndex], [params.local.evidence.correlationRatio, w.riskAssurance.correlationRatio]]),
+    digitalDualityReadiness: weightedComposite([[riskToScore(risks.digitalDualityRisk) / 100, w.digitalDuality.digitalDualityRisk],
+      [ratio(maturity.fiveLayers.strategicOps, 5), w.digitalDuality.toolGovernanceMaturity]])
   };
 }
 

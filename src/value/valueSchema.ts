@@ -24,11 +24,12 @@ export const valueSnapshotSchema = z.object({
   }),
   status: z.enum(["OK", "INSUFFICIENT_EVIDENCE"]),
   reasons: z.array(z.string()).default([]),
+  /** A gate input AMC did not measure (no diagnostic run, no value event) is null, never 0. */
   gates: z.object({
-    integrityIndex: z.number().min(0).max(1),
+    integrityIndex: z.number().min(0).max(1).nullable(),
     correlationRatio: z.number().min(0).max(1).nullable(),
-    observedShare: z.number().min(0).max(1),
-    selfReportedShare: z.number().min(0).max(1)
+    observedShare: z.number().min(0).max(1).nullable(),
+    selfReportedShare: z.number().min(0).max(1).nullable()
   }),
   baselines: z.object({
     windowDays: z.number().int().min(1),
@@ -43,9 +44,9 @@ export const valueSnapshotSchema = z.object({
       currentValue: z.number().nullable(),
       delta: z.number().nullable(),
       trustKindSummary: z.object({
-        observed: z.number().min(0).max(1),
-        attested: z.number().min(0).max(1),
-        selfReported: z.number().min(0).max(1)
+        observed: z.number().min(0).max(1).nullable(),
+        attested: z.number().min(0).max(1).nullable(),
+        selfReported: z.number().min(0).max(1).nullable()
       }),
       evidenceRefsCount: z.number().int().min(0)
     })

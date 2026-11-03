@@ -19,15 +19,16 @@ export const passportJsonSchema = z.object({
     type: passportScopeTypeSchema,
     idHash: z.string().regex(/^[a-f0-9]{8,64}$/)
   }),
+  /** A trust signal AMC did not measure (no trusted run, no receipted trace, no evidence mix) is null, never 0. */
   trust: z.object({
-    integrityIndex: z.number().min(0).max(1),
-    correlationRatio: z.number().min(0).max(1),
+    integrityIndex: z.number().min(0).max(1).nullable(),
+    correlationRatio: z.number().min(0).max(1).nullable(),
     trustLabel: passportTrustLabelSchema,
     evidenceCoverage: z.object({
       observedShare: z.number().min(0).max(1),
       attestedShare: z.number().min(0).max(1),
       selfReportedShare: z.number().min(0).max(1)
-    }),
+    }).nullable(),
     notary: z.object({
       enabled: z.boolean(),
       fingerprint: z.string().length(64).nullable().optional(),

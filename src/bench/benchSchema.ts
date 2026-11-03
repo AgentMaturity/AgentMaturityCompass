@@ -17,25 +17,26 @@ export const benchRiskSchema = z.object({
   digitalDualityRisk: z.number().min(0).max(100)
 });
 
+// A metric AMC did not measure in the window is null (not evaluated), never 0. Strategy risks stay worst-case 100 (WP37).
 export const benchValuesSchema = z.object({
-  emotionalValue: z.number().min(0).max(100),
-  functionalValue: z.number().min(0).max(100),
-  economicValue: z.number().min(0).max(100),
-  brandValue: z.number().min(0).max(100),
-  lifetimeValue: z.number().min(0).max(100),
-  valueScore: z.number().min(0).max(100).optional()
+  emotionalValue: z.number().min(0).max(100).nullable(),
+  functionalValue: z.number().min(0).max(100).nullable(),
+  economicValue: z.number().min(0).max(100).nullable(),
+  brandValue: z.number().min(0).max(100).nullable(),
+  lifetimeValue: z.number().min(0).max(100).nullable(),
+  valueScore: z.number().min(0).max(100).nullable().optional()
 });
 
 export const benchOperatingHealthSchema = z.object({
-  approvalsBacklogCount: z.number().int().min(0),
-  approvalsMedianAgeHours: z.number().min(0),
+  approvalsBacklogCount: z.number().int().min(0).nullable(),
+  approvalsMedianAgeHours: z.number().min(0).nullable(),
   budgetExceedEvents: z.number().int().min(0),
   toolhubDenialRate: z.number().min(0).max(1).nullable(),
   freezeEvents: z.number().int().min(0),
   assurance: z.object({
-    latestScore: z.number().min(0).max(100),
-    injectionFailures: z.number().int().min(0),
-    exfilAttemptsDetected: z.number().int().min(0)
+    latestScore: z.number().min(0).max(100).nullable(),
+    injectionFailures: z.number().int().min(0).nullable(),
+    exfilAttemptsDetected: z.number().int().min(0).nullable()
   }),
   plugins: z.object({
     integrity: benchPluginIntegritySchema,
@@ -49,20 +50,20 @@ export const benchOperatingHealthSchema = z.object({
 });
 
 export const benchMaturitySchema = z.object({
-  overall: z.number().min(0).max(5),
+  overall: z.number().min(0).max(5).nullable(),
   fiveLayers: z.object({
-    strategicOps: z.number().min(0).max(5),
-    leadership: z.number().min(0).max(5),
-    culture: z.number().min(0).max(5),
-    resilience: z.number().min(0).max(5),
-    skills: z.number().min(0).max(5)
+    strategicOps: z.number().min(0).max(5).nullable(),
+    leadership: z.number().min(0).max(5).nullable(),
+    culture: z.number().min(0).max(5).nullable(),
+    resilience: z.number().min(0).max(5).nullable(),
+    skills: z.number().min(0).max(5).nullable()
   }),
   fiveDimensions: z.object({
-    d1: z.number().min(0).max(5),
-    d2: z.number().min(0).max(5),
-    d3: z.number().min(0).max(5),
-    d4: z.number().min(0).max(5),
-    d5: z.number().min(0).max(5)
+    d1: z.number().min(0).max(5).nullable(),
+    d2: z.number().min(0).max(5).nullable(),
+    d3: z.number().min(0).max(5).nullable(),
+    d4: z.number().min(0).max(5).nullable(),
+    d5: z.number().min(0).max(5).nullable()
   }),
   questions42: z
     .array(
@@ -80,14 +81,14 @@ export const benchEvidenceSchema = z.object({
     startTs: z.number().int(),
     endTs: z.number().int()
   }),
-  integrityIndex: z.number().min(0).max(1),
-  correlationRatio: z.number().min(0).max(1),
+  integrityIndex: z.number().min(0).max(1).nullable(),
+  correlationRatio: z.number().min(0).max(1).nullable(),
   trustLabel: benchTrustLabelSchema,
   evidenceCoverage: z.object({
     observedShare: z.number().min(0).max(1),
     attestedShare: z.number().min(0).max(1),
     selfReportedShare: z.number().min(0).max(1)
-  })
+  }).nullable()
 });
 
 export const benchProofBindingSchema = z.object({
@@ -197,10 +198,11 @@ export const benchComparisonSchema = z.object({
   }),
   /** null per metric when there is no imported population to rank against (WP37). */
   percentiles: z.record(z.string().min(1), z.number().min(0).max(100).nullable()),
+  /** null when an input of the composite was not measured. */
   composites: z.object({
-    ecosystemAlignmentScore: z.number().min(0).max(100),
-    riskAssuranceScore: z.number().min(0).max(100),
-    digitalDualityReadiness: z.number().min(0).max(100)
+    ecosystemAlignmentScore: z.number().min(0).max(100).nullable(),
+    riskAssuranceScore: z.number().min(0).max(100).nullable(),
+    digitalDualityReadiness: z.number().min(0).max(100).nullable()
   }),
   peerGroup: z.object({
     id: z.string().min(1),

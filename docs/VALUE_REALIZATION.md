@@ -47,6 +47,8 @@ If gates fail:
 - numeric value outputs are nulled
 - reasons are explicit and signed
 
+A gate input that nothing measured is `null` in `gates`, never 0: the integrity index when no diagnostic run is in the lookback, and the observed and self-reported shares when the window has no value event. A KPI with no events has a `null` trust mix. A minimum above 0 then fails with `integrityIndex not measured` or `observedShare not measured (no value events)`.
+
 ## Recurrence
 
 Value snapshots/reports are refreshed on cadence and key events (diagnostic completion, prompt updates, plugin installs, approvals, release verification). This supports continuous recurrence with realtime unified clarity.
