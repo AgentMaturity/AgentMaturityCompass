@@ -30,7 +30,7 @@ The 1.1.1 package dir is `<scratch>/c111/node_modules/agent-maturity-compass`. R
 
 ### The 1.1.1 workspace
 
-Created by the published 1.1.1 CLI with the same steps as before (c01 to c07). The `.amc/` snapshot (104 files, ledger schema migrations 1 to 9) is `<scratch>/final/ws111-snapshot.tgz`, sha256 `cf3bb3b0768d8e2c9a708aafa0929d5d0c7b7ae026eac3ed2a43da98115abf7f`. It holds the encrypted vault, so it is not committed. Monitor key fingerprint `1ed41404b6827f214c8cb4ca5aa4679841cefcf412dbc13346c9a3ea3cd59945`.
+Created by the published 1.1.1 CLI with the same steps as before (c01 to c07). The `.amc/` snapshot (104 files, ledger schema migrations 1 to 10; corrected 2026-11-03 from "1 to 9", which was the tag rebuild's value, after re-reading `schema_migrations` in this snapshot) is `<scratch>/final/ws111-snapshot.tgz`, sha256 `cf3bb3b0768d8e2c9a708aafa0929d5d0c7b7ae026eac3ed2a43da98115abf7f`. It holds the encrypted vault, so it is not committed. Monitor key fingerprint `1ed41404b6827f214c8cb4ca5aa4679841cefcf412dbc13346c9a3ea3cd59945`.
 
 ## Results
 

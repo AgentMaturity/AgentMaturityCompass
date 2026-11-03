@@ -1,11 +1,23 @@
 #!/usr/bin/env node
 /**
- * P0-36: re-checks every repository fact the 1.1.1 advisory draft (docs/security/advisories/1.1.1.md) cites,
- * against the git history of the checkout it runs in. Read-only: it runs `git show`, `git ls-tree`, `git log` and
- * `git merge-base` only. Exit 0 when every fact holds, 1 otherwise.
+ * P0-36: mechanically checks part of what the 1.1.1 advisory draft (docs/security/advisories/1.1.1.md) cites, against
+ * the git history of the checkout that holds this script (git runs at its root, whatever the working directory): that
+ * one or more cited lines of each `in v1.1.1` source-code (src/) citation contain an expected text (not every line of
+ * a cited range), that each cited commit is in HEAD's history, that each cited file is tracked at HEAD, and the
+ * vault's tracking history. It does not check test names, dates, counts or anything outside LINES, COMMITS, FILES and
+ * the three tags that track the vault and its add/delete history. Read-only: it runs `git show`, `git ls-tree`,
+ * `git log` and `git merge-base` only. Exit 0 when every check holds, 1 otherwise.
  *
  *   node qualification/2026-10-29-P0-36/check-advisory-facts.mjs            # facts
  *   node qualification/2026-10-29-P0-36/check-advisory-facts.mjs --keys     # also list historical public key ids
+ *   node qualification/2026-10-29-P0-36/check-advisory-facts.mjs --published <package dir>
+ *
+ * --published checks an extracted npm package (the directory holding package.json and dist/): that package.json says
+ * 1.1.1, that each named dist file contains a PUBLISHED text anywhere in the file (one compiled counterpart per
+ * `v1.1.1` entry of LINES; not its position, nor the rest of a cited range), that dist/cli.js and dist/ledger/ledger.js
+ * exist and are not empty, that no dist .js file contains EXPECTED_MONITOR, and that exactly PUBLISHED_RAW_TAR_SITES
+ * dist .js files contain RAW_TAR. It does not check the tarball's shasum. The registry's 1.1.1 was built from a source
+ * later than the v1.1.1 tag, so a fact that holds at the tag does not by itself hold for what npm users installed.
  *
  * --keys lists the AMC key id (sha256 of the canonical SPKI PEM, src/keys/algorithmPolicy.ts signingKeyIdentity)
  * of every public key ever tracked under .amc/keys/ or --/.amc/keys/. They are candidate inputs for P0-37's distrust
@@ -13,8 +25,13 @@
  */
 import { execFileSync } from "node:child_process";
 import { createHash, createPublicKey } from "node:crypto";
+import { readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 
-const git = (...args) => execFileSync("git", args, { encoding: "utf8", maxBuffer: 64 * 1024 * 1024, stdio: ["ignore", "pipe", "ignore"] });
+/** git runs at the repository root, so pathspecs resolve the same from any working directory. */
+const ROOT = fileURLToPath(new URL("../../", import.meta.url));
+const git = (...args) => execFileSync("git", args, { cwd: ROOT, encoding: "utf8", maxBuffer: 64 * 1024 * 1024, stdio: ["ignore", "pipe", "ignore"] });
 const tryGit = (...args) => { try { return git(...args); } catch { return null; } };
 const lineAt = (rev, path, line) => (tryGit("show", `${rev}:${path}`) ?? "").split("\n")[line - 1] ?? "";
 
@@ -58,6 +75,48 @@ const LINES = [
   ["HEAD", "src/trust/amc-distrust.json", 2, '"distrust": []']
 ];
 
+/** [dist file, text it must contain] in the published npm 1.1.1 package; the same code as LINES, compiled. */
+const PUBLISHED = [
+  ["dist/assurance/assuranceRunner.js", "function syntheticResponse("],
+  ["dist/assurance/assuranceRunner.js", 'let trustTier = "OBSERVED"'],
+  ["dist/assurance/assuranceRunner.js", "syntheticResponse(prompt, context)"],
+  ["dist/redteam/runner.js", "syntheticResponse(attackPrompt)"],
+  ["dist/redteam/jailbreak/tap.js", "input.respondFn ?? syntheticResponse"],
+  ["dist/storage/blobs/blobKeys.js", "amc-no-sign-fallback-key-32bytes!"],
+  ["dist/cli.js", "Existing vault is locked and no passphrase is available"],
+  ["dist/cli.js", "state.vault.noSign"],
+  ["dist/bundles/bundle.js", 'startsWith(".amc/blobs/")'],
+  ["dist/assurance/certificate.js", 'getPublicKeyHistoryFromCert(extracted, "auditor")'],
+  ["dist/bundles/bundle.js", "function collectAuditorKeysFromBundle("],
+  ["dist/passport/passportVerifier.js", '"signer.pub"'],
+  ["dist/assurance/assuranceVerifier.js", '"signer.pub"'],
+  ["dist/release/releaseVerifier.js", '"release-signing.pub"'],
+  ["dist/vault/vault.js", '"amc-test-passphrase"'],
+  ["dist/vault/vault.js", 'process.env.NODE_ENV === "test" || process.env.VITEST === "true" || process.env.VITEST === "1"'],
+  ["dist/identity/hostVault.js", '"amc-host-vault-test-passphrase"'],
+  ["dist/eval/evalImporters.js", 'openai: "ATTESTED"'],
+  ["dist/eval/evalImporters.js", 'langwatch: "ATTESTED"'],
+  ["dist/eval/evalImporters.js", "ts: item.ts ?? undefined"],
+  ["dist/cli.js", "--trust-tier <tier>"],
+  ["dist/cli.js", '.command("attest")'],
+  ["dist/domains/domainCliIntegration.js", "function pseudoRandomScore("],
+  ["dist/domains/domainReportBuilder.js", "Certification Readiness"],
+  ["dist/storage/blobs/blobKeys.js", 'process.env.AMC_NO_SIGN === "1"'],
+  ["dist/cli.js", '"vault.amcvault"'],
+  ["dist/cli.js", "noSign: true"],
+  ["dist/cli.js", 'process.env.AMC_NO_SIGN = "1"'],
+  ["dist/passport/passportVerifier.js", "params.publicKeyPath"],
+  ["dist/assurance/assuranceVerifier.js", "params.publicKeyPath"],
+  ["dist/vault/vault.d.ts", '"monitor" | "auditor" | "lease" | "session"'],
+  ["dist/vault/vault.js", "monitorPrivateKeyPem"],
+  ["dist/identity/hostVault.js", 'process.env.NODE_ENV === "test" || process.env.VITEST === "true" || process.env.VITEST === "1"'],
+  ["dist/redteam/runner.js", "function syntheticResponse("],
+  ["dist/redteam/jailbreak/tap.js", "function syntheticResponse("]
+];
+/** Archive readers that run a raw `tar -xzf`: 19 in a build from the v1.1.1 tag, 17 in the npm package. */
+const PUBLISHED_RAW_TAR_SITES = 17;
+const RAW_TAR = 'spawnSync("tar", ["-xzf"';
+
 /** Commits the draft cites; each must be in HEAD's history. */
 const COMMITS = {
   "40358680": "vault first tracked", "cb6bba21": "vault untracked; archive extraction contained", "521f21e7": "second vault tracked; ledger anchoring",
@@ -92,8 +151,24 @@ const vaultLife = git("log", "--format=%H", "--diff-filter=AD", "--", ".amc/vaul
 const expectedLife = ["7cfcb767", "521f21e7", "cb6bba21", "40358680"];
 if (vaultLife.length !== 4 || vaultLife.some((sha, i) => !sha.startsWith(expectedLife[i]))) failures.push(`vault add/delete history is ${vaultLife.join(" ")}`);
 
+let total = LINES.length + Object.keys(COMMITS).length + FILES.length + 4; // 3 tags + the vault history
+const publishedAt = process.argv.indexOf("--published");
+if (publishedAt !== -1) {
+  const pkg = process.argv[publishedAt + 1];
+  const read = (path) => { try { return readFileSync(join(pkg, path), "utf8"); } catch { return ""; } };
+  if (JSON.parse(read("package.json") || "{}").version !== "1.1.1") failures.push(`${pkg} is not an extracted 1.1.1 package`);
+  for (const [path, text] of PUBLISHED) if (!read(path).includes(text)) failures.push(`published ${path} does not contain ${JSON.stringify(text)}`);
+  // An absent or empty anchor file would make the absence check below pass on nothing, so it fails instead.
+  const missingAnchors = ["dist/cli.js", "dist/ledger/ledger.js"].filter((path) => !read(path));
+  if (missingAnchors.length) failures.push(`published ${missingAnchors.join(" and ")} missing or empty, so the monitor pin check cannot hold`);
+  const jsFiles = readdirSync(join(pkg, "dist"), { recursive: true }).filter((p) => p.endsWith(".js"));
+  const pins = jsFiles.filter((p) => read(join("dist", p)).includes("EXPECTED_MONITOR"));
+  if (pins.length) failures.push(`published dist/${pins.join(", dist/")} pins a monitor key, so issue 3's ledger forgery claim needs review`);
+  const rawTar = jsFiles.filter((p) => read(join("dist", p)).includes(RAW_TAR)).length;
+  if (rawTar !== PUBLISHED_RAW_TAR_SITES) failures.push(`published dist has ${rawTar} raw tar -xzf sites, not ${PUBLISHED_RAW_TAR_SITES}`);
+  total += PUBLISHED.length + 4; // package version, anchor files present, no monitor pin, tar sites
+}
 for (const failure of failures) console.error(`FAIL ${failure}`);
-const total = LINES.length + Object.keys(COMMITS).length + FILES.length + 4; // 3 tags + the vault history
 console.log(`advisory facts: ${total - failures.length}/${total} hold at ${git("rev-parse", "HEAD").trim()}`);
 
 if (process.argv.includes("--keys")) {
