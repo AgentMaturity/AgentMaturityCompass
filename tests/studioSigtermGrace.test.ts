@@ -1,8 +1,8 @@
 import { connect, type Socket } from "node:net";
-import { chmodSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterEach, describe, expect, test, vi } from "vitest";
+import { afterAll, afterEach, beforeAll, describe, expect, test, vi } from "vitest";
 import { runBootstrap } from "../src/bootstrap/bootstrap.js";
 import { httpGetJson, pickFreePort, startStudioChildProcess } from "../src/e2e/smokeSteps.js";
 import { highWaterPath } from "../src/keys/highWater.js";
@@ -18,6 +18,43 @@ afterEach(() => {
   vi.unstubAllEnvs();
   while (roots.length > 0) rmSync(roots.pop()!, { recursive: true, force: true });
 });
+
+// Every path AMC derives from the user's home or an operator override points into a fresh temporary root, so the
+// smoke reproduces on a clean CI runner and never reads or writes the developer's real AMC home, vault or
+// checkpoints. The studio child inherits this environment.
+const HOME_OVERRIDES = ["AMC_CONTROL_CHECKPOINT_DIR", "AMC_CREDENTIALS_FILE", "AMC_HOST_DIR", "AMC_ROOT", "AMC_VAULT_PASSPHRASE_FILE",
+  "AMC_VAULT_REMEMBER_FILE", "XDG_CONFIG_HOME", "XDG_CACHE_HOME"];
+// Guard on the isolation itself: the suite's own HOME and AMC_HOME point at an empty sentinel, so a case that stops
+// isolating, or product code that grows a new home-derived path, writes there and fails the suite in afterAll.
+const sentinel = mkdtempSync(join(tmpdir(), "amc-studio-sentinel-"));
+const outerEnv = { HOME: process.env.HOME, AMC_HOME: process.env.AMC_HOME };
+function restoreOuterEnv(name: "HOME" | "AMC_HOME"): void {
+  if (outerEnv[name] === undefined) delete process.env[name];
+  else process.env[name] = outerEnv[name];
+}
+beforeAll(() => {
+  process.env.HOME = join(sentinel, "home");
+  process.env.AMC_HOME = join(sentinel, "amc-home");
+});
+afterAll(() => {
+  restoreOuterEnv("HOME");
+  restoreOuterEnv("AMC_HOME");
+  const leaked = readdirSync(sentinel);
+  rmSync(sentinel, { recursive: true, force: true });
+  expect(leaked).toEqual([]);
+});
+
+function isolatedRoot(prefix: string): string {
+  const root = mkdtempSync(join(tmpdir(), prefix));
+  roots.push(root);
+  const home = join(root, "user-home");
+  mkdirSync(home);
+  vi.stubEnv("HOME", home);
+  vi.stubEnv("USERPROFILE", home);
+  vi.stubEnv("AMC_HOME", join(root, "amc-home"));
+  for (const name of HOME_OVERRIDES) vi.stubEnv(name, undefined);
+  return root;
+}
 
 function stopRecorded(workspace: string): boolean {
   const ledger = openLedger(workspace);
@@ -50,9 +87,7 @@ async function openIncompleteRequest(port: number): Promise<Socket> {
 
 describe("Studio SIGTERM grace period", () => {
   test("the studio child, started as the smoke starts it, exits on SIGTERM well inside 10 s and records its stop", async () => {
-    const root = mkdtempSync(join(tmpdir(), "amc-studio-sigterm-"));
-    roots.push(root);
-    vi.stubEnv("AMC_HOME", join(root, "home"));
+    const root = isolatedRoot("amc-studio-sigterm-");
     const workspace = join(root, "workspace");
     const host = "127.0.0.1";
     const [apiPort, gatewayPort, proxyPort, metricsPort, dashboardPort] = [await pickFreePort(host), await pickFreePort(host), await pickFreePort(host), await pickFreePort(host), await pickFreePort(host)];
@@ -61,6 +96,7 @@ describe("Studio SIGTERM grace period", () => {
       workspace, vaultPassphrase, ownerUsername: "owner", ownerPassword: "owner-password", lanMode: false, bind: host, studioPort: apiPort,
       allowedCidrs: ["127.0.0.1/32", "::1/128"], enableNotary: false, notaryBaseUrl: "http://127.0.0.1:4343", notaryRequiredAttestation: "SOFTWARE", notaryAuthSecret: null
     });
+    expect(highWaterPath().startsWith(root)).toBe(true);
     growHighWater(20_000);
     const studio = await startStudioChildProcess({ repoRoot: process.cwd(), workspace, host, apiPort, dashboardPort, gatewayPort, proxyPort, metricsPort, vaultPassphrase });
     // Signature-heavy work in flight when the signal lands, as the scheduler tick or a ToolHub intent would be.
@@ -77,8 +113,10 @@ describe("Studio SIGTERM grace period", () => {
   }, 180_000);
 
   test("stop() records STUDIO_RUNTIME_STOPPED before the bounded socket drain, not after it", async () => {
-    const workspace = mkdtempSync(join(tmpdir(), "amc-studio-stop-order-"));
-    roots.push(workspace);
+    const root = isolatedRoot("amc-studio-stop-order-");
+    expect(highWaterPath().startsWith(root)).toBe(true);
+    const workspace = join(root, "workspace");
+    mkdirSync(workspace);
     vi.stubEnv("AMC_VAULT_PASSPHRASE", "stop-order-passphrase");
     initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
     const runtime = await runStudioForeground({ workspace, apiPort: 0, gatewayPort: 0, proxyPort: 0, dashboardPort: 0, metricsPort: 0 });
