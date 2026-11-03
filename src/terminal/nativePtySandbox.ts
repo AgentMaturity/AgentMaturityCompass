@@ -1,7 +1,7 @@
 import { closeSync, constants, existsSync, fstatSync, lstatSync, mkdtempSync, openSync, opendirSync, readFileSync, readlinkSync, realpathSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
-import { NAMESPACE_FLAGS, bwrapBackend, bwrapCommandExit, linuxSocketDenyFilter } from "../sandbox/bwrapBackend.js";
+import { NAMESPACE_FLAGS, bwrapBackend, bwrapCommandExit, linuxSocketDenyFilter, unconsumedFds } from "../sandbox/bwrapBackend.js";
 import type { SandboxPolicy } from "../sandbox/sandboxTypes.js";
 import { assertTerminalDimensions } from "./terminalTypes.js";
 import { NATIVE_PTY_HELPER } from "./nativePtyHelper.js";
@@ -127,7 +127,7 @@ export function prepareNativePtyLaunch(cwd: string, policy: SandboxPolicy, cols:
       const info = fstatSync(fd);
       if (!info.isFile() && !info.isDirectory()) throw new Error("Invalid terminal mount source.");
       if (writable) admitWritableDirectory(`/proc/self/fd/${fd}/.`);
-      argv.push(writable ? "--bind" : "--ro-bind", `/proc/self/fd/${descriptors.length + 2}`, path);
+      argv.push(writable ? "--bind-fd" : "--ro-bind-fd", String(descriptors.length + 2), path);
     };
     for (const root of RUNTIME_ROOTS) if (existsSync(root)) bind(root, false);
     for (const file of RUNTIME_FILES) if (existsSync(file)) bind(file, false);
@@ -136,6 +136,7 @@ export function prepareNativePtyLaunch(cwd: string, policy: SandboxPolicy, cols:
     argv.push("--tmpfs", join(workspace, ".amc"), "--chmod", "000", join(workspace, ".amc"), "--remount-ro", join(workspace, ".amc"),
       "--tmpfs", "/proc", "--remount-ro", "/proc", "--remount-ro", "/", "--chdir", workspace, "--",
       PYTHON, "-I", "-S", "-u", "-c", NATIVE_PTY_HELPER, String(cols), String(rows));
+    if (unconsumedFds(argv, descriptors.length).length) throw new Error("A terminal launcher fd would reach the command.");
     return {
       argv: Object.freeze(argv), cwd: workspace,
       env: Object.freeze({ PATH: "/usr/bin:/bin", HOME: "/tmp", TMPDIR: "/tmp", LANG: "C.UTF-8" }),

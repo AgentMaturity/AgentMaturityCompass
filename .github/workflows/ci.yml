@@ -78,6 +78,8 @@ jobs:
         shell: bash
         env:
           AMC_COVERAGE_SHARD: "1"
+          # The Linux escape suite must run against real Bubblewrap here; a missing prerequisite fails instead of skipping.
+          AMC_REQUIRE_REAL_SANDBOX: "1"
         run: |
           mkdir -p tmp/ci-coverage tmp/vitest-blobs
           npm run test:coverage -- --exclude 'tests/performance/**' --shard=${{ matrix.shard }}/4 --reporter=default --reporter=blob --reporter=hanging-process --outputFile.blob=tmp/vitest-blobs/blob-${{ matrix.shard }}.json 2>&1 | tee tmp/ci-coverage/tests-shard-${{ matrix.shard }}.log | cut -c1-4096

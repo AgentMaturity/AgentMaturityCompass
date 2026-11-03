@@ -16,7 +16,7 @@ import { seatbeltNativeShell } from "./seatbeltNativeShell.js";
  */
 export type ShellOptInSource = "cli-flag" | "sdk-option";
 export type NativeShellBoundary = "linux-bwrap" | "macos-seatbelt";
-type BackendCheck = { readonly ok: true } | { readonly ok: false; readonly reason: string };
+type BackendCheck = { readonly ok: true } | { readonly ok: false; readonly reason: string; readonly installed?: true };
 export type NativeShellDecision =
   | { readonly kind: "confined"; readonly boundary: NativeShellBoundary }
   | { readonly kind: "unconfined-opt-in"; readonly platform: NodeJS.Platform; readonly source: ShellOptInSource }
@@ -44,7 +44,8 @@ export function decideNativeShell(input: {
   const { platform, bwrap, seatbelt, optIn } = input;
   if (platform === "linux") {
     return bwrap.ok ? { kind: "confined", boundary: "linux-bwrap" } : { kind: "refused", platform,
-      remediation: `The native shell is refused: ${bwrap.reason.replace(/\.$/, "")}. Install Bubblewrap at /usr/bin/bwrap (Debian and Ubuntu: apt install bubblewrap); on Ubuntu 24.04 also follow docs/NATIVE_SANDBOX_UBUNTU.md. AMC never falls back to an unconfined Linux shell.` };
+      remediation: bwrap.installed ? `The native shell is refused: ${bwrap.reason.replace(/\.$/, "")}. AMC never falls back to an unconfined Linux shell.`
+        : `The native shell is refused: ${bwrap.reason.replace(/\.$/, "")}. Install Bubblewrap at /usr/bin/bwrap (Debian and Ubuntu: apt install bubblewrap); on Ubuntu 24.04 also follow docs/NATIVE_SANDBOX_UBUNTU.md. AMC never falls back to an unconfined Linux shell.` };
   }
   if (platform === "darwin") {
     if (seatbelt.ok) return { kind: "confined", boundary: "macos-seatbelt" };

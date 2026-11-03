@@ -1,4 +1,4 @@
-import { mkdtempSync, rmSync, realpathSync } from "node:fs";
+import { mkdtempSync, openSync, rmSync, realpathSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { existsSync } from "node:fs";
@@ -77,7 +77,7 @@ describe("confinement is a property of the process, not of the machine", () => {
     // Per host, measured independently: Seatbelt's binary on macOS; on Linux an actual Bubblewrap
     // namespace launch (docs/NATIVE_SANDBOX_UBUNTU.md), since an AppArmor-restricted host has the binary but cannot confine.
     const expected = process.platform === "darwin" ? existsSync("/usr/bin/sandbox-exec")
-      : process.platform === "linux" && spawnSync("/usr/bin/bwrap", ["--unshare-user", "--unshare-net", "--ro-bind", "/", "/", "--", "/bin/true"], { stdio: "ignore" }).status === 0;
+      : process.platform === "linux" && spawnSync("/usr/bin/bwrap", ["--unshare-user", "--unshare-net", "--ro-bind-fd", "3", "/", "--", "/bin/true"], { stdio: ["ignore", "ignore", "ignore", openSync("/", "r")] }).status === 0;
     expect(toolset.readiness.sandboxBackendAvailable).toBe(expected);
 
     toolset.close();

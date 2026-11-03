@@ -2,8 +2,9 @@ import { randomUUID } from "node:crypto";
 import { lookup } from "node:dns/promises";
 import { existsSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { describe, expect, test } from "vitest";
-import { bwrapBackend } from "../../src/sandbox/bwrapBackend.js";
+import { describe, expect, test, vi } from "vitest";
+import { bwrapBackend, unconsumedFds } from "../../src/sandbox/bwrapBackend.js";
+import { prepareNativePtyLaunch } from "../../src/terminal/nativePtySandbox.js";
 import { seatbeltNativeShell } from "../../src/sandbox/seatbeltNativeShell.js";
 import { nativeContainmentFixture, sandboxNode, type NativeCall } from "../helpers/nativeContainment.js";
 
@@ -133,6 +134,39 @@ describe("real native shell escape attempts with owned canaries", () => {
     } finally { await f.finish(passed); }
   });
 
+  // Linux only: macOS reports Node's own kqueue descriptors as directories, and Seatbelt passes no extra fd.
+  (process.platform === "linux" ? realTest : test.skip)("the command inherits no launcher descriptor and cannot write the read-only workspace", async () => {
+    const f = nativeContainmentFixture(); let passed = false;
+    try {
+      const target = join(f.workspace, "escaped.txt");
+      // Any inherited directory or file fd (mount sources, status, filter) would let openat reach the masked .amc or the workspace.
+      const call = await f.run(`const fs=require("node:fs");const leaked=[];for(let fd=3;fd<1024;fd++){try{const s=fs.fstatSync(fd);if(s.isDirectory()||s.isFile())leaked.push(fd);}catch{}}let wrote=false,code=null;try{fs.writeFileSync(${JSON.stringify(target)},"escaped");wrote=true;}catch(error){code=error.code;}${emit('{attempted:true,leaked,wrote,code}')} `);
+      applied(call); expect(call.data.leaked).toEqual([]); expect(call.data.wrote).toBe(false);
+      expect(existsSync(target)).toBe(false); passed = true;
+    } finally { await f.finish(passed); }
+  });
+
+  (process.platform === "linux" ? realTest : test.skip)("the native PTY launch plan hands its command no launcher descriptor", () => {
+    const f = nativeContainmentFixture();
+    const launch = prepareNativePtyLaunch(f.workspace, { writableRoots: [f.allowed], network: "deny", timeoutMs: 5_000 }, 80, 24);
+    try {
+      expect(launch.extraFds.length).toBeGreaterThan(2);
+      expect(unconsumedFds(launch.argv, launch.extraFds.length)).toEqual([]);
+      expect(launch.argv.some(arg => arg.startsWith("/proc/self/fd/"))).toBe(false);
+    } finally { launch.dispose(); }
+    return f.finish(true);
+  });
+
+  realTest("a root shell's receipt claims no process cap, because the kernel exempts root from RLIMIT_NPROC", async () => {
+    const f = nativeContainmentFixture({ maxProcesses: 16 }); let passed = false;
+    vi.spyOn(process, "geteuid").mockReturnValue(0);
+    try {
+      const call = await f.run(emit("{attempted:true}"));
+      applied(call); expect(call.receipt.enforcement?.processLimit).toBeNull();
+      expect(call.receipt.enforcement!.limitations.join(" ")).toContain("exempts from RLIMIT_NPROC"); passed = true;
+    } finally { vi.restoreAllMocks(); await f.finish(passed); }
+  });
+
   realTest("direct TCP to a healthy owned listener fails with an OS permission error", async () => {
     const f = nativeContainmentFixture(); let passed = false;
     try {
@@ -188,7 +222,8 @@ describe("real native shell escape attempts with owned canaries", () => {
     } finally { await f.finish(passed); }
   });
 
-  realTest("a finite process-cap probe reaches EAGAIN with at most 32 owned live children and reaps them", async () => {
+  // Root is exempt from RLIMIT_NPROC (the receipt says so, tested above), so the cap probe needs an ordinary user.
+  (process.geteuid?.() === 0 ? test.skip : realTest)("a finite process-cap probe reaches EAGAIN with at most 32 owned live children and reaps them", async () => {
     const f = nativeContainmentFixture({ maxProcesses: 16 }); let passed = false;
     try {
       const call = await f.run(`(async()=>{const {spawn}=require("node:child_process");const children=[],closed=[],errors=[],stdinErrors=[];let attempts=0;try{for(;attempts<32;){attempts+=1;const child=${liveChild};const close=new Promise(resolve=>child.once("close",(code,signal)=>{closed.push({pid:child.pid||null,code,signal});resolve();}));children.push({child,close});if(child.stdin)child.stdin.on("error",error=>stdinErrors.push(error.code));const started=await new Promise(resolve=>{child.once("spawn",()=>resolve(true));child.once("error",error=>{errors.push(error.code);resolve(false);});});if(!started)break;}}finally{for(const {child}of children)if(child.stdin)child.stdin.end();await Promise.all(children.map(row=>row.close));}${emit('{attempted:true,attempts,spawned:children.filter(row=>row.child.pid).map(row=>row.child.pid),closed,errors,stdinErrors,limitHit:errors.includes("EAGAIN")}')}})().catch(error=>{${emit('{attempted:true,error:error.message}')}process.exitCode=1;});`);
