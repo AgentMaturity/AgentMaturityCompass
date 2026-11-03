@@ -45,10 +45,11 @@ export const readableText = (bytes: Buffer) => { try { return !/[\u0000-\u001f\u
 const IGNORABLE = /[\p{Default_Ignorable_Code_Point}\p{Cf}]/gu;
 /**
  * The longest a fold may be, from the length of its text: four times it plus 1 MiB (60,000 copies of U+FDFA, a squared
- * unit such as U+337F on every character, a ligature line), and never over 16 MiB. A fold past it is not built.
+ * unit such as U+337F on every character, a ligature line), and never more than 16 MiB longer than the text, so long text
+ * that hardly grows always folds. A fold past it is not built.
  */
 export const FOLD_GROWTH = 4, FOLD_SLACK = 1_048_576, FOLD_MAX_CHARS = 16_777_216;
-export const foldLimit = (length: number) => Math.min(FOLD_GROWTH * length + FOLD_SLACK, FOLD_MAX_CHARS);
+export const foldLimit = (length: number) => length + Math.min((FOLD_GROWTH - 1) * length + FOLD_SLACK, FOLD_MAX_CHARS);
 /** A fold that would pass its limit: callers fail closed (refuse the request, replace the line or the whole text). */
 export class FoldOverflow extends Error {
   constructor() { super("Folded text would pass its length limit"); this.name = "FoldOverflow"; }
@@ -102,35 +103,42 @@ const CONFUSABLE = new RegExp(`[${Object.keys(CONFUSABLES).join("")}]`, "g");
 export const NAME_CHAR = "[^\\u0000-\\u002c\\u002f\\u003a-\\u0040\\u005b-\\u005e\\u0060\\u007b-\\u007f\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000]";
 /** A member name as it reads (`foldText`), its look-alike letters folded to Latin: `pаssword` and `ｐａｓｓｗｏｒｄ` are `password`. */
 export const foldName = (name: string) => foldText(name).replace(CONFUSABLE, letter => CONFUSABLES[letter]!);
-const FOLDED_CHARS = new Map<string, string>();
-const foldChar = (char: string) => {
-  let folded = char.charCodeAt(0) < 0x80 ? char : FOLDED_CHARS.get(char);
-  if (folded === undefined) { folded = foldName(char); if (FOLDED_CHARS.size < 65_536) FOLDED_CHARS.set(char, folded); }
+const FOLDED_CODE_POINTS = new Map<number, string>();
+const foldCodePoint = (code: number) => {
+  let folded = FOLDED_CODE_POINTS.get(code);
+  if (folded === undefined) { folded = foldName(String.fromCodePoint(code)); if (FOLDED_CODE_POINTS.size < 65_536) FOLDED_CODE_POINTS.set(code, folded); }
   return folded;
 };
 /**
  * `text` with each code point folded as `foldName` folds it, and where each view character came from: view character `i`
  * was read from the code point at original offset `from[i]`, so a match in the view maps back to the text. Undefined for
  * ASCII text, which folds to itself. The view's length is measured first; past `foldLimit` it throws `FoldOverflow`, so
- * neither the view nor its offsets are built.
+ * neither the view nor its offsets are built. ASCII is copied as it is and only non-ASCII code points are folded, into one
+ * array of UTF-16 units turned into the view in blocks, so no string or array entry is made per character.
  */
 export function foldedView(text: string): { readonly view: string; readonly from: Int32Array } | undefined {
   if (!/[^\u0000-\u007f]/.test(text)) return undefined;
   const limit = foldLimit(text.length);
-  let length = 0;
-  for (let index = 0; index < text.length;) {
-    const width = text.codePointAt(index)! > 0xffff ? 2 : 1;
-    length += foldChar(text.slice(index, index + width)).length;
+  let length = 0, run = 0;
+  for (let index = 0; index < text.length; index += 1) {
+    if (text.charCodeAt(index) < 0x80) continue;
+    const code = text.codePointAt(index)!;
+    length += index - run + foldCodePoint(code).length;
     if (length > limit) throw new FoldOverflow();
-    index += width;
+    if (code > 0xffff) index += 1;
+    run = index + 1;
   }
-  const from = new Int32Array(length), parts: string[] = [];
+  length += text.length - run;
+  if (length > limit) throw new FoldOverflow();
+  const units = new Uint16Array(length), from = new Int32Array(length);
   for (let index = 0, at = 0; index < text.length;) {
-    const width = text.codePointAt(index)! > 0xffff ? 2 : 1, folded = foldChar(text.slice(index, index + width));
-    from.fill(index, at, at + folded.length);
-    at += folded.length;
-    parts.push(folded);
-    index += width;
+    const unit = text.charCodeAt(index);
+    if (unit < 0x80) { units[at] = unit; from[at++] = index++; continue; }
+    const code = text.codePointAt(index)!, folded = foldCodePoint(code);
+    for (let offset = 0; offset < folded.length; offset += 1) { units[at] = folded.charCodeAt(offset); from[at++] = index; }
+    index += code > 0xffff ? 2 : 1;
   }
-  return { view: parts.join(""), from };
+  let view = "";
+  for (let start = 0; start < length; start += 8_192) view += String.fromCharCode(...units.subarray(start, start + 8_192));
+  return { view, from };
 }

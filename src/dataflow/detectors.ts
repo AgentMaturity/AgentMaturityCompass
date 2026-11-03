@@ -47,7 +47,7 @@ const NOISE_FILTERS: Readonly<Record<string, RegExp>> = Object.freeze({
   // Bare 13-digit runs starting with 1: Unix-millisecond timestamps (2001-2033), about 10% Luhn-valid. No card network
   // issues a 13-digit number starting with 1 (13-digit cards are legacy Visa, starting with 4).
   credit_card: /^1\d{12}$/,
-  bearer_token: /^Bearer\s+[A-Za-z._-]+$/i // "Bearer authentication": a real bearer value has a digit
+  bearer_token: /^Bearer\s+[A-Za-z._~+/\\=-]+$/i // "Bearer authentication": a real bearer value has a digit
 });
 // The phone pattern's leading \b cannot sit before "+", so an E.164 span starts after it; keep such a span. A clock-shaped
 // ip_address span right after "::" is the tail of a compressed IPv6 address (2001:db8::10:20:30, fe80::1:23:45); keep it.
@@ -134,7 +134,7 @@ function memberFinding(key: string | undefined, value: string, issued: IssuedTok
 /**
  * Credential shapes beside dlp's provider keys: the shared secret table's (src/shield/redaction/secretPatterns.ts, with
  * any Basic token in an Authorization header), a PEM private key block whole, a URL's password, an `api_key` assignment,
- * and a free Basic run whose bytes hold a `:`, UTF-8 text without controls if it is all letters ("Basic Overview" is prose).
+ * and a free Basic run (8+ characters, or fewer padded; "\/" read as "/") whose bytes hold a `:`, UTF-8 text without controls if it is all letters.
  * Where a rule has a group, only the value it captures is replaced. None backtracks quadratically.
  */
 const CREDENTIAL_RULES: readonly { readonly type: string; readonly re: RegExp; readonly accept?: (value: string) => boolean }[] = Object.freeze([
@@ -142,7 +142,7 @@ const CREDENTIAL_RULES: readonly { readonly type: string; readonly re: RegExp; r
   { type: "private_key", re: /-----BEGIN [A-Z ]{0,20}PRIVATE KEY-----[^-]*(?:-----END [A-Z ]{0,20}PRIVATE KEY-----)?/ },
   { type: "password_in_url", re: /\/\/[^:\s/@"]{1,256}:([^@\s/"]{1,256})@/ },
   { type: "generic_api_key", re: /(?:api[_-]?key|apikey|api_secret)["\s:=]+["']?([A-Za-z0-9_-]{16,})/i },
-  { type: "basic_auth", re: /\bBasic\s+([A-Za-z0-9+/_-]{8,}={0,2})/i, accept: value => basicPair(Buffer.from(value, "base64"), /[^A-Za-z]/.test(value)) }
+  { type: "basic_auth", re: /\bBasic\s+((?:[A-Za-z0-9+_-]|\\{0,7}\/){8,}={0,2}|(?:[A-Za-z0-9+_-]|\\{0,7}\/){2,7}={1,2})/i, accept: value => basicPair(Buffer.from(value.replace(/\\+\//g, "/"), "base64"), /[^A-Za-z]/.test(value)) }
 ]);
 // An empty user name (":secret") and a UTF-8 password count; a run of letters only must decode to text without controls.
 const basicPair = (bytes: Buffer, notWord: boolean) => bytes.includes(0x3a) && (notWord || readableText(bytes));
@@ -183,7 +183,7 @@ export const DETECTOR_SET_DIGEST = sha256Hex(canonicalize({
   secretMembers: SECRET_MEMBER.source, secretMemberNames: SECRET_MEMBER_NAME.source, pageTokenNames: PAGE_TOKEN_NAME.source,
   keyedNames: KEYWORD_BOUND.source, webEscapes: { source: WEB_ESCAPE.source, named: NAMED_REFERENCES },
   base64Runs: { source: BASE64_RUN.source, controls: CONTROL_CHARS.source }, tokenFormat: TOKEN_PATTERN_SOURCE,
-  walk: { revision: "protected-walk-v6", order: "json>base64>web>nfkc", nfkcView: { mode: "whole-budget-charged", bound: "nfkd-per-code-point", growth: FOLD_GROWTH, slack: FOLD_SLACK, max: FOLD_MAX_CHARS }, nameChar: NAME_CHAR, maxDecodePasses: MAX_DECODE_PASSES, viewRules: "dlp+shape+assign+line" },
+  walk: { revision: "protected-walk-v7", order: "json>base64>web>nfkc", nfkcView: { mode: "whole-budget-charged", bound: "nfkd-per-code-point", growth: FOLD_GROWTH, slack: FOLD_SLACK, max: FOLD_MAX_CHARS }, nameChar: NAME_CHAR, maxDecodePasses: MAX_DECODE_PASSES, viewRules: "dlp+shape+assign+line" },
   limits: { maxDepth: MAX_DEPTH, maxLeafChars: MAX_PROTECTED_TEXT_CHARS, maxRequestScanChars: MAX_REQUEST_SCAN_CHARS,
     unitCharge: UNIT_CHARGE, keyedContextChars: KEYED_CONTEXT_CHARS }
 }));
