@@ -430,10 +430,10 @@ class HttpAgentResponder implements AgentResponder {
 async function gatewayReachable(endpoint: string, fetchImpl: typeof fetch, workspace: string, agentId: string | undefined): Promise<boolean> {
   try {
     return await withTimeout(2_000, async (signal) => {
-      // Any HTTP answer proves the listener is up; a 401/404 still means "reachable".
+      // Any HTTP answer, 401/404 included, proves the listener is up; one retry, since a pooled socket the gateway closed while idle resets once.
       const init: RequestInit = { method: "GET", redirect: "manual", signal };
       checkScopedEgress(workspace, "bridge", endpoint, { agentId, dataClasses: null, purpose: null });
-      await fetchImpl(endpoint, init);
+      const probe = () => fetchImpl(endpoint, init); await probe().catch(probe);
       return true;
     });
   } catch (error) {

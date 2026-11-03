@@ -62,6 +62,17 @@ describe("agent responder", () => {
     expect(flipping.requests).toHaveLength(1);
   });
 
+  test("the gateway probe survives one stale pooled socket but two network failures fall back to direct", async () => {
+    vi.stubEnv("AMC_AGENT_BASE_URL", "");
+    const reset = () => Object.assign(new TypeError("fetch failed"), { cause: new Error("read ECONNRESET") });
+    const once = vi.fn<typeof fetch>().mockRejectedValueOnce(reset()).mockResolvedValueOnce(new Response(null, { status: 401 }));
+    expect((await resolveAgentResponder({ workspace: open, agentId: "residency-fixture", fetchImpl: once })).target.transport).toBe("gateway");
+    expect(once).toHaveBeenCalledTimes(2);
+    const down = vi.fn<typeof fetch>().mockRejectedValue(reset());
+    expect((await resolveAgentResponder({ workspace: open, agentId: "residency-fixture", fetchImpl: down })).target.transport).toBe("direct");
+    expect(down).toHaveBeenCalledTimes(2);
+  });
+
   test("a 3xx from the agent endpoint is an invocation failure, not followed", async () => {
     const redirector = await redirectTo(agent);
     const responder = await direct(open, redirector.url);
