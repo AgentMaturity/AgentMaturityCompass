@@ -6,7 +6,7 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
 import { randomUUID } from 'node:crypto';
 import { bodyJson, apiSuccess, apiError, apiRequestError, pathParam, queryParam } from './apiHelpers.js';
 import { openLedger } from '../ledger/ledger.js';
-import { createIncidentStore, computeIncidentHash, withUnsignedIncidents } from '../incidents/incidentStore.js';
+import { createIncidentStore, computeIncidentHash, incidentListLimit, withUnsignedIncidents } from '../incidents/incidentStore.js';
 import type { Incident, IncidentSeverity, IncidentState } from '../incidents/incidentTypes.js';
 import {
   IncidentInputError,
@@ -162,19 +162,20 @@ export async function handleIncidentRoute(
 
       const agentId = queryParam(req.url ?? '', 'agent') ?? 'default';
       const status = queryParam(req.url ?? '', 'status');
-      const limit = parseInt(queryParam(req.url ?? '', 'limit') ?? '50', 10);
+      const limit = incidentListLimit(queryParam(req.url ?? '', 'limit')) ?? 50;
 
-      // Always fetch all incidents for this agent, then resolve latest state from transitions; no-sign ones merge in, labelled.
+      // Always fetch all incidents for this agent, then resolve latest state from transitions. No-sign incidents are listed
+      // apart, labelled, under their own cap: an unsigned row never takes a signed row's place. OPEN CRITICAL ones pass the limit.
       const incidents = store.getIncidentsByAgent(agentId);
       const latestStates = store.getLatestIncidentStates(incidents.map(i => i.incidentId));
-      // An explicit status filter applies to unsigned incidents too; an unsigned OPEN CRITICAL one is kept past the limit.
       const listed = withUnsignedIncidents(workspace, agentId, incidents.map(i => ({ ...i, state: latestStates.get(i.incidentId) ?? i.state })),
         (i) => status === 'closed' ? i.state === 'RESOLVED' : status === 'open' ? i.state === 'OPEN' : true, limit);
-      const limited = listed.rows.map(i => ({ incidentId: i.incidentId, agentId: i.agentId, severity: i.severity, state: i.state, title: i.title,
-        createdTs: i.createdTs, ...('unsigned' in i ? { unsigned: true } : {}) }));
-      apiSuccess(res, { count: limited.length, incidents: limited, unsignedPinnedPastLimit: listed.pinnedUnsigned,
-        unsignedUnreadable: listed.unsignedUnreadable,
-        ...(listed.unsignedUnreadable ? { warning: 'the unsigned evidence store could not be read; unsigned incidents are not shown' } : {}) });
+      const summary = <R extends Incident>(i: R) => ({ incidentId: i.incidentId, agentId: i.agentId, severity: i.severity, state: i.state,
+        title: i.title, createdTs: i.createdTs, ...('unsigned' in i ? { unsigned: true } : {}) });
+      apiSuccess(res, { count: listed.signed.length, incidents: listed.signed.map(summary), pinnedPastLimit: listed.pinnedSigned,
+        unsigned: { count: listed.unsigned.length, incidents: listed.unsigned.map(summary), pinnedPastLimit: listed.pinnedUnsigned,
+          rejected: listed.unsignedRejected, unreadable: listed.unsignedUnreadable },
+        ...(listed.warnings.length > 0 ? { warnings: listed.warnings } : {}) });
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : 'Could not list incidents');
     } finally {

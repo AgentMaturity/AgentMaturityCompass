@@ -43,9 +43,15 @@ an unverifiable file, and a kill is released only by the signed release below.
 Its incident and its alerts (`KILL_SWITCH_UNVERIFIABLE`,
 `KILL_SWITCH_SUSPEND_FAILED`) are also recorded in the unsigned store, and
 `amc incident list` and `GET /api/v1/incidents` show that incident in any mode,
-labelled unsigned. That incident is never cut by `--limit` (or `limit`): it is
-kept past the limit and counted. If the unsigned store cannot be read, the
-list still shows the signed incidents and says so (`unsignedUnreadable`).
+in a separate section labelled unsigned (`unsigned` in the API response) with
+its own cap of `--limit` (or `limit`), so an unsigned row never takes a signed
+row's place. In either section an OPEN CRITICAL incident is never cut by the
+limit: it is kept past it and counted (`pinnedPastLimit`). Unsigned rows dated
+more than five minutes in the future, or before the workspace was created, are
+not shown but counted (`unsigned.rejected`) with a warning. If the unsigned
+store cannot be read, or is not a regular file inside the workspace (a FIFO or
+a symlink, say), it is never opened: the list still shows the signed incidents
+and says so (`unsigned.unreadable`).
 
 ## 2. Release (OWNER)
 

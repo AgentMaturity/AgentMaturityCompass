@@ -1,7 +1,7 @@
 import Database from "better-sqlite3";
 import { randomUUID } from "node:crypto";
-import { existsSync } from "node:fs";
-import { join } from "node:path";
+import { lstatSync, realpathSync, statSync } from "node:fs";
+import { join, sep } from "node:path";
 import { UNSIGNED_EVIDENCE_STORE } from "../ledger/ledgerConnection.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -346,9 +346,11 @@ function getIncident(db: Database.Database, incidentId: string): Incident | null
   };
 }
 
-function getIncidentsByAgent(db: Database.Database, agentId: string, state?: IncidentState, limit?: number): Incident[] {
+function getIncidentsByAgent(db: Database.Database, agentId: string, state?: IncidentState, limit?: number,
+  createdBetween?: readonly [number, number]): Incident[] {
   let query = "SELECT * FROM incidents WHERE agent_id = ?";
   const params: (string | number)[] = [agentId];
+  if (createdBetween) { query += " AND created_ts BETWEEN ? AND ?"; params.push(...createdBetween); }
 
   if (state) {
     query += " AND state = ?";
@@ -535,27 +537,52 @@ const INCIDENT_STATES = new Set(["OPEN", "INVESTIGATING", "MITIGATED", "RESOLVED
 const INCIDENT_SEVERITIES = new Set(["INFO", "WARN", "CRITICAL"]);
 export type UnsignedIncident = Incident & { unsigned: true };
 
+/** Unsigned rows dated further than this past the clock, or this far before the workspace, are planted and never listed. */
+const UNSIGNED_CLOCK_SKEW_MS = 5 * 60_000;
+/** The store and the sidecars SQLite opens with it: each must be absent or a regular file, never a FIFO, device or link. */
+const UNSIGNED_STORE_FILES = ["", "-wal", "-shm", "-journal"];
+
+/** Whether the unsigned store is absent, a regular file inside the workspace (sidecars too), or anything else. */
+function unsignedStoreFile(workspace: string, path: string): "absent" | "file" | "refused" {
+  try {
+    const stats = UNSIGNED_STORE_FILES.map((suffix) => lstatSync(path + suffix, { throwIfNoEntry: false }));
+    if (!stats[0]) return "absent";
+    if (stats.some((stat) => stat && !stat.isFile())) return "refused";
+    // A symlinked directory on the way could still lead out of the workspace.
+    return realpathSync(path).startsWith(realpathSync(workspace) + sep) ? "file" : "refused";
+  } catch { return "refused"; }
+}
+
 /**
  * The incidents AMC_NO_SIGN=1 detectors opened in the unsigned store (an unsigned kill's among them), with their latest
  * state, for incident lists to show labelled unsigned. Read in any mode: the kill switch enforces unsigned kills in
  * signing sessions too, so the incident must stay visible there. Never verified, and never merged into the signed store.
- * Anything wrong with that store (not a database, a table or column missing, a malformed row) reads as no incidents with
- * `unreadable` set, so it can never fail the signed incident list it is shown beside.
+ * Rows dated in the future past a small clock skew, or before the workspace was created, are not read but counted in
+ * `rejected`: a planted row cannot sit above every real one or use up the read cap. Anything wrong with that store (not
+ * a regular file, outside the workspace, not a database, a table or column missing, a malformed row) reads as no
+ * incidents with `unreadable` set, so it can never fail or block the signed incident list it is shown beside.
  */
-export function unsignedIncidents(workspace: string, agentId: string): { incidents: UnsignedIncident[]; unreadable: boolean } {
+export function unsignedIncidents(workspace: string, agentId: string, now = Date.now()):
+  { incidents: UnsignedIncident[]; rejected: number; unreadable: boolean } {
   const path = join(workspace, UNSIGNED_EVIDENCE_STORE);
-  if (!existsSync(path)) return { incidents: [], unreadable: false };
+  // ponytail: the check and the open are two steps; a writer racing them is one who could already rewrite the store.
+  const file = unsignedStoreFile(workspace, path);
+  if (file !== "file") return { incidents: [], rejected: 0, unreadable: file === "refused" };
   try {
+    // birthtimeMs is 0 where the filesystem does not record it; the lower bound is then the epoch.
+    const window = [Math.max(0, statSync(join(workspace, ".amc")).birthtimeMs - UNSIGNED_CLOCK_SKEW_MS), now + UNSIGNED_CLOCK_SKEW_MS] as const;
     const db = new Database(path, { readonly: true, fileMustExist: true });
     try {
       const tables = Object.keys(UNSIGNED_INCIDENT_COLUMNS).map((table) =>
         new Set((db.pragma(`table_info(${table})`) as Array<{ name: string }>).map((column) => column.name)));
       // Detectors create both tables on their first incident; a store with neither has never held one.
-      if (tables.every((columns) => columns.size === 0)) return { incidents: [], unreadable: false };
+      if (tables.every((columns) => columns.size === 0)) return { incidents: [], rejected: 0, unreadable: false };
       if (Object.values(UNSIGNED_INCIDENT_COLUMNS).some((names, index) => names.some((name) => !tables[index]!.has(name)))) {
-        return { incidents: [], unreadable: true };
+        return { incidents: [], rejected: 0, unreadable: true };
       }
-      const incidents = getIncidentsByAgent(db, agentId, undefined, UNSIGNED_INCIDENT_READ_CAP);
+      const incidents = getIncidentsByAgent(db, agentId, undefined, UNSIGNED_INCIDENT_READ_CAP, window);
+      const { rejected } = db.prepare("SELECT COUNT(*) AS rejected FROM incidents WHERE agent_id = ? AND created_ts NOT BETWEEN ? AND ?")
+        .get(agentId, ...window) as { rejected: number };
       // One aggregate row per incident, never every transition: a planted store cannot fill memory here.
       const states = new Map(incidents.length === 0 ? [] : (db.prepare(`SELECT incident_id, to_state, MAX(ts) FROM incident_transitions
         WHERE incident_id IN (${incidents.map(() => "?").join(", ")}) GROUP BY incident_id`).all(...incidents.map((incident) => incident.incidentId)) as
@@ -563,22 +590,37 @@ export function unsignedIncidents(workspace: string, agentId: string): { inciden
       const listed = incidents.map((incident) => ({ ...incident, state: states.get(incident.incidentId) ?? incident.state, unsigned: true as const }));
       const wellFormed = listed.every((incident) => INCIDENT_STATES.has(incident.state) && INCIDENT_SEVERITIES.has(incident.severity)
         && Number.isSafeInteger(incident.createdTs) && typeof incident.title === "string");
-      return wellFormed ? { incidents: listed, unreadable: false } : { incidents: [], unreadable: true };
+      return wellFormed ? { incidents: listed, rejected, unreadable: false } : { incidents: [], rejected: 0, unreadable: true };
     } finally { db.close(); }
-  } catch { return { incidents: [], unreadable: true }; }
+  } catch { return { incidents: [], rejected: 0, unreadable: true }; }
+}
+
+/** An incident list's `limit`: a positive integer in plain digits, or undefined for anything else. */
+export function incidentListLimit(raw: string | null | undefined): number | undefined {
+  return raw && /^[1-9]\d{0,5}$/.test(raw.trim()) ? Number(raw.trim()) : undefined;
 }
 
 /**
- * The signed incidents an incident list shows, merged with the unsigned store's newest first and cut to `limit`. An
- * unsigned OPEN CRITICAL incident (an unsigned kill's) that `keep` passes is never cut: it follows past the limit,
- * counted in `pinnedUnsigned`.
+ * An incident list in two sections that never share a limit. `signed`: the signed incidents `keep` passes, newest first,
+ * cut to `limit`. `unsigned`: the unsigned store's, newest first, under their own cap of `limit`, so a planted unsigned
+ * row can never take a signed row's place. In each section an OPEN CRITICAL incident (an unsigned kill's among them) is
+ * never cut: it follows past the limit, counted in `pinnedSigned` or `pinnedUnsigned`.
  */
-export function withUnsignedIncidents<T extends { createdTs: number }>(workspace: string, agentId: string, signed: T[],
-  keep: (row: T | UnsignedIncident) => boolean, limit: number) {
+export function withUnsignedIncidents<T extends { createdTs: number; severity: string; state: string }>(workspace: string, agentId: string,
+  signed: T[], keep: (row: T | UnsignedIncident) => boolean, limit: number) {
+  const cut = <R extends T | UnsignedIncident>(listed: R[]) => {
+    const rows = listed.filter(keep).sort((a, b) => b.createdTs - a.createdTs);
+    const pinned = rows.slice(limit).filter((row) => row.severity === "CRITICAL" && row.state === "OPEN");
+    return { rows: [...rows.slice(0, limit), ...pinned], pinned: pinned.length };
+  };
   const unsigned = unsignedIncidents(workspace, agentId);
-  const rows = [...signed, ...unsigned.incidents].filter(keep).sort((a, b) => b.createdTs - a.createdTs);
-  const pinned = rows.slice(limit).filter((row) => "unsigned" in row && row.severity === "CRITICAL" && row.state === "OPEN");
-  return { rows: [...rows.slice(0, limit), ...pinned], pinnedUnsigned: pinned.length, unsignedUnreadable: unsigned.unreadable };
+  const signedCut = cut(signed), unsignedCut = cut(unsigned.incidents);
+  const warnings = [
+    ...(unsigned.unreadable ? ["the unsigned evidence store could not be read; unsigned incidents are not shown"] : []),
+    ...(unsigned.rejected > 0 ? [`${unsigned.rejected} unsigned incident(s) dated in the future or before the workspace are not shown`] : [])
+  ];
+  return { signed: signedCut.rows, pinnedSigned: signedCut.pinned, unsigned: unsignedCut.rows, pinnedUnsigned: unsignedCut.pinned,
+    unsignedRejected: unsigned.rejected, unsignedUnreadable: unsigned.unreadable, warnings };
 }
 
 export function verifyIncidentSignature(

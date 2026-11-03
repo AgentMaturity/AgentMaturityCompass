@@ -4,8 +4,8 @@
  * `.amc/evidence.sqlite`, where an unsigned row makes every later signed reader fail.
  */
 import Database from "better-sqlite3";
-import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { execFileSync, spawnSync } from "node:child_process";
+import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readdirSync, realpathSync, renameSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
@@ -144,7 +144,8 @@ describe("the kill switch under no-sign", () => {
     const kill = await activateKillSwitch({ workspace, issuedBy: "owner-1", scope: { kind: "agent", id: "agent-a" }, mode: "stop_new_effects",
       reason: "emergency", incidentId: null });
     const listed = await getJson("/api/v1/incidents?agent=agent-a");
-    expect(listed.incidents).toEqual([expect.objectContaining({ agentId: "agent-a", state: "OPEN", unsigned: true,
+    expect(listed).toMatchObject({ count: 0, incidents: [] });
+    expect((listed.unsigned as Record<string, unknown>).incidents).toEqual([expect.objectContaining({ agentId: "agent-a", state: "OPEN", unsigned: true,
       title: "Kill switch activated (KILL_SWITCH_ACTIVATED)" })]);
     expect(unsignedIncidents(workspace, "agent-a").incidents[0]?.triggerId).toBe(`kill_switch:${kill.killId}`);
     const cli = spawnSync(process.execPath, [resolve("dist/cli.js"), "incident", "list", "--agent", "agent-a"], { cwd: workspace, encoding: "utf8",
@@ -156,16 +157,16 @@ describe("the kill switch under no-sign", () => {
     try { const store = createIncidentStore(signed.db); store.initTables(); expect(store.getIncidentsByAgent("agent-a")).toEqual([]); }
     finally { signed.close(); }
     // A signing session lists it too, so the kill it still enforces stays visible.
-    expect((await getJson("/api/v1/incidents?agent=agent-a")).incidents).toHaveLength(1);
+    expect((await getJson("/api/v1/incidents?agent=agent-a")).unsigned).toMatchObject({ count: 1, unreadable: false });
   });
 
   /** Incidents written straight into a store, signed or unsigned: the list reads, never verifies, them. */
-  function seedIncidents(store: string, rows: Array<{ id: string; createdTs: number }>): void {
+  function seedIncidents(store: string, rows: Array<{ id: string; createdTs: number; severity?: "WARN" | "CRITICAL" }>): void {
     mkdirSync(join(workspace, store, ".."), { recursive: true });
     const db = new Database(join(workspace, store));
     try {
       const incidents = createIncidentStore(db); incidents.initTables();
-      for (const row of rows) incidents.insertIncident({ incidentId: row.id, agentId: "agent-a", severity: "WARN", state: "OPEN", title: row.id,
+      for (const row of rows) incidents.insertIncident({ incidentId: row.id, agentId: "agent-a", severity: row.severity ?? "WARN", state: "OPEN", title: row.id,
         description: "seeded", triggerType: "MANUAL", triggerId: row.id, rootCauseClaimIds: [], affectedQuestionIds: [], causalEdges: [],
         timelineEventIds: [], createdTs: row.createdTs, updatedTs: row.createdTs, resolvedTs: null, postmortemRef: null,
         prev_incident_hash: "0", incident_hash: row.id, signature: "seeded" });
@@ -174,22 +175,73 @@ describe("the kill switch under no-sign", () => {
   const titles = (listed: Record<string, unknown>) => (listed.incidents as Array<{ title: string }>).map((row) => row.title);
   const KILL_TITLE = "Kill switch activated (KILL_SWITCH_ACTIVATED)";
 
-  test("an unsigned kill's incident merges by time and is never cut by a limit that signed incidents fill", async () => {
+  const section = (listed: Record<string, unknown>) => listed.unsigned as Record<string, unknown>;
+  const cliEnv = () => ({ ...process.env, AMC_NO_SIGN: "1", AMC_CONTROL_CHECKPOINT_DIR: join(root, "checkpoints"), NO_COLOR: "1" });
+  const listCli = (...args: string[]) => spawnSync(process.execPath, [resolve("dist/cli.js"), "incident", "list", "--agent", "agent-a", ...args],
+    { cwd: workspace, encoding: "utf8", env: cliEnv(), timeout: 30_000 });
+
+  test("unsigned incidents are listed apart: planted future-dated rows never displace a signed one, and OPEN CRITICAL passes the limit", async () => {
     await activateKillSwitch({ workspace, issuedBy: "owner-1", scope: { kind: "agent", id: "agent-a" }, mode: "stop_new_effects",
       reason: "emergency", incidentId: null });
     const now = Date.now();
+    // Planted: three far in the future, one before the workspace existed, two in the clock-skew window above the kill's.
+    seedIncidents(UNSIGNED_EVIDENCE_STORE, [{ id: "future-1", createdTs: now + 1e9 }, { id: "future-2", createdTs: now + 2e9 },
+      { id: "future-3", createdTs: now + 3e9 }, { id: "ancient", createdTs: 1_000 }, { id: "skew-1", createdTs: now + 60_000 },
+      { id: "skew-2", createdTs: now + 120_000 }]);
     vi.stubEnv("AMC_NO_SIGN", "0");
     openLedger(workspace).close();
-    seedIncidents(".amc/evidence.sqlite", [{ id: "newer-1", createdTs: now + 1_000_000 }, { id: "newer-2", createdTs: now + 2_000_000 },
-      { id: "older", createdTs: 1_000 }]);
-    expect(titles(await getJson("/api/v1/incidents?agent=agent-a"))).toEqual(["newer-2", "newer-1", KILL_TITLE, "older"]);
-    const limited = await getJson("/api/v1/incidents?agent=agent-a&limit=2");
-    expect(titles(limited)).toEqual(["newer-2", "newer-1", KILL_TITLE]);
-    expect(limited).toMatchObject({ count: 3, unsignedPinnedPastLimit: 1, unsignedUnreadable: false });
-    const cli = spawnSync(process.execPath, [resolve("dist/cli.js"), "incident", "list", "--agent", "agent-a", "--limit", "2"], { cwd: workspace,
-      encoding: "utf8", env: { ...process.env, AMC_NO_SIGN: "1", AMC_CONTROL_CHECKPOINT_DIR: join(root, "checkpoints"), NO_COLOR: "1" }, timeout: 60_000 });
-    expect(cli.stdout, cli.stderr).toContain("1 unsigned OPEN CRITICAL incident(s) shown past --limit.");
-    expect(cli.stdout).toMatch(/newer-2[\s\S]*newer-1[\s\S]*\[CRITICAL\/OPEN\]  Kill switch activated/);
+    seedIncidents(".amc/evidence.sqlite", [{ id: "signed-new", createdTs: now - 1_000 }, { id: "signed-mid", createdTs: now - 2_000 },
+      { id: "signed-critical", createdTs: 2_000, severity: "CRITICAL" }]);
+    const all = await getJson("/api/v1/incidents?agent=agent-a");
+    expect(titles(all)).toEqual(["signed-new", "signed-mid", "signed-critical"]);
+    expect(titles(section(all))).toEqual(["skew-2", "skew-1", KILL_TITLE]);
+    expect(section(all)).toMatchObject({ rejected: 4, unreadable: false });
+    expect(all.warnings).toEqual(["4 unsigned incident(s) dated in the future or before the workspace are not shown"]);
+    const limited = await getJson("/api/v1/incidents?agent=agent-a&limit=1");
+    expect(titles(limited)).toEqual(["signed-new", "signed-critical"]);
+    expect(limited).toMatchObject({ count: 2, pinnedPastLimit: 1 });
+    expect(titles(section(limited))).toEqual(["skew-2", KILL_TITLE]);
+    expect(section(limited)).toMatchObject({ count: 2, pinnedPastLimit: 1 });
+    // A limit that is not a positive integer falls back to 50.
+    for (const bad of ["-1", "0", "abc", "2x", "1.5"]) expect(titles(await getJson(`/api/v1/incidents?agent=agent-a&limit=${bad}`)), bad).toHaveLength(3);
+    const cli = listCli("--limit", "1");
+    expect(cli.stdout, cli.stderr).toMatch(/signed-new[\s\S]*signed-critical\n1 OPEN CRITICAL incident\(s\) shown past --limit\.\nUnsigned incidents[^\n]*\n.*skew-2.*\(unsigned\)\n.*\[CRITICAL\/OPEN\]  Kill switch activated.*\(unsigned\)\n1 unsigned OPEN CRITICAL incident\(s\) shown past --limit\./);
+    expect(cli.stdout).not.toMatch(/future|ancient|signed-mid/);
+    expect(cli.stderr).toContain("Warning: 4 unsigned incident(s) dated in the future or before the workspace are not shown.");
+    for (const bad of ["0", "-1", "2x", "1.5"]) {
+      const refused = listCli("--limit", bad);
+      expect(refused.status, bad).not.toBe(0);
+      expect(refused.stderr, bad).toContain("limit must be a positive integer");
+    }
+  });
+
+  test("an unsigned store that is a FIFO, or a symlink, is never opened", async () => {
+    vi.stubEnv("AMC_NO_SIGN", "0");
+    openLedger(workspace).close();
+    seedIncidents(".amc/evidence.sqlite", [{ id: "signed", createdTs: 1_000 }]);
+    const path = join(workspace, UNSIGNED_EVIDENCE_STORE);
+    mkdirSync(join(path, ".."), { recursive: true });
+    // A real store with an incident, outside the workspace: a symlink to it must not be followed.
+    const outside = join(root, "outside.sqlite");
+    seedIncidents(UNSIGNED_EVIDENCE_STORE, [{ id: "outside", createdTs: Date.now() }]);
+    renameSync(path, outside);
+    const plants: Array<[string, () => void]> = [
+      ["a FIFO", () => execFileSync("mkfifo", [path])],
+      ["a symlink out of the workspace", () => symlinkSync(outside, path)],
+      ["a symlink inside the workspace", () => { copyFileSync(outside, `${path}.real`); symlinkSync(`${path}.real`, path); }]
+    ];
+    for (const [name, plant] of plants) {
+      rmSync(path, { force: true }); plant();
+      // In a child process with a timeout: a blocking open would hang this worker past any test timeout.
+      const cli = listCli();
+      expect(cli.status, `${name}: ${cli.stderr}`).toBe(0);
+      expect(cli.stdout, name).toContain("signed");
+      expect(cli.stdout, name).not.toContain("outside");
+      expect(cli.stderr, name).toContain("Warning: the unsigned evidence store could not be read");
+      if (name.startsWith("a symlink")) {
+        expect(await getJson("/api/v1/incidents?agent=agent-a"), name).toMatchObject({ count: 1, unsigned: { count: 0, unreadable: true } });
+      }
+    }
   });
 
   test("an unreadable unsigned store never fails the signed incident list, in either mode", async () => {
@@ -201,9 +253,9 @@ describe("the kill switch under no-sign", () => {
     const plants: Array<[string, () => void]> = [
       ["not a database", () => writeFileSync(path, "not a database".repeat(1_000))],
       ["no transition table", () => { const db = new Database(path); db.exec("CREATE TABLE incidents (incident_id TEXT)"); db.close(); }],
-      ["a transition table without to_state", () => { seedIncidents(UNSIGNED_EVIDENCE_STORE, [{ id: "u", createdTs: 2_000 }]);
+      ["a transition table without to_state", () => { seedIncidents(UNSIGNED_EVIDENCE_STORE, [{ id: "u", createdTs: Date.now() }]);
         const db = new Database(path); db.exec("DROP TABLE incident_transitions; CREATE TABLE incident_transitions (incident_id TEXT, ts INTEGER)"); db.close(); }],
-      ["a malformed row", () => { seedIncidents(UNSIGNED_EVIDENCE_STORE, [{ id: "u", createdTs: 2_000 }]);
+      ["a malformed row", () => { seedIncidents(UNSIGNED_EVIDENCE_STORE, [{ id: "u", createdTs: Date.now() }]);
         const db = new Database(path);
         for (const { name: trigger } of db.prepare("SELECT name FROM sqlite_master WHERE type = 'trigger'").all() as Array<{ name: string }>) db.exec(`DROP TRIGGER "${trigger}"`);
         db.exec("UPDATE incidents SET causal_edges_json = '{'"); db.close(); }]
@@ -213,14 +265,14 @@ describe("the kill switch under no-sign", () => {
       for (const mode of ["0", "1"]) {
         vi.stubEnv("AMC_NO_SIGN", mode);
         const listed = await getJson("/api/v1/incidents?agent=agent-a");
-        expect(listed, `${name}, AMC_NO_SIGN=${mode}`).toMatchObject({ count: 1, unsignedUnreadable: true, incidents: [{ title: "signed" }] });
-        expect(listed.warning).toContain("unsigned evidence store could not be read");
+        expect(listed, `${name}, AMC_NO_SIGN=${mode}`).toMatchObject({ count: 1, unsigned: { unreadable: true }, incidents: [{ title: "signed" }] });
+        expect(listed.warnings).toEqual(["the unsigned evidence store could not be read; unsigned incidents are not shown"]);
       }
     }
   });
 
   test("the unsigned store is read newest first and at most 500 incidents deep", () => {
-    seedIncidents(UNSIGNED_EVIDENCE_STORE, Array.from({ length: 600 }, (_, index) => ({ id: `u-${index}`, createdTs: index + 1 })));
+    seedIncidents(UNSIGNED_EVIDENCE_STORE, Array.from({ length: 600 }, (_, index) => ({ id: `u-${index}`, createdTs: Date.now() - 100_000 + index })));
     const listed = unsignedIncidents(workspace, "agent-a");
     expect(listed.unreadable).toBe(false);
     expect(listed.incidents).toHaveLength(500);
