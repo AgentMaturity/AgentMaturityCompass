@@ -3,8 +3,8 @@ import { readdirSync, statSync } from "node:fs";
 import { verifyTrustConfigSignature, checkNotaryTrust } from "../trust/trustConfig.js";
 import { verifyOpsPolicySignature } from "../ops/policy.js";
 import { verifyPluginWorkspace } from "../plugins/pluginApi.js";
-import { transparencyLogPath, verifiedTransparencyLog } from "../transparency/logChain.js";
-import { PASSPORT_POLICY_WITNESSES, PROMPT_SCHEDULER_CONFIGURED } from "../transparency/configWitness.js";
+import { transparencyLogPath, transparencySealPath, transparencySealSigPath, verifiedTransparencyLog } from "../transparency/logChain.js";
+import { FORECAST_SCHEDULER_CONFIGURED, PASSPORT_POLICY_WITNESSES, PROMPT_SCHEDULER_CONFIGURED, WITNESS_GROUPS, ledgerWitnessTypes } from "../transparency/configWitness.js";
 import { verifyTransparencyMerkle } from "../transparency/merkleIndexStore.js";
 import { verifyLedgerIntegrity } from "../ledger/ledger.js";
 import { LEDGER_UNANCHORED_MESSAGE } from "../ledger/ledgerVerification.js";
@@ -111,19 +111,24 @@ function notConfigured(id: string, critical: boolean, details: string[]): Verify
   return { id, status: "NOT_CONFIGURED", critical, details };
 }
 
-/** The verified transparency log's entry types and agents, or null when it is missing or does not verify. */
-type Witness = { types: Set<string>; agentsOf: (type: string) => Set<string> } | null;
+/**
+ * The configuration witnesses: the verified transparency log's entry types and agents, and the witness types in the
+ * verified, anchored evidence ledger; each is null when its record is missing or does not verify.
+ */
+type Witness = { log: { types: Set<string>; agentsOf: (type: string) => Set<string> } | null; ledger: Set<string> | null };
 
 /**
- * A witnessed part with nothing on disk: NOT_CONFIGURED only when the verified log holds no witness of its configuration,
- * FAIL when it does (the files were removed), and SKIP when the log cannot be read to tell.
+ * A witnessed part with nothing on disk: FAIL when either record holds a witness of its configuration (the files were
+ * removed), NOT_CONFIGURED only when both verified records hold none, and SKIP when either cannot be read to tell.
  */
 function absentPart(id: string, critical: boolean, witness: Witness, types: readonly string[], what: string): VerifyAllCheck {
-  if (witness === null) return skip(id, critical, [`${what} absent, and no verified transparency log shows it was never configured`]);
-  const seen = types.find((type) => witness.types.has(type));
-  return seen !== undefined
-    ? fail(id, critical, [`${what} missing: the transparency log records it was configured (${seen})`])
-    : notConfigured(id, critical, [`${what} never configured (no ${types.join(" or ")} in the verified transparency log)`]);
+  const inLedger = types.find((type) => witness.ledger?.has(type)), inLog = types.find((type) => witness.log?.types.has(type));
+  if (inLedger !== undefined || inLog !== undefined) {
+    return fail(id, critical, [`${what} missing: the ${inLedger !== undefined ? "evidence ledger" : "transparency log"} records it was configured (${inLedger ?? inLog})`]);
+  }
+  return witness.log === null || witness.ledger === null
+    ? skip(id, critical, [`${what} absent, and no verified evidence ledger and transparency log both show it was never configured`])
+    : notConfigured(id, critical, [`${what} never configured (no ${types.join(" or ")} in the verified evidence ledger or transparency log)`]);
 }
 
 export async function verifyAll(params: {
@@ -133,19 +138,28 @@ export async function verifyAll(params: {
 }): Promise<VerifyAllReport> {
   const workspace = resolve(params.workspace);
   const checks: VerifyAllCheck[] = [];
-  // Read before any check: verifying a missing log would recreate it empty and sign a fresh seal, erasing the witnesses.
-  const tlogPresent = statExists(transparencyLogPath(workspace));
+  // Verify all is read-only: a missing log or seal is never recreated (a fresh seal would erase the witnesses).
+  const tlogPresent = [transparencyLogPath(workspace), transparencySealPath(workspace), transparencySealSigPath(workspace)].every(statExists);
   let tlog: ReturnType<typeof verifiedTransparencyLog> | null = null, tlogError: string | null = null;
   try {
-    tlog = tlogPresent ? verifiedTransparencyLog(workspace) : null;
+    tlog = tlogPresent ? verifiedTransparencyLog(workspace, { readOnly: true }) : null;
   } catch (error) {
     tlogError = String(error);
   }
+  let ledger: Awaited<ReturnType<typeof verifyLedgerIntegrity>> | null = null, ledgerError: string | null = null, ledgerWitness: Set<string> | null = null;
+  try {
+    ledger = await verifyLedgerIntegrity(workspace, { trust: params.trust });
+    // Only a verified ledger whose monitor key is anchored to the pinned fingerprint can witness, or show the absence of witnesses.
+    if (ledger.ok && ledger.trustRoot.anchored) ledgerWitness = ledgerWitnessTypes(workspace);
+  } catch (error) {
+    ledger = null; // a witness read that throws after the chain verified fails the ledger check rather than vanishing
+    ledgerError = String(error);
+  }
   const entries = tlog?.ok === true ? tlog.entries : null;
-  const witness: Witness = entries === null ? null : {
+  const witness: Witness = { ledger: ledgerWitness, log: entries === null ? null : {
     types: new Set(entries.map((entry) => entry.type)),
     agentsOf: (type) => new Set(entries.filter((entry) => entry.type === type).map((entry) => entry.agentId))
-  };
+  } };
 
   const trustSig = verifyTrustConfigSignature(workspace);
   checks.push(
@@ -248,7 +262,7 @@ export async function verifyAll(params: {
   const promptErrors: string[] = [];
   const promptAgents = listPromptAgentsWithPacks(workspace);
   // Packs are enforced on agents, so a pack the log records as built (PROMPT_PACK_CREATED) must still be on disk.
-  for (const agentId of witness?.agentsOf("PROMPT_PACK_CREATED") ?? []) {
+  for (const agentId of witness.log?.agentsOf("PROMPT_PACK_CREATED") ?? []) {
     if (!promptAgents.includes(agentId)) promptErrors.push(`pack(${agentId}): missing; the transparency log records a pack built for this agent`);
   }
   for (const agentId of promptAgents) {
@@ -264,7 +278,7 @@ export async function verifyAll(params: {
   }
   checks.push(
     promptAgents.length === 0 && promptErrors.length === 0
-      ? witness === null
+      ? witness.log === null
         ? skip("prompt-packs", false, ["no prompt packs, and no verified transparency log shows none were built"])
         : notConfigured("prompt-packs", false, ["no prompt packs built (none in the verified transparency log)"])
       : promptErrors.length === 0
@@ -370,12 +384,17 @@ export async function verifyAll(params: {
     );
   }
 
-  const tlogMissing = "transparency log missing: not verified, and verify all does not recreate it";
+  const tlogMissing = "transparency log or its seal missing: not verified, and verify all does not recreate it";
+  // The ledger row is written before the log entry, so a log that lacks a witness the ledger holds was restored to an older copy.
+  const lagging = WITNESS_GROUPS.filter((group) => group.some((type) => ledgerWitness?.has(type)) && !group.some((type) => witness.log?.types.has(type)))
+    .map((group) => group.join(" or "));
+  const rolledBack = `the evidence ledger records ${lagging.join(", ")} but the transparency log does not: the log was rolled back or removed`;
   checks.push(
-    !tlogPresent ? skip("transparency-log", true, [tlogMissing])
+    !tlogPresent ? (lagging.length > 0 ? fail("transparency-log", true, [tlogMissing, rolledBack]) : skip("transparency-log", true, [tlogMissing]))
       : tlog === null ? fail("transparency-log", true, [tlogError ?? "transparency log unreadable"])
-      : tlog.ok ? pass("transparency-log", true, [`entries=${tlog.entryCount}`, `lastHash=${tlog.lastHash}`])
-      : fail("transparency-log", true, tlog.errors)
+      : !tlog.ok ? fail("transparency-log", true, tlog.errors)
+      : lagging.length > 0 ? fail("transparency-log", true, [rolledBack])
+      : pass("transparency-log", true, [`entries=${tlog.entryCount}`, `lastHash=${tlog.lastHash}`])
   );
 
   try {
@@ -390,8 +409,9 @@ export async function verifyAll(params: {
     checks.push(fail("transparency-merkle", true, [String(error)]));
   }
 
-  try {
-    const ledger = await verifyLedgerIntegrity(workspace, { trust: params.trust });
+  if (ledger === null) {
+    checks.push(fail("ledger-hash-chain", true, [ledgerError ?? "ledger unreadable"]));
+  } else {
     checks.push(
       ledger.ok
         ? pass("ledger-hash-chain", true, ["event hash-chain and signatures verified"])
@@ -405,8 +425,6 @@ export async function verifyAll(params: {
       : params.trust.allowUnanchored
         ? skip("ledger-trust-root", true, ["UNANCHORED (--allow-unanchored): internal consistency only"])
         : fail("ledger-trust-root", true, [LEDGER_UNANCHORED_MESSAGE]));
-  } catch (error) {
-    checks.push(fail("ledger-hash-chain", true, [String(error)]));
   }
 
   // P1-57: each A4 project's chain, side rows and envelopes (integrity of bytes; never a claim about the agent).
@@ -428,9 +446,7 @@ export async function verifyAll(params: {
       fail("forecast-signatures", false, [`forecast policy: ${forecast.policy.reason ?? "invalid"}`])
     );
   } else if (!forecast.scheduler.valid && !statExists(forecast.scheduler.path) && !statExists(forecast.scheduler.sigPath)) {
-    checks.push(
-      notConfigured("forecast-signatures", false, ["forecast scheduler not initialized yet"])
-    );
+    checks.push(absentPart("forecast-signatures", false, witness, [FORECAST_SCHEDULER_CONFIGURED], "forecast scheduler state"));
   } else if (!forecast.scheduler.valid) {
     checks.push(
       fail("forecast-signatures", false, [`forecast scheduler: ${forecast.scheduler.reason ?? "invalid"}`])

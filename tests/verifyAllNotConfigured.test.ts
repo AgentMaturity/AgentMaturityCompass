@@ -2,7 +2,7 @@
  * `amc verify all` on optional features: a feature the workspace never configured reads NOT_CONFIGURED and does not
  * withhold the headline, while a configured feature that fails verification still fails it.
  */
-import { appendFileSync, existsSync, mkdtempSync, rmSync } from "node:fs";
+import { appendFileSync, cpSync, existsSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { afterEach, describe, expect, test, vi } from "vitest";
@@ -10,8 +10,11 @@ import { initWorkspace } from "../src/workspace.js";
 import { verifyAll } from "../src/verify/verifyAll.js";
 import { verifyAllExit } from "../src/cli-trust-flags.js";
 import { passportPolicyPath, savePassportPolicy } from "../src/passport/passportStore.js";
-import { passportPolicyApplyForApiAsync } from "../src/passport/passportApi.js";
-import { transparencyLogPath } from "../src/transparency/logChain.js";
+import { capturePassportInitialization, passportInitForApi, passportPolicyApplyForApiAsync } from "../src/passport/passportApi.js";
+import { passportInitCli, passportInitCliAsync } from "../src/passport/passportCli.js";
+import { loadPassportPolicyAsync } from "../src/passport/passportPairPublication.js";
+import { saveForecastSchedulerState, defaultForecastSchedulerState } from "../src/forecast/forecastStore.js";
+import { transparencyLogPath, transparencySealPath, transparencySealSigPath } from "../src/transparency/logChain.js";
 import { buildPromptPackForApi } from "../src/prompt/promptPackApi.js";
 import { promptLatestPackPath } from "../src/prompt/promptPolicyStore.js";
 import { promptSchedulerPath, savePromptSchedulerState } from "../src/prompt/promptPolicyStore.js";
@@ -160,15 +163,83 @@ describe("verify all: not configured is not INCOMPLETE", () => {
     expect(report.status).toBe("FAIL");
   });
 
-  test("without a readable witness log, removed passport files read INCOMPLETE, never PASS, and the log is not recreated", async () => {
+  test.each([
+    ["amc passport init", async (ws: string) => { await passportInitCliAsync(ws); }],
+    ["the sync passport init", (ws: string) => { passportInitCli(ws); }],
+    ["the API init", (ws: string) => { passportInitForApi(ws); }],
+    ["the Studio startup init", async (ws: string) => { await capturePassportInitialization(ws).initialize(); }]
+  ])("a passport policy created by %s and then deleted with its signature fails", async (_how, init) => {
+    const ws = fresh();
+    await init(ws);
+    rmSync(passportPolicyPath(ws));
+    rmSync(`${passportPolicyPath(ws)}.sig`);
+    const report = await run(ws);
+    expect(status(report, "passport-policy-signature")).toBe("FAIL");
+    expect(report.status).toBe("FAIL");
+  });
+
+  test("a default policy an async reader creates is not witnessed until an explicit init witnesses it", async () => {
+    const ws = fresh(), remove = () => { for (const file of [passportPolicyPath(ws), `${passportPolicyPath(ws)}.sig`]) rmSync(file); };
+    await loadPassportPolicyAsync(ws);
+    remove();
+    expect(status(await run(ws), "passport-policy-signature")).toBe("NOT_CONFIGURED");
+    await loadPassportPolicyAsync(ws);
+    passportInitCli(ws);
+    remove();
+    expect(status(await run(ws), "passport-policy-signature")).toBe("FAIL");
+  });
+
+  test("a forecast scheduler state deleted with its signature fails", async () => {
+    const ws = fresh();
+    const saved = saveForecastSchedulerState(ws, defaultForecastSchedulerState());
+    expect(status(await run(ws), "forecast-signatures")).toBe("PASS");
+    rmSync(saved.path);
+    rmSync(saved.sigPath);
+    const report = await run(ws);
+    expect(status(report, "forecast-signatures")).toBe("FAIL");
+    expect(report.status).toBe("FAIL");
+  });
+
+  test.each([
+    ["saved synchronously", (ws: string) => { savePassportPolicy(ws, defaultPassportPolicy()); }],
+    ["applied asynchronously", async (ws: string) => { await passportPolicyApplyForApiAsync({ workspace: ws, policy: defaultPassportPolicy() }); }]
+  ])("a transparency log restored to a copy taken before a policy was %s fails: the ledger witness disagrees", async (_how, save) => {
+    const ws = fresh(), dir = join(ws, ".amc", "transparency"), snapshot = mkdtempSync(join(tmpdir(), "amc-verify-snapshot-"));
+    roots.push(snapshot);
+    cpSync(dir, snapshot, { recursive: true });
+    await save(ws);
+    rmSync(dir, { recursive: true, force: true });
+    cpSync(snapshot, dir, { recursive: true });
+    expect(status(await run(ws), "transparency-log")).toBe("FAIL");
+    for (const file of [passportPolicyPath(ws), `${passportPolicyPath(ws)}.sig`]) rmSync(file);
+    const report = await run(ws);
+    expect(status(report, "passport-policy-signature")).toBe("FAIL");
+    expect(status(report, "transparency-log")).toBe("FAIL");
+    expect(report.status).toBe("FAIL");
+  });
+
+  test("without the witness log, removed passport files still fail on the ledger witness, and the log is not recreated", async () => {
     const ws = fresh();
     savePassportPolicy(ws, defaultPassportPolicy());
     for (const file of [passportPolicyPath(ws), `${passportPolicyPath(ws)}.sig`, transparencyLogPath(ws)]) rmSync(file);
     const report = await run(ws);
-    expect(report.status).toBe("INCOMPLETE");
-    expect(report.skippedCritical).toEqual(["passport-policy-signature", "transparency-log", "transparency-merkle"]);
-    expect(report.notConfigured).not.toContain("passport-policy-signature");
+    expect(status(report, "passport-policy-signature")).toBe("FAIL");
+    expect(status(report, "transparency-log")).toBe("FAIL");
+    expect(report.status).toBe("FAIL");
     expect(existsSync(transparencyLogPath(ws))).toBe(false);
-    expect((await run(ws)).status).toBe("INCOMPLETE");
+  });
+
+  test.each([
+    ["log", (ws: string) => [transparencyLogPath(ws)]],
+    ["seal", (ws: string) => [transparencySealPath(ws), transparencySealSigPath(ws)]]
+  ])("a missing transparency %s reads INCOMPLETE, never PASS, and verify all writes no new one", async (_what, files) => {
+    const ws = fresh();
+    for (const file of files(ws)) rmSync(file);
+    for (let i = 0; i < 2; i++) {
+      const report = await run(ws);
+      expect(report.status).toBe("INCOMPLETE");
+      expect(report.skippedCritical).toEqual(["passport-policy-signature", "transparency-log", "transparency-merkle"]);
+      for (const file of files(ws)) expect(existsSync(file)).toBe(false);
+    }
   });
 });

@@ -5,6 +5,7 @@ import { pathExists, readUtf8 } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import type { SignedFileVerification } from "../org/orgSigner.js";
 import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
+import { FORECAST_SCHEDULER_CONFIGURED, witnessConfiguration } from "../transparency/configWitness.js";
 import { captureOrgPairs, assertOrgPairsCurrent, orgPairBytes, prepareOrgPairsAsync, publishOrgPairs,
   type OrgPairsOptions, type OrgPairWrite, type OrgPairsSnapshot } from "../org/preparedOrgPairs.js";
 import { advisorySchema, forecastArtifactSchema, forecastPolicySchema, forecastSchedulerStateSchema,
@@ -70,7 +71,9 @@ function artifactWrites(workspace: string, scope: ForecastScope, forecast: Forec
   return { writes: [write(latestPath, bytes), write(snapshotPath, bytes)], result: { latestPath, latestSigPath: `${latestPath}.sig`,
     snapshotPath, snapshotSigPath: `${snapshotPath}.sig`, snapshotSha256: sha256Hex(bytes) } };
 }
-export function saveForecastSchedulerState(workspace: string, state: ForecastSchedulerState) { return publishOrgPairs(workspace, schedulerWrites(workspace, state))[0]!; }
+export function saveForecastSchedulerState(workspace: string, state: ForecastSchedulerState) {
+  const saved = publishOrgPairs(workspace, schedulerWrites(workspace, state))[0]!; witnessConfiguration(workspace, FORECAST_SCHEDULER_CONFIGURED, saved.path); return saved;
+}
 export function saveForecastPolicy(workspace: string, policy: ForecastPolicy) { return publishOrgPairs(workspace, policyWrites(workspace, policy))[0]!; }
 export function loadForecastPolicy(workspace: string): ForecastPolicy {
   const path = forecastPolicyPath(workspace); if (!pathExists(path)) throw new Error(`forecast policy not found: ${path}`);
@@ -136,7 +139,10 @@ export async function prepareForecastPolicy(workspace: string, policy: ForecastP
 }
 export async function prepareForecastSchedulerState(workspace: string, state: ForecastSchedulerState, options: OrgPairsOptions = {}, before?: OrgPairsSnapshot) {
   const prepared = await prepareOrgPairsAsync(workspace, schedulerWrites(workspace, state), options, before);
-  return { assertCurrent: prepared.assertCurrent, publish() { return prepared.publish()[0]!; } };
+  // Witnessed after the publish; no forecast scheduler flow holds the transparency state fixed past it.
+  return { assertCurrent: prepared.assertCurrent, publish() {
+    const saved = prepared.publish()[0]!; witnessConfiguration(workspace, FORECAST_SCHEDULER_CONFIGURED, saved.path); return saved;
+  } };
 }
 export async function prepareAdvisory(workspace: string, advisory: AdvisoryRecord, options: OrgPairsOptions = {}, before?: OrgPairsSnapshot) {
   const writes = advisoryWrites(workspace, advisory), digest = sha256Hex(writes[0]!.bytes);
