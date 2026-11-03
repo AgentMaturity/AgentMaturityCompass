@@ -30,7 +30,7 @@ vi.mock("../src/agent/agentToolset.js", async importOriginal => {
 const dirs: string[] = [];
 const writers: SessionService[] = [];
 beforeEach(() => {
-  const checkpoints = realpathSync(mkdtempSync("/private/tmp/amc-wp16-child-control-"));
+  const checkpoints = realpathSync(mkdtempSync(join(tmpdir(), "amc-wp16-child-control-")));
   dirs.push(checkpoints);
   vi.stubEnv("AMC_CONTROL_CHECKPOINT_DIR", checkpoints);
   process.env["AMC_VAULT_PASSPHRASE"] ??= "wp16-subagent-lifecycle-pass";

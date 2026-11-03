@@ -1,8 +1,9 @@
-import { mkdirSync, mkdtempSync, readdirSync, readFileSync, realpathSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, realpathSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, describe, expect, test } from "vitest";
 import { canonicalToolRequests, piRefusal } from "../src/bridge/hookProviders.js";
+import { protectedPathReason } from "../src/toolhub/protectedPaths.js";
 
 const workspace = mkdtempSync(join(tmpdir(), "amc-pi-mapping-"));
 mkdirSync(join(workspace, ".amc", "keys"), { recursive: true });
@@ -55,9 +56,11 @@ describe("Pi tool_call mapping to canonical ToolHub requests", () => {
     symlinkSync(join(workspace, ".amc"), join(workspace, "workspace", "state"));
     expect(path("read", "workspace/state/keys/receipt.pub")).toEqual([at(".amc", "keys", "receipt.pub")]);
     expect(path("write", "workspace/state/keys/new.pub")).toEqual([at(".amc", "keys", "new.pub")]);
-    if (realpathSync.native(at(".amc")) === realpathSync.native(at(".AMC"))) {
-      expect(path("write", ".AMC/keys/new.pub")).toEqual([at(".amc", "keys", "new.pub")]);
-    }
+    // Measured, not assumed from the platform: a case-insensitive volume opens .amc for .AMC; a case-sensitive one
+    // (Linux) names a different, missing entry, which the protected-path floor still refuses by its folded name.
+    if (existsSync(at(".AMC"))) expect(path("write", ".AMC/keys/new.pub")).toEqual([at(".amc", "keys", "new.pub")]);
+    else expect(path("write", ".AMC/keys/new.pub")).toEqual([at(".AMC", "keys", "new.pub")]);
+    expect(protectedPathReason(workspace, path("write", ".AMC/keys/new.pub")[0] as string)).toContain(".amc");
   });
 
   test("read covers the macOS name variants Pi falls back to when the named file is missing", () => {
