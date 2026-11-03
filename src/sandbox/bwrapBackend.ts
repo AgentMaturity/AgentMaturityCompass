@@ -1,4 +1,5 @@
 import { closeSync, constants, existsSync, fstatSync, lstatSync, mkdtempSync, openSync, opendirSync, readFileSync, readlinkSync, realpathSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { runProcess } from "../exec/runProcess.js";
@@ -8,6 +9,10 @@ import type { SandboxBackend, SandboxOutcome, SandboxPolicy } from "./sandboxTyp
 const BWRAP = "/usr/bin/bwrap";
 const RUNTIME_ROOTS = ["/usr", "/bin", "/lib", "/lib64"] as const;
 const RUNTIME_FILES = ["/etc/ld.so.cache", "/etc/ld.so.conf", "/etc/nsswitch.conf", "/etc/passwd", "/etc/group", "/etc/localtime"] as const;
+const NAMESPACE_FLAGS = ["--unshare-user", "--unshare-pid", "--unshare-net", "--unshare-ipc", "--unshare-uts",
+  "--die-with-parent", "--new-session", "--cap-drop", "ALL", "--disable-userns", "--assert-userns-disabled"] as const;
+type Check = { ok: true } | { ok: false; reason: string };
+let launchProbe: Check | undefined;
 
 export function within(root: string, path: string): boolean {
   const suffix = relative(root, path);
@@ -36,7 +41,24 @@ export function admitWritableDirectory(root: string): void {
   }
 }
 
-function prerequisites(): { ok: true } | { ok: false; reason: string } {
+/**
+ * Binary presence is not confinement: Ubuntu 24.04's AppArmor userns restriction
+ * lets bwrap start and then fail namespace setup. Launch the same namespaces once
+ * per process; a host that refuses them reports the backend unavailable.
+ * ponytail: cached for the process lifetime; a host policy change needs a restart.
+ */
+function namespaceLaunch(): Check {
+  launchProbe ??= (() => {
+    const probe = spawnSync(BWRAP, [...NAMESPACE_FLAGS, "--ro-bind", "/", "/", "--", "/bin/true"],
+      { stdio: ["ignore", "ignore", "pipe"], encoding: "utf8", timeout: 10_000, env: { PATH: "/usr/bin:/bin" } });
+    if (probe.status === 0) return { ok: true } as const;
+    const detail = (probe.stderr ?? "").split("\n")[0]!.replace(/[^\x20-\x7e]/g, "").slice(0, 160) || "no diagnostic";
+    return { ok: false, reason: `Bubblewrap is installed but this host refused its namespace setup (${detail})` };
+  })();
+  return launchProbe;
+}
+
+function prerequisites(): Check {
   if (process.platform !== "linux") return { ok: false, reason: "Bubblewrap requires Linux." };
   if (process.arch !== "x64" && process.arch !== "arm64") return { ok: false, reason: "The Linux socket filter supports x64 and arm64 only." };
   try {
@@ -50,11 +72,12 @@ function prerequisites(): { ok: true } | { ok: false; reason: string } {
       if (!parent.isDirectory() || parent.uid !== 0 || (parent.mode & 0o022) !== 0) return { ok: false, reason: "Bubblewrap's system installation directories must be root-owned and not writable by other users." };
       if (path === "/") break;
     }
-    return { ok: true };
   } catch {
     return { ok: false, reason: "Install a supported system Bubblewrap at /usr/bin/bwrap; AMC does not fall back to an unconfined Linux shell." };
   }
+  return namespaceLaunch();
 }
+
 
 /** Original classic-BPF filter: reject other syscall ABIs and socket creation/connection. */
 export function linuxSocketDenyFilter(arch: "x64" | "arm64"): Buffer {
@@ -107,7 +130,7 @@ export function bwrapCommandExit(status: string): number | null {
 export function bwrapBackend(): SandboxBackend {
   return {
     kind: "bwrap",
-    // A prerequisite check, not proof that the kernel accepts the namespace policy.
+    // A real namespace launch, but still not a command-exit receipt: run() requires its own.
     available: prerequisites,
     async run(command: readonly string[], cwd: string, policy: SandboxPolicy): Promise<SandboxOutcome> {
       const declined = (reason: string, kind: "unavailable" | "runner-failure" = "runner-failure"): SandboxOutcome => ({
@@ -147,9 +170,7 @@ export function bwrapBackend(): SandboxBackend {
         writeFileSync(filterPath, linuxSocketDenyFilter(process.arch as "x64" | "arm64"), { mode: 0o600 });
         descriptors.push(openSync(statusPath, constants.O_CREAT | constants.O_EXCL | constants.O_RDWR, 0o600));
         descriptors.push(openSync(filterPath, constants.O_RDONLY));
-        const args: string[] = [BWRAP, "--unshare-user", "--unshare-pid", "--unshare-net", "--unshare-ipc", "--unshare-uts",
-          "--die-with-parent", "--new-session", "--cap-drop", "ALL", "--disable-userns", "--assert-userns-disabled",
-          "--json-status-fd", "3", "--seccomp", "4",
+        const args: string[] = [BWRAP, ...NAMESPACE_FLAGS, "--json-status-fd", "3", "--seccomp", "4",
           // Create scratch mounts first so a workspace beneath /tmp is not hidden later.
           "--dev", "/dev", "--tmpfs", "/tmp", "--chmod", "1777", "/tmp"];
         const readonlyRoots: string[] = [];

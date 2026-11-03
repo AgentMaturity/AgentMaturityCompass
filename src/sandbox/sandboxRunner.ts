@@ -80,7 +80,9 @@ export class SandboxRunner {
         timedOut: false,
         stdout: "",
         stderr: "",
-        writableRoots: policy.writableRoots
+        writableRoots: policy.writableRoots,
+        // Nothing was launched, so no process tree can survive (as a backend's own refusal says).
+        treeExitProven: true
       };
     }
 

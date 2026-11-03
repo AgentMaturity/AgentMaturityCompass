@@ -43,7 +43,7 @@ const resourceTools = [
 ] as const;
 
 beforeEach(() => {
-  const checkpoints = realpathSync(mkdtempSync("/private/tmp/amc-wp16-control-"));
+  const checkpoints = realpathSync(mkdtempSync(join(tmpdir(), "amc-wp16-control-")));
   dirs.push(checkpoints);
   vi.stubEnv("AMC_CONTROL_CHECKPOINT_DIR", checkpoints);
   process.env["AMC_VAULT_PASSPHRASE"] ??= "wp16-native-composition-pass";

@@ -25,7 +25,7 @@ export interface NativePtySupport {
   readonly reason: string;
 }
 
-/** No subprocess probes. Even a positive result is NOT namespace/PTY evidence. */
+/** Only Bubblewrap's cached namespace launch probe runs. Even a positive result is NOT PTY evidence. */
 export function nativePtySupport(): NativePtySupport {
   const base = { platform: process.platform, arch: process.arch, implementation: "linux-bwrap-python-pty" as const, executionVerified: false as const };
   const bwrap = bwrapBackend().available();
@@ -39,7 +39,7 @@ export function nativePtySupport(): NativePtySupport {
       if (!parent.isDirectory() || parent.uid !== 0 || (parent.mode & 0o022) !== 0) throw new Error("untrusted installation");
       if (path === "/") break;
     }
-    return { ...base, prerequisitesAvailable: true, reason: "System Bubblewrap and Python exist; Python 3.11+, devpts and namespace execution remain unverified until launch." };
+    return { ...base, prerequisitesAvailable: true, reason: "System Bubblewrap and Python exist; Python 3.11+ and devpts remain unverified until launch." };
   } catch {
     return { ...base, prerequisitesAvailable: false, reason: "A root-owned, non-setuid system Python 3.11+ at /usr/bin/python3 is required. No host-shell fallback is available." };
   }

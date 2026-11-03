@@ -5,14 +5,21 @@ import { join } from "node:path";
 import { describe, expect, test } from "vitest";
 import { bwrapBackend } from "../../src/sandbox/bwrapBackend.js";
 import { seatbeltNativeShell } from "../../src/sandbox/seatbeltNativeShell.js";
-import { nativeContainmentFixture, type NativeCall } from "../helpers/nativeContainment.js";
+import { nativeContainmentFixture, sandboxNode, type NativeCall } from "../helpers/nativeContainment.js";
 
 // Binary prerequisites are not confinement evidence. Every actual call must produce a real applied receipt.
 const backend = process.platform === "darwin" ? seatbeltNativeShell() : bwrapBackend();
 const supported = process.platform === "darwin" || process.platform === "linux";
 const prerequisite = backend.available();
 const required = process.env.AMC_REQUIRE_REAL_SANDBOX === "1";
-const realTest = supported && prerequisite.ok || required ? test : test.skip;
+const node = sandboxNode();
+const realTest = supported && prerequisite.ok && node !== null || required ? test : test.skip;
+// Linux refuses a signed egress allowlist (ADR-008), so the proxy cases run where it is supported.
+const proxyTest = process.platform === "darwin" ? realTest : test.skip;
+// A Linux host whose kernel refuses Bubblewrap's namespaces must say so and run nothing.
+const refusalTest = process.platform === "linux" && !prerequisite.ok && !required ? test : test.skip;
+if (process.platform === "linux" && !prerequisite.ok) console.warn(`escape suite: Bubblewrap cannot confine here (${prerequisite.reason}); asserting the honest refusal instead.`);
+if (process.platform === "linux" && prerequisite.ok && node === null) console.warn("escape suite: skipped, no Node under /usr or /bin is visible inside the Linux shell.");
 const emit = (expression: string): string => `console.log("AMC_P105:"+JSON.stringify(${expression}));`;
 
 function applied(call: NativeCall, network: "denied" | "proxy-allowlist" = "denied"): void {
@@ -45,7 +52,34 @@ headers:{"proxy-authorization":auth,connection:"close"}},response=>{
 request.setTimeout(2000,()=>request.destroy(new Error("owned proxy request timed out")));
 request.on("error",error=>{${emit('{attempted:true,errorCode:error.code||null,error:error.message}')}});request.end();`;
 
+function refusedBeforeLaunch(call: NativeCall, reason: string): void {
+  expect(call.receipt).toMatchObject({ confined: false, exitCode: null, failure: { kind: "unavailable" } });
+  expect(call.receipt.failure!.reason).toContain(reason);
+  expect(call.receipt.enforcement).toBeUndefined();
+  expect(call.outcome.ok).toBe(false);
+}
+
 describe("real native shell escape attempts with owned canaries", () => {
+  refusalTest("a host that refuses Bubblewrap's namespaces reports it and runs nothing", async () => {
+    const f = nativeContainmentFixture(); let passed = false;
+    try {
+      const target = join(f.allowed, "refused.txt");
+      const call = await f.run(`require("node:fs").writeFileSync(${JSON.stringify(target)},"ran");`);
+      refusedBeforeLaunch(call, prerequisite.ok ? "" : prerequisite.reason);
+      expect(existsSync(target)).toBe(false); passed = true;
+    } finally { await f.finish(passed); }
+  });
+
+  (process.platform === "linux" ? test : test.skip)("a signed egress allowlist is refused on Linux before anything launches", async () => {
+    const f = nativeContainmentFixture({ allowHosts: ["127.0.0.1"] }); let passed = false;
+    try {
+      const origin = await f.origin(), requests = origin.requests.length, connections = origin.connectionCount();
+      const call = await f.run(proxyProgram(`${origin.url}/allowed`));
+      refusedBeforeLaunch(call, prerequisite.ok ? "A signed shell egress allowlist is not available on Linux yet" : prerequisite.reason);
+      expect(origin.requests).toHaveLength(requests); expect(origin.connectionCount()).toBe(connections); expect(f.egress).toEqual([]); passed = true;
+    } finally { await f.finish(passed); }
+  });
+
   realTest("positive control writes the signed root and preserves the real policy/permit receipt", async () => {
     const f = nativeContainmentFixture(); let passed = false;
     try {
@@ -107,7 +141,7 @@ describe("real native shell escape attempts with owned canaries", () => {
     } finally { await f.finish(passed); }
   });
 
-  realTest("the real proxy denies an unlisted host with 403 and a matching decision callback", async () => {
+  proxyTest("the real proxy denies an unlisted host with 403 and a matching decision callback", async () => {
     const f = nativeContainmentFixture({ allowHosts: ["127.0.0.1"] }); let passed = false;
     try {
       const origin = await f.origin(), before = origin.requests.length;
@@ -122,7 +156,7 @@ describe("real native shell escape attempts with owned canaries", () => {
     } finally { await f.finish(passed); }
   });
 
-  realTest("an explicitly listed loopback IP reaches the real owned origin through the authenticated proxy", async () => {
+  proxyTest("an explicitly listed loopback IP reaches the real owned origin through the authenticated proxy", async () => {
     const f = nativeContainmentFixture({ allowHosts: ["127.0.0.1"] }); let passed = false;
     try {
       const origin = await f.origin(), before = origin.requests.length;
@@ -135,7 +169,7 @@ describe("real native shell escape attempts with owned canaries", () => {
     } finally { await f.finish(passed); }
   });
 
-  realTest("a listed localhost name without an IP exemption is refused after actual local resolution", async () => {
+  proxyTest("a listed localhost name without an IP exemption is refused after actual local resolution", async () => {
     const f = nativeContainmentFixture({ allowHosts: ["localhost"] }); let passed = false;
     try {
       const addresses = (await lookup("localhost", { all: true, verbatim: true })).map(row => row.address);
