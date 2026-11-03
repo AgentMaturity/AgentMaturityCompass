@@ -1,5 +1,8 @@
 import Database from "better-sqlite3";
 import { randomUUID } from "node:crypto";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
+import { UNSIGNED_EVIDENCE_STORE } from "../ledger/ledgerConnection.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { signHexDigest, verifyHexDigestAny, getPublicKeyHistory } from "../crypto/keys.js";
@@ -516,6 +519,23 @@ export function createIncidentStore(db: Database.Database): IncidentStoreInstanc
     insertIncidentClockEvent: (event: IncidentClockEvent) => insertIncidentClockEvent(db, event),
     getIncidentClockEvents: (incidentId: string) => getIncidentClockEvents(db, incidentId)
   };
+}
+
+/**
+ * The incidents AMC_NO_SIGN=1 detectors opened in the unsigned store (an unsigned kill's among them), with their latest
+ * state, for incident lists to show labelled unsigned. Read in any mode: the kill switch enforces unsigned kills in
+ * signing sessions too, so the incident must stay visible there. Never verified, and never merged into the signed store.
+ */
+export function unsignedIncidents(workspace: string, agentId: string): Array<Incident & { unsigned: true }> {
+  const path = join(workspace, UNSIGNED_EVIDENCE_STORE);
+  if (!existsSync(path)) return [];
+  const db = new Database(path, { readonly: true, fileMustExist: true });
+  try {
+    if (!db.prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'incident_transitions'").get()) return [];
+    const incidents = getIncidentsByAgent(db, agentId);
+    const states = getLatestIncidentStates(db, incidents.map((incident) => incident.incidentId));
+    return incidents.map((incident) => ({ ...incident, state: states.get(incident.incidentId) ?? incident.state, unsigned: true as const }));
+  } finally { db.close(); }
 }
 
 export function verifyIncidentSignature(

@@ -110,7 +110,7 @@ import { exportLifecycleChangeReceipts, listLifecycleChangeReceipts, loadLifecyc
 import { exportLifecycleRunArtifact, listLifecycleRunArtifacts, loadLifecycleRunArtifact, writeLifecycleRunArtifact } from "./lifecycle/lifecycleRunArtifact.js";
 import { listObservabilityLaneRecords, loadObservabilityLaneRecord, writeObservabilityLaneRecord } from "./lifecycle/observabilityLane.js";
 import { getSigningKey, getPublicKeyHistory, signHexDigest } from "./crypto/keys.js";
-import { computeIncidentHash, createIncidentStore } from "./incidents/incidentStore.js";
+import { computeIncidentHash, createIncidentStore, unsignedIncidents } from "./incidents/incidentStore.js";
 import {
   RECORDABLE_TRIGGERS,
   clockListing,
@@ -7915,9 +7915,9 @@ incident
     try {
       const store = createIncidentStore(ledger.db);
       store.initTables();
-      const incidents = store
-        .getIncidentsByAgent(agentId)
-        .map((row) => ({ ...row, state: deriveIncidentState(store, row) }))
+      // AMC_NO_SIGN=1 incidents (an unsigned kill's) live in the unsigned store and follow, labelled unsigned.
+      const incidents = [...store.getIncidentsByAgent(agentId).map((row) => ({ ...row, state: deriveIncidentState(store, row) })),
+        ...unsignedIncidents(process.cwd(), agentId)]
         .filter((row) => {
           if (!status) {
             return true;
@@ -7933,7 +7933,7 @@ incident
       }
 
       for (const row of incidents) {
-        console.log(`${row.incidentId}  [${row.severity}/${row.state}]  ${row.title}`);
+        console.log(`${row.incidentId}  [${row.severity}/${row.state}]  ${row.title}${"unsigned" in row ? "  (unsigned)" : ""}`);
       }
     } finally {
       ledger.close();

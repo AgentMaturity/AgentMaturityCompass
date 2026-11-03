@@ -40,6 +40,10 @@ Every enforcement point treats it as an active kill for the scope and mode it
 names (one whose scope is not a plain id counts as a workspace `stop_all`). An
 unsigned record never lifts or narrows a kill: an unsigned release counts as
 an unverifiable file, and a kill is released only by the signed release below.
+Its incident and its alerts (`KILL_SWITCH_UNVERIFIABLE`,
+`KILL_SWITCH_SUSPEND_FAILED`) are also recorded in the unsigned store, and
+`amc incident list` and `GET /api/v1/incidents` show that incident in any mode,
+labelled unsigned.
 
 ## 2. Release (OWNER)
 

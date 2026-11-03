@@ -6,7 +6,7 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
 import { randomUUID } from 'node:crypto';
 import { bodyJson, apiSuccess, apiError, apiRequestError, pathParam, queryParam } from './apiHelpers.js';
 import { openLedger } from '../ledger/ledger.js';
-import { createIncidentStore, computeIncidentHash } from '../incidents/incidentStore.js';
+import { createIncidentStore, computeIncidentHash, unsignedIncidents } from '../incidents/incidentStore.js';
 import type { Incident, IncidentSeverity, IncidentState } from '../incidents/incidentTypes.js';
 import {
   IncidentInputError,
@@ -164,22 +164,14 @@ export async function handleIncidentRoute(
       const status = queryParam(req.url ?? '', 'status');
       const limit = parseInt(queryParam(req.url ?? '', 'limit') ?? '50', 10);
 
-      // Always fetch all incidents for this agent, then resolve latest state from transitions
+      // Always fetch all incidents for this agent, then resolve latest state from transitions; no-sign ones follow, labelled.
       const incidents = store.getIncidentsByAgent(agentId);
       const incidentIds = incidents.map(i => i.incidentId);
       const latestStates = store.getLatestIncidentStates(incidentIds);
 
-      let mapped = incidents.map(i => {
-        const currentState = latestStates.get(i.incidentId) ?? i.state;
-        return {
-          incidentId: i.incidentId,
-          agentId: i.agentId,
-          severity: i.severity,
-          state: currentState,
-          title: i.title,
-          createdTs: i.createdTs,
-        };
-      });
+      let mapped = [...incidents.map(i => ({ ...i, state: latestStates.get(i.incidentId) ?? i.state })), ...unsignedIncidents(workspace, agentId)]
+        .map(i => ({ incidentId: i.incidentId, agentId: i.agentId, severity: i.severity, state: i.state, title: i.title,
+          createdTs: i.createdTs, ...('unsigned' in i ? { unsigned: true } : {}) }));
 
       // Apply status filter on resolved state
       if (status === 'closed') {

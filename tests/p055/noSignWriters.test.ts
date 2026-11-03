@@ -4,13 +4,15 @@
  * `.amc/evidence.sqlite`, where an unsigned row makes every later signed reader fail.
  */
 import Database from "better-sqlite3";
+import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { Readable } from "node:stream";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { agentToolset } from "../../src/agent/agentToolset.js";
+import { handleIncidentRoute } from "../../src/api/incidentRouter.js";
 import { handleWatchRoute } from "../../src/api/watchRouter.js";
 import { signArtifactProvenance } from "../../src/artifact/artifactProvenance.js";
 import { appendBridgeTelemetryEvent } from "../../src/bridge/bridgeTelemetry.js";
@@ -18,12 +20,14 @@ import { reserveNativeToolBudget } from "../../src/budgets/nativeBudgetAdmission
 import { createFreezeIncident } from "../../src/drift/freezeEngine.js";
 import { evalImportCoverageStatus, importEvalResults } from "../../src/eval/evalImporters.js";
 import { executeCaseTrials } from "../../src/experiments/trialExecutor.js";
+import { createIncidentStore, unsignedIncidents } from "../../src/incidents/incidentStore.js";
 import { revokeKeyAsync } from "../../src/keys/purposeKeys.js";
 import { signPurposeRevocationList, signWithPurposeKey } from "../../src/keys/purposeProviders.js";
 import { openLedger } from "../../src/ledger/ledger.js";
 import { controlCheckpointDir } from "../../src/lifecycle/signedControlJournalRecords.js";
 import { UNSIGNED_EVIDENCE_STORE } from "../../src/ledger/ledgerConnection.js";
 import { exportReviewTimingCsv, recordReviewTiming } from "../../src/operator/reviewTiming.js";
+import { appendOpsAuditEvent } from "../../src/ops/audit.js";
 import { writeEffectivePolicyReceipt } from "../../src/policy/effectivePolicyReceipt.js";
 import { checkChangeEnvelopeAtOpen } from "../../src/runtime/changeEnvelope.js";
 import { activateKillSwitch, killSwitchDenial, killSwitchStatus, releaseKillSwitch } from "../../src/runtime/killSwitch.js";
@@ -77,6 +81,16 @@ async function postWatch(path: string, body: unknown): Promise<{ status: number;
   return { status, data: parsed.data ?? parsed };
 }
 
+async function getJson(path: string): Promise<Record<string, unknown>> {
+  const req = Readable.from([]) as unknown as IncomingMessage;
+  req.method = "GET"; req.url = path;
+  let text = "";
+  const res = { writeHead() {}, end(chunk?: string) { text = chunk ?? ""; }, setHeader() {} } as unknown as ServerResponse;
+  expect(await handleIncidentRoute(path.split("?")[0]!, "GET", req, res, workspace)).toBe(true);
+  const parsed = JSON.parse(text) as { data?: Record<string, unknown> } & Record<string, unknown>;
+  return parsed.data ?? parsed;
+}
+
 test("ledger checkpoints with a configured TSA refuse before signing or writing a checkpoint", async () => {
   signedConfig(config => { config.time = { required: false, tsa: [{ name: "probe-tsa", url: "https://tsa.invalid/", anchorIds: ["probe-anchor"] }] }; });
   // A signed ledger head to checkpoint, written with signing on.
@@ -126,13 +140,35 @@ describe("the kill switch under no-sign", () => {
     expect(killSwitchDenial(workspace, tool("agent-a", "WRITE_LOW"))).toBeNull();
   });
 
+  test("an unsigned kill opens an incident that the incident list shows, labelled unsigned", async () => {
+    const kill = await activateKillSwitch({ workspace, issuedBy: "owner-1", scope: { kind: "agent", id: "agent-a" }, mode: "stop_new_effects",
+      reason: "emergency", incidentId: null });
+    const listed = await getJson("/api/v1/incidents?agent=agent-a");
+    expect(listed.incidents).toEqual([expect.objectContaining({ agentId: "agent-a", state: "OPEN", unsigned: true,
+      title: "Kill switch activated (KILL_SWITCH_ACTIVATED)" })]);
+    expect(unsignedIncidents(workspace, "agent-a")[0]?.triggerId).toBe(`kill_switch:${kill.killId}`);
+    const cli = spawnSync(process.execPath, [resolve("dist/cli.js"), "incident", "list", "--agent", "agent-a"], { cwd: workspace, encoding: "utf8",
+      env: { ...process.env, AMC_NO_SIGN: "1", AMC_CONTROL_CHECKPOINT_DIR: join(root, "checkpoints"), NO_COLOR: "1" }, timeout: 60_000 });
+    expect(cli.stdout, cli.stderr).toMatch(/\[CRITICAL\/OPEN\]  Kill switch activated \(KILL_SWITCH_ACTIVATED\)  \(unsigned\)/);
+    // The signed store holds no incident: an unsigned one there would fail every signed incident reader.
+    vi.stubEnv("AMC_NO_SIGN", "0");
+    const signed = openLedger(workspace);
+    try { const store = createIncidentStore(signed.db); store.initTables(); expect(store.getIncidentsByAgent("agent-a")).toEqual([]); }
+    finally { signed.close(); }
+    // A signing session lists it too, so the kill it still enforces stays visible.
+    expect((await getJson("/api/v1/incidents?agent=agent-a")).incidents).toHaveLength(1);
+  });
+
   test("no unsigned record releases or narrows a signed kill", async () => {
     vi.stubEnv("AMC_NO_SIGN", "0");
     const signed = await activateKillSwitch({ workspace, issuedBy: "owner-1", scope: { kind: "workspace", id: "workspace" }, mode: "stop_all",
       reason: "signed", incidentId: "inc-1" });
     vi.stubEnv("AMC_NO_SIGN", "1");
-    // Planted in the mirror under a name that sorts after every signed copy, so it is the last record read.
-    writeFileSync(join(controlCheckpointDir(workspace, "kill-switch"), "zz-planted.json"),
+    // The reader takes the workspace directory before the mirror, so with the mirror holding only the unsigned twin it
+    // is read after the signed copy whatever order the file system lists names in.
+    const mirror = controlCheckpointDir(workspace, "kill-switch");
+    for (const name of readdirSync(mirror)) rmSync(join(mirror, name));
+    writeFileSync(join(mirror, "planted.json"),
       JSON.stringify({ ...signed, scope: { kind: "agent", id: "nobody" }, mode: "stop_new_effects", signature: "unsigned" }));
     expect(killSwitchDenial(workspace, tool("default", "READ_ONLY"))).toContain(`kill_switch_active: ${signed.killId} (workspace:workspace, stop_all)`);
     write({ v: 1, release: true, killId: signed.killId, incidentId: "inc-1", releasedBy: "owner-1", releasedTs: Date.now(), signature: "unsigned" });
@@ -192,9 +228,12 @@ test("record-only writers put unsigned rows in the unsigned store only", () => {
   const evalFile = join(workspace, "eval.json");
   writeFileSync(evalFile, JSON.stringify({ results: [{ id: "oa-1", name: "probe", pass: true, score: 1 }] }));
   importEvalResults({ workspace, format: "openai", file: evalFile });
+  // Ops audits: the deletion gate's record and the kill switch's alerts.
+  const ops = appendOpsAuditEvent({ workspace, auditType: "KILL_SWITCH_UNVERIFIABLE", severity: "CRITICAL", payload: { files: [] } });
   const unsigned = unsignedStore();
   expect(unsigned.get(telemetry.eventId)).toBe("unsigned");
-  expect(unsigned.size).toBeGreaterThanOrEqual(4);
+  expect(unsigned.get(ops.eventId)).toBe("unsigned");
+  expect(unsigned.size).toBeGreaterThanOrEqual(5);
   expect([...unsigned.values()].every(sig => sig === "unsigned")).toBe(true);
   const signedAfter = signedStore();
   expect(signedAfter.size).toBe(signedBefore.size);
