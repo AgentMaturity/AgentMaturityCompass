@@ -19,14 +19,36 @@ const contracts = [
   "src/ops/otelExporter.ts"
 ];
 
+function dependency(file: string, specifier: string): string {
+  return posix.normalize(posix.join(posix.dirname(file), specifier)).replace(/\.js$/, ".ts");
+}
+
+const reverseImports = new WeakMap<Map<string, string>, Map<string, string[]>>();
+/** The target and every file that names it, or names such a file, in an import, export-from, import() or require()
+ * specifier: a superset of the consumers and barrels productionConsumers can find, read with TypeScript's import
+ * scanner so only these files get a full parse (parsing and walking all of src per contract took 20-40 s on CI). */
+function importersOf(target: string, sources: Map<string, string>): Set<string> {
+  let reverse = reverseImports.get(sources);
+  if (!reverse) {
+    reverse = new Map();
+    for (const [file, text] of sources) {
+      for (const { fileName } of ts.preProcessFile(text, true, true).importedFiles) {
+        const next = dependency(file, fileName);
+        reverse.set(next, [...(reverse.get(next) ?? []), file]);
+      }
+    }
+    reverseImports.set(sources, reverse);
+  }
+  const reached = new Set([target]);
+  for (const file of reached) for (const importer of reverse.get(file) ?? []) reached.add(importer);
+  return reached;
+}
+
 // Re-exports publish a library API; only value imports count as production use.
 function productionConsumers(target: string, sources: Map<string, string>, parsed = new Map<string, ts.SourceFile>()): string[] {
   function source(file: string): ts.SourceFile {
     if (!parsed.has(file)) parsed.set(file, ts.createSourceFile(file, sources.get(file)!, ts.ScriptTarget.Latest, true));
     return parsed.get(file)!;
-  }
-  function dependency(file: string, specifier: string): string {
-    return posix.normalize(posix.join(posix.dirname(file), specifier)).replace(/\.js$/, ".ts");
   }
   function exposes(file: string, name: string, seen = new Set<string>()): boolean {
     if (file === target) return true;
@@ -41,8 +63,9 @@ function productionConsumers(target: string, sources: Map<string, string>, parse
       return statement.exportClause.elements.some(element => !element.isTypeOnly && (name === "*" || element.name.text === name) && exposes(next, (element.propertyName ?? element.name).text, seen));
     });
   }
+  const candidates = importersOf(target, sources);
   return [...sources.keys()].filter(file => {
-    if (file === target) return false;
+    if (file === target || !candidates.has(file)) return false;
     let used = false;
     function visit(node: ts.Node): void {
       if (ts.isImportDeclaration(node) && ts.isStringLiteral(node.moduleSpecifier) && !node.importClause?.isTypeOnly) {
@@ -129,7 +152,7 @@ describe("WP46 unwired contract labels", () => {
   test("legacy registry and public cancellation help disclose their limits", () => {
     expect(sources.get("src/runtimes/index.ts")).toMatch(/@deprecated[\s\S]*src\/adapters\//);
     for (const operation of ["cancel", "resume"]) {
-      const help = execFileSync(process.execPath, [resolve(root, "dist/cli.js"), "runtime", operation, "--help"], { encoding: "utf8" });
+      const help = execFileSync(process.execPath, [resolve(root, "dist/cli.js"), "runtime", operation, "--help"], { encoding: "utf8", timeout: 20_000 });
       expect(help).toContain("record-only");
       expect(help.replace(/\s+/g, " ")).toContain(`does not ${operation} native execution`);
     }

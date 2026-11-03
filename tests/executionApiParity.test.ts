@@ -185,13 +185,23 @@ async function typescriptLeg(f: Fixture): Promise<Leg> {
   return { ...record, verbs: [...verbs].sort(), ids: { parent, child: child.sessionId } };
 }
 
-async function pythonLeg(f: Fixture): Promise<Leg> {
-  const out = join(f.root, "python-parity.json");
-  const python = process.env.AMC_PARITY_PYTHON ?? "python3";
+/** Runs sdk/python/tests/test_parity.py against the fixture and returns the record it writes. The script imports pytest
+ * (the SDK's test dependency, pyproject's dev extra), so an interpreter without it is named as such, not as exit 1. */
+function pythonParity<T>(f: Fixture, name: string, mode: Record<string, string> = {}): T {
+  const python = process.env.AMC_PARITY_PYTHON ?? "python3", out = join(f.root, name);
+  const probe = spawnSync(python, ["-c", "import pytest"], { encoding: "utf8", timeout: 60_000 });
+  if (probe.status !== 0) {
+    throw new Error(`${python} cannot import pytest, which sdk/python/tests/test_parity.py needs: install the SDK's test dependencies `
+      + `(${python} -m pip install "pytest>=8") or set AMC_PARITY_PYTHON to an interpreter that has them.\n${probe.error ?? probe.stderr}`);
+  }
   const run = spawnSync(python, ["-B", "sdk/python/tests/test_parity.py"], { encoding: "utf8", timeout: 300_000,
-    env: { ...process.env, ...f.env, AMC_BIN: CLI, AMC_PARITY_WORKSPACE: f.workspace, AMC_PARITY_OUT: out, PYTHONPATH: resolve("sdk/python") } });
+    env: { ...process.env, ...f.env, ...mode, AMC_BIN: CLI, AMC_PARITY_WORKSPACE: f.workspace, AMC_PARITY_OUT: out, PYTHONPATH: resolve("sdk/python") } });
   expect(run.status, `${run.stdout}\n${run.stderr}`).toBe(0);
-  return JSON.parse(readFileSync(out, "utf8")) as Leg;
+  return JSON.parse(readFileSync(out, "utf8")) as T;
+}
+
+async function pythonLeg(f: Fixture): Promise<Leg> {
+  return pythonParity<Leg>(f, "python-parity.json");
 }
 
 /** The built Studio server with logged-in owner and reviewer identities, and the native-task calls both scenarios use. */
@@ -322,11 +332,7 @@ const purposeLegs: Record<string, (f: Fixture) => Promise<{ turn: StatusRecord; 
     return { turn, verified: statusOf((await client.verifySession(session.sessionId)).execution) };
   },
   async python(f) {
-    const out = join(f.root, "python-purpose.json");
-    const run = spawnSync(process.env.AMC_PARITY_PYTHON ?? "python3", ["-B", "sdk/python/tests/test_parity.py"], { encoding: "utf8", timeout: 300_000,
-      env: { ...process.env, ...f.env, AMC_BIN: CLI, AMC_PARITY_WORKSPACE: f.workspace, AMC_PARITY_OUT: out, AMC_PARITY_MODE: "purpose", PYTHONPATH: resolve("sdk/python") } });
-    expect(run.status, `${run.stdout}\n${run.stderr}`).toBe(0);
-    return JSON.parse(readFileSync(out, "utf8")) as { turn: StatusRecord; verified: StatusRecord };
+    return pythonParity<{ turn: StatusRecord; verified: StatusRecord }>(f, "python-purpose.json", { AMC_PARITY_MODE: "purpose" });
   },
   async studio(f) {
     const { settled, control, start, close } = await studio(f);

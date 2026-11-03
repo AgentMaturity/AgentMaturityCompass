@@ -67,6 +67,15 @@ jobs:
       - name: Build
         run: npm run build
 
+      # tests/executionApiParity.test.ts drives sdk/python/tests/test_parity.py, which imports pytest: the SDK's test
+      # dependency (pyproject's dev extra), installed as the python-sdk job installs it.
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install the Python SDK's test dependency
+        run: python3 -m pip install "pytest>=8"
+
       - name: Set up Helm for full test suite
         uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5
         with:
