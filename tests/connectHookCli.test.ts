@@ -134,6 +134,7 @@ describe("amc connect hooks CLI", () => {
     expect(JSON.parse(installed.stdout)).toMatchObject({
       mode: "control",
       lease: { scopes: ["hook:observe", "hook:control"] },
+      warnings: [],
     });
 
     const forwarded = run(cwd, [
@@ -170,7 +171,11 @@ describe("amc connect hooks CLI", () => {
     const cwd = workspace();
     const noClaude = claudePath(join(cwd, "no-claude"), null);
     const control = ["--provider", "claude-code", "--mode", "control", "--agent", "control-cli-agent"];
-    expect(run(cwd, ["connect", "hooks", "install", ...control, "--json"], undefined, noClaude).status).toBe(0);
+    const installed = run(cwd, ["connect", "hooks", "install", ...control, "--json"], undefined, noClaude);
+    expect(installed.status).toBe(0);
+    expect(JSON.parse(installed.stdout).warnings).toEqual([expect.stringContaining("no Claude Code was on PATH, so the installation binds no qualified release and the hook denies every action")]);
+    const again = run(cwd, ["connect", "hooks", "install", ...control], undefined, noClaude);
+    expect(again.stdout).toContain("Warning: no Claude Code was on PATH");
     const forwarded = run(cwd, ["connect", "hooks", "forward", ...control, "--token-file", ".amc/hooks/claude-code.lease", "--event", "PreToolUse"],
       JSON.stringify({ session_id: "cli-unbound-session", transcript_path: "/private/transcript.jsonl", cwd, permission_mode: "default",
         hook_event_name: "PreToolUse", tool_name: "Read", tool_use_id: "toolu_cli_unbound_01", tool_input: { file_path: "/private/never-forwarded.txt" } }), noClaude);

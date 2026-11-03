@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { getAgentPaths } from "../src/fleet/paths.js";
-import { latestVerifiedRun, listVerifiedRuns, loadVerifiedRunReport } from "../src/diagnostic/runReportResolution.js";
+import { latestVerifiedRun, listVerifiedRuns, loadVerifiedRunReport, MAX_CACHED_VERDICTS } from "../src/diagnostic/runReportResolution.js";
 import { generateTrustCertificate } from "../src/cert/trustCertificate.js";
 import { startTrustDriftMonitor } from "../src/monitor/trustDriftMonitor.js";
 import { latestAssuranceByPack, scanVerifiedAssuranceByPack } from "../src/assurance/assuranceRunner.js";
@@ -24,6 +24,24 @@ vi.mock("../src/assurance/assuranceVerifier.js", async (importActual) => {
   const actual = await importActual<typeof import("../src/assurance/assuranceVerifier.js")>();
   return { ...actual, verifyAssuranceCertificateFile: (params: Parameters<typeof actual.verifyAssuranceCertificateFile>[0]) =>
     certStub.result ?? actual.verifyAssuranceCertificateFile(params) };
+});
+
+/** Counts seal verifications and file reads so a test can show what a repeated scan redoes. */
+const counts = vi.hoisted(() => ({ verifies: 0, reads: [] as string[] }));
+vi.mock("../src/diagnostic/reportSeal.js", async (importActual) => {
+  const actual = await importActual<typeof import("../src/diagnostic/reportSeal.js")>();
+  return { ...actual, sealedRunReportVerifies: (...args: Parameters<typeof actual.sealedRunReportVerifies>) => {
+    counts.verifies += 1;
+    return actual.sealedRunReportVerifies(...args);
+  } };
+});
+vi.mock("node:fs", async (importActual) => {
+  const actual = await importActual<typeof import("node:fs")>();
+  const readFileSync = ((...args: Parameters<typeof actual.readFileSync>) => {
+    counts.reads.push(String(args[0]));
+    return actual.readFileSync(...args);
+  }) as typeof actual.readFileSync;
+  return { ...actual, default: { ...actual, readFileSync }, readFileSync };
 });
 
 const roots: string[] = [];
@@ -80,6 +98,35 @@ describe("WP37 verified run readers", () => {
     tamperReport(newest, (report) => { report.integrityIndex = 0.99; });
     expect(latestVerifiedRun(ws, "agent-x")).toMatchObject({ run: null, blocking: [{ tampered: true }] });
     expect(listVerifiedRuns(ws, "agent-x").map((row) => row.runId)).toEqual(["run-1"]);
+  });
+
+  test("a repeated scan reads only the run it returns and re-verifies nothing while stats and bytes are unchanged", () => {
+    const ws = workspace();
+    for (let index = 1; index <= 5; index += 1) writeSealedReport(ws, runsDir(ws), `run-${index}`, run(`run-${index}`, index * 1000, 0.5));
+    vi.useFakeTimers({ toFake: ["Date"] });
+    try {
+      // Past the racy window: the files' stats now vouch for the bytes they were verified with.
+      vi.setSystemTime(Date.now() + 10_000);
+      expect(latestVerifiedRun(ws, "agent-x").run?.runId).toBe("run-5");
+      counts.verifies = 0; counts.reads.length = 0;
+      expect(latestVerifiedRun(ws, "agent-x").run?.runId).toBe("run-5");
+      expect(counts.verifies).toBe(0);
+      expect(counts.reads.filter((file) => file.startsWith(runsDir(ws)))).toEqual([join(runsDir(ws), "run-5.json")]);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  test("a workspace with more run files than the cache holds still reuses the verdicts it kept", () => {
+    const ws = workspace();
+    const overflow = 20, total = MAX_CACHED_VERDICTS + overflow;
+    writeSealedReport(ws, runsDir(ws), "run-0000", run("run-0000", 1000, 0.5));
+    for (let index = 1; index < total; index += 1) writeFileSync(join(runsDir(ws), `run-${String(index).padStart(4, "0")}.json`), "{}");
+    listVerifiedRuns(ws, "agent-x");
+    counts.verifies = 0;
+    expect(listVerifiedRuns(ws, "agent-x").map((row) => row.runId)).toEqual(["run-0000"]);
+    // An LRU or a cleared cache would re-verify every file on each scan; only the files past the cap are verified again.
+    expect(counts.verifies).toBe(overflow);
   });
 
   test("loadVerifiedRunReport refuses a sealed run of another agent or stored under another run's name", () => {

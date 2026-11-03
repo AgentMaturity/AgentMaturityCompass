@@ -484,8 +484,8 @@ async function forwardClaudeSessionHook(payload: ClaudeHookPayload, opts: HookFo
   return { stdout: "{}\n", stderr: "", exitCode: 0 };
 }
 
-/** The installation binds no Claude Code release AMC qualified, so no payload can be read: the installation's fault. */
-class UnboundClaudeReleaseError extends HookIntegrationError {}
+/** The installation, not the payload, is at fault: its manifest, lease or .gitignore block fails, or it binds no qualified release. */
+class HookInstallationError extends HookIntegrationError {}
 
 /** Events on which exit 2 keeps Claude Code (or a subagent or teammate) working, or that nothing can block: never exit 2. */
 const NEVER_BLOCKED = new Set(["Stop", "SubagentStop", "TeammateIdle", "TaskCompleted", "SessionEnd", "Notification", "SubagentStart"]);
@@ -515,7 +515,7 @@ function claudeFailure(handler: string | null, payloadEvents: ReadonlySet<string
   }
   if (error instanceof HookDeadlineError) return claudeDeny("AMC hook control timed out; action denied.");
   if (error instanceof EgressBlocked) return claudeDeny(`AMC residency refused hook delivery; action denied (${why}).`);
-  if (error instanceof UnboundClaudeReleaseError) return claudeDeny(`AMC hook installation unusable (${why}); action denied.`);
+  if (error instanceof HookInstallationError) return claudeDeny(`AMC hook installation unusable (${why}); action denied.`);
   return claudeDeny(forwarding ? "AMC hook control unavailable; action denied." : "AMC hook control input invalid; action denied.");
 }
 
@@ -541,10 +541,15 @@ function payloadEventNames(bytes: Buffer): Set<string> {
 /** Claude Code's payload bytes read the one way they can be read, then the installation's bound release's payload schema. */
 function claudePayload(bytes: Buffer, opts: HookForwardOptions, workspace: string): { payload: ClaudeHookPayload; text: string } {
   const strict = strictClaudeJson(bytes);
-  const release = authorizeForwardInvocation({ workspace, provider: "claude-code", mode: "control", agentId: opts.agent,
-    bridgeBase: normalizeBridgeBase(opts.bridgeUrl), tokenFile: opts.tokenFile }).claudeCodeVersion;
+  let release: string | null;
+  try {
+    release = authorizeForwardInvocation({ workspace, provider: "claude-code", mode: "control", agentId: opts.agent,
+      bridgeBase: normalizeBridgeBase(opts.bridgeUrl), tokenFile: opts.tokenFile }).claudeCodeVersion;
+  } catch (error) {
+    throw new HookInstallationError(error instanceof HookIntegrationError ? error.code : "HOOK_MANIFEST_INVALID", error instanceof Error ? error.message : String(error));
+  }
   const schemas = claudeHookSchemasFor(release);
-  if (!schemas) throw new UnboundClaudeReleaseError("HOOK_MANIFEST_INVALID", "the installation binds no qualified Claude Code release; reinstall with Claude Code on PATH");
+  if (!schemas) throw new HookInstallationError("HOOK_MANIFEST_INVALID", "the installation binds no qualified Claude Code release; reinstall with Claude Code on PATH");
   const payload = schemas.payload.parse(strict.value);
   if (payload.hook_event_name !== opts.event) throw new HookIntegrationError("HOOK_INPUT_UNSUPPORTED", `a ${payload.hook_event_name} payload reached AMC's ${opts.event} hook`);
   return { payload, text: strict.text };

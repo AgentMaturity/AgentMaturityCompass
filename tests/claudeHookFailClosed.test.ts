@@ -443,4 +443,26 @@ describe("in-process forwarder deadline", () => {
     const geminiEmpty = await runHookForward({ ...claude, provider: "gemini-cli", tokenFile: ".amc/hooks/gemini-cli.lease" }, async () => "", workspace);
     expect(geminiEmpty.exitCode).toBe(1);
   }, 30_000);
+
+  test("denies a valid payload as an unusable installation, not invalid input, when the installation itself is at fault", async () => {
+    const workspace = newWorkspace();
+    const bridgeBase = await listen(() => { /* never reached */ });
+    const claude = { provider: "claude-code" as const, mode: "control" as const, agent: "fault-agent", tokenFile: ".amc/hooks/claude-code.lease", bridgeUrl: bridgeBase,
+      event: "PreToolUse" };
+    const call = async () => claudeRead("/private/fault.txt", "toolu_fault_01");
+    const unusable = (cause: string) => ({ stdout: `${JSON.stringify(CLAUDE_DENY)}\n`, stderr: `AMC hook installation unusable (${cause}); action denied.\n`, exitCode: 2 });
+
+    expect(await runHookForward(claude, call, workspace)).toEqual(unusable("signed hook installation manifest is required before forwarding"));
+    installControl(workspace, "claude-code", "fault-agent", bridgeBase);
+    const mismatch = "hook forwarder agent or Bridge origin differs from the signed installation manifest";
+    expect(await runHookForward({ ...claude, agent: "other-agent" }, call, workspace)).toEqual(unusable(mismatch));
+    expect(await runHookForward({ ...claude, bridgeUrl: "http://127.0.0.1:9" }, call, workspace)).toEqual(unusable(mismatch));
+    expect(await runHookForward({ ...claude, tokenFile: ".amc/hooks/other.lease" }, call, workspace))
+      .toEqual(unusable("hook forwarder accepts only the signed installation lease path"));
+    // A malformed payload is still the payload's fault, whatever the installation's state.
+    expect(await runHookForward({ ...claude, agent: "other-agent" }, async () => "{", workspace))
+      .toMatchObject({ exitCode: 2, stderr: "AMC hook control input invalid; action denied.\n" });
+    writeFileSync(join(workspace, ".gitignore"), "");
+    expect(await runHookForward(claude, call, workspace)).toEqual(unusable(".amc/hooks/ must remain protected by the managed .gitignore block"));
+  }, 30_000);
 });
