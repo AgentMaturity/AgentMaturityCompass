@@ -2,14 +2,14 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, beforeAll, describe, expect, test, vi } from "vitest";
-import { initWorkspace } from "../dist/workspace.js";
-import { SessionService } from "../dist/session/sessionService.js";
-import { openLedger } from "../dist/ledger/ledger.js";
+import { initWorkspace } from "../src/workspace.js";
+import { SessionService } from "../src/session/sessionService.js";
+import { openLedger } from "../src/ledger/ledger.js";
 import {
   analyzeArchitectureExperiment, createArchitectureExperiment, createArchitectureSpec, createProbe,
   renderArchitectureComparisonMarkdown, runArchitectureExperiment, simulateProbeOutcomes,
   type ArchitectureSpec, type ArchitectureProbe
-} from "../dist/experiments/architectureExperiment.js";
+} from "../src/experiments/architectureExperiment.js";
 
 let workspace: string;
 const activeSessions: SessionService[] = [];

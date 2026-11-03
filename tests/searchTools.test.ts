@@ -5,9 +5,11 @@ import { fileURLToPath } from "node:url";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { ToolRegistry } from "../dist/tools/toolRegistry.js";
-import { ToolPipeline } from "../dist/tools/toolPipeline.js";
-import { searchTools } from "../dist/tools/builtin/searchTools.js";
+import type { ToolPipeline } from "../src/tools/toolPipeline.js";
+// Grep and glob run in a built worker, so these load from dist at run time; their types come from src so the type check needs no build.
+const { ToolRegistry } = await import(new URL("../dist/tools/toolRegistry.js", import.meta.url).href) as typeof import("../src/tools/toolRegistry.js");
+const { ToolPipeline: ToolPipelineImpl } = await import(new URL("../dist/tools/toolPipeline.js", import.meta.url).href) as typeof import("../src/tools/toolPipeline.js");
+const { searchTools } = await import(new URL("../dist/tools/builtin/searchTools.js", import.meta.url).href) as typeof import("../src/tools/builtin/searchTools.js");
 
 /**
  * Search is capped, and every cap says what it dropped.
@@ -38,7 +40,7 @@ function harness(): {
   dirs.push(workspace);
   const registry = new ToolRegistry();
   for (const tool of searchTools()) registry.define(tool);
-  const pipeline = new ToolPipeline({ registry, workspace });
+  const pipeline = new ToolPipelineImpl({ registry, workspace });
   return {
     workspace,
     run: (name, args) => pipeline.execute({ name, agentId: "alice", arguments: args, requestedMode: "EXECUTE" })
@@ -393,7 +395,7 @@ describe("safe search file opens", () => {
   it("bounds a read before allocating and does not call a capped prefix a complete file", async () => {
     const h = harness();
     write(h.workspace, "wide.txt", "0123456789");
-    const { readWorkspaceFile } = await import("../dist/tools/builtin/workspaceWalk.js");
+    const { readWorkspaceFile } = await import(new URL("../dist/tools/builtin/workspaceWalk.js", import.meta.url).href) as typeof import("../src/tools/builtin/workspaceWalk.js");
     const prefix = readWorkspaceFile(h.workspace, "wide.txt", 4, 20);
     expect(prefix?.bytes.toString()).toBe("0123");
     expect(prefix?.complete).toBe(false);
@@ -483,7 +485,7 @@ describe("scoped search roots", () => {
     write(outside, "private.ts", "NEEDLE");
     symlinkSync(outside, join(h.workspace, "escape"));
     write(h.workspace, "file.ts", "NEEDLE");
-    const { walkWorkspace } = await import("../dist/tools/builtin/workspaceWalk.js");
+    const { walkWorkspace } = await import(new URL("../dist/tools/builtin/workspaceWalk.js", import.meta.url).href) as typeof import("../src/tools/builtin/workspaceWalk.js");
     for (const path of ["../", outside, "escape", "file.ts"]) {
       expect(() => walkWorkspace(h.workspace, { path, maxFiles: 10, maxFileBytes: 100 }), path).toThrow();
     }

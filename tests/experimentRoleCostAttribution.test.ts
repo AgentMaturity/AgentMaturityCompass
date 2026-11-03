@@ -1,8 +1,8 @@
 import { describe, expect, test } from "vitest";
-import { createModelMetadataSnapshot } from "../dist/llm/modelCatalog.js";
-import { projectNativeCost } from "../dist/budgets/nativeCostProjection.js";
-import { summarizeExperimentRoleCosts } from "../dist/experiments/experimentResourceUsage.js";
-import type { EvidenceEvent } from "../dist/types.js";
+import { createModelMetadataSnapshot } from "../src/llm/modelCatalog.js";
+import { projectNativeCost } from "../src/budgets/nativeCostProjection.js";
+import { summarizeExperimentRoleCosts } from "../src/experiments/experimentResourceUsage.js";
+import type { EvidenceEvent } from "../src/types.js";
 
 function cost(id: string, options: { reportedUsd?: number; pending?: boolean; partial?: boolean; unpriced?: boolean } = {}) {
   const event = (suffix: string, event_type: EvidenceEvent["event_type"], meta: Record<string, unknown>): EvidenceEvent =>

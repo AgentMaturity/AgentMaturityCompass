@@ -2,13 +2,13 @@ import { mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, writeFile
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { afterEach, describe, expect, test, vi } from "vitest";
-import { checkComparisonCampaign, comparisonCampaignSchema } from "../dist/benchmarks/comparisonCampaign.js";
-import { analyzeComparisonCampaign } from "../dist/benchmarks/comparisonCampaignAnalysis.js";
-import { comparisonSha256 } from "../dist/benchmarks/harnessComparisonArtifacts.js";
-import * as campaignArtifacts from "../dist/benchmarks/harnessComparisonArtifacts.js";
-import { HARNESS_COMPARISON_VERSION, type HarnessComparisonManifest } from "../dist/benchmarks/harnessComparisonSchema.js";
-import { checkHarnessComparison, runHarnessComparison, type HarnessComparisonReport } from "../dist/benchmarks/harnessComparison.js";
-import { captureCampaignWorkspace } from "../dist/benchmarks/comparisonCampaignEvidence.js";
+import { checkComparisonCampaign, comparisonCampaignSchema } from "../src/benchmarks/comparisonCampaign.js";
+import { analyzeComparisonCampaign } from "../src/benchmarks/comparisonCampaignAnalysis.js";
+import { comparisonSha256 } from "../src/benchmarks/harnessComparisonArtifacts.js";
+import * as campaignArtifacts from "../src/benchmarks/harnessComparisonArtifacts.js";
+import { HARNESS_COMPARISON_VERSION, type HarnessComparisonManifest } from "../src/benchmarks/harnessComparisonSchema.js";
+import { checkHarnessComparison, runHarnessComparison, type HarnessComparisonReport } from "../src/benchmarks/harnessComparison.js";
+import { captureCampaignWorkspace } from "../src/benchmarks/comparisonCampaignEvidence.js";
 
 const roots: string[] = [];
 afterEach(() => { vi.restoreAllMocks(); for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true }); });

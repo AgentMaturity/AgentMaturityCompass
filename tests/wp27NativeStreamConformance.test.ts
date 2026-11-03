@@ -1,23 +1,23 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, test } from "vitest";
-import { LLM_FAILURE_CODE } from "../dist/llm/llmFailure.js";
-import { BlockAssembler, surfaceBlocks } from "../dist/llm/blockAssembler.js";
-import { sseEvents } from "../dist/llm/adapter/sse.js";
-import { openaiAdapter } from "../dist/llm/providers/openaiAdapter.js";
-import { openaiResponsesAdapter } from "../dist/llm/providers/openaiResponsesAdapter.js";
-import { anthropicAdapter } from "../dist/llm/providers/anthropicAdapter.js";
-import { deepseekAdapter } from "../dist/llm/providers/deepseekAdapter.js";
-import { geminiAdapter } from "../dist/llm/providers/geminiAdapter.js";
-import { geminiAudioAdapter } from "../dist/llm/providers/geminiAudioAdapter.js";
-import { ollamaAdapter } from "../dist/llm/providers/ollamaAdapter.js";
-import { gatewayAdapter } from "../dist/llm/providers/gatewayAdapter.js";
-import { readOllamaCallKey, OLLAMA_CALL_KEY_PREFIX } from "../dist/llm/providers/ollamaToolIdentity.js";
-import { RequestEncoderRegistry } from "../dist/llm/request/requestEncoder.js";
-import { BUILT_IN_REQUEST_ENCODERS } from "../dist/llm/request/builtInEncoders.js";
-import type { LlmAdapter } from "../dist/llm/adapter/adapterTypes.js";
-import type { HttpResponse } from "../dist/llm/adapter/transport.js";
-import type { StreamChunk, StreamTokenUsage } from "../dist/llm/streamChunk.js";
-import type { EncodablePart, EncodableRequest } from "../dist/llm/request/requestSpec.js";
+import { LLM_FAILURE_CODE } from "../src/llm/llmFailure.js";
+import { BlockAssembler, surfaceBlocks } from "../src/llm/blockAssembler.js";
+import { sseEvents } from "../src/llm/adapter/sse.js";
+import { openaiAdapter } from "../src/llm/providers/openaiAdapter.js";
+import { openaiResponsesAdapter } from "../src/llm/providers/openaiResponsesAdapter.js";
+import { anthropicAdapter } from "../src/llm/providers/anthropicAdapter.js";
+import { deepseekAdapter } from "../src/llm/providers/deepseekAdapter.js";
+import { geminiAdapter } from "../src/llm/providers/geminiAdapter.js";
+import { geminiAudioAdapter } from "../src/llm/providers/geminiAudioAdapter.js";
+import { ollamaAdapter } from "../src/llm/providers/ollamaAdapter.js";
+import { gatewayAdapter } from "../src/llm/providers/gatewayAdapter.js";
+import { readOllamaCallKey, OLLAMA_CALL_KEY_PREFIX } from "../src/llm/providers/ollamaToolIdentity.js";
+import { RequestEncoderRegistry } from "../src/llm/request/requestEncoder.js";
+import { BUILT_IN_REQUEST_ENCODERS } from "../src/llm/request/builtInEncoders.js";
+import type { LlmAdapter } from "../src/llm/adapter/adapterTypes.js";
+import type { HttpResponse } from "../src/llm/adapter/transport.js";
+import type { StreamChunk, StreamTokenUsage } from "../src/llm/streamChunk.js";
+import type { EncodablePart, EncodableRequest } from "../src/llm/request/requestSpec.js";
 
 interface Frame { data: unknown; event?: string }
 interface Fixture {
