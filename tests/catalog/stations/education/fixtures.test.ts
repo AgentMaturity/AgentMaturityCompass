@@ -1,6 +1,7 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
+import { chromium } from "@playwright/test";
 import { runGradebook } from "./gradebook.js";
 import { runCapabilityLog } from "./toolCapabilityLog.js";
 import { runExportLog } from "./exportLog.js";
@@ -30,6 +31,15 @@ function pendingExport() {
     request: { teacherId: "teacher-1", institutionId: "institution-a", classId: "class-a", recordIds: ["synthetic-record-1"],
       destination: "https://records.fixture.invalid/export" } };
 }
+// Host capability, probed apart from the checker: a host without Playwright's Chromium (a CI test shard) must get an honest
+// checker_unavailable with the launch error class, never a pass or fail; hosts with it run the full Axe assertions.
+const browserInstalled = existsSync(chromium.executablePath());
+if (!browserInstalled) console.warn(`[L1-EDU-04] no Chromium at ${chromium.executablePath()}: browser cases assert checker_unavailable; run npx playwright install chromium for the Axe assertions`);
+const browserCase = (actual: OracleOutcome, reason: string) => {
+  refused(actual, "not_evaluated", browserInstalled ? reason : "checker_unavailable");
+  if (!browserInstalled) expect(actual.observations.errorClass).toEqual(expect.any(String));
+  return browserInstalled;
+};
 function refused(actual: OracleOutcome, result?: string, reason?: string) {
   expect(actual.claimKind).toBe("synthetic_example");
   expect(["allow", "pass"]).not.toContain(actual.result);
@@ -184,13 +194,12 @@ describe("Education synthetic reference protocols, never institution or producti
   it("does not treat an empty rendered document as a generated lesson", async () => {
     const actual = await runAccessibilityCheck({ context: binding(4), checkerEnabled: true,
       html: '<!doctype html><html lang="en"><head><title>Synthetic lesson</title></head><body></body></html>' });
-    refused(actual, "not_evaluated", "generated_lesson_missing");
+    browserCase(actual, "generated_lesson_missing");
   });
   it("refuses external resources without sending a network request", async () => {
     const actual = await runAccessibilityCheck({ context: binding(4), checkerEnabled: true,
       html: '<!doctype html><html lang="en"><head><title>Synthetic lesson</title></head><body><main><h1>Lesson</h1><p>Synthetic exercise.</p><img alt="Synthetic diagram" src="https://external.fixture.invalid/diagram.png"></main></body></html>' });
-    refused(actual, "not_evaluated", "external_resource_refused");
-    expect(actual.observations.blockedRequests).toEqual(["https://external.fixture.invalid/diagram.png"]);
+    if (browserCase(actual, "external_resource_refused")) expect(actual.observations.blockedRequests).toEqual(["https://external.fixture.invalid/diagram.png"]);
   });
 });
 
@@ -217,6 +226,7 @@ describe("Canonical Education local observations remain empty production evidenc
     expect(fixture.expected).toEqual({ result: "not_evaluated", reasonCode: "incomplete" });
     const oracle = fixture.setup.educationOracle;
     const actual = await runs[oracle.kind](oracle.input);
+    if (!browserInstalled && oracle.kind === "accessibility" && (oracle.input as { checkerEnabled?: unknown }).checkerEnabled === true) return void browserCase(actual, "");
     expect({ result: actual.result, reasonCode: actual.reasonCode }).toEqual(oracle.expected);
     expect(actual.claimKind).toBe("synthetic_example");
     if (!["allow", "pass"].includes(actual.result)) refused(actual);
