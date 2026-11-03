@@ -24,13 +24,13 @@ describe("verify all on a fresh workspace (first-run passport boundary)", () => 
     rmSync(dir, { recursive: true, force: true });
   });
 
-  test("uninitialized passport reports SKIP, not a critical failure", async () => {
+  test("uninitialized passport reports NOT_CONFIGURED, not a critical failure", async () => {
     const report = await verifyAll({ workspace: dir, trust: workspaceKeyTrust(dir) });
     const policy = report.checks.find((check) => check.id === "passport-policy-signature");
     const integrity = report.checks.find((check) => check.id === "passport-workspace-integrity");
-    expect(policy?.status).toBe("SKIP");
+    expect(policy?.status).toBe("NOT_CONFIGURED");
     expect(policy?.details).toEqual(["passport not initialized yet"]);
-    expect(integrity?.status).toBe("SKIP");
+    expect(integrity?.status).toBe("NOT_CONFIGURED");
     const passportFailures = report.checks.filter(
       (check) => check.id.startsWith("passport-") && check.status === "FAIL"
     );
@@ -162,9 +162,9 @@ describe("verify all and the operator's trust (P0-09)", () => {
       return { ...ledger, explicitPins: [...ledger.explicitPins, ...pinnedTrust([{ publicKeyPem: bundle.publicKeyPem, purposes: ["release"] }]).explicitPins] };
     };
 
-    test("skips the check when dist/ holds no .amcrelease", async () => {
+    test("reports the check not configured when dist/ holds no .amcrelease", async () => {
       const report = await verifyAll({ workspace: dir, trust: workspaceKeyTrust(dir) });
-      expect(check(report, "release-bundles")).toEqual({ id: "release-bundles", status: "SKIP", critical: false, details: ["no .amcrelease files found in dist/"] });
+      expect(check(report, "release-bundles")).toEqual({ id: "release-bundles", status: "NOT_CONFIGURED", critical: false, details: ["no .amcrelease files found in dist/"] });
     });
 
     test("passes a bundle signed by a key the operator pinned for release", async () => {

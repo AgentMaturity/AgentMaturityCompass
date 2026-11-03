@@ -42,7 +42,8 @@ import { verifyPassportWorkspace } from "../passport/passportVerifier.js";
 import { verifyStandardSchemas } from "../standard/standardGenerator.js";
 import { verifyA4Projects } from "../a4/a4Verify.js";
 
-type VerifyStatus = "PASS" | "FAIL" | "SKIP";
+/** NOT_CONFIGURED: an optional feature the workspace never set up, so there is nothing to verify; SKIP: something exists but was not verified. */
+type VerifyStatus = "PASS" | "FAIL" | "SKIP" | "NOT_CONFIGURED";
 
 export interface VerifyAllCheck {
   id: string;
@@ -57,6 +58,8 @@ export interface VerifyAllReport {
   criticalFail: boolean;
   /** Ids of critical checks recorded as SKIP (never performed). */
   skippedCritical: string[];
+  /** Ids of checks recorded as NOT_CONFIGURED: they neither pass nor withhold the headline. */
+  notConfigured: string[];
   generatedTs: number;
   checks: VerifyAllCheck[];
 }
@@ -101,6 +104,10 @@ function fail(id: string, critical: boolean, details: string[]): VerifyAllCheck 
 
 function skip(id: string, critical: boolean, details: string[]): VerifyAllCheck {
   return { id, status: "SKIP", critical, details };
+}
+
+function notConfigured(id: string, critical: boolean, details: string[]): VerifyAllCheck {
+  return { id, status: "NOT_CONFIGURED", critical, details };
 }
 
 export async function verifyAll(params: {
@@ -200,8 +207,11 @@ export async function verifyAll(params: {
 
   const promptSchedulerSig = verifyPromptSchedulerStateSignature(workspace);
   checks.push(
-    promptSchedulerSig.valid || !promptSchedulerSig.signatureExists
-      ? pass("prompt-scheduler-signature", false, [promptSchedulerSig.signatureExists ? promptSchedulerSig.path : "scheduler not initialized"])
+    // A state file without its signature is unverifiable, so it fails; only an absent state file is not configured.
+    !statExists(promptSchedulerSig.path)
+      ? notConfigured("prompt-scheduler-signature", false, ["scheduler not initialized"])
+      : promptSchedulerSig.valid
+      ? pass("prompt-scheduler-signature", false, [promptSchedulerSig.path])
       : fail("prompt-scheduler-signature", false, [promptSchedulerSig.reason ?? "signature verification failed"])
   );
 
@@ -287,8 +297,8 @@ export async function verifyAll(params: {
     listPassportExportFiles(workspace).length === 0 &&
     passportCacheEntries.length === 0;
   if (passportUninitialized) {
-    checks.push(skip("passport-policy-signature", true, ["passport not initialized yet"]));
-    checks.push(skip("passport-workspace-integrity", false, ["passport not initialized yet"]));
+    checks.push(notConfigured("passport-policy-signature", true, ["passport not initialized yet"]));
+    checks.push(notConfigured("passport-workspace-integrity", false, ["passport not initialized yet"]));
   } else {
     checks.push(
       passportPolicy.valid
@@ -307,7 +317,7 @@ export async function verifyAll(params: {
 
   const standard = verifyStandardSchemas(workspace);
   if (!standard.meta && standard.errors.some((row) => row.toLowerCase().includes("meta.json missing"))) {
-    checks.push(skip("standard-schema-bundle", false, ["schema bundle not generated yet"]));
+    checks.push(notConfigured("standard-schema-bundle", false, ["schema bundle not generated yet"]));
   } else {
     checks.push(
       standard.ok
@@ -360,7 +370,7 @@ export async function verifyAll(params: {
   // P1-57: each A4 project's chain, side rows and envelopes (integrity of bytes; never a claim about the agent).
   try {
     for (const row of verifyA4Projects(workspace, params.trust)) {
-      checks.push((row.status === "PASS" ? pass : row.status === "FAIL" ? fail : skip)("a4-projects", true, row.details));
+      checks.push({ id: "a4-projects", status: row.status, critical: true, details: row.details });
     }
   } catch (error) {
     checks.push(fail("a4-projects", true, [String(error)]));
@@ -373,7 +383,7 @@ export async function verifyAll(params: {
     );
   } else if (!forecast.scheduler.valid && (forecast.scheduler.reason ?? "").toLowerCase().includes("file missing")) {
     checks.push(
-      skip("forecast-signatures", false, ["forecast scheduler not initialized yet"])
+      notConfigured("forecast-signatures", false, ["forecast scheduler not initialized yet"])
     );
   } else if (!forecast.scheduler.valid) {
     checks.push(
@@ -431,7 +441,7 @@ export async function verifyAll(params: {
 
   const backupFiles = recursiveFiles(workspace, (file) => file.endsWith(".amcbackup"));
   if (backupFiles.length === 0) {
-    checks.push(skip("backup-manifests", false, ["no .amcbackup files found under workspace"]));
+    checks.push(notConfigured("backup-manifests", false, ["no .amcbackup files found under workspace"]));
   } else {
     const backupErrors: string[] = [];
     let requiresPassphraseOnly = true;
@@ -483,7 +493,7 @@ export async function verifyAll(params: {
   const distDir = join(workspace, "dist");
   const releaseFiles = recursiveFiles(distDir, (file) => file.endsWith(".amcrelease"));
   if (releaseFiles.length === 0) {
-    checks.push(skip("release-bundles", false, ["no .amcrelease files found in dist/"]));
+    checks.push(notConfigured("release-bundles", false, ["no .amcrelease files found in dist/"]));
   } else {
     const releaseErrors: string[] = [];
     for (const file of releaseFiles) {
@@ -513,6 +523,7 @@ export async function verifyAll(params: {
     status: anyFail ? "FAIL" : skippedCritical.length > 0 ? "INCOMPLETE" : "PASS",
     criticalFail,
     skippedCritical,
+    notConfigured: checks.filter((check) => check.status === "NOT_CONFIGURED").map((check) => check.id),
     generatedTs: Date.now(),
     checks
   };

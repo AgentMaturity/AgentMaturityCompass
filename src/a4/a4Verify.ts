@@ -292,8 +292,9 @@ export function verifyA4Chain(ledger: Ledger, projectId: string, trust: TrustCon
 /**
  * The `a4-projects` rows of `amc verify all`: one per project, opened read-only. A ledger whose schema is a contiguous
  * prefix below migration 13 skips (no A4 tables yet); a schema at or above it without the tables fails, never an empty pass.
+ * A migrated ledger with no project reads NOT_CONFIGURED: A4 is optional, so that is not a check withheld.
  */
-export function verifyA4Projects(workspace: string, trust: TrustContext): Array<{ status: "PASS" | "FAIL" | "SKIP"; details: string[] }> {
+export function verifyA4Projects(workspace: string, trust: TrustContext): Array<{ status: "PASS" | "FAIL" | "SKIP" | "NOT_CONFIGURED"; details: string[] }> {
   let ledger: Ledger;
   try {
     ledger = openLedger(workspace, { readonly: true });
@@ -310,7 +311,7 @@ export function verifyA4Projects(workspace: string, trust: TrustContext): Array<
     }
     // A deleted head row (or project) fails as A4_CHAIN_INVALID / A4_PROJECT_NOT_FOUND, never reads as a smaller passing set.
     const projects = a4ProjectIds(db);
-    if (projects.length === 0) return [{ status: "SKIP", details: ["no A4 projects"] }];
+    if (projects.length === 0) return [{ status: "NOT_CONFIGURED", details: ["no A4 projects"] }];
     return projects.map((projectId) => {
       const report = verifyA4Chain(ledger, projectId, trust, Date.now(), { mirror: true });
       const failed = report.integrity.status === "fail";
