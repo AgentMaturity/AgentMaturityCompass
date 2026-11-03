@@ -1,5 +1,5 @@
 import { connect, type Socket } from "node:net";
-import { chmodSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, test, vi } from "vitest";
@@ -18,6 +18,23 @@ afterEach(() => {
   vi.unstubAllEnvs();
   while (roots.length > 0) rmSync(roots.pop()!, { recursive: true, force: true });
 });
+
+// Every path AMC derives from the user's home or an operator override points into a fresh temporary root, so the
+// smoke reproduces on a clean CI runner and never reads or writes the developer's real AMC home, vault or
+// checkpoints. The studio child inherits this environment.
+const HOME_OVERRIDES = ["AMC_CONTROL_CHECKPOINT_DIR", "AMC_CREDENTIALS_FILE", "AMC_HOST_DIR", "AMC_ROOT", "AMC_VAULT_PASSPHRASE_FILE",
+  "AMC_VAULT_REMEMBER_FILE", "XDG_CONFIG_HOME", "XDG_CACHE_HOME"];
+function isolatedRoot(prefix: string): string {
+  const root = mkdtempSync(join(tmpdir(), prefix));
+  roots.push(root);
+  const home = join(root, "user-home");
+  mkdirSync(home);
+  vi.stubEnv("HOME", home);
+  vi.stubEnv("USERPROFILE", home);
+  vi.stubEnv("AMC_HOME", join(root, "amc-home"));
+  for (const name of HOME_OVERRIDES) vi.stubEnv(name, undefined);
+  return root;
+}
 
 function stopRecorded(workspace: string): boolean {
   const ledger = openLedger(workspace);
@@ -50,9 +67,7 @@ async function openIncompleteRequest(port: number): Promise<Socket> {
 
 describe("Studio SIGTERM grace period", () => {
   test("the studio child, started as the smoke starts it, exits on SIGTERM well inside 10 s and records its stop", async () => {
-    const root = mkdtempSync(join(tmpdir(), "amc-studio-sigterm-"));
-    roots.push(root);
-    vi.stubEnv("AMC_HOME", join(root, "home"));
+    const root = isolatedRoot("amc-studio-sigterm-");
     const workspace = join(root, "workspace");
     const host = "127.0.0.1";
     const [apiPort, gatewayPort, proxyPort, metricsPort, dashboardPort] = [await pickFreePort(host), await pickFreePort(host), await pickFreePort(host), await pickFreePort(host), await pickFreePort(host)];
@@ -77,8 +92,8 @@ describe("Studio SIGTERM grace period", () => {
   }, 180_000);
 
   test("stop() records STUDIO_RUNTIME_STOPPED before the bounded socket drain, not after it", async () => {
-    const workspace = mkdtempSync(join(tmpdir(), "amc-studio-stop-order-"));
-    roots.push(workspace);
+    const workspace = join(isolatedRoot("amc-studio-stop-order-"), "workspace");
+    mkdirSync(workspace);
     vi.stubEnv("AMC_VAULT_PASSPHRASE", "stop-order-passphrase");
     initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
     const runtime = await runStudioForeground({ workspace, apiPort: 0, gatewayPort: 0, proxyPort: 0, dashboardPort: 0, metricsPort: 0 });
