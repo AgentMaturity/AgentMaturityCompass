@@ -1,5 +1,5 @@
 import { createServer } from "node:http";
-import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { afterEach, describe, expect, test } from "vitest";
@@ -15,6 +15,8 @@ import { defaultPassportPolicy } from "../src/passport/passportPolicySchema.js";
 import { passportPolicySigPath, savePassportPolicy } from "../src/passport/passportStore.js";
 import { scanPassportForPii } from "../src/passport/passportRedaction.js";
 import { workspaceKeyTrust } from "./helpers/trustContext.js";
+import { writeAnchoredRun } from "./helpers/sealedRun.js";
+import { getAgentPaths } from "../src/fleet/paths.js";
 
 const roots: string[] = [];
 const previousVaultPassphrase = process.env.AMC_VAULT_PASSPHRASE;
@@ -33,14 +35,19 @@ function writeDiagnosticRun(params: {
   runId: string;
   ts: number;
   integrity: number;
-  correlation: number;
+  correlation: number | null;
   observed: number;
   attested: number;
   selfReported: number;
 }): void {
+  // Sealed and ledger-anchored: only a trusted run is signed into a passport; any other run leaves its signals unmeasured.
   const run = {
+    agentId: "default",
     runId: params.runId,
     ts: params.ts,
+    windowStartTs: params.ts - 86_400_000,
+    windowEndTs: params.ts,
+    status: "VALID" as const,
     trustLabel: "HIGH TRUST",
     integrityIndex: params.integrity,
     correlationRatio: params.correlation,
@@ -60,11 +67,12 @@ function writeDiagnosticRun(params: {
       questionId: question.id,
       finalLevel: 2,
       evidenceEventIds: ["ev_fixture"]
-    }))
+    })),
+    verificationPassed: true, trustBoundaryViolated: false, trustBoundaryMessage: null, targetProfileId: "default",
+    inflationAttempts: [], unsupportedClaimCount: 0, contradictionCount: 0, invalidReceiptsCount: 0, correlationWarnings: [],
+    evidenceCoverage: 0.9, targetDiff: [], prioritizedUpgradeActions: [], evidenceToCollectNext: []
   };
-  const path = join(params.workspace, ".amc", "agents", "default", "runs", `${params.runId}.json`);
-  mkdirSync(join(params.workspace, ".amc", "agents", "default", "runs"), { recursive: true });
-  writeFileSync(path, JSON.stringify(run, null, 2));
+  writeAnchoredRun(params.workspace, getAgentPaths(params.workspace, "default").runsDir, run);
 }
 
 async function pickPort(): Promise<number> {
@@ -147,6 +155,30 @@ describe("agent passport + open standard", () => {
     expect(created.passport.status.reasons).toContain("GATE_FAIL_LOW_INTEGRITY");
     expect(created.passport.status.reasons).toContain("GATE_FAIL_LOW_CORRELATION");
     expect(created.passport.status.reasons).toContain("MISSING_ASSURANCE_CERT_PASS");
+  });
+
+  test("with no trusted run, the trust signals read not measured (null), never 0", () => {
+    const ws = workspace();
+    const created = createPassportArtifact({ workspace: ws, scopeType: "AGENT", scopeId: "default",
+      outFile: ".amc/passport/exports/agent/default/no-run.amcpass" });
+    expect(created.passport.trust.integrityIndex).toBeNull();
+    expect(created.passport.trust.correlationRatio).toBeNull();
+    expect(created.passport.trust.evidenceCoverage).toBeNull();
+    expect(created.passport.status.reasons).toEqual(expect.arrayContaining(["GATE_FAIL_INTEGRITY_NOT_MEASURED",
+      "GATE_FAIL_CORRELATION_NOT_MEASURED", "MISSING_DIAGNOSTIC_REPORT"]));
+    expect(created.passport.status.reasons).not.toContain("GATE_FAIL_LOW_INTEGRITY");
+  });
+
+  test("a trusted run that measured no correlation reads null with a not-measured reason, not a low 0", () => {
+    const ws = workspace();
+    writeDiagnosticRun({ workspace: ws, runId: "run_no_receipts", ts: Date.UTC(2026, 0, 20, 12, 0, 0), integrity: 0.95,
+      correlation: null, observed: 0.95, attested: 0.03, selfReported: 0.02 });
+    const created = createPassportArtifact({ workspace: ws, scopeType: "AGENT", scopeId: "default",
+      outFile: ".amc/passport/exports/agent/default/no-correlation.amcpass" });
+    expect(created.passport.trust.integrityIndex).toBe(0.95);
+    expect(created.passport.trust.correlationRatio).toBeNull();
+    expect(created.passport.status.reasons).toContain("GATE_FAIL_CORRELATION_NOT_MEASURED");
+    expect(created.passport.status.reasons).not.toContain("GATE_FAIL_LOW_CORRELATION");
   });
 
   test("pii scanner accepts AMC's explainability sentences but still refuses an email inside one", () => {

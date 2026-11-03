@@ -236,7 +236,7 @@ describe("buildMetricValidationReport", () => {
     expect(report.rows[0]?.metricId).toBe("overall_maturity_score");
     expect(report.rows[0]?.owner).toBe("AMC Score");
     expect(report.rows[0]?.sampleSize).toBe(6);
-    expect(report.rows[0]?.confidenceInterval.level).toBe(0.95);
+    expect(report.rows[0]?.confidenceInterval?.level).toBe(0.95);
     expect(report.rows[0]?.interRaterAgreement).toBe(0.92);
     expect(report.rows[0]?.testRetestStability).toBeGreaterThan(0.8);
     expect(report.evalPack.replayable).toBe(true);

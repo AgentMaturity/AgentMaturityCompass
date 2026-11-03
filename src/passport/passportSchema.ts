@@ -1,5 +1,6 @@
 import { signatureEnvelopeSchema } from "../crypto/signing/signatureEnvelope.js";
 import { z } from "zod";
+import { evidenceCoverageSchema, fiveLayersSchema, valueDimensionFields } from "../bench/benchSchema.js";
 
 export const passportScopeTypeSchema = z.enum(["WORKSPACE", "NODE", "AGENT"]);
 export const passportTrustLabelSchema = z.enum(["LOW", "MEDIUM", "HIGH"]);
@@ -19,15 +20,12 @@ export const passportJsonSchema = z.object({
     type: passportScopeTypeSchema,
     idHash: z.string().regex(/^[a-f0-9]{8,64}$/)
   }),
+  /** A trust signal AMC did not measure (no trusted run, no receipted trace, no evidence mix) is null, never 0. */
   trust: z.object({
-    integrityIndex: z.number().min(0).max(1),
-    correlationRatio: z.number().min(0).max(1),
+    integrityIndex: z.number().min(0).max(1).nullable(),
+    correlationRatio: z.number().min(0).max(1).nullable(),
     trustLabel: passportTrustLabelSchema,
-    evidenceCoverage: z.object({
-      observedShare: z.number().min(0).max(1),
-      attestedShare: z.number().min(0).max(1),
-      selfReportedShare: z.number().min(0).max(1)
-    }),
+    evidenceCoverage: evidenceCoverageSchema,
     notary: z.object({
       enabled: z.boolean(),
       fingerprint: z.string().length(64).nullable().optional(),
@@ -41,13 +39,7 @@ export const passportJsonSchema = z.object({
   maturity: z.object({
     status: passportMaturityStatusSchema,
     overall: z.number().min(0).max(5).nullable(),
-    byFiveLayers: z.object({
-      strategicOps: z.number().min(0).max(5).nullable(),
-      leadership: z.number().min(0).max(5).nullable(),
-      culture: z.number().min(0).max(5).nullable(),
-      resilience: z.number().min(0).max(5).nullable(),
-      skills: z.number().min(0).max(5).nullable()
-    }),
+    byFiveLayers: fiveLayersSchema,
     unknownQuestionsCount: z.number().int().min(0),
     questionExplainabilityHash: z.string().length(64).optional(),
     questionExplainabilitySummary: z
@@ -96,14 +88,7 @@ export const passportJsonSchema = z.object({
     riskAssuranceRisk: z.number().min(0).max(100).nullable(),
     digitalDualityRisk: z.number().min(0).max(100).nullable()
   }),
-  valueDimensions: z.object({
-    emotionalValue: z.number().min(0).max(100).nullable(),
-    functionalValue: z.number().min(0).max(100).nullable(),
-    economicValue: z.number().min(0).max(100).nullable(),
-    brandValue: z.number().min(0).max(100).nullable(),
-    lifetimeValue: z.number().min(0).max(100).nullable(),
-    valueScore: z.number().min(0).max(100).nullable()
-  }),
+  valueDimensions: z.object({ ...valueDimensionFields, valueScore: z.number().min(0).max(100).nullable() }),
   checkpoints: z.object({
     cgxPackSha256: z.string().length(64),
     promptPackSha256: z.string().length(64).nullable().optional(),

@@ -187,7 +187,7 @@ describe("GAP-0900 toolkit-mcp-server metric-validity boundary", () => {
       outcomeAlignment: 1,
       status: "pass",
     });
-    expect(report.rows[0]?.confidenceInterval.level).toBe(0.95);
+    expect(report.rows[0]?.confidenceInterval?.level).toBe(0.95);
     expect(report.rows[0]?.interRaterAgreement).toBe(0.84);
     expect(report.evalPack.replayable).toBe(true);
     expect(report.evalPack.sourceRefs).toEqual([URL]);

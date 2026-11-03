@@ -32,6 +32,10 @@ Bench exports bind metrics to signed transparency + Merkle artifacts and inclusi
 
 If proofs are unavailable, exports are still possible, but trust is downgraded and publishing gates can block distribution.
 
+## Not Measured Is Null
+
+A metric that nothing in the window measured is `null` (not evaluated), never 0. This covers the integrity index and evidence mix when no run is in the lookback, a correlation ratio when no trace carried a receipt, maturity layers and value dimensions without a series or score, the approval backlog, and assurance scores and failure counts when no pack ran. Counts of ledger events (budget and freeze events) stay measured counts, and a strategy risk with no series stays worst-case 100. A null metric gets no percentile, and peers that did not measure it are left out of the ranking. A composite with an unmeasured input is `null`. A publish gate with a minimum above 0 refuses an unmeasured integrity or correlation and says it was not measured.
+
 ## Question-Level Benchmark Submission Proof
 
 Question explainability rows can carry benchmark-submission lenses for task-level submission claims. AMC records benchmark/source identity, submission id/version, agent version, timestamp, task id/category/status, grading type, overall/category score, speed, cost, leaderboard metric views, submission metadata hash, task-breakdown hash, leaderboard snapshot hash, criterion-level scores, evidence refs, rejected-evidence refs, repair hint, and row hash.

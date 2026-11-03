@@ -7,11 +7,13 @@ import { loadAssurancePolicy, verifyAssurancePolicySignature } from "../assuranc
 import { latestAssuranceCertificateSummary, latestAssuranceRun } from "../assurance/assuranceStore.js";
 import { verifyAdaptersConfigSignature } from "../adapters/adapterConfigStore.js";
 import { verifyBenchRegistriesSignature } from "../bench/benchPolicyStore.js";
+import { derivedTrustLabel } from "../bench/benchCollector.js";
 import { verifyBridgeConfigSignature } from "../bridge/bridgeConfigStore.js";
 import { verifyBudgetsConfigSignature } from "../budgets/budgets.js";
 import { canonPath } from "../canon/canonLoader.js";
 import { cgxLatestGraphPath, cgxLatestPackPath } from "../cgx/cgxStore.js";
 import { diagnosticBankPath } from "../diagnostic/bank/bankLoader.js";
+import { questionBank } from "../diagnostic/questionBank.js";
 import { latestTrustedRun } from "../governor/actionPolicyEngine.js";
 import { resolveAgentId } from "../fleet/paths.js";
 import { verifyLedgerIntegrity, openLedger } from "../ledger/ledger.js";
@@ -162,20 +164,6 @@ function insufficient(reason: string, refs: string[] = []): FactResult {
   };
 }
 
-function trustLabelFromSignals(params: {
-  integrityIndex: number;
-  correlationRatio: number;
-  observedShare: number;
-}): "LOW" | "MEDIUM" | "HIGH" {
-  if (params.integrityIndex >= 0.9 && params.correlationRatio >= 0.9 && params.observedShare >= 0.7) {
-    return "HIGH";
-  }
-  if (params.integrityIndex >= 0.75 && params.correlationRatio >= 0.75 && params.observedShare >= 0.5) {
-    return "MEDIUM";
-  }
-  return "LOW";
-}
-
 function mapRunTrustLabel(input: string): "LOW" | "MEDIUM" | "HIGH" {
   const text = input.toUpperCase();
   if (text.includes("HIGH")) {
@@ -314,8 +302,8 @@ function evaluateControl(params: {
   control: AuditMapFile["auditMap"]["controlFamilies"][number]["controls"][number];
   kindChecks: Record<string, { ok: boolean; refs: string[] }>;
   checkFacts: FactCatalog;
-  integrityIndex: number;
-  correlationRatio: number;
+  integrityIndex: number | null;
+  correlationRatio: number | null;
 }): {
   status: "PASS" | "FAIL" | "INSUFFICIENT_EVIDENCE";
   reasons: string[];
@@ -324,12 +312,12 @@ function evaluateControl(params: {
   const reasons: string[] = [];
   const evidenceRefs: string[] = [];
 
-  if (params.integrityIndex < params.control.evidenceRequirements.strongClaimGates.minIntegrityIndex) {
-    reasons.push("GATE_FAIL_INTEGRITY");
-  }
-  if (params.correlationRatio < params.control.evidenceRequirements.strongClaimGates.minCorrelationRatio) {
-    reasons.push("GATE_FAIL_CORRELATION");
-  }
+  // Not measured never meets a minimum above 0, and says so; a minimum of 0 sets no requirement.
+  const gates = params.control.evidenceRequirements.strongClaimGates;
+  if (params.integrityIndex === null) { if (gates.minIntegrityIndex > 0) reasons.push("GATE_FAIL_INTEGRITY_NOT_MEASURED"); }
+  else if (params.integrityIndex < gates.minIntegrityIndex) reasons.push("GATE_FAIL_INTEGRITY");
+  if (params.correlationRatio === null) { if (gates.minCorrelationRatio > 0) reasons.push("GATE_FAIL_CORRELATION_NOT_MEASURED"); }
+  else if (params.correlationRatio < gates.minCorrelationRatio) reasons.push("GATE_FAIL_CORRELATION");
 
   let missingKind = false;
   for (const kind of params.control.evidenceRequirements.requiredKinds) {
@@ -672,10 +660,7 @@ export function collectAuditBinderLocalData(params: AuditBinderCollectionInput, 
         : insufficient("no tool denial events in window")
   };
 
-  const kindChecks = mapEvidenceKinds({
-    eventsByType,
-    facts
-  });
+  const kindChecks = mapEvidenceKinds({ eventsByType, facts });
 
   let maturityOverall: number | null = null;
   let maturityByDim: { DIM1: number | null; DIM2: number | null; DIM3: number | null; DIM4: number | null; DIM5: number | null } = {
@@ -685,15 +670,14 @@ export function collectAuditBinderLocalData(params: AuditBinderCollectionInput, 
     DIM4: null,
     DIM5: null
   };
-  let unknownQuestionsCount = 0;
   let maturityRefs: string[] = [];
   let maturityNotes: string[] = [];
 
-  let integrityIndex = 0;
-  let correlationRatio = 0;
-  let observedShare = 0;
-  let attestedShare = 0;
-  let selfReportedShare = 1;
+  // Every question counts as unknown until a trusted run or org scorecard measures it, never a measured 0.
+  let unknownQuestionsCount = questionBank.length;
+  let integrityIndex: number | null = null;
+  let correlationRatio: number | null = null;
+  let evidenceCoverage: { observedShare: number; attestedShare: number; selfReportedShare: number } | null = null;
   let trustLabel: "LOW" | "MEDIUM" | "HIGH" = "LOW";
   let runCount = 0;
 
@@ -706,10 +690,10 @@ export function collectAuditBinderLocalData(params: AuditBinderCollectionInput, 
       maturityByDim = byDimensionFromRun(run);
       unknownQuestionsCount = run.questionScores.filter((row) => row.finalLevel <= 1).length;
       integrityIndex = Number(run.integrityIndex.toFixed(6));
-      correlationRatio = Number((run.correlationRatio ?? 0).toFixed(6)); // binder schema is 0..1: not measured stays below every gate
-      observedShare = Number((run.evidenceTrustCoverage?.observed ?? 0).toFixed(6));
-      attestedShare = Number((run.evidenceTrustCoverage?.attested ?? 0).toFixed(6));
-      selfReportedShare = Number((run.evidenceTrustCoverage?.selfReported ?? 1).toFixed(6));
+      correlationRatio = run.correlationRatio === null ? null : Number(run.correlationRatio.toFixed(6));
+      evidenceCoverage = run.evidenceTrustCoverage ? { observedShare: Number(run.evidenceTrustCoverage.observed.toFixed(6)),
+        attestedShare: Number(run.evidenceTrustCoverage.attested.toFixed(6)),
+        selfReportedShare: Number(run.evidenceTrustCoverage.selfReported.toFixed(6)) } : null;
       trustLabel = mapRunTrustLabel(run.trustLabel);
       runCount = 1;
       maturityRefs = dedupeSorted([sha256Hex(Buffer.from(run.runId, "utf8"))]);
@@ -730,9 +714,9 @@ export function collectAuditBinderLocalData(params: AuditBinderCollectionInput, 
       unknownQuestionsCount = node.questionScores.filter((row) => row.median <= 1).length;
       integrityIndex = Number(node.integrityIndex.toFixed(6));
       correlationRatio = Number(node.confidence.medianCorrelationRatio.toFixed(6));
-      observedShare = Number(node.evidenceCoverage.observedRatio.toFixed(6));
-      attestedShare = Number(node.evidenceCoverage.attestedRatio.toFixed(6));
-      selfReportedShare = Number(node.evidenceCoverage.selfReportedRatio.toFixed(6));
+      evidenceCoverage = { observedShare: Number(node.evidenceCoverage.observedRatio.toFixed(6)),
+        attestedShare: Number(node.evidenceCoverage.attestedRatio.toFixed(6)),
+        selfReportedShare: Number(node.evidenceCoverage.selfReportedRatio.toFixed(6)) };
       trustLabel = mapRunTrustLabel(node.trustLabel);
       runCount = node.runRefs.length;
       maturityRefs = dedupeSorted([...(node.transparencyRefs ?? []), ...(node.runRefs ?? []).map((row) => sha256Hex(Buffer.from(row, "utf8")))]);
@@ -742,17 +726,11 @@ export function collectAuditBinderLocalData(params: AuditBinderCollectionInput, 
     }
   }
 
-  if (integrityIndex <= 0 || correlationRatio <= 0) {
-    // Fallback to trust evidence from trust mode if no diagnostic/org data exists.
-    integrityIndex = integrityIndex > 0 ? integrityIndex : 0;
-    correlationRatio = correlationRatio > 0 ? correlationRatio : 0;
-  }
-
   if (trustLabel === "LOW") {
-    trustLabel = trustLabelFromSignals({
+    trustLabel = derivedTrustLabel({
       integrityIndex,
       correlationRatio,
-      observedShare
+      observedShare: evidenceCoverage?.observedShare ?? null
     });
   }
 
@@ -760,12 +738,11 @@ export function collectAuditBinderLocalData(params: AuditBinderCollectionInput, 
   if (runCount < params.policy.auditPolicy.gates.minRunsForStrongClaims) {
     strongClaimFailures.push(`MIN_RUNS_NOT_MET:${runCount}<${params.policy.auditPolicy.gates.minRunsForStrongClaims}`);
   }
-  if (integrityIndex < params.policy.auditPolicy.gates.minIntegrityIndexForStrongClaims) {
-    strongClaimFailures.push("MIN_INTEGRITY_NOT_MET");
-  }
-  if (correlationRatio < params.policy.auditPolicy.gates.minCorrelationRatioForStrongClaims) {
-    strongClaimFailures.push("MIN_CORRELATION_NOT_MET");
-  }
+  const auditGates = params.policy.auditPolicy.gates;
+  if (integrityIndex === null) { if (auditGates.minIntegrityIndexForStrongClaims > 0) strongClaimFailures.push("MIN_INTEGRITY_NOT_MEASURED"); }
+  else if (integrityIndex < auditGates.minIntegrityIndexForStrongClaims) strongClaimFailures.push("MIN_INTEGRITY_NOT_MET");
+  if (correlationRatio === null) { if (auditGates.minCorrelationRatioForStrongClaims > 0) strongClaimFailures.push("MIN_CORRELATION_NOT_MEASURED"); }
+  else if (correlationRatio < auditGates.minCorrelationRatioForStrongClaims) strongClaimFailures.push("MIN_CORRELATION_NOT_MET");
 
   const maturityStatus =
     maturityOverall === null || strongClaimFailures.length > 0
@@ -941,14 +918,10 @@ export function collectAuditBinderLocalData(params: AuditBinderCollectionInput, 
       idHash: truncateHash(scopeHashInput, params.policy.auditPolicy.privacy.hashTruncBytes)
     },
     trust: {
-      integrityIndex: Number(integrityIndex.toFixed(6)),
-      correlationRatio: Number(correlationRatio.toFixed(6)),
+      integrityIndex,
+      correlationRatio,
       trustLabel,
-      evidenceCoverage: {
-        observedShare: Number(observedShare.toFixed(6)),
-        attestedShare: Number(attestedShare.toFixed(6)),
-        selfReportedShare: Number(selfReportedShare.toFixed(6))
-      },
+      evidenceCoverage,
       notary: {
         enabled: trust.trust.mode === "NOTARY",
         fingerprint: trust.trust.mode === "NOTARY" ? trust.trust.notary.pinnedPubkeyFingerprint : null,

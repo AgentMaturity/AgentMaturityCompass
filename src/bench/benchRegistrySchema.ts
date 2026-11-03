@@ -22,7 +22,7 @@ export const benchRegistryBenchItemSchema = z.object({
     })
     .default({}),
   evidence: z.object({
-    integrityIndex: z.number().min(0).max(1),
+    integrityIndex: z.number().min(0).max(1).nullable(),
     trustLabel: benchTrustLabelSchema
   }),
   versions: z.array(benchRegistryItemVersionSchema).min(1)

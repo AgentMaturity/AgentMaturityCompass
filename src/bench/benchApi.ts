@@ -106,11 +106,13 @@ function assertPublishGates(params: {
   const policy = loadBenchPolicy(params.workspace);
   const inspected = inspectBenchArtifact(params.benchFile);
   const bench = inspected.bench;
-  if (bench.evidence.integrityIndex < policy.benchPolicy.integrityGates.minIntegrityIndexForPublish) {
-    throw new Error("publish blocked: integrity gate not met");
+  // Not measured never meets a minimum above 0; a minimum of 0 sets no requirement.
+  const gates = policy.benchPolicy.integrityGates;
+  if (bench.evidence.integrityIndex === null ? gates.minIntegrityIndexForPublish > 0 : bench.evidence.integrityIndex < gates.minIntegrityIndexForPublish) {
+    throw new Error(`publish blocked: integrity gate not met${bench.evidence.integrityIndex === null ? " (integrity not measured)" : ""}`);
   }
-  if (bench.evidence.correlationRatio < policy.benchPolicy.integrityGates.minCorrelationRatioForPublish) {
-    throw new Error("publish blocked: correlation gate not met");
+  if (bench.evidence.correlationRatio === null ? gates.minCorrelationRatioForPublish > 0 : bench.evidence.correlationRatio < gates.minCorrelationRatioForPublish) {
+    throw new Error(`publish blocked: correlation gate not met${bench.evidence.correlationRatio === null ? " (correlation not measured)" : ""}`);
   }
   if (trustRank(bench.evidence.trustLabel) < trustRank(policy.benchPolicy.integrityGates.requireTrustLevelForPublish)) {
     throw new Error("publish blocked: trust level gate not met");

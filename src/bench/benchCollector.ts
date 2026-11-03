@@ -67,14 +67,12 @@ function latestInWindow<T extends { ts: number }>(rows: T[], startTs: number, en
   return latest;
 }
 
-function layerMapFromRun(run: DiagnosticReport): Record<"strategicOps" | "leadership" | "culture" | "resilience" | "skills", number> {
-  const base = {
-    strategicOps: 0,
-    leadership: 0,
-    culture: 0,
-    resilience: 0,
-    skills: 0
-  };
+type LayerMap = Record<"strategicOps" | "leadership" | "culture" | "resilience" | "skills", number | null>;
+/** Every layer not evaluated (null) until a run or scorecard measures it. */
+const unmeasuredLayers = (): LayerMap => ({ strategicOps: null, leadership: null, culture: null, resilience: null, skills: null });
+
+function layerMapFromRun(run: DiagnosticReport): LayerMap {
+  const base = unmeasuredLayers();
   for (const layer of run.layerScores) {
     const key = LAYER_KEY_BY_NAME[layer.layerName as LayerName];
     if (!key) {
@@ -85,14 +83,8 @@ function layerMapFromRun(run: DiagnosticReport): Record<"strategicOps" | "leader
   return base;
 }
 
-function layerMapFromNode(node: NonNullable<ReturnType<typeof loadLatestOrgScorecard>>["nodes"][number]): Record<"strategicOps" | "leadership" | "culture" | "resilience" | "skills", number> {
-  const base = {
-    strategicOps: 0,
-    leadership: 0,
-    culture: 0,
-    resilience: 0,
-    skills: 0
-  };
+function layerMapFromNode(node: NonNullable<ReturnType<typeof loadLatestOrgScorecard>>["nodes"][number]): LayerMap {
+  const base = unmeasuredLayers();
   for (const layer of node.layerScores) {
     const key = LAYER_KEY_BY_NAME[layer.layerName as LayerName];
     if (!key) {
@@ -114,11 +106,14 @@ function mapTrustLabel(input: string): "LOW" | "MEDIUM" | "HIGH" {
   return "MEDIUM";
 }
 
-function derivedTrustLabel(params: {
-  integrityIndex: number;
-  correlationRatio: number;
-  observedShare: number;
+/** Trust label from the evidence gates; shared with the audit binder. */
+export function derivedTrustLabel(params: {
+  integrityIndex: number | null;
+  correlationRatio: number | null;
+  observedShare: number | null;
 }): "LOW" | "MEDIUM" | "HIGH" {
+  // An unmeasured signal never earns a label above LOW.
+  if (params.integrityIndex === null || params.correlationRatio === null || params.observedShare === null) return "LOW";
   if (params.observedShare >= 0.7 && params.integrityIndex >= 0.9 && params.correlationRatio >= 0.9) {
     return "HIGH";
   }
@@ -128,31 +123,19 @@ function derivedTrustLabel(params: {
   return "LOW";
 }
 
-function valueDimensionsFromOutcome(report: OutcomeReport | null): {
-  emotionalValue: number;
-  functionalValue: number;
-  economicValue: number;
-  brandValue: number;
-  lifetimeValue: number;
-  valueScore: number;
-} {
-  if (!report) {
-    return {
-      emotionalValue: 0,
-      functionalValue: 0,
-      economicValue: 0,
-      brandValue: 0,
-      lifetimeValue: 0,
-      valueScore: 0
-    };
-  }
+type ValueDims = Record<"emotionalValue" | "functionalValue" | "economicValue" | "brandValue" | "lifetimeValue" | "valueScore", number | null>;
+const round6 = (value: number | null | undefined): number | null =>
+  typeof value === "number" && Number.isFinite(value) ? Number(value.toFixed(6)) : null;
+
+/** A category the outcome report did not score is not evaluated (null), never 0. */
+function valueDimensionsFromOutcome(report: OutcomeReport): ValueDims {
   return {
-    emotionalValue: Number((report.categoryScores.Emotional ?? 0).toFixed(6)),
-    functionalValue: Number((report.categoryScores.Functional ?? 0).toFixed(6)),
-    economicValue: Number((report.categoryScores.Economic ?? 0).toFixed(6)),
-    brandValue: Number((report.categoryScores.Brand ?? 0).toFixed(6)),
-    lifetimeValue: Number((report.categoryScores.Lifetime ?? 0).toFixed(6)),
-    valueScore: Number(report.valueScore.toFixed(6))
+    emotionalValue: round6(report.categoryScores.Emotional),
+    functionalValue: round6(report.categoryScores.Functional),
+    economicValue: round6(report.categoryScores.Economic),
+    brandValue: round6(report.categoryScores.Brand),
+    lifetimeValue: round6(report.categoryScores.Lifetime),
+    valueScore: round6(report.valueScore)
   };
 }
 
@@ -175,6 +158,9 @@ function median(values: number[]): number {
   return Number(arithmeticMedian(values).toFixed(6));
 }
 
+const mean6 = (values: number[]): number => Number((values.reduce((sum, value) => sum + value, 0) / values.length).toFixed(6));
+const nullableMap = <T>(value: number | null, map: (value: number) => T): T | null => (value === null ? null : map(value));
+
 function resolveWindow(windowDays: number): { startTs: number; endTs: number; days: number } {
   const ms = parseWindowToMs(`${windowDays}d`);
   const endTs = Date.now();
@@ -185,16 +171,9 @@ function resolveWindow(windowDays: number): { startTs: number; endTs: number; da
   };
 }
 
-function latestSeriesValue(
-  series:
-    | Array<{ ts: number; value: number }>
-    | undefined,
-  missing = 0
-): number {
-  if (!series || series.length === 0) {
-    return missing;
-  }
-  return Number((series[series.length - 1]?.value ?? missing).toFixed(6));
+/** The newest point of a series; null (not measured) when the series has none. */
+function latestSeriesValue(series: Array<{ ts: number; value: number }> | undefined): number | null {
+  return round6(series?.[series.length - 1]?.value);
 }
 
 /** A risk index with no series is unmeasured: score it as worst-case risk, never as risk 0 (= a perfect 100) (WP37). */
@@ -288,12 +267,15 @@ function collectBenchDataWithInputs(params: BenchCollectionInput, window: Return
   const latestForecast = loadVerifiedForecastArtifact(params.workspace, scope);
   const evidenceGateReasons: string[] = signals.ignoredInputs.map((input) => `UNVERIFIED_INPUT_IGNORED:${input}`);
   if (latestForecast === null && pathExists(forecastScopeLatestPath(params.workspace, scope))) evidenceGateReasons.push("UNVERIFIED_INPUT_IGNORED:latest forecast");
-  const observedShare = Number((signals.evidence.observedShare ?? 0).toFixed(6));
-  const attestedShare = Number((signals.evidence.attestedShare ?? 0).toFixed(6));
-  const selfReportedShare = Number((signals.evidence.selfReportedShare ?? 0).toFixed(6));
-  const integrityIndex = Number((signals.evidence.latestIntegrityIndex ?? 0).toFixed(6));
-  const correlationRatio = Number((signals.evidence.latestCorrelationRatio ?? 0).toFixed(6));
-  const observedRuns = signals.evidence.observedRuns ?? 0;
+  // No run in the lookback measured the evidence mix or an integrity index: null (not evaluated), not the bundle's 0.
+  const measuredRuns = signals.runRefs.length > 0;
+  const evidenceCoverage = measuredRuns ? { observedShare: Number(signals.evidence.observedShare.toFixed(6)),
+    attestedShare: Number(signals.evidence.attestedShare.toFixed(6)),
+    selfReportedShare: Number(signals.evidence.selfReportedShare.toFixed(6)) } : null;
+  const observedShare = evidenceCoverage?.observedShare ?? null;
+  const integrityIndex = measuredRuns ? Number(signals.evidence.latestIntegrityIndex.toFixed(6)) : null;
+  const correlationRatio = round6(signals.evidence.latestCorrelationRatio);
+  const observedRuns = signals.evidence.observedRuns; // a real count: 0 runs is a measurement
   const runRefs = signals.runRefs;
 
   if (observedRuns < params.policy.benchPolicy.privacy.minRunsForAnyExport) {
@@ -313,13 +295,7 @@ function collectBenchDataWithInputs(params: BenchCollectionInput, window: Return
   });
 
   const maturityOverall = latestSeriesValue(signals.points.maturityOverall);
-  const layers = {
-    strategicOps: 0,
-    leadership: 0,
-    culture: 0,
-    resilience: 0,
-    skills: 0
-  };
+  const layers = unmeasuredLayers();
   const maturityQuestions: Array<{ qIdHash: string; score: number }> = [];
 
   if (params.scopeType === "AGENT") {
@@ -370,27 +346,23 @@ function collectBenchDataWithInputs(params: BenchCollectionInput, window: Return
   }
 
   const risk = {
-    ecosystemFocusRisk: latestSeriesValue(signals.points.indices.EcosystemFocusRisk, UNMEASURED_RISK),
-    clarityPathRisk: latestSeriesValue(signals.points.indices.ClarityPathRisk, UNMEASURED_RISK),
-    economicSignificanceRisk: latestSeriesValue(signals.points.indices.EconomicSignificanceRisk, UNMEASURED_RISK),
-    riskAssuranceRisk: latestSeriesValue(signals.points.indices.RiskAssuranceRisk, UNMEASURED_RISK),
-    digitalDualityRisk: latestSeriesValue(signals.points.indices.DigitalDualityRisk, UNMEASURED_RISK)
+    ecosystemFocusRisk: latestSeriesValue(signals.points.indices.EcosystemFocusRisk) ?? UNMEASURED_RISK,
+    clarityPathRisk: latestSeriesValue(signals.points.indices.ClarityPathRisk) ?? UNMEASURED_RISK,
+    economicSignificanceRisk: latestSeriesValue(signals.points.indices.EconomicSignificanceRisk) ?? UNMEASURED_RISK,
+    riskAssuranceRisk: latestSeriesValue(signals.points.indices.RiskAssuranceRisk) ?? UNMEASURED_RISK,
+    digitalDualityRisk: latestSeriesValue(signals.points.indices.DigitalDualityRisk) ?? UNMEASURED_RISK
   };
 
-  let values = {
+  const seriesDims = {
     emotionalValue: latestSeriesValue(signals.points.value.EmotionalValue),
     functionalValue: latestSeriesValue(signals.points.value.FunctionalValue),
     economicValue: latestSeriesValue(signals.points.value.EconomicValue),
     brandValue: latestSeriesValue(signals.points.value.BrandValue),
-    lifetimeValue: latestSeriesValue(signals.points.value.LifetimeValue),
-    valueScore: 0
+    lifetimeValue: latestSeriesValue(signals.points.value.LifetimeValue)
   };
-  values.valueScore = Number(
-    (
-      (values.emotionalValue + values.functionalValue + values.economicValue + values.brandValue + values.lifetimeValue) /
-      5
-    ).toFixed(6)
-  );
+  // The score averages the measured dimensions only; with none measured it is not evaluated.
+  const measuredDims = Object.values(seriesDims).filter((value): value is number => value !== null);
+  let values: ValueDims = { ...seriesDims, valueScore: measuredDims.length > 0 ? mean6(measuredDims) : null };
 
   if (params.scopeType === "AGENT") {
     const agentId = resolveAgentId(params.workspace, params.scopeId);
@@ -402,8 +374,9 @@ function collectBenchDataWithInputs(params: BenchCollectionInput, window: Return
 
   const pluginState = verifyPluginWorkspace({ workspace: params.workspace, readonly: readOnly });
   const operating = {
-    approvalsBacklogCount: Math.max(0, Math.round(latestSeriesValue(signals.points.operating.approval_backlog_size))),
-    approvalsMedianAgeHours: Number(latestSeriesValue(signals.points.operating.approval_backlog_age_hours).toFixed(6)),
+    // No run in the window measured the approval backlog: not evaluated, not an empty queue.
+    approvalsBacklogCount: nullableMap(latestSeriesValue(signals.points.operating.approval_backlog_size), (value) => Math.max(0, Math.round(value))),
+    approvalsMedianAgeHours: latestSeriesValue(signals.points.operating.approval_backlog_age_hours),
     budgetExceedEvents: countSelectedAudit({
       workspace: params.workspace,
       startTs: window.startTs,
@@ -411,18 +384,18 @@ function collectBenchDataWithInputs(params: BenchCollectionInput, window: Return
       auditTypes: ["BUDGET_EXCEEDED", "LEASE_RATE_LIMITED"]
     }),
     // No run in the window measured a denial rate (no ToolHub actions): not measured, not a clean 0.
-    toolhubDenialRate: signals.points.operating.toolhub_denial_rate?.length
-      ? Number(latestSeriesValue(signals.points.operating.toolhub_denial_rate).toFixed(6)) : null,
+    toolhubDenialRate: latestSeriesValue(signals.points.operating.toolhub_denial_rate),
     freezeEvents: countSelectedAudit({
       workspace: params.workspace,
       startTs: window.startTs,
       endTs: window.endTs,
       auditTypes: ["FREEZE_APPLIED", "EXECUTE_FROZEN_ACTIVE"]
     }),
+    // No assurance pack run in the window: not evaluated (null), never a 0 score or 0 failures.
     assurance: {
-      latestScore: 0,
-      injectionFailures: 0,
-      exfilAttemptsDetected: 0
+      latestScore: null as number | null,
+      injectionFailures: null as number | null,
+      exfilAttemptsDetected: null as number | null
     },
     plugins: {
       integrity: pluginState.ok ? "PASS" as const : "FAIL" as const,
@@ -450,8 +423,8 @@ function collectBenchDataWithInputs(params: BenchCollectionInput, window: Return
       );
       const injectionPack = assurance.get("injection");
       const exfilPack = assurance.get("exfiltration");
-      operating.assurance.injectionFailures = injectionPack ? injectionPack.failCount : 0;
-      operating.assurance.exfilAttemptsDetected = exfilPack ? exfilPack.failCount : 0;
+      operating.assurance.injectionFailures = injectionPack ? injectionPack.failCount : null;
+      operating.assurance.exfilAttemptsDetected = exfilPack ? exfilPack.failCount : null;
     }
   }
 
@@ -532,15 +505,11 @@ function collectBenchDataWithInputs(params: BenchCollectionInput, window: Return
       integrityIndex,
       correlationRatio,
       trustLabel: evidenceGateReasons.length > 0 ? "LOW" : trustLabel,
-      evidenceCoverage: {
-        observedShare,
-        attestedShare,
-        selfReportedShare
-      }
+      evidenceCoverage
     },
     metrics: {
       maturity: {
-        overall: Number(maturityOverall.toFixed(6)),
+        overall: maturityOverall,
         fiveLayers: {
           strategicOps: layers.strategicOps,
           leadership: layers.leadership,
@@ -575,7 +544,7 @@ function collectBenchDataWithInputs(params: BenchCollectionInput, window: Return
       operatingHealth: operating,
       forecastSummary: {
         status: forecastStatus,
-        maturityDeltaShort: maturityShort === null ? null : Number((maturityShort - maturityNow).toFixed(6)),
+        maturityDeltaShort: maturityShort === null || maturityNow === null ? null : Number((maturityShort - maturityNow).toFixed(6)),
         riskDeltaShort: riskShort === null ? null : Number((riskShort - riskNow).toFixed(6)),
         confidenceLabel,
         reasons: forecastReasons.map((reason) => reason.replace(/\s+/g, "_").slice(0, 64))

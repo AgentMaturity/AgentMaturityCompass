@@ -283,6 +283,18 @@ describe("value realization engine", () => {
     expect(out.snapshot.reasons.length).toBeGreaterThan(0);
   });
 
+  test("with no diagnostic run the integrity gate input reads not measured (null), never 0", async () => {
+    const workspace = newWorkspace();
+    const nowTs = Date.UTC(2026, 0, 12, 12, 0, 0);
+    vi.useFakeTimers();
+    vi.setSystemTime(nowTs);
+    const out = await createValueSnapshot({ workspace, scopeType: "AGENT", scopeId: "default", windowDays: 7, nowTs });
+    expect(out.snapshot.gates.integrityIndex).toBeNull();
+    expect(out.snapshot.gates.correlationRatio).toBeNull();
+    expect(out.snapshot.status).toBe("INSUFFICIENT_EVIDENCE");
+    expect(out.snapshot.reasons).toContain("integrityIndex not measured");
+  });
+
   test("webhook ingest accepts numeric payloads, labels trust, and rejects suspicious text", () => {
     const workspace = newWorkspace();
     const goodPayload = {

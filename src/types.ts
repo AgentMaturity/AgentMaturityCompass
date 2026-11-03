@@ -3112,13 +3112,15 @@ interface MetricValidationSharedFields {
   subtleMemoryJudgeAgreement0to1: number | null;
   subtleMemoryValidationPassRate0to1: number | null;
   subtleMemoryReportArtifactHashes: string[];
-  confidenceInterval: MetricValidationConfidenceInterval;
+  /** Null when the metric has no samples (not evaluated). */
+  confidenceInterval: MetricValidationConfidenceInterval | null;
   evidenceRefs: string[];
   warnings: string[];
 }
 
 export interface MetricValidationRow extends MetricValidationSharedFields {
-  constructValidity: number;
+  /** Null when the metric has no question scores (not evaluated). */
+  constructValidity: number | null;
   interRaterAgreement: number | null;
   testRetestStability: number | null;
   status: "pass" | "attention" | "fail";

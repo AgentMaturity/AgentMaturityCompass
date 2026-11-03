@@ -15,7 +15,7 @@ import { collectForecastSignals } from "../forecast/forecastSignals.js";
 import { evaluateValueEvidenceGates } from "./valueEvidenceGates.js";
 import { attributeValue } from "./valueAttribution.js";
 import { collectObservedValueEvents } from "./valueCollector.js";
-import { scoreValueDimensions } from "./valueScoring.js";
+import { scoreValueDimensions, trustKindShares } from "./valueScoring.js";
 import { computeEconomicSignificance, detectValueRegression } from "./valueRisk.js";
 import {
   appendValueEvents,
@@ -36,24 +36,6 @@ async function dispatchValueSecondary(event: Parameters<typeof dispatchIntegrati
 
 function scopeIdHash(scope: { type: "WORKSPACE" | "NODE" | "AGENT"; id: string }): string {
   return sha256Hex(`${scope.type}:${scope.id}`).slice(0, 16);
-}
-
-function summaryTrust(events: Array<{ source: { trustKind: "OBSERVED" | "ATTESTED" | "SELF_REPORTED" } }>): {
-  observed: number;
-  attested: number;
-  selfReported: number;
-} {
-  if (events.length === 0) {
-    return { observed: 0, attested: 0, selfReported: 0 };
-  }
-  const observed = events.filter((event) => event.source.trustKind === "OBSERVED").length;
-  const attested = events.filter((event) => event.source.trustKind === "ATTESTED").length;
-  const self = events.filter((event) => event.source.trustKind === "SELF_REPORTED").length;
-  return {
-    observed: Number((observed / events.length).toFixed(6)),
-    attested: Number((attested / events.length).toFixed(6)),
-    selfReported: Number((self / events.length).toFixed(6))
-  };
 }
 
 function nowWindow(days: number, nowTs: number): {
@@ -171,7 +153,7 @@ async function createValueSnapshotRun(params: {
     baselineEvents
   });
 
-  const trustSummary = summaryTrust(currentEvents);
+  const trustSummary = trustKindShares(currentEvents);
   const forecastSignals = collectForecastSignals({
     workspace: params.workspace,
     scope,
@@ -184,8 +166,10 @@ async function createValueSnapshotRun(params: {
   beforePublish();
   const notaryState = notaryRequired ? await checkNotaryTrust(params.workspace).catch(() => ({ ok: false })) : { ok: true };
   beforePublish();
+  // No diagnostic run in the lookback measured an integrity index: null, never the signal bundle's 0.
+  const integrityIndex = forecastSignals.runRefs.length === 0 ? null : forecastSignals.evidence.latestIntegrityIndex;
   const gates = evaluateValueEvidenceGates(policy, {
-    integrityIndex: forecastSignals.evidence.latestIntegrityIndex,
+    integrityIndex,
     correlationRatio: forecastSignals.evidence.latestCorrelationRatio,
     observedShare: trustSummary.observed,
     selfReportedShare: trustSummary.selfReported,
@@ -223,7 +207,7 @@ async function createValueSnapshotRun(params: {
     status: gates.ok ? "OK" : "INSUFFICIENT_EVIDENCE",
     reasons: gates.ok ? [] : gates.reasons,
     gates: {
-      integrityIndex: Number(forecastSignals.evidence.latestIntegrityIndex.toFixed(6)),
+      integrityIndex: integrityIndex === null ? null : Number(integrityIndex.toFixed(6)),
       correlationRatio: forecastSignals.evidence.latestCorrelationRatio === null ? null : Number(forecastSignals.evidence.latestCorrelationRatio.toFixed(6)),
       observedShare: trustSummary.observed,
       selfReportedShare: trustSummary.selfReported

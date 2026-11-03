@@ -1306,7 +1306,7 @@ async function runDiagnosticCore(input: RunDiagnosticInput, outputMarkdownPath?:
         trustLabel,
         integrityIndex: Number(integrityIndex.toFixed(4)),
         evidenceCoverage: Number(evidenceCoverage.toFixed(4)),
-        correlationRatio: Number((correlation.correlationRatio ?? 0).toFixed(4)), // unmeasured adds no validity weight
+        correlationRatio: correlation.correlationRatio === null ? null : Number(correlation.correlationRatio.toFixed(4)),
         unsupportedClaimCount,
         layerScores,
         questionScores,
@@ -1533,7 +1533,7 @@ export function generateReport(report: DiagnosticReport, format: "md" | "json", 
         "|---|---|---:|---:|---:|---:|---:|---:|---:|---|---|---|",
         ...metricValidation.rows.map((row) => {
           const interval = row.confidenceInterval;
-          return `| ${row.metricId} | ${row.owner} | ${row.sampleSize} | ${row.constructValidity.toFixed(2)} | ${row.counterfactualResponsiveness === null ? "-" : `${row.counterfactualResponsiveness.toFixed(2)} (${row.counterfactualSampleSize})`} | ${row.validationFacetCoverage === null ? "-" : `${row.validationFacetCoverage.toFixed(2)} (${row.validationFacetSampleSize})`} | ${row.confounderControlCoverage === null ? "-" : `${row.confounderControlCoverage.toFixed(2)} (${row.confounderControlSampleSize})`} | ${row.interRaterAgreement === null ? "-" : row.interRaterAgreement.toFixed(2)} | ${row.testRetestStability === null ? "-" : row.testRetestStability.toFixed(2)} | ${interval.lower.toFixed(1)}-${interval.upper.toFixed(1)} | ${row.status} | ${row.warnings.join("; ") || "-"} |`;
+          return `| ${row.metricId} | ${row.owner} | ${row.sampleSize} | ${row.constructValidity === null ? "not evaluated" : row.constructValidity.toFixed(2)} | ${row.counterfactualResponsiveness === null ? "-" : `${row.counterfactualResponsiveness.toFixed(2)} (${row.counterfactualSampleSize})`} | ${row.validationFacetCoverage === null ? "-" : `${row.validationFacetCoverage.toFixed(2)} (${row.validationFacetSampleSize})`} | ${row.confounderControlCoverage === null ? "-" : `${row.confounderControlCoverage.toFixed(2)} (${row.confounderControlSampleSize})`} | ${row.interRaterAgreement === null ? "-" : row.interRaterAgreement.toFixed(2)} | ${row.testRetestStability === null ? "-" : row.testRetestStability.toFixed(2)} | ${interval === null ? "not evaluated" : `${interval.lower.toFixed(1)}-${interval.upper.toFixed(1)}`} | ${row.status} | ${row.warnings.join("; ") || "-"} |`;
         })
       ].join("\n")
     : "- Metric validation table unavailable in this report.";

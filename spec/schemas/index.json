@@ -83,12 +83,12 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/amcaudit.schema.json",
       "name": "amcaudit.schema.json",
-      "sha256": "01ae1fcbc8ee2667b06197511c5bf8ca7c23b591819bf50fbb49b690b62dc524"
+      "sha256": "5550adb10019c34e14ede83fcea32a3736963cd44781a02d348b0d83a3b722b4"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/amcbench.schema.json",
       "name": "amcbench.schema.json",
-      "sha256": "2c4b0c16ea66c982c90281acbcc2d287379dd1a998847c646505801921130944"
+      "sha256": "b008fb16f3c860df8ce7eb4008f85af6def3fc0572acf3c9bd90701fb2198783"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/amccert.schema.json",
@@ -98,7 +98,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/amcpass.schema.json",
       "name": "amcpass.schema.json",
-      "sha256": "5a558ea9b0b7dc200798481d8b15255c3b22e2165a80b1da668eebc83007188e"
+      "sha256": "09b5b00aeb66af6f5d1d7c7c45eda22a12b4fc2e713e43e067948defe60a2eda"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/amcprompt.schema.json",
@@ -188,7 +188,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/registry.bench.schema.json",
       "name": "registry.bench.schema.json",
-      "sha256": "29de696c9b0e7386cccaa3444d3ed8c6a78ead43ce62c891b46b4b6a1df8aaf0"
+      "sha256": "29f24f7c8d7fa712284031a6bd87572a59e5cbda8ab70da1221708d194ac77ed"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/registry.passport.schema.json",

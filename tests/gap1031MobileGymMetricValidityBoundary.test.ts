@@ -216,7 +216,7 @@ describe("GAP-1031 MobileGym metric-validity boundary", () => {
       outcomeAlignment: 1,
       status: "pass",
     });
-    expect(report.rows[0]?.confidenceInterval.level).toBe(0.95);
+    expect(report.rows[0]?.confidenceInterval?.level).toBe(0.95);
     expect(report.rows[0]?.interRaterAgreement).toBe(0.9);
     expect(report.rows[0]?.testRetestStability).toBeGreaterThan(0.8);
     expect(report.evalPack.replayable).toBe(true);
