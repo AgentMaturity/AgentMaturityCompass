@@ -72,6 +72,18 @@ jobs:
         with:
           version: "v4.3.0"
 
+      # Ubuntu 24.04 restricts unprivileged user namespaces through AppArmor. Load the purpose-built Bubblewrap
+      # profile this repository ships (docs/NATIVE_SANDBOX_UBUNTU.md), then run the product's own readiness probe,
+      # so the confinement suite runs for real and a refusal is named here rather than as failed escape tests.
+      - name: Provision Bubblewrap for the confinement suite
+        shell: bash
+        run: |
+          command -v bwrap >/dev/null || { sudo apt-get update -q && sudo apt-get install -y -q bubblewrap; }
+          bwrap --version
+          sudo install -m 0644 deploy/apparmor/bwrap-userns-restrict /etc/apparmor.d/bwrap-userns-restrict
+          sudo apparmor_parser -r /etc/apparmor.d/bwrap-userns-restrict
+          node --input-type=module -e "const { bwrapHostChecks } = await import('./dist/sandbox/bwrapBackend.js'); const probe = bwrapHostChecks.namespaceLaunch(); console.log(JSON.stringify(probe)); if (!probe.ok) process.exit(1);"
+
       # Runner log lines are cut at 4,096 bytes for the reason given at build-test's merge step; the full log is uploaded.
       - name: Test shard
         timeout-minutes: 45
