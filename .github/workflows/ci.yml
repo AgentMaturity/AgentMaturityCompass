@@ -67,6 +67,15 @@ jobs:
       - name: Build
         run: npm run build
 
+      # tests/executionApiParity.test.ts drives sdk/python/tests/test_parity.py, which imports pytest: the SDK's test
+      # dependency (pyproject's dev extra), installed as the python-sdk job installs it.
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: "3.12"
+
+      - name: Install the Python SDK's test dependency
+        run: python3 -m pip install --require-hashes -r sdk/python/requirements-ci.txt
+
       - name: Set up Helm for full test suite
         uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5
         with:
@@ -367,6 +376,12 @@ jobs:
           cache: pnpm
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+      # The gate's full suite includes tests/executionApiParity.test.ts, which runs pytest (as test-shard installs it).
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: "3.12"
+      - name: Install the Python SDK's test dependency
+        run: python3 -m pip install --require-hashes -r sdk/python/requirements-ci.txt
       - name: Full release gate
         env:
           AMC_RELEASE_GATE_LIVE_URL: ${{ vars.AMC_RELEASE_GATE_LIVE_URL }}
@@ -438,7 +453,7 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Build the CLI the wrapper drives
         run: pnpm run build
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
           python-version: ${{ matrix.python-version }}
       - name: Build the wheel and install it into a fresh virtual environment

@@ -1,11 +1,13 @@
-import { execFileSync } from "node:child_process";
+import { execFile } from "node:child_process";
 import { readFileSync, readdirSync } from "node:fs";
 import { dirname, posix, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { promisify } from "node:util";
 import ts from "typescript";
 import { describe, expect, test } from "vitest";
 import * as approvalClient from "../src/runtime/approvalClient.js";
 
+const execFileAsync = promisify(execFile);
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const contracts = [
   "src/runtime/approvalClient.ts",
@@ -19,14 +21,44 @@ const contracts = [
   "src/ops/otelExporter.ts"
 ];
 
+function dependency(file: string, specifier: string): string {
+  return posix.normalize(posix.join(posix.dirname(file), specifier)).replace(/\.js$/, ".ts");
+}
+
+const reverseImports = new WeakMap<Map<string, string>, { reverse: Map<string, string[]>; reexporters: Set<string> }>();
+/** The target, every file that names it in an import, export-from, import() or require() specifier, and so on through
+ * files with an export-from declaration (the only re-exports exposes follows): a superset of the consumers and barrels
+ * productionConsumers can find. Imports come from TypeScript's import scanner and export-from declarations from one
+ * parse of the files naming both words, built once per source map (parsing and walking all of src, or every
+ * transitive importer, per contract took 20-40 s under coverage on CI). */
+function importersOf(target: string, sources: Map<string, string>): Set<string> {
+  let index = reverseImports.get(sources);
+  if (!index) {
+    index = { reverse: new Map(), reexporters: new Set() };
+    for (const [file, text] of sources) {
+      for (const { fileName } of ts.preProcessFile(text, true, true).importedFiles) {
+        const next = dependency(file, fileName);
+        index.reverse.set(next, [...(index.reverse.get(next) ?? []), file]);
+      }
+      if (/\bexport\b/.test(text) && /\bfrom\b/.test(text) && ts.createSourceFile(file, text, ts.ScriptTarget.Latest)
+        .statements.some(statement => ts.isExportDeclaration(statement) && statement.moduleSpecifier)) index.reexporters.add(file);
+    }
+    reverseImports.set(sources, index);
+  }
+  const { reverse, reexporters } = index;
+  const reached = new Set([target]);
+  for (const file of reached) {
+    if (file !== target && !reexporters.has(file)) continue;
+    for (const importer of reverse.get(file) ?? []) reached.add(importer);
+  }
+  return reached;
+}
+
 // Re-exports publish a library API; only value imports count as production use.
 function productionConsumers(target: string, sources: Map<string, string>, parsed = new Map<string, ts.SourceFile>()): string[] {
   function source(file: string): ts.SourceFile {
     if (!parsed.has(file)) parsed.set(file, ts.createSourceFile(file, sources.get(file)!, ts.ScriptTarget.Latest, true));
     return parsed.get(file)!;
-  }
-  function dependency(file: string, specifier: string): string {
-    return posix.normalize(posix.join(posix.dirname(file), specifier)).replace(/\.js$/, ".ts");
   }
   function exposes(file: string, name: string, seen = new Set<string>()): boolean {
     if (file === target) return true;
@@ -41,8 +73,9 @@ function productionConsumers(target: string, sources: Map<string, string>, parse
       return statement.exportClause.elements.some(element => !element.isTypeOnly && (name === "*" || element.name.text === name) && exposes(next, (element.propertyName ?? element.name).text, seen));
     });
   }
+  const candidates = importersOf(target, sources);
   return [...sources.keys()].filter(file => {
-    if (file === target) return false;
+    if (file === target || !candidates.has(file)) return false;
     let used = false;
     function visit(node: ts.Node): void {
       if (ts.isImportDeclaration(node) && ts.isStringLiteral(node.moduleSpecifier) && !node.importClause?.isTypeOnly) {
@@ -126,14 +159,16 @@ describe("WP46 unwired contract labels", () => {
     expect(sources.get("src/index.ts")).toContain("hasApprovalTokenMarker");
   });
 
-  test("legacy registry and public cancellation help disclose their limits", () => {
+  test("legacy registry and public cancellation help disclose their limits", async () => {
     expect(sources.get("src/runtimes/index.ts")).toMatch(/@deprecated[\s\S]*src\/adapters\//);
-    for (const operation of ["cancel", "resume"]) {
-      const help = execFileSync(process.execPath, [resolve(root, "dist/cli.js"), "runtime", operation, "--help"], { encoding: "utf8" });
+    // The CLI takes one subcommand per process, so both help processes run at once. Both took 5.7 s together, run one
+    // after the other, on a CI shard under coverage; each is bounded at 50 s inside the test's 60 s.
+    await Promise.all(["cancel", "resume"].map(async operation => {
+      const { stdout: help } = await execFileAsync(process.execPath, [resolve(root, "dist/cli.js"), "runtime", operation, "--help"], { encoding: "utf8", timeout: 50_000 });
       expect(help).toContain("record-only");
       expect(help.replace(/\s+/g, " ")).toContain(`does not ${operation} native execution`);
-    }
-  });
+    }));
+  }, 60_000);
 
   test("the guard follows value imports through barrels and ignores type-only references", () => {
     const fixture = new Map([
@@ -149,8 +184,14 @@ describe("WP46 unwired contract labels", () => {
       ["src/otherDynamic.ts", "const { other } = await import('./outer.js');"],
       ["src/valueDynamic.ts", "const { renamed: helper } = await import('./outer.js');"],
       ["src/quotedDynamic.ts", "const { 'renamed': helper } = await import('./outer.js');"],
-      ["src/computedDynamic.ts", "const { ['renamed']: helper } = await import('./outer.js');"]
+      ["src/computedDynamic.ts", "const { ['renamed']: helper } = await import('./outer.js');"],
+      ["src/lines.ts", "export {\n  helper\n} from './contract.js'"],
+      ["src/viaLines.ts", "import { helper } from './lines.js';"],
+      ["src/commented.ts", "export {\n  helper // ; a comment\n} from './contract.js'"],
+      ["src/viaCommented.ts", "import { helper } from './commented.js';"],
+      ["src/user.ts", "import { helper } from './contract.js'; export const used = helper;"],
+      ["src/indirect.ts", "import { used } from './user.js';"]
     ]);
-    expect(productionConsumers("src/contract.ts", fixture)).toEqual(["src/value.ts", "src/dynamic.ts", "src/require.ts", "src/namespace.ts", "src/valueDynamic.ts", "src/quotedDynamic.ts", "src/computedDynamic.ts"]);
+    expect(productionConsumers("src/contract.ts", fixture)).toEqual(["src/value.ts", "src/dynamic.ts", "src/require.ts", "src/namespace.ts", "src/valueDynamic.ts", "src/quotedDynamic.ts", "src/computedDynamic.ts", "src/viaLines.ts", "src/viaCommented.ts", "src/user.ts"]);
   });
 });

@@ -96,6 +96,15 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # The gate's full suite includes tests/executionApiParity.test.ts, which runs pytest (as CI's test-shard installs it).
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: "3.12"
+
+      - name: Install the Python SDK's test dependency
+        run: python3 -m pip install --require-hashes -r sdk/python/requirements-ci.txt
+
       # Version, one CHANGELOG heading, release notes, no pending changesets.
       - name: Check the release candidate
         run: node scripts/check-release-candidate.mjs

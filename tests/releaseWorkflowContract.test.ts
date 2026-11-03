@@ -116,6 +116,10 @@ function gateContract(gate: Job | undefined): string[] {
   if (!/check-pack-contents\.mjs --tarball "\$TARBALL"/.test(all)) failures.push("pack contents are not checked on the packed tarball");
   if (!/npm publish "\$TARBALL" --dry-run/.test(all)) failures.push("the dry run does not publish the packed tarball");
   if (!/pnpm install --frozen-lockfile/.test(all)) failures.push("gate does not install from the committed lockfile");
+  // The gate's full suite includes tests/executionApiParity.test.ts, which drives pytest.
+  if (!gate.steps.some(step => step.uses?.startsWith("actions/setup-python@")) || !all.includes('python3 -m pip install --require-hashes -r sdk/python/requirements-ci.txt')) {
+    failures.push("gate does not install pytest for the parity test");
+  }
   const notes = all.search(/node scripts\/check-release-notes\.mjs "docs\/releases\/\$\{AMC_RELEASE_TAG#v\}\.md"/);
   if (notes < 0 || notes > all.search(/\bnpm pack\b/)) failures.push("gate does not check the tag's release notes for banned claim words before packing");
   for (const command of ["check-release-candidate.mjs", "release-record.mjs tag", "release-record.mjs write", "release-record.mjs verify"]) {
@@ -321,6 +325,7 @@ describe("release workflow contract (P0-34)", () => {
       return contract(changed);
     };
     const release = mutated("release.yml", releaseContract);
+    expect(release(/\n\s+- name: Install the Python SDK's test dependency\n[^\n]*\n/, "\n")).toContain("gate does not install pytest for the parity test");
     expect(release(/\n\s+- name: Check the release notes[^\n]*\n\s+run: [^\n]*\n/, "\n"))
       .toContain("gate does not check the tag's release notes for banned claim words before packing");
 
