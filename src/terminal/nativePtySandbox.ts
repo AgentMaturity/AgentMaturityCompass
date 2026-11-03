@@ -1,7 +1,7 @@
 import { closeSync, constants, existsSync, fstatSync, lstatSync, mkdtempSync, openSync, opendirSync, readFileSync, readlinkSync, realpathSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
-import { bwrapBackend, bwrapCommandExit, linuxSocketDenyFilter } from "../sandbox/bwrapBackend.js";
+import { NAMESPACE_FLAGS, bwrapBackend, bwrapCommandExit, linuxSocketDenyFilter } from "../sandbox/bwrapBackend.js";
 import type { SandboxPolicy } from "../sandbox/sandboxTypes.js";
 import { assertTerminalDimensions } from "./terminalTypes.js";
 import { NATIVE_PTY_HELPER } from "./nativePtyHelper.js";
@@ -118,9 +118,7 @@ export function prepareNativePtyLaunch(cwd: string, policy: SandboxPolicy, cols:
     writeFileSync(filterPath, linuxSocketDenyFilter(process.arch as "x64" | "arm64"), { mode: 0o600 });
     descriptors.push(openSync(statusPath, constants.O_CREAT | constants.O_EXCL | constants.O_RDWR, 0o600));
     descriptors.push(openSync(filterPath, constants.O_RDONLY));
-    const argv = ["/usr/bin/bwrap", "--unshare-user", "--unshare-pid", "--unshare-net", "--unshare-ipc", "--unshare-uts",
-      "--die-with-parent", "--new-session", "--cap-drop", "ALL", "--disable-userns", "--assert-userns-disabled",
-      "--json-status-fd", "3", "--seccomp", "4", "--dev", "/dev", "--tmpfs", "/tmp", "--chmod", "1777", "/tmp"];
+    const argv = ["/usr/bin/bwrap", ...NAMESPACE_FLAGS, "--json-status-fd", "3", "--seccomp", "4", "--dev", "/dev", "--tmpfs", "/tmp", "--chmod", "1777", "/tmp"];
     const bind = (path: string, writable: boolean): void => {
       const canonical = realpathSync(path);
       const fd = openSync(canonical, constants.O_RDONLY | constants.O_NOFOLLOW);

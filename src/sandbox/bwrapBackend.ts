@@ -9,7 +9,9 @@ import type { SandboxBackend, SandboxOutcome, SandboxPolicy } from "./sandboxTyp
 const BWRAP = "/usr/bin/bwrap";
 const RUNTIME_ROOTS = ["/usr", "/bin", "/lib", "/lib64"] as const;
 const RUNTIME_FILES = ["/etc/ld.so.cache", "/etc/ld.so.conf", "/etc/nsswitch.conf", "/etc/passwd", "/etc/group", "/etc/localtime"] as const;
-const NAMESPACE_FLAGS = ["--unshare-user", "--unshare-pid", "--unshare-net", "--unshare-ipc", "--unshare-uts",
+
+/** Shared by the shell and the PTY launcher, so the launch probe tests what both use. */
+export const NAMESPACE_FLAGS = ["--unshare-user", "--unshare-pid", "--unshare-net", "--unshare-ipc", "--unshare-uts",
   "--die-with-parent", "--new-session", "--cap-drop", "ALL", "--disable-userns", "--assert-userns-disabled"] as const;
 type Check = { ok: true } | { ok: false; reason: string };
 let launchProbe: Check | undefined;
@@ -58,7 +60,7 @@ function namespaceLaunch(): Check {
   return launchProbe;
 }
 
-function prerequisites(): Check {
+function installation(): { ok: true } | { ok: false; reason: string } {
   if (process.platform !== "linux") return { ok: false, reason: "Bubblewrap requires Linux." };
   if (process.arch !== "x64" && process.arch !== "arm64") return { ok: false, reason: "The Linux socket filter supports x64 and arm64 only." };
   try {
@@ -72,12 +74,17 @@ function prerequisites(): Check {
       if (!parent.isDirectory() || parent.uid !== 0 || (parent.mode & 0o022) !== 0) return { ok: false, reason: "Bubblewrap's system installation directories must be root-owned and not writable by other users." };
       if (path === "/") break;
     }
+    return { ok: true };
   } catch {
     return { ok: false, reason: "Install a supported system Bubblewrap at /usr/bin/bwrap; AMC does not fall back to an unconfined Linux shell." };
   }
-  return namespaceLaunch();
 }
 
+/** Installation checks first, then one real namespace launch. */
+function prerequisites(): Check {
+  const installed = installation();
+  return installed.ok ? namespaceLaunch() : installed;
+}
 
 /** Original classic-BPF filter: reject other syscall ABIs and socket creation/connection. */
 export function linuxSocketDenyFilter(arch: "x64" | "arm64"): Buffer {

@@ -52,6 +52,9 @@ headers:{"proxy-authorization":auth,connection:"close"}},response=>{
 request.setTimeout(2000,()=>request.destroy(new Error("owned proxy request timed out")));
 request.on("error",error=>{${emit('{attempted:true,errorCode:error.code||null,error:error.message}')}});request.end();`;
 
+// Linux's socket filter also denies socketpair, which Node's piped stdio needs, so children there are short sleeps.
+const liveChild = process.platform === "linux" ? 'spawn("/bin/sleep",["2"],{stdio:"ignore"})' : 'spawn("/bin/cat",[],{stdio:["pipe","ignore","ignore"]})';
+
 function refusedBeforeLaunch(call: NativeCall, reason: string): void {
   expect(call.receipt).toMatchObject({ confined: false, exitCode: null, failure: { kind: "unavailable" } });
   expect(call.receipt.failure!.reason).toContain(reason);
@@ -185,10 +188,10 @@ describe("real native shell escape attempts with owned canaries", () => {
     } finally { await f.finish(passed); }
   });
 
-  realTest("a finite process-cap probe reaches EAGAIN with at most 32 owned live cat children and reaps them", async () => {
+  realTest("a finite process-cap probe reaches EAGAIN with at most 32 owned live children and reaps them", async () => {
     const f = nativeContainmentFixture({ maxProcesses: 16 }); let passed = false;
     try {
-      const call = await f.run(`(async()=>{const {spawn}=require("node:child_process");const children=[],closed=[],errors=[],stdinErrors=[];let attempts=0;try{for(;attempts<32;){attempts+=1;const child=spawn("/bin/cat",[],{stdio:["pipe","ignore","ignore"]});const close=new Promise(resolve=>child.once("close",(code,signal)=>{closed.push({pid:child.pid||null,code,signal});resolve();}));children.push({child,close});if(child.stdin)child.stdin.on("error",error=>stdinErrors.push(error.code));const started=await new Promise(resolve=>{child.once("spawn",()=>resolve(true));child.once("error",error=>{errors.push(error.code);resolve(false);});});if(!started)break;}}finally{for(const {child}of children)if(child.stdin)child.stdin.end();await Promise.all(children.map(row=>row.close));}${emit('{attempted:true,attempts,spawned:children.filter(row=>row.child.pid).map(row=>row.child.pid),closed,errors,stdinErrors,limitHit:errors.includes("EAGAIN")}')}})().catch(error=>{${emit('{attempted:true,error:error.message}')}process.exitCode=1;});`);
+      const call = await f.run(`(async()=>{const {spawn}=require("node:child_process");const children=[],closed=[],errors=[],stdinErrors=[];let attempts=0;try{for(;attempts<32;){attempts+=1;const child=${liveChild};const close=new Promise(resolve=>child.once("close",(code,signal)=>{closed.push({pid:child.pid||null,code,signal});resolve();}));children.push({child,close});if(child.stdin)child.stdin.on("error",error=>stdinErrors.push(error.code));const started=await new Promise(resolve=>{child.once("spawn",()=>resolve(true));child.once("error",error=>{errors.push(error.code);resolve(false);});});if(!started)break;}}finally{for(const {child}of children)if(child.stdin)child.stdin.end();await Promise.all(children.map(row=>row.close));}${emit('{attempted:true,attempts,spawned:children.filter(row=>row.child.pid).map(row=>row.child.pid),closed,errors,stdinErrors,limitHit:errors.includes("EAGAIN")}')}})().catch(error=>{${emit('{attempted:true,error:error.message}')}process.exitCode=1;});`);
       applied(call); expect(call.data.limitHit).toBe(true); expect(call.data.errors).toEqual(["EAGAIN"]);
       expect(call.data.spawned.length).toBeLessThanOrEqual(32); expect(call.data.attempts).toBeLessThanOrEqual(32);
       expect(call.data.closed).toHaveLength(call.data.spawned.length + 1);
