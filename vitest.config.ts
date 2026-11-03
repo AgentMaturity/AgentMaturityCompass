@@ -25,7 +25,8 @@ export default defineConfig({
        * 80% target in the engineering standards is the destination, not the
        * current state, and pretending otherwise is what left the gate at zero.
        */
-      thresholds: {
+      // CI shards (AMC_COVERAGE_SHARD=1) each hold a quarter of the coverage; build-test merges them and checks once.
+      thresholds: process.env.AMC_COVERAGE_SHARD === "1" ? undefined : {
         lines: 65,
         functions: 75,
         branches: 59,

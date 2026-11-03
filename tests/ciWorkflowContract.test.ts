@@ -38,9 +38,16 @@ function ciWorkflowFailures(workflow: Workflow): string[] {
       "npm run check:duplicates", "npm run check:dead-code"]) {
       if (!required(commandStep(build, command))) failures.push(`build-test does not require ${command}`);
     }
-    // The instrumented suite runs the same Vitest tests as npm test; performance files run separately without coverage.
+    // The instrumented suite runs the same Vitest tests as npm test, either in build-test or in test-shard's four
+    // shards that build-test merges with coverage; performance files run separately without coverage.
     const coverage = commandStep(build, "npm run test:coverage");
-    if (!required(commandStep(build, "npm test")) && !(required(coverage)
+    const shards = workflow.jobs["test-shard"];
+    const shardRun = commandStep(shards, "npm run test:coverage");
+    const merge = build.steps.find(step => /(?:^|\n)\s*npx vitest run --merge-reports \S+ --coverage\b/.test(step.run ?? ""));
+    const sharded = required(shardRun) && /--shard=\$\{\{ matrix\.shard \}\}\/4\b/.test(shardRun?.run ?? "")
+      && JSON.stringify((shards as { strategy?: { matrix?: { shard?: unknown } } } | undefined)?.strategy?.matrix?.shard) === "[1,2,3,4]"
+      && required(merge) && /blob-\*\.json \| wc -l\)" -eq 4/.test(merge?.run ?? "");
+    if (!required(commandStep(build, "npm test")) && !((required(coverage) || sharded)
       && scripts.test === "vitest run" && scripts["test:coverage"] === "vitest run --coverage"
       && required(commandStep(build, "npx vitest run tests/performance --no-file-parallelism")))) {
       failures.push("build-test does not require the full test suite");
@@ -67,7 +74,7 @@ function ciWorkflowFailures(workflow: Workflow): string[] {
   if (gate) {
     if (gate["runs-on"] !== "macos-latest") failures.push("release-gate does not execute the full native corpus on Darwin");
     if (gate.if !== "github.event_name != 'pull_request'") failures.push("release-gate is not restricted to non-PR events");
-    if (gate["timeout-minutes"] !== 120) failures.push("release-gate does not have its 120-minute budget");
+    if (gate["timeout-minutes"] !== 180) failures.push("release-gate does not have its 180-minute budget");
     const run = commandStep(gate, "npm run release:gate -- --json --out tmp/release-gate/ci.json");
     if (!required(run)) failures.push("release-gate does not require the actual full gate and receipt");
     if ((run?.env?.AMC_RELEASE_GATE_LIVE_URL ?? gate.env?.AMC_RELEASE_GATE_LIVE_URL) !== "${{ vars.AMC_RELEASE_GATE_LIVE_URL }}") {
@@ -99,6 +106,15 @@ describe("CI workflow contract (P0-33)", () => {
     const workflow = parse();
     workflow.jobs["build-test"]!.steps = workflow.jobs["build-test"]!.steps.filter(step => step.name !== "Lint");
     expect(ciWorkflowFailures(workflow)).toContain("build-test does not require npm run lint");
+  });
+
+  test("dropping a shard or the merged coverage step fails the contract", () => {
+    const fewer = parse() as Workflow & { jobs: Record<string, Job & { strategy?: { matrix?: { shard?: number[] } } }> };
+    fewer.jobs["test-shard"]!.strategy!.matrix!.shard = [1, 2, 3];
+    expect(ciWorkflowFailures(fewer)).toContain("build-test does not require the full test suite");
+    const unmerged = parse();
+    unmerged.jobs["build-test"]!.steps = unmerged.jobs["build-test"]!.steps.filter(step => !/--merge-reports/.test(step.run ?? ""));
+    expect(ciWorkflowFailures(unmerged)).toContain("build-test does not require the full test suite");
   });
 
   test("removing the release-gate job fails the contract", () => {

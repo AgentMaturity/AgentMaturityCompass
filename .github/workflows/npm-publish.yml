@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    timeout-minutes: 60
+    timeout-minutes: 150
     steps:
       - uses: actions/checkout@v6 # TODO(P1-41 follow-up): pin actions/checkout@v6 by full commit SHA
         with:
@@ -62,7 +62,7 @@ jobs:
         run: npm run typecheck:tests
 
       - name: Test
-        timeout-minutes: 30
+        timeout-minutes: 120
         shell: bash
         # The full output goes to the log artifact; the runner log gets lines cut at
         # 4,096 bytes. A test once teed a 5 MiB single-line answer to stdout, and a

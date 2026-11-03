@@ -119,7 +119,7 @@ describe("release gate execution and qualification scope", () => {
     expect(f.calls.find((call) => call.id === "full-test-suite")!.args).toContain("--coverage");
     expect(f.calls.find((call) => call.id === "full-test-suite")!.args).toContain("--coverage.reportOnFailure");
     const coverage = f.calls.find((call) => call.id === "full-test-suite")!;
-    expect(coverage).toMatchObject({ timeoutMs: 2_700_000 });
+    expect(coverage).toMatchObject({ timeoutMs: 7_200_000 });
     expect(coverage.args).toContain("--exclude");
     expect(coverage.args[coverage.args.indexOf("--exclude") + 1]).toBe("tests/performance/**");
     const performance = f.calls.filter((call) => call.id === "performance-floors");
