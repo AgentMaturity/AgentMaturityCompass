@@ -170,6 +170,7 @@ export interface PurposeSignature { provider: KeyProviderId; algorithm: SigningA
 
 /** Preparation for the async owner revocation flow; no staging or publication occurs while the provider is awaited. */
 export async function signPurposeRevocationList(workspace: string, list: RevocationListV1, opts: { provider?: KeyProvider; beforeSign?: () => void } = {}): Promise<{ signed: SignedRevocationList; description: KeyDescription; provider: KeyProviderId }> {
+  if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize revocation-list signing");
   const beforeSign = opts.beforeSign, providerOverride = opts.provider;
   beforeSign?.();
   const { provider, description, recheck } = await purposeSigner(workspace, "revocation-list", providerOverride, beforeSign);

@@ -18,8 +18,10 @@ import { reserveNativeToolBudget } from "../../src/budgets/nativeBudgetAdmission
 import { createFreezeIncident } from "../../src/drift/freezeEngine.js";
 import { evalImportCoverageStatus, importEvalResults } from "../../src/eval/evalImporters.js";
 import { executeCaseTrials } from "../../src/experiments/trialExecutor.js";
-import { signWithPurposeKey } from "../../src/keys/purposeProviders.js";
+import { revokeKeyAsync } from "../../src/keys/purposeKeys.js";
+import { signPurposeRevocationList, signWithPurposeKey } from "../../src/keys/purposeProviders.js";
 import { openLedger } from "../../src/ledger/ledger.js";
+import { controlCheckpointDir } from "../../src/lifecycle/signedControlJournalRecords.js";
 import { UNSIGNED_EVIDENCE_STORE } from "../../src/ledger/ledgerConnection.js";
 import { exportReviewTimingCsv, recordReviewTiming } from "../../src/operator/reviewTiming.js";
 import { writeEffectivePolicyReceipt } from "../../src/policy/effectivePolicyReceipt.js";
@@ -129,7 +131,9 @@ describe("the kill switch under no-sign", () => {
     const signed = await activateKillSwitch({ workspace, issuedBy: "owner-1", scope: { kind: "workspace", id: "workspace" }, mode: "stop_all",
       reason: "signed", incidentId: "inc-1" });
     vi.stubEnv("AMC_NO_SIGN", "1");
-    write({ ...signed, scope: { kind: "agent", id: "nobody" }, mode: "stop_new_effects", signature: "unsigned" });
+    // Planted in the mirror under a name that sorts after every signed copy, so it is the last record read.
+    writeFileSync(join(controlCheckpointDir(workspace, "kill-switch"), "zz-planted.json"),
+      JSON.stringify({ ...signed, scope: { kind: "agent", id: "nobody" }, mode: "stop_new_effects", signature: "unsigned" }));
     expect(killSwitchDenial(workspace, tool("default", "READ_ONLY"))).toContain(`kill_switch_active: ${signed.killId} (workspace:workspace, stop_all)`);
     write({ v: 1, release: true, killId: signed.killId, incidentId: "inc-1", releasedBy: "owner-1", releasedTs: Date.now(), signature: "unsigned" });
     expect(killSwitchStatus(workspace).unverifiable).toHaveLength(1);
@@ -154,6 +158,11 @@ test("the shared purpose signer refuses every purpose but the session credential
   await expect(signWithPurposeKey(workspace, "artifact-seal", Buffer.from("probe"))).rejects.toThrow("no-sign mode does not authorize artifact-seal signing");
   await expect(signWithPurposeKey(workspace, "receipt", Buffer.from("probe"))).rejects.toThrow("no-sign mode does not authorize receipt signing");
   expect((await signWithPurposeKey(workspace, "session", Buffer.from("probe"))).signature.length).toBeGreaterThan(0);
+});
+
+test("key revocation and the shared revocation-list signer refuse", async () => {
+  await expect(signPurposeRevocationList(workspace, {} as never)).rejects.toThrow("no-sign mode does not authorize revocation-list signing");
+  await expect(revokeKeyAsync(workspace, "receipt", "probe-key", "superseded", "passphrase")).rejects.toThrow("Key revocation is unavailable in no-sign mode");
 });
 
 // Change envelope test results refuse too; that case needs an authenticated tester and an active envelope (tests/runtime/changeEnvelope.test.ts).
