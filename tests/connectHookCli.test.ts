@@ -1,4 +1,4 @@
-import { mkdtempSync, rmSync } from "node:fs";
+import { chmodSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -16,13 +16,28 @@ function workspace(): string {
   return root;
 }
 
-function run(cwd: string, args: string[], input?: string) {
+/**
+ * A PATH whose only `claude` reports `version` (the qualified release by default), or none at all, so the installer binds
+ * the same Claude Code on every host instead of whatever release (if any) the machine running the tests has installed.
+ */
+function claudePath(root: string, version: string | null = "2.1.296"): string {
+  const bin = join(root, ".fixture-bin");
+  mkdirSync(bin, { recursive: true });
+  if (version) {
+    writeFileSync(join(bin, "claude"), `#!/bin/sh\necho '${version} (Claude Code)'\n`);
+    chmodSync(join(bin, "claude"), 0o755);
+  }
+  return bin;
+}
+
+function run(cwd: string, args: string[], input?: string, PATH = claudePath(cwd)) {
   return spawnSync(process.execPath, [cliPath, ...args], {
     cwd,
     encoding: "utf8",
     input,
     env: {
       ...process.env,
+      PATH,
       NO_COLOR: "1",
       AMC_VAULT_PASSPHRASE: "amc-test-passphrase"
     },
@@ -149,5 +164,19 @@ describe("amc connect hooks CLI", () => {
     });
     expect(forwarded.stderr).toContain("AMC hook control unavailable; action denied.");
     expect(forwarded.stdout).not.toContain("never-forwarded");
+  });
+
+  test("denies as an unusable installation, not invalid input, when control was installed with no Claude Code on PATH", () => {
+    const cwd = workspace();
+    const noClaude = claudePath(join(cwd, "no-claude"), null);
+    const control = ["--provider", "claude-code", "--mode", "control", "--agent", "control-cli-agent"];
+    expect(run(cwd, ["connect", "hooks", "install", ...control, "--json"], undefined, noClaude).status).toBe(0);
+    const forwarded = run(cwd, ["connect", "hooks", "forward", ...control, "--token-file", ".amc/hooks/claude-code.lease", "--event", "PreToolUse"],
+      JSON.stringify({ session_id: "cli-unbound-session", transcript_path: "/private/transcript.jsonl", cwd, permission_mode: "default",
+        hook_event_name: "PreToolUse", tool_name: "Read", tool_use_id: "toolu_cli_unbound_01", tool_input: { file_path: "/private/never-forwarded.txt" } }), noClaude);
+    expect(forwarded.status).toBe(2);
+    expect(JSON.parse(forwarded.stdout)).toMatchObject({ hookSpecificOutput: { hookEventName: "PreToolUse", permissionDecision: "deny" } });
+    expect(forwarded.stderr).toContain("AMC hook installation unusable (the installation binds no qualified Claude Code release");
+    expect(forwarded.stderr).not.toContain("input invalid");
   });
 });

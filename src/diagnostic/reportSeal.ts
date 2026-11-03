@@ -18,7 +18,9 @@ import { sha256Hex } from "../utils/hash.js";
  */
 export function sealedRunReportVerifies(
   workspace: string,
-  parsed: Record<string, unknown>
+  parsed: Record<string, unknown>,
+  /** The run-hash verification keys when the caller already read them (it must have read them from `workspace`). */
+  keys?: readonly string[]
 ): boolean {
   const claimedHash = parsed.reportJsonSha256;
   const seal = parsed.runSealSig;
@@ -29,8 +31,7 @@ export function sealedRunReportVerifies(
   );
   if (recomputed !== claimedHash) return false;
   try {
-    const keys = runHashVerificationKeys(workspace);
-    return verifyHexDigestAny(claimedHash, seal, keys);
+    return verifyHexDigestAny(claimedHash, seal, [...(keys ?? runHashVerificationKeys(workspace))]);
   } catch {
     return false;
   }

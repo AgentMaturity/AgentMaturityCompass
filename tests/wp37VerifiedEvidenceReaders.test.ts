@@ -68,6 +68,20 @@ describe("WP37 verified run readers", () => {
     expect(loadVerifiedRunReport(ws, "missing", "agent-x")).toBeNull();
   });
 
+  test("a repeated scan re-verifies changed bytes and hands each caller its own report", () => {
+    const ws = workspace();
+    writeSealedReport(ws, runsDir(ws), "run-1", run("run-1", 1000, 0.5));
+    const newest = writeSealedReport(ws, runsDir(ws), "run-2", run("run-2", 2000, 0.6));
+    const first = latestVerifiedRun(ws, "agent-x").run!;
+    expect(first.runId).toBe("run-2");
+    first.integrityIndex = 0.01;
+    expect(latestVerifiedRun(ws, "agent-x").run?.integrityIndex).toBe(0.6);
+    expect(listVerifiedRuns(ws, "agent-x").map((row) => row.runId)).toEqual(["run-2", "run-1"]);
+    tamperReport(newest, (report) => { report.integrityIndex = 0.99; });
+    expect(latestVerifiedRun(ws, "agent-x")).toMatchObject({ run: null, blocking: [{ tampered: true }] });
+    expect(listVerifiedRuns(ws, "agent-x").map((row) => row.runId)).toEqual(["run-1"]);
+  });
+
   test("loadVerifiedRunReport refuses a sealed run of another agent or stored under another run's name", () => {
     const ws = workspace();
     writeSealedReport(ws, runsDir(ws), "run-foreign", { ...run("run-foreign", 1000, 0.5), agentId: "agent-other" });
