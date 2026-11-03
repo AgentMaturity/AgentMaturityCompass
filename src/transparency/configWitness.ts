@@ -8,7 +8,8 @@
  * the log lacks (the log was restored to an older copy). The ledger row comes first, so an interrupted pair reads as a
  * rollback until the next save completes it. A rollback of the whole workspace (ledger and log together) is not
  * detectable here: that needs an anchor outside the workspace (the public transparency anchor or high-water marks).
- * Prompt pack builds write a per-agent PROMPT_PACK_CREATED ledger row (witnessInLedger) before their own log entry.
+ * Prompt pack builds write a per-agent PROMPT_PACK_CREATED ledger row (witnessInLedger) before their own log entry, and the
+ * A4 store writes the per-agent A4_PROJECT_CREATED pair (witnessRecords) after a new project's CREATED ledger rows commit.
  *
  * Every explicit writer of the three files witnesses, sync and async, SDK exports included. Deliberately unwitnessed:
  * - the default passport policy an async reader creates lazily (loadPassportPolicyAttemptAsync): it is only the default
@@ -22,16 +23,20 @@ import { openLedger } from "../ledger/ledger.js";
 import { appendOpsAuditEvent } from "../ops/audit.js";
 import { sha256Hex } from "../utils/hash.js";
 import { appendTransparencyEntry, transparencyLogPath, verifiedTransparencyLog } from "./logChain.js";
+import type { TransparencyArtifactKind } from "./logSchema.js";
 
 export const PASSPORT_POLICY_CONFIGURED = "PASSPORT_POLICY_CONFIGURED";
 export const PROMPT_SCHEDULER_CONFIGURED = "PROMPT_SCHEDULER_CONFIGURED";
 export const FORECAST_SCHEDULER_CONFIGURED = "FORECAST_SCHEDULER_CONFIGURED";
 /** A prompt pack build: the build appends this log entry itself; its ledger row (per agent) comes from witnessInLedger. */
 export const PROMPT_PACK_CREATED = "PROMPT_PACK_CREATED";
+/** An A4 project's creation (preview only), per agent: a project either record shows was created must still be in the ledger. */
+export const A4_PROJECT_CREATED = "A4_PROJECT_CREATED";
 /** Types that show the passport policy was configured: the witness, or an applied policy (logged, and audited by Studio). */
 export const PASSPORT_POLICY_WITNESSES = [PASSPORT_POLICY_CONFIGURED, "PASSPORT_POLICY_APPLIED"] as const;
 /** One group per part: when the ledger holds a type of a group, verify all requires the log to hold a type of it too. */
-export const WITNESS_GROUPS: readonly (readonly string[])[] = [PASSPORT_POLICY_WITNESSES, [PROMPT_SCHEDULER_CONFIGURED], [FORECAST_SCHEDULER_CONFIGURED], [PROMPT_PACK_CREATED]];
+export const WITNESS_GROUPS: readonly (readonly string[])[] = [PASSPORT_POLICY_WITNESSES, [PROMPT_SCHEDULER_CONFIGURED], [FORECAST_SCHEDULER_CONFIGURED], [PROMPT_PACK_CREATED],
+  [A4_PROJECT_CREATED]];
 
 /** Whether the ledger holds a `type` audit row for `agentId`. A forged row would fail ledger verification, which verify all reports. */
 function ledgerHolds(workspace: string, type: string, agentId: string): boolean {
@@ -51,17 +56,25 @@ export function witnessInLedger(workspace: string, type: string, agentId: string
 }
 
 /**
- * Witnesses the saved file at `path` (its current bytes unless given). Each record is decided on its own: the ledger row is
- * written whenever the ledger lacks one of `type`, then the log entry whenever the verified log (its parsed entries, read
- * only) lacks one; neither suppresses the other, so a rollback of either record is repaired on the next save. Called after
+ * Witnesses the saved file at `path` (its current bytes unless given), as the workspace's: see witnessRecords. Called after
  * the save, outside any flow that holds the transparency state fixed (a default passport policy that an async reader creates
  * lazily is not witnessed: it is a default, recreated on the next load).
  */
 export function witnessConfiguration(workspace: string, type: string, path: string, bytes?: Uint8Array): void {
   const id = relative(resolve(workspace), resolve(path)).split(sep).join("/"), sha256 = sha256Hex(Buffer.from(bytes ?? readFileSync(path)));
-  witnessInLedger(workspace, type, "workspace", { path: id, sha256 });
-  // ponytail: one read-only verification of the log per save (the schedulers save often); index it if the log grows large.
+  witnessRecords(workspace, type, "workspace", { kind: "policy", id, sha256 }, { path: id, sha256 });
+}
+
+/**
+ * Writes the `type` witness of `agentId` to both records, each decided on its own: the ledger row whenever the ledger lacks
+ * one, then the log entry whenever the verified log (its parsed entries, read only) lacks one of this type and agent; neither
+ * suppresses the other, so a rollback of either record is repaired on the next witness.
+ */
+export function witnessRecords(workspace: string, type: string, agentId: string, artifact: { kind: TransparencyArtifactKind; id: string; sha256: string },
+  payload: Record<string, unknown>): void {
+  witnessInLedger(workspace, type, agentId, payload);
+  // ponytail: one read-only verification of the log per witness (the schedulers save often); index it if the log grows large.
   const log = existsSync(transparencyLogPath(workspace)) ? verifiedTransparencyLog(workspace, { readOnly: true }) : null;
-  if (log?.ok === true && log.entries.some((entry) => entry.type === type)) return;
-  appendTransparencyEntry({ workspace, type, agentId: "workspace", artifact: { kind: "policy", id, sha256 } });
+  if (log?.ok === true && log.entries.some((entry) => entry.type === type && entry.agentId === agentId)) return;
+  appendTransparencyEntry({ workspace, type, agentId, artifact });
 }

@@ -238,7 +238,7 @@ describe("verify all: not configured is not INCOMPLETE", () => {
     for (let i = 0; i < 2; i++) {
       const report = await run(ws);
       expect(report.status).toBe("INCOMPLETE");
-      expect(report.skippedCritical).toEqual(["passport-policy-signature", "transparency-log", "transparency-merkle"]);
+      expect(report.skippedCritical).toEqual(["passport-policy-signature", "transparency-log", "transparency-merkle", "a4-projects"]);
       for (const file of files(ws)) expect(existsSync(file)).toBe(false);
     }
   });

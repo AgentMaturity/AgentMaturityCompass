@@ -292,9 +292,10 @@ export function verifyA4Chain(ledger: Ledger, projectId: string, trust: TrustCon
 /**
  * The `a4-projects` rows of `amc verify all`: one per project, opened read-only. A ledger whose schema is a contiguous
  * prefix below migration 13 skips (no A4 tables yet); a schema at or above it without the tables fails, never an empty pass.
- * A migrated ledger with no project reads NOT_CONFIGURED: A4 is optional, so that is not a check withheld.
+ * A migrated ledger with no project reads NOT_CONFIGURED here; verify all decides that from its witnesses. Each project row
+ * names its agent (when its a4_projects row reads) so verify all can match the A4_PROJECT_CREATED witnesses.
  */
-export function verifyA4Projects(workspace: string, trust: TrustContext): Array<{ status: "PASS" | "FAIL" | "SKIP" | "NOT_CONFIGURED"; details: string[] }> {
+export function verifyA4Projects(workspace: string, trust: TrustContext): Array<{ status: "PASS" | "FAIL" | "SKIP" | "NOT_CONFIGURED"; details: string[]; agentId?: string }> {
   let ledger: Ledger;
   try {
     ledger = openLedger(workspace, { readonly: true });
@@ -315,7 +316,8 @@ export function verifyA4Projects(workspace: string, trust: TrustContext): Array<
     return projects.map((projectId) => {
       const report = verifyA4Chain(ledger, projectId, trust, Date.now(), { mirror: true });
       const failed = report.integrity.status === "fail";
-      return { status: failed ? "FAIL" : "PASS", details: [projectId, ...(failed ? report.integrity.errors.slice(0, 20)
+      const agent = db.prepare("SELECT agent_id FROM a4_projects WHERE project_id = ?").get(projectId) as { agent_id: string } | undefined;
+      return { status: failed ? "FAIL" : "PASS", ...(agent ? { agentId: agent.agent_id } : {}), details: [projectId, ...(failed ? report.integrity.errors.slice(0, 20)
         : ["chain, side rows and envelopes verify (integrity of bytes under this workspace's keys)"]),
         ...(report.freshness.status === "fail" ? report.freshness.reasons.slice(0, 5) : [])] };
     });

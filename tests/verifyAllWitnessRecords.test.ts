@@ -20,6 +20,7 @@ import { openLedger } from "../src/ledger/ledger.js";
 import { closeAllSqlitePools } from "../src/storage/sqlitePool.js";
 import { verifiedTransparencyLog } from "../src/transparency/logChain.js";
 import { workspaceKeyTrust } from "./helpers/trustContext.js";
+import { A4Project, a4Workspace } from "./a4/a4Harness.js";
 
 const hook = vi.hoisted(() => ({ afterLedgerVerify: null as null | (() => void) }));
 vi.mock("../src/ledger/ledger.js", async (original) => {
@@ -36,6 +37,7 @@ vi.setConfig({ testTimeout: 60_000 });
 const roots: string[] = [];
 afterEach(() => {
   hook.afterLedgerVerify = null;
+  vi.unstubAllEnvs();
   for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true });
 });
 
@@ -143,5 +145,57 @@ describe("verify all configuration witnesses", () => {
     expect(check(report, "prompt-packs")?.details.join(" ")).toContain("the evidence ledger records a pack built for this agent");
     expect(check(report, "transparency-log")?.status).toBe("FAIL");
     expect(report.notConfigured).not.toContain("prompt-packs");
+  });
+
+  /** A preview workspace with one A4 project created after `before` was taken; verification then runs without the preview flag. */
+  async function a4Created() {
+    const { workspace, alice, sessionId } = a4Workspace();
+    const ledger = openLedger(workspace);
+    try { ledger.sealSession(sessionId); } finally { ledger.close(); }
+    const before = snapshot(workspace);
+    await A4Project.create(workspace, alice);
+    expect([ledgerRows(workspace, "A4_PROJECT_CREATED"), logRows(workspace, "A4_PROJECT_CREATED")]).toEqual([1, 1]);
+    vi.unstubAllEnvs();
+    return { workspace, before };
+  }
+
+  test("an A4 project rolled out of the ledger alone fails: the transparency log records it was created", async () => {
+    const { workspace, before } = await a4Created();
+    expect(check(await run(workspace), "a4-projects")?.status).toBe("PASS");
+    before.restoreLedger();
+    const report = await run(workspace);
+    expect(check(report, "a4-projects")?.status).toBe("FAIL");
+    expect(check(report, "a4-projects")?.details.join(" ")).toContain("transparency log");
+    expect(report.notConfigured).not.toContain("a4-projects");
+    expect(report.status).toBe("FAIL");
+  });
+
+  test("an A4 project with only the log rolled back fails the transparency log", async () => {
+    const { workspace, before } = await a4Created();
+    before.restoreLog();
+    const report = await run(workspace);
+    expect(check(report, "a4-projects")?.status).toBe("PASS");
+    expect(check(report, "transparency-log")?.details.join(" ")).toContain("A4_PROJECT_CREATED");
+  });
+
+  test("the A4 project witness is read from the verified ledger rows: both records rolled back after verification still fail", async () => {
+    const { workspace, before } = await a4Created();
+    before.restoreLog();
+    hook.afterLedgerVerify = () => before.restoreLedger();
+    const report = await run(workspace);
+    expect(check(report, "a4-projects")?.status).toBe("FAIL");
+    expect(check(report, "a4-projects")?.details.join(" ")).toContain("evidence ledger");
+  });
+
+  test("a second A4 project rolled out of the ledger fails while the first still verifies", async () => {
+    const { workspace, alice } = a4Workspace();
+    await A4Project.create(workspace, alice, "first", "a4-first");
+    const before = snapshot(workspace);
+    await A4Project.create(workspace, alice, "second", "a4-second");
+    vi.unstubAllEnvs();
+    before.restoreLedger();
+    const rows = (await run(workspace)).checks.filter((row) => row.id === "a4-projects");
+    expect(rows.map((row) => row.status)).toEqual(["PASS", "FAIL"]);
+    expect(rows[1]!.details.join(" ")).toContain("agent a4-second");
   });
 });

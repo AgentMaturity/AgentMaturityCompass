@@ -4,7 +4,7 @@ import { verifyTrustConfigSignature, checkNotaryTrust } from "../trust/trustConf
 import { verifyOpsPolicySignature } from "../ops/policy.js";
 import { verifyPluginWorkspace } from "../plugins/pluginApi.js";
 import { transparencyLogPath, transparencySealPath, transparencySealSigPath, verifiedTransparencyLog } from "../transparency/logChain.js";
-import { FORECAST_SCHEDULER_CONFIGURED, PASSPORT_POLICY_WITNESSES, PROMPT_PACK_CREATED, PROMPT_SCHEDULER_CONFIGURED, WITNESS_GROUPS } from "../transparency/configWitness.js";
+import { A4_PROJECT_CREATED, FORECAST_SCHEDULER_CONFIGURED, PASSPORT_POLICY_WITNESSES, PROMPT_PACK_CREATED, PROMPT_SCHEDULER_CONFIGURED, WITNESS_GROUPS } from "../transparency/configWitness.js";
 import { verifyTransparencyMerkle } from "../transparency/merkleIndexStore.js";
 import { verifyLedgerIntegrity } from "../ledger/ledger.js";
 import { LEDGER_UNANCHORED_MESSAGE } from "../ledger/ledgerVerification.js";
@@ -430,12 +430,16 @@ export async function verifyAll(params: {
 
   // P1-57: each A4 project's chain, side rows and envelopes (integrity of bytes; never a claim about the agent).
   try {
-    // A4 projects are witnessed by their hash-chained ledger audit rows, so "no project" holds only on a ledger that verified.
-    const ledgerVerified = checks.some((check) => check.id === "ledger-hash-chain" && check.status === "PASS");
-    for (const row of verifyA4Projects(workspace, params.trust)) {
-      checks.push(row.status === "NOT_CONFIGURED" && !ledgerVerified
-        ? skip("a4-projects", true, [...row.details, "the ledger hash chain did not verify, so no A4 project cannot be shown"])
-        : { id: "a4-projects", status: row.status, critical: true, details: row.details });
+    // The projects are read on a second handle, so "none" and "one is gone" are decided from the verified witness records.
+    const rows = verifyA4Projects(workspace, params.trust), agents = new Set(rows.flatMap((row) => row.agentId ?? []));
+    // With no project, absentPart fails it when either record holds a witness, and reads NOT_CONFIGURED only when both hold none.
+    if (rows.length === 1 && rows[0]!.status === "NOT_CONFIGURED") checks.push(absentPart("a4-projects", true, witness, [A4_PROJECT_CREATED], "A4 project"));
+    else {
+      const lost = ([["transparency log", witness.log?.agentsOf(A4_PROJECT_CREATED)], ["evidence ledger", witness.ledger?.get(A4_PROJECT_CREATED)]] as const)
+        .flatMap(([record, witnessed]) => [...witnessed ?? []].filter((agentId) => !agents.has(agentId))
+          .map((agentId) => `A4 project of agent ${agentId} missing from the ledger: the ${record} records it was created`));
+      for (const row of rows) checks.push({ id: "a4-projects", status: row.status, critical: true, details: row.details });
+      if (lost.length > 0) checks.push(fail("a4-projects", true, lost));
     }
   } catch (error) {
     checks.push(fail("a4-projects", true, [String(error)]));
