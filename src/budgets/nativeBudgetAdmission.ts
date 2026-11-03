@@ -25,6 +25,8 @@ type Spend = { kind: "llm"; nativeSessionId: string; headerEventId: string } |
  * This is admission against known usage, not a tokenizer or pricing oracle.
  */
 function reserve(workspace: string, spend: Spend, agentId?: string, dispatch?: NativeBudgetDispatch): void {
+  // An unsigned reservation would make every later signed budget read fail, so AMC_NO_SIGN=1 admits nothing.
+  if (process.env.AMC_NO_SIGN === "1") throw new NativeBudgetRefusal("native budget admission records a signed reservation; AMC_NO_SIGN=1 cannot reserve, so the dispatch is refused");
   const ledger = openLedger(workspace);
   try {
     ledger.db.transaction(() => {

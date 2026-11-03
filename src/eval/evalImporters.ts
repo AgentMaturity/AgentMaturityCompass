@@ -1537,7 +1537,7 @@ export function importEvalResults(params: {
   const questionCoverage = summarizeQuestionCoverage(parsed.cases);
   const sessionId = randomUUID();
   const eventIds: string[] = [];
-  const ledger = openLedger(workspace);
+  const ledger = openLedger(workspace, process.env.AMC_NO_SIGN === "1" ? { store: "unsigned" } : {}); // P0-55: unsigned rows stay apart
   try {
     ledger.startSession({
       sessionId,

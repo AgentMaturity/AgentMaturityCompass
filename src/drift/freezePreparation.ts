@@ -13,11 +13,10 @@ import { vaultStatus } from "../vault/vault.js";
 
 export interface PreparedFreezeSignature { readonly signature: string; assertCurrent(): void }
 
-/** Retained real private-key API, including its historical no-sign ephemeral result. Never labelled checked. */
+/** Retained real private-key API. Never labelled checked. Like the async path, it signs nothing under AMC_NO_SIGN=1. */
 export function prepareFreezeSignature(workspace: string, digest: string): PreparedFreezeSignature {
+  if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize policy signing");
   const key = getSigningKey(workspace, "artifact-seal");
-  const ephemeral = process.env.AMC_NO_SIGN === "1" && !vaultStatus(workspace).unlocked;
-  if (ephemeral) return { signature: signHexDigest(digest, key), assertCurrent: () => { assertVaultMaySign(workspace, "artifact-seal"); } };
   const captured = capturePurposePublication(workspace, "artifact-seal"), publicKey = publicKeyFromPrivate(key);
   const algorithm = canonicalSigningKey(publicKey)?.algorithm;
   if (!algorithm) throw new Error("freeze key has no supported signing identity");

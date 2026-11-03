@@ -255,6 +255,8 @@ function publish(workspace: string, name: string, body: object): void {
 }
 
 async function signDigest(workspace: string, digest: string): Promise<string> {
+  // A kill or release is a signed control record; under AMC_NO_SIGN=1 it is refused before anything is written.
+  if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize kill switch signing; activate or release it from a signing session");
   const captured = capturePurposePublication(workspace, "artifact-seal");
   const signed = await signWithPurposeKey(workspace, "artifact-seal", Buffer.from(digest, "hex"));
   assertPurposePublicationCurrent(workspace, captured, signed);

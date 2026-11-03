@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { openLedger, hashBinaryOrPath } from "../ledger/ledger.js";
+import { writerStore } from "../ledger/ledgerConnection.js";
 import { bridgeEvidenceRedactor } from "./bridgeRedaction.js";
 
 export const bridgeTelemetryEventSchema = z.object({
@@ -19,7 +20,7 @@ export function appendBridgeTelemetryEvent(params: {
   event: BridgeTelemetryEvent;
 }): { eventId: string; sessionId: string } {
   const redact = bridgeEvidenceRedactor(params.workspace);
-  const ledger = openLedger(params.workspace);
+  const ledger = openLedger(params.workspace, writerStore());
   try {
     const sessionId = params.event.sessionId;
     try {

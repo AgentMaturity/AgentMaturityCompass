@@ -273,6 +273,7 @@ function prepareArtifactProvenance(input: SignArtifactProvenanceInput, output?: 
 export function signArtifactProvenance(
   input: SignArtifactProvenanceInput
 ): SignArtifactProvenanceResult {
+  provenanceMaySign();
   const { workspace, file, fileSha256, promptSha256, manifestPath, signaturePath, manifest, manifestSha256 } = prepareArtifactProvenance(input);
   const monitorPublicKey = getPublicKeyPem(workspace, "monitor");
   const signature = artifactProvenanceSignatureSchema.parse({

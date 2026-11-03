@@ -167,6 +167,8 @@ export async function executeCaseTrials(params: {
   limits?: Partial<TrialLimits>;
   budget?: TrialBudgetHook;
 }): Promise<ExecutedTrials> {
+  // The trial rows feed a signed experiment result, which AMC_NO_SIGN=1 refuses; refuse before any row is written.
+  if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize executed trials: their signed experiment result cannot be produced");
   const agentId = resolveAgentId(params.workspace, params.agentId);
   const limits = resolveLimits(params.limits);
   if (params.mode !== "supervise" && params.mode !== "sandbox") throw new Error(`invalid experiment mode '${String(params.mode)}'`);

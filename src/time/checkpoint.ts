@@ -165,6 +165,11 @@ function verifiedLedgerHead(workspace: string, trust: TrustContext): { count: nu
   }
 }
 
+/** A checkpoint is a signed, timestamped receipt over the ledger head, so AMC_NO_SIGN=1 refuses it before any write. */
+function assertCheckpointSigning(): void {
+  if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize ledger checkpoint signing");
+}
+
 export interface CheckpointResult { sequence: number; status: "timestamped" | "pending"; failures: string[] }
 
 async function stampCheckpoint(workspace: string, entry: VerifiedCheckpoint, trust?: TrustContext): Promise<CheckpointResult> {
@@ -184,6 +189,7 @@ async function stampCheckpoint(workspace: string, entry: VerifiedCheckpoint, tru
  * are verified before anything is written.
  */
 export async function checkpointLedger(workspace: string, trust?: TrustContext): Promise<CheckpointResult> {
+  assertCheckpointSigning();
   const config = loadTimeConfig(workspace);
   if (!config.tsa.length) throw new Error("ledger checkpoints need at least one time.tsa entry in .amc/amc.config.yaml");
   // Producer-internal input checks may trust the current workspace state; public readers use operator trust.
@@ -240,6 +246,7 @@ export async function checkpointLedger(workspace: string, trust?: TrustContext):
 
 /** Fetches tokens for checkpoints still pending, oldest first. */
 export async function completePendingCheckpoints(workspace: string, trust?: TrustContext): Promise<CheckpointResult[]> {
+  assertCheckpointSigning();
   const results: CheckpointResult[] = [];
   for (const entry of readCheckpointChain(workspace, workspaceSelfTrust(workspace))) {
     if (!pathExists(tokenPath(workspace, entry.checkpoint.sequence))) results.push(await stampCheckpoint(workspace, entry, trust));
