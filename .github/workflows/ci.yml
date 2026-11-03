@@ -376,6 +376,12 @@ jobs:
           cache: pnpm
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+      # The gate's full suite includes tests/executionApiParity.test.ts, which runs pytest (as test-shard installs it).
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Install the Python SDK's test dependency
+        run: python3 -m pip install "pytest>=8"
       - name: Full release gate
         env:
           AMC_RELEASE_GATE_LIVE_URL: ${{ vars.AMC_RELEASE_GATE_LIVE_URL }}

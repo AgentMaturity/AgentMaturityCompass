@@ -25,26 +25,30 @@ function dependency(file: string, specifier: string): string {
   return posix.normalize(posix.join(posix.dirname(file), specifier)).replace(/\.js$/, ".ts");
 }
 
-const reverseImports = new WeakMap<Map<string, string>, Map<string, string[]>>();
+const reverseImports = new WeakMap<Map<string, string>, { reverse: Map<string, string[]>; reexporters: Set<string> }>();
 /** The target, every file that names it in an import, export-from, import() or require() specifier, and so on through
- * files with an export-from (the only re-exports exposes follows): a superset of the consumers and barrels
- * productionConsumers can find, read with TypeScript's import scanner so only these files get a full parse (parsing
- * and walking all of src, or every transitive importer, per contract took 20-40 s under coverage on CI). */
+ * files with an export-from declaration (the only re-exports exposes follows): a superset of the consumers and barrels
+ * productionConsumers can find. Imports come from TypeScript's import scanner and export-from declarations from one
+ * parse of the files naming both words, built once per source map (parsing and walking all of src, or every
+ * transitive importer, per contract took 20-40 s under coverage on CI). */
 function importersOf(target: string, sources: Map<string, string>): Set<string> {
-  let reverse = reverseImports.get(sources);
-  if (!reverse) {
-    reverse = new Map();
+  let index = reverseImports.get(sources);
+  if (!index) {
+    index = { reverse: new Map(), reexporters: new Set() };
     for (const [file, text] of sources) {
       for (const { fileName } of ts.preProcessFile(text, true, true).importedFiles) {
         const next = dependency(file, fileName);
-        reverse.set(next, [...(reverse.get(next) ?? []), file]);
+        index.reverse.set(next, [...(index.reverse.get(next) ?? []), file]);
       }
+      if (/\bexport\b/.test(text) && /\bfrom\b/.test(text) && ts.createSourceFile(file, text, ts.ScriptTarget.Latest)
+        .statements.some(statement => ts.isExportDeclaration(statement) && statement.moduleSpecifier)) index.reexporters.add(file);
     }
-    reverseImports.set(sources, reverse);
+    reverseImports.set(sources, index);
   }
+  const { reverse, reexporters } = index;
   const reached = new Set([target]);
   for (const file of reached) {
-    if (file !== target && !/\bexport\b[^;]*\bfrom\s*["'`]/.test(sources.get(file)!)) continue;
+    if (file !== target && !reexporters.has(file)) continue;
     for (const importer of reverse.get(file) ?? []) reached.add(importer);
   }
   return reached;
@@ -183,9 +187,11 @@ describe("WP46 unwired contract labels", () => {
       ["src/computedDynamic.ts", "const { ['renamed']: helper } = await import('./outer.js');"],
       ["src/lines.ts", "export {\n  helper\n} from './contract.js'"],
       ["src/viaLines.ts", "import { helper } from './lines.js';"],
+      ["src/commented.ts", "export {\n  helper // ; a comment\n} from './contract.js'"],
+      ["src/viaCommented.ts", "import { helper } from './commented.js';"],
       ["src/user.ts", "import { helper } from './contract.js'; export const used = helper;"],
       ["src/indirect.ts", "import { used } from './user.js';"]
     ]);
-    expect(productionConsumers("src/contract.ts", fixture)).toEqual(["src/value.ts", "src/dynamic.ts", "src/require.ts", "src/namespace.ts", "src/valueDynamic.ts", "src/quotedDynamic.ts", "src/computedDynamic.ts", "src/viaLines.ts", "src/user.ts"]);
+    expect(productionConsumers("src/contract.ts", fixture)).toEqual(["src/value.ts", "src/dynamic.ts", "src/require.ts", "src/namespace.ts", "src/valueDynamic.ts", "src/quotedDynamic.ts", "src/computedDynamic.ts", "src/viaLines.ts", "src/viaCommented.ts", "src/user.ts"]);
   });
 });
