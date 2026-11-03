@@ -43,7 +43,9 @@ an unverifiable file, and a kill is released only by the signed release below.
 Its incident and its alerts (`KILL_SWITCH_UNVERIFIABLE`,
 `KILL_SWITCH_SUSPEND_FAILED`) are also recorded in the unsigned store, and
 `amc incident list` and `GET /api/v1/incidents` show that incident in any mode,
-labelled unsigned.
+labelled unsigned. That incident is never cut by `--limit` (or `limit`): it is
+kept past the limit and counted. If the unsigned store cannot be read, the
+list still shows the signed incidents and says so (`unsignedUnreadable`).
 
 ## 2. Release (OWNER)
 

@@ -146,7 +146,7 @@ describe("the kill switch under no-sign", () => {
     const listed = await getJson("/api/v1/incidents?agent=agent-a");
     expect(listed.incidents).toEqual([expect.objectContaining({ agentId: "agent-a", state: "OPEN", unsigned: true,
       title: "Kill switch activated (KILL_SWITCH_ACTIVATED)" })]);
-    expect(unsignedIncidents(workspace, "agent-a")[0]?.triggerId).toBe(`kill_switch:${kill.killId}`);
+    expect(unsignedIncidents(workspace, "agent-a").incidents[0]?.triggerId).toBe(`kill_switch:${kill.killId}`);
     const cli = spawnSync(process.execPath, [resolve("dist/cli.js"), "incident", "list", "--agent", "agent-a"], { cwd: workspace, encoding: "utf8",
       env: { ...process.env, AMC_NO_SIGN: "1", AMC_CONTROL_CHECKPOINT_DIR: join(root, "checkpoints"), NO_COLOR: "1" }, timeout: 60_000 });
     expect(cli.stdout, cli.stderr).toMatch(/\[CRITICAL\/OPEN\]  Kill switch activated \(KILL_SWITCH_ACTIVATED\)  \(unsigned\)/);
@@ -157,6 +157,74 @@ describe("the kill switch under no-sign", () => {
     finally { signed.close(); }
     // A signing session lists it too, so the kill it still enforces stays visible.
     expect((await getJson("/api/v1/incidents?agent=agent-a")).incidents).toHaveLength(1);
+  });
+
+  /** Incidents written straight into a store, signed or unsigned: the list reads, never verifies, them. */
+  function seedIncidents(store: string, rows: Array<{ id: string; createdTs: number }>): void {
+    mkdirSync(join(workspace, store, ".."), { recursive: true });
+    const db = new Database(join(workspace, store));
+    try {
+      const incidents = createIncidentStore(db); incidents.initTables();
+      for (const row of rows) incidents.insertIncident({ incidentId: row.id, agentId: "agent-a", severity: "WARN", state: "OPEN", title: row.id,
+        description: "seeded", triggerType: "MANUAL", triggerId: row.id, rootCauseClaimIds: [], affectedQuestionIds: [], causalEdges: [],
+        timelineEventIds: [], createdTs: row.createdTs, updatedTs: row.createdTs, resolvedTs: null, postmortemRef: null,
+        prev_incident_hash: "0", incident_hash: row.id, signature: "seeded" });
+    } finally { db.close(); }
+  }
+  const titles = (listed: Record<string, unknown>) => (listed.incidents as Array<{ title: string }>).map((row) => row.title);
+  const KILL_TITLE = "Kill switch activated (KILL_SWITCH_ACTIVATED)";
+
+  test("an unsigned kill's incident merges by time and is never cut by a limit that signed incidents fill", async () => {
+    await activateKillSwitch({ workspace, issuedBy: "owner-1", scope: { kind: "agent", id: "agent-a" }, mode: "stop_new_effects",
+      reason: "emergency", incidentId: null });
+    const now = Date.now();
+    vi.stubEnv("AMC_NO_SIGN", "0");
+    openLedger(workspace).close();
+    seedIncidents(".amc/evidence.sqlite", [{ id: "newer-1", createdTs: now + 1_000_000 }, { id: "newer-2", createdTs: now + 2_000_000 },
+      { id: "older", createdTs: 1_000 }]);
+    expect(titles(await getJson("/api/v1/incidents?agent=agent-a"))).toEqual(["newer-2", "newer-1", KILL_TITLE, "older"]);
+    const limited = await getJson("/api/v1/incidents?agent=agent-a&limit=2");
+    expect(titles(limited)).toEqual(["newer-2", "newer-1", KILL_TITLE]);
+    expect(limited).toMatchObject({ count: 3, unsignedPinnedPastLimit: 1, unsignedUnreadable: false });
+    const cli = spawnSync(process.execPath, [resolve("dist/cli.js"), "incident", "list", "--agent", "agent-a", "--limit", "2"], { cwd: workspace,
+      encoding: "utf8", env: { ...process.env, AMC_NO_SIGN: "1", AMC_CONTROL_CHECKPOINT_DIR: join(root, "checkpoints"), NO_COLOR: "1" }, timeout: 60_000 });
+    expect(cli.stdout, cli.stderr).toContain("1 unsigned OPEN CRITICAL incident(s) shown past --limit.");
+    expect(cli.stdout).toMatch(/newer-2[\s\S]*newer-1[\s\S]*\[CRITICAL\/OPEN\]  Kill switch activated/);
+  });
+
+  test("an unreadable unsigned store never fails the signed incident list, in either mode", async () => {
+    vi.stubEnv("AMC_NO_SIGN", "0");
+    openLedger(workspace).close();
+    seedIncidents(".amc/evidence.sqlite", [{ id: "signed", createdTs: 1_000 }]);
+    const path = join(workspace, UNSIGNED_EVIDENCE_STORE);
+    mkdirSync(join(path, ".."), { recursive: true });
+    const plants: Array<[string, () => void]> = [
+      ["not a database", () => writeFileSync(path, "not a database".repeat(1_000))],
+      ["no transition table", () => { const db = new Database(path); db.exec("CREATE TABLE incidents (incident_id TEXT)"); db.close(); }],
+      ["a transition table without to_state", () => { seedIncidents(UNSIGNED_EVIDENCE_STORE, [{ id: "u", createdTs: 2_000 }]);
+        const db = new Database(path); db.exec("DROP TABLE incident_transitions; CREATE TABLE incident_transitions (incident_id TEXT, ts INTEGER)"); db.close(); }],
+      ["a malformed row", () => { seedIncidents(UNSIGNED_EVIDENCE_STORE, [{ id: "u", createdTs: 2_000 }]);
+        const db = new Database(path);
+        for (const { name: trigger } of db.prepare("SELECT name FROM sqlite_master WHERE type = 'trigger'").all() as Array<{ name: string }>) db.exec(`DROP TRIGGER "${trigger}"`);
+        db.exec("UPDATE incidents SET causal_edges_json = '{'"); db.close(); }]
+    ];
+    for (const [name, plant] of plants) {
+      rmSync(path, { force: true }); plant();
+      for (const mode of ["0", "1"]) {
+        vi.stubEnv("AMC_NO_SIGN", mode);
+        const listed = await getJson("/api/v1/incidents?agent=agent-a");
+        expect(listed, `${name}, AMC_NO_SIGN=${mode}`).toMatchObject({ count: 1, unsignedUnreadable: true, incidents: [{ title: "signed" }] });
+        expect(listed.warning).toContain("unsigned evidence store could not be read");
+      }
+    }
+  });
+
+  test("the unsigned store is read newest first and at most 500 incidents deep", () => {
+    seedIncidents(UNSIGNED_EVIDENCE_STORE, Array.from({ length: 600 }, (_, index) => ({ id: `u-${index}`, createdTs: index + 1 })));
+    const listed = unsignedIncidents(workspace, "agent-a");
+    expect(listed.unreadable).toBe(false);
+    expect(listed.incidents).toHaveLength(500);
+    expect(listed.incidents[0]?.incidentId).toBe("u-599");
   });
 
   test("no unsigned record releases or narrows a signed kill", async () => {

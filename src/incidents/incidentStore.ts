@@ -346,7 +346,7 @@ function getIncident(db: Database.Database, incidentId: string): Incident | null
   };
 }
 
-function getIncidentsByAgent(db: Database.Database, agentId: string, state?: IncidentState): Incident[] {
+function getIncidentsByAgent(db: Database.Database, agentId: string, state?: IncidentState, limit?: number): Incident[] {
   let query = "SELECT * FROM incidents WHERE agent_id = ?";
   const params: (string | number)[] = [agentId];
 
@@ -356,6 +356,7 @@ function getIncidentsByAgent(db: Database.Database, agentId: string, state?: Inc
   }
 
   query += " ORDER BY created_ts DESC";
+  if (limit !== undefined) { query += " LIMIT ?"; params.push(limit); }
 
   const rows = db.prepare(query).all(...params) as IncidentRow[];
 
@@ -521,21 +522,63 @@ export function createIncidentStore(db: Database.Database): IncidentStoreInstanc
   };
 }
 
+/** At most this many unsigned incidents are read, newest first: a planted store cannot make an incident list slow or huge. */
+const UNSIGNED_INCIDENT_READ_CAP = 500;
+/** The columns the unsigned reader reads, per table; a store missing any of them (or either table) is unreadable. */
+const UNSIGNED_INCIDENT_COLUMNS: Record<string, readonly string[]> = {
+  incidents: ["incident_id", "agent_id", "severity", "state", "title", "description", "trigger_type", "trigger_id",
+    "root_cause_claim_ids_json", "affected_question_ids_json", "causal_edges_json", "timeline_event_ids_json", "created_ts",
+    "updated_ts", "resolved_ts", "postmortem_ref", "prev_incident_hash", "incident_hash", "signature"],
+  incident_transitions: ["incident_id", "to_state", "ts"]
+};
+const INCIDENT_STATES = new Set(["OPEN", "INVESTIGATING", "MITIGATED", "RESOLVED", "POSTMORTEM"]);
+const INCIDENT_SEVERITIES = new Set(["INFO", "WARN", "CRITICAL"]);
+export type UnsignedIncident = Incident & { unsigned: true };
+
 /**
  * The incidents AMC_NO_SIGN=1 detectors opened in the unsigned store (an unsigned kill's among them), with their latest
  * state, for incident lists to show labelled unsigned. Read in any mode: the kill switch enforces unsigned kills in
  * signing sessions too, so the incident must stay visible there. Never verified, and never merged into the signed store.
+ * Anything wrong with that store (not a database, a table or column missing, a malformed row) reads as no incidents with
+ * `unreadable` set, so it can never fail the signed incident list it is shown beside.
  */
-export function unsignedIncidents(workspace: string, agentId: string): Array<Incident & { unsigned: true }> {
+export function unsignedIncidents(workspace: string, agentId: string): { incidents: UnsignedIncident[]; unreadable: boolean } {
   const path = join(workspace, UNSIGNED_EVIDENCE_STORE);
-  if (!existsSync(path)) return [];
-  const db = new Database(path, { readonly: true, fileMustExist: true });
+  if (!existsSync(path)) return { incidents: [], unreadable: false };
   try {
-    if (!db.prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'incident_transitions'").get()) return [];
-    const incidents = getIncidentsByAgent(db, agentId);
-    const states = getLatestIncidentStates(db, incidents.map((incident) => incident.incidentId));
-    return incidents.map((incident) => ({ ...incident, state: states.get(incident.incidentId) ?? incident.state, unsigned: true as const }));
-  } finally { db.close(); }
+    const db = new Database(path, { readonly: true, fileMustExist: true });
+    try {
+      const tables = Object.keys(UNSIGNED_INCIDENT_COLUMNS).map((table) =>
+        new Set((db.pragma(`table_info(${table})`) as Array<{ name: string }>).map((column) => column.name)));
+      // Detectors create both tables on their first incident; a store with neither has never held one.
+      if (tables.every((columns) => columns.size === 0)) return { incidents: [], unreadable: false };
+      if (Object.values(UNSIGNED_INCIDENT_COLUMNS).some((names, index) => names.some((name) => !tables[index]!.has(name)))) {
+        return { incidents: [], unreadable: true };
+      }
+      const incidents = getIncidentsByAgent(db, agentId, undefined, UNSIGNED_INCIDENT_READ_CAP);
+      // One aggregate row per incident, never every transition: a planted store cannot fill memory here.
+      const states = new Map(incidents.length === 0 ? [] : (db.prepare(`SELECT incident_id, to_state, MAX(ts) FROM incident_transitions
+        WHERE incident_id IN (${incidents.map(() => "?").join(", ")}) GROUP BY incident_id`).all(...incidents.map((incident) => incident.incidentId)) as
+        Array<{ incident_id: string; to_state: IncidentState }>).map((row) => [row.incident_id, row.to_state]));
+      const listed = incidents.map((incident) => ({ ...incident, state: states.get(incident.incidentId) ?? incident.state, unsigned: true as const }));
+      const wellFormed = listed.every((incident) => INCIDENT_STATES.has(incident.state) && INCIDENT_SEVERITIES.has(incident.severity)
+        && Number.isSafeInteger(incident.createdTs) && typeof incident.title === "string");
+      return wellFormed ? { incidents: listed, unreadable: false } : { incidents: [], unreadable: true };
+    } finally { db.close(); }
+  } catch { return { incidents: [], unreadable: true }; }
+}
+
+/**
+ * The signed incidents an incident list shows, merged with the unsigned store's newest first and cut to `limit`. An
+ * unsigned OPEN CRITICAL incident (an unsigned kill's) that `keep` passes is never cut: it follows past the limit,
+ * counted in `pinnedUnsigned`.
+ */
+export function withUnsignedIncidents<T extends { createdTs: number }>(workspace: string, agentId: string, signed: T[],
+  keep: (row: T | UnsignedIncident) => boolean, limit: number) {
+  const unsigned = unsignedIncidents(workspace, agentId);
+  const rows = [...signed, ...unsigned.incidents].filter(keep).sort((a, b) => b.createdTs - a.createdTs);
+  const pinned = rows.slice(limit).filter((row) => "unsigned" in row && row.severity === "CRITICAL" && row.state === "OPEN");
+  return { rows: [...rows.slice(0, limit), ...pinned], pinnedUnsigned: pinned.length, unsignedUnreadable: unsigned.unreadable };
 }
 
 export function verifyIncidentSignature(

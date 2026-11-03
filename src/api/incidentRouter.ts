@@ -6,7 +6,7 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
 import { randomUUID } from 'node:crypto';
 import { bodyJson, apiSuccess, apiError, apiRequestError, pathParam, queryParam } from './apiHelpers.js';
 import { openLedger } from '../ledger/ledger.js';
-import { createIncidentStore, computeIncidentHash, unsignedIncidents } from '../incidents/incidentStore.js';
+import { createIncidentStore, computeIncidentHash, withUnsignedIncidents } from '../incidents/incidentStore.js';
 import type { Incident, IncidentSeverity, IncidentState } from '../incidents/incidentTypes.js';
 import {
   IncidentInputError,
@@ -164,24 +164,17 @@ export async function handleIncidentRoute(
       const status = queryParam(req.url ?? '', 'status');
       const limit = parseInt(queryParam(req.url ?? '', 'limit') ?? '50', 10);
 
-      // Always fetch all incidents for this agent, then resolve latest state from transitions; no-sign ones follow, labelled.
+      // Always fetch all incidents for this agent, then resolve latest state from transitions; no-sign ones merge in, labelled.
       const incidents = store.getIncidentsByAgent(agentId);
-      const incidentIds = incidents.map(i => i.incidentId);
-      const latestStates = store.getLatestIncidentStates(incidentIds);
-
-      let mapped = [...incidents.map(i => ({ ...i, state: latestStates.get(i.incidentId) ?? i.state })), ...unsignedIncidents(workspace, agentId)]
-        .map(i => ({ incidentId: i.incidentId, agentId: i.agentId, severity: i.severity, state: i.state, title: i.title,
-          createdTs: i.createdTs, ...('unsigned' in i ? { unsigned: true } : {}) }));
-
-      // Apply status filter on resolved state
-      if (status === 'closed') {
-        mapped = mapped.filter(i => i.state === 'RESOLVED');
-      } else if (status === 'open') {
-        mapped = mapped.filter(i => i.state === 'OPEN');
-      }
-
-      const limited = mapped.slice(0, limit);
-      apiSuccess(res, { count: limited.length, incidents: limited });
+      const latestStates = store.getLatestIncidentStates(incidents.map(i => i.incidentId));
+      // An explicit status filter applies to unsigned incidents too; an unsigned OPEN CRITICAL one is kept past the limit.
+      const listed = withUnsignedIncidents(workspace, agentId, incidents.map(i => ({ ...i, state: latestStates.get(i.incidentId) ?? i.state })),
+        (i) => status === 'closed' ? i.state === 'RESOLVED' : status === 'open' ? i.state === 'OPEN' : true, limit);
+      const limited = listed.rows.map(i => ({ incidentId: i.incidentId, agentId: i.agentId, severity: i.severity, state: i.state, title: i.title,
+        createdTs: i.createdTs, ...('unsigned' in i ? { unsigned: true } : {}) }));
+      apiSuccess(res, { count: limited.length, incidents: limited, unsignedPinnedPastLimit: listed.pinnedUnsigned,
+        unsignedUnreadable: listed.unsignedUnreadable,
+        ...(listed.unsignedUnreadable ? { warning: 'the unsigned evidence store could not be read; unsigned incidents are not shown' } : {}) });
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : 'Could not list incidents');
     } finally {
