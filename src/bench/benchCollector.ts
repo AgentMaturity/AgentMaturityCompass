@@ -106,7 +106,8 @@ function mapTrustLabel(input: string): "LOW" | "MEDIUM" | "HIGH" {
   return "MEDIUM";
 }
 
-function derivedTrustLabel(params: {
+/** Trust label from the evidence gates; shared with the audit binder. */
+export function derivedTrustLabel(params: {
   integrityIndex: number | null;
   correlationRatio: number | null;
   observedShare: number | null;

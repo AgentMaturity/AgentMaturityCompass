@@ -2050,7 +2050,7 @@ describe("public methodology manifest", () => {
     expect(report.methodologyVersioning?.missingAuditFields).toEqual([]);
     expect(report.metricValidation?.rows.length).toBeGreaterThan(0);
     expect(report.metricValidation?.rows[0]?.owner).toBe("AMC Score");
-    expect(report.metricValidation?.rows[0]?.confidenceInterval.level).toBe(0.95);
+    expect(report.metricValidation?.rows[0]?.confidenceInterval?.level).toBe(0.95);
     expect(report.reportJsonSha256).toMatch(/^[a-f0-9]{64}$/);
 
     const markdown = generateReport(report, "md") as string;

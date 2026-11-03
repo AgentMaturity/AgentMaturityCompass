@@ -10517,8 +10517,7 @@ type MetricRowStatusInput = Pick<MetricValidationRow,
   | "subtleMemoryJudgeAgreement0to1"
   | "subtleMemoryValidationPassRate0to1"
 > & {
-  /** Null with no samples: there is no interval to measure. */
-  ciWidth: number | null;
+  ciWidth: number | null; // null with no samples: no interval to measure
   thresholds: MetricValidationThresholdPolicy;
 };
 
@@ -12385,8 +12384,7 @@ function stabilityForMetric(params: {
 function buildRow(params: MetricRowBuildInput): MetricValidationRow {
   const interval = params.values.length === 0 ? null : confidenceInterval(params.values); // no samples: not evaluated
   const score = mean(params.values);
-  // No samples: the current run measured no score, so it adds no stability observation.
-  const testRetestStability = interval === null ? null : stabilityForMetric({
+  const testRetestStability = interval === null ? null : stabilityForMetric({ // no samples: no stability observation
     current: {
       agentId: params.agentId,
       score,

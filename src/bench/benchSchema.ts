@@ -17,15 +17,18 @@ export const benchRiskSchema = z.object({
   digitalDualityRisk: z.number().min(0).max(100)
 });
 
-// A metric AMC did not measure in the window is null (not evaluated), never 0. Strategy risks stay worst-case 100 (WP37).
-export const benchValuesSchema = z.object({
-  emotionalValue: z.number().min(0).max(100).nullable(),
-  functionalValue: z.number().min(0).max(100).nullable(),
-  economicValue: z.number().min(0).max(100).nullable(),
-  brandValue: z.number().min(0).max(100).nullable(),
-  lifetimeValue: z.number().min(0).max(100).nullable(),
-  valueScore: z.number().min(0).max(100).nullable().optional()
-});
+// A metric AMC did not measure is null (not evaluated), never 0. Strategy risks stay worst-case 100 (WP37).
+// The shapes below are shared with passports and audit binders.
+const nullableScore = (max: number) => z.number().min(0).max(max).nullable();
+export const valueDimensionFields = { emotionalValue: nullableScore(100), functionalValue: nullableScore(100),
+  economicValue: nullableScore(100), brandValue: nullableScore(100), lifetimeValue: nullableScore(100) };
+export const fiveLayersSchema = z.object({ strategicOps: nullableScore(5), leadership: nullableScore(5), culture: nullableScore(5),
+  resilience: nullableScore(5), skills: nullableScore(5) });
+/** Shares of evidence by trust kind; null when nothing measured the mix. */
+export const evidenceCoverageSchema = z.object({ observedShare: z.number().min(0).max(1), attestedShare: z.number().min(0).max(1),
+  selfReportedShare: z.number().min(0).max(1) }).nullable();
+
+export const benchValuesSchema = z.object({ ...valueDimensionFields, valueScore: nullableScore(100).optional() });
 
 export const benchOperatingHealthSchema = z.object({
   approvalsBacklogCount: z.number().int().min(0).nullable(),
@@ -51,13 +54,7 @@ export const benchOperatingHealthSchema = z.object({
 
 export const benchMaturitySchema = z.object({
   overall: z.number().min(0).max(5).nullable(),
-  fiveLayers: z.object({
-    strategicOps: z.number().min(0).max(5).nullable(),
-    leadership: z.number().min(0).max(5).nullable(),
-    culture: z.number().min(0).max(5).nullable(),
-    resilience: z.number().min(0).max(5).nullable(),
-    skills: z.number().min(0).max(5).nullable()
-  }),
+  fiveLayers: fiveLayersSchema,
   fiveDimensions: z.object({
     d1: z.number().min(0).max(5).nullable(),
     d2: z.number().min(0).max(5).nullable(),
@@ -84,11 +81,7 @@ export const benchEvidenceSchema = z.object({
   integrityIndex: z.number().min(0).max(1).nullable(),
   correlationRatio: z.number().min(0).max(1).nullable(),
   trustLabel: benchTrustLabelSchema,
-  evidenceCoverage: z.object({
-    observedShare: z.number().min(0).max(1),
-    attestedShare: z.number().min(0).max(1),
-    selfReportedShare: z.number().min(0).max(1)
-  }).nullable()
+  evidenceCoverage: evidenceCoverageSchema
 });
 
 export const benchProofBindingSchema = z.object({

@@ -7,6 +7,7 @@ import { loadAssurancePolicy, verifyAssurancePolicySignature } from "../assuranc
 import { latestAssuranceCertificateSummary, latestAssuranceRun } from "../assurance/assuranceStore.js";
 import { verifyAdaptersConfigSignature } from "../adapters/adapterConfigStore.js";
 import { verifyBenchRegistriesSignature } from "../bench/benchPolicyStore.js";
+import { derivedTrustLabel } from "../bench/benchCollector.js";
 import { verifyBridgeConfigSignature } from "../bridge/bridgeConfigStore.js";
 import { verifyBudgetsConfigSignature } from "../budgets/budgets.js";
 import { canonPath } from "../canon/canonLoader.js";
@@ -160,22 +161,6 @@ function insufficient(reason: string, refs: string[] = []): FactResult {
     reason,
     refs: dedupeSorted(refs)
   };
-}
-
-function trustLabelFromSignals(params: {
-  integrityIndex: number | null;
-  correlationRatio: number | null;
-  observedShare: number | null;
-}): "LOW" | "MEDIUM" | "HIGH" {
-  // An unmeasured signal never earns a label above LOW.
-  if (params.integrityIndex === null || params.correlationRatio === null || params.observedShare === null) return "LOW";
-  if (params.integrityIndex >= 0.9 && params.correlationRatio >= 0.9 && params.observedShare >= 0.7) {
-    return "HIGH";
-  }
-  if (params.integrityIndex >= 0.75 && params.correlationRatio >= 0.75 && params.observedShare >= 0.5) {
-    return "MEDIUM";
-  }
-  return "LOW";
 }
 
 function mapRunTrustLabel(input: string): "LOW" | "MEDIUM" | "HIGH" {
@@ -744,7 +729,7 @@ export function collectAuditBinderLocalData(params: AuditBinderCollectionInput, 
   }
 
   if (trustLabel === "LOW") {
-    trustLabel = trustLabelFromSignals({
+    trustLabel = derivedTrustLabel({
       integrityIndex,
       correlationRatio,
       observedShare: evidenceCoverage?.observedShare ?? null

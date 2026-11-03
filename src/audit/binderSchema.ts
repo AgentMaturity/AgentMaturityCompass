@@ -1,5 +1,6 @@
 import { signatureEnvelopeSchema } from "../crypto/signing/signatureEnvelope.js";
 import { z } from "zod";
+import { evidenceCoverageSchema } from "../bench/benchSchema.js";
 import { auditFamilyResultSchema } from "./auditMapSchema.js";
 import { conformanceStatusSchema } from "../domains/conformance/conformanceSchema.js";
 
@@ -15,11 +16,7 @@ export const binderTrustSchema = z.object({
   integrityIndex: z.number().min(0).max(1).nullable(),
   correlationRatio: z.number().min(0).max(1).nullable(),
   trustLabel: z.enum(["LOW", "MEDIUM", "HIGH"]),
-  evidenceCoverage: z.object({
-    observedShare: z.number().min(0).max(1),
-    attestedShare: z.number().min(0).max(1),
-    selfReportedShare: z.number().min(0).max(1)
-  }).nullable(),
+  evidenceCoverage: evidenceCoverageSchema,
   notary: z.object({
     enabled: z.boolean(),
     fingerprint: z.string().nullable().optional(),
