@@ -5,13 +5,13 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import YAML from "yaml";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { loadDeclarativeConfig } from "../dist/config/amcConfigLoader.js";
-import { runFromConfig } from "../dist/config/amcConfigRunner.js";
-import { captureRawConfigPairForAsync } from "../dist/config/configSignaturePair.js";
-import { initWorkspace } from "../dist/workspace.js";
-import { lockVault } from "../dist/vault/vault.js";
-import { sha256Hex } from "../dist/utils/hash.js";
-import { amcDeclarativeConfigSchema } from "../dist/config/amcConfigSchema.js";
+import { loadDeclarativeConfig } from "../src/config/amcConfigLoader.js";
+import { runFromConfig } from "../src/config/amcConfigRunner.js";
+import { captureRawConfigPairForAsync } from "../src/config/configSignaturePair.js";
+import { initWorkspace } from "../src/workspace.js";
+import { lockVault } from "../src/vault/vault.js";
+import { sha256Hex } from "../src/utils/hash.js";
+import { amcDeclarativeConfigSchema } from "../src/config/amcConfigSchema.js";
 
 const roots: string[] = [];
 function workspace() {

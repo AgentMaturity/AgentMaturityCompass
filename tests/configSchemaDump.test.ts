@@ -6,8 +6,8 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Ajv2020 } from "ajv/dist/2020.js";
 import { describe, expect, it } from "vitest";
-import { renderConfigSchema } from "../dist/config/configSchemaDump.js";
-import { amcAgentSchema, amcDeclarativeConfigSchema } from "../dist/config/amcConfigSchema.js";
+import { renderConfigSchema } from "../src/config/configSchemaDump.js";
+import { amcAgentSchema, amcDeclarativeConfigSchema } from "../src/config/amcConfigSchema.js";
 
 const addFormats: import("ajv-formats").FormatsPlugin = createRequire(import.meta.url)("ajv-formats");
 

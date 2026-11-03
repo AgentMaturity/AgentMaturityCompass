@@ -4,7 +4,7 @@ import { dirname, posix, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import ts from "typescript";
 import { describe, expect, test } from "vitest";
-import * as approvalClient from "../dist/runtime/approvalClient.js";
+import * as approvalClient from "../src/runtime/approvalClient.js";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const contracts = [

@@ -2,18 +2,18 @@ import { existsSync, mkdirSync, mkdtempSync, realpathSync, rmSync, symlinkSync, 
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { initWorkspace } from "../dist/workspace.js";
-import { openLedger } from "../dist/ledger/ledger.js";
-import { initBudgets } from "../dist/budgets/budgets.js";
-import { writeRuntimeFirewallPolicy } from "../dist/runtime/firewall.js";
-import { agentToolset } from "../dist/agent/agentToolset.js";
 import { insideWorkspace } from "../src/tools/builtin/fsTools.js";
 import { walkWorkspace } from "../src/tools/builtin/workspaceWalk.js";
 import { protectedPathReason } from "../src/toolhub/protectedPaths.js";
 import { pathAllowedByPatterns } from "../src/toolhub/toolhubValidators.js";
 import { admissibleConfigFile } from "../src/experiments/configFile.js";
+// The toolset loads from dist at run time (grep and glob run in a built worker); its types come from src so the type check needs no build.
+const { initWorkspace } = await import(new URL("../dist/workspace.js", import.meta.url).href) as typeof import("../src/workspace.js");
+const { openLedger } = await import(new URL("../dist/ledger/ledger.js", import.meta.url).href) as typeof import("../src/ledger/ledger.js");
+const { initBudgets } = await import(new URL("../dist/budgets/budgets.js", import.meta.url).href) as typeof import("../src/budgets/budgets.js");
+const { writeRuntimeFirewallPolicy } = await import(new URL("../dist/runtime/firewall.js", import.meta.url).href) as typeof import("../src/runtime/firewall.js");
+const { agentToolset } = await import(new URL("../dist/agent/agentToolset.js", import.meta.url).href) as typeof import("../src/agent/agentToolset.js");
 
-// The pure path logic is imported from source; the toolset runs from dist because grep and glob run in a built worker.
 /**
  * `.amc` and `.git` are protected by NAME, and on a case-insensitive volume
  * (the macOS and Windows default) `.AMC` is the same directory. The grep and

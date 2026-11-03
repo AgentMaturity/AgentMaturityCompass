@@ -4,11 +4,11 @@ import { mkdirSync, mkdtempSync, realpathSync, rmSync, symlinkSync, unlinkSync, 
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, test, vi } from "vitest";
-import * as comparisonArtifacts from "../dist/benchmarks/harnessComparisonArtifacts.js";
+import * as comparisonArtifacts from "../src/benchmarks/harnessComparisonArtifacts.js";
 import {
   campaignTrialEvidenceSchema, captureCampaignWorkspace, diffCampaignWorkspace,
   type CampaignWorkspaceSnapshot
-} from "../dist/benchmarks/comparisonCampaignEvidence.js";
+} from "../src/benchmarks/comparisonCampaignEvidence.js";
 
 const directories: string[] = [];
 afterEach(() => { for (const directory of directories.splice(0)) rmSync(directory, { recursive: true, force: true }); });

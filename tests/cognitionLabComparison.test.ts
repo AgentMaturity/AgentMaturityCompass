@@ -10,7 +10,7 @@ import {
   recordLabProbeResult,
   renderLabReportMarkdown,
   resetLabState,
-} from "../dist/lab/cognitionLab.js";
+} from "../src/lab/cognitionLab.js";
 
 const workspaces: string[] = [];
 afterEach(() => {
