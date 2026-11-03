@@ -127,7 +127,7 @@ describe("WP46 unwired contract labels", () => {
     const labelled = /library-only, not enforced/i.test(header);
     expect({ file, consumers, labelled }).toEqual({ file, consumers, labelled: consumers.length === 0 });
     if (labelled) expect(header).toMatch(/src\/[\w/]+\.ts/);
-  });
+  }, 90_000); // the first case parses the production sources: 9.4 s locally under coverage, past 30 s on CI
 
   test("WP16 job and terminal services have a real native composition consumer", () => {
     for (const file of ["src/kernel/services/jobServices.ts", "src/kernel/services/terminalServices.ts"]) {

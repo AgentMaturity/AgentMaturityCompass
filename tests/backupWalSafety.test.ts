@@ -34,6 +34,9 @@ const APPENDER = `
   while (Date.now() < end) {
     ledger.appendEvidence({ sessionId: "concurrent", runtime: "unknown", eventType: "stdout", payload: "row " + n + " " + "x".repeat(3000), inline: true });
     if (++n === 40) console.log("ready");
+    // Leave the write lock free for a moment every ten appends, as real writers do, so the backup's own
+    // audit row is not starved past SQLite's 5 s busy timeout on a loaded runner.
+    if (n % 10 === 0) Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 1);
   }
   ledger.close();
   console.log("done " + n);
