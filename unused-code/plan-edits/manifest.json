@@ -836,6 +836,13 @@
       "sha256": "c34cdc21c3e05fa1be379e0d6b18b1b886c4508288065fcd51d8cc98bd83705e"
     },
     {
+      "path": "src/sandbox/sandboxRunner.ts",
+      "issue": "P1-05",
+      "baseCommit": "02a721f45b3450803420572a6a231afa455c1c0b",
+      "archivePath": "unused-code/plan-edits/P1-05/src/sandbox/sandboxRunner.ts.landed",
+      "sha256": "f8c37fe487e069d9b1e1a0a89aa1687625fbd7f7e65dc66a3f80f1b6dbc0b5c0"
+    },
+    {
       "path": "src/score/metricValidity.ts",
       "issue": "GAP-WP05",
       "baseCommit": "c71c28e2c10cad64c72600e042a2121b07b9b38e",

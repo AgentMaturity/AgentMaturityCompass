@@ -230,10 +230,12 @@ export function bwrapBackend(): SandboxBackend {
         args.push("--tmpfs", join(workspace, ".amc"), "--chmod", "000", join(workspace, ".amc"), "--remount-ro", join(workspace, ".amc"),
           // Do not expose procfs: it could reopen a launcher-owned descriptor via PID 1.
           "--tmpfs", "/proc", "--remount-ro", "/proc", "--remount-ro", "/",
-          "--chdir", workspace, "--", ...(limit === null ? command : withProcessLimit(limit, command)));
+          "--chdir", workspace, "--", ...command);
         if (unconsumedFds(args, descriptors.length).length) throw new Error("A launcher fd would reach the command.");
         launched = true;
-        const outcome = await runProcess({ argv: args, cwd: workspace,
+        // The limit goes on the launcher, before it creates the user namespace: the kernel then holds this user's
+        // host-wide count to it. Set inside, a fresh namespace counts from zero and the cap never binds.
+        const outcome = await runProcess({ argv: limit === null ? args : withProcessLimit(limit, args), cwd: workspace,
           env: { PATH: "/usr/bin:/bin", HOME: "/tmp", TMPDIR: "/tmp", LANG: "C.UTF-8" },
           stdin: "ignore", stdout: "capture", stderr: "capture", maxCaptureBytes: 64_000,
           scrubValues: policy.scrubValues ?? [], graceMs: 2_000, timeoutMs: policy.timeoutMs,
