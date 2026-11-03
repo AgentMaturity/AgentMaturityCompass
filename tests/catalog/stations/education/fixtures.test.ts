@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { runGradebook } from "./gradebook.js";
 import { runCapabilityLog } from "./toolCapabilityLog.js";
 import { runExportLog } from "./exportLog.js";
-import { classifyAccessibilityFindings, runAccessibilityCheck } from "./accessibilityCheck.js";
+import { classifyAccessibilityFindings, launchCheckerBrowser, runAccessibilityCheck } from "./accessibilityCheck.js";
 import { sameBinding, utcTime, type OracleOutcome } from "./protocol.js";
 
 const at = "2026-10-18T12:00:00.000Z";
@@ -30,6 +30,18 @@ function pendingExport() {
     request: { teacherId: "teacher-1", institutionId: "institution-a", classId: "class-a", recordIds: ["synthetic-record-1"],
       destination: "https://records.fixture.invalid/export" } };
 }
+// Host capability, probed by the checker's own launch: a host that cannot launch it (no headless shell) must get an honest
+// checker_unavailable with the launch error class, never a pass or fail; hosts that can run the full Axe assertions.
+// CI sets AMC_REQUIRE_BROWSER_CHECKER=1 so a missing browser fails there instead of silently skipping the Axe path.
+const launchError = await launchCheckerBrowser().then(browser => browser.close().then(() => undefined), (error: unknown) => String(error).split("\n")[0]);
+const browserInstalled = launchError === undefined;
+if (!browserInstalled && process.env.AMC_REQUIRE_BROWSER_CHECKER === "1") throw new Error(`[L1-EDU-04] AMC_REQUIRE_BROWSER_CHECKER=1 but the checker browser cannot launch: ${launchError}`);
+if (!browserInstalled) console.warn(`[L1-EDU-04] checker browser cannot launch (${launchError}): browser cases assert checker_unavailable; run npx playwright install --only-shell chromium for the Axe assertions`);
+const browserCase = (actual: OracleOutcome, reason: string) => {
+  refused(actual, "not_evaluated", browserInstalled ? reason : "checker_unavailable");
+  if (!browserInstalled) expect(actual.observations.errorClass).toEqual(expect.any(String));
+  return browserInstalled;
+};
 function refused(actual: OracleOutcome, result?: string, reason?: string) {
   expect(actual.claimKind).toBe("synthetic_example");
   expect(["allow", "pass"]).not.toContain(actual.result);
@@ -184,13 +196,12 @@ describe("Education synthetic reference protocols, never institution or producti
   it("does not treat an empty rendered document as a generated lesson", async () => {
     const actual = await runAccessibilityCheck({ context: binding(4), checkerEnabled: true,
       html: '<!doctype html><html lang="en"><head><title>Synthetic lesson</title></head><body></body></html>' });
-    refused(actual, "not_evaluated", "generated_lesson_missing");
+    browserCase(actual, "generated_lesson_missing");
   });
   it("refuses external resources without sending a network request", async () => {
     const actual = await runAccessibilityCheck({ context: binding(4), checkerEnabled: true,
       html: '<!doctype html><html lang="en"><head><title>Synthetic lesson</title></head><body><main><h1>Lesson</h1><p>Synthetic exercise.</p><img alt="Synthetic diagram" src="https://external.fixture.invalid/diagram.png"></main></body></html>' });
-    refused(actual, "not_evaluated", "external_resource_refused");
-    expect(actual.observations.blockedRequests).toEqual(["https://external.fixture.invalid/diagram.png"]);
+    if (browserCase(actual, "external_resource_refused")) expect(actual.observations.blockedRequests).toEqual(["https://external.fixture.invalid/diagram.png"]);
   });
 });
 
@@ -217,6 +228,7 @@ describe("Canonical Education local observations remain empty production evidenc
     expect(fixture.expected).toEqual({ result: "not_evaluated", reasonCode: "incomplete" });
     const oracle = fixture.setup.educationOracle;
     const actual = await runs[oracle.kind](oracle.input);
+    if (!browserInstalled && oracle.kind === "accessibility" && (oracle.input as { checkerEnabled?: unknown }).checkerEnabled === true) return void browserCase(actual, "");
     expect({ result: actual.result, reasonCode: actual.reasonCode }).toEqual(oracle.expected);
     expect(actual.claimKind).toBe("synthetic_example");
     if (!["allow", "pass"].includes(actual.result)) refused(actual);

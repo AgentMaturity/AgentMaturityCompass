@@ -81,12 +81,18 @@ jobs:
         with:
           version: "v4.3.0"
 
+      # The L1-EDU-04 accessibility oracle runs Axe in Playwright's headless shell; shards hash files, so every shard
+      # installs it (same lockfile Playwright as e2e-playwright) and AMC_REQUIRE_BROWSER_CHECKER fails a shard without it.
+      - name: Install Chromium headless shell and system dependencies
+        run: npx playwright install --with-deps --only-shell chromium
+
       # Runner log lines are cut at 4,096 bytes for the reason given at build-test's merge step; the full log is uploaded.
       - name: Test shard
         timeout-minutes: 45
         shell: bash
         env:
           AMC_COVERAGE_SHARD: "1"
+          AMC_REQUIRE_BROWSER_CHECKER: "1"
         run: |
           mkdir -p tmp/ci-coverage tmp/vitest-blobs
           npm run test:coverage -- --exclude 'tests/performance/**' --shard=${{ matrix.shard }}/4 --reporter=default --reporter=blob --reporter=hanging-process --outputFile.blob=tmp/vitest-blobs/blob-${{ matrix.shard }}.json 2>&1 | tee tmp/ci-coverage/tests-shard-${{ matrix.shard }}.log | cut -c1-4096

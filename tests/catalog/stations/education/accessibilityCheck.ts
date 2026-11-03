@@ -25,6 +25,9 @@ function installedVersion(name: "@axe-core/playwright" | "@playwright/test"): st
   return z.object({ version: z.string().regex(/^\d+\.\d+\.\d+/) }).parse(metadata).version;
 }
 
+/** The one browser launch the checker uses; host probes call this too, so they test exactly what the checker needs. */
+export const launchCheckerBrowser = () => chromium.launch({ headless: true });
+
 /** Executes installed Axe in an offline browser on the actual fixture HTML. No rules are disabled and no publication occurs. */
 export async function runAccessibilityCheck(input: unknown): Promise<OracleOutcome> {
   const parsed = schema.safeParse(input);
@@ -39,7 +42,7 @@ export async function runAccessibilityCheck(input: unknown): Promise<OracleOutco
   try {
     const adapterVersion = installedVersion("@axe-core/playwright");
     const playwrightVersion = installedVersion("@playwright/test");
-    browser = await chromium.launch({ headless: true });
+    browser = await launchCheckerBrowser();
     const context = await browser.newContext({ offline: true, serviceWorkers: "block" });
     const blockedRequests: string[] = [];
     await context.route("**/*", async route => {
