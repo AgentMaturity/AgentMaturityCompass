@@ -11,7 +11,7 @@ import { initWorkspaceWithoutActionPolicy } from "./helpers/actionPolicyFixtures
 
 const dirs: string[] = [];
 beforeEach(() => {
-  const checkpoints = realpathSync(mkdtempSync("/private/tmp/amc-wp16-kernel-control-"));
+  const checkpoints = realpathSync(mkdtempSync(join(tmpdir(), "amc-wp16-kernel-control-")));
   dirs.push(checkpoints);
   vi.stubEnv("AMC_CONTROL_CHECKPOINT_DIR", checkpoints);
   process.env["AMC_VAULT_PASSPHRASE"] ??= "wp16-kernel-shutdown-pass";
@@ -91,5 +91,5 @@ describe("WP16 bounded native kernel shutdown", () => {
       expect(rows.filter(event => event.event_type === "session/close")
         .map(event => (JSON.parse(event.meta_json) as { reason?: unknown }).reason)).toEqual(["resource_outcome_unknown"]);
     } finally { ledger.close(); }
-  }, 15_000);
+  });
 });
