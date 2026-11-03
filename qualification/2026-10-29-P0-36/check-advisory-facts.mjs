@@ -2,10 +2,11 @@
 /**
  * P0-36: mechanically checks part of what the 1.1.1 advisory draft (docs/security/advisories/1.1.1.md) cites, against
  * the git history of the checkout that holds this script (git runs at its root, whatever the working directory): that
- * one or more cited lines of each `in v1.1.1` citation contain an expected text (not every line of a cited range),
- * that each cited commit is in HEAD's history, that each cited file is tracked at HEAD, and the vault's tracking
- * history. It does not check test names, dates, counts or anything outside LINES, COMMITS and FILES. Read-only: it
- * runs `git show`, `git ls-tree`, `git log` and `git merge-base` only. Exit 0 when every check holds, 1 otherwise.
+ * one or more cited lines of each `in v1.1.1` source-code (src/) citation contain an expected text (not every line of
+ * a cited range), that each cited commit is in HEAD's history, that each cited file is tracked at HEAD, and the
+ * vault's tracking history. It does not check test names, dates, counts or anything outside LINES, COMMITS, FILES and
+ * the three tags that track the vault and its add/delete history. Read-only: it runs `git show`, `git ls-tree`,
+ * `git log` and `git merge-base` only. Exit 0 when every check holds, 1 otherwise.
  *
  *   node qualification/2026-10-29-P0-36/check-advisory-facts.mjs            # facts
  *   node qualification/2026-10-29-P0-36/check-advisory-facts.mjs --keys     # also list historical public key ids
@@ -14,9 +15,9 @@
  * --published checks an extracted npm package (the directory holding package.json and dist/): that package.json says
  * 1.1.1, that each named dist file contains a PUBLISHED text anywhere in the file (one compiled counterpart per
  * `v1.1.1` entry of LINES; not its position, nor the rest of a cited range), that dist/cli.js and dist/ledger/ledger.js
- * do not contain EXPECTED_MONITOR, and that exactly PUBLISHED_RAW_TAR_SITES dist .js files contain RAW_TAR. It does
- * not check the tarball's shasum. The registry's 1.1.1 was built from a source later than the v1.1.1 tag, so a fact
- * that holds at the tag does not by itself hold for what npm users installed.
+ * exist and are not empty, that no dist .js file contains EXPECTED_MONITOR, and that exactly PUBLISHED_RAW_TAR_SITES
+ * dist .js files contain RAW_TAR. It does not check the tarball's shasum. The registry's 1.1.1 was built from a source
+ * later than the v1.1.1 tag, so a fact that holds at the tag does not by itself hold for what npm users installed.
  *
  * --keys lists the AMC key id (sha256 of the canonical SPKI PEM, src/keys/algorithmPolicy.ts signingKeyIdentity)
  * of every public key ever tracked under .amc/keys/ or --/.amc/keys/. They are candidate inputs for P0-37's distrust
@@ -157,13 +158,15 @@ if (publishedAt !== -1) {
   const read = (path) => { try { return readFileSync(join(pkg, path), "utf8"); } catch { return ""; } };
   if (JSON.parse(read("package.json") || "{}").version !== "1.1.1") failures.push(`${pkg} is not an extracted 1.1.1 package`);
   for (const [path, text] of PUBLISHED) if (!read(path).includes(text)) failures.push(`published ${path} does not contain ${JSON.stringify(text)}`);
-  for (const path of ["dist/cli.js", "dist/ledger/ledger.js"]) {
-    if (read(path).includes("EXPECTED_MONITOR")) failures.push(`published ${path} pins a monitor key, so issue 3's ledger forgery claim needs review`);
-  }
+  // An absent or empty anchor file would make the absence check below pass on nothing, so it fails instead.
+  const missingAnchors = ["dist/cli.js", "dist/ledger/ledger.js"].filter((path) => !read(path));
+  if (missingAnchors.length) failures.push(`published ${missingAnchors.join(" and ")} missing or empty, so the monitor pin check cannot hold`);
   const jsFiles = readdirSync(join(pkg, "dist"), { recursive: true }).filter((p) => p.endsWith(".js"));
+  const pins = jsFiles.filter((p) => read(join("dist", p)).includes("EXPECTED_MONITOR"));
+  if (pins.length) failures.push(`published dist/${pins.join(", dist/")} pins a monitor key, so issue 3's ledger forgery claim needs review`);
   const rawTar = jsFiles.filter((p) => read(join("dist", p)).includes(RAW_TAR)).length;
   if (rawTar !== PUBLISHED_RAW_TAR_SITES) failures.push(`published dist has ${rawTar} raw tar -xzf sites, not ${PUBLISHED_RAW_TAR_SITES}`);
-  total += PUBLISHED.length + 4; // package version, two anchor checks, tar sites
+  total += PUBLISHED.length + 4; // package version, anchor files present, no monitor pin, tar sites
 }
 for (const failure of failures) console.error(`FAIL ${failure}`);
 console.log(`advisory facts: ${total - failures.length}/${total} hold at ${git("rev-parse", "HEAD").trim()}`);
