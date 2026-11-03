@@ -5,6 +5,7 @@ import { effectiveTrustTier, readerTrustFor } from "../claims/evidenceProvenance
 import { questionBank, questionIds } from "../diagnostic/questionBank.js";
 import { resolveAgentId } from "../fleet/paths.js";
 import { hashBinaryOrPath, openLedger } from "../ledger/ledger.js";
+import { writerStore } from "../ledger/ledgerConnection.js";
 import type { LayerName, TrustTier } from "../types.js";
 import { pathExists, readUtf8 } from "../utils/fs.js";
 
@@ -1537,7 +1538,7 @@ export function importEvalResults(params: {
   const questionCoverage = summarizeQuestionCoverage(parsed.cases);
   const sessionId = randomUUID();
   const eventIds: string[] = [];
-  const ledger = openLedger(workspace, process.env.AMC_NO_SIGN === "1" ? { store: "unsigned" } : {}); // P0-55: unsigned rows stay apart
+  const ledger = openLedger(workspace, writerStore()); // P0-55: unsigned rows stay apart
   try {
     ledger.startSession({
       sessionId,
@@ -1843,7 +1844,8 @@ export function evalImportCoverageStatus(params: {
   agentId?: string;
   sinceTs?: number;
 }): EvalCoverageStatus {
-  const ledger = openLedger(params.workspace);
+  // Read where importEvalResults writes: under AMC_NO_SIGN=1 that is the unsigned store.
+  const ledger = openLedger(params.workspace, writerStore());
   try {
     const clauses = ["json_extract(meta_json, '$.source') = 'eval_import'"];
     const args: unknown[] = [];

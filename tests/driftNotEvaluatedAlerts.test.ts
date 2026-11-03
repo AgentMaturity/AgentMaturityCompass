@@ -1,8 +1,8 @@
-import { mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { dispatchAlert } from "../src/drift/alerts.js";
-import { driftCheckCliAsync } from "../src/drift/driftCli.js";
+import { driftCheckCli, driftCheckCliAsync } from "../src/drift/driftCli.js";
 import { getAgentPaths } from "../src/fleet/paths.js";
 import { Ledger } from "../src/ledger/ledger.js";
 import { ContinuousMonitor } from "../src/watch/continuousMonitor.js";
@@ -83,6 +83,21 @@ describe("drift that cannot be evaluated alerts, never reads as clean", () => {
     vi.mocked(dispatchAlert).mockRejectedValueOnce(new Error("webhook unreachable"));
     const result = await driftCheckCliAsync({ workspace: f.workspace, agentId: "default" });
     expect(result.reasons).toContain("ALERT_NOT_DELIVERED: webhook unreachable");
+  });
+
+  test("under AMC_NO_SIGN=1 a detected regression alerts the owner and refuses, never a clean pass or a signed incident", async () => {
+    const f = freezeFixture();
+    runs(f, "default", [5, 4]);
+    vi.stubEnv("AMC_NO_SIGN", "1");
+    const incidents = () => { try { return readdirSync(f.dir); } catch { return []; } };
+    for (const check of [driftCheckCli, driftCheckCliAsync]) {
+      await expect(check({ workspace: f.workspace, agentId: "default" })).rejects.toThrow("no-sign mode does not authorize the signed freeze incident");
+    }
+    expect(incidents()).toEqual([]);
+    // The fixture's rule freezes without ALERT_OWNER; the owner is alerted anyway, since the freeze cannot be raised.
+    const regressions = vi.mocked(dispatchAlert).mock.calls.filter(([, payload]) => payload.ruleId !== "drift-not-evaluated");
+    expect(regressions).toHaveLength(2);
+    expect(regressions[0]![1]).toMatchObject({ type: "AMC_ALERT", agentId: "default", summary: expect.stringContaining("Drift/regression detected") });
   });
 
   test("the continuous monitor alerts and counts a drift check it could not evaluate", async () => {

@@ -126,9 +126,30 @@ function incidentInput(params: DriftCheckParams, ready: ReadyDrift): Parameters<
     reason: ready.evaluated.reasons.join("; ") };
 }
 
+function regressionAlert(ready: ReadyDrift): AlertPayload {
+  const { agentId, current, rule, evaluated } = ready;
+  return { type: "AMC_ALERT", ruleId: rule.id, agentId, runId: current.runId, summary: `Drift/regression detected: ${evaluated.reasons.join(" | ")}`,
+    links: { dashboard: "http://127.0.0.1:4173", report: `.amc/agents/${agentId}/reports/${current.runId}.md` },
+    hashes: { reportSha256: current.reportJsonSha256, bundleSha256: sha256Hex(`${agentId}:${current.runId}`) } };
+}
+
+/**
+ * AMC_NO_SIGN=1 cannot publish the signed freeze incident, so a detected regression is never read as a clean pass: the
+ * owner is alerted, whatever the rule's actions (the freeze it may ask for cannot be raised), and the check refuses.
+ */
+async function refuseUnsignedRegression(params: DriftCheckParams, ready: ReadyDrift): Promise<void> {
+  if (process.env.AMC_NO_SIGN !== "1") return;
+  let undelivered = "";
+  try { await dispatchAlert(params.workspace, regressionAlert(ready)); }
+  catch (error) { undelivered = `; the owner alert was not delivered: ${error instanceof Error ? error.message : String(error)}`; }
+  throw new Error(`drift regression detected (${ready.evaluated.reasons.join("; ")}), but no-sign mode does not authorize the signed freeze incident; `
+    + `rerun the drift check from a signing session${undelivered}`);
+}
+
 /** Retained incident-signing branch for callback-absent registry consumers. */
 export async function runDriftCheck(input: DriftCheckParams): Promise<DriftCheckResult> {
   const params = { ...input }, ready = prepareDriftDecision(params); if ("result" in ready) return ready.result;
+  await refuseUnsignedRegression(params, ready);
   const incident = createFreezeIncidentForSnapshot(incidentInput(params, ready), ready.assertInputsCurrent);
   return finishDriftCheck(params, ready, incident, false);
 }
@@ -138,6 +159,7 @@ export async function runDriftCheckAsync(input: DriftCheckParams): Promise<Drift
 /** Internal maintained caller handoff. No request-derived actor or signer selector is accepted. */
 export async function runDriftCheckForAuthority(input: DriftCheckParams, beforePublish: () => void): Promise<DriftCheckResult> {
   const params = { ...input }, ready = prepareDriftDecision(params); if ("result" in ready) return ready.result;
+  await refuseUnsignedRegression(params, ready);
   const incident = await createFreezeIncidentForAuthority(incidentInput(params, ready), () => { beforePublish(); ready.assertInputsCurrent(); });
   return finishDriftCheck(params, ready, incident, true);
 }
@@ -234,21 +256,7 @@ async function finishDriftCheck(params: DriftCheckParams, ready: ReadyDrift, inc
 
     if (rule.actions.includes("ALERT_OWNER")) {
       phase = "alert";
-      await dispatchAlert(params.workspace, {
-        type: "AMC_ALERT",
-        ruleId: rule.id,
-        agentId,
-        runId: current.runId,
-        summary: `Drift/regression detected: ${evaluated.reasons.join(" | ")}`,
-        links: {
-          dashboard: "http://127.0.0.1:4173",
-          report: `.amc/agents/${agentId}/reports/${current.runId}.md`
-        },
-        hashes: {
-          reportSha256: current.reportJsonSha256,
-          bundleSha256: sha256Hex(`${agentId}:${current.runId}`)
-        }
-      });
+      await dispatchAlert(params.workspace, regressionAlert(ready));
       completed.push("alert");
     }
 
