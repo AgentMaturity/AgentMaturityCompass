@@ -13,6 +13,7 @@ import { verifyBudgetsConfigSignature } from "../budgets/budgets.js";
 import { canonPath } from "../canon/canonLoader.js";
 import { cgxLatestGraphPath, cgxLatestPackPath } from "../cgx/cgxStore.js";
 import { diagnosticBankPath } from "../diagnostic/bank/bankLoader.js";
+import { questionBank } from "../diagnostic/questionBank.js";
 import { latestTrustedRun } from "../governor/actionPolicyEngine.js";
 import { resolveAgentId } from "../fleet/paths.js";
 import { verifyLedgerIntegrity, openLedger } from "../ledger/ledger.js";
@@ -659,10 +660,7 @@ export function collectAuditBinderLocalData(params: AuditBinderCollectionInput, 
         : insufficient("no tool denial events in window")
   };
 
-  const kindChecks = mapEvidenceKinds({
-    eventsByType,
-    facts
-  });
+  const kindChecks = mapEvidenceKinds({ eventsByType, facts });
 
   let maturityOverall: number | null = null;
   let maturityByDim: { DIM1: number | null; DIM2: number | null; DIM3: number | null; DIM4: number | null; DIM5: number | null } = {
@@ -672,11 +670,11 @@ export function collectAuditBinderLocalData(params: AuditBinderCollectionInput, 
     DIM4: null,
     DIM5: null
   };
-  let unknownQuestionsCount = 0;
   let maturityRefs: string[] = [];
   let maturityNotes: string[] = [];
 
-  // Null until a trusted run or org scorecard measures it: not evaluated, never 0.
+  // Null (every question unknown) until a trusted run or org scorecard measures it: not evaluated, never 0.
+  let unknownQuestionsCount = questionBank.length;
   let integrityIndex: number | null = null;
   let correlationRatio: number | null = null;
   let evidenceCoverage: { observedShare: number; attestedShare: number; selfReportedShare: number } | null = null;

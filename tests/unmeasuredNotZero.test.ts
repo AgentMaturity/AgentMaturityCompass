@@ -15,6 +15,11 @@ import type { DiagnosticReport, LayerName, QuestionScore } from "../src/types.js
 import { evaluateValueEvidenceGates } from "../src/value/valueEvidenceGates.js";
 import { defaultValuePolicy } from "../src/value/valuePolicySchema.js";
 import { trustKindShares } from "../src/value/valueScoring.js";
+import { computeEconomicSignificance } from "../src/value/valueRisk.js";
+import { createForecast, initForecastPolicy } from "../src/forecast/forecastEngine.js";
+import { collectPassportData } from "../src/passport/passportCollector.js";
+import { defaultPassportPolicy } from "../src/passport/passportPolicySchema.js";
+import { savePassportPolicy } from "../src/passport/passportStore.js";
 
 /**
  * 2.0 truth reset, residual cases: a value AMC did not measure reads not evaluated (null with a reason), never 0.
@@ -78,6 +83,34 @@ describe("value report", () => {
   test("trust-kind shares over no events are null; over real events a 0 share stays a measured 0", () => {
     expect(trustKindShares([])).toEqual({ observed: null, attested: null, selfReported: null });
     expect(trustKindShares([{ source: { trustKind: "SELF_REPORTED" } }])).toEqual({ observed: 0, attested: 0, selfReported: 1 });
+  });
+
+  test("economic significance with no measured benefit is not evaluated, never a score built on a 0 benefit", () => {
+    const base = { policy: defaultValuePolicy(), costScore: null, assuranceScore: null, insufficientEvidence: false,
+      valueRegressing: false, costRising: false, noValueEventsLast30d: false };
+    const unmeasured = computeEconomicSignificance({ ...base, valueScore: null, economicValue: null });
+    expect(unmeasured.score).toBeNull();
+    expect(unmeasured.reasons).toContain("VALUE_NOT_MEASURED");
+    expect(computeEconomicSignificance({ ...base, valueScore: 0, economicValue: null }).score).toBeTypeOf("number");
+  });
+});
+
+describe("passport", () => {
+  const roots: string[] = [];
+  afterEach(() => { while (roots.length > 0) rmSync(roots.pop()!, { recursive: true, force: true }); });
+
+  test("a signed forecast built from no runs leaves the evidence mix not measured, never a {0,0,0} mix", () => {
+    process.env.AMC_VAULT_PASSPHRASE ??= "unmeasured-passport-pass";
+    const ws = realpathSync(mkdtempSync(join(tmpdir(), "amc-unmeasured-passport-")));
+    roots.push(ws);
+    initWorkspace({ workspacePath: ws, trustBoundaryMode: "isolated" });
+    savePassportPolicy(ws, defaultPassportPolicy());
+    initForecastPolicy(ws);
+    const { forecast } = createForecast({ workspace: ws, scope: { type: "AGENT", id: "default" } });
+    expect(forecast.evidenceCoverage.observedShare + forecast.evidenceCoverage.attestedShare
+      + forecast.evidenceCoverage.selfReportedShare).toBe(0);
+    const { passport } = collectPassportData({ workspace: ws, scopeType: "AGENT", scopeId: "default", policy: defaultPassportPolicy() });
+    expect(passport.trust.evidenceCoverage).toBeNull();
   });
 });
 

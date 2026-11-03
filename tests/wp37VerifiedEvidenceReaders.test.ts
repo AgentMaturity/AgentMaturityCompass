@@ -16,6 +16,7 @@ import { loadAuditMapActive } from "../src/audit/auditMapStore.js";
 import { assuranceLatestCertificatePath } from "../src/assurance/assurancePolicyStore.js";
 import { writeFileAtomic, ensureDir } from "../src/utils/fs.js";
 import { dirname } from "node:path";
+import { questionBank } from "../src/diagnostic/questionBank.js";
 import { tamperReport, writeAnchoredRun, writeSealedReport } from "./helpers/sealedRun.js";
 
 /** A parsed-but-unverified certificate: the verifier is stubbed only for the certificate-summary test. */
@@ -143,6 +144,8 @@ describe("WP37 verified run readers", () => {
     expect(binder.trust.correlationRatio).toBeNull();
     expect(binder.trust.evidenceCoverage).toBeNull();
     expect(binder.sections.maturity.status).toBe("INSUFFICIENT_EVIDENCE");
+    // No trusted run counted the unknown questions: every question stays unknown, never a measured 0.
+    expect(binder.sections.maturity.unknownQuestionsCount).toBe(questionBank.length);
   });
 });
 

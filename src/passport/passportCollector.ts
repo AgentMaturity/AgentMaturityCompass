@@ -133,11 +133,15 @@ function latestForecastRisk(
     economicSignificanceRisk: fromSeries("EconomicSignificanceRisk"),
     riskAssuranceRisk: fromSeries("RiskAssuranceRisk"),
     digitalDualityRisk: fromSeries("DigitalDualityRisk"),
-    evidenceCoverage: {
-      observedShare: forecast.evidenceCoverage.observedShare,
-      attestedShare: forecast.evidenceCoverage.attestedShare,
-      selfReportedShare: forecast.evidenceCoverage.selfReportedShare
-    }
+    // A forecast built from no runs stores {0,0,0} shares (they sum to 0); that mix was never measured.
+    evidenceCoverage: forecast.evidenceCoverage.observedShare + forecast.evidenceCoverage.attestedShare
+      + forecast.evidenceCoverage.selfReportedShare === 0
+      ? null
+      : {
+          observedShare: forecast.evidenceCoverage.observedShare,
+          attestedShare: forecast.evidenceCoverage.attestedShare,
+          selfReportedShare: forecast.evidenceCoverage.selfReportedShare
+        }
   };
 }
 
