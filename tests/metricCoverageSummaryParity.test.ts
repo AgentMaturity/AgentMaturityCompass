@@ -211,7 +211,10 @@ function publicProjectionInput(row: typeof projectionMap.summaries[number], valu
     agentId: "owned-projection-fixture", runId: "owned-projection-run", ts: Date.UTC(2026, 9, 1),
     trustLabel: "LOW TRUST", integrityIndex: 0, evidenceCoverage: 0, correlationRatio: 0,
     unsupportedClaimCount: 0, layerScores: [{ layerName: "Strategic Agent Operations", avgFinalLevel: 0, confidenceWeightedFinalLevel: 0 }],
-    questionScores: [], sourceRefs: ["fixture:public-metric-projection"], gateMode: "ci",
+    // One scored question keeps construct validity measured, so the parity compares projection, not the
+    // "not evaluated" rule that now applies (and the archived original lacks) when no question was scored.
+    questionScores: [{ questionId: "AMC-1.1", claimedLevel: 1, supportedMaxLevel: 1, finalLevel: 1, confidence: 0.5,
+      evidenceEventIds: [], flags: [], narrative: "fixture" }], sourceRefs: ["fixture:public-metric-projection"], gateMode: "ci",
     // Deliberately uncovered, unrecognized signals exercise metadata projection;
     // these fixtures provide no signed evidence or behavioral measurement.
     [publicProjectionInputs[row.name]]: [
