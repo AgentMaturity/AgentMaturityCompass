@@ -1889,6 +1889,99 @@
       }
     },
     {
+      "id": "adv-xml-cdata",
+      "round": "adv",
+      "finding": "adv-closed-gap",
+      "surface": "walk",
+      "input": {
+        "text": "<password><![CDATA[{{PASSWORD}}]]></password>"
+      },
+      "expect": {
+        "classes": [
+          "credential"
+        ],
+        "absent": [
+          "{{PASSWORD}}"
+        ],
+        "present": [
+          "<password>",
+          "</password>"
+        ]
+      }
+    },
+    {
+      "id": "adv-benign-xml-cdata",
+      "round": "adv",
+      "finding": "adv-closed-gap",
+      "surface": "walk",
+      "input": {
+        "text": "<note><![CDATA[a < b and c]] ok]]></note>"
+      },
+      "expect": {
+        "unchanged": true
+      }
+    },
+    {
+      "id": "adv-benign-nfkc-expansion",
+      "round": "adv",
+      "finding": "adv-closed-gap",
+      "surface": "walk",
+      "input": {
+        "generate": [
+          [
+            "ﷺ",
+            60000
+          ]
+        ]
+      },
+      "expect": {
+        "unchanged": true
+      }
+    },
+    {
+      "id": "adv-benign-nfkc-expansion-squared",
+      "round": "adv",
+      "finding": "adv-closed-gap",
+      "surface": "walk",
+      "input": {
+        "generate": [
+          [
+            "㍿",
+            300000
+          ]
+        ]
+      },
+      "expect": {
+        "unchanged": true
+      }
+    },
+    {
+      "id": "adv-fullwidth-card-past-nfkc-cap",
+      "round": "adv",
+      "finding": "adv-closed-gap",
+      "surface": "walk",
+      "input": {
+        "generate": [
+          [
+            "ﷺ",
+            60000
+          ],
+          [
+            " card {{fullwidth:{{CARD}}}} ok",
+            1
+          ]
+        ]
+      },
+      "expect": {
+        "classes": [
+          "card_number"
+        ],
+        "absent": [
+          "{{fullwidth:{{CARD}}}}"
+        ]
+      }
+    },
+    {
       "id": "h-input-attribute-runs",
       "round": "hostile",
       "finding": "adv-closed-gap",
@@ -1970,6 +2063,23 @@
           [
             "１​",
             300000
+          ]
+        ]
+      },
+      "expect": {
+        "withinMs": 20000
+      }
+    },
+    {
+      "id": "h-xml-unclosed-cdata",
+      "round": "hostile",
+      "finding": "adv-closed-gap",
+      "surface": "walk",
+      "input": {
+        "generate": [
+          [
+            "<password><![CDATA[",
+            50000
           ]
         ]
       },

@@ -22,12 +22,19 @@ export const decodeWebEscapes = (text: string) => text.replace(WEB_ESCAPE,
 /** Characters that render as nothing: zero-width space, joiners, word joiner, soft hyphen, Mongolian vowel separator, BOM. */
 const ZERO_WIDTH_SOURCE = "\\u00ad\\u180e\\u200b-\\u200d\\u2060\\ufeff";
 const ZERO_WIDTH = new RegExp(`[${ZERO_WIDTH_SOURCE}]`, "g");
+/** One character's NFKC form where it is no longer than the character (`４` is `4`), else the character as it is. */
+const foldChar = (char: string) => { const folded = char.normalize("NFKC"); return folded.length <= char.length ? folded : char; };
 /**
  * Text as it reads: NFKC (fullwidth `４１１１` is `4111`, `ﬁ` is `fi`) with zero-width characters removed, so a card number
- * split by them or typed in fullwidth digits is seen. ASCII text is returned as it is. NFKC can lengthen text; the
- * walk's length and budget limits apply to the result.
+ * split by them or typed in fullwidth digits is seen. ASCII text is returned as it is. NFKC can lengthen text (U+FDFA is
+ * 18 characters): where it would pass `maxChars`, each character is folded only where that does not lengthen it, so the
+ * fold never makes a text the walk accepted too long to read.
  */
-export const foldText = (text: string) => /[^\u0000-\u007f]/.test(text) ? text.normalize("NFKC").replace(ZERO_WIDTH, "") : text;
+export const foldText = (text: string, maxChars = Number.POSITIVE_INFINITY) => {
+  if (!/[^\u0000-\u007f]/.test(text)) return text;
+  const nfkc = text.normalize("NFKC");
+  return (nfkc.length <= Math.max(maxChars, text.length) ? nfkc : text.replace(/[^\u0000-\u007f]/gu, foldChar)).replace(ZERO_WIDTH, "");
+};
 
 /** Cyrillic and Greek letters drawn like a Latin one, folded in member names only: prose in those scripts is left as it is. */
 const CONFUSABLES: Readonly<Record<string, string>> = Object.freeze({

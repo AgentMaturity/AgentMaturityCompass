@@ -174,7 +174,8 @@ const MEMBER_KEY = String.raw`(?<k>(?:${NAME_CHARS}|\\+u[0-9A-Fa-f]{4}){1,64})`;
  * name, decoded (`memberFinding`); only the value is replaced. A quoted string value ends at its closing quote or, unclosed
  * (truncated output), at the end of its line. A decoded view runs only the rules that do not depend on where quotes fall
  * (`exactOnly: false`): decoding an escaped backslash before a closing quote leaves an escaped quote, so a value runs on.
- * An XML element's text and an HTML input's quoted `value` under its `name` (either order) are pairs too.
+ * An XML element's text (CDATA sections in it up to 1,024 characters each) and an HTML input's quoted `value` under its
+ * `name` (either order) are pairs too.
  */
 const PAIR_RULES: readonly { readonly type: "secret_json" | "secret_field"; readonly re: RegExp; readonly exactOnly: boolean }[] = Object.freeze([
   { type: "secret_json", exactOnly: true, re: new RegExp(String.raw`(?<q>\\?["'])${MEMBER_KEY}\k<q>\s*:\s*(?<r>\\?["'])(?<v>(?:(?!\k<r>)(?:[^\\\r\n]|\\[^\r\n]))*)(?:\k<r>|(?=[\r\n]|$))`) },
@@ -182,7 +183,7 @@ const PAIR_RULES: readonly { readonly type: "secret_json" | "secret_field"; read
   { type: "secret_field", exactOnly: false, re: new RegExp(String.raw`(?:^|[?&;\s])${MEMBER_KEY}=(?<v>[^&;\s#]*)`) },
   { type: "secret_field", exactOnly: true, re: new RegExp(String.raw`name="${MEMBER_KEY}"[^\r\n]{0,256}\r?\n(?:[^\r\n]{1,256}\r?\n){0,8}\r?\n(?<v>[^\r\n]*)`) },
   { type: "secret_field", exactOnly: false, re: new RegExp(String.raw`^[ \t]*(?<k>${NAME_CHARS}{1,64})[ \t]*[:=][ \t]*(?<v>\S+)`, "m") },
-  { type: "secret_field", exactOnly: false, re: new RegExp(String.raw`<(?<k>${NAME_CHARS}{1,64})(?:\s[^<>]{0,256})?>(?<v>[^<]*)</\k<k>\s*>`) },
+  { type: "secret_field", exactOnly: false, re: new RegExp(String.raw`<(?<k>${NAME_CHARS}{1,64})(?:\s[^<>]{0,256})?>(?<v>(?:<!\[CDATA\[(?:[^\]]|\](?!\]>)){0,1024}\]\]>|[^<])*)</\k<k>\s*>`) },
   { type: "secret_field", exactOnly: false, re: new RegExp(String.raw`<input\b[^<>]{0,256}?\sname=(?<q>["'])(?<k>${NAME_CHARS}{1,64})\k<q>[^<>]{0,256}?\svalue=(?<r>["'])(?<v>(?:(?!\k<r>)[^<>])*)\k<r>`, "i") },
   { type: "secret_field", exactOnly: false, re: new RegExp(String.raw`<input\b[^<>]{0,256}?\svalue=(?<r>["'])(?<v>(?:(?!\k<r>)[^<>])*)\k<r>[^<>]{0,256}?\sname=(?<q>["'])(?<k>${NAME_CHARS}{1,64})\k<q>`, "i") }
 ]);
@@ -198,7 +199,7 @@ export const DETECTOR_SET_DIGEST = sha256Hex(canonicalize({
   secretMembers: SECRET_MEMBER.source, secretMemberNames: SECRET_MEMBER_NAME.source, pageTokenNames: PAGE_TOKEN_NAME.source,
   keyedNames: KEYWORD_BOUND.source, webEscapes: { source: WEB_ESCAPE.source, named: NAMED_REFERENCES },
   base64Runs: { source: BASE64_RUN.source, controls: CONTROL_CHARS.source }, tokenFormat: TOKEN_PATTERN_SOURCE,
-  walk: { revision: "protected-walk-v3", order: "json>base64>web>nfkc", nameFold: NAME_FOLD_CHARS, maxDecodePasses: MAX_DECODE_PASSES, viewRules: "dlp+shape+assign+line" },
+  walk: { revision: "protected-walk-v3", order: "json>base64>web>nfkc", nfkcOverCap: "per-char-non-lengthening", nameFold: NAME_FOLD_CHARS, maxDecodePasses: MAX_DECODE_PASSES, viewRules: "dlp+shape+assign+line" },
   limits: { maxDepth: MAX_DEPTH, maxLeafChars: MAX_PROTECTED_TEXT_CHARS, maxRequestScanChars: MAX_REQUEST_SCAN_CHARS,
     unitCharge: UNIT_CHARGE, keyedContextChars: KEYED_CONTEXT_CHARS }
 }));
@@ -700,7 +701,7 @@ export function protectedWalk(options: WalkOptions): ProtectedWalk {
       for (let view = masked, round = 0; round < MAX_DECODE_PASSES; round += 1) {
         const json = decodeJsonEscapes(view);
         if (json !== view) { base64Children(json, child); probe(json, child); }
-        const web = decodeWebEscapes(json), folded = foldText(web);
+        const web = decodeWebEscapes(json), folded = foldText(web, MAX_PROTECTED_TEXT_CHARS);
         if (web !== json) { base64Children(web, child); probe(web, child); }
         if (folded !== web) { base64Children(folded, child); probe(folded, child); }
         if (folded === view) return distinctFindings(found);
