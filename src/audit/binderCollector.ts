@@ -673,7 +673,7 @@ export function collectAuditBinderLocalData(params: AuditBinderCollectionInput, 
   let maturityRefs: string[] = [];
   let maturityNotes: string[] = [];
 
-  // Null (every question unknown) until a trusted run or org scorecard measures it: not evaluated, never 0.
+  // Every question counts as unknown until a trusted run or org scorecard measures it, never a measured 0.
   let unknownQuestionsCount = questionBank.length;
   let integrityIndex: number | null = null;
   let correlationRatio: number | null = null;
