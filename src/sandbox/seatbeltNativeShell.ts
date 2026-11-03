@@ -4,7 +4,7 @@ import { join, resolve } from "node:path";
 import { runProcess } from "../exec/runProcess.js";
 import { admitWritableDirectory, within } from "./bwrapBackend.js";
 import { startShellEgressProxy, type ShellEgressProxy } from "./egress/shellEgressProxy.js";
-import { PROCESS_LIMIT_LIMITATION, processLimit, withProcessLimit } from "./processCap.js";
+import { PROCESS_LIMIT_LIMITATION, ROOT_PROCESS_LIMIT_LIMITATION, processLimit, withProcessLimit } from "./processCap.js";
 import { realOrLiteral, sbplString } from "./seatbeltBackend.js";
 import type { SandboxBackend, SandboxOutcome, SandboxPolicy } from "./sandboxTypes.js";
 
@@ -160,6 +160,7 @@ export function seatbeltNativeShell(): SandboxBackend {
         const profilePath = join(launcher, "profile.sb");
         writeFileSync(profilePath, buildSeatbeltShellProfile({ workspace, writableRoots, privateTmp, denied, proxyPort: proxy?.port ?? null }), { mode: 0o600 });
         const limit = policy.maxProcesses === undefined ? null : processLimit(policy.maxProcesses);
+        const capped = limit !== null && process.geteuid?.() !== 0 ? limit : null; // the kernel exempts root from RLIMIT_NPROC
         const probe = join(launcher, "probe");
         const marker = join(privateTmp, MARKER);
         launched = true;
@@ -183,9 +184,9 @@ export function seatbeltNativeShell(): SandboxBackend {
           ...(applied ? { enforcement: {
             boundary: "macos-seatbelt" as const, hostWrites: "declared-roots-only" as const, reads: "open-except-denylist" as const,
             network: proxy ? "proxy-allowlist" as const : "denied" as const, allowHosts: [...(policy.allowHosts ?? [])],
-            processLimit: limit === null ? null : { mechanism: "rlimit-nproc" as const, max: limit },
+            processLimit: capped === null ? null : { mechanism: "rlimit-nproc" as const, max: capped },
             readonlyRoots: ["/"], privateWritableRoots: [privateTmp, "/dev/null"], launcherStatus: "command-exited" as const,
-            sourcePolicySha256: policy.sourcePolicySha256 ?? null, limitations: [...LIMITATIONS, ...(limit === null ? [] : [PROCESS_LIMIT_LIMITATION])]
+            sourcePolicySha256: policy.sourcePolicySha256 ?? null, limitations: [...LIMITATIONS, ...(limit === null ? [] : [capped !== null ? PROCESS_LIMIT_LIMITATION : ROOT_PROCESS_LIMIT_LIMITATION])]
           } } : {})
         };
       } catch {

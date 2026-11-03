@@ -14,6 +14,8 @@ export const DEFAULT_MAX_PROCESSES = 256;
 
 export const PROCESS_LIMIT_LIMITATION = "The process cap is RLIMIT_NPROC: it counts every process of your user (threads on Linux), so it is your process count at launch plus the signed allowance, not a count of the command's own processes.";
 
+export const ROOT_PROCESS_LIMIT_LIMITATION = "No process cap applies: the shell runs as root, which the kernel exempts from RLIMIT_NPROC, so the signed allowance is not enforced.";
+
 /** Linux charges threads of the real user id; procfs is always there, `ps` is not in slim images. */
 function linuxTaskCount(uid: number): number {
   let count = 0;

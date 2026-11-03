@@ -1,7 +1,8 @@
-import { mkdtempSync, rmSync, realpathSync } from "node:fs";
+import { mkdtempSync, openSync, rmSync, realpathSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { existsSync } from "node:fs";
+import { spawnSync } from "node:child_process";
 import { afterEach, describe, expect, it } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { openLedger } from "../src/ledger/ledger.js";
@@ -73,7 +74,10 @@ describe("confinement is a property of the process, not of the machine", () => {
     const dir = workspace();
     const toolset = agentToolset({ workspace: dir, agentId: "payments-agent", sessionId: "toolset-test-session", mode: "code" });
 
-    const expected = process.platform === "darwin" && existsSync("/usr/bin/sandbox-exec");
+    // Per host, measured independently: Seatbelt's binary on macOS; on Linux an actual Bubblewrap
+    // namespace launch (docs/NATIVE_SANDBOX_UBUNTU.md), since an AppArmor-restricted host has the binary but cannot confine.
+    const expected = process.platform === "darwin" ? existsSync("/usr/bin/sandbox-exec")
+      : process.platform === "linux" && spawnSync("/usr/bin/bwrap", ["--unshare-user", "--unshare-net", "--ro-bind-fd", "3", "/", "--", "/bin/true"], { stdio: ["ignore", "ignore", "ignore", openSync("/", "r")] }).status === 0;
     expect(toolset.readiness.sandboxBackendAvailable).toBe(expected);
 
     toolset.close();

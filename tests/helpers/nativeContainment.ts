@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { createHash, randomUUID, verify } from "node:crypto";
-import { chmodSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { get as httpGet, createServer } from "node:http";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
@@ -20,6 +20,17 @@ import { lockVault } from "../../src/vault/vault.js";
 const hash = (bytes: Buffer): string => createHash("sha256").update(bytes).digest("hex");
 const quote = (text: string): string => `'${text.replaceAll("'", "'\\''")}'`;
 export type NativeCall = { outcome: ToolOutcome; receipt: SandboxOutcome; execution: RecordedToolCall; data: Record<string, any> };
+
+/**
+ * A Node the native shell can execute. Linux mounts only /usr, /bin, /lib and /lib64, so a
+ * toolcache Node (GitHub's /opt/hostedtoolcache) is invisible inside it; null when none qualifies.
+ */
+export function sandboxNode(): string | null {
+  const own = realpathSync(process.execPath);
+  if (process.platform !== "linux") return own;
+  return [own, "/usr/local/bin/node", "/usr/bin/node"].filter(path => existsSync(path)).map(path => realpathSync(path))
+    .find(path => path.startsWith("/usr/") || path.startsWith("/bin/")) ?? null;
+}
 
 /** Real signed tools, default P1-02 binding and private native permit; no injected backend or body. */
 export function nativeContainmentFixture(options: { allowHosts?: string[]; maxProcesses?: number } = {}) {
@@ -47,7 +58,8 @@ export function nativeContainmentFixture(options: { allowHosts?: string[]; maxPr
   try {
     initWorkspace({ workspacePath: workspace, agentId: "default", trustBoundaryMode: "isolated" });
     const auditor = getPublicKeyPem(workspace, "auditor"); // captured before tools policy signing
-    const node = realpathSync(process.execPath);
+    // A refusal test still needs a signed binary; real runs are gated on sandboxNode() itself.
+    const node = sandboxNode() ?? realpathSync(process.execPath);
     const shell: SignedTool = {
       name: "bash", actionClass: "WRITE_HIGH", allow: { binariesAllowlist: [node] }, deny: { argvRegexDenylist: [] },
       nativeSandbox: { kind: "os-native", writableDirectories: ["workspace/allowed"], readDeny: [home],
