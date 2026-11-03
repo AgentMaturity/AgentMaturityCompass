@@ -54,8 +54,9 @@ export async function promptSchedulerTickAsync(params: {workspace:string;workspa
   const reason = !ready ? "workspace not ready" : !admission.valid ? `prompt policy invalid: ${admission.reason ?? "unknown"}` : null;
   if (reason !== null) {
     const stateNext = {...state,lastOutcome:{status:"ERROR" as const,reason}}, original = captureOrgPairsAuthority(workspace,options.beforePublish), inputs=options.assertInputsCurrent;
-    const plan = await prepareOrgPairsAsync(workspace,[{path,bytes:Buffer.from(JSON.stringify(stateNext,null,2))}], {beforePublish:()=>{original();assertOrgPairsCurrent(policyPair);},assertInputsCurrent:inputs},previous);
-    plan.publish(); return {ran:false,reason:!ready?"workspace_not_ready" as const:"policy_untrusted" as const};
+    const stateBytes = Buffer.from(JSON.stringify(stateNext,null,2));
+    const plan = await prepareOrgPairsAsync(workspace,[{path,bytes:stateBytes}], {beforePublish:()=>{original();assertOrgPairsCurrent(policyPair);},assertInputsCurrent:inputs},previous);
+    plan.publish(); witnessConfiguration(workspace, PROMPT_SCHEDULER_CONFIGURED, path, stateBytes); return {ran:false,reason:!ready?"workspace_not_ready" as const:"policy_untrusted" as const};
   }
   if (state.nextRefreshTs && state.nextRefreshTs > Date.now()) return {ran:false,reason:"not_due" as const};
   const inputs = options.assertInputsCurrent;

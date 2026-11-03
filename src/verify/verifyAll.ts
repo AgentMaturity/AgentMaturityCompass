@@ -4,7 +4,7 @@ import { verifyTrustConfigSignature, checkNotaryTrust } from "../trust/trustConf
 import { verifyOpsPolicySignature } from "../ops/policy.js";
 import { verifyPluginWorkspace } from "../plugins/pluginApi.js";
 import { transparencyLogPath, transparencySealPath, transparencySealSigPath, verifiedTransparencyLog } from "../transparency/logChain.js";
-import { FORECAST_SCHEDULER_CONFIGURED, PASSPORT_POLICY_WITNESSES, PROMPT_SCHEDULER_CONFIGURED, WITNESS_GROUPS, ledgerWitnessTypes } from "../transparency/configWitness.js";
+import { FORECAST_SCHEDULER_CONFIGURED, PASSPORT_POLICY_WITNESSES, PROMPT_PACK_CREATED, PROMPT_SCHEDULER_CONFIGURED, WITNESS_GROUPS } from "../transparency/configWitness.js";
 import { verifyTransparencyMerkle } from "../transparency/merkleIndexStore.js";
 import { verifyLedgerIntegrity } from "../ledger/ledger.js";
 import { LEDGER_UNANCHORED_MESSAGE } from "../ledger/ledgerVerification.js";
@@ -113,9 +113,10 @@ function notConfigured(id: string, critical: boolean, details: string[]): Verify
 
 /**
  * The configuration witnesses: the verified transparency log's entry types and agents, and the witness types in the
- * verified, anchored evidence ledger; each is null when its record is missing or does not verify.
+ * verified, anchored evidence ledger (each type with the agents its rows name); each is null when its record is missing or
+ * does not verify.
  */
-type Witness = { log: { types: Set<string>; agentsOf: (type: string) => Set<string> } | null; ledger: Set<string> | null };
+type Witness = { log: { types: Set<string>; agentsOf: (type: string) => Set<string> } | null; ledger: ReadonlyMap<string, ReadonlySet<string>> | null };
 
 /**
  * A witnessed part with nothing on disk: FAIL when either record holds a witness of its configuration (the files were
@@ -146,15 +147,15 @@ export async function verifyAll(params: {
   } catch (error) {
     tlogError = String(error);
   }
-  let ledger: Awaited<ReturnType<typeof verifyLedgerIntegrity>> | null = null, ledgerError: string | null = null, ledgerWitness: Set<string> | null = null;
+  let ledger: Awaited<ReturnType<typeof verifyLedgerIntegrity>> | null = null, ledgerError: string | null = null;
   try {
-    ledger = await verifyLedgerIntegrity(workspace, { trust: params.trust });
-    // Only a verified ledger whose monitor key is anchored to the pinned fingerprint can witness, or show the absence of witnesses.
-    if (ledger.ok && ledger.trustRoot.anchored) ledgerWitness = ledgerWitnessTypes(workspace);
+    // The witness rows come from the rows this verification checked, on its one ledger handle; the file is never reopened.
+    ledger = await verifyLedgerIntegrity(workspace, { trust: params.trust, auditTypes: WITNESS_GROUPS.flat() });
   } catch (error) {
-    ledger = null; // a witness read that throws after the chain verified fails the ledger check rather than vanishing
     ledgerError = String(error);
   }
+  // Only a verified ledger whose monitor key is anchored to the pinned fingerprint can witness, or show the absence of witnesses.
+  const ledgerWitness = ledger?.ok === true && ledger.trustRoot.anchored ? ledger.audits ?? null : null;
   const entries = tlog?.ok === true ? tlog.entries : null;
   const witness: Witness = { ledger: ledgerWitness, log: entries === null ? null : {
     types: new Set(entries.map((entry) => entry.type)),
@@ -261,9 +262,9 @@ export async function verifyAll(params: {
 
   const promptErrors: string[] = [];
   const promptAgents = listPromptAgentsWithPacks(workspace);
-  // Packs are enforced on agents, so a pack the log records as built (PROMPT_PACK_CREATED) must still be on disk.
-  for (const agentId of witness.log?.agentsOf("PROMPT_PACK_CREATED") ?? []) {
-    if (!promptAgents.includes(agentId)) promptErrors.push(`pack(${agentId}): missing; the transparency log records a pack built for this agent`);
+  // Packs are enforced on agents, so a pack either record shows was built (PROMPT_PACK_CREATED) must still be on disk.
+  for (const [record, agents] of [["transparency log", witness.log?.agentsOf(PROMPT_PACK_CREATED)], ["evidence ledger", witness.ledger?.get(PROMPT_PACK_CREATED)]] as const) {
+    for (const agentId of agents ?? []) if (!promptAgents.includes(agentId)) promptErrors.push(`pack(${agentId}): missing; the ${record} records a pack built for this agent`);
   }
   for (const agentId of promptAgents) {
     const packPath = promptLatestPackPath(workspace, agentId);
@@ -278,9 +279,9 @@ export async function verifyAll(params: {
   }
   checks.push(
     promptAgents.length === 0 && promptErrors.length === 0
-      ? witness.log === null
-        ? skip("prompt-packs", false, ["no prompt packs, and no verified transparency log shows none were built"])
-        : notConfigured("prompt-packs", false, ["no prompt packs built (none in the verified transparency log)"])
+      ? witness.log === null || witness.ledger === null || witness.ledger.has(PROMPT_PACK_CREATED) || witness.log.types.has(PROMPT_PACK_CREATED)
+        ? skip("prompt-packs", false, ["no prompt packs, and no verified evidence ledger and transparency log both show none were built"])
+        : notConfigured("prompt-packs", false, ["no prompt packs built (none in the verified evidence ledger or transparency log)"])
       : promptErrors.length === 0
       ? pass("prompt-packs", false, ["all prompt packs + lint signatures verified"])
       : fail("prompt-packs", false, promptErrors)

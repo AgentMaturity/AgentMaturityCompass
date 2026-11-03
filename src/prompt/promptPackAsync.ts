@@ -13,6 +13,7 @@ import { resolveAgentId } from "../fleet/paths.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 import { appendTransparencyEntryAsync } from "../transparency/asyncWorkspaceAppend.js";
+import { PROMPT_PACK_CREATED, witnessInLedger } from "../transparency/configWitness.js";
 import { promptLintSchema, promptPackSignatureSchema } from "./promptPackSchema.js";
 import { promptLatestPackPath, promptLatestPackShaPath, promptLatestLintPath, promptSnapshotsDir } from "./promptPolicyStore.js";
 import { prepareCompiledPromptPackAsync, promptCompilerInputPaths, PromptPackPreparationError } from "./promptCompilerAsync.js";
@@ -91,7 +92,7 @@ export async function buildPromptPackForApiAsync(params: { workspace: string; ag
     completedPaths = published.map(row => row.path);
     commitPromptLessons(input.workspace, input.agentId, compiled.compiled.pack.packId, compiled.compiled.pack.checkpoints.lessonTransfer);
     const afterPublication = () => { assertCurrent(); assertPromptFilesCurrent(published); };
-    afterPublication();
+    afterPublication(); witnessInLedger(input.workspace, PROMPT_PACK_CREATED, input.agentId, { packId: compiled.compiled.pack.packId, sha256 });
     const created = await appendTransparencyEntryAsync({ workspace: input.workspace, type: "PROMPT_PACK_CREATED", agentId: input.agentId,
       artifact: { kind: "policy", id: compiled.compiled.pack.packId, sha256 } }, { beforeCommit: afterPublication }); logs.push(created.hash);
     if (compiled.compiled.lint.status === "FAIL") {
