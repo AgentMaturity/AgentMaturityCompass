@@ -500,8 +500,10 @@
   "notCovered": [
     "Names, addresses and other free-text identifiers outside declared fields.",
     "Values split across JSON fields, lines or stream chunks that are not joined.",
-    "Fullwidth or other non-ASCII digits, zero-width characters inside a value, and homoglyph member names.",
-    "XML elements, HTML input attributes and Basic authorization schemes as name and value pairs.",
+    "Non-ASCII digits that NFKC does not fold (Arabic-Indic, Devanagari), and look-alike letters in member names outside the Cyrillic and Greek fold table.",
+    "Namespaced XML element names, CDATA sections and comments inside an element over 1,024 characters each, markup attribute values over 256 characters, attribute names over 64 characters, more than 64 attributes before the value, an unquoted HTML input value, and HTML attributes other than an input's name and value.",
+    "A free-text Basic token (outside an Authorization header) that decodes to no colon, or that is letters only and does not decode to UTF-8 text without control characters, or that is shorter than eight base64 characters before its padding and written without that padding: a user:password pair of 3 bytes always, and one of 4 or 5 bytes written unpadded.",
+    "Text redacted only by the shared secret table (redactSecrets: fetched web pages, file tools, SDK evidence and the other direct callers), which reads no JSON member, form, query, multipart or env-line name and value pairs.",
     "Base64 that decodes to binary (images, audio, PDFs).",
     "Clinical meaning: a keyword-bound MRN pattern is not a clinical record check."
   ]

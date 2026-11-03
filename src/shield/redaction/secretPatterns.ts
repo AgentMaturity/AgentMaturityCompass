@@ -82,7 +82,11 @@ export const SECRET_PATTERNS: readonly SecretPattern[] = [
   // Bounded, and never across "/" or a quote: unbounded, one URL's "//" ran on through JSON members to any later "@"
   // (an email), and rescanning from every "//" took quadratic time on text without whitespace.
   { type: "password_in_url", source: "secretBlind", pattern: /\/\/[^:\s/@"]{1,256}:[^@\s/"]{1,256}@/ },
-  { type: "bearer_token", source: "both", pattern: /Bearer\s+[A-Za-z0-9._-]{8,}/i },
+  // Any token after Basic in an Authorization or Proxy-Authorization header, decoded or not, its quotes escaped (up to
+  // seven backslashes: JSON in a JSON string, nested again, or a log line) or not; the group is the token. A "/" in a token
+  // may be escaped the same way, as JSON may write it ("\/"), so the token's tail is read too; a Bearer token likewise.
+  { type: "basic_auth", source: "dataflow", pattern: /\b(?:Proxy-)?Authorization\\{0,7}["']?\s*[:=]\s*\\{0,7}["']?Basic\s+((?:[A-Za-z0-9._~+-]|\\{0,7}\/)+=*)/i },
+  { type: "bearer_token", source: "both", pattern: /Bearer\s+(?:[A-Za-z0-9._~+-]|\\{0,7}\/){8,}=*/i },
   { type: "jwt", source: "both", pattern: /eyJ[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]{10,}/ },
   { type: "amc_lease", source: "bridge", pattern: /\blease_[a-z0-9]{10,}\b/i },
   { type: "amc_token", source: "bridge", pattern: /\bamc_[a-z0-9]{12,}\b/i }
