@@ -60,7 +60,7 @@ describe("Pi tool_call mapping to canonical ToolHub requests", () => {
     // (Linux) names a different, missing entry, which the protected-path floor still refuses by its folded name.
     if (existsSync(at(".AMC"))) expect(path("write", ".AMC/keys/new.pub")).toEqual([at(".amc", "keys", "new.pub")]);
     else expect(path("write", ".AMC/keys/new.pub")).toEqual([at(".AMC", "keys", "new.pub")]);
-    expect(protectedPathReason(workspace, path("write", ".AMC/keys/new.pub")[0] as string)).toContain(".amc");
+    expect(protectedPathReason(workspace, path("write", ".AMC/keys/new.pub")[0] as string)).toBe("access to .amc/vault paths is always denied — holds the vault, the signing keys, and every signed policy — a tool that could read it could re-sign the allowlist governing it");
   });
 
   test("read covers the macOS name variants Pi falls back to when the named file is missing", () => {

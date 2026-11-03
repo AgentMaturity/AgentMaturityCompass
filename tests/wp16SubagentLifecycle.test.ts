@@ -117,7 +117,7 @@ describe("WP16 delegated cleanup", () => {
     expect(rows(dir).filter(event => event.event_type === "session/close")
       .map(event => (JSON.parse(event.meta_json) as { reason: string }).reason)).toEqual(["resource_outcome_unknown"]);
     expect(() => writers[0]!.assertWritable()).toThrow();
-  }, 15_000);
+  });
 
   it("does not return a successful noncontinuable child after owned resource cleanup is unknown", async () => {
     const dir = workspace();

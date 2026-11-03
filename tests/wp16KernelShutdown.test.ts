@@ -91,5 +91,5 @@ describe("WP16 bounded native kernel shutdown", () => {
       expect(rows.filter(event => event.event_type === "session/close")
         .map(event => (JSON.parse(event.meta_json) as { reason?: unknown }).reason)).toEqual(["resource_outcome_unknown"]);
     } finally { ledger.close(); }
-  }, 15_000);
+  });
 });
