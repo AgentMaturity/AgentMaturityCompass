@@ -74,7 +74,7 @@ function ciWorkflowFailures(workflow: Workflow): string[] {
   for (const id of ["test-shard", "release-gate"]) {
     const job = workflow.jobs[id];
     if (job && !(job.steps.some(step => step.uses?.startsWith("actions/setup-python@"))
-      && required(commandStep(job, 'python3 -m pip install "pytest>=8"')))) failures.push(`${id} does not install pytest`);
+      && required(commandStep(job, 'python3 -m pip install --require-hashes -r sdk/python/requirements-ci.txt')))) failures.push(`${id} does not install pytest`);
   }
   const gate = workflow.jobs["release-gate"];
   if (gate) {
@@ -144,7 +144,7 @@ describe("CI workflow contract (P0-33)", () => {
 
   test("a suite job without pytest fails the contract", () => {
     const workflow = parse();
-    for (const id of ["test-shard", "release-gate"]) workflow.jobs[id]!.steps = workflow.jobs[id]!.steps.filter(step => !/pytest/.test(step.run ?? ""));
+    for (const id of ["test-shard", "release-gate"]) workflow.jobs[id]!.steps = workflow.jobs[id]!.steps.filter(step => !/requirements-ci\.txt/.test(step.run ?? ""));
     expect(ciWorkflowFailures(workflow)).toEqual(["test-shard does not install pytest", "release-gate does not install pytest"]);
   });
 });

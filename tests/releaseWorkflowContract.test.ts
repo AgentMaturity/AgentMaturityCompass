@@ -117,7 +117,7 @@ function gateContract(gate: Job | undefined): string[] {
   if (!/npm publish "\$TARBALL" --dry-run/.test(all)) failures.push("the dry run does not publish the packed tarball");
   if (!/pnpm install --frozen-lockfile/.test(all)) failures.push("gate does not install from the committed lockfile");
   // The gate's full suite includes tests/executionApiParity.test.ts, which drives pytest.
-  if (!gate.steps.some(step => step.uses?.startsWith("actions/setup-python@")) || !all.includes('python3 -m pip install "pytest>=8"')) {
+  if (!gate.steps.some(step => step.uses?.startsWith("actions/setup-python@")) || !all.includes('python3 -m pip install --require-hashes -r sdk/python/requirements-ci.txt')) {
     failures.push("gate does not install pytest for the parity test");
   }
   const notes = all.search(/node scripts\/check-release-notes\.mjs "docs\/releases\/\$\{AMC_RELEASE_TAG#v\}\.md"/);
