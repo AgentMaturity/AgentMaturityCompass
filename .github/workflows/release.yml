@@ -10,8 +10,7 @@ on:
 env:
   AMC_RELEASE_TAG: ${{ github.ref_name }}
   # The npm CLI the publish job runs, pinned by exact version and integrity; trusted publishing needs 11.5.1 or later.
-  # TODO(P0-34 follow-up): Sid confirms with `npm view npm@11.10.1 dist.integrity`. The value below is the integrity of
-  # npm-11.10.1.tgz as recorded by a local npm cache entry of a registry fetch (bytes re-hashed 2026-10-11).
+  # The value below is the integrity of npm-11.10.1.tgz, confirmed 2026-11-03 against `npm view npm@11.10.1 dist.integrity`.
   NPM_CLI_VERSION: 11.10.1
   NPM_CLI_INTEGRITY: sha512-woavuY2OgDFQ1K/tB9QHsUuW989nKfvsKTN/h5qGyS+3+BhvXN/DA2TNzx569JaFfTqrET5bEQNHwVhFk+U1gg==
 
