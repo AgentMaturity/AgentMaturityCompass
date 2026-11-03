@@ -37,7 +37,7 @@ import { verifyAuditPolicySignature } from "../audit/auditPolicyStore.js";
 import { verifyAuditMapActiveSignature, verifyAuditMapBuiltinSignature } from "../audit/auditMapStore.js";
 import { listExportedAuditBinders } from "../audit/binderArtifact.js";
 import { verifyAuditBinderFile, verifyAuditWorkspace } from "../audit/binderVerifier.js";
-import { listPassportExportFiles, verifyPassportPolicySignature } from "../passport/passportStore.js";
+import { listPassportExportFiles, passportPolicySigPath, verifyPassportPolicySignature } from "../passport/passportStore.js";
 import { verifyPassportWorkspace } from "../passport/passportVerifier.js";
 import { verifyStandardSchemas } from "../standard/standardGenerator.js";
 import { verifyA4Projects } from "../a4/a4Verify.js";
@@ -207,16 +207,18 @@ export async function verifyAll(params: {
 
   const promptSchedulerSig = verifyPromptSchedulerStateSignature(workspace);
   checks.push(
-    // A state file without its signature is unverifiable, so it fails; only an absent state file is not configured.
-    !statExists(promptSchedulerSig.path)
+    // A state file without its signature, or a signature without its state file, is unverifiable and fails; only the
+    // absence of both is not configured.
+    !statExists(promptSchedulerSig.path) && !statExists(promptSchedulerSig.sigPath)
       ? notConfigured("prompt-scheduler-signature", false, ["scheduler not initialized"])
-      : promptSchedulerSig.valid
+      : promptSchedulerSig.valid && statExists(promptSchedulerSig.path)
       ? pass("prompt-scheduler-signature", false, [promptSchedulerSig.path])
-      : fail("prompt-scheduler-signature", false, [promptSchedulerSig.reason ?? "signature verification failed"])
+      : fail("prompt-scheduler-signature", false, [promptSchedulerSig.reason ?? "state file missing beside its signature"])
   );
 
   const promptErrors: string[] = [];
-  for (const agentId of listPromptAgentsWithPacks(workspace)) {
+  const promptAgents = listPromptAgentsWithPacks(workspace);
+  for (const agentId of promptAgents) {
     const packPath = promptLatestPackPath(workspace, agentId);
     const verify = verifyWorkspacePromptPack(workspace, packPath);
     if (!verify.ok) {
@@ -228,7 +230,9 @@ export async function verifyAll(params: {
     }
   }
   checks.push(
-    promptErrors.length === 0
+    promptAgents.length === 0
+      ? notConfigured("prompt-packs", false, ["no prompt packs built"])
+      : promptErrors.length === 0
       ? pass("prompt-packs", false, ["all prompt packs + lint signatures verified"])
       : fail("prompt-packs", false, promptErrors)
   );
@@ -269,7 +273,8 @@ export async function verifyAll(params: {
       : fail("audit-workspace-integrity", false, auditWorkspace.errors)
   );
   const auditExportErrors: string[] = [];
-  for (const row of listExportedAuditBinders(workspace)) {
+  const auditExports = listExportedAuditBinders(workspace);
+  for (const row of auditExports) {
     const verify = verifyAuditBinderFile({
       file: row.file,
       workspace,
@@ -280,7 +285,9 @@ export async function verifyAll(params: {
     }
   }
   checks.push(
-    auditExportErrors.length === 0
+    auditExports.length === 0
+      ? notConfigured("audit-binder-exports", false, ["no .amcaudit files exported"])
+      : auditExportErrors.length === 0
       ? pass("audit-binder-exports", false, ["all exported .amcaudit files verified"])
       : fail("audit-binder-exports", false, auditExportErrors)
   );
@@ -292,8 +299,10 @@ export async function verifyAll(params: {
   const passportCacheEntries = statExists(passportCachePath)
     ? readdirSync(passportCachePath).filter((name) => name.startsWith("latest_") && name.endsWith(".json"))
     : [];
+  // An orphaned policy signature proves a policy once existed, so the missing body fails rather than reading as never configured.
   const passportUninitialized =
     passportPolicyFileMissing &&
+    !statExists(passportPolicySigPath(workspace)) &&
     listPassportExportFiles(workspace).length === 0 &&
     passportCacheEntries.length === 0;
   if (passportUninitialized) {
@@ -381,7 +390,7 @@ export async function verifyAll(params: {
     checks.push(
       fail("forecast-signatures", false, [`forecast policy: ${forecast.policy.reason ?? "invalid"}`])
     );
-  } else if (!forecast.scheduler.valid && (forecast.scheduler.reason ?? "").toLowerCase().includes("file missing")) {
+  } else if (!forecast.scheduler.valid && !statExists(forecast.scheduler.path) && !statExists(forecast.scheduler.sigPath)) {
     checks.push(
       notConfigured("forecast-signatures", false, ["forecast scheduler not initialized yet"])
     );
@@ -403,13 +412,15 @@ export async function verifyAll(params: {
   );
 
   const benchErrors: string[] = [];
-  for (const artifact of listExportedBenchArtifacts(workspace)) {
+  const benchExports = listExportedBenchArtifacts(workspace);
+  const benchImports = listImportedBenchArtifacts(workspace);
+  for (const artifact of benchExports) {
     const verify = verifyBenchArtifactFile({ file: artifact.file, trust: workspaceSelfTrust(workspace) });
     if (!verify.ok) {
       benchErrors.push(`export ${artifact.file}: ${untrustedReasons(verify.report).join("; ")}`);
     }
   }
-  for (const imported of listImportedBenchArtifacts(workspace)) {
+  for (const imported of benchImports) {
     let artifactPath: string;
     try {
       artifactPath = importedBenchPath(workspace, imported.benchId, imported.version).artifactPath;
@@ -434,7 +445,9 @@ export async function verifyAll(params: {
     }
   }
   checks.push(
-    benchErrors.length === 0
+    benchExports.length + benchImports.length === 0
+      ? notConfigured("bench-artifacts", false, ["no .amcbench files imported or exported"])
+      : benchErrors.length === 0
       ? pass("bench-artifacts", false, ["all imported/exported .amcbench files verified"])
       : fail("bench-artifacts", false, benchErrors)
   );
