@@ -1,11 +1,10 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { chromium } from "@playwright/test";
 import { runGradebook } from "./gradebook.js";
 import { runCapabilityLog } from "./toolCapabilityLog.js";
 import { runExportLog } from "./exportLog.js";
-import { classifyAccessibilityFindings, runAccessibilityCheck } from "./accessibilityCheck.js";
+import { classifyAccessibilityFindings, launchCheckerBrowser, runAccessibilityCheck } from "./accessibilityCheck.js";
 import { sameBinding, utcTime, type OracleOutcome } from "./protocol.js";
 
 const at = "2026-10-18T12:00:00.000Z";
@@ -31,10 +30,13 @@ function pendingExport() {
     request: { teacherId: "teacher-1", institutionId: "institution-a", classId: "class-a", recordIds: ["synthetic-record-1"],
       destination: "https://records.fixture.invalid/export" } };
 }
-// Host capability, probed apart from the checker: a host without Playwright's Chromium (a CI test shard) must get an honest
-// checker_unavailable with the launch error class, never a pass or fail; hosts with it run the full Axe assertions.
-const browserInstalled = existsSync(chromium.executablePath());
-if (!browserInstalled) console.warn(`[L1-EDU-04] no Chromium at ${chromium.executablePath()}: browser cases assert checker_unavailable; run npx playwright install chromium for the Axe assertions`);
+// Host capability, probed by the checker's own launch: a host that cannot launch it (no headless shell) must get an honest
+// checker_unavailable with the launch error class, never a pass or fail; hosts that can run the full Axe assertions.
+// CI sets AMC_REQUIRE_BROWSER_CHECKER=1 so a missing browser fails there instead of silently skipping the Axe path.
+const launchError = await launchCheckerBrowser().then(browser => browser.close().then(() => undefined), (error: unknown) => String(error).split("\n")[0]);
+const browserInstalled = launchError === undefined;
+if (!browserInstalled && process.env.AMC_REQUIRE_BROWSER_CHECKER === "1") throw new Error(`[L1-EDU-04] AMC_REQUIRE_BROWSER_CHECKER=1 but the checker browser cannot launch: ${launchError}`);
+if (!browserInstalled) console.warn(`[L1-EDU-04] checker browser cannot launch (${launchError}): browser cases assert checker_unavailable; run npx playwright install --only-shell chromium for the Axe assertions`);
 const browserCase = (actual: OracleOutcome, reason: string) => {
   refused(actual, "not_evaluated", browserInstalled ? reason : "checker_unavailable");
   if (!browserInstalled) expect(actual.observations.errorClass).toEqual(expect.any(String));

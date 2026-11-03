@@ -52,6 +52,8 @@ function ciWorkflowFailures(workflow: Workflow): string[] {
       && required(commandStep(build, "npx vitest run tests/performance --no-file-parallelism")))) {
       failures.push("build-test does not require the full test suite");
     }
+    if (shards && (!required(commandStep(shards, "npx playwright install --with-deps --only-shell chromium"))
+      || shardRun?.env?.AMC_REQUIRE_BROWSER_CHECKER !== "1")) failures.push("test-shard does not require the L1-EDU-04 browser checker");
     const clean = commandStep(build, "git status --porcelain=v1 --untracked-files=all");
     if (!required(clean) || !/\bexit 1\b/.test(clean?.run ?? "")) failures.push("build-test has no failing clean-tree check");
     if (!required(commandStep(build, "npm run check:no-fabrication"))
