@@ -90,7 +90,18 @@ const PUBLISHED = [
   ["dist/cli.js", "--trust-tier <tier>"],
   ["dist/cli.js", '.command("attest")'],
   ["dist/domains/domainCliIntegration.js", "function pseudoRandomScore("],
-  ["dist/domains/domainReportBuilder.js", "Certification Readiness"]
+  ["dist/domains/domainReportBuilder.js", "Certification Readiness"],
+  ["dist/storage/blobs/blobKeys.js", 'process.env.AMC_NO_SIGN === "1"'],
+  ["dist/cli.js", '"vault.amcvault"'],
+  ["dist/cli.js", "noSign: true"],
+  ["dist/cli.js", 'process.env.AMC_NO_SIGN = "1"'],
+  ["dist/passport/passportVerifier.js", "params.publicKeyPath"],
+  ["dist/assurance/assuranceVerifier.js", "params.publicKeyPath"],
+  ["dist/vault/vault.d.ts", '"monitor" | "auditor" | "lease" | "session"'],
+  ["dist/vault/vault.js", "monitorPrivateKeyPem"],
+  ["dist/identity/hostVault.js", 'process.env.NODE_ENV === "test" || process.env.VITEST === "true" || process.env.VITEST === "1"'],
+  ["dist/redteam/runner.js", "function syntheticResponse("],
+  ["dist/redteam/jailbreak/tap.js", "function syntheticResponse("]
 ];
 /** Archive readers that run a raw `tar -xzf`: 19 in a build from the v1.1.1 tag, 17 in the npm package. */
 const PUBLISHED_RAW_TAR_SITES = 17;
