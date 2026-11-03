@@ -1839,11 +1839,7 @@ function emptyTrustTierBreakdown(): Record<TrustTier, number> {
   };
 }
 
-export function evalImportCoverageStatus(params: {
-  workspace: string;
-  agentId?: string;
-  sinceTs?: number;
-}): EvalCoverageStatus {
+export function evalImportCoverageStatus(params: { workspace: string; agentId?: string; sinceTs?: number }): EvalCoverageStatus {
   // Read where importEvalResults writes: under AMC_NO_SIGN=1 that is the unsigned store.
   const ledger = openLedger(params.workspace, writerStore());
   try {
