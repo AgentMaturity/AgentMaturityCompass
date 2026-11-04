@@ -475,20 +475,6 @@ function getCausalEdges(db: Database.Database, incidentId: string): CausalEdge[]
   }));
 }
 
-function updateIncidentState(
-  db: Database.Database,
-  incidentId: string,
-  newState: IncidentState,
-  updatedTs: number,
-  newHash: string,
-  newSig: string
-): void {
-  // Note: Since incidents are append-only, we only update the state column when creating
-  // a new record. This function is a conceptual helper - in practice, new incident records
-  // are inserted with updated state, causalEdges, and timelineEventIds.
-  // The actual state transition is recorded via incident_transitions table.
-}
-
 export interface IncidentStoreInstance {
   initTables: () => void;
   insertIncident: (incident: Incident) => void;

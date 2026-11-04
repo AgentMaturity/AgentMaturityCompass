@@ -144,6 +144,11 @@ describe("the table cannot carry stateful flags", () => {
     expect(stateful.map((p) => p.type)).toEqual([]);
   });
 
+  it("has no entry that can match the empty string", () => {
+    // redactSecrets maps each folded match's last character back to the original text, so it relies on this.
+    expect(SECRET_PATTERNS.filter((p) => new RegExp(`^(?:${p.pattern.source})$`, p.pattern.flags).test("")).map((p) => p.type)).toEqual([]);
+  });
+
   it("matches the same input twice in a row", () => {
     // The empirical half: a sticky regex would pass the first call and fail the
     // second.
