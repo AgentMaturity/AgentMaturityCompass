@@ -41,7 +41,8 @@ afterEach(() => { distrust.entries = []; for (const root of roots.splice(0)) { l
 function workspace(): string {
   const root = mkdtempSync(join(tmpdir(), "amc-purpose-providers-"));
   roots.push(root);
-  initWorkspace({ workspacePath: root, trustBoundaryMode: "isolated" });
+  // witnessing: false: this suite counts the ledger rows it writes from an empty ledger, without the creation marker.
+  initWorkspace({ workspacePath: root, trustBoundaryMode: "isolated", witnessing: false });
   return root;
 }
 

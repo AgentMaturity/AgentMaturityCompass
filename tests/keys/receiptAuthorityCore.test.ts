@@ -153,7 +153,8 @@ test("actual committed sealed-child opener refuses a different Ed private key be
 
 test("actual bound receipt public reader refuses a missing outcome table at empty and populated epochs and restores", async () => {
   const f = makeReceiptAuthorityFixture(); await f.own();
-  expect(f.withLedger(ledger => ledger.getAllEvents())).toEqual([]);
+  // Only the workspace's WITNESSING_ENABLED creation marker, written before the binding: the bound epoch holds no row.
+  expect(f.withLedger(ledger => ledger.getAllEvents().map((event) => JSON.parse(event.meta_json).auditType))).toEqual(["WITNESSING_ENABLED"]);
   expect(f.withLedger(ledger => ledger.getAllOutcomeEvents())).toEqual([]);
   const checkMissingTable = () => f.withLedger(ledger => {
     const rows = ledger.db.prepare("SELECT * FROM outcome_events ORDER BY rowid").all();

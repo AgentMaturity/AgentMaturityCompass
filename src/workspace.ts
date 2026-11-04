@@ -21,6 +21,7 @@ import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "./utils/fs.js"
 import { sha256Hex } from "./utils/hash.js";
 import { canonicalize } from "./utils/json.js";
 import { openLedger } from "./ledger/ledger.js";
+import { witnessingEnabled, workspaceIsNew } from "./transparency/configWitness.js";
 import { getAgentPaths } from "./fleet/paths.js";
 import {
   ensureDefaultFleetAgent,
@@ -219,6 +220,8 @@ export interface InitWorkspaceOptions {
   trustBoundaryMode?: "isolated" | "shared";
   /** `false`: sign a declaration that this workspace has no Action Policy, the AXR-02 "not configured" state (fixtures). */
   actionPolicy?: false;
+  /** `false`: no WITNESSING_ENABLED marker, for a scratch ledger that must start empty (Postgres parity) or a pre-2.0 fixture. */
+  witnessing?: false;
 }
 
 export function defaultContextGraph(opts: InitWorkspaceOptions): Record<string, unknown> {
@@ -291,6 +294,8 @@ export function defaultWorkspaceArtifactBodies(paths: Pick<WorkspacePaths, "guar
 export function initWorkspace(opts: InitWorkspaceOptions = {}): { workspacePath: string; contextGraphHash: string } {
   const workspace = opts.workspacePath ?? process.cwd();
   const paths = getWorkspacePaths(workspace, opts.agentId);
+  // Only a new workspace starts the WITNESSING_ENABLED pair (decided before init writes anything).
+  const isNew = workspaceIsNew(workspace);
 
   ensureDir(paths.amcDir);
   ensureDir(paths.keysDir);
@@ -336,8 +341,8 @@ export function initWorkspace(opts: InitWorkspaceOptions = {}): { workspacePath:
     saveTargetProfile(workspace, target, paths.agentId);
   }
 
-  const ledger = openLedger(workspace);
-  ledger.close();
+  openLedger(workspace).close();
+  if (opts.witnessing !== false) witnessingEnabled(workspace, isNew);
 
   if (opts.actionPolicy === false) {
     if (!pathExists(actionPolicyPath(workspace))) declareActionPolicyAbsent(workspace);

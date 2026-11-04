@@ -64,7 +64,8 @@ export interface PostgresMigrationOptions {
 function scratchBackend(id: "sqlite" | "postgres", options: PostgresMigrationOptions): ConformanceBackend {
   const createWorkspace = () => {
     const workspace = mkdtempSync(join(tmpdir(), `amc-pg-parity-${id}-`));
-    initWorkspace({ workspacePath: workspace, agentId: "default", trustBoundaryMode: "isolated" });
+    // No marker row: the parity input must be the first row of both chains.
+    initWorkspace({ workspacePath: workspace, agentId: "default", trustBoundaryMode: "isolated", witnessing: false });
     return { workspace, dispose: () => rmSync(workspace, { recursive: true, force: true }) };
   };
   return id === "sqlite"

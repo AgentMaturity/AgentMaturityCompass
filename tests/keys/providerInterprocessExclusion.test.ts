@@ -51,7 +51,8 @@ function fixture() {
   const root = realpathSync(mkdtempSync(join(tmpdir(), "amc-p208-process-"))), workspace = join(root, "workspace"), home = join(root, "home"), barriers = join(root, "barriers");
   mkdirSync(home); mkdirSync(barriers); vi.stubEnv("AMC_HOME", home); vi.stubEnv("AMC_VAULT_PASSPHRASE", PASS);
   vi.stubEnv("AMC_NO_SIGN", "0"); vi.stubEnv("AMC_EXPECTED_MONITOR_FINGERPRINT", ""); vi.stubEnv("AMC_LEDGER_SQLITE_SYNCHRONOUS", "FULL");
-  initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+  // witnessing: false: this suite indexes the ledger rows it writes from an empty ledger, without the creation marker.
+  initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated", witnessing: false });
   const f = { root, workspace, home, barriers, children: [] as Worker[] }; fixtures.push(f);
   const key = fakeKey("p256"), arn = AWS_ARN("owned-process-issuer"), fake = awsFake({ [arn]: key });
   const pem = key.publicKey.export({ format: "pem", type: "spki" }).toString();

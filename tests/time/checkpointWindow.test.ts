@@ -135,7 +135,8 @@ async function withCheckpointWorkspace(caseId: string, tsa: Fixture, body: (fixt
       nativeBefore = filePin(nativePath);
       facts.nativeBefore = nativeBefore;
       initializationAttempted = true;
-      initWorkspace({ workspacePath: tsa.workspace, agentId: "default", trustBoundaryMode: "isolated" });
+      // witnessing: false: this suite counts the ledger rows it writes from an empty ledger, without the creation marker.
+      initWorkspace({ workspacePath: tsa.workspace, agentId: "default", trustBoundaryMode: "isolated", witnessing: false });
       const monitorPem = getPublicKeyPem(tsa.workspace, "monitor");
       const monitorFingerprint = sha256(monitorPem);
       const listRoot = testKey();

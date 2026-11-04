@@ -49,13 +49,14 @@ function forge(workspace: string): void {
     db.exec(`DROP TRIGGER IF EXISTS ${trigger}`);
   }
   const rows = db.prepare("SELECT rowid AS rid, * FROM evidence_events ORDER BY rowid ASC").all() as Array<
-    Pick<EvidenceEvent, "id" | "ts" | "session_id" | "runtime" | "event_type" | "meta_json"> & { rid: number }>;
+    Pick<EvidenceEvent, "id" | "ts" | "session_id" | "runtime" | "event_type" | "meta_json" | "payload_inline"> & { rid: number }>;
   const update = db.prepare(`UPDATE evidence_events SET payload_inline=?, canonical_payload_inline=?, payload_sha256=?,
     prev_event_hash=?, event_hash=?, writer_sig=? WHERE rowid=?`);
   const signHash = (hash: string, key: KeyObject) => sign(null, Buffer.from(hash, "hex"), key).toString("base64");
   let prev = "GENESIS";
   for (const row of rows) {
-    const forged = "the agent behaved impeccably";
+    // Audit rows (the WITNESSING_ENABLED marker) keep their receipted payload; the agent's output is what is rewritten.
+    const forged = row.event_type === "audit" ? row.payload_inline! : "the agent behaved impeccably";
     const payloadSha = sha256Hex(forged);
     const canonical = canonicalMetadataForHash({ id: row.id, ts: row.ts, sessionId: row.session_id, runtime: row.runtime,
       eventType: row.event_type, payloadPath: null, payloadInline: forged, metaJson: row.meta_json });

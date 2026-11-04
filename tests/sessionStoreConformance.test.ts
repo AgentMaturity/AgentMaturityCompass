@@ -45,7 +45,8 @@ const CONFORMANCE_TEST_TIMEOUT_MS = 120_000;
 
 function makeWorkspace(): ConformanceWorkspace {
   const workspace = mkdtempSync(join(tmpdir(), "amc-store-conf-"));
-  initWorkspace({ workspacePath: workspace, agentId: "default", trustBoundaryMode: "isolated" });
+  // witnessing: false: this suite needs an empty chain, as the migration's parity scratch does, without the creation marker.
+  initWorkspace({ workspacePath: workspace, agentId: "default", trustBoundaryMode: "isolated", witnessing: false });
   return {
     workspace,
     dispose: () => rmSync(workspace, { recursive: true, force: true })

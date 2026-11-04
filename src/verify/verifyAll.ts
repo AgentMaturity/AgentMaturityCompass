@@ -4,7 +4,7 @@ import { verifyTrustConfigSignature, checkNotaryTrust } from "../trust/trustConf
 import { verifyOpsPolicySignature } from "../ops/policy.js";
 import { verifyPluginWorkspace } from "../plugins/pluginApi.js";
 import { transparencyLogPath, transparencySealPath, transparencySealSigPath, verifiedTransparencyLog } from "../transparency/logChain.js";
-import { A4_PROJECT_CREATED, FORECAST_SCHEDULER_CONFIGURED, PASSPORT_POLICY_WITNESSES, PROMPT_PACK_CREATED, PROMPT_SCHEDULER_CONFIGURED, WITNESS_GROUPS } from "../transparency/configWitness.js";
+import { A4_PROJECT_CREATED, FORECAST_SCHEDULER_CONFIGURED, PASSPORT_POLICY_WITNESSES, PROMPT_PACK_CREATED, PROMPT_SCHEDULER_CONFIGURED, WITNESS_GROUPS, WITNESSING_ENABLED } from "../transparency/configWitness.js";
 import { verifyTransparencyMerkle } from "../transparency/merkleIndexStore.js";
 import { verifyLedgerIntegrity } from "../ledger/ledger.js";
 import { LEDGER_UNANCHORED_MESSAGE } from "../ledger/ledgerVerification.js";
@@ -116,7 +116,20 @@ function notConfigured(id: string, critical: boolean, details: string[]): Verify
  * verified, anchored evidence ledger (each type with the subjects, else agents, its rows name); each is null when its record is missing or
  * does not verify.
  */
-type Witness = { log: { types: Set<string>; agentsOf: (type: string) => Set<string> } | null; ledger: ReadonlyMap<string, ReadonlySet<string>> | null };
+type Witness = { log: { types: Set<string>; agentsOf: (type: string) => Set<string> } | null; ledger: ReadonlyMap<string, ReadonlySet<string>> | null;
+  /** Both verified records hold WITNESSING_ENABLED where workspace creation writes it (markedAtCreation): only then does a
+   * missing witness prove "never configured"; a workspace created before witnessing existed lacks it, so its parts read SKIP. */
+  markedAtCreation: boolean };
+
+/**
+ * Whether both verified records hold the WITNESSING_ENABLED marker where workspace creation writes it: the ledger's first row,
+ * and a log entry preceded only by the creation-time KEY_HISTORY_REVISION entries. A marker anywhere else (a ledger deleted
+ * from an older workspace and recreated, or a marker written after the fact) vouches for nothing, so it counts as absent.
+ */
+function markedAtCreation(ledgerFirstAudit: string | undefined, entries: readonly { type: string }[] | null): boolean {
+  const at = entries?.findIndex((entry) => entry.type === WITNESSING_ENABLED) ?? -1;
+  return ledgerFirstAudit === WITNESSING_ENABLED && at >= 0 && entries!.slice(0, at).every((entry) => entry.type === "KEY_HISTORY_REVISION");
+}
 
 /**
  * A witnessed part with nothing on disk: FAIL when either record holds a witness of its configuration (the files were
@@ -127,8 +140,8 @@ function absentPart(id: string, critical: boolean, witness: Witness, types: read
   if (inLedger !== undefined || inLog !== undefined) {
     return fail(id, critical, [`${what} missing: the ${inLedger !== undefined ? "evidence ledger" : "transparency log"} records it was configured (${inLedger ?? inLog})`]);
   }
-  return witness.log === null || witness.ledger === null
-    ? skip(id, critical, [`${what} absent, and no verified evidence ledger and transparency log both show it was never configured`])
+  return !witness.markedAtCreation
+    ? skip(id, critical, [`${what} absent, and no verified evidence ledger and transparency log both show it was never configured (${WITNESSING_ENABLED} in both)`])
     : notConfigured(id, critical, [`${what} never configured (no ${types.join(" or ")} in the verified evidence ledger or transparency log)`]);
 }
 
@@ -165,7 +178,7 @@ export async function verifyAll(params: {
   // Only a verified ledger whose monitor key is anchored to the pinned fingerprint can witness, or show the absence of witnesses.
   const ledgerWitness = ledger?.ok === true && ledger.trustRoot.anchored ? ledger.audits ?? null : null;
   const entries = tlog?.ok === true ? tlog.entries : null;
-  const witness: Witness = { ledger: ledgerWitness, log: entries === null ? null : {
+  const witness: Witness = { ledger: ledgerWitness, markedAtCreation: ledgerWitness !== null && markedAtCreation(ledger?.firstAudit, entries), log: entries === null ? null : {
     types: new Set(entries.map((entry) => entry.type)),
     agentsOf: (type) => new Set(entries.filter((entry) => entry.type === type).map((entry) => entry.agentId))
   } };
@@ -287,7 +300,7 @@ export async function verifyAll(params: {
   }
   checks.push(
     promptAgents.length === 0 && promptErrors.length === 0
-      ? witness.log === null || witness.ledger === null || witness.ledger.has(PROMPT_PACK_CREATED) || witness.log.types.has(PROMPT_PACK_CREATED)
+      ? !witness.markedAtCreation || witness.ledger?.has(PROMPT_PACK_CREATED) === true || witness.log?.types.has(PROMPT_PACK_CREATED) === true
         ? skip("prompt-packs", false, ["no prompt packs, and no verified evidence ledger and transparency log both show none were built"])
         : notConfigured("prompt-packs", false, ["no prompt packs built (none in the verified evidence ledger or transparency log)"])
       : promptErrors.length === 0
@@ -398,11 +411,14 @@ export async function verifyAll(params: {
   const lagging = WITNESS_GROUPS.filter((group) => group.some((type) => ledgerWitness?.has(type)) && !group.some((type) => witness.log?.types.has(type)))
     .map((group) => group.join(" or "));
   const rolledBack = `the evidence ledger records ${lagging.join(", ")} but the transparency log does not: the log was rolled back or removed`;
+  // The marker is written once, ledger row first: a verified ledger without the one the verified log holds was replaced.
+  const markerOnlyInLog = ledgerWitness !== null && !ledgerWitness.has(WITNESSING_ENABLED) && witness.log?.types.has(WITNESSING_ENABLED) === true;
   checks.push(
     !tlogPresent ? (lagging.length > 0 ? fail("transparency-log", true, [tlogMissing, rolledBack]) : skip("transparency-log", true, [tlogMissing]))
       : tlog === null ? fail("transparency-log", true, [tlogError ?? "transparency log unreadable"])
       : !tlog.ok ? fail("transparency-log", true, tlog.errors)
       : lagging.length > 0 ? fail("transparency-log", true, [rolledBack])
+      : markerOnlyInLog ? fail("transparency-log", true, [`the transparency log records ${WITNESSING_ENABLED} but the evidence ledger does not: the records disagree`])
       : pass("transparency-log", true, [`entries=${tlog.entryCount}`, `lastHash=${tlog.lastHash}`])
   );
 
@@ -443,8 +459,11 @@ export async function verifyAll(params: {
     const rows = a4.rows;
     if (rows === null) throw new Error("no readable evidence ledger: ledger verification did not reach the A4 checks");
     const projects = new Set(rows.flatMap((row) => row.projectId ?? []));
-    // With no project, absentPart fails it when either record holds a witness, and reads NOT_CONFIGURED only when both hold none.
-    if (rows.length === 1 && rows[0]!.status === "NOT_CONFIGURED") checks.push(absentPart("a4-projects", true, witness, [A4_PROJECT_CREATED], "A4 project"));
+    // With no project, absentPart fails it when either record holds a witness, and reads NOT_CONFIGURED when both verified records
+    // hold none, marker or not: A4 is new in 2.0 and every shipped create writes the witness pair, so no unwitnessed project predates it.
+    if (rows.length === 1 && rows[0]!.status === "NOT_CONFIGURED") {
+      checks.push(absentPart("a4-projects", true, { ...witness, markedAtCreation: witness.log !== null && witness.ledger !== null }, [A4_PROJECT_CREATED], "A4 project"));
+    }
     else {
       const logged = entries?.filter((entry) => entry.type === A4_PROJECT_CREATED).map((entry) => entry.artifact.id ?? "(unnamed)");
       const lost = ([["transparency log", logged], ["evidence ledger", witness.ledger?.get(A4_PROJECT_CREATED)]] as const)

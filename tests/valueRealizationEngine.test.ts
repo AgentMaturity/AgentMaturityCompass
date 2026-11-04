@@ -33,7 +33,8 @@ function newWorkspace(): string {
   roots.push(dir);
   const _savedVaultPass = process.env.AMC_VAULT_PASSPHRASE;
   process.env.AMC_VAULT_PASSPHRASE = "value-engine-passphrase";
-  initWorkspace({ workspacePath: dir, trustBoundaryMode: "isolated" });
+  // witnessing: false: this suite scores only the evidence it writes (a marker written under fake timers falls in the window), without the creation marker.
+  initWorkspace({ workspacePath: dir, trustBoundaryMode: "isolated", witnessing: false });
   valueInitForApi(dir);
   valueContractInitForApi({
     workspace: dir,

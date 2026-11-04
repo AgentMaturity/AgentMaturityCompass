@@ -12,6 +12,13 @@
  * A4 store writes the per-project A4_PROJECT_CREATED pair (witnessRecords with the project id as subject) after a new
  * project's CREATED ledger rows commit, and again on a replay of that create, so an interrupted pair is completed.
  *
+ * initWorkspace writes the WITNESSING_ENABLED pair once, when it creates the ledger of a new workspace (a transparency log holding
+ * at most the creation-time KEY_HISTORY_REVISION entries), before any part can be configured, and completes an interrupted pair on a later init. Only
+ * where both verified records hold it does the absence of a part's witness show the part was never configured; a workspace
+ * created before witnessing existed has no marker (none is backfilled: that would vouch for files already deleted), so its
+ * unwitnessed parts read SKIP until an explicit save of each part witnesses it. A4 projects need no marker: A4 is new in 2.0 and
+ * every shipped create writes its pair, so both verified records holding none proves no project was created.
+ *
  * Every explicit writer of the three files witnesses, sync and async, SDK exports included. Deliberately unwitnessed:
  * - the default passport policy an async reader creates lazily (loadPassportPolicyAttemptAsync): it is only the default
  *   and the next read recreates it; every explicit init witnesses it afterwards;
@@ -23,7 +30,7 @@ import { join, relative, resolve, sep } from "node:path";
 import { openLedger } from "../ledger/ledger.js";
 import { appendOpsAuditEvent } from "../ops/audit.js";
 import { sha256Hex } from "../utils/hash.js";
-import { appendTransparencyEntry, transparencyLogPath, verifiedTransparencyLog } from "./logChain.js";
+import { appendTransparencyEntry, readTransparencyEntries, transparencyLogPath, verifiedTransparencyLog } from "./logChain.js";
 import type { TransparencyArtifactKind } from "./logSchema.js";
 
 export const PASSPORT_POLICY_CONFIGURED = "PASSPORT_POLICY_CONFIGURED";
@@ -33,11 +40,13 @@ export const FORECAST_SCHEDULER_CONFIGURED = "FORECAST_SCHEDULER_CONFIGURED";
 export const PROMPT_PACK_CREATED = "PROMPT_PACK_CREATED";
 /** An A4 project's creation (preview only), per project: a project either record shows was created must still be in the ledger. */
 export const A4_PROJECT_CREATED = "A4_PROJECT_CREATED";
+/** Written at workspace creation: witnesses were recorded from the start, so a missing witness means never configured. */
+export const WITNESSING_ENABLED = "WITNESSING_ENABLED";
 /** Types that show the passport policy was configured: the witness, or an applied policy (logged, and audited by Studio). */
 export const PASSPORT_POLICY_WITNESSES = [PASSPORT_POLICY_CONFIGURED, "PASSPORT_POLICY_APPLIED"] as const;
 /** One group per part: when the ledger holds a type of a group, verify all requires the log to hold a type of it too. */
 export const WITNESS_GROUPS: readonly (readonly string[])[] = [PASSPORT_POLICY_WITNESSES, [PROMPT_SCHEDULER_CONFIGURED], [FORECAST_SCHEDULER_CONFIGURED], [PROMPT_PACK_CREATED],
-  [A4_PROJECT_CREATED]];
+  [A4_PROJECT_CREATED], [WITNESSING_ENABLED]];
 
 /** Whether the ledger holds a `type` audit row for `agentId` (and `subjectId`, or none). A forged row would fail ledger verification. */
 function ledgerHolds(workspace: string, type: string, agentId: string, subjectId?: string): boolean {
@@ -55,6 +64,25 @@ function ledgerHolds(workspace: string, type: string, agentId: string, subjectId
 /** Writes the ledger witness (an ops audit row) of `type` for `agentId` (and `subjectId`) unless the ledger already holds one. */
 export function witnessInLedger(workspace: string, type: string, agentId: string, payload: Record<string, unknown>, subjectId?: string): void {
   if (!ledgerHolds(workspace, type, agentId, subjectId)) appendOpsAuditEvent({ workspace, auditType: type, agentId, subjectId, payload });
+}
+
+/**
+ * Whether initWorkspace is creating a new workspace: no ledger, and a transparency log holding at most the creation-time
+ * KEY_HISTORY_REVISION entries (as an init interrupted before the ledger leaves it). A log holding more, or unreadable, means
+ * the workspace existed and its ledger was removed, so it gets no marker.
+ */
+export function workspaceIsNew(workspace: string): boolean {
+  if (existsSync(join(workspace, ".amc", "evidence.sqlite"))) return false;
+  try { return readTransparencyEntries(workspace).every((entry) => entry.type === "KEY_HISTORY_REVISION"); } catch { return false; }
+}
+
+/**
+ * The WITNESSING_ENABLED pair. With `created` (initWorkspace created the ledger of a new workspace) it is written; otherwise only
+ * a pair whose ledger row exists is completed (an init interrupted between the two records), so no marker is ever started on
+ * an existing workspace.
+ */
+export function witnessingEnabled(workspace: string, created: boolean): void {
+  if (created || ledgerHolds(workspace, WITNESSING_ENABLED, "workspace")) witnessRecords(workspace, WITNESSING_ENABLED, "workspace", { kind: "policy", id: "workspace", sha256: sha256Hex(WITNESSING_ENABLED) }, {});
 }
 
 /**

@@ -232,13 +232,14 @@ describe("verify all: not configured is not INCOMPLETE", () => {
   test.each([
     ["log", (ws: string) => [transparencyLogPath(ws)]],
     ["seal", (ws: string) => [transparencySealPath(ws), transparencySealSigPath(ws)]]
-  ])("a missing transparency %s reads INCOMPLETE, never PASS, and verify all writes no new one", async (_what, files) => {
+  ])("a missing transparency %s fails (the ledger records WITNESSING_ENABLED), never PASS, and verify all writes no new one", async (_what, files) => {
     const ws = fresh();
     for (const file of files(ws)) rmSync(file);
     for (let i = 0; i < 2; i++) {
       const report = await run(ws);
-      expect(report.status).toBe("INCOMPLETE");
-      expect(report.skippedCritical).toEqual(["passport-policy-signature", "transparency-log", "transparency-merkle", "a4-projects"]);
+      expect(report.status).toBe("FAIL");
+      expect(report.checks.find((check) => check.id === "transparency-log")?.details.join(" ")).toContain("WITNESSING_ENABLED");
+      expect(report.skippedCritical).toEqual(["passport-policy-signature", "transparency-merkle", "a4-projects"]);
       for (const file of files(ws)) expect(existsSync(file)).toBe(false);
     }
   });

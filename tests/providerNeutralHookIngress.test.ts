@@ -31,7 +31,8 @@ const roots: string[] = [];
 function newWorkspace(): string {
   const workspace = mkdtempSync(join(tmpdir(), "amc-hook-ingress-"));
   roots.push(workspace);
-  initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+  // witnessing: false: this suite counts the ledger rows it writes from an empty ledger, without the creation marker.
+  initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated", witnessing: false });
   return workspace;
 }
 
