@@ -41,7 +41,8 @@ interface Region { readonly type: string; readonly start: number; readonly end: 
  * src/dataflow/detectors.ts), and a table match in the text read as the
  * walk reads a member name (`foldedView`: NFKC, look-alike letters, ignorable characters removed) where that reading
  * changed it, so `аpi_key=` with a Cyrillic а or a fullwidth `ａｐｉ＿ｋｅｙ` is redacted too. Text whose folded reading
- * would pass its length limit (`foldLimit`: megabytes of U+FDFA) cannot be read that way and is replaced whole.
+ * would pass its length limit (`foldLimit`: megabytes of U+FDFA) cannot be read that way and is replaced whole. No table
+ * entry matches the empty string (tests/secretRedaction.test.ts), so every folded match has a last character.
  */
 function foldedRegions(text: string): Region[] {
   const regions: Region[] = [...markupSecretSpans(text).map(span => ({ type: "secret_field", start: span.start, end: span.end })),
@@ -54,7 +55,6 @@ function foldedRegions(text: string): Region[] {
   if (folded === undefined) return regions;
   for (const entry of SECRET_PATTERNS) {
     for (const match of folded.view.matchAll(globalise(entry.pattern))) {
-      if (match[0].length === 0) continue;
       const start = folded.from[match.index]!, last = folded.from[match.index + match[0].length - 1]!;
       const end = last + (text.codePointAt(last)! > 0xffff ? 2 : 1);
       if (text.slice(start, end) !== match[0]) regions.push({ type: entry.type, start, end });

@@ -6,6 +6,7 @@ import { Readable } from "node:stream";
 import { afterEach, describe, expect, test } from "vitest";
 import { handleApiRoute } from "../src/api/index.js";
 import { handleIncidentRoute } from "../src/api/incidentRouter.js";
+import { listDomainIds } from "../src/domains/domainRegistry.js";
 import { initWorkspace } from "../src/workspace.js";
 
 interface MockResponseState {
@@ -57,11 +58,12 @@ async function callIncidentRoute(
   method: string,
   pathname: string,
   url: string,
-  body?: unknown
+  body?: unknown,
+  principal?: string
 ): Promise<{ handled: boolean; state: MockResponseState; json: any }> {
   const req = mockReq(method, url, body);
   const { res, state } = mockRes();
-  const handled = await handleIncidentRoute(pathname, method, req, res);
+  const handled = await handleIncidentRoute(pathname, method, req, res, process.cwd(), principal);
   return {
     handled,
     state,
@@ -205,5 +207,82 @@ describe("incident API routes", () => {
     expect(handled).toBe(true);
     // Incident router is now wired — should return 200 with incidents list
     expect(state.statusCode).toBe(200);
+  });
+});
+
+describe("incident API routes refuse bad requests before writing", () => {
+  async function createdIncident(): Promise<string> {
+    const created = await callIncidentRoute("POST", "/api/v1/incidents", "/api/v1/incidents", { agentId: "agent-api", title: "probe" });
+    expect(created.state.statusCode).toBe(201);
+    return created.json.data.incidentId as string;
+  }
+
+  test("leaves other paths and methods to the next router", async () => {
+    process.chdir(newWorkspace());
+    expect((await callIncidentRoute("GET", "/api/v1/watch", "/api/v1/watch")).handled).toBe(false);
+    const id = await createdIncident();
+    expect((await callIncidentRoute("DELETE", `/api/v1/incidents/${id}`, `/api/v1/incidents/${id}`)).handled).toBe(false);
+    // A clock action under the wrong method is not a clock route, and not an incident id either.
+    expect((await callIncidentRoute("GET", `/api/v1/incidents/${id}/oversight`, `/api/v1/incidents/${id}/oversight`)).handled).toBe(false);
+  });
+
+  test("answers 400 to an incident without a title and 404 to an unknown incident", async () => {
+    process.chdir(newWorkspace());
+    const untitled = await callIncidentRoute("POST", "/api/v1/incidents", "/api/v1/incidents", { agentId: "agent-api" });
+    expect(untitled.state.statusCode).toBe(400);
+    expect(untitled.json.error).toContain("title required");
+    for (const [method, action] of [["GET", ""], ["PATCH", ""], ["GET", "/clocks"], ["POST", "/clock-events"], ["POST", "/oversight"]] as const) {
+      const path = `/api/v1/incidents/incident_missing${action}`;
+      const out = await callIncidentRoute(method, path, path, {}, "reviewer-a");
+      expect(out.state.statusCode, `${method} ${path}`).toBe(404);
+    }
+  });
+
+  test("lists with a malformed limit as with the default", async () => {
+    process.chdir(newWorkspace());
+    await createdIncident();
+    for (const limit of ["abc", "-1", "0"]) {
+      const out = await callIncidentRoute("GET", "/api/v1/incidents", `/api/v1/incidents?agent=agent-api&limit=${limit}`);
+      expect(out.state.statusCode, limit).toBe(200);
+      expect(out.json.data.count, limit).toBe(1);
+      expect(out.json.data.unsigned).toEqual({ count: 0, incidents: [], pinnedPastLimit: 0, rejected: 0, unreadable: false });
+      expect(out.json.data.warnings, limit).toBeUndefined();
+    }
+  });
+
+  test("answers 400 to a bad station, timestamp or clock event, and records nothing", async () => {
+    process.chdir(newWorkspace());
+    const id = await createdIncident();
+    const station = listDomainIds()[0]!;
+    const clocks = `/api/v1/incidents/${id}/clocks`, events = `/api/v1/incidents/${id}/clock-events`;
+    for (const url of [`${clocks}?station=nowhere`, `${clocks}?station=${station}&now=yesterday`]) {
+      const out = await callIncidentRoute("GET", clocks, url);
+      expect(out.state.statusCode, url).toBe(400);
+    }
+    for (const body of [{ station: "nowhere", trigger: "t" }, { station, trigger: "t", notified: "c" }, { station },
+      { station, trigger: "t", at: "2026-03-02 10:00" }]) {
+      const out = await callIncidentRoute("POST", events, events, body);
+      expect(out.state.statusCode, JSON.stringify(body)).toBe(400);
+    }
+    const listed = await callIncidentRoute("GET", clocks, `${clocks}?station=${station}&now=2026-03-02T10:00:00Z`);
+    expect(listed.state.statusCode).toBe(200);
+    expect(JSON.stringify(listed.json.data)).not.toContain('"kind":"TRIGGER"');
+  });
+
+  test("takes an oversight reviewer only from the authenticated caller", async () => {
+    process.chdir(newWorkspace());
+    const id = await createdIncident();
+    const path = `/api/v1/incidents/${id}/oversight`;
+    const anonymous = await callIncidentRoute("POST", path, path, { decision: "approve" });
+    expect(anonymous.state.statusCode).toBe(403);
+    expect(anonymous.json.error).toContain("authenticated reviewer");
+    const impersonated = await callIncidentRoute("POST", path, path, { reviewerId: "reviewer-b", decision: "approve" }, "reviewer-a");
+    expect(impersonated.state.statusCode).toBe(403);
+    expect(impersonated.json.error).toContain("reviewerId must be the authenticated caller");
+    for (const clockIds of ["clock-1", [1]]) {
+      const out = await callIncidentRoute("POST", path, path, { decision: "approve", clockIds }, "reviewer-a");
+      expect(out.state.statusCode, JSON.stringify(clockIds)).toBe(400);
+      expect(out.json.error).toContain("clockIds must be an array");
+    }
   });
 });

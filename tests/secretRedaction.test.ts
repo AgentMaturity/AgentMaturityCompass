@@ -144,6 +144,21 @@ describe("the table cannot carry stateful flags", () => {
     expect(stateful.map((p) => p.type)).toEqual([]);
   });
 
+  it("has no entry that can match zero characters anywhere", () => {
+    // redactSecrets maps each folded match's last character back to the original text, so it relies on this.
+    // Scan text around each entry's own trigger words too: a lookaround-only entry matches empty mid-text.
+    const samples = ["", "x", " ", "key=", "api_key=", "password = ", "token: ", "Authorization: Basic ", "Bearer ", "-----BEGIN ",
+      "<password>", "<input name=\"password\" value=\"", ...SECRET_PATTERNS.map((p) => p.type + "=")];
+    const zeroWidth = SECRET_PATTERNS.filter((p) => samples.some((text) => {
+      const re = new RegExp(p.pattern.source, p.pattern.flags.includes("g") ? p.pattern.flags : p.pattern.flags + "g");
+      for (const match of text.matchAll(re)) if (match[0].length === 0) return true;
+      return false;
+    }));
+    expect(zeroWidth.map((p) => p.type)).toEqual([]);
+    // The scan itself sees a zero-width entry.
+    expect([...":".matchAll(/(?<=:)\w*/g)].some((match) => match[0].length === 0)).toBe(true);
+  });
+
   it("matches the same input twice in a row", () => {
     // The empirical half: a sticky regex would pass the first call and fail the
     // second.
